@@ -4,6 +4,7 @@ require("app.utils.DataUtils")
 require("app.service.NetManager")
 require("app.service.DataManager")
 local BuildingRegister = import("app.entity.BuildingRegister")
+local Flag = import("app.entity.Flag")
 local promise = import("app.utils.promise")
 local GameDefautlt = import("app.utils.GameDefautlt")
 local ChatManager = import("app.entity.ChatManager")
@@ -11,6 +12,10 @@ local Timer = import('.utils.Timer')
 
 _ = function(...) return ... end
 local MyApp = class("MyApp")
+function MyApp:GetAudioManager()
+    return {PlayeEffectSoundWithKey = function ( ... )
+    end}
+end
 
 function MyApp:ctor()
     NetManager:init()
@@ -57,19 +62,12 @@ local function setRun()
     running = true
 end
 local function JoinAlliance()
-    NetManager:getFetchCanDirectJoinAlliancesPromise():done(function(response)
-        if not response.msg or not response.msg.allianceDatas then return end
-        local id
-        if response.msg.allianceDatas then
-            id = response.msg.allianceDatas[math.random(#response.msg.allianceDatas)].id
-        end
-        local p = app:JoinAlliance(id)
-        if p then
-            p:always(setRun)
-        else
-            setRun()
-        end
-    end)
+    local p = app:JoinAlliance()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
 end
 local function getQuitAlliancePromise()
     local p = app:getQuitAlliancePromise()
@@ -135,6 +133,23 @@ local function DailyQuests()
         setRun()
     end
 end
+local function SetPlayerIcon()
+    local p = app:SetPlayerIcon()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function Fight()
+    local p = app:Fight()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+
 local function idle()
     setRun()
 end
@@ -145,10 +160,12 @@ func_map = {
     BuildRandomHouse,
     UnlockBuilding,
     Recommend,
-    SwitchBuilding,
+    -- SwitchBuilding,
     -- TreatSoldiers,
--- SetCityTerrain,
-    DailyQuests
+    -- SetCityTerrain,
+    SetPlayerIcon,
+    -- DailyQuests,
+    Fight,
 }
 api_index = 1
 function MyApp:RunAI()
@@ -175,10 +192,31 @@ local house_type = {
     "miner",
     "miner",
 }
-function MyApp:JoinAlliance(id)
-    if not id then return end
+function MyApp:CreateAlliance()
     if Alliance_Manager:GetMyAlliance():IsDefault() then
-        return NetManager:getJoinAllianceDirectlyPromise(id)
+        local name , tag =DataUtils:randomAllianceNameTag()
+        local random = math.random(3)
+        local tmp = {"desert","iceField","grassLand"}
+        local terrian = tmp[random]
+        return NetManager:getCreateAlliancePromise(name,tag,"all",terrian,Flag:RandomFlag():EncodeToJson())
+    end
+end
+function MyApp:JoinAlliance(id)
+    if Alliance_Manager:GetMyAlliance():IsDefault() then
+        if id then
+            return NetManager:getJoinAllianceDirectlyPromise(id)
+        else
+            local find_id
+            NetManager:getFetchCanDirectJoinAlliancesPromise():done(function(response)
+                if not response.msg or not response.msg.allianceDatas then return end
+                if response.msg.allianceDatas then
+                    find_id = response.msg.allianceDatas[math.random(#response.msg.allianceDatas)].id
+                end
+            end)
+            if find_id then
+                return self:JoinAlliance(find_id)
+            end
+        end
     end
 end
 function MyApp:getQuitAlliancePromise()
@@ -250,6 +288,30 @@ function MyApp:SetCityTerrain()
         return NetManager:getChangeToDesertPromise()
     else
         return NetManager:getChangeToIceFieldPromise()
+    end
+end
+
+-- 设置头像
+function MyApp:SetPlayerIcon()
+    local icon_key = math.random(11)
+    local can_set = false
+    -- 前六个默认解锁
+    if icon_key < 7 then
+        can_set = true
+    end
+    if icon_key == 7 then -- 刺客
+        can_set = User:Kill() >= 1000000
+    elseif icon_key == 8 then -- 将军
+        can_set = User:Power() >= 1000000
+    elseif icon_key == 9 then -- 术士
+        can_set = User:GetVipLevel() == 10
+    elseif icon_key == 10 then -- 贵妇
+        can_set = City:GetFirstBuildingByType("keep"):GetLevel() >= 40
+    elseif icon_key == 11 then -- 旧神
+        can_set = User:GetPVEDatabase():GetMapByIndex(3):IsComplete()
+    end
+    if can_set then
+        return NetManager:getSetPlayerIconPromise(icon_key)
     end
 end
 
@@ -356,7 +418,7 @@ function MyApp:DailyQuests()
             print("任务已经完成,领取奖励")
             return NetManager:getDailyQeustRewardPromise(started_quest.id)
         else
-        -- TODO 加速任务
+            -- TODO 加速任务
             return
         end
     end
@@ -379,7 +441,70 @@ function MyApp:DailyQuests()
         return NetManager:getStartDailyQuestPromise(to_start_quest.id)
     end
 end
-
+-- 加入或创建一个联盟
+function MyApp:CreateOrJoinAlliance()
+    -- 没有联盟
+    if Alliance_Manager:GetMyAlliance():IsDefault() then
+        -- 随机加入一个联盟或者创建一个联盟
+        local createOrJoin = math.random(2)
+        if createOrJoin == 1 then
+            print("加入一个联盟")
+            return self:JoinAlliance()
+        else
+            print("创建一个联盟")
+            return self:CreateAlliance()
+        end
+    end
+end
+-- 孵化龙
+function MyApp:HatchDragon()
+    local dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
+    -- 没有已孵化的龙
+    if dragon_manager:NoDragonHated() then
+        local hate_dragon_type = {"redDragon","blueDragon","greenDragon"}
+        local dragon_type = hate_dragon_type[math.random(3)]
+        print("没有已孵化的龙 孵化第一条龙",dragon_type)
+        return NetManager:getHatchDragonPromise(dragon_type)
+    end
+    for __,dragon in pairs(dragon_manager:GetDragons()) do
+        if not dragon:Ishated() then
+            local dragonEvent = dragon_manager:GetDragonEventByDragonType(dragon:Type())
+            if dragonEvent then
+                -- TODO 加速孵化
+                print("TODO 加速孵化")
+                return promise.new()
+            else
+                print(" 孵化更多龙",dragon:Type())
+                return NetManager:getHatchDragonPromise(dragon:Type())
+            end
+        end
+    end
+end
+-- 招募普通士兵
+function MyApp:RecruitNormalSoldier()
+    -- 兵营是否已解锁
+    if self:IsBuildingUnLocked(5) then
+        local barracks = City:GetFirstBuildingByType("barracks")
+        local unlock_soldiers = {}
+    local level = barracks:GetLevel()
+    
+        for k,v in pairs(barracks:GetUnlockSoldiers()) do
+            if v <= level then
+                table.insert(unlock_soldiers, k)
+            end
+        end
+        dump(unlock_soldiers)
+        local soldier_type = unlock_soldiers[math.random(#unlock_soldiers)]
+        print("立即招募普通士兵",soldier_type)
+        return NetManager:getInstantRecruitNormalSoldierPromise(soldier_type, 10)
+    end
+end
+-- 战斗
+function MyApp:Fight()
+    self:CreateOrJoinAlliance()
+    self:HatchDragon()
+    return self:RecruitNormalSoldier()
+end
 
 -- 辅助方法
 
@@ -391,31 +516,6 @@ function MyApp:IsBuildingUnLocked(location_id)
     return City:IsUnLockedAtIndex(b_x,b_y)
 end
 return MyApp
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
