@@ -24,7 +24,7 @@ function GameUIWriteMail:ctor(send_type,contacts)
         {
             text = contacts and _("收件人")..":      "..contacts.name,
             size = 20,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER,58, r_size.height-70)
         :addTo(write_mail)
     -- 主题
@@ -33,7 +33,7 @@ function GameUIWriteMail:ctor(send_type,contacts)
             text = _("主题："),
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.RIGHT_CENTER,120, r_size.height-120)
         :addTo(write_mail)
 
@@ -61,7 +61,7 @@ function GameUIWriteMail:ctor(send_type,contacts)
             font = UIKit:getFontFilePath(),
             size = 20,
             dimensions = cc.size(410,24),
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER,58,r_size.height-180)
         :addTo(write_mail)
     -- 回复的邮件内容

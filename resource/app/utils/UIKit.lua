@@ -496,15 +496,15 @@ function UIKit:createLineItem(params)
         {
             text = params.text_1,
             size = 20,
-            color = 0x797154
-        }):align(display.LEFT_BOTTOM, 0, 0)
+            color = 0x615b44
+        }):align(display.LEFT_BOTTOM, 0, 4)
         :addTo(line)
     local value_label = self:ttfLabel(
         {
             text = params.text_2,
             size = 22,
             color = 0x403c2f
-        }):align(display.RIGHT_BOTTOM, line_size.width, 0)
+        }):align(display.RIGHT_BOTTOM, line_size.width, 4)
         :addTo(line)
 
     function line:SetValue(value)
@@ -670,46 +670,36 @@ function UIKit:getIapPackageName(productId)
     return Localize.iap_package_name[productId]
 end
 
-function UIKit:addTipsToNode( node,tips )
+function UIKit:addTipsToNode( node,tips , include_node)
     node:setTouchEnabled(true)
+    node:setTouchSwallowEnabled(false)
     node:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
         if event.name == "began" then
+            local world_postion = node:getParent():convertToWorldSpace(cc.p(node:getPosition()))
             local tips_bg = display.newScale9Sprite("back_ground_240x73.png",0,0,cc.size(240,73),cc.rect(10,10,220,53))
-                :addTo(node):align(display.CENTER)
+                :addTo(include_node):align(display.BOTTOM_CENTER)
             tips_bg:setTag(100)
             local text_1 = UIKit:ttfLabel({text = tips,size = 20 ,color = 0xfff2b3})
                 :addTo(tips_bg)
-            text_1:setGlobalZOrder(100)
             tips_bg:size(text_1:getContentSize().width+20,text_1:getContentSize().height+40)
             local t_size = tips_bg:getContentSize()
             text_1:align(display.CENTER, t_size.width/2, t_size.height/2)
-            tips_bg:setGlobalZOrder(100)
-
-            local world_postion = node:getParent():convertToWorldSpace(cc.p(node:getPosition()))
-            local tip_x = 0
-            if world_postion.x < display.cx then
-                tip_x = t_size.width/2
-            else
-                tip_x = node:getContentSize().width -t_size.width/2
-            end
-            tips_bg:setPosition(tip_x, node:getContentSize().height + t_size.height/2)
+            tips_bg:zorder(999999)
+            local node_postioon = include_node:convertToNodeSpace(world_postion) 
+            tips_bg:setPosition(node_postioon.x, node_postioon.y + node:getContentSize().height/2)
         elseif event.name == "ended" then
-            if node:getChildByTag(100) then
-                node:removeChildByTag(100, true)
+            if include_node:getChildByTag(100) then
+                include_node:removeChildByTag(100, true)
             end
         elseif event.name == "moved" then
             local rect = node:convertToNodeSpace(cc.p(event.x,event.y))
             local box = node:getContentSize()
             if box.width < rect.x or rect.x < 0 or box.height < rect.y or rect.y < 0 then
-                if node:getChildByTag(100) then
-                    node:removeChildByTag(100, true)
+                if include_node:getChildByTag(100) then
+                    include_node:removeChildByTag(100, true)
                 end
             end
         end
         return true
     end)
 end
-
-
-
-

@@ -19,9 +19,9 @@ local building_map_tech = {
 }
 
 local GameUIMilitaryTechBuilding = UIKit:createUIClass('GameUIMilitaryTechBuilding',"GameUIUpgradeBuilding")
-function GameUIMilitaryTechBuilding:ctor(city,building)
+function GameUIMilitaryTechBuilding:ctor(city,building,default_tab)
     local bn = Localize.building_name
-    GameUIMilitaryTechBuilding.super.ctor(self,city,bn[building:GetType()],building)
+    GameUIMilitaryTechBuilding.super.ctor(self,city,bn[building:GetType()],building,default_tab)
 end
 
 function GameUIMilitaryTechBuilding:OnMoveInStage()
@@ -89,12 +89,12 @@ function GameUIMilitaryTechBuilding:InitTech()
 
     -- 科技点数
     local tech_point_bg = display.newSprite("back_ground_548x52.png"):addTo(self.tech_layer):align(display.CENTER, window.cx, window.top-244)
-    display.newSprite("icon_teac.png"):addTo(tech_point_bg):align(display.CENTER,40,tech_point_bg:getContentSize().height/2)
+    display.newSprite("bottom_icon_package_77x67.png"):addTo(tech_point_bg):align(display.CENTER,30,tech_point_bg:getContentSize().height/2):scale(0.5)
     UIKit:ttfLabel({
         text = building_map_tech[self.building:GetType()],
         size = 20,
-        color = 0x797154,
-    }):align(display.LEFT_CENTER, 70 , tech_point_bg:getContentSize().height/2)
+        color = 0x615b44,
+    }):align(display.LEFT_CENTER, 50 , tech_point_bg:getContentSize().height/2)
         :addTo(tech_point_bg)
 
     -- 科技点数

@@ -2,7 +2,7 @@ local Sprite = import(".Sprite")
 local SingleTreeSprite = class("SingleTreeSprite", Sprite)
 
 function SingleTreeSprite:ctor(city_layer, x, y)
-    self.png_index = math.random(4)
+    self.png_index = math.random(2)
     self.x, self.y = x, y
     local ax, ay = city_layer:GetLogicMap():ConvertToMapPosition(x, y)
     SingleTreeSprite.super.ctor(self, city_layer, nil, ax, ay)

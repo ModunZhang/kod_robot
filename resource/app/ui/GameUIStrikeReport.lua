@@ -17,10 +17,9 @@ end
 function GameUIStrikeReport:GetReportLevel()
     local report = self.report
     local level = report:GetStrikeLevel()
-    local report_level = level==1 and _("没有得到任何情报") or _("得到一封%s级的情报")
+    local report_level = level == 1 and _("没有得到任何情报") or _("得到一封%s级的情报")
     local level_map ={
         "",
-        "D",
         "C",
         "B",
         "A",
@@ -56,7 +55,7 @@ function GameUIStrikeReport:onEnter()
     self.body = report_body
 
     local rb_size = report_body:getContentSize()
-    local title = display.newSprite("title_blue_600x52.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
+    local title = display.newSprite("title_blue_600x56.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
         :addTo(report_body)
 
 
@@ -66,7 +65,6 @@ function GameUIStrikeReport:onEnter()
             text = report:GetReportTitle(),
             font = UIKit:getFontFilePath(),
             size = 22,
-            -- dimensions = cc.size(200,0),
             color = UIKit:hex2c3b(0xffedae)
         }):align(display.CENTER, title:getContentSize().width/2, title:getContentSize().height/2)
         :addTo(title)
@@ -97,7 +95,6 @@ function GameUIStrikeReport:onEnter()
             text = self:GetReportLevel(),
             font = UIKit:getFontFilePath(),
             size = 18,
-            -- dimensions = cc.size(200,0),
             color = UIKit:hex2c3b(0xffedae)
         }):align(display.CENTER, strike_result_image:getContentSize().width/2, 15)
         :addTo(strike_result_image)
@@ -107,8 +104,7 @@ function GameUIStrikeReport:onEnter()
             text = self:GetBattleCityName(),
             font = UIKit:getFontFilePath(),
             size = 18,
-            -- dimensions = cc.size(200,0),
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER, 20, rb_size.height-170)
         :addTo(report_body)
     local strike_result_label = cc.ui.UILabel.new(
@@ -117,13 +113,11 @@ function GameUIStrikeReport:onEnter()
             text = GameUtils:formatTimeStyle2(math.floor(report:CreateTime()/1000)),
             font = UIKit:getFontFilePath(),
             size = 18,
-            -- dimensions = cc.size(200,0),
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER, 20, rb_size.height-200)
         :addTo(report_body)
     -- 突袭战报详细内容展示
     self.details_view = UIListView.new{
-        -- bgColor = UIKit:hex2c4b(0x7a000000),
         viewRect = cc.rect(0, 70, 588, 505),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }:addTo(report_body):pos(10, 5)
@@ -278,8 +272,6 @@ function GameUIStrikeReport:CreateWarStatisticsPart()
     self:CreateBelligerents(l_player,r_player)
     local l_dragon = l_player.dragon
     local r_dragon = r_player.dragon
-    -- LuaUtils:outputTable("l_dragon", l_dragon)
-    -- LuaUtils:outputTable("r_dragon", r_dragon)
     self:CreateArmyGroup(l_dragon,r_dragon)
 end
 
@@ -310,7 +302,7 @@ function GameUIStrikeReport:CreateBelligerentsItem(height,player,isSelf)
 
     -- 玩家头像
     UIKit:GetPlayerCommonIcon(player.icon):addTo(player_item,1):align(display.CENTER, 50, height/2):setScale(0.7)
-    
+
     -- 玩家名称
     UIKit:ttfLabel({
         text = player.name or Localize.village_name[player.type] ,
@@ -426,14 +418,15 @@ function GameUIStrikeReport:CreateReportOfEnemy()
         -- 驻防部队
         self:CreateGarrison()
     end
-    -- 敌方军事水平
-    -- 暂无
-    -- self:CreateEnemyTechnology()
     if report_level>3 then
         -- 敌方龙的装备
         self:CreateDragonEquipments()
         -- 敌方龙的技能
         self:CreateDragonSkills()
+    end
+    -- 敌方军事水平
+    if report_level > 4 then
+        self:CreateEnemyTechnology()
     end
 end
 function GameUIStrikeReport:CreateEnemyResource()
@@ -473,11 +466,11 @@ function GameUIStrikeReport:CreateEnemyResource()
         local r_value = self.report:GetStrikeLevel() < 3 and self:GetProbableNum(r_parms.value) or r_parms.value
         cc.ui.UILabel.new({
             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-            text = r_value,
+            text = self.report:GetStrikeLevel() < 3 and r_value or GameUtils:formatNumber(r_value),
             font = UIKit:getFontFilePath(),
             size = 20,
             color = UIKit:hex2c3b(0x403c2f)
-        }):align(display.RIGHT_CENTER,group_width-30,18):addTo(r_item_bg)
+        }):align(display.RIGHT_CENTER,group_width-10,18):addTo(r_item_bg)
 
         added_r_item_count = added_r_item_count + 1
         r_item_bg_color_flag = not r_item_bg_color_flag
@@ -507,35 +500,45 @@ function GameUIStrikeReport:CreateEnemyTechnology()
     local r_tip_height = 36
 
     -- 敌方科技列表部分高度
-    local r_count = #self:GetTextEnemyTechnology()
+    local militaryTechs = self.report:GetStrikeIntelligence().militaryTechs
+    local r_count = #militaryTechs
     local r_list_height = r_count * r_tip_height
 
     -- 敌方科技列表
-    local group = self:CreateBigBackGround(r_list_height+37,_("军事科技水平"))
-    local group_width , group_height = 552,r_list_height+50
+
+    local group_width , group_height = 548,r_list_height+34
+    local group = self:CreateSmallBackGround({width = group_width,height = group_height,title=_("军事科技水平"),isSelf=false})
 
     -- 构建所有科技标签项
     local r_item_bg_color_flag = true
     local added_r_item_count = 0
-    for k,r_parms in pairs(self:GetTextEnemyTechnology()) do
+    for i = #militaryTechs,1,-1 do
+        local r_parms = militaryTechs[i]
         local r_item_bg_image = r_item_bg_color_flag and "back_ground_546X36_1.png" or "back_ground_546X36_2.png"
         local r_item_bg = display.newSprite(r_item_bg_image)
             :align(display.TOP_CENTER, group_width/2, r_list_height-r_tip_height*added_r_item_count+4)
             :addTo(group)
+        local soldiers = string.split(r_parms.name, "_")
+        local tech_name
+        if soldiers[2] == "hpAdd" then
+            tech_name = string.format(_("%s血量增加"),Localize.soldier_category[soldiers[1]])
+        else
+            tech_name = string.format(_("%s对%s攻击"),Localize.soldier_category[soldiers[1]],Localize.soldier_category[soldiers[2]])
+        end
         cc.ui.UILabel.new({
             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-            text = r_parms.tech_type,
+            text = tech_name ,
             font = UIKit:getFontFilePath(),
             size = 20,
             color = UIKit:hex2c3b(0x403c2f)
         }):align(display.LEFT_CENTER,10,18):addTo(r_item_bg)
         cc.ui.UILabel.new({
             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-            text = r_parms.value,
+            text = "LV "..r_parms.level,
             font = UIKit:getFontFilePath(),
             size = 20,
             color = UIKit:hex2c3b(0x403c2f)
-        }):align(display.RIGHT_CENTER,group_width-30,18):addTo(r_item_bg)
+        }):align(display.RIGHT_CENTER,group_width-10,18):addTo(r_item_bg)
 
         added_r_item_count = added_r_item_count + 1
         r_item_bg_color_flag = not r_item_bg_color_flag
@@ -621,7 +624,6 @@ function GameUIStrikeReport:CreateDragonSkills()
     self.details_view:addItem(item)
 end
 function GameUIStrikeReport:CreateGarrison()
-    -- local soldiers = self.report[self.report:Type()].enemyPlayerData.soldiers
     local soldiers = self.report:GetStrikeIntelligence().soldiers
 
     local r_tip_height = 36
@@ -687,7 +689,6 @@ end
 function GameUIStrikeReport:CreateDragonEquipments()
     local dragon = self.report:GetStrikeIntelligence().dragon
 
-    -- local dragon = self.report:GetData().enemyPlayerData.dragon
     local equipments = dragon and dragon.equipments
 
     local r_tip_height = 36
@@ -710,7 +711,7 @@ function GameUIStrikeReport:CreateDragonEquipments()
                 :addTo(group)
             cc.ui.UILabel.new({
                 UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-                text = Localize.body[r_parms.type],
+                text = Localize.equip[r_parms.name],
                 font = UIKit:getFontFilePath(),
                 size = 20,
                 color = UIKit:hex2c3b(0x403c2f)
@@ -736,31 +737,7 @@ function GameUIStrikeReport:CreateDragonEquipments()
     item:addContent(group)
     self.details_view:addItem(item)
 end
-function GameUIStrikeReport:GetDragonEquipments()
-    return {
-        {
-            equipments_name = _("头部装备名"),
-            equipments_level = 1,
-        },
-        {
-            equipments_name = _("胸部装备名"),
-            equipments_level = 2,
-        },
-        {
-            equipments_name = _("尾部装备名"),
-            equipments_level = 3,
-        },
-        {
-            equipments_name = _("手部装备名"),
-            equipments_level = 4,
-        },
-        {
-            equipments_name = _("法球装备名"),
-            equipments_level = 5,
-        },
 
-    }
-end
 -- 创建 宽度为258的 UI框
 function GameUIStrikeReport:CreateSmallBackGround(params)
     local widht = params.width or 258
@@ -777,39 +754,6 @@ function GameUIStrikeReport:CreateSmallBackGround(params)
         }):align(display.CENTER,t_bg:getContentSize().width/2, 17):addTo(t_bg)
     end
 
-    return r_bg
-end
--- 创建 宽度为552的 UI框
-function GameUIStrikeReport:CreateBigBackGround(height,title)
-    local r_bg = display.newNode()
-    r_bg:setContentSize(cc.size(552,height))
-    -- 上中下三段的图片高度
-    local u_height,m_height,b_height = 12 , 1 , 10
-    -- title bg
-    local t_bg = display.newSprite("report_title_546X30.png"):align(display.CENTER_TOP, 276, height-3):addTo(r_bg,2)
-    cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = title ,
-        font = UIKit:getFontFilePath(),
-        size = 20,
-        color = UIKit:hex2c3b(0xffedae)
-    }):align(display.CENTER,t_bg:getContentSize().width/2, 15):addTo(t_bg)
-    --top
-    display.newSprite("back_ground_552X12_top.png"):align(display.LEFT_TOP, 0, height):addTo(r_bg)
-    --bottom
-    display.newSprite("back_ground_552X10_bottom.png"):align(display.LEFT_BOTTOM, 0, 0):addTo(r_bg)
-
-    --center
-    local need_filled_height = height-(u_height+b_height) --中间部分需要填充的高度
-    local center_y = b_height -- 中间部分起始 y 坐标
-    local  next_y = b_height
-    -- 需要填充的剩余高度大于中间部分图片原始高度时，直接复制即可
-    while need_filled_height>=m_height do
-        display.newSprite("back_ground_552X1_mid.png"):align(display.LEFT_BOTTOM, 0, next_y):addTo(r_bg)
-        need_filled_height = need_filled_height - m_height
-        -- copy_count = copy_count + 1
-        next_y = next_y+m_height
-    end
     return r_bg
 end
 
@@ -856,6 +800,7 @@ function GameUIStrikeReport:GetProbableNum(num)
 end
 
 return GameUIStrikeReport
+
 
 
 

@@ -17,7 +17,7 @@ function GameUISettingContactUs:BuildUI()
 	local shadowLayer = UIKit:shadowLayer():addTo(self)
 	local bg = WidgetUIBackGround.new({height=762}):addTo(shadowLayer)
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
-	local titleBar = display.newSprite("title_blue_600x52.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
+	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
 	   	:addTo(titleBar)
 	   	:align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
@@ -33,7 +33,7 @@ function GameUISettingContactUs:BuildUI()
 	UIKit:ttfLabel({
 		text = _("你将使用你的邮箱向我们发送一份邮件"),
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.CENTER_TOP,304, 735):addTo(bg)
 	self.list_view = UIListView.new{
         viewRect = cc.rect(26,50,556,650),

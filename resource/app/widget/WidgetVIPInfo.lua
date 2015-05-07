@@ -35,13 +35,13 @@ function WidgetVIPInfo:CreateInfoItem(info_message)
             UIKit:ttfLabel({
                 text = v[2],
                 size = 20,
-                color = 0x797154,
+                color = 0x403c2f,
             }):align(display.LEFT_CENTER, 10, item_height/2):addTo(content)
         elseif add_type == "edit" then
             local one = UIKit:ttfLabel({
                 text = v[2],
                 size = 20,
-                color = 0x797154,
+                color = 0x403c2f,
             }):align(display.LEFT_CENTER, 10, item_height/2):addTo(content)
             UIKit:ttfLabel({
                 text = v[3],

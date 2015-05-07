@@ -193,7 +193,7 @@ function GameUIPVESendTroop:SelectDragonPart()
     self.dragon_vitality = UIKit:ttfLabel({
         text = _("生命值")..dragon:Hp().."/"..dragon:GetMaxHP(),
         size = 20,
-        color = 0x797154,
+        color = 0x615b44,
     }):align(display.LEFT_CENTER,20,30)
         :addTo(box_bg)
 

@@ -227,7 +227,7 @@ function WidgetAllianceTop:CreateResourcesPageItem()
         {"res_coin_81x68.png", "coin_label"},
     }) do
         local x = -238 + (i-1) * 106
-        display.newSprite(v[1]):addTo(resource_btn):pos(x, 0):scale(0.25)
+        display.newSprite(v[1]):addTo(resource_btn):pos(x, 0):scale(0.3)
         self[v[2]] = UIKit:ttfLabel({text = "111",
             size = 18,
             color = 0xf3f0b6,

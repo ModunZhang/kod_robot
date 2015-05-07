@@ -205,18 +205,19 @@ function GameUIVip:InitVip()
 end
 
 function GameUIVip:InitAD()
-    local ad_clip_rect = display.newClippingRegionNode(cc.rect(window.cx-592/2,window.top_bottom-119,592,139)):addTo(self.vip_layer)
+    display.newSprite("box_617x147.png"):align(display.TOP_CENTER,window.cx,window.top_bottom+22):addTo(self.vip_layer)
+    local ad_clip_rect = display.newClippingRegionNode(cc.rect(window.cx-592/2,window.top_bottom-122,592,146)):addTo(self.vip_layer)
     self.ad_clip_rect = ad_clip_rect
     math.randomseed(tostring(os.time()):reverse():sub(1, 6))
 
     self.current_ad_index = math.random(1,#self:GetStoreData())
-    self.current_ad = self:CreateAD(self.current_ad_index):addTo(ad_clip_rect):align(display.LEFT_BOTTOM,window.cx-592/2,window.top_bottom-119)
+    self.current_ad = self:CreateAD(self.current_ad_index):addTo(ad_clip_rect):align(display.LEFT_BOTTOM,window.cx-592/2,window.top_bottom-122)
 
     self.ad_handle = scheduler.scheduleGlobal(handler(self, self.MoveAD), 10.0, false)
 end
 function GameUIVip:MoveAD()
     self.current_ad_index = self.current_ad_index==#self:GetStoreData() and 1 or (self.current_ad_index + 1)
-    local current_ad = self:CreateAD(self.current_ad_index):addTo(self.ad_clip_rect):align(display.LEFT_BOTTOM,window.cx-592/2+592,window.top_bottom-119)
+    local current_ad = self:CreateAD(self.current_ad_index):addTo(self.ad_clip_rect):align(display.LEFT_BOTTOM,window.cx-592/2+592,window.top_bottom-122)
     transition.moveTo(self.current_ad, {
         x = self.current_ad:getPositionX() -592, y = y, time = 1.0,
         onComplete = function()
@@ -596,7 +597,7 @@ function GameUIVip:CreateBackGroundWithTitle(title_string)
     local body = WidgetUIBackGround.new({height=643}):align(display.TOP_CENTER,display.cx,display.top-200)
     layer:addTouchAbleChild(body)
     local rb_size = body:getContentSize()
-    local title = display.newSprite("title_blue_600x52.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
+    local title = display.newSprite("title_blue_600x56.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
         :addTo(body)
     local title_label = cc.ui.UILabel.new(
         {
@@ -659,7 +660,7 @@ function GameUIVip:CreateVIPItem(params)
             text = params.second_label,
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER,140, 60)
         :addTo(body)
     local button_label_str,normal_img,pressed_img
@@ -775,11 +776,11 @@ function GameUIVip:OpenVIPDetails(show_vip_level)
                     -- 增加VIP点数按钮
                     local increase_vip_label = UIKit:ttfLabel({
                         text = _("增加VIP点数"),
-                        size = 20,
+                        size = 22,
                         color = 0xfff3c7})
                     increase_vip_label:enableShadow()
                     local btn = WidgetPushButton.new(
-                        {normal = "yellow_button_highlight_190x46.png", pressed = "yellow_button_190x46.png"},
+                        {normal = "yellow_btn_up_186x66.png", pressed = "yellow_btn_down_186x66.png"},
                         {scale9 = false}
                     ):setButtonLabel(increase_vip_label)
                         :addTo(body):align(display.CENTER, size.width/2, 80)
@@ -819,11 +820,11 @@ function GameUIVip:OpenVIPDetails(show_vip_level)
                     -- 激活VIP按钮
                     local active_vip_label = UIKit:ttfLabel({
                         text = _("激活VIP"),
-                        size = 20,
+                        size = 22,
                         color = 0xfff3c7})
                     active_vip_label:enableShadow()
                     local active_button = WidgetPushButton.new(
-                        {normal = "yellow_button_highlight_190x46.png", pressed = "yellow_button_190x46.png"},
+                        {normal = "yellow_btn_up_186x66.png", pressed = "yellow_btn_down_186x66.png"},
                         {scale9 = false},
                         {
                             disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }

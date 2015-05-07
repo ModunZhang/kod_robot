@@ -39,7 +39,7 @@ function WidgetBuyBuildingQueue:CreateBuyItem()
     UIKit:ttfLabel({
         text = "首冲￥99.99，永久赠送1条建筑队列",
         size = 20,
-        color = 0x797154,
+        color = 0x615b44,
         dimensions = cc.size(200,60)
     }):align(display.LEFT_TOP,140,70)
         :addTo(item)

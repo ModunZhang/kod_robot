@@ -70,13 +70,18 @@ UIKit = {
 }
 
 device = { getOpenUDID = function() return GlobalDeviceId end,
-platform = "mac" }
+    platform = "mac" }
 
 
 ext.gamecenter = {
-        isGameCenterEnabled = _,
-    }
-
+    isGameCenterEnabled = _,
+}
+ext.market_sdk = {
+    onPlayerBuyGameItems = function ( ... )
+    end,
+    onPlayerUseGameItems = function ( ... )
+    end
+}
 
 
 
@@ -90,7 +95,7 @@ cocos_promise.promiseFilterNetError = function(p) return p end
 require("app.ui.GameGlobalUIUtils")
 local GameGlobalUIUtils = GameGlobalUI
 
-function GameGlobalUIUtils:showTips() 
+function GameGlobalUIUtils:showTips()
 end
 
 
@@ -103,6 +108,7 @@ function Run()
         app:RunAI()
     end
 end
+
 
 
 

@@ -57,7 +57,7 @@ function GameUIHelp:onEnter()
     -- 帮助列表
     local list,list_node = UIKit:commonListView_1({
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
-        viewRect = cc.rect(0, 0,570,456),
+        viewRect = cc.rect(0, 0,547,456),
     })
     list_node:addTo(body):align(display.BOTTOM_CENTER, rb_size.width/2,90)
 

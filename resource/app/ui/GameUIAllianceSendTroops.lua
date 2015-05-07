@@ -192,6 +192,9 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                 elseif self.dragon:Hp()<1 then
                     UIKit:showMessageDialog(_("提示"),_("选择的龙已经死亡"))
                     return
+                elseif self.show:IsExceed() then
+                    UIKit:showMessageDialog(_("提示"),_("派出的部队超过了所选龙的带兵上限"))
+                    return
                 elseif #soldiers == 0 then
                     UIKit:showMessageDialog(_("提示"),_("请选择要派遣的部队"))
                     return
@@ -307,7 +310,7 @@ function GameUIAllianceSendTroops:SelectDragonPart()
     self.dragon_vitality = UIKit:ttfLabel({
         text = _("生命值")..dragon:Hp().."/"..dragon:GetMaxHP(),
         size = 20,
-        color = 0x797154,
+        color = 0x615b44,
     }):align(display.LEFT_CENTER,20,30)
         :addTo(box_bg)
 
@@ -330,6 +333,8 @@ function GameUIAllianceSendTroops:RefreashDragon(dragon)
     self.dragon_name:setString(_(dragon:Type()).."（LV "..dragon:Level().."）")
     self.dragon_vitality:setString(_("生命值")..dragon:Hp().."/"..dragon:GetMaxHP())
     self.dragon = dragon
+    print("RefreashDragon>>>>",dragon:Type())
+    self:RefreashSoldierShow()
 end
 
 function GameUIAllianceSendTroops:SelectDragon()
@@ -579,23 +584,44 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
 
     local function createInfoItem(title,value)
         local info = cc.Layer:create()
-        local value_label = UIKit:ttfLabel({
-            text = value,
-            size = 18,
-            color = 0xffedae,
-        })
-        value_label:align(display.BOTTOM_CENTER,value_label:getContentSize().width/2,0)
-            :addTo(info)
+        local split_str = string.split(value, "/")
+        local total_width
+        if #split_str > 1 then
+            local num_1 = tonumber(split_str[1])
+            local num_2 = tonumber(split_str[2])
+            local value_label_1 = UIKit:ttfLabel({
+                text = num_1,
+                size = 18,
+                color = num_1 > num_2 and 0x7e0000 or 0xffedae,
+            })
+            local value_label_2 = UIKit:ttfLabel({
+                text = "/"..num_2,
+                size = 18,
+                color = 0xffedae,
+            })
+            total_width = value_label_1:getContentSize().width + value_label_2:getContentSize().width
+            value_label_1:align(display.BOTTOM_LEFT,0,0)
+                :addTo(info)
+            value_label_2:align(display.BOTTOM_LEFT,value_label_1:getContentSize().width,0)
+                :addTo(info)
+            info:setContentSize(total_width, 45)
+        else
+            local value_label = UIKit:ttfLabel({
+                text = value,
+                size = 18,
+                color = 0xffedae,
+            })
+            value_label:align(display.BOTTOM_CENTER,value_label:getContentSize().width/2,0)
+                :addTo(info)
+            total_width = value_label:getContentSize().width
+            info:setContentSize(total_width, 45)
+        end
         UIKit:ttfLabel({
             text = title,
             size = 16,
             color = 0xbbae80,
-        }):align(display.BOTTOM_CENTER,value_label:getContentSize().width/2,20)
+        }):align(display.BOTTOM_CENTER,total_width/2,20)
             :addTo(info)
-        info:setContentSize(value_label:getContentSize().width, 45)
-        function info:SetValue(value)
-            value_label:setString(value)
-        end
         return info
     end
 
@@ -643,7 +669,11 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
         local citizen_item = createInfoItem(_("部队容量"),citizen.."/"..parent.dragon:LeadCitizen())
         citizen_item:align(display.CENTER,310-citizen_item:getContentSize().width/2,0)
             :addTo(info_bg)
+        self.exceed_lead = citizen > parent.dragon:LeadCitizen()
         return self
+    end
+    function TroopShow:IsExceed()
+        return self.exceed_lead
     end
     function TroopShow:SetWeight(weight)
         local weight_item = createInfoItem(_("负重"),string.formatnumberthousands(weight))
@@ -687,51 +717,34 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
         table.sort(soldiers, function(a, b)
             return a.power > b.power
         end)
-        local isRefresh = false
-        if self:GetSoldiers() then
-            if #self:GetSoldiers() ~= #soldiers then
-                isRefresh = true
-            else
-                for i,soldier in ipairs(self:GetSoldiers()) do
-                    if soldier.soldier_type ~= soldiers[i].soldier_type
-                        or soldier.power ~= soldiers[i].power then
-                        isRefresh = true
-                        break
-                    end
-                end
-            end
-        else
-            isRefresh = true
-        end
+
         -- 更新
         self:SetSoldiers(soldiers)
-        if isRefresh then
-            self:RemoveAllSoldierCrops()
-            local y  = 110
-            local x = 681
-            local total_power , total_weight, total_citizen =0,0,0
-            self.soldier_crops = {}
-            for index,v in pairs(soldiers) do
-                local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
-                if v.soldier_type ~= "catapult" and v.soldier_type ~= "ballista" and v.soldier_type ~= "meatWagon" then
-                    corp:PlayAnimation("idle_90")
-                else
-                    corp:PlayAnimation("move_90")
-                end
-                table.insert(self.soldier_crops,corp)
-                x = x - soldier_ani_width[v.soldier_type]
-
-                corp:pos(x,y)
-                total_power = total_power + v.power
-                total_weight = total_weight + v.soldier_weight
-                total_citizen = total_citizen + v.soldier_citizen
+        self:RemoveAllSoldierCrops()
+        local y  = 110
+        local x = 681
+        local total_power , total_weight, total_citizen =0,0,0
+        self.soldier_crops = {}
+        for index,v in pairs(soldiers) do
+            local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
+            if v.soldier_type ~= "catapult" and v.soldier_type ~= "ballista" and v.soldier_type ~= "meatWagon" then
+                corp:PlayAnimation("idle_90")
+            else
+                corp:PlayAnimation("move_90")
             end
-            self:RefreshScrollNode(x)
-            info_bg:removeAllChildren()
-            self:SetPower(total_power)
-            self:SetWeight(total_weight)
-            self:SetCitizen(total_citizen)
+            table.insert(self.soldier_crops,corp)
+            x = x - soldier_ani_width[v.soldier_type]
+
+            corp:pos(x,y)
+            total_power = total_power + v.power
+            total_weight = total_weight + v.soldier_weight
+            total_citizen = total_citizen + v.soldier_citizen
         end
+        self:RefreshScrollNode(x)
+        info_bg:removeAllChildren()
+        self:SetPower(total_power)
+        self:SetWeight(total_weight)
+        self:SetCitizen(total_citizen)
     end
 
     return TroopShow
@@ -753,6 +766,10 @@ function GameUIAllianceSendTroops:onExit()
 end
 
 return GameUIAllianceSendTroops
+
+
+
+
 
 
 

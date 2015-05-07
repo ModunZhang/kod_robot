@@ -17,9 +17,6 @@ end
 function WidgetPVEObelisk:GetDesc()
     return _('你发现一座用你从未见过的石头雕刻的石碑。你上前仔细观察一番, 石碑上突然闪现一个神秘的符文没入你的身体, 让你感觉身体中充满了力量。')
 end
-function WidgetPVEObelisk:SetUpButtons()
-    return { { label = _("离开") } }
-end
 
 return WidgetPVEObelisk
 

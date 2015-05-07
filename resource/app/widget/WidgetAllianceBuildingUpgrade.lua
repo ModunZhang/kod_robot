@@ -96,7 +96,7 @@ function WidgetAllianceBuildingUpgrade:InitBuildingIntroduces()
         font = UIKit:getFontFilePath(),
         size = 18,
         dimensions = cc.size(380, 90),
-        color = UIKit:hex2c3b(0x797154)
+        color = UIKit:hex2c3b(0x615b44)
     }):align(display.LEFT_CENTER,display.cx-110, display.top-190):addTo(self)
     self:SetBuildingIntroduces()
 end

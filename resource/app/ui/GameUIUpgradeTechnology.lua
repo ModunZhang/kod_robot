@@ -83,30 +83,38 @@ function GameUIUpgradeTechnology:GetLevelUpTimeStr()
 end
 
 function GameUIUpgradeTechnology:GetBuffEffectStr()
-    if self:CheckIsMeUpgrade() and not self:CheckMeIsReachLimitLevel() then
-        return self:GetProductionTechnology():GetNextLevelBuffEffectVal() * 100  .. "%"
-    end
     return self:GetProductionTechnology():GetBuffEffectVal() * 100  .. "%"
 end
 
+function GameUIUpgradeTechnology:GetPowerStr()
+    return self:GetProductionTechnology():GetCurrentLevelPower()
+end
+
 function GameUIUpgradeTechnology:GetNextLevelBuffEffectStr()
+    return self:GetProductionTechnology():GetNextLevelBuffEffectVal() * 100  .. "%"
+end
+
+function GameUIUpgradeTechnology:GetNextLevelPower()
     if self:CheckIsMeUpgrade() and not self:CheckMeIsReachLimitLevel() then
-        if self:GetProductionTechnology():GetNextNexLevelBuffEffectVal() then
-            return  self:GetProductionTechnology():GetNextNexLevelBuffEffectVal()  * 100  .. "%"
+        if self:GetProductionTechnology():GetNextLevelPower() > 0 then
+            return  self:GetProductionTechnology():GetNextLevelPower() 
         else
-            return ""
+            return 0
         end
     end
-    return self:GetProductionTechnology():GetNextLevelBuffEffectVal() * 100  .. "%"
+    return self:GetProductionTechnology():GetNextLevelPower() 
 end
 
 function GameUIUpgradeTechnology:RefreshUI()
     local tech = self:GetProductionTechnology()
     self.lv_label:setString(self:GetTechLevelStr())
     self.current_effect_val_label:setString(self:GetBuffEffectStr())
+    self.current_power_val_label:setString(self:GetPowerStr())
     if not tech:IsReachLimitLevel() then
         self.upgrade_info_icon:show()
         self.next_effect_val_label:setString(self:GetNextLevelBuffEffectStr())
+        self.upgrade_power_icon:show()
+        self.next_power_val_label:setString(self:GetNextLevelPower())
         self.time_label:setString(self:GetLevelUpTimeStr())
         self.need_gems_label:setString(self:GetUpgradeNowGems())
         self.buff_time_label:setString(self:GetLevelUpBuffTimeStr())
@@ -120,6 +128,8 @@ function GameUIUpgradeTechnology:RefreshUI()
         self.need_gems_label:hide()
         self.next_effect_val_label:hide()
         self.upgrade_info_icon:hide()
+        self.upgrade_power_icon:hide()
+        self.next_power_val_label:hide()
         self.buff_time_label:hide()
         self.need_gems_icon:hide()
         self.time_icon:hide()
@@ -128,6 +138,9 @@ function GameUIUpgradeTechnology:RefreshUI()
         if self.listView then
             self.listView:hide()
         end
+        local x = self.line_1:getPositionX() + self.line_1:getContentSize().width
+        self.current_effect_val_label:setPositionX(x)
+        self.current_power_val_label:setPositionX(x)
     end
 end
 
@@ -155,7 +168,7 @@ end
 function GameUIUpgradeTechnology:BuildUI()
     local bg_node =  WidgetUIBackGround.new({height = HEIGHT,isFrame = "no"}):align(display.TOP_CENTER, window.cx, window.top_bottom - 50)
     self:addTouchAbleChild(bg_node)
-    local title_bar = display.newSprite("title_blue_600x52.png"):align(display.BOTTOM_CENTER,304,HEIGHT - 15):addTo(bg_node)
+    local title_bar = display.newSprite("title_blue_600x56.png"):align(display.BOTTOM_CENTER,304,HEIGHT - 15):addTo(bg_node)
     UIKit:closeButton():align(display.RIGHT_BOTTOM,600, 0):addTo(title_bar):onButtonClicked(function()
         self:LeftButtonClicked()
     end)
@@ -179,28 +192,54 @@ function GameUIUpgradeTechnology:BuildUI()
     local line_1 = display.newScale9Sprite("dividing_line_594x2.png"):size(422,1)
         :align(display.LEFT_BOTTOM,line_2:getPositionX(), line_2:getPositionY() + 40)
         :addTo(bg_node)
-
+    self.line_1 = line_1
     local current_effect_desc = UIKit:ttfLabel({
         text = self:GetProductionTechnology():GetBuffLocalizedDesc(),
         size = 20,
-        color= 0x797154
+        color= 0x615b44
     }):align(display.LEFT_BOTTOM,line_1:getPositionX(), line_1:getPositionY() + 5):addTo(bg_node)
-    local current_effect_val_label = UIKit:ttfLabel({
-        text = "",--self:GetProductionTechnology():GetBuffEffectVal() * 100  .. "%",
-        size = 22,
-        color= 0x403c2f
-    }):align(display.LEFT_BOTTOM,line_2:getPositionX(), line_2:getPositionY() + 5):addTo(bg_node)
-    self.current_effect_val_label = current_effect_val_label
-
-    self.upgrade_info_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.LEFT_BOTTOM, line_2:getPositionX() + 50,
-        line_2:getPositionY() + 10):addTo(bg_node)
     local next_effect_val_label = UIKit:ttfLabel({
         text = "", --self:GetProductionTechnology():GetNextLevelBuffEffectVal() * 100  .. "%",
         size = 22,
-        color= 0x403c2f
-    }):align(display.LEFT_BOTTOM,self.upgrade_info_icon:getPositionX() + self.upgrade_info_icon:getContentSize().width + 12,
-        current_effect_val_label:getPositionY()):addTo(bg_node)
+        color= 0x403c2f,
+        align = cc.TEXT_ALIGNMENT_RIGHT,
+    }):align(display.RIGHT_BOTTOM,line_1:getPositionX()+ 422,current_effect_desc:getPositionY()):addTo(bg_node)
     self.next_effect_val_label = next_effect_val_label
+
+    self.upgrade_info_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.RIGHT_BOTTOM, next_effect_val_label:getPositionX() - 50,
+        next_effect_val_label:getPositionY() + 5):addTo(bg_node)
+
+    local current_effect_val_label = UIKit:ttfLabel({
+        text = "",--self:GetProductionTechnology():GetBuffEffectVal() * 100  .. "%",
+        size = 22,
+        color= 0x403c2f,
+        align = cc.TEXT_ALIGNMENT_RIGHT,
+    }):align(display.RIGHT_BOTTOM,self.upgrade_info_icon:getPositionX() - 35, next_effect_val_label:getPositionY()):addTo(bg_node)
+    self.current_effect_val_label = current_effect_val_label
+
+    local current_power_desc = UIKit:ttfLabel({
+        text = _("战斗力"),
+        size = 20,
+        color= 0x615b44
+    }):addTo(bg_node):align(display.LEFT_BOTTOM,line_2:getPositionX(), line_2:getPositionY() + 5)
+
+    local next_power_val_label = UIKit:ttfLabel({
+        text = "123", --self:GetProductionTechnology():GetNextLevelBuffEffectVal() * 100  .. "%",
+        size = 22,
+        color= 0x403c2f,
+        align = cc.TEXT_ALIGNMENT_RIGHT,
+    }):align(display.RIGHT_BOTTOM,line_2:getPositionX()+ 422,current_power_desc:getPositionY()):addTo(bg_node)
+    self.next_power_val_label = next_power_val_label
+    self.upgrade_power_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.RIGHT_BOTTOM, next_power_val_label:getPositionX() - 50,
+        next_power_val_label:getPositionY() + 5):addTo(bg_node)
+
+    local current_power_val_label = UIKit:ttfLabel({
+        text = "0",--self:GetProductionTechnology():GetBuffEffectVal() * 100  .. "%",
+        size = 22,
+        color= 0x403c2f,
+        align = cc.TEXT_ALIGNMENT_RIGHT,
+    }):align(display.RIGHT_BOTTOM,self.upgrade_power_icon:getPositionX() - 35, next_power_val_label:getPositionY()):addTo(bg_node)
+    self.current_power_val_label = current_power_val_label
     local btn_now = UIKit:commonButtonWithBG(
         {
             w=250,
@@ -294,7 +333,7 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             isVisible = true,
             isSatisfy = not City:HaveProductionTechEvent(),
             icon="hammer_31x33.png",
-            description= City:HaveProductionTechEvent() and "1/1" or "1/0"
+            description= City:HaveProductionTechEvent() and "0/1" or "1/1"
         })
     if unLockByTech:Index() ~= current_tech:Index() then
         table.insert(requirements,
@@ -306,6 +345,14 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
                 description= _("等级达到") .. current_tech:UnlockLevel()
             })
     end
+     table.insert(requirements,
+        {
+            resource_type = _("学院等级"),
+            isVisible = true,
+            isSatisfy = current_tech:AcademyLevel() <= City:GetAcademyBuildingLevel(),
+            icon="academy.png",
+            description = _("等级达到") .. current_tech:AcademyLevel()
+        })
     table.insert(requirements,
         {
             resource_type = _("银币"),
@@ -345,7 +392,8 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             isSatisfy = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["pulley"]>=cost.pulley,
             icon="pulley_112x112.png",
             description = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["pulley"] .. "/" .. cost.pulley
-        })
+        })  
+   
 
     return requirements
 end
@@ -366,6 +414,10 @@ function GameUIUpgradeTechnology:OnUpgradButtonClicked()
     elseif gems_cost == 0 then
         NetManager:getUpgradeProductionTechPromise(self:GetProductionTechnology():Name(),false):done(function()
             self:LeftButtonClicked()
+            local acdemy = UIKit:GetUIInstance("GameUIAcademy")
+            if acdemy then
+                acdemy:LeftButtonClicked()
+            end
         end)
     else
         UIKit:showMessageDialog(_("提示"),msg, function ()
@@ -462,17 +514,30 @@ function GameUIUpgradeTechnology:RefreshButtonState()
 end
 
 function GameUIUpgradeTechnology:CheckUpgradeButtonState()
-    if not self:CheckMeIsOpened() or not self:CheckMeDependTechIsUnlock() or self:CheckIsMeUpgrade() then
+    if not self:CheckMeIsOpened() 
+        or not self:CheckMeDependTechIsUnlock() 
+        or self:CheckIsMeUpgrade() 
+        or not self:CheckAcademyLevel()
+        then
         return false
     end
     return true
 end
 
 function GameUIUpgradeTechnology:CheckUpgradeNowButtonState()
-    if not self:CheckMeIsOpened() or not self:CheckMeDependTechIsUnlock() or self:CheckIsMeUpgrade() then
+    if not self:CheckMeIsOpened() 
+        or not self:CheckMeDependTechIsUnlock() 
+        or self:CheckIsMeUpgrade() 
+        or not self:CheckAcademyLevel()
+        then
         return false
     end
     return true
+end
+
+function GameUIUpgradeTechnology:CheckAcademyLevel()
+    local current_tech = self:GetProductionTechnology()
+    return current_tech:AcademyLevel() <= City:GetAcademyBuildingLevel()
 end
 
 function GameUIUpgradeTechnology:CheckIsMeUpgrade()

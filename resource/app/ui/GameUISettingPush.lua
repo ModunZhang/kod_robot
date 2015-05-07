@@ -21,7 +21,7 @@ function GameUISettingPush:BuildUI()
 	local shadowLayer = UIKit:shadowLayer():addTo(self)
 	local bg = WidgetUIBackGround.new({height=762}):addTo(shadowLayer)
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
-	local titleBar = display.newSprite("title_blue_600x52.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
+	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
 	   	:addTo(titleBar)
 	   	:align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
@@ -40,7 +40,7 @@ function GameUISettingPush:BuildUI()
  	UIKit:ttfLabel({
  		text = _("建筑队列完成提醒"),
  		size = 20,
- 		color= 0x797154
+ 		color= 0x615b44
  	}):align(display.CENTER_LEFT,15,48):addTo(building_push_bg)
  	local building_push_button = UICheckBoxButton.new(CHECKBOX_BUTTON_IMAGES)
 	    :setButtonLabelAlignment(display.CENTER)
@@ -57,7 +57,7 @@ function GameUISettingPush:BuildUI()
  	UIKit:ttfLabel({
  		text = _("招募兵种完成提醒"),
  		size = 20,
- 		color= 0x797154
+ 		color= 0x615b44
  	}):align(display.CENTER_LEFT,15,48):addTo(soldier_push_bg)
  	local soldier_push_button = UICheckBoxButton.new(CHECKBOX_BUTTON_IMAGES)
 	    :setButtonLabelAlignment(display.CENTER)
@@ -74,7 +74,7 @@ function GameUISettingPush:BuildUI()
  	UIKit:ttfLabel({
  		text = _("科技研发完成提醒"),
  		size = 20,
- 		color= 0x797154
+ 		color= 0x615b44
  	}):align(display.CENTER_LEFT,15,48):addTo(technology_push_bg)
  	local technology_push_button = UICheckBoxButton.new(CHECKBOX_BUTTON_IMAGES)
 	    :setButtonLabelAlignment(display.CENTER)

@@ -20,7 +20,7 @@ function GameUIAllianceNoticeOrDescEdit:OnMoveInStage()
 	--base UI
 	local bg_node = WidgetUIBackGround.new({height=content_height}):pos(window.left+20,window.bottom + 400)
 	self:addTouchAbleChild(bg_node)
-	local titleBar = display.newSprite("title_blue_600x52.png")
+	local titleBar = display.newSprite("title_blue_600x56.png")
 		:align(display.LEFT_BOTTOM, 2,content_height - 15)
 		:addTo(bg_node)
 	local title = self.isNotice_ and _("联盟公告") or _("联盟描述")

@@ -58,10 +58,9 @@ end
 function VillageEvent:OnTimer(current_time)
 	self.times_ = math.ceil(self:FinishTime() - current_time)
 	if self.times_ >= 0 then
-		local total_time = self:FinishTime() - self:StartTime()
-		local collectTime = app.timer:GetServerTime() - self:StartTime()
-		local collectPercent = math.floor(math.min(collectTime/total_time*100,100))
-		local collectCount = math.floor(collectPercent/100 * self:VillageData().collectTotal)
+		local collectTime = current_time - self:StartTime()
+		local collectCount = math.floor(self:GetCollectSpeed() * collectTime)
+		local collectPercent = math.floor(collectCount/self:VillageData().collectTotal * 100)
 		self:SetCollectPercent(collectPercent)
 		self:SetCollectCount(collectCount)
 		self:NotifyObservers(function(listener)

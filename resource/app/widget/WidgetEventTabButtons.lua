@@ -379,12 +379,11 @@ function WidgetEventTabButtons:CreateProgressItem()
     ,{
         disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
     }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6, half_height)
-        :setButtonLabel(cc.ui.UILabel.new({
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        :setButtonLabel(UIKit:ttfLabel({
             text = _("加速"),
             size = 18,
-            font = UIKit:getFontFilePath(),
-            color = UIKit:hex2c3b(0xfff3c7)}))
+            color = 0xfff3c7,
+            shadow = true}))
     function node:SetProgressInfo(str, percent)
         self.desc:setString(str)
         self.progress:setPercentage(percent)
@@ -408,12 +407,11 @@ function WidgetEventTabButtons:CreateProgressItem()
         return self
     end
     function node:SetButtonLabel(str)
-        self.speed_btn:setButtonLabel(cc.ui.UILabel.new({
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        self.speed_btn:setButtonLabel(UIKit:ttfLabel({
             text = str,
             size = 18,
-            font = UIKit:getFontFilePath(),
-            color = UIKit:hex2c3b(0xfff3c7)}))
+            color = 0xfff3c7,
+            shadow = true}))
         return self
     end
     function node:GetSpeedUpButton()
@@ -810,25 +808,29 @@ function WidgetEventTabButtons:LoadMaterialEvents()
     end
 end
 local military_techs = {
-    academy = 1,
-    workshop = 2,
-    trainingGround = 3,
+    trainingGround = 5,
     hunterHall = 4,
-    stable = 5,
+    stable = 3,
+    workshop = 2,
+    academy = 1,
 }
 local military_techs_desc = {
-    academy = _("查看学院科技"),
-    workshop = _("车间空闲"),
     trainingGround = _("训练营地空闲"),
     hunterHall = _("猎手大厅空闲"),
     stable = _("马厩空闲"),
+    workshop = _("车间空闲"),
+    academy = _("查看学院科技"),
 }
 function WidgetEventTabButtons:LoadTechnologyEvents()
     local technology_buildings = {}
     local technology_events = {}
     local city = self.city
     local soldier_manager = city:GetSoldierManager()
-    for building_type,_ in pairs(military_techs) do
+    for _,building_type in ipairs({"trainingGround",
+        "hunterHall",
+        "stable",
+        "workshop",
+        "academy"}) do
         if building_type == "academy" then
             if city:HaveProductionTechEvent() then
                 city:IteratorProductionTechEvents(function(event)
@@ -866,7 +868,6 @@ function WidgetEventTabButtons:LoadTechnologyEvents()
     for i = #technology_events, 1, -1 do
         print(i, technology_events[i][1])
     end
-
     for i,v in ipairs(technology_events) do
         local building_type, event = unpack(v)
         local desc = military_techs_desc[building_type]
@@ -993,6 +994,7 @@ function WidgetEventTabButtons:GetProductionTechnologyEventProgressInfo(event)
     return _("研发") .. event:Entity():GetLocalizedName() .. " " .. GameUtils:formatTimeStyle1(event:GetTime()),event:GetPercent()
 end
 return WidgetEventTabButtons
+
 
 
 

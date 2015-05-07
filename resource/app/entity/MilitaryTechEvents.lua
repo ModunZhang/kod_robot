@@ -23,6 +23,7 @@ function MilitaryTechEvents:UpdateData(json_data)
     self:SetName(json_data.name or self.name or "")
     self:SetStartTime(json_data.startTime/1000 or self.startTime or 0)
     self:SetFinishTime(json_data.finishTime/1000 or self.finishTime or 0)
+    self.times_ = math.ceil(self:FinishTime() - app.timer:GetServerTime())
 end
 
 function MilitaryTechEvents:Reset()

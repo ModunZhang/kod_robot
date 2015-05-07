@@ -637,6 +637,9 @@ local ITEM = {
     coinClass_5 = "coinClass_5_128x128.png",
     coinClass_6 = "coinClass_6_128x128.png",
     coinClass_7 = "coinClass_7_128x128.png",
+    gemClass_1 = "gem_icon_62x61.png",
+    gemClass_2 = "gem_icon_62x61.png",
+    gemClass_3 = "gem_icon_62x61.png",
 
     siegeAtkBonus_1 = "siegeAtkBonus_1_128x128.png",
     siegeAtkBonus_2 = "siegeAtkBonus_2_128x128.png",

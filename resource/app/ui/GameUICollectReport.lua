@@ -19,7 +19,7 @@ function GameUICollectReport:ctor(report)
     local r_size = body:getContentSize()
 
     local strike_result_image = display.newSprite("report_collect_590x137.png")
-        :align(display.CENTER_TOP, r_size.width/2, r_size.height-10)
+        :align(display.CENTER_TOP, r_size.width/2, r_size.height-17)
         :addTo(body)
 
     -- 战斗发生时间
@@ -34,7 +34,7 @@ function GameUICollectReport:ctor(report)
         {
             text = self:GetFightTarget(),
             size = 18,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER, 40, r_size.height-220)
         :addTo(body)
 

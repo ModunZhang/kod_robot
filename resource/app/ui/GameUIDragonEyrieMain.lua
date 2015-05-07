@@ -5,6 +5,8 @@
 local GameUIDragonEyrieMain = UIKit:createUIClass("GameUIDragonEyrieMain","GameUIUpgradeBuilding")
 local GameUtils = GameUtils
 local window = import("..utils.window")
+local TutorialLayer = import(".TutorialLayer")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
 local cocos_promise = import("..utils.cocos_promise")
 local StarBar = import(".StarBar")
 local DragonManager = import("..entity.DragonManager")
@@ -17,8 +19,8 @@ local GameUIDragonDeathSpeedUp = import(".GameUIDragonDeathSpeedUp")
 local UICheckBoxButton = import(".UICheckBoxButton")
 
 -- lockDragon: 是否锁定选择龙的操作,默认不锁定
-function GameUIDragonEyrieMain:ctor(city,building,lockDragon)
-	GameUIDragonEyrieMain.super.ctor(self,city,_("龙巢"),building)
+function GameUIDragonEyrieMain:ctor(city,building,lockDragon,default_tab)
+	GameUIDragonEyrieMain.super.ctor(self,city,_("龙巢"),building,default_tab)
 	self.building = building
 	self.city = city
 	self.draong_index = 1
@@ -48,6 +50,7 @@ function GameUIDragonEyrieMain:OnDragonHatched(dragon)
 	local eyrie = self.draongContentNode:GetItemByIndex(localIndex)
 	eyrie.dragon_image:hide()
 	eyrie.armature:show()
+	eyrie.armature:PlayAnimation("idle")
 	self:RefreshUI()
 end
 
@@ -97,7 +100,6 @@ end
 
 
 function GameUIDragonEyrieMain:OnMoveInStage()
-	GameUIDragonEyrieMain.super.OnMoveInStage(self)
 	self:CreateUI()
 	self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnHPChanged)
 	self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
@@ -107,6 +109,7 @@ function GameUIDragonEyrieMain:OnMoveInStage()
 	self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventChanged)
 	self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventRefresh)
 	self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventTimer)
+	GameUIDragonEyrieMain.super.OnMoveInStage(self)
 end
 
 function GameUIDragonEyrieMain:OnMoveOutStage()
@@ -385,7 +388,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
 		self.info_panel = info_panel
     	local strength_title_label =  UIKit:ttfLabel({
 			text = _("力量"),
-			color = 0x797154,
+			color = 0x615b44,
 			size  = 20
 		}):addTo(info_panel):align(display.LEFT_BOTTOM,10,45)
 		self.strength_val_label =  UIKit:ttfLabel({
@@ -396,7 +399,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
 
 		local vitality_title_label =  UIKit:ttfLabel({
 			text = _("活力"),
-			color = 0x797154,
+			color = 0x615b44,
 			size  = 20
 		}):addTo(info_panel):align(display.LEFT_BOTTOM,10,10)
 
@@ -408,7 +411,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
 
 		local leadership_title_label =  UIKit:ttfLabel({
 			text = _("领导力"),
-			color = 0x797154,
+			color = 0x615b44,
 			size  = 20
 		}):addTo(info_panel):align(display.LEFT_BOTTOM,10,80)
 
@@ -497,7 +500,7 @@ end
 
 
 function GameUIDragonEyrieMain:OnEnergyButtonClicked()
-	NetManager:getHatchDragonPromise(self:GetCurrentDragon():Type())
+	return NetManager:getHatchDragonPromise(self:GetCurrentDragon():Type())
 end
 
 function GameUIDragonEyrieMain:GetCurrentDragon()
@@ -616,6 +619,9 @@ function GameUIDragonEyrieMain:OnDragonDeathSpeedUpClicked()
 end
 
 --fte
+function GameUIDragonEyrieMain:CreateFteLayer()
+	return TutorialLayer.new(self.hate_button):addTo(self, 999):Enable()
+end
 function GameUIDragonEyrieMain:Find(type_)
 	if type_ == "dragon" then
 		return cocos_promise.defer(function()
@@ -631,4 +637,17 @@ function GameUIDragonEyrieMain:WaitTag(type_)
         return self
     end)
 end
+function GameUIDragonEyrieMain:PromiseOfFte()
+	-- local p = promise.new()
+	-- self:OnEnergyButtonClicked():done(function() 
+	-- 	p:resolve()
+	-- end)
+	-- local fte_layer = self:CreateFteLayer()
+	-- local r = self.hate_button:getCascadeBoundingBox()
+	-- WidgetFteArrow.new(_("点击按钮: 孵化")):addTo(fte_layer):TurnUp():pos(r.x + r.width/2, r.y)
+	-- return p
+	-- return cocos_promise.defer()
+end
 return GameUIDragonEyrieMain
+
+

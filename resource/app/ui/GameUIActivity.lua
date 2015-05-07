@@ -147,8 +147,11 @@ function GameUIActivity:RefreshListView()
 	self.list_view:addItem(item)
 	item = self:GetItem(self.ITEMS_TYPE.CONTINUITY)
 	self.list_view:addItem(item)	
-	item = self:GetItem(self.ITEMS_TYPE.FIRST_IN_PURGURE)
-	self.list_view:addItem(item)	
+	local countInfo = User:GetCountInfo()
+	if not countInfo.isFirstIAPRewardsGeted then
+		item = self:GetItem(self.ITEMS_TYPE.FIRST_IN_PURGURE)
+		self.list_view:addItem(item)	
+	end
 	item = self:GetItem(self.ITEMS_TYPE.PLAYER_LEVEL_UP)
 	self.list_view:addItem(item)
 	self.list_view:reload()

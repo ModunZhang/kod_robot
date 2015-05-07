@@ -127,7 +127,7 @@ function CityScene:CreateSceneUILayer()
         end
     end
     function scene_ui_layer:OnSceneMove()
-        if self.indicator then
+        if self.indicator and self.building__.GetWorldPosition then
             local _,top = self.building__:GetWorldPosition()
             self.indicator:pos(top.x, top.y)
         end
@@ -193,9 +193,9 @@ function CityScene:GotoLogicPointInstant(x, y)
     local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(x, y)
     self:GetSceneLayer():GotoMapPositionInMiddle(point.x, point.y)
 end
-function CityScene:GotoLogicPoint(x, y)
+function CityScene:GotoLogicPoint(x, y, speed)
     local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(x, y)
-    return self:GetSceneLayer():PromiseOfMove(point.x, point.y)
+    return self:GetSceneLayer():PromiseOfMove(point.x, point.y, speed)
 end
 function CityScene:PlayBackgroundMusic()
     app:GetAudioManager():PlayGameMusic()

@@ -92,7 +92,7 @@ function GameUIActivityReward:BuildUI()
 	self:addTouchAbleChild(bg)
 	self.bg = bg
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
-	local titleBar = display.newSprite("title_blue_600x52.png"):align(display.LEFT_BOTTOM,3,height - 15):addTo(bg)
+	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,height - 15):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
 	   	:addTo(titleBar)
 	   	:align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
@@ -208,7 +208,7 @@ function GameUIActivityReward:GetOnLineItem(item_key,time_str,rewards,flag,timeP
 	local desc_label = UIKit:ttfLabel({
 		text = rewards,
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.LEFT_CENTER, 120, 58):addTo(content)
 
 	if flag == 1 then
@@ -317,7 +317,7 @@ end
 
 function GameUIActivityReward:ui_CONTINUITY()
 	UIKit:ttfLabel({
-		text = _("在未来的14天连续登陆，每天都会有来自王城的援军前来投奔你，连续登陆15天免费解锁第二条行军队列！"),
+		text = _("在未来的14天连续登陆，每天都会有来自王城的援军前来投奔你，连续登陆14天免费解锁第二条行军队列！"),
 		size = 20,
 		color= 0x403c2f,
 		dimensions = cc.size(500,0),
@@ -382,7 +382,7 @@ function GameUIActivityReward:GetContinutyListItem(reward_type,item_key,time_str
 	local desc_label = UIKit:ttfLabel({
 		text = rewards_str,
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.LEFT_CENTER, 120, 38):addTo(content)
 
 	if flag == 1 or flag == 3 then

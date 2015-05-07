@@ -25,7 +25,7 @@ function GameUIDragonSkill:onEnter()
 	self.backgroundImage = WidgetUIBackGround.new({height=BODY_HEIGHT})
   self:addTouchAbleChild(self.backgroundImage)
 	self.backgroundImage:pos((display.width-self.backgroundImage:getContentSize().width)/2,display.height - self.backgroundImage:getContentSize().height - 280)
-	local titleBar = display.newSprite("title_blue_600x52.png")
+	local titleBar = display.newSprite("title_blue_600x56.png")
 		:align(display.BOTTOM_LEFT, 2,self.backgroundImage:getContentSize().height - 15)
 		:addTo(self.backgroundImage)
 

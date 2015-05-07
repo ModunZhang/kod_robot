@@ -26,7 +26,7 @@ function GameUISettingShield:BuildUI()
 	local shadowLayer = UIKit:shadowLayer():addTo(self)
 	local bg = WidgetUIBackGround.new({height=762}):addTo(shadowLayer)
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
-	local titleBar = display.newSprite("title_blue_600x52.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
+	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
 	   	:addTo(titleBar)
 	   	:align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
@@ -43,7 +43,7 @@ function GameUISettingShield:BuildUI()
 	UIKit:ttfLabel({
 	  	text = _("你无法收到屏蔽用户发送的邮件。同时在聊天界面也看不到这个用户的任何发言。"),
         size = 20,
-        color=0x797154,
+        color=0x615b44,
         align=cc.TEXT_ALIGNMENT_CENTER,
         dimensions = cc.size(556, 60),
 	}):addTo(tip_bg):align(display.CENTER, 278, 53)

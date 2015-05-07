@@ -367,6 +367,7 @@ end
 
 local base_event_map = {
     disconnect = function(success, response)
+        print("server----->disconnect---->")
         if NetManager.m_netService:isConnected() then
             UIKit:showMessageDialog(_("错误"), _("服务器连接断开,请检测你的网络环境后重试!"), function()
                 app:retryConnectServer()
@@ -374,8 +375,10 @@ local base_event_map = {
         end
     end,
     timeout = function(success, response)
+        print("server----->timeout---->")
     end,
     onKick = function(success, response)
+        print("server----->onKick---->")
         NetManager:disconnect()
         UIKit:showMessageDialog(_("提示"), _("服务器连接断开!"), function()
             app:restart(false)
@@ -526,7 +529,7 @@ end
 -- 重写OpenUDID
 local getOpenUDID = device.getOpenUDID
 device.getOpenUDID = function()
-    -- if true then return "4" end
+    -- if true then return "dannyhe" end
     if CONFIG_IS_DEBUG then
         local device_id
         local udid = cc.UserDefault:getInstance():getStringForKey("udid")
@@ -1273,19 +1276,19 @@ function NetManager:getStrikeVillagePromise(dragonType,defenceAllianceId,defence
         {dragonType = dragonType,defenceAllianceId = defenceAllianceId,defenceVillageId=defenceVillageId},"突袭村落失败!"):done(get_response_msg)
 end
 --查看敌方进攻行军事件详细信息
-function NetManager:getAttackMarchEventDetailPromise(eventId)
+function NetManager:getAttackMarchEventDetailPromise(eventId,enemyAllianceId)
     return get_blocking_request_promise("logic.allianceHandler.getAttackMarchEventDetail",
-        {eventId = eventId},"获取行军事件数据失败!"):done(get_response_msg)
+        {eventId = eventId,enemyAllianceId = enemyAllianceId},"获取行军事件数据失败!"):done(get_response_msg)
 end
 --查看敌方突袭行军事件详细信息
-function NetManager:getStrikeMarchEventDetailPromise(eventId)
+function NetManager:getStrikeMarchEventDetailPromise(eventId,enemyAllianceId)
     return get_blocking_request_promise("logic.allianceHandler.getStrikeMarchEventDetail",
-        {eventId = eventId},"获取突袭事件数据失败!"):done(get_response_msg)
+        {eventId = eventId,enemyAllianceId = enemyAllianceId},"获取突袭事件数据失败!"):done(get_response_msg)
 end
 --查看协助部队行军事件详细信息
-function NetManager:getHelpDefenceMarchEventDetailPromise(eventId)
+function NetManager:getHelpDefenceMarchEventDetailPromise(eventId,allianceId)
     return get_blocking_request_promise("logic.allianceHandler.getHelpDefenceMarchEventDetail",
-        {eventId = eventId},"获取协防事件数据失败!"):done(get_response_msg)
+        {eventId = eventId,allianceId = allianceId},"获取协防事件数据失败!"):done(get_response_msg)
 end
 --查看协防部队详细信息
 function NetManager:getHelpDefenceTroopDetailPromise(playerId,helpedByPlayerId)
@@ -1533,15 +1536,16 @@ end
 
 -- 获取排行榜
 function NetManager:getPlayerRankPromise(rankType, fromRank)
-    return get_blocking_request_promise("logic.playerHandler.getPlayerRankList",{
+    return get_blocking_request_promise("rank.rankHandler.getPlayerRankList",{
         rankType = rankType,
-        fromRank = fromRank or 0
+        fromRank = fromRank or 0,
     },"获取排行榜失败!")
 end
 function NetManager:getAllianceRankPromise(rankType, fromRank)
-    return get_blocking_request_promise("logic.playerHandler.getAllianceRankList",{
+    return get_blocking_request_promise("rank.rankHandler.getAllianceRankList",{
+        allianceId = Alliance_Manager:GetMyAlliance():Id(),
         rankType = rankType,
-        fromRank = fromRank or 0
+        fromRank = fromRank or 0,
     },"获取排行榜失败!")
 end
 -- 获取GameCenter账号绑定状态

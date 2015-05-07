@@ -8,8 +8,8 @@ local GameUIResource = import(".GameUIResource")
 local WidgetCitizen = import("..widget.WidgetCitizen")
 local GameUIDwelling = class("GameUIDwelling", GameUIResource)
 
-function GameUIDwelling:ctor(building, city)
-    GameUIDwelling.super.ctor(self, building)
+function GameUIDwelling:ctor(building, city,default_tab)
+    GameUIDwelling.super.ctor(self, building,default_tab)
     self.dwelling_city = city
     return true
 end

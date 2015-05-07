@@ -51,7 +51,7 @@ function WidgetAllianceCreateOrEdit:onEnter()
 		local gemLabel = UIKit:ttfLabel({
 			text = self:IsCreate() and config_intInit.createAllianceGem.value or config_intInit.editAllianceBasicInfoGem.value,
 			size = 16,
-			color = 0x797154
+			color = 0x615b44
 		})
 			:addTo(self)
 			:align(display.LEFT_CENTER, gemIcon:getPositionX()+gemIcon:getCascadeBoundingBox().width + 4,gemIcon:getPositionY() + gemIcon:getCascadeBoundingBox().height/2)
@@ -100,7 +100,9 @@ function WidgetAllianceCreateOrEdit:CreateAllianceButtonClicked()
 		return 
 	end
 	if self:IsCreate() then
-		NetManager:getCreateAlliancePromise(data.name,data.tag,data.language,data.terrain,data.flag):done()
+		NetManager:getCreateAlliancePromise(data.name,data.tag,data.language,data.terrain,data.flag):done(function()
+			 GameGlobalUI:showTips(_("提示"),_("创建联盟成功!"))
+		end)
 	else
 		local my_alliance = Alliance_Manager:GetMyAlliance()
 		if not self:GetFlagInfomation():IsDifferentWith(Alliance_Manager:GetMyAlliance():Flag()) 
@@ -111,6 +113,7 @@ function WidgetAllianceCreateOrEdit:CreateAllianceButtonClicked()
 			UIKit:showMessageDialog(_("提示"),_("联盟信息当前没有任何改动!"))
 		else
 			NetManager:getEditAllianceBasicInfoPromise(data.name,data.tag,data.language,data.flag):done(function(result)
+				GameGlobalUI:showTips(_("提示"),_("修改联盟信息成功!"))
 				if self.callback and type(self.callback) == 'function' then
 					self.callback()
 				end
@@ -212,7 +215,7 @@ function WidgetAllianceCreateOrEdit:createCheckAllianeGroup()
 		local tipsLabel = UIKit:ttfLabel({
 				text = _("草地——产出强化绿龙的材料，更容易培养绿龙，更容易培养绿龙，草地产出绿金龙币，建造资源加成类的铺筑建筑"),
 				size = 18,
-				color = 0x797154,
+				color = 0x615b44,
 				dimensions = cc.size(552, 0),
 		}):addTo(groupNode):align(display.LEFT_BOTTOM, 0, 0)
 		local landSelect = UIKit:CreateBoxPanelWithBorder({}):addTo(groupNode):pos(0,tipsLabel:getContentSize().height+10)
@@ -235,15 +238,15 @@ function WidgetAllianceCreateOrEdit:createCheckAllianeGroup()
 	    }
 		self.landTypeButton = cc.ui.UICheckBoxButtonGroup.new()
 	        :addButton(UICheckBoxButton.new(checkbox_image)
-	            :setButtonLabel(UIKit:ttfLabel({text = _("草地"),size = 20,color = 0x797154}))
+	            :setButtonLabel(UIKit:ttfLabel({text = _("草地"),size = 20,color = 0x615b44}))
 	            :setButtonLabelOffset(40, 0)
 	            :align(display.LEFT_CENTER))
 	        :addButton(UICheckBoxButton.new(checkbox_image)
-	            :setButtonLabel(UIKit:ttfLabel({text = _("沙漠"),size = 20,color = 0x797154}))
+	            :setButtonLabel(UIKit:ttfLabel({text = _("沙漠"),size = 20,color = 0x615b44}))
 	            :setButtonLabelOffset(40, 0)
 	            :align(display.LEFT_CENTER))
 	        :addButton(UICheckBoxButton.new(checkbox_image)
-	            :setButtonLabel(UIKit:ttfLabel({text = _("雪地"),size = 20,color = 0x797154}))
+	            :setButtonLabel(UIKit:ttfLabel({text = _("雪地"),size = 20,color = 0x615b44}))
 	            :setButtonLabelOffset(40, 0)
 	            :align(display.LEFT_CENTER))
 	        :setButtonsLayoutMargin(10, 100, 0,0)
@@ -266,7 +269,7 @@ function WidgetAllianceCreateOrEdit:createTextfieldPanel()
 	local limitLabel = UIKit:ttfLabel({
 		text = _("只允许字母、数字需要1~3个字符"),
 		size = 18,
-		color = 0x797154
+		color = 0x615b44
 	}):addTo(node):align(display.LEFT_BOTTOM, 0, 0)
 
 	local editbox_tag = cc.ui.UIInput.new({
@@ -293,7 +296,7 @@ function WidgetAllianceCreateOrEdit:createTextfieldPanel()
 	local nameTipLabel = UIKit:ttfLabel({
 		text = _("只允许字母、数字和空格，需要3~20个字符"),
 		size = 18,
-		color = 0x797154
+		color = 0x615b44
 	}):addTo(node):align(display.LEFT_BOTTOM, 0, tagLabel:getPositionY()+40)
 
 	local editbox_name = cc.ui.UIInput.new({

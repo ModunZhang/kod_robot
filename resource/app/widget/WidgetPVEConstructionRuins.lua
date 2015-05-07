@@ -15,8 +15,11 @@ function WidgetPVEConstructionRuins:GetDesc()
 end
 function WidgetPVEConstructionRuins:SetUpButtons()
     return self:GetObject():IsSearched() and
-        { { label = _("离开") } } or
-        { { label = _("搜索"), callback = function()
+        { { label = _("离开"), icon = "pve_icon_leave.png", } } or
+        { { 
+            label = _("搜索"), 
+            icon = "alliacne_search_29x33.png",
+            callback = function()
             if self:UseStrength(3) then
                 local rollback = self:Search()
                 self:GetRewardsFromServer():fail(function()
@@ -24,7 +27,7 @@ function WidgetPVEConstructionRuins:SetUpButtons()
                 end)
                 self:removeFromParent()
             end
-        end }, { label = _("离开") } }
+        end }, { label = _("离开"), icon = "pve_icon_leave.png", } }
 end
 
 return WidgetPVEConstructionRuins

@@ -10,8 +10,8 @@ local UILib = import(".UILib")
 local City = City
 local UIListView = import(".UIListView")
 local window = import("..utils.window")
-function GameUIResource:ctor(building)
-    GameUIResource.super.ctor(self, City, self:GetTitleByType(building),building)
+function GameUIResource:ctor(building,default_tab)
+    GameUIResource.super.ctor(self, City, self:GetTitleByType(building),building,default_tab)
     self.building = building
     self.dataSource = self:GetDataSource()
 end
@@ -256,7 +256,7 @@ function GameUIResource:GetListItem(index,title,val)
         font = UIKit:getFontFilePath(),
         size = 20,
         align = cc.ui.UILabel.TEXT_ALIGN_LEFT,
-        color = UIKit:hex2c3b(0x797154),
+        color = UIKit:hex2c3b(0x615b44),
         valign = cc.ui.UILabel.TEXT_VALIGN_CENTER})
         :addTo(bg)
         :pos(10,20)

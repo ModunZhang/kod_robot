@@ -1,6 +1,6 @@
 local WidgetUIBackGround = import(".WidgetUIBackGround")
 local TITLE_COLOR = {
-     "title_blue_600x52.png",
+     "title_blue_600x56.png",
      "title_green_600x52.png",
      "title_yellow_600x52.png",
      "title_red_600x52.png",

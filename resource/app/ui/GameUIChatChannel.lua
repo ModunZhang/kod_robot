@@ -40,9 +40,9 @@ end
 
 
 
-function GameUIChatChannel:OnMoveOutStage()
+function GameUIChatChannel:onCleanup()
     self:GetChatManager():RemoveListenerOnType(self,ChatManager.LISTEN_TYPE.TO_TOP)
-    GameUIChatChannel.super.OnMoveOutStage(self)    
+    GameUIChatChannel.super.onCleanup(self)    
 end
 
 function GameUIChatChannel:TO_TOP(data)
@@ -434,7 +434,7 @@ function GameUIChatChannel:CreatShieldView()
     local shieldView = display.newColorLayer(UIKit:hex2c4b(0x7a000000))
         :addTo(self,PLAYERMENU_ZORDER)
     local bg =  WidgetUIBackGround.new({height=608}):addTo(shieldView):pos(window.left+20,window.bottom+150)
-    local header = display.newSprite("title_blue_600x52.png")
+    local header = display.newSprite("title_blue_600x56.png")
         :addTo(bg)
         :align(display.CENTER_BOTTOM, 304, 594)
     UIKit:closeButton():addTo(header)

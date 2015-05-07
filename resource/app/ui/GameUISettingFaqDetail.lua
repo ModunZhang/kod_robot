@@ -18,7 +18,7 @@ function GameUISettingFaqDetail:BuildUI()
 	local shadowLayer = UIKit:shadowLayer():addTo(self)
 	local bg = WidgetUIBackGround.new({height=762}):addTo(shadowLayer)
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
-	local titleBar = display.newSprite("title_blue_600x52.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
+	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
 	   	:addTo(titleBar)
 	   	:align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
@@ -34,7 +34,7 @@ function GameUISettingFaqDetail:BuildUI()
 	UIKit:ttfLabel({
 		text = self.data.title,
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.TOP_CENTER, 304,732):addTo(bg)
 	local list_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 648}):align(display.BOTTOM_CENTER, 304, 33):addTo(bg)
 	self.list_view = UIListView.new{

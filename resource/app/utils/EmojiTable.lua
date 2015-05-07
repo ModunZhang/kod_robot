@@ -1,210 +1,225 @@
-local EmojiTable = {}
--- func
-local function formatUTF8String(...)
-	local arg = {...}
-	local formatKey = string.rep("%c",#arg)
-	return string.format(formatKey,unpack(arg))
-end
--- table
-local Smiley = {}
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x84)] = "1F604.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x8A)] = "1F60A.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x83)] = "1F603.png"
-Smiley[formatUTF8String(0xE2,0x98,0xBA)]      = "263A.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x89)] = "1F609.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x8D)] = "1F60D.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x98)] = "1F618.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x9A)] = "1F61A.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xB3)] = "1F633.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x8C)] = "1F60C.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x81)] = "1F601.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x9C)] = "1F61C.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x9D)] = "1F61D.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x92)] = "1F612.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x8F)] = "1F60F.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x93)] = "1F613.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x94)] = "1F614.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x9E)] = "1F61E.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x96)] = "1F616.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xA5)] = "1F625.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xB0)] = "1F630.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xA8)] = "1F628.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xA3)] = "1F623.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xA2)] = "1F622.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xAD)] = "1F62D.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0x82)] = "1F602.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xB2)] = "1F632.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xB1)] = "1F631.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xA0)] = "1F620.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xA1)] = "1F621.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xAA)] = "1F62A.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x98,0xB7)] = "1F637.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xBF)] = "1F47F.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xBD)] = "1F47D.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x9B)] = "1F49B.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x99)] = "1F499.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x9C)] = "1F49C.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x97)] = "1F497.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x9A)] = "1F49A.png"
-Smiley[formatUTF8String(0xE2,0x9D,0xA4)] 	  = "2764.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x94)] = "1F494.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x93)] = "1F493.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x98)] = "1F498.png"
-Smiley[formatUTF8String(0xE2,0x9C,0xA8)]      = "2728.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x8C,0x9F)] = "1F31F.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0xA2)] = "1F4A2.png"
-Smiley[formatUTF8String(0xE2,0x9D,0x95)]      = "2755.png"
-Smiley[formatUTF8String(0xE2,0x9D,0x94)]      = "2754.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0xA4)] = "1F4A4.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0xA8)] = "1F4A8.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0xA6)] = "1F4A6.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x8E,0xB6)] = "1F3B6.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x8E,0xB5)] = "1F3B5.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x94,0xA5)] = "1F525.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0xA9)] = "1F4A9.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x8D)] = "1F44D.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x8E)] = "1F44E.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x8C)] = "1F44C.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x8A)] = "1F44A.png"
-Smiley[formatUTF8String(0xE2,0x9C,0x8A)]      = "270A.png"
-Smiley[formatUTF8String(0xE2,0x9C,0x8C)]      = "270C.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x8B)] = "1F44B.png"
-Smiley[formatUTF8String(0xE2,0x9C,0x8B)]      = "270B.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x90)] = "1F450.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x86)] = "1F446.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x87)] = "1F447.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x89)] = "1F449.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x88)] = "1F448.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x99,0x8C)] = "1F64C.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x99,0x8F)] = "1F64F.png"
-Smiley[formatUTF8String(0xE2,0x98,0x9D)]      = "261D.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x8F)] = "1F44F.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0xAA)] = "1F4AA.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x9A,0xB6)] = "1F6B6.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x8F,0x83)] = "1F3C3.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xAB)] = "1F46B.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x83)] = "1F483.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xAF)] = "1F46F.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x99,0x86)] = "1F646.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x99,0x85)] = "1F645.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x81)] = "1F481.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x99,0x87)] = "1F647.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x8F)] = "1F48F.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x91)] = "1F491.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x86)] = "1F486.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x87)] = "1F487.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x85)] = "1F485.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xA6)] = "1F466.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xA7)] = "1F467.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xA9)] = "1F469.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xA8)] = "1F468.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xB6)] = "1F476.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xB5)] = "1F475.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xB4)] = "1F474.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xB1)] = "1F471.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xB2)] = "1F472.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xB3)] = "1F473.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xB7)] = "1F477.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xAE)] = "1F46E.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xBC)] = "1F47C.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xB8)] = "1F478.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x82)] = "1F482.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x80)] = "1F480.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0xA3)] = "1F463.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x92,0x8B)] = "1F48B.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x84)] = "1F444.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x82)] = "1F442.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x80)] = "1F440.png"
-Smiley[formatUTF8String(0xF0,0x9F,0x91,0x83)] = "1F443.png"
-
-function EmojiTable:GetSmiley()
-	return Smiley
-end
-
-function EmojiTable:GetSmileyImages()
-	local r = {}
-	for _,v in pairs(Smiley) do
-		table.insert(r,v)
-	end
-	return r
-end
-
-local Flower = {}
-Flower[formatUTF8String(0xE2,0x98,0x80)] = "2600.png"
-Flower[formatUTF8String(0xE2,0x98,0x94)] = "2614.png"
-Flower[formatUTF8String(0xE2,0x98,0x81)] = "2601.png"
-Flower[formatUTF8String(0xE2,0x9B,0x84)] = "26C4.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0x99)] = "1F319.png"
-Flower[formatUTF8String(0xE2,0x9A ,0xA1)] = "26A1.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0x80)] = "1F300.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0x8A)] = "1F30A.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB1)] = "1F431.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB6)] = "1F436.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xAD)] = "1F42D.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB9)] = "1F439.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB0)] = "1F430.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xBA)] = "1F43A.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB8)] = "1F438.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xAF)] = "1F42F.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xA8)] = "1F428.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xBB)] = "1F43B.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB7)] = "1F437.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xAE)] = "1F42E.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x97)] = "1F417.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB5)] = "1F435.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x92)] = "1F412.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB4)] = "1F434.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x8E)] = "1F40E.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xAB)] = "1F42B.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x91)] = "1F411.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x98)] = "1F418.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x8D)] = "1F40D.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xA6)] = "1F426.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xA4)] = "1F424.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x94)] = "1F414.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xA7)] = "1F427.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x9B)] = "1F41B.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x99)] = "1F419.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xA0)] = "1F420.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x9F)] = "1F41F.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xB3)] = "1F433.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0xAC)] = "1F42C.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x90)] = "1F490.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0xB8)] = "1F338.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0xB7)] = "1F337.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8D,0x80)] = "1F340.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0xB9)] = "1F339.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0xBB)] = "1F33B.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0xBA)] = "1F33A.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8D,0x81)] = "1F341.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8D,0x83)] = "1F343.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8D,0x82)] = "1F342.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0xB4)] = "1F334.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0xB5)] = "1F335.png"
-Flower[formatUTF8String(0xF0,0x9F,0x8C,0xBE)] = "1F33E.png"
-Flower[formatUTF8String(0xF0,0x9F,0x90,0x9A)] = "1F41A.png"
-
-function EmojiTable:GetFlower()
-	return Flower
-end
-
-function EmojiTable:GetFlowerImages()
-	local r = {}
-	for _,v in pairs(Flower) do
-		table.insert(r,v)
-	end
-	return r
-end
-
-function EmojiTable:GetAllImages()
-	local r = {}
-	for _,v in pairs(Flower) do
-		table.insert(r,v)
-	end
-	for _,v in pairs(Smiley) do
-		table.insert(r,v)
-	end
-	return r
-end
-
+local EmojiTable = {
+	--first page
+	"1F600.png",
+	"263A.png",
+	"1F60A.png",
+	"1F60B.png",
+	"1F61D.png",
+	"1F601.png",
+	"1F602.png",
+	"1F603.png",
+	"1F604.png",
+	"1F605.png",
+	"1F606.png",
+	"1F607.png",
+	"1F60D.png",
+	"1F609.png",
+	"1F610.png",
+	"1F611.png",
+	"1F612.png",
+	"1F613.png",
+	"1F614.png",
+	"1F615.png",
+	"1F616.png",
+	"1F617.png",
+	"1F618.png",
+	"1F619.png",
+	"1F620.png",
+	"1F621.png",
+	"1F622.png",
+	"1F623.png",
+	"1F624.png",
+	"1F625.png",
+	"1F626.png",
+	"1F627.png",
+	"1F628.png",
+	"1F629.png",
+	"1F630.png",
+	"1F631.png",
+	"1F632.png",
+	"1F633.png",
+	"1F634.png",
+	"1F635.png",
+	"1F636.png",
+	"1F637.png",
+	"1F61E.png",
+	"1F61F.png",
+	"1F62A.png",
+	"1F60E.png",
+	"1F60F.png",
+	"1F61A.png",
+	"1F61B.png",
+	"1F61C.png",
+	"1F62B.png",
+	"1F62C.png",
+	"1F62D.png",
+	"1F62E.png",
+	"1F62F.png",
+	"1F60C.png",
+	"1F608.png",
+	"1F47F.png",
+	"1F648.png",
+	"1F64A.png",
+	"1F47D.png",
+	"1F47B.png",
+	"1F4A4.png",
+	"1F4A6.png",
+	"1F4A8.png",
+	"1F4A9.png",
+	"1F4AF.png",
+	"1F4B0.png",
+	"1F52B.png",
+	"1F52A.png",
+	"1F6AC.png",
+	"1F303.png",
+	"1F306.png",
+	"1F4F1.png",
+	"1F4BB.png",
+	"1F4FA.png",
+	"1F380.png",
+	"1F525.png",
+	"2764.png",
+	"1F494.png",
+	"1F496.png",
+	"1F498.png",
+	"1F49D.png",
+	"1F48B.png",
+	"1F48D.png",
+	"1F48E.png",
+	"1F492.png",
+	"1F3E9.png",
+	"1F3F0.png",
+	"2600.png",
+	"2614.png",
+	"2728.png",
+	"2744.png",
+	"2753.png",
+	"2757.png",
+	"1F6AB.png",
+	"1F4A1.png",
+	"1F4B5.png",
+	"1F6A8.png",
+	"1F51E.png",
+	"1F48A.png",
+	"1F30D.png",
+	"1F50D.png",
+	"1F55A.png",
+	"1F6BD.png",
+	"1F6C1.png",
+	"1F197.png",
+	"1F199.png",
+	"1F192.png",
+	"1F198.png",
+	-- second page
+	"1F357.png",
+	"1F356.png",
+	"1F355.png",
+	"1F354.png",
+	"1F369.png",
+	"1F36D.png",
+	"1F35A.png",
+	"1F35B.png",
+	"1F35C.png",
+	"1F370.png",
+	"1F371.png",
+	"1F366.png",
+	"1F35F.png",
+	"1F36B.png",
+	"1F35D.png",
+	"1F35E.png",
+	"1F363.png",
+	"1F346.png",
+	"1F352.png",
+	"1F353.png",
+	"1F37C.png",
+	"1F37B.png",
+	"1F37A.png",
+	"1F377.png",
+	"1F378.png",
+	"1F379.png",
+	"1F382.png",
+	"1F381.png",
+	"1F484.png",
+	"1F384.png",
+	"1F385.png",
+	"1F383.png",
+	"1F388.png",
+	"1F389.png",
+	"1F451.png",
+	"1F38A.png",
+	"1F483.png",
+	"1F3BE.png",
+	"1F3C0.png",
+	"1F3B1.png",
+	"1F3C8.png",
+	"1F3C9.png",
+	"1F3B3.png",
+	"26BD.png",
+	"26BE.png",
+	"1F3AE.png",
+	"1F3C1.png",
+	"1F3B0.png",
+	"1F3A8.png",
+	"1F3B8.png",
+	"1F3B9.png",
+	"1F3B2.png",
+	"1F3C6.png",
+	"2708.png",
+	"1F680.png",
+	"1F682.png",
+	"1F684.png",
+	"1F690.png",
+	"1F691.png",
+	"1F692.png",
+	"1F693.png",
+	"1F695.png",
+	"1F697.png",
+	"1F699.png",
+	"1F68E.png",
+	"1F440.png",
+	"1F442.png",
+	"1F443.png",
+	"1F444.png",
+	"1F445.png",
+	"1F446.png",
+	"1F447.png",
+	"1F448.png",
+	"1F449.png",
+	"1F450.png",
+	"1F44F.png",
+	"270B.png",
+	"270C.png",
+	"1F44A.png",
+	"1F44B.png",
+	"1F44C.png",
+	"1F44D.png",
+	"1F44E.png",
+	"1F4AA.png",
+	"1F64F.png",
+	"1F46C.png",
+	"1F46D.png",
+	"1F46F.png",
+	"1F491.png",
+	"1F48F.png",
+	"1F46A.png",
+	"1F46B.png",
+	"1F466.png",
+	"1F467.png",
+	"1F468.png",
+	"1F469.png",
+	"1F470.png",
+	"1F471.png",
+	"1F474.png",
+	"1F475.png",
+	"1F476.png",
+	"1F478.png",
+	"1F46E.png",
+	"1F482.png",
+	"1F479.png",
+	"1F480.png",
+	"1F43D.png",
+	"1F42D.png",
+	"1F431.png",
+	"1F436.png",
+}
 return EmojiTable

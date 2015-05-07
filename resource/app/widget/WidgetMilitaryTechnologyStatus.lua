@@ -44,7 +44,7 @@ function WidgetMilitaryTechnologyStatus:CreateNormalStatus()
     UIKit:ttfLabel({
         text = _("请选择一个科技进行研发"),
         size = 20,
-        color = 0x797154
+        color = 0x615b44
     }):align(display.CENTER, normal_node:getContentSize().width/2,normal_node:getContentSize().height/2-20)
         :addTo(normal_node)
     normal_node:setVisible(false)

@@ -9,6 +9,7 @@ local GameUIStrikePlayer = import(".GameUIStrikePlayer")
 local WidgetAllianceEnterButtonProgress = import("..widget.WidgetAllianceEnterButtonProgress")
 local SpriteConfig = import("..sprites.SpriteConfig")
 local UILib = import(".UILib")
+local BelvedereEntity = import("..entity.BelvedereEntity")
 
 function GameUIAllianceVillageEnter:ctor(building,isMyAlliance,my_alliance,enemy_alliance)
 	GameUIAllianceVillageEnter.super.ctor(self,building,isMyAlliance,my_alliance)
@@ -130,7 +131,7 @@ end
 function GameUIAllianceVillageEnter:GetBuildingInfo()
 	if self:IsRuins() then
 		return {{
-	        {_("坐标"),0x797154},
+	        {_("坐标"),0x615b44},
 	        {self:GetLocation(),0x403c2f},
     	}}
 	end
@@ -147,7 +148,7 @@ function GameUIAllianceVillageEnter:GetBuildingInfo()
 		self:GetEnemyAlliance():AddListenOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
 	end
 	local location = {
-        {_("坐标"),0x797154},
+        {_("坐标"),0x615b44},
         {self:GetLocation(),0x403c2f},
     }
 	local labels = {}
@@ -158,15 +159,15 @@ function GameUIAllianceVillageEnter:GetBuildingInfo()
 	 		villageEvent = self:GetEnemyAlliance():FindVillageEventByVillageId(village_id)
 		    if villageEvent then  --敌方联盟人占领
 		      	local occupy_label = {
-            		{_("占领者"),0x797154},
+            		{_("占领者"),0x615b44},
             		{villageEvent:PlayerData().name,0x403c2f}
         		}
         		local current_collect_label =  {
-		            {_("当前采集"),0x797154},
+		            {_("当前采集"),0x615b44},
 		            {villageEvent:CollectCount() .. "(" .. villageEvent:CollectPercent()  .. "%)",0x403c2f,900},
         		}
         		local end_time_label = {
-		            {_("完成时间"),0x797154},
+		            {_("完成时间"),0x615b44},
 		            {
 		                villageEvent:GetTime() == 0 and _("已完成") or GameUtils:formatTimeStyle1(villageEvent:GetTime()),
 		                0x403c2f,
@@ -174,44 +175,44 @@ function GameUIAllianceVillageEnter:GetBuildingInfo()
 		            },
         		}
         		labels = {location,occupy_label,current_collect_label,end_time_label}
-        		local str = self:GetVillageInfo().resource - villageEvent:CollectCount() .. "/" .. VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+        		local str = string.formatnumberthousands(self:GetVillageInfo().resource - villageEvent:CollectCount()) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
 				local percent = (self:GetVillageInfo().resource - villageEvent:CollectCount())/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
 				self:GetProgressTimer():setPercentage(percent*100)
 				self:GetProcessLabel():setString(str)
 				self:GetEnemyAlliance():AddListenOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventTimer)
 		    else --没人占领
 		    	local no_one_label = {
-		            {_("占领者"),0x797154},
+		            {_("占领者"),0x615b44},
 		            {_("无"),0x403c2f}
         		}
         		labels = {location,no_one_label}
-        		local str = self:GetVillageInfo().resource .. "/" .. VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+        		local str = string.formatnumberthousands(self:GetVillageInfo().resource) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
 				local percent = self:GetVillageInfo().resource/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
 				self:GetProgressTimer():setPercentage(percent*100)
 				self:GetProcessLabel():setString(str)
 		    end
 		else --没人占领
 			local no_one_label = {
-		        {_("占领者"),0x797154},
+		        {_("占领者"),0x615b44},
 		        {_("无"),0x403c2f}
 			}
 			labels = {location,no_one_label}
-			local str = self:GetVillageInfo().resource .. "/" .. VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+			local str = string.formatnumberthousands(self:GetVillageInfo().resource) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
 			local percent = self:GetVillageInfo().resource/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
 			self:GetProgressTimer():setPercentage(percent*100)
 			self:GetProcessLabel():setString(str)
 		end
 	else --我方占领
 		local occupy_label = {
-            		{_("占领者"),0x797154},
+            		{_("占领者"),0x615b44},
             		{villageEvent:PlayerData().name,0x403c2f}
         		}
 		local current_collect_label =  {
-            {_("当前采集"),0x797154},
+            {_("当前采集"),0x615b44},
              {villageEvent:CollectCount() .. "(" .. villageEvent:CollectPercent()  .. "%)",0x403c2f,900},
 		}
 		local end_time_label = {
-            {_("完成时间"),0x797154},
+            {_("完成时间"),0x615b44},
             {
                 villageEvent:GetTime() == 0 and _("已完成") or GameUtils:formatTimeStyle1(villageEvent:GetTime()),
                 0x403c2f,
@@ -219,7 +220,7 @@ function GameUIAllianceVillageEnter:GetBuildingInfo()
             },
 		}
 		labels = {location,occupy_label,current_collect_label,end_time_label}
-		local str = self:GetVillageInfo().resource - villageEvent:CollectCount() .. "/" .. VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+		local str = string.formatnumberthousands(self:GetVillageInfo().resource - villageEvent:CollectCount()) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
 		local percent = (self:GetVillageInfo().resource - villageEvent:CollectCount())/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
 		self:GetProgressTimer():setPercentage(percent*100)
 		self:GetProcessLabel():setString(str)
@@ -231,13 +232,13 @@ end
 function GameUIAllianceVillageEnter:OnVillageEventTimer(village_event,left_resource)
 	if self:IsRuins() then return end
 	if village_event:VillageData().id == self:GetVillageInfo().id then
-		local str = left_resource .. "/" .. VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+		local str = string.formatnumberthousands(left_resource) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
 		local percent = left_resource/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
 		self:GetProgressTimer():setPercentage(percent*100)
 		self:GetProcessLabel():setString(str)
 		local label = self:GetInfoLabelByTag(900)
 		if label then
-			label:setString(village_event:CollectCount() .. "(" .. village_event:CollectPercent() .. "%)")
+			label:setString(string.formatnumberthousands(village_event:CollectCount()) .. "(" .. village_event:CollectPercent() .. "%)")
 		end
 		local label = self:GetInfoLabelByTag(1000)
 		if label then
@@ -376,12 +377,17 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
 		end
 	else --我方占领
 		if villageEvent:GetPlayerRole() == villageEvent.EVENT_PLAYER_ROLE.Me then --自己占领
-			local che_button = self:BuildOneButton("capture_38x56.png",_("撤军"),{down = "TROOP_BACK"}):onButtonClicked(function()
+			local che_button = self:BuildOneButton("capture_38x56.png",_("撤军")):onButtonClicked(function()
 
 				NetManager:getRetreatFromVillagePromise(villageEvent:VillageData().alliance.id,villageEvent:Id())
 				self:LeftButtonClicked()
 			end)
-	        buttons =  {che_button}
+
+			local info_button = self:BuildOneButton("icon_info_56x56.png",_("部队")):onButtonClicked(function()
+				self:FindTroopShowInfoFromAllianceBelvedere()
+				self:LeftButtonClicked()
+			end)
+	        buttons =  {che_button,info_button}
 	    elseif villageEvent:GetPlayerRole() ==   villageEvent.EVENT_PLAYER_ROLE.Ally then --盟友占领
 			local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
 	     		if self:CheckCanAttackVillage() then
@@ -401,6 +407,18 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
 	    end
  	end
  	return buttons
+end
+
+function GameUIAllianceVillageEnter:FindTroopShowInfoFromAllianceBelvedere()
+	local village_id = self:GetVillageInfo().id
+    local villageEvent = self:GetMyAlliance():FindVillageEventByVillageId(village_id)
+    if villageEvent then
+    	if villageEvent:GetPlayerRole() == villageEvent.EVENT_PLAYER_ROLE.Me then 
+    		local belvedereEntity = BelvedereEntity.new(villageEvent)
+			belvedereEntity:SetType(BelvedereEntity.ENTITY_TYPE.COLLECT)
+			UIKit:newGameUI("GameUIWatchTowerMyTroopsDetail",belvedereEntity):AddToCurrentScene(true)
+    	end
+    end
 end
 
 function GameUIAllianceVillageEnter:OnMoveOutStage()

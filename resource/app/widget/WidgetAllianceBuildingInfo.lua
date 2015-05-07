@@ -15,7 +15,7 @@ function WidgetAllianceBuildingInfo:ctor()
             size = 20,
             align = cc.ui.TEXT_ALIGN_CENTER,
             dimensions = cc.size(360,0),
-            color = 0x797154
+            color = 0x615b44
         }):align(display.TOP_CENTER, rb_size.width/2, rb_size.height-40)
         :addTo(body)
 

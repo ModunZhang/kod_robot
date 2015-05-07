@@ -7,6 +7,7 @@ local window = import("..utils.window")
 local Localize_item = import("..utils.Localize_item")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetGachaItemBox = import("..widget.WidgetGachaItemBox")
+local WidgetUseItems = import("..widget.WidgetUseItems")
 local intInit = GameDatas.PlayerInitData.intInit
 
 local NORMAL = GameDatas.Gacha.normal
@@ -146,12 +147,12 @@ function GameUIGacha:CreateGachaPool(layer)
         table.insert(gacha_item_table,remove_element)
     end
 
-
+    print("gacha_item_table=",#gacha_item_table)
     -- 当前所在位置
     local current_box,current_index
     for i=1,16 do
 
-        local gahca_box =WidgetGachaItemBox.new(gacha_item_table[i],isSenior):addTo(layer,2)
+        local gahca_box =WidgetGachaItemBox.new(gacha_item_table[i],isSenior,self):addTo(layer,2)
         if i<6 then
             if i>1 then
                 x = x+box_width+gap
@@ -277,6 +278,7 @@ function GameUIGacha:CreateGachaPool(layer)
         main:GetHomeButton():setButtonEnabled(false)
         self.award =self.award or {} -- 抽到物品的图标和名字node,开启下次抽奖需移除
         local item_name = item[1]
+        print("item_name==",item_name)
         self.current_gacha_item_count = item[2]
         self.current_gacha_item_name = item_name
         layer:EnAbleButton(false)
@@ -410,11 +412,15 @@ function GameUIGacha:InitOrdinary()
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
                 if User:GetOddFreeNormalGachaCount()<1 and self.city:GetResourceManager():GetCasinoTokenResource():GetValue()<intInit.casinoTokenNeededPerNormalGacha.value then
-                    UIKit:showMessageDialog(_("提示"),_("赌币不足"))
+                    WidgetUseItems.new():Create({
+                        item_type = WidgetUseItems.USE_TYPE.RESOURCE,
+                        item_name = "casinoTokenClass_1"
+                    }):AddToCurrentScene()
                 else
                     NetManager:getNormalGachaPromise():done(function(response)
                         if response.msg.playerData then
                             local data = response.msg.playerData
+                            dump(data)
                             local items = {}
                             for i,v in ipairs(data) do
                                 local key = string.split(v[1], ".")[1]
@@ -498,7 +504,10 @@ function GameUIGacha:InitDeluxe()
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
                 if self.city:GetResourceManager():GetCasinoTokenResource():GetValue()<intInit.casinoTokenNeededPerAdvancedGacha.value then
-                    UIKit:showMessageDialog(_("提示"),_("赌币不足"))
+                    WidgetUseItems.new():Create({
+                        item_type = WidgetUseItems.USE_TYPE.RESOURCE,
+                        item_name = "casinoTokenClass_1"
+                    }):AddToCurrentScene()
                 else
                     NetManager:getAdvancedGachaPromise():done(function(response)
                         if response.msg.playerData then
@@ -587,6 +596,9 @@ function GameUIGacha:OnCountInfoChanged()
     end
 end
 return GameUIGacha
+
+
+
 
 
 

@@ -951,8 +951,10 @@ function GameUIShop:onEnter()
         :addTo(content)
         :align(display.CENTER, window.left + 320, window.top - 1600)
         :onButtonClicked(function(event)
-            dump(Alliance_Manager:GetMyAlliance(),"调试自己联盟的数据---")
-            device.showAlert("提示","联盟数据输出成功",{_("确定")})
+            local alliance = Alliance_Manager:GetMyAlliance()
+            if not alliance:IsDefault() then 
+                device.showAlert("提示",alliance:Id(),{_("确定")})
+            end
         end)
 
     WidgetPushButton.new(

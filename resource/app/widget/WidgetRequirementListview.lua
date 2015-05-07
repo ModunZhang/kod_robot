@@ -13,7 +13,7 @@ function WidgetRequirementListview:ctor(parms)
     self.listParms = parms.listParms
     self.contents = parms.contents
 
-    self.width = 548
+    self.width = 540
     self:setContentSize(cc.size(self.width, self.listview_height+50))
     self:setAnchorPoint(cc.p(0.5,0))
 

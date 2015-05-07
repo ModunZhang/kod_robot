@@ -85,7 +85,7 @@ function WidgetBuyGoods:ctor(item)
         size = 20,
         color = 0x403c2f,
         dimensions = cc.size(400,0)
-    }):align(display.LEFT_TOP,item_bg:getPositionX()+item_bg:getContentSize().width/2+30, 280):addTo(back_ground)
+    }):align(display.LEFT_CENTER,item_bg:getPositionX()+item_bg:getContentSize().width/2+34, 240):addTo(back_ground)
     -- progress
     local slider_height, label_height = size.height - 170, size.height - 170
 

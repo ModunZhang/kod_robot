@@ -28,7 +28,6 @@ function GameUIBase:onEnter()
     if ext.closeKeyboard then
         ext.closeKeyboard()
     end
-    UIKit:CheckOpenUI(self)
 end
 
 function GameUIBase:onEnterTransitionFinish()
@@ -78,6 +77,7 @@ end
 
 function GameUIBase:OnMoveInStage()
 -- app:lockInput(false)
+    UIKit:CheckOpenUI(self)
 end
 
 function GameUIBase:OnMoveOutStage()
@@ -222,9 +222,6 @@ function GameUIBase:CreateVerticalListViewDetached(left_bottom_x, left_bottom_y,
         viewRect = cc.rect(left_bottom_x, left_bottom_y, width, height),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }
-end
-function GameUIBase:CreatePopupBg(height)
-    return WidgetUIBackGround.new({height=height})
 end
 function GameUIBase:CreateTutorialLayer()
     local node = display.newNode():addTo(self, 3000)

@@ -119,7 +119,8 @@ function DataUtils:getGemByTimeInterval(interval)
     return gem
 end
 --龙相关计算
-local config_dragonAttribute = GameDatas.Dragons.dragonAttributes
+local config_dragonLevel = GameDatas.Dragons.dragonLevel
+local config_dragonStar = GameDatas.Dragons.dragonStar
 local config_dragonSkill = GameDatas.Dragons.dragonSkills
 local config_equipments = GameDatas.DragonEquipments.equipments
 local config_dragoneyrie = GameDatas.DragonEquipments
@@ -163,8 +164,8 @@ end
 function DataUtils:getDragonBaseStrengthAndVitality(star,level)
     star = checkint(star)
     level = checkint(level)
-    return config_dragonAttribute[star].initStrength + level * config_dragonAttribute[star].perLevelStrength,
-        config_dragonAttribute[star].initVitality + level * config_dragonAttribute[star].perLevelVitality
+    return config_dragonLevel[level].strength + config_dragonStar[star].initStrength,
+    config_dragonLevel[level].vitality + config_dragonStar[star].initVitality
 end
 
 function DataUtils:getDragonEquipmentAttribute(body,max_star,star)

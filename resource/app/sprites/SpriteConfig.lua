@@ -93,22 +93,22 @@ end
 
 create_building_config(
     {"other_keep"}
-    ,create_config(MIN_LEVEL, level(1), "other_keep_1.png", offset(60, 225), scale(1))
-    ,create_config(level(2), level(5), "other_keep_2.png", offset(60, 245), scale(1))
-    ,create_config(level(6), MAX_LEVEL, "other_keep_3.png", offset(60, 285), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "other_keep_1.png", offset(60, 225), scale(1))
+    ,create_config(level(6), level(15), "other_keep_2.png", offset(60, 245), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "other_keep_3.png", offset(60, 285), scale(1))
 )
 create_building_config(
     {"my_keep"}
-    ,create_config(MIN_LEVEL, level(1), "my_keep_1.png", offset(60, 225), scale(1))
-    ,create_config(level(2), level(5), "my_keep_2.png", offset(60, 245), scale(1))
-    ,create_config(level(6), MAX_LEVEL, "my_keep_3.png", offset(60, 285), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "my_keep_1.png", offset(60, 225), scale(1))
+    ,create_config(level(6), level(15), "my_keep_2.png", offset(60, 245), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "my_keep_3.png", offset(60, 285), scale(1))
 )
 
 create_building_config(
     {"keep"}
-    ,create_config(MIN_LEVEL, level(1), "keep_1.png", offset(60, 225), scale(1), decorator("image", "keep_1_d.png", offset(124, -100)))
-    ,create_config(level(2), level(5), "keep_2.png", offset(60, 245), scale(1), decorator("image", "keep_2_d.png", offset(126, -126)))
-    ,create_config(level(6), MAX_LEVEL, "keep_3.png", offset(60, 285), scale(1), decorator("image", "keep_3_d.png", offset(121, -167)))
+    ,create_config(MIN_LEVEL, level(5), "keep_1.png", offset(60, 225), scale(1), decorator("image", "keep_1_d.png", offset(124, -100)))
+    ,create_config(level(6), level(15), "keep_2.png", offset(60, 245), scale(1), decorator("image", "keep_2_d.png", offset(126, -126)))
+    ,create_config(level(16), MAX_LEVEL, "keep_3.png", offset(60, 285), scale(1), decorator("image", "keep_3_d.png", offset(121, -167)))
 )
 create_building_config(
     {"dragonEyrie"}
@@ -209,47 +209,47 @@ create_building_config(
 -- 装饰小屋
 create_building_config(
     {"dwelling"}
-    ,create_config(MIN_LEVEL, level(1), "dwelling_1.png", offset(0, 50), scale(1))
-    ,create_config(level(2), level(2), "dwelling_2.png", offset(0, 60), scale(1))
-    ,create_config(level(3), MAX_LEVEL, "dwelling_3.png", offset(0, 60), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "dwelling_1.png", offset(0, 50), scale(1))
+    ,create_config(level(6), level(15), "dwelling_2.png", offset(0, 60), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "dwelling_3.png", offset(0, 60), scale(1))
 )
 create_building_config(
     {"farmer"}
-    ,create_config(MIN_LEVEL, level(1), "farmer_1.png", offset(0, 50), scale(1))
-    ,create_config(level(2), level(2), "farmer_2.png", offset(0, 50), scale(1))
-    ,create_config(level(3), MAX_LEVEL, "farmer_3.png", offset(0, 50), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "farmer_1.png", offset(0, 50), scale(1))
+    ,create_config(level(6), level(15), "farmer_2.png", offset(0, 50), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "farmer_3.png", offset(0, 50), scale(1))
 )
 create_building_config(
     {"woodcutter"}
-    ,create_config(MIN_LEVEL, level(1), "woodcutter_1.png", offset(0, 50), scale(1))
-    ,create_config(level(2), level(2), "woodcutter_2.png", offset(0, 60), scale(1))
-    ,create_config(level(3), MAX_LEVEL, "woodcutter_3.png", offset(0, 70), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "woodcutter_1.png", offset(0, 50), scale(1))
+    ,create_config(level(6), level(15), "woodcutter_2.png", offset(0, 60), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "woodcutter_3.png", offset(0, 70), scale(1))
 )
 create_building_config(
     {"quarrier"}
-    ,create_config(MIN_LEVEL, level(1), "quarrier_1.png", offset(0, 50), scale(1))
-    ,create_config(level(2), level(2), "quarrier_2.png", offset(0, 60), scale(1))
-    ,create_config(level(3), MAX_LEVEL, "quarrier_3.png", offset(0, 70), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "quarrier_1.png", offset(0, 50), scale(1))
+    ,create_config(level(6), level(15), "quarrier_2.png", offset(0, 60), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "quarrier_3.png", offset(0, 70), scale(1))
 )
 create_building_config(
     {"miner"}
-    ,create_config(MIN_LEVEL, level(1), "miner_1.png", offset(0, 50), scale(1))
-    ,create_config(level(2), level(2), "miner_2.png", offset(0, 50), scale(1))
-    ,create_config(level(3), MAX_LEVEL, "miner_3.png", offset(0, 50), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "miner_1.png", offset(0, 50), scale(1))
+    ,create_config(level(6), level(15), "miner_2.png", offset(0, 50), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "miner_3.png", offset(0, 50), scale(1))
 )
 
 -- walls
 create_building_config(
     {"wall"}
-    ,create_config(MIN_LEVEL, level(1), "gate_1.png", offset(0, 100), scale(1))
-    ,create_config(level(2), level(2), "gate_2.png", offset(0, 100), scale(1))
-    ,create_config(level(3), MAX_LEVEL, "gate_3.png", offset(0, 100), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "gate_1.png", offset(0, 100), scale(1))
+    ,create_config(level(6), level(15), "gate_2.png", offset(0, 100), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "gate_3.png", offset(0, 100), scale(1))
 )
 create_building_config(
     {"tower"}
-    ,create_config(MIN_LEVEL, level(1), "tower_none_1.png", offset(0, 100), scale(1))
-    ,create_config(level(2), level(2), "tower_none_2.png", offset(0, 100), scale(1))
-    ,create_config(level(3), MAX_LEVEL, "tower_none_3.png", offset(0, 100), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "tower_none_1.png", offset(0, 100), scale(1))
+    ,create_config(level(6), level(15), "tower_none_2.png", offset(0, 100), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "tower_none_3.png", offset(0, 100), scale(1))
 )
 
 -- village

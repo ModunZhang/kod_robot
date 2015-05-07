@@ -35,8 +35,8 @@ GameUIHospital.HEAL_NEED_RESOURCE_TYPE ={
 
 local COIN = GameUIHospital.HEAL_NEED_RESOURCE_TYPE.COIN
 
-function GameUIHospital:ctor(city,building)
-    GameUIHospital.super.ctor(self,city,_("医院"),building)
+function GameUIHospital:ctor(city,building,default_tab)
+    GameUIHospital.super.ctor(self,city,_("医院"),building,default_tab)
     self.heal_resource_item_table = {}
     self.treat_soldier_boxes_table = {}
 end

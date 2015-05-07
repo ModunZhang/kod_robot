@@ -18,13 +18,16 @@ function WidgetPVEStartAirship:SetUpButtons()
     return
         {
             {
-                label = _("传送"), callback = function()
+                label = _("传送"), 
+                icon = "pve_icon_through.png",
+                callback = function()
                     UIKit:newWidgetUI("WidgetPVESelectStage",self.user):AddToCurrentScene(true)
                     self:removeFromParent()
                 end
             },
             {
-                label = _("离开")
+                label = _("离开"),
+                icon = "pve_icon_leave.png",
             }
         }
 end

@@ -18,8 +18,8 @@ function WidgetPVEResource:GetDesc()
 end
 function WidgetPVEResource:SetUpButtons()
     return self:GetObject():IsSearched() and
-        { { label = _("离开") } } or
-        { { label = _("进攻"), callback = function() self:Fight() end }, { label = _("离开") } }
+        { { label = _("离开"), icon = "pve_icon_leave.png", } } or
+        { { label = _("进攻"), icon = "pve_icon_fight.png", icon = "pve_icon_fight.png", callback = function() self:Fight() end }, { label = _("离开"), icon = "pve_icon_leave.png", } }
 end
 
 return WidgetPVEResource

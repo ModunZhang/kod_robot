@@ -23,13 +23,15 @@ function WidgetRankingList:ctor(type_)
     WidgetRankingList.super.ctor(self, 762, str, display.cy + 350)
     self.type_ = type_
     self.rank_map = rank_data[type_]
-    WidgetRankingList.lock = true
-    scheduler.performWithDelayGlobal(function()
-        if not WidgetRankingList.lock then
-            WidgetRankingList.rank_data.player = {}
-            WidgetRankingList.rank_data.alliance = {}
-        end
-    end, EXPIRE_TIME)
+    WidgetRankingList.rank_data.player = {}
+    WidgetRankingList.rank_data.alliance = {}
+    -- WidgetRankingList.lock = true
+    -- scheduler.performWithDelayGlobal(function()
+    --     if not WidgetRankingList.lock then
+    --         WidgetRankingList.rank_data.player = {}
+    --         WidgetRankingList.rank_data.alliance = {}
+    --     end
+    -- end, EXPIRE_TIME)
 end
 local function rank_filter(response)
     local data = response.msg
@@ -128,7 +130,7 @@ function WidgetRankingList:onEnter()
 end
 function WidgetRankingList:onExit()
     WidgetRankingList.super.onExit(self)
-    WidgetRankingList.lock = false
+    -- WidgetRankingList.lock = false
 end
 function WidgetRankingList:LoadMore()
     if not self.drop_list then return end
@@ -152,12 +154,11 @@ function WidgetRankingList:LoadMore()
     end
 end
 function WidgetRankingList:ReloadRank(rank)
-    if self.rank_map.power == rank then
+    if rank.myData.rank == json.null then
+        self.my_ranking:setString(_("暂无排名"))
+    else
         local str = self.type_ == "player" and _("我的战斗力排行") or _("我的联盟战斗力排行")
-        self.my_ranking:setString(string.format("%s : %d", str, rank.myData.rank == json.null and 999999 or rank.myData.rank))
-    elseif self.rank_map.kill == rank then
-        local str = self.type_ == "player" and _("我的击杀排行") or _("我的联盟击杀排行")
-        self.my_ranking:setString(string.format("%s : %d", str, rank.myData.rank == json.null and 999999 or rank.myData.rank))
+        self.my_ranking:setString(string.format("%s : %d", str, rank.myData.rank))
     end
     self.current_rank = rank
     self.listview:reload()
@@ -318,6 +319,7 @@ end
 
 
 return WidgetRankingList
+
 
 
 

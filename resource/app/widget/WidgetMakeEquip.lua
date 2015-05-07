@@ -16,16 +16,15 @@ local WidgetMakeEquip = class("WidgetMakeEquip", WidgetPopDialog
     -- end
     )
 local STAR_BG = {
-    "box_100x100_1.png",
-    "box_100x100_2.png",
-    "box_100x100_3.png",
-    "box_100x100_4.png",
-    "box_100x100_5.png",
+    "box_104x104_1.png",
+    "box_104x104_2.png",
+    "box_104x104_3.png",
+    "box_104x104_4.png",
 }
 local DRAGON_BG = {
-    redDragon = "box_100x100_1.png",
-    blueDragon = "box_100x100_2.png",
-    greenDragon = "box_100x100_3.png",
+    redDragon = "box_118x118.png",
+    blueDragon = "box_118x118.png",
+    greenDragon = "box_118x118.png",
 }
 
 -- local EQUIP_LOCALIZE = Localize.equip_material
@@ -77,7 +76,7 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
     -- 装备图标
     local pos = star_bg:getAnchorPointInPoints()
     cc.ui.UIImage.new(UILib.equipment[equip_type]):addTo(star_bg, 2)
-        :align(display.CENTER, pos.x, pos.y):scale(0.5)
+        :align(display.CENTER, pos.x, pos.y):scale(0.62)
 
     -- 装备的数量背景
     local back_ground_97x20 = cc.ui.UIImage.new("back_ground_138x34.png"):addTo(star_bg, 2)
@@ -136,11 +135,11 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
     local instant_button = cc.ui.UIPushButton.new({normal = "green_btn_up_250x65.png",
         pressed = "green_btn_down_250x65.png"}):addTo(back_ground)
         :align(display.CENTER, 150, 100)
-        :setButtonLabel(cc.ui.UILabel.new({
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        :setButtonLabel(UIKit:ttfLabel({
             text = _("立即制造"),
             size = 24,
-            color = UIKit:hex2c3b(0xfff3c7)
+            color = 0xfff3c7,
+            shadow = true
         }))
         :onButtonClicked(function(event)
             if self:IsAbleToMakeEqui(true) then
@@ -175,11 +174,11 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
     }
     ):addTo(back_ground)
         :align(display.CENTER, size.width - 130, 100)
-        :setButtonLabel(cc.ui.UILabel.new({
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        :setButtonLabel(UIKit:ttfLabel({
             text = _("制造"),
             size = 24,
-            color = UIKit:hex2c3b(0xfff3c7)
+            color = 0xfff3c7,
+            shadow = true
         }))
         :onButtonClicked(function(event)
             if self:IsAbleToMakeEqui(false) then
@@ -226,12 +225,13 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
         -- 材料背景根据龙的颜色来
         local material = cc.ui.UIImage.new(DRAGON_BG[equip_config.usedFor]):addTo(back_ground, 2)
             :align(display.CENTER, origin_x + (unit_len + gap_x) * (i - 1), origin_y)
+
         -- 材料icon
         local pos = material:getAnchorPointInPoints()
         local material_image = UILib.dragon_material_pic_map[material_type]
         local image = cc.ui.UIImage.new(material_image):addTo(material, 2)
             :align(display.CENTER, pos.x, pos.y)
-        image:scale(80/math.max(image:getContentSize().width,image:getContentSize().height))
+        image:scale(100/math.max(image:getContentSize().width,image:getContentSize().height))
         -- 数量背景框
         local materials_bg =  cc.ui.UIImage.new("back_ground_96x30.png"):addTo(material, 2)
             :align(display.CENTER, pos.x, pos.y - material:getContentSize().height / 2 - 18)
@@ -268,7 +268,7 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
         :align(display.LEFT_CENTER, 60, 20)
 
     local size = back_ground:getContentSize()
-    self.build_check_box = cc.ui.UICheckBoxButton.new({on = "yes_40x40.png", off = "no_40x40.png" })
+    self.build_check_box = cc.ui.UICheckBoxButton.new({on = "yes_40x40.png", off = "wow_40x40.png" })
         :addTo(condition_bg_1)
         :align(display.LEFT_CENTER, 500, 20)
         :setButtonSelected(true)
@@ -292,7 +292,7 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
     }):addTo(condition_bg_2, 2)
         :align(display.LEFT_CENTER, 60, 20)
 
-    self.coin_check_box = cc.ui.UICheckBoxButton.new({on = "yes_40x40.png", off = "no_40x40.png" })
+    self.coin_check_box = cc.ui.UICheckBoxButton.new({on = "yes_40x40.png", off = "wow_40x40.png" })
         :addTo(condition_bg_2)
         :align(display.LEFT_CENTER, 500, 20)
         :setButtonSelected(true)
@@ -362,8 +362,6 @@ function WidgetMakeEquip:UpdateMaterials()
         local matrials_need = tonumber(v[2])
         local ui = matrials_map[i]
         local current = materials[material_type]
-        LuaUtils:outputTable("materials[material_type]", materials)
-        print("current>>",tolua.type(current))
 
         ui:setString(string.format("%d/%d", current, matrials_need))
         local un_reached = matrials_need > current

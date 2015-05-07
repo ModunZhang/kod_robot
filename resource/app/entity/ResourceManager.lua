@@ -38,7 +38,7 @@ local CASINOTOKEN = ResourceManager.RESOURCE_TYPE.CASINOTOKEN
 local WALLHP = ResourceManager.RESOURCE_TYPE.WALLHP
 
 local RESOURCE_TYPE = ResourceManager.RESOURCE_TYPE
-local dump_buffs = function(...)
+local dump_resources = function(...)
     local t, name = ...
     dump(LuaUtils:table_map(t, function(k, v)
         return RESOURCE_TYPE[k], v
@@ -204,6 +204,7 @@ function ResourceManager:UpdateByCity(city, current_time)
             resource:SetProductionPerHour(current_time, resource_production)
         end
     end
+    dump_resources(total_production_map, "total_production_map--->")
 end
 function ResourceManager:GetCitizenAllocInfo()
     return self.resource_citizen
@@ -275,7 +276,7 @@ function ResourceManager:GetTotalBuffData(city)
             end
         end
     end)
-    dump_buffs(buff_production_map, "建筑对资源的影响--->")
+    dump_resources(buff_production_map, "建筑对资源的影响--->")
     --学院科技
     local techs_buff_map = {
         [WOOD] = 0,
@@ -295,7 +296,7 @@ function ResourceManager:GetTotalBuffData(city)
             techs_buff_map[resource_type] = techs_buff_map[resource_type] + buff_value
         end
     end)
-    dump_buffs(techs_buff_map, "学院科技对资源的影响--->")
+    dump_resources(techs_buff_map, "学院科技对资源的影响--->")
     --道具buuff
     local item_buff_map = {
         [WOOD] = 0,
@@ -323,7 +324,7 @@ function ResourceManager:GetTotalBuffData(city)
             end
         end
     end
-    dump_buffs(item_buff_map, "道具对资源的影响--->")
+    dump_resources(item_buff_map, "道具对资源的影响--->")
     --vip buff
     local vip_buff_map = {
         [WOOD] = User:GetVIPWoodProductionAdd(),
@@ -335,13 +336,13 @@ function ResourceManager:GetTotalBuffData(city)
         [COIN] = 0,
         [CART] = 0,
     }
-    dump_buffs(vip_buff_map, "VIP对资源的影响--->")
+    dump_resources(vip_buff_map, "VIP对资源的影响--->")
     for resource_type,v in pairs(buff_production_map) do
         buff_production_map[resource_type] = v + vip_buff_map[resource_type]
     end
     --end
-    dump_buffs(buff_production_map,"buff_production_map--->")
-    dump_buffs(buff_limt_map,"buff_limt_map--->")
+    dump_resources(buff_production_map,"buff_production_map--->")
+    dump_resources(buff_limt_map,"buff_limt_map--->")
     return buff_production_map,buff_limt_map
 end
 

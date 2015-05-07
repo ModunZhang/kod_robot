@@ -7,6 +7,7 @@ local WidgetAllianceEnterButtonProgress = class("WidgetAllianceEnterButtonProgre
     return display.newProgressTimer("progress_bg_116x89.png", display.PROGRESS_TIMER_RADIAL)
 end)
 function WidgetAllianceEnterButtonProgress:ctor()
+    self:setTouchEnabled(true)
     self:setNodeEventEnabled(true)
     self:setRotationSkewY(180)
 end

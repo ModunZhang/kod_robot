@@ -52,7 +52,7 @@ end
 function GameUIAllianceTitle:BuildUI()
 	local bg = WidgetUIBackGround.new({height=614}):pos(window.left+20,window.bottom+150)
     self:addTouchAbleChild(bg)
-	local title_bar = display.newSprite("title_blue_600x52.png")
+	local title_bar = display.newSprite("title_blue_600x56.png")
 		:addTo(bg)
 		:align(display.CENTER_BOTTOM, 304, 600)
 	UIKit:closeButton():addTo(title_bar)
@@ -138,6 +138,10 @@ function GameUIAllianceTitle:OnBuyAllianceArchonButtonClicked()
         NetManager:getBuyAllianceArchon():done(function(response)
            UIKit:showMessageDialog(nil, _("竞选盟主成功"), function()
            end)
+           local ui_alliance = UIKit:GetUIInstance("GameUIAlliance")
+           if ui_alliance and ui_alliance.RefreshMemberListIf then
+                ui_alliance:RefreshMemberListIf()
+           end
         end)
     end
 end
@@ -152,7 +156,7 @@ function GameUIAllianceTitle:RefreshListView(index)
     		UIKit:ttfLabel({
 				text = v[1],
 				size = 20,
-				color = 0x797154,
+				color = 0x615b44,
 			}):addTo(bg):align(display.LEFT_CENTER, 10, 23)
 			local icon_image = v[2] and  "yes_40x40.png" or "no_40x40.png"
 			display.newSprite(icon_image):align(display.RIGHT_CENTER,537,23):addTo(bg)
@@ -186,7 +190,7 @@ end
 function GameUIAllianceTitle:CreateEditTitleUI()
     local layer = UIKit:shadowLayer()
     local bg = WidgetUIBackGround.new({height=150}):addTo(layer):pos(window.left+20,window.cy-20)
-    local title_bar = display.newSprite("title_blue_600x52.png")
+    local title_bar = display.newSprite("title_blue_600x56.png")
         :addTo(bg)
         :align(display.LEFT_BOTTOM, 0,150-15)
 
@@ -200,12 +204,12 @@ function GameUIAllianceTitle:CreateEditTitleUI()
         text = _("修改联盟职位名称"),
         size = 22,
         color = 0xffedae
-    }):addTo(title_bar):align(display.LEFT_BOTTOM, 100, 10)
+    }):addTo(title_bar):align(display.CENTER, 300, 26)
 
     UIKit:ttfLabel({
         text = _("职位名称"),
         size = 20,
-        color = 0x797154
+        color = 0x615b44
     }):addTo(bg):align(display.LEFT_TOP, 20,150-40)
 
     local editbox = cc.ui.UIInput.new({
@@ -236,6 +240,10 @@ function GameUIAllianceTitle:CreateEditTitleUI()
                 NetManager:getEditAllianceTitleNamePromise(self.title_,newTitle):done(function()
  					self:RefreshTitle()
 					layer:removeFromParent(true)
+                    local ui_alliance = UIKit:GetUIInstance("GameUIAlliance")
+                    if ui_alliance and ui_alliance.RefreshMemberListIf then
+                        ui_alliance:RefreshMemberListIf()
+                    end
 		 		end):fail(function()
 		 			layer:removeFromParent(true)
 		 		end)

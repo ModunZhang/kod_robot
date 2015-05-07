@@ -6,19 +6,19 @@ local TutorialLayer = class('TutorialLayer', function()
 end)
 
 function TutorialLayer:ctor(obj)
-    -- self.left = display.newColorLayer(cc.c4b(255, 0, 0, 255)):addTo(self, 0)
-    -- self.right = display.newColorLayer(cc.c4b(255, 0, 0, 255)):addTo(self, 0)
-    -- self.top = display.newColorLayer(cc.c4b(255, 0, 0, 255)):addTo(self, 0)
-    -- self.bottom = display.newColorLayer(cc.c4b(255, 0, 0, 255)):addTo(self, 0)
-    self.left = display.newLayer():addTo(self, 0)
-    self.right = display.newLayer():addTo(self, 0)
-    self.top = display.newLayer():addTo(self, 0)
-    self.bottom = display.newLayer():addTo(self, 0)
+    self.left = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, 0)
+    self.right = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, 0)
+    self.top = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, 0)
+    self.bottom = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, 0)
+    -- self.left = display.newLayer():addTo(self, 0)
+    -- self.right = display.newLayer():addTo(self, 0)
+    -- self.top = display.newLayer():addTo(self, 0)
+    -- self.bottom = display.newLayer():addTo(self, 0)
     local left, right, top, bottom = self.left, self.right, self.top, self.bottom
     for _, v in pairs{ left, right, top, bottom } do
         v:setContentSize(cc.size(display.width, display.height))
     end
-    self.arrow = Arrow.new():addTo(self):hide()
+    -- self.arrow = Arrow.new():addTo(self):hide()
     self:Reset()
     self:SetTouchObject(obj)
     self:setLocalZOrder(3000)
@@ -76,19 +76,19 @@ function TutorialLayer:GetClickedRect()
         return cc.rect(0, 0, display.width, display.height)
     end
 end
-function TutorialLayer:DefferShow(control, angle, offset_x, offset_y)
-    local rect = control:getCascadeBoundingBox()
-    local x = rect.x + rect.width * 0.5
-    local y = rect.y + rect.height * 0.5
-    self.arrow:OnPositionChanged(x, y)
-    self.arrow:Set(angle, offset_x, offset_y):show()
-    self:Enable():SetTouchObject(control)
-    return cocos_promise.defer(function() return control end)
-end
-function TutorialLayer:DefferHide()
-    self.arrow:hide()
-    return cocos_promise.defer()
-end
+-- function TutorialLayer:DeferShow(control, angle, offset_x, offset_y)
+--     local rect = control:getCascadeBoundingBox()
+--     local x = rect.x + rect.width * 0.5
+--     local y = rect.y + rect.height * 0.5
+--     self.arrow:OnPositionChanged(x, y)
+--     self.arrow:Set(angle, offset_x, offset_y):show()
+--     self:Enable():SetTouchObject(control)
+--     return cocos_promise.defer(function() return control end)
+-- end
+-- function TutorialLayer:DefferHide()
+--     self.arrow:hide()
+--     return cocos_promise.defer()
+-- end
 
 return TutorialLayer
 

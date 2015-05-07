@@ -1,8 +1,8 @@
 local WidgetResources = import('..widget.WidgetResources')
 local GameUIWarehouse = UIKit:createUIClass('GameUIWarehouse',"GameUIUpgradeBuilding")
 
-function GameUIWarehouse:ctor(city,building)
-    GameUIWarehouse.super.ctor(self,city,_("仓库"),building)
+function GameUIWarehouse:ctor(city,building,default_tab)
+    GameUIWarehouse.super.ctor(self,city,_("仓库"),building,default_tab)
 end
 
 function GameUIWarehouse:OnMoveInStage()

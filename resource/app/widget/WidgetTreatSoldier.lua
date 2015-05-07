@@ -120,7 +120,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x5bb800)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_BOTTOM, label_origin_x, size.height - 85 - 11)
+        :align(display.LEFT_BOTTOM, label_origin_x -12, size.height - 85 - 11)
 
     local vs_map = return_vs_soldiers_map(soldier_type)
     local strong_vs = {}
@@ -134,7 +134,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x403c2f)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_CENTER, label_origin_x + label:getContentSize().width, size.height - 85)
+        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width -12, size.height - 85 - 11)
 
     local label = cc.ui.UILabel.new({
         text = "弱势对抗",
@@ -143,7 +143,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x890000)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_BOTTOM, label_origin_x, size.height - 120 - 11)
+        :align(display.LEFT_BOTTOM, label_origin_x - 12, size.height - 120 - 11)
 
     local weak_vs = {}
     for i, v in ipairs(vs_map.weak_vs) do
@@ -156,7 +156,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x403c2f)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_CENTER, label_origin_x + label:getContentSize().width, size.height - 120)
+        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, size.height - 120 - 11)
 
 
     -- food icon
@@ -168,7 +168,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         size = 18,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0x7f775f)
+        color = UIKit:hex2c3b(0x615b44)
     }):addTo(back_ground, 2)
         :align(display.LEFT_CENTER, size.width - 90, size.height - 80)
 
@@ -220,7 +220,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
             align = cc.ui.TEXT_ALIGN_CENTER,
             color = UIKit:hex2c3b(0x403c2f)
         }):addTo(need, 2)
-            :align(display.CENTER, x, size.height - origin_y - 40)
+            :align(display.CENTER, x, size.height - origin_y - 36)
 
         local need = cc.ui.UILabel.new({
             size = 20,
@@ -229,7 +229,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
             color = UIKit:hex2c3b(0x403c2f)
         -- color = display.COLOR_RED
         }):addTo(need, 2)
-            :align(display.CENTER, x, size.height - origin_y - 60)
+            :align(display.CENTER, x, size.height - origin_y - 56)
 
         self.res_map[res_type] = { total = total, need = need }
     end
@@ -244,11 +244,11 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         })
         :addTo(back_ground, 2)
         :align(display.CENTER, 160, 110)
-        :setButtonLabel(cc.ui.UILabel.new({
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        :setButtonLabel(UIKit:ttfLabel({
             text = _("立即治愈"),
             size = 24,
-            color = UIKit:hex2c3b(0xfff3c7)
+            color = 0xfff3c7,
+            shadow = true
         }))
         :onButtonClicked(function(event)
             local soldiers = {{name=self.soldier_type, count=self.count}}
@@ -301,11 +301,12 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         })
         :addTo(back_ground, 2)
         :align(display.CENTER, size.width - 120, 110)
-        :setButtonLabel(cc.ui.UILabel.new({
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        :setButtonLabel(UIKit:ttfLabel({
             text = _("治愈"),
             size = 27,
-            color = UIKit:hex2c3b(0xfff3c7)
+            color = 0xfff3c7,
+            shadow = true
+
         }))
         :onButtonClicked(function(event)
             local hospital = City:GetFirstBuildingByType("hospital")

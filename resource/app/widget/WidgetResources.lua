@@ -119,7 +119,7 @@ function WidgetResources:InitAllResources()
         },
         coin = {
             resource_icon="res_coin_81x68.png",
-            resource_current_value=crm:GetCoinResource():GetResourceValueByCurrentTime(current_time),
+            resource_current_value=GameUtils:formatNumber(crm:GetCoinResource():GetResourceValueByCurrentTime(current_time)),
             total_income=GameUtils:formatNumber(crm:GetCoinResource():GetProductionPerHour()).."/h",
             occupy_citizen=GameUtils:formatNumber(self.city:GetResourceManager():GetPopulationResource():GetNoneAllocatedByTime(current_time)),
             type = "coin"
@@ -201,7 +201,7 @@ function WidgetResources:AddResourceItem(parms)
         -- 单位产能
         item.produce_capacity = createTipItem({
             title = _("单位产能"),
-            title_color = UIKit:hex2c3b(0x797154),
+            title_color = UIKit:hex2c3b(0x615b44),
             value = total_income ,
             value_color = UIKit:hex2c3b(0x403c2f),
             x = icon_bg:getPositionX()+icon_bg:getContentSize().width/2+180,
@@ -211,7 +211,7 @@ function WidgetResources:AddResourceItem(parms)
         --  占用人口
         item.occupy_citizen = createTipItem({
             title = _("占用人口"),
-            title_color = UIKit:hex2c3b(0x797154),
+            title_color = UIKit:hex2c3b(0x615b44),
             value = occupy_citizen ,
             value_color = UIKit:hex2c3b(0x403c2f),
             x = icon_bg:getPositionX()+icon_bg:getContentSize().width/2+180,
@@ -222,7 +222,7 @@ function WidgetResources:AddResourceItem(parms)
             --  维护费用
             item.maintenance_cost = createTipItem({
                 title = _("维护费用"),
-                title_color = UIKit:hex2c3b(0x797154),
+                title_color = UIKit:hex2c3b(0x615b44),
                 value = maintenance_cost ,
                 value_color = UIKit:hex2c3b(0x4ff0000),
                 x = icon_bg:getPositionX()+icon_bg:getContentSize().width/2+180,
@@ -246,7 +246,7 @@ function WidgetResources:AddResourceItem(parms)
         -- 单位产能
         item.produce_capacity = createTipItem({
             title = _("单位产能"),
-            title_color = UIKit:hex2c3b(0x797154),
+            title_color = UIKit:hex2c3b(0x615b44),
             value = total_income ,
             value_color = UIKit:hex2c3b(0x403c2f),
             x = icon_bg:getPositionX()+icon_bg:getContentSize().width/2+180,
@@ -261,7 +261,7 @@ function WidgetResources:AddResourceItem(parms)
         -- local tax_time = townHall:IsInImposing() and GameUtils:formatTimeStyle1(townHall:GetTaxEvent():LeftTime(app.timer:GetServerTime())) or ""
         -- item.tax = createTipItem({
         --     title = title_value,
-        --     title_color = UIKit:hex2c3b(0x797154),
+        --     title_color = UIKit:hex2c3b(0x615b44),
         --     value = tax_time ,
         --     value_color = UIKit:hex2c3b(0x403c2f),
         --     x = 40,
@@ -271,7 +271,7 @@ function WidgetResources:AddResourceItem(parms)
         --  空闲人口
         -- item.free_citizen = createTipItem({
         --     title = _("空闲人口"),
-        --     title_color = UIKit:hex2c3b(0x797154),
+        --     title_color = UIKit:hex2c3b(0x615b44),
         --     value = occupy_citizen ,
         --     value_color = UIKit:hex2c3b(0x403c2f),
         --     x = 40,

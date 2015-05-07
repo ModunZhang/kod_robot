@@ -981,7 +981,7 @@ function GameUIMail:ShowSendMailDetails(mail)
             text = _("收件人")..": ",
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER, 155, bg:getContentSize().height-60)
         :addTo(bg)
     local subject_content_label = cc.ui.UILabel.new(
@@ -999,7 +999,7 @@ function GameUIMail:ShowSendMailDetails(mail)
             text = _("主题")..": ",
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER, 155, bg:getContentSize().height-100)
         :addTo(bg)
     local subject_content_label = cc.ui.UILabel.new(
@@ -1016,7 +1016,7 @@ function GameUIMail:ShowSendMailDetails(mail)
             text = _("日期")..": ",
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER, 155, bg:getContentSize().height-140)
         :addTo(bg)
     local date_label = cc.ui.UILabel.new(
@@ -1065,7 +1065,7 @@ function GameUIMail:ShowMailDetails(mail)
             text = _("主题: "),
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER, 155, size.height-60)
         :addTo(body)
     local subject_content_label = cc.ui.UILabel.new(
@@ -1082,7 +1082,7 @@ function GameUIMail:ShowMailDetails(mail)
             text = _("日期: "),
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER, 155, size.height-100)
         :addTo(body)
     local date_label = UIKit:ttfLabel(
@@ -1324,7 +1324,7 @@ function GameUIMail:CreateReportContent()
                 {
                     text = _("From"),
                     size = 16,
-                    color = 0x797154
+                    color = 0x615b44
                 }):align(display.LEFT_CENTER, 120, 70)
                 :addTo(report_content_bg)
             -- 发出方名字
@@ -1353,7 +1353,7 @@ function GameUIMail:CreateReportContent()
                 {
                     text = _("To"),
                     size = 16,
-                    color = 0x797154
+                    color = 0x615b44
                 }):align(display.LEFT_CENTER, 350, 70)
                 :addTo(report_content_bg)
             -- 发向方名字
@@ -1577,7 +1577,7 @@ function GameUIMail:CreateSavedReportContent()
                 {
                     text = _("From"),
                     size = 16,
-                    color = 0x797154
+                    color = 0x615b44
                 }):align(display.LEFT_CENTER, 120, 70)
                 :addTo(report_content_bg)
             -- 发出方名字
@@ -1606,7 +1606,7 @@ function GameUIMail:CreateSavedReportContent()
                 {
                     text = _("To"),
                     size = 16,
-                    color = 0x797154
+                    color = 0x615b44
                 }):align(display.LEFT_CENTER, 350, 70)
                 :addTo(report_content_bg)
             -- 发向方名字
@@ -1658,7 +1658,7 @@ function GameUIMail:OpenReplyMail(mail)
             text = _("收件人："),
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.RIGHT_CENTER,120, r_size.height-70)
         :addTo(reply_mail)
     local addressee_input_box_image = display.newSprite("input_box.png",350, r_size.height-70):addTo(reply_mail)
@@ -1669,7 +1669,7 @@ function GameUIMail:OpenReplyMail(mail)
             font = UIKit:getFontFilePath(),
             size = 18,
             dimensions = cc.size(410,24),
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER,10,18)
         :addTo(addressee_input_box_image)
     -- 主题
@@ -1678,7 +1678,7 @@ function GameUIMail:OpenReplyMail(mail)
             text = _("主题："),
             font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.RIGHT_CENTER,120, r_size.height-120)
         :addTo(reply_mail)
     local subject_input_box_image = display.newSprite("input_box.png",350, r_size.height-120):addTo(reply_mail)
@@ -1688,7 +1688,7 @@ function GameUIMail:OpenReplyMail(mail)
             font = UIKit:getFontFilePath(),
             size = 18,
             dimensions = cc.size(410,24),
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER,10,18)
         :addTo(subject_input_box_image)
     -- 分割线
@@ -1700,7 +1700,7 @@ function GameUIMail:OpenReplyMail(mail)
             font = UIKit:getFontFilePath(),
             size = 18,
             dimensions = cc.size(410,24),
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER,30,r_size.height-180)
         :addTo(reply_mail)
     -- 回复的邮件内容

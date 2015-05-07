@@ -8,12 +8,13 @@ local UIListView = import(".UIListView")
 local UIScrollView = import(".UIScrollView")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
+local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 
 function GameAllianceApproval:onEnter()
 	GameAllianceApproval.super.onEnter(self)
 	local layer = UIKit:shadowLayer():addTo(self)
-	local bg = self:CreatePopupBg(754):addTo(layer):pos(window.left+10,window.bottom+50)
-	local title_bar = display.newSprite("title_blue_600x52.png")
+	local bg = WidgetUIBackGround.new({height=754}):addTo(layer):pos(window.left+10,window.bottom+50)
+	local title_bar = display.newSprite("title_blue_600x56.png")
 		:addTo(bg)
 		:align(display.LEFT_BOTTOM, 2, 754 - 20)
 	UIKit:closeButton():align(display.BOTTOM_RIGHT,title_bar:getContentSize().width, 0)
@@ -45,11 +46,21 @@ function GameAllianceApproval:RefreshListView()
 end
 
 
+function GameAllianceApproval:OnPlayerDetailButtonClicked(memberId)
+    UIKit:newGameUI('GameUIAllianceMemberInfo',false,memberId,function()end):AddToCurrentScene(true)
+end
+
 function GameAllianceApproval:GetListItem(player)
 	local item = self.listView:newItem()
 	local bg = WidgetUIBackGround.new({width = 568,height = 152},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
 	local icon_box = display.newSprite("alliance_item_flag_box_126X126.png"):align(display.LEFT_BOTTOM, 10,15):addTo(bg)
 	UIKit:GetPlayerCommonIcon():addTo(icon_box):pos(icon_box:getContentSize().width/2,icon_box:getContentSize().height/2)
+	WidgetPushTransparentButton.new(cc.rect(0,0,126,126))
+		:align(display.LEFT_BOTTOM, 0, 0)
+		:addTo(icon_box)
+		:onButtonClicked(function()
+			self:OnPlayerDetailButtonClicked(player.id)
+		end)
 	local line = display.newScale9Sprite("dividing_line.png")
 		:align(display.LEFT_CENTER,icon_box:getPositionX()+icon_box:getContentSize().width + 5,icon_box:getPositionY() + icon_box:getContentSize().height/2)
 		:addTo(bg)
@@ -108,6 +119,13 @@ end
 function GameAllianceApproval:OnAgreeButtonClicked(memberId)
 	NetManager:getApproveJoinAllianceRequestPromise(memberId):done(function(result)
 		self:RefreshListView()
+		end):fail(function(msg)
+			local code = msg.errcode and msg.errcode[1].code or nil
+			if code then
+				if UIKit:getErrorCodeKey(code) == 'playerCancelTheJoinRequestToTheAlliance' then
+					self:OnRefuseButtonClicked(memberId)
+				end
+			end
 	end)
 end
 

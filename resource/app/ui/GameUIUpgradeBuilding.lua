@@ -2,7 +2,7 @@ local GameUIWithCommonHeader = import('.GameUIWithCommonHeader')
 local CommonUpgradeUI = import('.CommonUpgradeUI')
 local GameUIUpgradeBuilding = class('GameUIUpgradeBuilding', GameUIWithCommonHeader)
 
-function GameUIUpgradeBuilding:ctor(city, title , building,default_tab)
+function GameUIUpgradeBuilding:ctor(city, title , building, default_tab)
     GameUIUpgradeBuilding.super.ctor(self,city, title)
     self.upgrade_city = city
     self.default_tab = default_tab
@@ -20,6 +20,11 @@ function GameUIUpgradeBuilding:CreateTabButtons(param, cb)
         tag = "upgrade",
         default = is_default_upgrade,
     })
+    for i,v in ipairs(param) do
+        if v.tag == self.default_tab then
+            v.default = true
+        end
+    end
     return GameUIUpgradeBuilding.super.CreateTabButtons(self,param,function(tag)
         if tag == "upgrade" then
             if not self.upgrade_layer then

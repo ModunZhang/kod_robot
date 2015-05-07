@@ -4,11 +4,12 @@
 --
 local UILib = import("..ui.UILib")
 local Localize_item = import("..utils.Localize_item")
+local Localize = import("..utils.Localize")
 
 local WidgetGachaItemBox = class("WidgetGachaItemBox",function ()
     return display.newNode()
 end)
-function WidgetGachaItemBox:ctor(gacha_item,isSenior)
+function WidgetGachaItemBox:ctor(gacha_item,isSenior,include_tips_node)
     self:setContentSize(cc.size(92,92))
     self:align(display.CENTER)
     self.gacha_item = gacha_item
@@ -17,10 +18,10 @@ function WidgetGachaItemBox:ctor(gacha_item,isSenior)
     -- item icon
     local item_icon = display.newScale9Sprite(self:GetGachaItemIcon()):addTo(self)
     item_icon:scale(74/item_icon:getContentSize().width)
-    self:SetNodeEvent(gacha_box)
+    self:SetNodeEvent(gacha_box,include_tips_node)
 end
-function WidgetGachaItemBox:SetNodeEvent(gacha_box)
-    UIKit:addTipsToNode( gacha_box,Localize_item.item_name[self.gacha_item.itemName] )
+function WidgetGachaItemBox:SetNodeEvent(gacha_box,include_tips_node)
+    UIKit:addTipsToNode(gacha_box,Localize_item.item_name[self:GetGachaItemName()] or Localize.fight_reward[self:GetGachaItemName()],include_tips_node)
 end
 -- 设置起点或取消起点状态
 function WidgetGachaItemBox:SetOrginStatus()
@@ -117,11 +118,12 @@ function WidgetGachaItemBox:ResetLigt()
     end
 
 end
-function WidgetGachaItemBox:GetGachaItemName( )
-    return self.gacha_item.itemName
+function WidgetGachaItemBox:GetGachaItemName()
+   return self.gacha_item.itemName
 end
 function WidgetGachaItemBox:GetGachaItemIcon( )
-    return UILib.item[self:GetGachaItemName()]
+    local name = self:GetGachaItemName()
+    return UILib.item[name]
 end
 function WidgetGachaItemBox:RemoveSelectStatus( )
     if self.select_box then

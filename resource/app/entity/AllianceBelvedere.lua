@@ -2,7 +2,9 @@
 -- Author: Danny He
 -- Date: 2014-12-30 15:10:58
 --
-
+--[[ 
+给瞭望塔、区域地图事件条使用、区域地图的行军路线会从这里读取属性来判定是否显示
+--]]
 local Enum = import("..utils.Enum")
 local MultiObserver = import(".MultiObserver")
 local AllianceBelvedere = class("AllianceBelvedere",MultiObserver)
@@ -114,10 +116,6 @@ end
 function AllianceBelvedere:HasOtherEvents()
 	local other_count = #self:GetOtherEvents()
 	return other_count > 0,other_count
-end
-
-function AllianceBelvedere:FastCheckHasEvent()
-	PRINT_DEPRECATED("AllianceBelvedere:FastCheckHasEvent or TODO:")
 end
 
 function AllianceBelvedere:OnAttackMarchEventTimerChanged(attackMarchEvent)
@@ -288,42 +286,41 @@ function AllianceBelvedere:GetWatchTowerLevel()
 	return City:GetWatchTowerLevel()
 end
 
-function AllianceBelvedere:CanDisplayMarchEventInMap(level)
-	local watcher_level = level or self:GetWatchTowerLevel()
-	return  watcher_level >= 1 
-end
 --获取显示进攻事件的最大时间
 function AllianceBelvedere:GetWarningTime(level)
 	local watcher_level = level or self:GetWatchTowerLevel()
-	return client_config_watchTower[watcher_level].waringMinute * 60
+	local seconds = client_config_watchTower[watcher_level].waringMinute * 60
+	print(string.format("AllianceBelvedere:GetWarningTime--->%s seconds",seconds))
+	return seconds
 end
-
+--显示来袭的玩家名称
 function AllianceBelvedere:CanDisplayCommingPlayerName(level)
 	local watcher_level = level or self:GetWatchTowerLevel()
 	return watcher_level >= 2
 end
-
+--------------------------------废弃
 function AllianceBelvedere:CanDisplayCommingCityName(level)
 	local watcher_level = level or self:GetWatchTowerLevel()
 	return watcher_level >= 4
 end
 
+--显示敌方的行军路线 除去攻击我的事件
+function AllianceBelvedere:CanDisplayEnemyAllianceMarchEventNotAttackMe(level)
+	local watcher_level = level or self:GetWatchTowerLevel()
+	return watcher_level >= 4
+end
 
+--显示龙的类型 
 function AllianceBelvedere:CanDisplayCommingDragonType(level)
 	local watcher_level = level or self:GetWatchTowerLevel()
 	return watcher_level >= 6
 end
-
-function AllianceBelvedere:CanViewEnemyPlayerCity(level)
-	local watcher_level = level or self:GetWatchTowerLevel()
-	return watcher_level >= 8
-end
-
+--显示详情按钮
 function AllianceBelvedere:CanViewEventDetail(level)
 	local watcher_level = level or self:GetWatchTowerLevel()
 	return watcher_level >= 10
 end
-
+--区域地图能查看敌方城市
 function AllianceBelvedere:CanEnterEnemyCity(level)
 	local watcher_level = level or self:GetWatchTowerLevel()
 	return watcher_level >= 8

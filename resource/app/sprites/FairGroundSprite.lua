@@ -12,6 +12,9 @@ function FairGroundSprite:GetEntity()
     return {
         GetType = function()
             return "FairGround"
+        end,
+        GetLogicPosition = function()
+            return -1, -1
         end
     }
 end

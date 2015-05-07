@@ -69,18 +69,20 @@ function WidgetPVEDialog:Refresh()
     UIKit:ttfLabel({
         text = self:GetDesc(),
         size = 18,
-        color = 0x797154,
+        color = 0x615b44,
         dimensions = cc.size(300,0)
     }):align(display.LEFT_TOP, 220, h*0.5 + 50):addTo(dialog)
 
     --
     local param = self:SetUpButtons()
     for i = #param, 1, -1 do
-        cc.ui.UIPushButton.new({normal = "btn_138x110.png",pressed = "btn_pressed_138x110.png"})
-            :addTo(dialog):pos(w - (#param - i + 0.5) * 138, - 110*0.5 + 10):setButtonLabel(UIKit:ttfLabel({
-            text = param[i].label,
-            size = 25,
-            color = 0xffedae}))
+        local btn = cc.ui.UIPushButton.new({normal = "btn_138x110.png",pressed = "btn_pressed_138x110.png"})
+            :addTo(dialog):pos(w - (#param - i + 0.5) * 138, - 110*0.5 + 10)
+            :setButtonLabel(UIKit:ttfLabel({
+                text = param[i].label,
+                size = 18,
+                color = 0xffedae}))
+            :setButtonLabelOffset(0, -30)
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
                     if type(param[i].callback) == "function" then
@@ -92,6 +94,9 @@ function WidgetPVEDialog:Refresh()
                     end
                 end
             end)
+        if param[i].icon then
+            display.newSprite(param[i].icon):addTo(btn, -1):pos(0, 12)
+        end
     end
 end
 function WidgetPVEDialog:GetIcon()
@@ -113,7 +118,7 @@ function WidgetPVEDialog:GetDesc()
     return ""
 end
 function WidgetPVEDialog:SetUpButtons()
-    return { { label = _("离开") } }
+    return { { label = _("离开"), icon = "pve_icon_leave.png", } }
 end
 function WidgetPVEDialog:GotoNext()
     local cur_index = self.pve_map:GetIndex()
@@ -222,6 +227,7 @@ end
 
 
 return WidgetPVEDialog
+
 
 
 

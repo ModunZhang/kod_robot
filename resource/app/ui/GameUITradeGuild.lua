@@ -43,9 +43,9 @@ local function get_goods_unit(goods_name)
     end
 end
 
-function GameUITradeGuild:ctor(city,building)
+function GameUITradeGuild:ctor(city,building, default_tab)
     local bn = Localize.building_name
-    GameUITradeGuild.super.ctor(self,city,bn[building:GetType()],building)
+    GameUITradeGuild.super.ctor(self,city,bn[building:GetType()],building,default_tab)
     self.trade_manager = User:GetTradeManager()
     self.max_sell_queue = self.building:GetMaxSellQueue()
 end
@@ -173,34 +173,34 @@ function GameUITradeGuild:LoadResource(goods_details,goods_type)
         {
             text = _("资源"),
             size = 20,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER,50, 570)
         :addTo(layer)
     UIKit:ttfLabel(
         {
             text = _("数量"),
             size = 20,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER,135, 570)
         :addTo(layer)
     UIKit:ttfLabel(
         {
             text =_("单价"),
             size = 20,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER,250, 570)
         :addTo(layer)
     UIKit:ttfLabel(
         {
             text = _("总价"),
             size = 20,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER,365, 570)
         :addTo(layer)
 
     -- 资源选择框
     local options = self:CreateOptions(goods_details)
-        :pos(40, h-135):addTo(layer)
+        :pos(40, h-140):addTo(layer)
         :onButtonSelectChanged(function(event)
             self:RefreshSellListView(goods_type,event.selected)
         end)
@@ -253,7 +253,7 @@ function GameUITradeGuild:CreateSellItemForListView(listView,goods)
     -- 银币icon
     display.newSprite("res_coin_81x68.png")
         :align(display.CENTER, 310, content:getContentSize().height/2)
-        :addTo(content):scale(0.5)
+        :addTo(content):scale(0.4)
     -- 总价
     UIKit:ttfLabel(
         {
@@ -395,8 +395,8 @@ function GameUITradeGuild:GetGoodsTypeMapToString(goods_type)
 end
 function GameUITradeGuild:CreateOptions(params)
     local checkbox_image = {
-        off = "box_120x120_1.png",
-        on = "box_132x132.png",
+        off = "box_136x136_1.png",
+        on = "box_136x136_2.png",
     }
     local group = cc.ui.UICheckBoxButtonGroup.new(display.LEFT_TO_RIGHT)
 
@@ -407,9 +407,12 @@ function GameUITradeGuild:CreateOptions(params)
             :align(display.CENTER,0,0)
             :addTo(checkBoxButton):scale(0.8)
         group:addButton(checkBoxButton)
-        local num_bg = display.newSprite("number_bg_98x26.png")
-            :align(display.BOTTOM_CENTER, 0, -checkBoxButton:getCascadeBoundingBox().size.height/2+10)
-            :addTo(checkBoxButton)
+        -- local num_bg = display.newSprite("number_bg_98x26.png")
+        --     :align(display.BOTTOM_CENTER, 0, -checkBoxButton:getCascadeBoundingBox().size.height/2+10)
+        --     :addTo(checkBoxButton)
+        local num_bg = UIKit:shadowLayer()
+        num_bg:setContentSize(cc.size(104,26))
+        num_bg:addTo(checkBoxButton):pos(-50,-checkBoxButton:getCascadeBoundingBox().size.height/2+15)
         local num_value = UIKit:ttfLabel(
             {
                 text = GameUtils:formatNumber(v[2]),
@@ -426,7 +429,7 @@ function GameUITradeGuild:CreateOptions(params)
             end
         end
     end
-    group:setButtonsLayoutMargin(0, 27, 0, 0)
+    group:setButtonsLayoutMargin(0, 4, 0, 0)
 
     return group
 end
@@ -441,7 +444,7 @@ function GameUITradeGuild:LoadMyGoodsPage()
     local layer = self.my_goods_layer
     -- 资源小车 btn
     local car_btn = WidgetPushButton.new(
-        {normal = "box_124x124.png",pressed = "box_124x124.png"})
+        {normal = "box_118x118.png",pressed = "box_118x118.png"})
         :addTo(layer)
         :align(display.CENTER, window.left + 110 , window.top - 150)
         :onButtonClicked(function(event)
@@ -517,7 +520,7 @@ function GameUITradeGuild:CreateSellItem(list,index)
 
     -- 基础的元素
     -- 商品背景框
-    local goods_bg = display.newSprite("box_124x124.png")
+    local goods_bg = display.newSprite("box_118x118.png")
         :align(display.LEFT_CENTER, 6, item_height/2)
         :addTo(content)
     local title_bg = display.newSprite("title_blue_430x30.png")
@@ -556,7 +559,7 @@ function GameUITradeGuild:CreateSellItem(list,index)
             {
                 text = goods.goods_status and _("交易成功") or _("等待交易"),
                 size = 20,
-                color = 0x797154
+                color = 0x615b44
             }):align(display.LEFT_CENTER,140, item_height-80)
             :addTo(content)
 
@@ -662,7 +665,7 @@ function GameUITradeGuild:OpenDollyIntro()
     local w,h = body:getContentSize().width,body:getContentSize().height
 
     -- 资源小车 btn
-    local dolly_icon_bg = display.newSprite("box_124x124.png")
+    local dolly_icon_bg = display.newSprite("box_118x118.png")
         :addTo(body)
         :align(display.CENTER, 80,h-90)
 
@@ -674,7 +677,7 @@ function GameUITradeGuild:OpenDollyIntro()
     UIKit:ttfLabel({
         text = _("出售商品需要马车来运输，马车不足则无法出售。在学院提升马车的科技，能够提高每个马车容纳资源和材料的数量"),
         size = 20,
-        color = 0x797154,
+        color = 0x615b44,
         dimensions = cc.size(400,0)
     }):addTo(body)
         :align(display.TOP_LEFT, 160, h-30)
@@ -776,12 +779,12 @@ function GameUITradeGuild:OpenSellDialog()
                 text = _("总价"),
                 size = 22,
                 color = 0x403c2f,
-            }):align(display.LEFT_CENTER, 54 ,70)
+            }):align(display.LEFT_CENTER, 30 ,70)
             :addTo(layer)
         -- 银币icon
         local temp_icon = display.newSprite("res_coin_81x68.png")
             :align(display.CENTER, temp_label:getPositionX()+temp_label:getContentSize().width+24, 70)
-            :addTo(layer):scale(0.5)
+            :addTo(layer):scale(0.4)
         -- 总价
         self.total_price_label = UIKit:ttfLabel(
             {
@@ -797,13 +800,13 @@ function GameUITradeGuild:OpenSellDialog()
                 text = _("资源小车"),
                 size = 22,
                 color = 0x403c2f,
-            }):align(display.LEFT_CENTER, 54 ,30)
+            }):align(display.LEFT_CENTER, 30 ,30)
             :addTo(layer)
         -- 需要小车icon
         local temp_icon = display.newSprite("icon_dolly_128x128.png")
             :align(display.CENTER, temp_label:getPositionX()+temp_label:getContentSize().width+20, 30)
             :addTo(layer)
-            :scale(0.2)
+            :scale(0.3)
         -- 已有小车数量
         self.own_cart_num_label = UIKit:ttfLabel(
             {
@@ -974,12 +977,15 @@ function GameUITradeGuild:OpenSellDialog()
         -- icon
         local x,y = slider:GetEditBoxPostion()
         if parms.icon then
+            local icon_bg = cc.ui.UIImage.new("box_118x118.png"):addTo(slider)
+                :align(display.CENTER, x-80, y)
+            icon_bg:scale(40/icon_bg:getContentSize().width)
             item.icon = display.newSprite(parms.icon)
                 :align(display.CENTER, x-80, y)
                 :addTo(slider)
             local icon = item.icon
             local max = math.max(icon:getContentSize().width,icon:getContentSize().height)
-            icon:scale(40/max)
+            icon:scale(30/max)
         end
         function item:SetIcon(icon)
             local icon = item.icon
@@ -1109,6 +1115,7 @@ function GameUITradeGuild:GetMaterialIndexByName(material_type)
     return build_temp[material_type] or teach_temp[material_type]
 end
 return GameUITradeGuild
+
 
 
 

@@ -382,7 +382,7 @@ function GameUIAllianceShop:CreateRecordItem(item_log,index)
         text = text_1..Localize_item.item_name[item_log.itemName].."X"..item_log.itemCount,
         size = 20,
         color = color_1,
-    }):align(display.LEFT_CENTER, 140 , 70)
+    }):align(display.LEFT_CENTER, 120 , 80)
         :addTo(content)
 
 
@@ -390,14 +390,14 @@ function GameUIAllianceShop:CreateRecordItem(item_log,index)
         text = item_log.playerName,
         size = 20,
         color = 0x403c2f,
-    }):align(display.LEFT_CENTER, 140 , 30)
+    }):align(display.LEFT_CENTER, 120 , 30)
         :addTo(content)
 
     UIKit:ttfLabel({
         text = GameUtils:formatTimeStyle2(item_log.time/1000),
         size = 20,
-        color = 0x797154,
-    }):align(display.LEFT_CENTER, 320 , 30)
+        color = 0x615b44,
+    }):align(display.RIGHT_CENTER, 528 , 30)
         :addTo(content)
 
     item:addContent(content)

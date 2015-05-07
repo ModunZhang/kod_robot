@@ -122,7 +122,7 @@ function GameUIQuickTechnology:BuildTipsUI(technology_node,y)
 	local no_event_label_2 = UIKit:ttfLabel({
 		text = _("选择一个技能进行研发"),
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.BOTTOM_CENTER,278,30):addTo(tips_bg)
 	self.no_event_label_2 = no_event_label_2
 	local upgrade_label = UIKit:ttfLabel({

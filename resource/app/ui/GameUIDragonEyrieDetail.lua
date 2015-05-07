@@ -167,6 +167,9 @@ end
 function GameUIDragonEyrieDetail:RefreshUI()
     local dragon = self:GetDragon()
     local button_tag = self.tab_buttons:GetCurrentTag()
+    -- if button_tag ~= 'skill' and self.skill_ui and self.skill_ui.listView then
+    --     self.skill_ui.listView:removeAllItems()
+    -- end
     if button_tag == 'equipment' then
         self.dragon_hp_label:setString(dragon:Exp() .. "/" .. dragon:GetMaxExp())
         self.hp_process_timer:setPercentage(dragon:Exp()/dragon:GetMaxExp()*100)

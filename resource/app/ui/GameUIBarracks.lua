@@ -13,8 +13,8 @@ local WidgetRecruitSoldier = import("..widget.WidgetRecruitSoldier")
 local SoldierManager = import("..entity.SoldierManager")
 local GameUIBarracks = UIKit:createUIClass("GameUIBarracks", "GameUIUpgradeBuilding")
 local WidgetRecruitSoldier_tag = 1
-function GameUIBarracks:ctor(city, barracks)
-    GameUIBarracks.super.ctor(self, city, _("兵营"),barracks)
+function GameUIBarracks:ctor(city, barracks,default_tab)
+    GameUIBarracks.super.ctor(self, city, _("兵营"),barracks,default_tab)
     self.barracks_city = city
     self.barracks = barracks
 
@@ -234,7 +234,7 @@ function GameUIBarracks:CreateItemWithListView(list_view, soldiers)
 end
 function GameUIBarracks:CreateSpecialItemWithListView( list_view, soldiers ,title,title_img)
     local rect = list_view:getViewRect()
-    local origin_x = 10
+    local origin_x = 14
     local widget_width = 568
     local unit_width = 120
     local gap_x = (widget_width - unit_width * 4-origin_x*2) / 3

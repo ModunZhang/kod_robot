@@ -89,7 +89,7 @@ function GameUIPResourceBuilding:ProduceIncreasePart()
         title = string.format(_("周围2格范围的%s数量"),Localize.building_name[self.building:GetHouseType()]),
         h = 146,
         info = info
-    }):align(display.CENTER, display.cx, display.top-180):addTo(self.info_layer)
+    }):align(display.CENTER, display.cx, display.top-200):addTo(self.info_layer)
 
     local bg_size = bg:getContentSize()
 
@@ -98,7 +98,7 @@ end
 
 -- 构建改建建筑部分
 function GameUIPResourceBuilding:RebuildPart()
-    local bg = WidgetUIBackGround.new({height=584}):align(display.CENTER, display.cx, display.top-570):addTo(self.info_layer)
+    local bg = WidgetUIBackGround.new({height=584,isFrame = "yes"}):align(display.CENTER, display.cx, display.top-570):addTo(self.info_layer)
     local bg_size = bg:getContentSize()
     -- title bg
     local title_bg = display.newSprite("title_blue_586x34.png"):align(display.TOP_CENTER, bg_size.width/2, bg_size.height-24):addTo(bg)
@@ -205,7 +205,7 @@ function GameUIPResourceBuilding:RebuildPart()
 
 
     cc.ui.UIPushButton.new({normal = "green_btn_up_250x65.png",pressed = "green_btn_down_250x65.png"})
-        :setButtonLabel(cc.ui.UILabel.new({UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,text = _("立即转换"), size = 20, color = display.COLOR_WHITE}))
+        :setButtonLabel(UIKit:ttfLabel({text = _("立即转换"), size = 22, color = 0xffedae,shadow = true}))
         :onButtonClicked(function(event)
             if self:CheckSwitch(self.selected_rebuild_to_building) then
                 NetManager:getSwitchBuildingPromise(City:GetLocationIdByBuilding(self.building),self.selected_rebuild_to_building)

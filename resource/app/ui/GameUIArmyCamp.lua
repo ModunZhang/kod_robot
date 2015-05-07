@@ -130,7 +130,7 @@ function GameUIArmyCamp:CreateTopPart()
     -- 空闲部队人口
     self.free_troops = createTipItem({
         title = _("驻防部队人口"),
-        title_color = UIKit:hex2c3b(0x797154),
+        title_color = UIKit:hex2c3b(0x615b44),
         value = City:GetSoldierManager():GetGarrisonSoldierCount(),
         value_color = UIKit:hex2c3b(0x403c2f),
         x = display.cx,
@@ -139,7 +139,7 @@ function GameUIArmyCamp:CreateTopPart()
     -- 驻防部队人口
     self.garrison_troops = createTipItem({
         title = _("出征部队人口"),
-        title_color = UIKit:hex2c3b(0x797154),
+        title_color = UIKit:hex2c3b(0x615b44),
         value = City:GetSoldierManager():GetMarchSoldierCount() ,
         value_color = UIKit:hex2c3b(0x403c2f),
         x = display.cx,

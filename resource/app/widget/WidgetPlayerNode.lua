@@ -35,7 +35,8 @@ end
 function WidgetPlayerNode:RefreshUI()
 	self:GetListView():removeAllItems()
 	self:GetListView():addItem(self:GetBasicInfoItemNode())
-	self:GetListView():addItem(self:GetMedalItemNode())
+	--暂时关闭勋章
+	-- self:GetListView():addItem(self:GetMedalItemNode())
 	self:GetListView():addItem(self:GetTitleItemNode())
 	local data_list = self:BuildDataItemNode()
 	self:GetListView():addItem(data_list)

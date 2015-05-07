@@ -30,7 +30,7 @@ function GameUIShrineReport:BuildUI()
         :addTo(self)
     local bg_node = WidgetUIBackGround.new({height=content_height}):addTo(shadowLayer):pos(window.left+20,window.bottom+140)
     self.bg_node = bg_node
-    local titleBar = display.newScale9Sprite("title_blue_600x52.png")
+    local titleBar = display.newScale9Sprite("title_blue_600x56.png")
         :align(display.CENTER_BOTTOM, 304,content_height - 15)
         :addTo(bg_node)
     local titleLabel = UIKit:ttfLabel({

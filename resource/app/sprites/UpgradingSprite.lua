@@ -78,6 +78,8 @@ function UpgradingSprite:StopBuildingAnimation()
         self.hammer_animation:removeFromParent()
         self.hammer_animation = nil
     end
+
+    self.level_bg:pos(self:GetSpriteTopPosition())
 end
 function UpgradingSprite:CheckCondition()
     -- self:NotifyObservers(function(listener)

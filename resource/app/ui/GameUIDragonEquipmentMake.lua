@@ -35,7 +35,7 @@ function GameUIDragonEquipmentMake:onEnter()
     self.ui_node_main = display.newNode():addTo(backgroundImage)
     self:addTouchAbleChild(backgroundImage)
 	  self.background = backgroundImage:pos((display.width-backgroundImage:getContentSize().width)/2,display.height - backgroundImage:getContentSize().height - 150)
-	  local titleBar = display.newSprite("title_blue_600x52.png")
+	  local titleBar = display.newSprite("title_blue_600x56.png")
 		  :align(display.BOTTOM_LEFT, 2,backgroundImage:getContentSize().height - 15)
 		  :addTo(backgroundImage)
 	  self.mainTitleLabel =  UIKit:ttfLabel({

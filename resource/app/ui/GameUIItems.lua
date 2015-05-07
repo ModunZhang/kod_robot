@@ -152,7 +152,7 @@ function GameUIItems:CreateShopContentByIndex( idx )
     local item_name = UIKit:ttfLabel({
         size = 22,
         color = 0xffedae,
-    }):align(display.LEFT_CENTER, 18 , title_bg:getContentSize().height/2)
+    }):align(display.LEFT_CENTER, 14 , title_bg:getContentSize().height/2)
         :addTo(title_bg)
 
     local own_num = UIKit:ttfLabel({
@@ -167,15 +167,14 @@ function GameUIItems:CreateShopContentByIndex( idx )
         :addTo(content)
 
     local desc = UIKit:ttfLabel({
-        size = 18,
-        color = 0x797154,
+        size = 20,
+        color = 0x615b44,
         dimensions = cc.size(380,0)
     }):align(display.LEFT_CENTER, 19 , 38)
         :addTo(desc_bg)
     -- local icon_bg = display.newSprite("box_120x154.png"):addTo(content):align(display.CENTER, 70, item_height/2)
     local item_bg = display.newSprite("box_118x118.png"):addTo(content):align(display.TOP_CENTER,  70, item_height-10)
     -- local item_icon_color_bg = display.newSprite("box_item_100x100.png"):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
-    local i_icon = display.newSprite("goods_26x26.png"):addTo(item_bg,2):align(display.CENTER, 15, 15)
     local parent = self
     function content:SetOwnCount( new_item )
         own_num:setString(_("拥有")..":"..string.formatnumberthousands(new_item:Count()))
@@ -374,22 +373,21 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
         text = items:GetLocalizeName(),
         size = 22,
         color = 0xffedae,
-    }):align(display.LEFT_CENTER, 20 , title_bg:getContentSize().height/2)
+    }):align(display.LEFT_CENTER, 16 , title_bg:getContentSize().height/2)
         :addTo(title_bg)
 
     local desc = UIKit:ttfLabel({
         text = items:GetLocalizeDesc(),
         size = 18,
-        color = 0x797154,
+        color = 0x615b44,
         dimensions = cc.size(260,0)
-    }):align(display.LEFT_TOP, 156 , item_height-60)
+    }):align(display.LEFT_TOP, 152 , item_height-60)
         :addTo(content)
 
     local icon_bg = display.newSprite("box_120x154.png"):addTo(content):align(display.CENTER, 70, item_height/2)
     local num_bg = display.newSprite("back_ground_118x36.png"):addTo(icon_bg):align(display.CENTER, icon_bg:getContentSize().width/2, 20)
     local item_bg = display.newSprite("box_118x118.png"):addTo(icon_bg):align(display.CENTER, icon_bg:getContentSize().width/2, icon_bg:getContentSize().height-60)
     -- local item_icon_color_bg = display.newSprite("box_item_100x100.png"):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
-    local i_icon = cc.ui.UIImage.new("goods_26x26.png"):addTo(item_bg,2):align(display.CENTER, 15, 15)
 
 
     local own_num = UIKit:ttfLabel({
@@ -427,8 +425,9 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
             self.button = cc.ui.UIPushButton.new({normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"})
                 :setButtonLabel(UIKit:ttfLabel({
                     text = _("使用"),
-                    size = 20,
+                    size = 22,
                     color = 0xffedae,
+                    shadow = true
                 }))
                 :onButtonClicked(function(event)
                     if event.name == "CLICKED_EVENT" then

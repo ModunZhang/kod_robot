@@ -201,7 +201,7 @@ function WidgetPromoteSoldier:UpgradeRequirement()
             resource_type = _("科技点数"),
             isVisible = level_up_config.upgradeTechPointNeed>0,
             isSatisfy =tech_points>=level_up_config.upgradeTechPointNeed,
-            icon="icon_teac.png",
+            icon="bottom_icon_package_77x67.png",
             description=tech_points..'/'..level_up_config.upgradeTechPointNeed,
             canNotBuy = true
         },

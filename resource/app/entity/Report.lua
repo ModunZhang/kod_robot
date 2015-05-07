@@ -318,9 +318,9 @@ function Report:GetBattleAt()
     if self.type == Report.REPORT_TYPE[CITYBESTRIKED]
         or self.type == Report.REPORT_TYPE[STRIKECITY]
     then
-        return data.strikeTarget.cityName
+        return data.strikeTarget.name
     elseif self.type == Report.REPORT_TYPE[ATTACKCITY] then
-        return data.attackTarget.cityName
+        return data.attackTarget.name
     elseif self.type == Report.REPORT_TYPE[VILLAGEBESTRIKED]
         or self.type == Report.REPORT_TYPE[STRIKEVILLAGE]
     then
@@ -534,7 +534,7 @@ function Report:GetFightAttackDragonRoundData()
 end
 function Report:GetFightDefenceDragonRoundData()
     local data = self:GetFightReports()
-    return data.defencePlayerDragonFightData or data.defenceVillageDragonFightData or {}
+    return data.defencePlayerDragonFightData or {}
 end
 function Report:GetFightAttackSoldierRoundData()
     local data = self:GetFightReports()
@@ -542,7 +542,7 @@ function Report:GetFightAttackSoldierRoundData()
 end
 function Report:GetFightDefenceSoldierRoundData()
     local data = self:GetFightReports()
-    return data.defenceVillageSoldierRoundDatas or data.defencePlayerSoldierRoundDatas or {}
+    return data.defencePlayerSoldierRoundDatas or {}
 end
 function Report:IsFightWall()
     local data = self:GetFightReports()
@@ -571,7 +571,7 @@ end
 function Report:GetFightReports()
     local data = self:GetData()
     return data.fightWithHelpDefencePlayerReports or data.fightWithDefencePlayerReports
-        or data.fightWithDefenceVillageReports or {}
+        or {}
 end
 function Report:GetReportResult()
     local data = self.data

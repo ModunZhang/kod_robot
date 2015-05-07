@@ -35,7 +35,7 @@ function GameUIAttackPlayerCity:BuildUI()
 		:addTo(self)
 	local bg_node = WidgetUIBackGround.new({height=content_height}):addTo(shadowLayer):pos(window.left+20,window.bottom+250)
 	self.bg_node = bg_node
-	local titleBar = display.newScale9Sprite("title_blue_600x52.png")
+	local titleBar = display.newScale9Sprite("title_blue_600x56.png")
 		:size(bg_node:getCascadeBoundingBox().width,42)
 		:align(display.LEFT_BOTTOM, -2,content_height - 15)
 		:addTo(bg_node)
@@ -59,7 +59,7 @@ function GameUIAttackPlayerCity:BuildUI()
 	local from_label = UIKit:ttfLabel({
 		text = _("出发地"),
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.LEFT_BOTTOM, line_2:getPositionX()+2, line_2:getPositionY()+4):addTo(bg_node)
 
 	local from_location = self:GetAlliance():GetAllianceMap():FindAllianceBuildingInfoByName('moonGate').location
@@ -75,7 +75,7 @@ function GameUIAttackPlayerCity:BuildUI()
 	local to_label = UIKit:ttfLabel({
 		text = _("目的地"),
 		size = 20,
-		color = 0x797154
+		color = 0x615b44
 	}):align(display.LEFT_BOTTOM, line_1:getPositionX()+2, line_1:getPositionY()+4):addTo(bg_node)
 	UIKit:ttfLabel({
 		text = self.to_location.x .. "," .. self.to_location.y,

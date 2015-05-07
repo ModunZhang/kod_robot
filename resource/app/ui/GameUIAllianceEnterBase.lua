@@ -67,7 +67,7 @@ function GameUIAllianceEnterBase:GetBuildingInfo()
     return
         {
             {
-                {_("坐标"),0x797154},
+                {_("坐标"),0x615b44},
                 {self:GetLocation(),0x403c2f},
             }
         }
@@ -185,7 +185,7 @@ function GameUIAllianceEnterBase:InitBuildingDese()
     self.desc_label = UIKit:ttfLabel({
         text = self:GetBuildingDesc(),
         size = 18,
-        color = 0x797154,
+        color = 0x615b44,
         dimensions = cc.size(400,0)
     }):align(display.LEFT_TOP, 180, self:GetUIHeight()-20):addTo(body)
 

@@ -40,8 +40,8 @@ function GameUIAcademy:GetTechsData()
 	return r
 end
 
-function GameUIAcademy:ctor(city,building)
-	GameUIAcademy.super.ctor(self,city,_("学院"),building)
+function GameUIAcademy:ctor(city,building,default_tab)
+	GameUIAcademy.super.ctor(self,city,_("学院"),building,default_tab)
 	local tree_data = self:GetTechsData()
 	local max_y = (math.ceil(#tree_data/3) - 1) * (142+46) + 71
 	local techNodes = {}
@@ -150,7 +150,7 @@ function GameUIAcademy:BuildTipsUI(technology_node,y)
 	local no_event_label_2 = UIKit:ttfLabel({
 		text = _("选择一个技能进行研发"),
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.BOTTOM_CENTER,278,30):addTo(tips_bg)
 	self.no_event_label_2 = no_event_label_2
 	local upgrade_label = UIKit:ttfLabel({

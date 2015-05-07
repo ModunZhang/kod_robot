@@ -15,7 +15,7 @@ function WidgetPVEKeel:GetDesc()
 end
 function WidgetPVEKeel:SetUpButtons()
     return self:GetObject():IsSearched() and
-        { { label = _("离开") } } or
+        { { label = _("离开"), icon = "pve_icon_leave.png", } } or
         {
             {
                 label = _("知识"), callback = function()

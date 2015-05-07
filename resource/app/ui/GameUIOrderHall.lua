@@ -107,29 +107,28 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
     local content = WidgetUIBackGround.new({width=item_width,height=item_height},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
 
     -- 建筑图片 放置区域左右边框
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.LEFT_CENTER, 10, 120)
+    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.LEFT_BOTTOM, 10, 16)
         :addTo(content):flipX(true)
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.RIGHT_CENTER, 143, 120)
+    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.RIGHT_BOTTOM, 143, 16)
         :addTo(content)
 
     local build_png = SpriteConfig[village_type]:GetConfigByLevel(village_level).png
 
     local building_image = display.newSprite(build_png)
-        :addTo(content):pos(75, 120)
+        :addTo(content):pos(75, 70)
     building_image:setAnchorPoint(cc.p(0.5,0.5))
     building_image:setScale(113/math.max(building_image:getContentSize().width,building_image:getContentSize().height))
-    local level_bg = display.newSprite("back_ground_138x34.png")
-        :addTo(content):pos(76, 34)
-    local villageLevel = UIKit:ttfLabel({
-        text = _("等级")..village_level,
-        size = 20,
-        color = 0x514d3e,
-    }):align(display.CENTER, level_bg:getContentSize().width/2 , level_bg:getContentSize().height/2)
-        :addTo(level_bg)
+    -- local level_bg = display.newSprite("back_ground_138x34.png")
+    --     :addTo(content):pos(76, 34)
+    -- local villageLevel = UIKit:ttfLabel({
+    --     text = _("等级")..village_level,
+    --     size = 20,
+    --     color = 0x514d3e,
+    -- }):align(display.CENTER, level_bg:getContentSize().width/2 , level_bg:getContentSize().height/2)
+    --     :addTo(level_bg)
     -- 村落名字
-    local title_bg = display.newSprite("title_blue_412x30.png")
-        :align(display.LEFT_CENTER, 150, 175)
-        :addTo(content)
+    local title_bg = display.newScale9Sprite("title_blue_430x30.png", item_width/2, 175,cc.size(550,30),cc.rect(15,10,400,10))
+           :align(display.CENTER):addTo(content)
     UIKit:ttfLabel({
         text = Localize.village_name[village_type],
         size = 22,
@@ -145,7 +144,15 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
             text_1 = _("资源总量"),
             text_2 = string.formatnumberthousands(config[village_level].production),
         }
-    ):align(display.RIGHT_CENTER,item_width - 10 , 100)
+    ):align(display.RIGHT_CENTER,item_width - 10 , 120)
+        :addTo(content)
+    local current_level = UIKit:createLineItem(
+        {
+            width = 396,
+            text_1 = _("当前等级"),
+            text_2 = _("等级")..village_level,
+        }
+    ):align(display.RIGHT_CENTER,item_width - 10 , 80)
         :addTo(content)
 
 
@@ -250,7 +257,7 @@ function GameUIOrderHall:InitProficiencyPart()
     UIKit:ttfLabel({
         text = _("显示联盟成员的村落采集资源熟练度,每采集一定的村落资源,就会增加一定的熟练度,熟练度越高,采集相应村落资源的速度就会越快"),
         size = 20,
-        color = 0x797154,
+        color = 0x615b44,
         dimensions = cc.size(500,0)
     }):align(display.CENTER, desc_bg:getContentSize().width/2 , desc_bg:getContentSize().height/2)
         :addTo(desc_bg)

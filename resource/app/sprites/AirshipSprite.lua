@@ -16,6 +16,9 @@ function AirshipSprite:GetEntity()
     return {
         GetType = function()
             return "airship"
+        end,
+        GetLogicPosition = function()
+            return -1, -1
         end
     }
 end

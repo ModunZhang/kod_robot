@@ -6,8 +6,8 @@ local window = import("..utils.window")
 local WidgetManufacture = import("..widget.WidgetManufacture")
 local GameUIToolShop = UIKit:createUIClass("GameUIToolShop", "GameUIUpgradeBuilding")
 
-function GameUIToolShop:ctor(city, toolShop)
-    GameUIToolShop.super.ctor(self, city, _("工具作坊"), toolShop)
+function GameUIToolShop:ctor(city, toolShop, default_tab)
+    GameUIToolShop.super.ctor(self, city, _("工具作坊"), toolShop, default_tab)
     self.tool_shop_city = city
     self.toolShop = toolShop
 end

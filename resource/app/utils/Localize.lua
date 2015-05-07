@@ -406,6 +406,7 @@ local SOLDIER_CATEGORY = {
     ["archer"] = _("弓手"),
     ["cavalry"] = _("骑兵"),
     ["siege"] = _("攻城"),
+    ["hpAdd"] = _("攻城"),
     ["wall"] = _("城墙"),
 }
 local SOLDIER_NAME = {

@@ -42,7 +42,8 @@ local effect_sound_map = {
 	ATTACK_PLAYER_ARRIVE = "sfx_select_armyCamp.wav",
 	STRIKE_PLAYER_ARRIVE = "sfx_select_dragon3.wav",
 	TREATE_SOLDIER = "sfx_heal.mp3",
-	INSTANT_TREATE_SOLDIER = "sfx_instant_heal.mp3"
+	INSTANT_TREATE_SOLDIER = "sfx_instant_heal.mp3",
+	BATTLE_START = "sfx_battle_start.mp3",
 }
 
 local soldier_step_sfx_map = {

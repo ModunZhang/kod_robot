@@ -52,13 +52,13 @@ end
 
 function GameUIAllianceDecorateEnter:GetBuildingInfo()
 	local location = {
-        {_("坐标"),0x797154},
+        {_("坐标"),0x615b44},
         {self:GetLocation(),0x403c2f},
     }
     local w,h = self:GetBuilding():GetSize()
     local occupy_str = string.format("%d x %d",w,h)
     local occupy = {
-        {_("占地"),0x797154},
+        {_("占地"),0x615b44},
         {occupy_str,0x403c2f},
     }
   	return {location,occupy}

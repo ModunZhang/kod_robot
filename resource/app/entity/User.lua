@@ -93,6 +93,11 @@ property(User, "allianceDonate", {
     coin = 1,
     gem = 1,
 })
+---[[
+function User:Terrain()
+    return "grassLand"
+end
+--]]
 function User:ctor(p)
     User.super.ctor(self)
     self.resources = {

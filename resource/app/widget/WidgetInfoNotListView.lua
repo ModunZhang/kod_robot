@@ -53,7 +53,7 @@ function WidgetInfoNotListView:CreateInfoItem(info_message)
         UIKit:ttfLabel({
             text = v[1],
             size = 20,
-            color = 0x797154,
+            color = 0x615b44,
         }):align(display.LEFT_CENTER, 10, item_height/2):addTo(content)
         if v[2] then
             local text_2 = UIKit:ttfLabel({

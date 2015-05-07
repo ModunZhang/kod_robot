@@ -51,7 +51,7 @@ function GameUIStrikePlayer:BuildUI()
 	WidgetPushButton.new({
 		normal = "yellow_btn_up_149x47.png",
 		pressed = "yellow_btn_down_149x47.png"
-		},nil,nil,{down = "DRAGON_STRIKE"})
+		})
 		:align(display.CENTER_BOTTOM,window.cx,window.bottom + 20)
 		:addTo(self.content_node)
 		:setButtonLabel("normal",UIKit:commonButtonLable({
@@ -64,6 +64,8 @@ function GameUIStrikePlayer:BuildUI()
 				UIKit:showMessageDialog(_("提示"),_("您派出的龙可能会因血量过低而死亡，您确定还要派出吗？"), function()
 					self:OnStrikeButtonClicked()
 				end, function()end)
+			else
+				self:OnStrikeButtonClicked()
 			end
 		end)
     self:RefreshListView()
@@ -105,7 +107,7 @@ function GameUIStrikePlayer:GetItem(dragon,power_dragon_type)
 	UIKit:ttfLabel({
 		text = _("生命值") .. " " .. dragon:Hp() .. "/" .. dragon:GetMaxHP(),
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.LEFT_CENTER,20,63):addTo(content_box)
 	local color = 0x007c23
 	if dragon:Status() == 'march' then
@@ -148,10 +150,12 @@ end
 function GameUIStrikePlayer:OnStrikeButtonClicked()
 	if self.strike_type == self.STRIKE_TYPE.CITY then
 		NetManager:getStrikePlayerCityPromise(self:GetSelectDragonType(),self.params):done(function()
+			app:GetAudioManager():PlayeEffectSoundWithKey("DRAGON_STRIKE")
 			self:LeftButtonClicked()
 		end)
 	else
 		NetManager:getStrikeVillagePromise(self:GetSelectDragonType(),self.params.defenceAllianceId,self.params.defenceVillageId):done(function()
+			app:GetAudioManager():PlayeEffectSoundWithKey("DRAGON_STRIKE")
 			self:LeftButtonClicked()
 		end)
 	end

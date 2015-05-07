@@ -188,6 +188,9 @@ function Alliance:OnPropertyChange(property_name, old_value, new_value)
     if is_new_alliance then
         self:OnOperation("join")
     end
+    if property_name == "status" and new_value == "fight" and display.getRunningScene().__cname ~= "MainScene" then
+        app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_START")
+    end
     self:OnBasicChanged{
         [property_name] = {old = old_value, new = new_value}
     }
@@ -240,11 +243,7 @@ function Alliance:GetMembersCountInfo()
             online = online + 1
         end
     end
-    local palace = self:GetAllianceMap():FindAllianceBuildingInfoByName("palace")
-    if palace and config_palace[palace.level] then
-        maxCount = config_palace[palace.level].memberCount
-    end
-    return count,online,maxCount
+    return count,online,self:MaxMembers()
 end
 function Alliance:OnMemberChanged(changed_map)
     self:NotifyListeneOnType(Alliance.LISTEN_TYPE.MEMBER, function(listener)
@@ -431,6 +430,18 @@ function Alliance:OnJoinEventsChanged()
         listener:OnJoinEventsChanged(self)
     end)
 end
+--更新联盟的成员人数限制
+function Alliance:UpdateMaxMemberCount(alliacne_data)
+    if alliacne_data and alliacne_data.buildings then
+        for __,v in ipairs(alliacne_data.buildings) do
+            if v.name == 'palace' then
+                self:SetMaxMembers(config_palace[v.level].memberCount)
+                break
+            end
+        end
+    end
+end
+
 function Alliance:OnAllianceDataChanged(alliance_data,refresh_time,deltaData)
     if alliance_data.notice then
         self:SetNotice(alliance_data.notice)
@@ -441,6 +452,7 @@ function Alliance:OnAllianceDataChanged(alliance_data,refresh_time,deltaData)
     if alliance_data.titles then
         self:SetTitleNames(alliance_data.titles)
     end
+    self:UpdateMaxMemberCount(alliance_data)
     self:OnAllianceBasicInfoChangedFirst(alliance_data,deltaData)
     self:OnAllianceFightReportsChanged(alliance_data, deltaData)
 
@@ -462,7 +474,6 @@ function Alliance:OnAllianceDataChanged(alliance_data,refresh_time,deltaData)
     self:OnVillagesChanged(alliance_data,deltaData)
     self.alliance_shrine:OnAllianceDataChanged(alliance_data,deltaData,refresh_time)
     self.alliance_map:OnAllianceDataChanged(alliance_data, deltaData)
-    --TODO:
 
     self:OnAttackMarchEventsDataChanged(alliance_data,deltaData,refresh_time)
 
@@ -651,10 +662,10 @@ end
 
 function Alliance:CallEventsChangedListeners(LISTEN_TYPE,changed_map)
     self:NotifyListeneOnType(LISTEN_TYPE, function(listener)
-        listener[Alliance.LISTEN_TYPE[LISTEN_TYPE]](listener,changed_map)
+        listener[Alliance.LISTEN_TYPE[LISTEN_TYPE]](listener,changed_map,self)
     end)
     if self:GetAllianceBelvedere()[Alliance.LISTEN_TYPE[LISTEN_TYPE]] then
-        self:GetAllianceBelvedere()[Alliance.LISTEN_TYPE[LISTEN_TYPE]](self:GetAllianceBelvedere(),changed_map)
+        self:GetAllianceBelvedere()[Alliance.LISTEN_TYPE[LISTEN_TYPE]](self:GetAllianceBelvedere(),changed_map,self)
     end
 end
 

@@ -13,32 +13,31 @@ local intInit = GameDatas.PlayerInitData.intInit
 local GameUIKeep = UIKit:createUIClass('GameUIKeep',"GameUIUpgradeBuilding")
 
 local building_config_map = {
-    ["keep"] = {scale = 0.28, offset = {x = 80, y = 80}},
+    ["keep"] = {scale = 0.3, offset = {x = 80, y = 74}},
     ["watchTower"] = {scale = 0.4, offset = {x = 80, y = 70}},
-    ["warehouse"] = {scale = 0.4, offset = {x = 70, y = 70}},
+    ["warehouse"] = {scale = 0.5, offset = {x = 70, y = 70}},
     ["dragonEyrie"] = {scale = 0.35, offset = {x = 70, y = 70}},
-    ["toolShop"] = {scale = 0.4, offset = {x = 80, y = 70}},
-    ["materialDepot"] = {scale = 0.4, offset = {x = 70, y = 70}},
-    ["armyCamp"] = {scale = 0.4, offset = {x = 80, y = 80}},
-    ["barracks"] = {scale = 0.4, offset = {x = 80, y = 70}},
-    ["blackSmith"] = {scale = 0.4, offset = {x = 75, y = 70}},
-    ["foundry"] = {scale = 0.45, offset = {x = 75, y = 80}},
-    ["stoneMason"] = {scale = 0.44, offset = {x = 80, y = 75}},
-    ["lumbermill"] = {scale = 0.45, offset = {x = 80, y = 80}},
-    ["mill"] = {scale = 0.45, offset = {x = 80, y = 80}},
-    ["hospital"] = {scale = 0.45, offset = {x = 80, y = 80}},
-    ["townHall"] = {scale = 0.45, offset = {x = 80, y = 80}},
-    ["tradeGuild"] = {scale = 0.4, offset = {x = 80, y = 80}},
-    ["academy"] = {scale = 0.4, offset = {x = 80, y = 80}},
+    ["toolShop"] = {scale = 0.5, offset = {x = 80, y = 70}},
+    ["materialDepot"] = {scale = 0.5, offset = {x = 70, y = 70}},
+    ["barracks"] = {scale = 0.5, offset = {x = 80, y = 70}},
+    ["blackSmith"] = {scale = 0.5, offset = {x = 75, y = 70}},
+    ["foundry"] = {scale = 0.47, offset = {x = 75, y = 74}},
+    ["stoneMason"] = {scale = 0.47, offset = {x = 76, y = 75}},
+    ["lumbermill"] = {scale = 0.45, offset = {x = 80, y = 74}},
+    ["mill"] = {scale = 0.45, offset = {x = 76, y = 74}},
+    ["hospital"] = {scale = 0.5, offset = {x = 80, y = 75}},
+    ["townHall"] = {scale = 0.45, offset = {x = 76, y = 74}},
+    ["tradeGuild"] = {scale = 0.5, offset = {x = 74, y = 74}},
+    ["academy"] = {scale = 0.5, offset = {x = 80, y = 74}},
     ["prison"] = {scale = 0.4, offset = {x = 80, y = 80}},
-    ["hunterHall"] = {scale = 0.4, offset = {x = 80, y = 80}},
-    ["trainingGround"] = {scale = 0.4, offset = {x = 80, y = 80}},
-    ["stable"] = {scale = 0.4, offset = {x = 80, y = 80}},
-    ["workshop"] = {scale = 0.4, offset = {x = 80, y = 80}},
+    ["hunterHall"] = {scale = 0.5, offset = {x = 74, y = 74}},
+    ["trainingGround"] = {scale = 0.5, offset = {x = 76, y = 74}},
+    ["stable"] = {scale = 0.46, offset = {x = 74, y = 74}},
+    ["workshop"] = {scale = 0.46, offset = {x = 74, y = 74}},
 }
 
-function GameUIKeep:ctor(city,building)
-    GameUIKeep.super.ctor(self,city,_("城堡"),building)
+function GameUIKeep:ctor(city,building,default_tab)
+    GameUIKeep.super.ctor(self,city,_("城堡"),building,default_tab)
 end
 
 function GameUIKeep:OnMoveInStage()
@@ -66,9 +65,7 @@ function GameUIKeep:OnMoveInStage()
     end):pos(window.cx, window.bottom + 34)
 
 end
-function GameUIKeep:OnCityNameChanged(cityName)
-    self.city_name_item:SetValue(cityName)
-end
+
 function GameUIKeep:onExit()
     self.city:RemoveListenerOnType(self, City.LISTEN_TYPE.CITY_NAME)
     GameUIKeep.super.onExit(self)
@@ -89,14 +86,16 @@ function GameUIKeep:CreateCityBasicInfo()
         :addTo(left_frame):pos(building_cp.offset.x, building_cp.offset.y)
         :scale(building_cp.scale)
 
-    -- 修改城市名字item
-    self.city_name_item = self:CreateLineItem({
-        title_1 =  _("城市名字"),
-        title_2 =  City:GetCityName(),
-        button_label =  _("修改"),
-        listener =  function ()
-            self:CreateModifyCityNameWindow()
-        end,
+    local city_postion = "0,0"
+    if not Alliance_Manager:GetMyAlliance():IsDefault() then
+        local alliance = Alliance_Manager:GetMyAlliance()
+        local mapObject = alliance:GetAllianceMap():FindMapObjectById(alliance:GetSelf():MapId())
+        local x, y = mapObject:GetLogicPosition()
+        city_postion = x..","..y
+    end
+    self:CreateLineItem({
+        title_1 =  _("城市坐标"),
+        title_2 =  "("..city_postion..")",
     }):align(display.LEFT_CENTER, display.cx-120, display.top-160)
         :addTo(self.info_layer)
     -- 修改地形
@@ -122,7 +121,7 @@ function GameUIKeep:CreateLineItem(params)
             font = UIKit:getFontFilePath(),
             size = 16,
             color = UIKit:hex2c3b(0x665f49)
-        }):align(display.LEFT_BOTTOM, 0, 40)
+        }):align(display.LEFT_BOTTOM, 0, 34)
         :addTo(line)
     local value_label = cc.ui.UILabel.new(
         {
@@ -131,25 +130,27 @@ function GameUIKeep:CreateLineItem(params)
             font = UIKit:getFontFilePath(),
             size = 22,
             color = UIKit:hex2c3b(0x29261c)
-        }):align(display.LEFT_BOTTOM, 0, 10)
+        }):align(display.LEFT_BOTTOM, 0, 2)
         :addTo(line)
-    local button = WidgetPushButton.new({normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"}
-        ,{}
-        ,{
-            disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
-        })
-        :setButtonLabel(UIKit:ttfLabel({
-            text = params.button_label,
-            size = 20,
-            color = 0xffedae,
-        }))
-        :onButtonClicked(function(event)
-            if event.name == "CLICKED_EVENT" then
-                params.listener()
-            end
-        end)
-        :align(display.RIGHT_BOTTOM, line_size.width, 5)
-        :addTo(line)
+    if params.button_label then
+        local button = WidgetPushButton.new({normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"}
+            ,{}
+            ,{
+                disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
+            })
+            :setButtonLabel(UIKit:ttfLabel({
+                text = params.button_label,
+                size = 20,
+                color = 0xffedae,
+            }))
+            :onButtonClicked(function(event)
+                if event.name == "CLICKED_EVENT" then
+                    params.listener()
+                end
+            end)
+            :align(display.RIGHT_BOTTOM, line_size.width, 5)
+            :addTo(line)
+    end
     function line:SetValue(value)
         value_label:setString(value)
     end
@@ -228,7 +229,7 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
                 color = 0xffedae}):align(display.CENTER_LEFT, 14, title_bg:getContentSize().height/2)
                 :addTo(title_bg)
             if canUnlock then
-                display.newSprite("dragon_next_icon_28x31.png"):align(display.CENTER, 260, 0):addTo(content, 10)
+                display.newSprite("activity_next_32x37.png"):align(display.CENTER, 260, 0):addTo(content, 10)
             end
 
             UIKit:ttfLabel({
@@ -243,8 +244,8 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
                 size = 20,
                 aglin = ui.TEXT_ALIGN_LEFT,
                 valign = ui.TEXT_VALIGN_CENTER,
-                dimensions = cc.size(354, 65),
-                color = 0x797154}):align(display.TOP_LEFT, -120, 10)
+                dimensions = cc.size(374, 0),
+                color = 0x615b44}):align(display.CENTER_LEFT, -120, -10)
             content:addWidget(building_tip)
 
             -- 建筑图片 放置区域左右边框
@@ -398,7 +399,7 @@ function GameUIKeep:CreateChangeTerrainWindow()
             font = UIKit:getFontFilePath(),
             size = 20,
             dimensions = cc.size(260,100),
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_TOP, 140, 80)
         :addTo(bg2)
     -- 回复按钮
@@ -475,7 +476,7 @@ function GameUIKeep:CreateBackGroundWithTitle(title_string)
     local body = WidgetUIBackGround.new({height=450}):align(display.TOP_CENTER,display.cx,display.top-200)
         :addTo(leyer)
     local rb_size = body:getContentSize()
-    local title = display.newSprite("title_blue_600x52.png"):align(display.CENTER, rb_size.width/2, rb_size.height)
+    local title = display.newSprite("title_blue_600x56.png"):align(display.CENTER, rb_size.width/2, rb_size.height)
         :addTo(body)
     local title_label = cc.ui.UILabel.new(
         {
@@ -511,6 +512,7 @@ end
 
 
 return GameUIKeep
+
 
 
 

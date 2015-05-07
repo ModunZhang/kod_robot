@@ -127,13 +127,13 @@ function PVELayer:onExit()
 end
 function PVELayer:LoadPlayer()
     self.char = display.newNode():addTo(self.object_layer)
-    self.char:setContentSize(cc.size(80, 80))
+    self.char:setContentSize(cc.size(160, 160))
     local ariship = display.newSprite("airship.png"):addTo(self.char):scale(0.5)
     local armature = ccs.Armature:create("feiting"):addTo(ariship)
     local p = ariship:getAnchorPointInPoints()
     armature:align(display.CENTER, p.x - 10, p.y + 40):getAnimation():playWithIndex(0)
     armature:getAnimation():setSpeedScale(2)
-    ariship:setAnchorPoint(cc.p(0.4, 0.5))
+    ariship:setAnchorPoint(cc.p(0.3, 0.4))
     ariship:runAction(cc.RepeatForever:create(transition.sequence{
         cc.MoveBy:create(5, cc.p(0, 10)),
         cc.MoveBy:create(5, cc.p(0, -10))
@@ -179,7 +179,7 @@ function PVELayer:PromiseOfTrap()
     local t = 0.025
     local r = 5
     local exclamation_time = 0.5
-    local exclamation_scale = 0.2
+    local exclamation_scale = 1
     local size = self.char:getContentSize()
     local s = display.newSprite("exclamation.png")
         :addTo(self.char):pos(size.width*0.4, size.height*0.4):scale(0)

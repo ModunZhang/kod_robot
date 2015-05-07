@@ -22,15 +22,15 @@ local RIGHT_TAG1 = tags.RIGHT_TAG1
 
 
 local function decode_battle_from_report(report)
-    local attacks = report:GetFightAttackSoldierRoundData()
-    local defends = report:GetFightDefenceSoldierRoundData()
+    local attacks = clone(report:GetFightAttackSoldierRoundData())
+    local defends = clone(report:GetFightDefenceSoldierRoundData())
     if report:IsFightWall() then
         assert(report.GetFightAttackWallRoundData)
         assert(report.GetFightDefenceWallRoundData)
-        for i,v in ipairs(report:GetFightAttackWallRoundData()) do
+        for i,v in ipairs(clone(report:GetFightAttackWallRoundData())) do
             attacks[#attacks + 1] = v
         end
-        for i,v in ipairs(report:GetFightDefenceWallRoundData()) do
+        for i,v in ipairs(clone(report:GetFightDefenceWallRoundData())) do
             defends[#defends + 1] = v
         end
     end

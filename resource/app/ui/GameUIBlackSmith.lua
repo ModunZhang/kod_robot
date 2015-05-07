@@ -271,7 +271,7 @@ function GameUIBlackSmith:CreateEquipmentByType(equip_type)
         :align(display.CENTER,0,14)
     -- 装备图标
     cc.ui.UIImage.new(UILib.equipment[equip_type]):addTo(eq_bg)
-        :align(display.CENTER,eq_bg:getContentSize().width/2,eq_bg:getContentSize().height/2):scale(0.5)
+        :align(display.CENTER,eq_bg:getContentSize().width/2,eq_bg:getContentSize().height/2):scale(0.62)
 
     -- 详细按钮
     local info_clicked = nil

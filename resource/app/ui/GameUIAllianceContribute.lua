@@ -21,7 +21,7 @@ local CON_TYPE = {
 local GameUIAllianceContribute = class("GameUIAllianceContribute", WidgetPopDialog)
 
 function GameUIAllianceContribute:ctor()
-    GameUIAllianceContribute.super.ctor(self,398,_("联盟捐献"),window.top-200)
+    GameUIAllianceContribute.super.ctor(self,626,_("联盟捐献"),window.top-200)
     self:setNodeEventEnabled(true)
     -- 联盟主页滑动框需要监听捐赠ui是否开启来决定是否自动滚动
     self.observer = Observer.new()
@@ -30,8 +30,8 @@ function GameUIAllianceContribute:ctor()
     self.group = self:CreateContributeGroup()
 
     -- 捐赠能获得荣耀点
-    local honour_bg = display.newSprite("back_ground_138x34.png"):align(display.LEFT_CENTER, 30, 90):addTo(self.body)
-    display.newSprite("honour_128x128.png"):align(display.CENTER, 30, 90):addTo(self.body):scale(42/128)
+    local honour_bg = display.newSprite("back_ground_138x34.png"):align(display.LEFT_CENTER, 30, 75):addTo(self.body)
+    display.newSprite("honour_128x128.png"):align(display.CENTER, 30, 75):addTo(self.body):scale(42/128)
     self.donate_honour = UIKit:ttfLabel({
         text = "+0",
         size = 22,
@@ -39,8 +39,8 @@ function GameUIAllianceContribute:ctor()
     }):align(display.CENTER, honour_bg:getContentSize().width/2,honour_bg:getContentSize().height/2)
         :addTo(honour_bg)
     -- 捐赠能获得忠诚
-    local loyalty_bg = display.newSprite("back_ground_138x34.png"):align(display.LEFT_CENTER, 200, 90):addTo(self.body)
-    display.newSprite("loyalty_128x128.png"):align(display.CENTER, 200, 90):addTo(self.body):scale(42/128)
+    local loyalty_bg = display.newSprite("back_ground_138x34.png"):align(display.LEFT_CENTER, 200, 75):addTo(self.body)
+    display.newSprite("loyalty_128x128.png"):align(display.CENTER, 205, 75):addTo(self.body):scale(46/128)
     self.donate_loyalty = UIKit:ttfLabel({
         text = "+0",
         size = 22,
@@ -51,7 +51,7 @@ function GameUIAllianceContribute:ctor()
     self.donate_eff = UIKit:ttfLabel({
         text = "",
         size = 20,
-        color = 0x514d3e,
+        color = 0x615b44,
     }):align(display.LEFT_CENTER, 20,40)
         :addTo(self.body)
 
@@ -61,8 +61,6 @@ function GameUIAllianceContribute:ctor()
             if event.name == "CLICKED_EVENT" then
                 if self:IsAbleToContribute() then
                     NetManager:getDonateToAlliancePromise(self.group:GetSelectedType())
-                else
-
                 end
             end
         end)
@@ -123,8 +121,8 @@ function GameUIAllianceContribute:CreateContributeGroup()
     local ui_self = self
 
     -- 透明背景框
-    local group = WidgetUIBackGround.new({width = 580,height=248},WidgetUIBackGround.STYLE_TYPE.STYLE_4)
-        :align(display.CENTER,304, 250):addTo(self.body)
+    local group = WidgetUIBackGround.new({width = 568,height=490},WidgetUIBackGround.STYLE_TYPE.STYLE_6)
+        :align(display.CENTER,304, 355):addTo(self.body)
     local wood = City.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local stone = City.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local food = City.resource_manager:GetFoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
@@ -164,14 +162,14 @@ function GameUIAllianceContribute:CreateContributeGroup()
         },
     }
 
-    local gap_x,gap_y = 10 ,10
+    local gap_y = 78
     local origin_x = 145
-    local origin_y = 206
+    local origin_y = 480
     local count = -1
     for k,v in pairs(group_table) do
         count = count + 1
         local item = self:CreateContributeItem(v)
-            :align(display.CENTER, origin_x + math.mod(count,2)*(280+gap_x), origin_y - math.floor(count/2)*(72+gap_y))
+            :align(display.TOP_CENTER, 568/2, origin_y - gap_y * count)
             :addTo(group)
 
         item:setTag(count+1)
@@ -232,37 +230,40 @@ function GameUIAllianceContribute:CreateContributeGroup()
 end
 function GameUIAllianceContribute:CreateContributeItem(params)
     -- 背景框
-    local item = WidgetUIBackGround.new({
-        width = 280,
-        height = 72,
-        top_img = "back_ground_top_2.png",
-        bottom_img = "back_ground_bottom_2.png",
-        mid_img = "back_ground_mid_2.png",
-        u_height = 10,
-        b_height = 10,
-        m_height = 1,
-    })
+    local body_image = self.which_bg and "upgrade_resources_background_2.png" or "upgrade_resources_background_3.png"
+    self.which_bg = not self.which_bg
+    local item = display.newScale9Sprite(body_image,0,0,cc.size(548,78),cc.rect(10,10,500,26))
+
     local size = item:getContentSize()
+    local icon_bg = display.newSprite("box_118x118.png"):align(display.CENTER, 40, size.height/2)
+        :addTo(item)
+    icon_bg:setScale(70/icon_bg:getContentSize().height)
     local icon = display.newSprite(params.icon):align(display.CENTER, 40, size.height/2)
         :addTo(item)
-    icon:setScale(60/icon:getContentSize().height)
-    UIKit:ttfLabel({
-        text = _("拥有").."/".._("捐赠"),
+    icon:setScale(40/icon:getContentSize().height)
+    local own_title_label = UIKit:ttfLabel({
+        text = _("拥有"),
         size = 20,
-        color = 0x514d3e,
-    }):align(display.LEFT_CENTER, 90,50)
+        color = 0x403c2f,
+    }):align(display.LEFT_CENTER, 90,60)
+        :addTo(item)
+    local donate_title_label = UIKit:ttfLabel({
+        text = _("捐赠"),
+        size = 20,
+        color = 0x403c2f,
+    }):align(display.LEFT_CENTER, 90,20)
         :addTo(item)
     local own_label = UIKit:ttfLabel({
         text = GameUtils:formatNumber(params.own),
         size = 20,
         color = params.own < params.donate and 0x7e0000 or 0x288400,
-    }):align(display.LEFT_CENTER, 90,25)
+    }):align(display.LEFT_CENTER, own_title_label:getPositionX()+own_title_label:getContentSize().width,60)
         :addTo(item)
     local donate_label = UIKit:ttfLabel({
-        text = "/"..GameUtils:formatNumber(params.donate),
+        text = GameUtils:formatNumber(params.donate),
         size = 20,
         color = 0x288400,
-    }):align(display.LEFT_CENTER, own_label:getPositionX()+own_label:getContentSize().width,25)
+    }):align(display.LEFT_CENTER, donate_title_label:getPositionX()+donate_title_label:getContentSize().width,20)
         :addTo(item)
     item.donate = params.donate
     local checkbox_image = {
@@ -292,8 +293,7 @@ function GameUIAllianceContribute:CreateContributeItem(params)
     end
     function item:SetDonate(donate)
         self.donate = donate
-        donate_label:setString("/"..GameUtils:formatNumber(donate))
-        donate_label:setPositionX(own_label:getPositionX()+own_label:getContentSize().width) 
+        donate_label:setString(GameUtils:formatNumber(donate))
     end
     function item:OnStateChanged(listener)
         check_box:onButtonStateChanged(function(event)
@@ -355,6 +355,7 @@ function GameUIAllianceContribute:OnAllianceDonateChanged()
     self:RefreashEff()
 end
 return GameUIAllianceContribute
+
 
 
 

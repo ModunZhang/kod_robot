@@ -9,10 +9,11 @@ local UIListView = import(".UIListView")
 local WidgetSelectDragon = import("..widget.WidgetSelectDragon")
 local timer = app.timer
 local WidgetUseItems = import("..widget.WidgetUseItems")
+local WidgetSelectWallDragon = import("..widget.WidgetSelectWallDragon")
 
-function GameUIWall:ctor(city,building)
+function GameUIWall:ctor(city,building,default_tab)
 	self.city = city
-    GameUIWall.super.ctor(self,city,Localize.building_name[building:GetType()],building)
+    GameUIWall.super.ctor(self,city,Localize.building_name[building:GetType()],building,default_tab)
     self.dragon_manager = city:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
     self.dragon_manager:AddListenOnType(self,self.dragon_manager.LISTEN_TYPE.OnHPChanged)
 end
@@ -140,7 +141,6 @@ function GameUIWall:CreateMilitaryUIIf()
 	}):align(display.LEFT_BOTTOM,draogn_box:getPositionX()+draogn_box:getContentSize().width + 30,  draogn_box:getPositionY()+10):addTo(top_bg)
    	self.tips_label = tips_label
    	local name_str = _("请选择一个巨龙驻防")
-   	--TODO:
    	local level_str = string.format(_("当前城市地形:%s"),Localize.terrain[User:Terrain()])
    	if dragon then
    		name_str = dragon:GetLocalizedName()
@@ -157,7 +157,7 @@ function GameUIWall:CreateMilitaryUIIf()
 	local level_title_label = UIKit:ttfLabel({
 		text = level_str,
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.LEFT_BOTTOM,name_label:getPositionX(), tips_label:getPositionY() + tips_label:getContentSize().height + 20):addTo(top_bg)
 	self.level_title_label = level_title_label
 	self.dragon_level_label = UIKit:ttfLabel({
@@ -271,7 +271,7 @@ function GameUIWall:GetListItem(index,data)
 	UIKit:ttfLabel({
 		text = data.title,
 		size = 20,
-		color= 0x797154
+		color= 0x615b44
 	}):align(display.LEFT_CENTER, 20, 21):addTo(content)
 	local val_x = 540
 	if data.buffer then --buffer
@@ -309,21 +309,14 @@ function GameUIWall:OnResourceChanged(resource_manager)
 end
 
 function GameUIWall:OnSelectDragonButtonClicked()
-	WidgetSelectDragon.new({
-		title = _("选择驻防巨龙"),
-		btns  = {
-			{
-				btn_label = _("选择"),
-				btn_callback = function(dragon)
-					self:OnDragonSelected(dragon)
-				end
-			},
-			{
-				btn_label = _("不驻防"),
-				btn_callback = function()
-					self:OnDragonSelected()
-				end
-			}
+	WidgetSelectWallDragon.new({
+		callback  = {
+			function(dragon)
+				self:OnDragonSelected(dragon)
+			end,
+			function()
+				self:OnDragonSelected()
+			end
 		},
 		default_dragon_type = self.dragon_manager:GetDefenceDragon() and self.dragon_manager:GetDefenceDragon():Type()
 	}):addTo(self:GetView())
@@ -348,6 +341,7 @@ end
 
 function GameUIWall:RefreshUIAfterSelectDragon(dragon)
 	if dragon then
+		self.name_label:setString(dragon:GetLocalizedName())
 		self.dragon_info_panel:show()
 		self.tips_panel:hide()
 		self.level_title_label:setString(_("等级"))
@@ -362,6 +356,7 @@ function GameUIWall:RefreshUIAfterSelectDragon(dragon)
 		self.dragon_head:show()
 		self:RefreshListView()
 	else
+		self.name_label:setString(_("请选择一个巨龙驻防"))
 		self.dragon_info_panel:hide()
 		self.tips_panel:show()
 		self.tips_label:show()

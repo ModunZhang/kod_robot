@@ -18,7 +18,7 @@ function WidgetDragonEquipIntensify:ctor(delegate,equipmentName,current_count,ma
     --ui
 	super_.ctor(self,{normal = "back_ground_104x132.png"})
 	local bg,icon = self:GetBgImageAndIcon()
-	local icon_bg = display.newSprite(bg):addTo(self):pos(0,16)
+	local icon_bg = display.newSprite(bg):addTo(self):pos(0,15)
 	local icon_ = display.newSprite(icon)
 	icon_:addTo(icon_bg):setScale(0.6):pos(52,52)
 	display.newSprite("i_icon_20x20.png"):align(display.LEFT_BOTTOM, 5, 5):addTo(icon_bg)

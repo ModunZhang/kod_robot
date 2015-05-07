@@ -16,6 +16,7 @@ local intInit = GameDatas.AllianceInitData.intInit
 local floor = math.floor
 local random = math.random
 local max = math.max
+local min = math.min
 local ipairs = ipairs
 local function random_indexes_in_rect(number, rect)
     local indexes = {}
@@ -250,12 +251,13 @@ function AllianceView:EmptyGround(x, y)
         }
     end
 end
+
 function AllianceView:OnSceneScale(s)
     if s then self.scale = s end
-    local scale = max(2 - self.scale, 0.8)
-    for i,v in ipairs(self:GetLayer():GetInfoNode():getChildren()) do
-        v:setScale(scale)
-    end
+    local scale = self.scale
+    local l = max(0.5, scale) - 0.5
+    local r = 0.8 - min(0.8, scale)
+    self:GetLayer():GetInfoNode():opacity(l / (l + r) * 255)
 end
 
 

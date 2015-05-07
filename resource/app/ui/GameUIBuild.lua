@@ -64,7 +64,7 @@ function GameUIBuild:LoadBuildingQueue()
         size = 20,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_LEFT,
-        color = UIKit:hex2c3b(0x797154)
+        color = UIKit:hex2c3b(0x615b44)
     }):addTo(back_ground, 2)
         :align(display.LEFT_CENTER, 60, back_ground:getContentSize().height/2)
 
@@ -246,7 +246,7 @@ function GameUIBuild:CreateItemWithListView(list_view)
     local building_icon = display.newSprite(SpriteConfig["dwelling"]:GetConfigByLevel(1).png)
         :addTo(back_ground):align(display.BOTTOM_CENTER, (left_x + right_x) / 2, 30)
 
-    local title_blue = cc.ui.UIImage.new("title_blue_402x48.png")
+    local title_blue = display.newScale9Sprite("title_blue_430x30.png",0, 0,cc.size(410,30),cc.rect(15,10,400,10))
         :addTo(back_ground):align(display.LEFT_CENTER, right_x, h - 23)
 
     local size = title_blue:getContentSize()
@@ -259,17 +259,17 @@ function GameUIBuild:CreateItemWithListView(list_view)
         :align(display.LEFT_CENTER, 30, size.height/2)
 
 
-    local btn_info = WidgetPushButton.new(
-        {normal = "info_26x26.png",pressed = "info_26x26.png"})
-        :addTo(back_ground)
-        :align(display.LEFT_BOTTOM, 10, 10)
+    -- local btn_info = WidgetPushButton.new(
+    --     {normal = "info_26x26.png",pressed = "info_26x26.png"})
+    --     :addTo(back_ground)
+    --     :align(display.LEFT_BOTTOM, 10, 10)
 
     local condition_label = cc.ui.UILabel.new({
         text = _("已达到最大建筑数量"),
         size = 20,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_LEFT,
-        color = UIKit:hex2c3b(0x797154)
+        color = UIKit:hex2c3b(0x615b44)
     }):addTo(back_ground)
         :align(display.LEFT_CENTER, 175, 80)
 
@@ -283,7 +283,7 @@ function GameUIBuild:CreateItemWithListView(list_view)
         :align(display.LEFT_CENTER, 175, 40)
 
     local build_btn = WidgetPushButton.new(
-        {normal = "yellow_btn_up_149x47.png",pressed = "yellow_btn_down_149x47.png"}
+        {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"}
         ,{}
         ,{
             disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }

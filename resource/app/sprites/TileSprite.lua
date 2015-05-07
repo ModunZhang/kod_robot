@@ -17,10 +17,10 @@ function TileSprite:ctor(city_layer, entity, x, y)
     if entity:NeedWalls() then
         self:GetSprite():hide()
     end
-    local sx, sy = 200, 100
+    local sx,ex,sy,ey = 200,250,150,200
     for i = 1,2 do
         display.newSprite(surface[math.random(#surface)]):addTo(self:GetSprite())
-        :pos(sx + math.random(510 - sx), sy + math.random(310 - sy))
+        :pos(sx + math.random(ex - sx), sy + math.random(ey - sy))
     end
 end
 function TileSprite:ReloadSpriteCauseTerrainChanged()

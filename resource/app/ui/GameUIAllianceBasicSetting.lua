@@ -18,7 +18,7 @@ function GameUIAllianceBasicSetting:BuildModifyUI()
 	local modify_height = window.height - 60
 	local shadowLayer = UIKit:shadowLayer():addTo(self)
 	local bg = WidgetUIBackGround.new({height=modify_height}):addTo(shadowLayer):pos(window.left+10,window.bottom)
-	local titleBar = display.newSprite("title_blue_600x52.png"):align(display.LEFT_BOTTOM,3,modify_height-15):addTo(bg)
+	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,modify_height-15):addTo(bg)
 	local closeButton = UIKit:closeButton()
 	   	:addTo(titleBar)
 	   	:align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)

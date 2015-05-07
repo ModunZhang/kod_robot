@@ -16,15 +16,16 @@ function WidgetPages:ctor(params)
     if self.icon_image then
         local image_name = type(self.icon_image) == 'table' and self.icon_image[self.current_page] or self.icon_image
         icon = cc.ui.UIImage.new(image_name):addTo(self)
-            :align(display.LEFT_CENTER, 70, 28)
+            :align(display.LEFT_CENTER, 70, 29)
         self.icon = icon
     end
     self.title_label = UIKit:ttfLabel({
         text = "",
         size = 20,
-        color = 0x5d563f
+        color = 0xffedae,
+        shadow = true
     })
-        :align(display.LEFT_BOTTOM,icon and icon:getContentSize().width + 80 or 70,15)
+        :align(display.LEFT_BOTTOM,icon and icon:getContentSize().width + 80 or 70,17)
         :addTo(self)
     if params.fixed_title_position then
         self.title_label:pos(params.fixed_title_position.x,params.fixed_title_position.y)
@@ -32,22 +33,24 @@ function WidgetPages:ctor(params)
     local page_label = UIKit:ttfLabel({
         text = "/"..self.page,
         size = 20,
-        color = 0x5d563f
+        color = 0xffedae,
+        shadow = true
     })
-        :align(display.RIGHT_BOTTOM,480,15)
+        :align(display.RIGHT_BOTTOM,480,17)
         :addTo(self)
     self.current_page_label = UIKit:ttfLabel({
         text = self.current_page,
         size = 20,
-        color = 0x5d563f
+        color = 0xffedae,
+        shadow = true
     })
-        :align(display.RIGHT_BOTTOM,page_label:getPositionX() - page_label:getContentSize().width,15)
+        :align(display.RIGHT_BOTTOM,page_label:getPositionX() - page_label:getContentSize().width,17)
         :addTo(self)
 
     self.left_button = cc.ui.UIPushButton.new(
         {normal = "shrine_page_btn_normal_52x44.png",pressed = "shrine_page_btn_light_52x44.png",disabled="shrine_page_btn_disable_52x44.png"},
         {scale9 = false}
-    ):addTo(self):align(display.LEFT_CENTER,7,29)
+    ):addTo(self):align(display.LEFT_CENTER,9,31)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
                 self:ChangePage_(-1)
@@ -60,7 +63,7 @@ function WidgetPages:ctor(params)
     self.right_button = cc.ui.UIPushButton.new(
         {normal = "shrine_page_btn_normal_52x44.png",pressed = "shrine_page_btn_light_52x44.png",disabled="shrine_page_btn_disable_52x44.png"},
         {scale9 = false}
-    ):addTo(self):align(display.RIGHT_CENTER,557,29)
+    ):addTo(self):align(display.RIGHT_CENTER,559,31)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
                 self:ChangePage_(1)

@@ -55,12 +55,12 @@ local function promiseFilterNetError(p,need_catch)
                     end
                 end,nil,false)
             else
-                local code = content.code 
+                local code = content.code
                 if UIKit:getErrorCodeKey(code) == "reLoginNeeded" then
                     app:retryConnectServer()
                 else
                     UIKit:showMessageDialog(_("错误"), content.msg .. string.format("[%d]",code),function()
-                    end,nil,false)
+                        end,nil,false)
                 end
             end
         end
@@ -83,6 +83,32 @@ local function promiseOfMoveTo(node, x, y, time, easing)
     return p
 end
 
+local function promiseOfSchedule(node, time, dt, func)
+    local p = promise.new()
+    local t = 0
+    dt = dt or 0.01
+    local speed = cc.RepeatForever:create(
+        transition.sequence({
+            cc.DelayTime:create(dt),
+            cc.CallFunc:create(function()
+                t = t + dt
+                if t > time then
+                    func(1)
+                    p:resolve()
+                    node:stopAction(node.speed_action)
+                else
+                    if type(func) == "function" then
+                        func(t / time)
+                    end
+                end
+            end)
+        })
+    )
+    node.speed_action = speed
+    node:runAction(speed)
+    return p
+end
+
 return {
     defer = defer,
     defferPromise = defferPromise,
@@ -93,7 +119,9 @@ return {
     promiseWithCatchError = promiseWithCatchError,
     promiseFilterNetError = promiseFilterNetError,
     promiseOfMoveTo = promiseOfMoveTo,
+    promiseOfSchedule = promiseOfSchedule,
 }
+
 
 
 

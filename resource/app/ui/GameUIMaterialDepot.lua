@@ -4,8 +4,8 @@ local WidgetMaterials = import("..widget.WidgetMaterials")
 local MaterialManager = import("..entity.MaterialManager")
 
 local GameUIMaterialDepot = UIKit:createUIClass("GameUIMaterialDepot", "GameUIUpgradeBuilding")
-function GameUIMaterialDepot:ctor(city,building)
-    GameUIMaterialDepot.super.ctor(self, city, _("材料库房"),building)
+function GameUIMaterialDepot:ctor(city,building,default_tab)
+    GameUIMaterialDepot.super.ctor(self, city, _("材料库房"),building,default_tab)
 end
 
 function GameUIMaterialDepot:OnMoveInStage()

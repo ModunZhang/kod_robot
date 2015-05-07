@@ -15,8 +15,8 @@ function WidgetPVEEntranceDoor:GetDesc()
 end
 function WidgetPVEEntranceDoor:SetUpButtons()
     return self:GetObject():IsSearched() and
-        { { label = _("传送"), callback = function() self:GotoNext() end }, { label = _("离开") } } or
-        { { label = _("进攻"), callback = function() self:Fight() end }, { label = _("离开") } }
+        { { label = _("传送"), icon = "pve_icon_through.png", callback = function() self:GotoNext() end }, { label = _("离开"), icon = "pve_icon_leave.png", } } or
+        { { label = _("进攻"), icon = "pve_icon_fight.png", callback = function() self:Fight() end }, { label = _("离开"), icon = "pve_icon_leave.png", } }
 end
 
 return WidgetPVEEntranceDoor

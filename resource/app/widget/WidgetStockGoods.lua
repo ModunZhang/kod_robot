@@ -48,7 +48,7 @@ function WidgetStockGoods:ctor(item)
     local label_origin_x = 190
 
     -- bg
-    local back_ground = WidgetUIBackGround.new({height=464,isFrame="yes"}):align(display.BOTTOM_CENTER, window.cx, 0):addTo(self)
+    local back_ground = WidgetUIBackGround.new({height=400,isFrame="yes"}):align(display.BOTTOM_CENTER, window.cx, 0):addTo(self)
     back_ground:setTag(101)
     back_ground:setTouchEnabled(true)
     local size = back_ground:getContentSize()
@@ -79,7 +79,7 @@ function WidgetStockGoods:ctor(item)
         size = 20,
         color = 0x403c2f,
         dimensions = cc.size(400,0)
-    }):align(display.LEFT_TOP,item_bg:getPositionX()+item_bg:getContentSize().width/2+30, size.height-60):addTo(back_ground)
+    }):align(display.LEFT_CENTER,item_bg:getPositionX()+item_bg:getContentSize().width/2+30, size.height-100):addTo(back_ground)
     -- progress
     local slider_height, label_height = size.height - 170, size.height - 170
 
@@ -98,30 +98,30 @@ function WidgetStockGoods:ctor(item)
                 {_("联盟拥有"),item:Count()}
             }
         }
-    ):align(display.CENTER, size.width/2, 165)
+    ):align(display.CENTER, size.width/2, 135)
         :addTo(back_ground)
 
 
     -- 荣耀值
-    display.newSprite("honour_128x128.png"):align(display.CENTER, 200, 50):addTo(back_ground):scale(42/128)
+    display.newSprite("honour_128x128.png"):align(display.CENTER, 200, 60):addTo(back_ground):scale(42/128)
     local dividing = UIKit:ttfLabel({
         text = "/",
         size = 20,
         color = 0x403c2f,
-    }):addTo(back_ground):align(display.CENTER,300, 50)
+    }):addTo(back_ground):align(display.CENTER,300, 60)
 
     self.need_honour_label = UIKit:ttfLabel({
         text = GameUtils:formatNumber(self.item:BuyPriceInAlliance()*slider:GetValue()),
         size = 20,
         color = 0x403c2f,
-    }):addTo(back_ground):align(display.LEFT_CENTER,dividing:getPositionX()+4,50)
+    }):addTo(back_ground):align(display.LEFT_CENTER,dividing:getPositionX()+4,60)
     local alliance = Alliance_Manager:GetMyAlliance()
 
     self.honour_label = UIKit:ttfLabel({
         text = GameUtils:formatNumber(alliance:Honour()) ,
         size = 20,
         color = 0x403c2f,
-    }):addTo(back_ground):align(display.RIGHT_CENTER,dividing:getPositionX()-4,50)
+    }):addTo(back_ground):align(display.RIGHT_CENTER,dividing:getPositionX()-4,60)
     -- 购买按钮
     local button = WidgetPushButton.new(
         {normal = "yellow_btn_up_185x65.png",pressed = "yellow_btn_down_185x65.png"}
@@ -144,7 +144,7 @@ function WidgetStockGoods:ctor(item)
                 return response
             end)
             self:removeFromParent(true)
-        end):pos(500, 50)
+        end):pos(500, 60)
         :addTo(back_ground)
 
     button:setButtonEnabled(buy_max~=0)

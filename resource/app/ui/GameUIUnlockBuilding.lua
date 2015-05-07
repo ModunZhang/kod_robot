@@ -26,7 +26,6 @@ function GameUIUnlockBuilding:OnResourceChanged(resource_manager)
     self:SetUpgradeRequirementListview()
 end
 function GameUIUnlockBuilding:onEnter()
-    UIKit:CheckOpenUI(self)
 end
 function GameUIUnlockBuilding:onExit()
     self.city:GetResourceManager():RemoveObserver(self)
@@ -120,7 +119,7 @@ function GameUIUnlockBuilding:Init()
         font = UIKit:getFontFilePath(),
         size = 20,
         color = UIKit:hex2c3b(0x403c2f)
-    }):align(display.LEFT_CENTER,display.cx-240,display.top-446):addTo(self)
+    }):align(display.LEFT_CENTER,display.cx-240,display.top-440):addTo(self)
     self:SetUpgradeNowNeedGems()
     --升级所需时间
     display.newSprite("hourglass_39x46.png", display.cx+100, display.top-440):addTo(self):setScale(0.6)
@@ -133,9 +132,10 @@ function GameUIUnlockBuilding:Init()
     self:SetUpgradeTime()
 
     -- 科技减少升级时间
+    local buff_time = DataUtils:getBuildingBuff(self.building:GetUpgradeTimeToNextLevel())
     self.buff_reduce_time = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "(-00:20:00)",
+        text = string.format("(-%s)",GameUtils:formatTimeStyle1(buff_time)),
         font = UIKit:getFontFilePath(),
         size = 18,
         color = UIKit:hex2c3b(0x068329)
@@ -146,16 +146,18 @@ function GameUIUnlockBuilding:Init()
 end
 
 function GameUIUnlockBuilding:InitBuildingIntroduces()
+  local title_bg = display.newScale9Sprite("title_blue_430x30.png", display.cx-110, display.top-214,cc.size(380,30),cc.rect(15,10,400,10))
+           :align(display.LEFT_CENTER)
+           :addTo(self)
     self.building_name = UIKit:ttfLabel({
         size = 24,
-        dimensions = cc.size(350, 90),
-        color = 0x403c2f
-    }):align(display.LEFT_CENTER,display.cx-100, display.top-240):addTo(self)
+        color = 0xffedae
+    }):align(display.LEFT_CENTER,20, 15):addTo(title_bg)
     self.building_introduces = UIKit:ttfLabel({
-        size = 22,
-        dimensions = cc.size(350, 90),
-        color = 0x403c2f
-    }):align(display.LEFT_CENTER,display.cx-100, display.top-280):addTo(self)
+        size = 20,
+        dimensions = cc.size(380, 90),
+        color = 0x615b44
+    }):align(display.LEFT_CENTER,display.cx-110, display.top-280):addTo(self)
     self:SetBuildingName()
     self:SetBuildingIntroduces()
 end

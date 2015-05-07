@@ -33,25 +33,37 @@ function WidgetBuffBox:ctor(params)
     local buff_icon = display.newSprite(UILib.buff[buff_type],0,12,{class=cc.FilteredSpriteWithOne})
         :addTo(buff_btn)
     buff_icon:scale(102/math.max(buff_icon:getContentSize().width,buff_icon:getContentSize().height))
-
-    local  isBuffActived = ItemManager:IsBuffActived( buff_type )
-    if not isBuffActived then
-        local my_filter = filter
-        local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
-        buff_icon:setFilter(filters)
-    end
     self.buff_icon = buff_icon
+    local buff_active = display.newSprite("buff_active_123x125.png"):addTo(self)
+        :align(display.CENTER, width/2, height/2+27)
+    local seq_1 = transition.sequence{
+        cc.RotateTo:create(2, -180),
+        cc.RotateTo:create(2, -360)
+    }
+    buff_active:runAction(cc.RepeatForever:create(seq_1))
+    self.buff_active = buff_active
     -- 信息框
     local info_bg = display.newSprite("back_ground_130x30.png")
         :align(display.CENTER, width/2, 15)
         :addTo(self)
     self.info_label = UIKit:ttfLabel(
         {
-            text = isBuffActived and GameUtils:formatTimeStyle1(ItemManager:GetItemEventByType(buff_type):GetTime()) or _("未激活"),
             size = 20,
-            color = isBuffActived and 0x007c23 or 0x403c2f
         }):align(display.CENTER, info_bg:getContentSize().width/2 ,info_bg:getContentSize().height/2)
         :addTo(info_bg)
+    self:IsActived(ItemManager:IsBuffActived( buff_type ))
+end
+function WidgetBuffBox:IsActived(isActive)
+    if not isActive then
+        local my_filter = filter
+        local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
+        self.buff_icon:setFilter(filters)
+        self.buff_active:hide()
+    else
+        self.buff_icon:clearFilter()
+        self.buff_active:show()
+    end
+    self:SetInfo(isActive and GameUtils:formatTimeStyle1(ItemManager:GetItemEventByType(self.buff_type):GetTime()) or _("未激活"),UIKit:hex2c4b(isActive and 0x007c23 or 0x403c2f))
 end
 function WidgetBuffBox:SetInfo(info,color)
     self.info_label:setString(info)
@@ -63,15 +75,7 @@ end
 function WidgetBuffBox:OnItemEventTimer( item_event_new )
     if self.buff_type == item_event_new:Type() then
         local time = item_event_new:GetTime()
-        if time >0 then
-            self:SetInfo(GameUtils:formatTimeStyle1(time),UIKit:hex2c4b(0x007c23))
-            self.buff_icon:clearFilter()
-        else
-            self:SetInfo(_("未激活"),UIKit:hex2c4b(0x403c2f))
-            local my_filter = filter
-            local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
-            self.buff_icon:setFilter(filters)
-        end
+        self:IsActived(time > 0)
     end
 end
 function WidgetBuffBox:onEnter()
@@ -81,6 +85,9 @@ function WidgetBuffBox:onExit()
     ItemManager:RemoveListenerOnType(self,ItemManager.LISTEN_TYPE.OnItemEventTimer)
 end
 return WidgetBuffBox
+
+
+
 
 
 

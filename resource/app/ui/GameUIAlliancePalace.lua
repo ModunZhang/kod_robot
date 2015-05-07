@@ -461,7 +461,7 @@ function GameUIAlliancePalace:InitInfoPart()
         title = _("信息"),
         h = 306
     }):addTo(layer)
-        :align(display.BOTTOM_CENTER, window.cx, window.bottom_top+20)
+        :align(display.BOTTOM_CENTER, window.cx, window.bottom_top+50)
 end
 function GameUIAlliancePalace:OnAllianceBasicChanged(alliance,changed_map)
     if changed_map.honour then

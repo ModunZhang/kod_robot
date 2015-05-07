@@ -138,7 +138,7 @@ function WidgetUseItems:OpenChangePlayerOrCityName(item)
         font = UIKit:getFontFilePath(),
     })
     editbox:setPlaceHolder(eidtbox_holder)
-    editbox:setMaxLength(14)
+    editbox:setMaxLength(12)
     editbox:setFont(UIKit:getEditBoxFont(),22)
     editbox:setFontColor(cc.c3b(0,0,0))
     editbox:setPlaceholderFontColor(cc.c3b(204,196,158))
@@ -255,14 +255,14 @@ function WidgetUseItems:OpenResourceDialog( item )
 
     local list,list_node = UIKit:commonListView_1({
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
-        viewRect = cc.rect(0, 0,570,4 * 130),
+        viewRect = cc.rect(0, 0,546,4 * 130),
     })
     list_node:addTo(body):align(display.BOTTOM_CENTER, size.width/2,20)
     local which_bg = true
     for i,v in ipairs(same_items) do
         if not (v:Count()<1 and not v:IsSell()) then
             local list_item = list:newItem()
-            list_item:setItemSize(570,130)
+            list_item:setItemSize(546,130)
             list_item:addContent(self:CreateItemBox(
                 v,
                 function ()
@@ -298,7 +298,7 @@ function WidgetUseItems:OpenHeroBloodDialog( item )
     UIKit:ttfLabel({
         text = _("英雄之血"),
         size = 22,
-        color = 0x797154,
+        color = 0x615b44,
     }):align(display.LEFT_CENTER,40,blood_bg:getContentSize().height/2)
         :addTo(blood_bg)
     local blood_value = UIKit:ttfLabel({
@@ -506,7 +506,7 @@ function WidgetUseItems:OpenStrengthDialog( item )
     UIKit:ttfLabel({
         text = _("探索体力值"),
         size = 22,
-        color = 0x797154,
+        color = 0x615b44,
     }):align(display.LEFT_CENTER,80,blood_bg:getContentSize().height/2)
         :addTo(blood_bg)
     UIKit:ttfLabel({
@@ -580,7 +580,7 @@ function WidgetUseItems:OpenIncreaseDragonExpOrHp( item )
         local dragon_vitality = UIKit:ttfLabel({
             text = text_1,
             size = 20,
-            color = 0x797154,
+            color = 0x615b44,
         }):align(display.LEFT_CENTER,20,60)
             :addTo(box_bg)
 
@@ -858,7 +858,7 @@ function WidgetUseItems:OpenNormalDialog( item )
 end
 function WidgetUseItems:OpenVipActive( item )
     local same_items = ItemManager:GetSameTypeItems(item)
-    local dialog = UIKit:newWidgetUI("WidgetPopDialog",4 * 130+24 +80,_("激活VIP"),window.top-230)
+    local dialog = UIKit:newWidgetUI("WidgetPopDialog",3 * 130+24 +80,_("激活VIP"),window.top-230)
     local body = dialog:GetBody()
     local size = body:getContentSize()
     -- 是否激活 vip
@@ -893,7 +893,7 @@ function WidgetUseItems:OpenVipActive( item )
 
     local list,list_node = UIKit:commonListView_1({
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
-        viewRect = cc.rect(0, 0,570,4 * 130),
+        viewRect = cc.rect(0, 0,546,3 * 130),
     })
     list_node:addTo(body):align(display.BOTTOM_CENTER, size.width/2,20)
 
@@ -901,7 +901,7 @@ function WidgetUseItems:OpenVipActive( item )
     for i,v in ipairs(same_items) do
         if not (v:Count()<1 and not v:IsSell()) then
             local list_item = list:newItem()
-            list_item:setItemSize(570,130)
+            list_item:setItemSize(546,130)
             list_item:addContent(self:CreateItemBox(
                 v,
                 function ()
@@ -1071,7 +1071,7 @@ function WidgetUseItems:CreateItemBox(item,checkUseFunc,useItemFunc,buyAndUseFun
             text = item:GetLocalizeName(),
             size = 24,
             color = 0x403c2f,
-        }):addTo(body):align(display.LEFT_CENTER,130, body:getContentSize().height-20)
+        }):addTo(body):align(display.LEFT_CENTER,130, body:getContentSize().height-22)
         -- 道具介绍
         UIKit:ttfLabel({
             text = item:GetLocalizeDesc(),

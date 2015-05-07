@@ -10,6 +10,9 @@ local WidgetUseItems = import("..widget.WidgetUseItems")
 local config_day14 = GameDatas.Activities.day14
 local SpriteConfig = import("..sprites.SpriteConfig")
 local unlockPlayerSecondMarchQueue_price = GameDatas.PlayerInitData.intInit.unlockPlayerSecondMarchQueue.value
+local GameUIActivityReward = import(".GameUIActivityReward")
+local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
+
 
 function GameUIWatchTower:ctor(city,building,default_tab)
     default_tab = default_tab or "upgrade"
@@ -138,6 +141,14 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
     local title_bg  = display.newSprite("title_blue_558x34.png")
         :align(display.TOP_CENTER,284, 198)
         :addTo(bg)
+    if entity then
+        display.newSprite("info_16x33.png"):align(display.RIGHT_CENTER,540, 17):addTo(title_bg):scale(26/33)
+        WidgetPushTransparentButton.new(cc.rect(0,0,558,34))
+            :addTo(title_bg):align(display.LEFT_BOTTOM, 0, 0)
+            :onButtonClicked(function()
+                UIKit:newGameUI("GameUIWatchTowerMyTroopsDetail",entity):AddToCurrentScene(true)
+            end)
+    end
     local tile_label = UIKit:ttfLabel({
         text = "",
         size = 20,
@@ -207,7 +218,7 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
 
 
         UIKit:ttfLabel({
-            text =  string.format(_("累计签到%s天，永久+1进攻队列"),countInfo.day14 .. "/" .. #config_day14 ),
+            text =  string.format(_("累计签到%s天，永久+1进攻队列"),#config_day14 ),
             size = 22,
             color= 0x403c2f
         }):addTo(bg):align(display.LEFT_TOP, 164, event_bg:getPositionY() + 104)
@@ -236,24 +247,24 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
             local desctition_label = UIKit:ttfLabel({
                 text = _("目的地"),
                 size = 20,
-                color= 0x797154
+                color= 0x615b44
             }):align(display.LEFT_TOP,164,153):addTo(bg)
             local line_1 = display.newScale9Sprite("dividing_line.png"):size(390,2):addTo(bg):align(display.LEFT_TOP,164, 125)
             local desctition_label_val =  UIKit:ttfLabel({
                 text = entity:GetDestination(),
                 size = 20,
-                color= 0x797154
+                color= 0x615b44
             }):align(display.RIGHT_TOP,554,153):addTo(bg)
             local localtion_label = UIKit:ttfLabel({
                 text = _("坐标"),
                 size = 20,
-                color= 0x797154
+                color= 0x615b44
             }):align(display.LEFT_TOP,164,115):addTo(bg)
             local line_2 = display.newScale9Sprite("dividing_line.png"):size(390,2):addTo(bg):align(display.LEFT_TOP,164, 87)
             local localtion_label_val =  UIKit:ttfLabel({
                 text = entity:GetDestinationLocation(),
                 size = 20,
-                color= 0x797154
+                color= 0x615b44
             }):align(display.RIGHT_TOP,554,115):addTo(bg)
             tile_label:setString(entity:GetTitle())
             if entity:GetTypeStr() == 'HELPTO' then
@@ -365,24 +376,24 @@ function GameUIWatchTower:GetOtherEventItem(entity)
     local desctition_label = UIKit:ttfLabel({
         text = _("来自"),
         size = 20,
-        color= 0x797154
+        color= 0x615b44
     }):align(display.LEFT_TOP,164,153):addTo(bg)
     local line_1 = display.newScale9Sprite("dividing_line.png"):size(390,2):addTo(bg):align(display.LEFT_TOP,164, 125)
     local desctition_label_val =  UIKit:ttfLabel({
         text = self:GetEntityFromCityName(entity),
         size = 20,
-        color= 0x797154
+        color= 0x615b44
     }):align(display.RIGHT_TOP,554,153):addTo(bg)
     local localtion_label = UIKit:ttfLabel({
         text = _("玩家"),
         size = 20,
-        color= 0x797154
+        color= 0x615b44
     }):align(display.LEFT_TOP,164,115):addTo(bg)
     local line_2 = display.newScale9Sprite("dividing_line.png"):size(390,2):addTo(bg):align(display.LEFT_TOP,164, 87)
     local localtion_label_val =  UIKit:ttfLabel({
         text = self:GetEntityAttackPlayerName(entity),
         size = 20,
-        color= 0x797154
+        color= 0x615b44
     }):align(display.RIGHT_TOP,554,115):addTo(bg)
     local dragon_png = UILib.dragon_head[self:GetEntityDragonType(entity)]
     if dragon_png then
@@ -419,15 +430,16 @@ function GameUIWatchTower:OnEventDetailButtonClicked(entity)
     local strEntityType = entity:GetType()
     if strEntityType == entity.ENTITY_TYPE.MARCH_OUT then
         if entity:WithObject():MarchType() == "helpDefence" then
-            NetManager:getHelpDefenceMarchEventDetailPromise(entity:WithObject():Id()):done(function(response)
-                UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.MARCH,response.msg.eventDetail,DataManager:getUserData()._id)
+            NetManager:getHelpDefenceMarchEventDetailPromise(entity:WithObject():Id(),Alliance_Manager:GetMyAlliance():Id()):done(function(response)
+                UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.MARCH,response.msg.eventDetail,User:Id())
                     :AddToCurrentScene(true)
             end)
         else
             local my_status = Alliance_Manager:GetMyAlliance():Status()
             if my_status == "prepare" or  my_status == "fight" then
-                NetManager:getAttackMarchEventDetailPromise(entity:WithObject():Id()):done(function(response)
-                    UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.HELP_DEFENCE,response,DataManager:getUserData()._id)
+                local __,alliance_id = entity:WithObject():FromLocation()
+                NetManager:getAttackMarchEventDetailPromise(entity:WithObject():Id(),alliance_id):done(function(response)
+                    UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.HELP_DEFENCE,response.msg.eventDetail,User:Id())
                         :AddToCurrentScene(true)
                 end)
             else
@@ -437,8 +449,9 @@ function GameUIWatchTower:OnEventDetailButtonClicked(entity)
     elseif strEntityType == entity.ENTITY_TYPE.STRIKE_OUT then
         local my_status = Alliance_Manager:GetMyAlliance():Status()
         if my_status == "prepare" or  my_status == "fight" then
-            NetManager:getStrikeMarchEventDetailPromise(entity:WithObject():Id()):done(function(response)
-                UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.STRIKE,response,DataManager:getUserData()._id)
+            local __,alliance_id = entity:WithObject():FromLocation()
+            NetManager:getStrikeMarchEventDetailPromise(entity:WithObject():Id(),alliance_id):done(function(response)
+                UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.STRIKE,response.msg.eventDetail,User:Id())
                     :AddToCurrentScene(true)
             end)
         else
@@ -525,20 +538,15 @@ end
 --event
 --签到按钮
 function GameUIWatchTower:OnSignButtonClikced()
-    UIKit:newGameUI("GameUIActivity",City):AddToCurrentScene()
+    UIKit:newGameUI("GameUIActivityReward",GameUIActivityReward.REWARD_TYPE.CONTINUITY):AddToCurrentScene()
 end
 
---内容过滤
+--内容过滤 这里被更改为显示坐标
 function GameUIWatchTower:GetEntityFromCityName(entity)
     if entity:GetType() == entity.ENTITY_TYPE.MARCH_OUT and entity:WithObject():MarchType() == "helpDefence" then
-        return entity:GetFromCityName()
+        return entity:GetDestinationLocation()
     end
-    local level = self:GetBuilding():GetLevel()
-    if not self:GetAllianceBelvedere():CanDisplayCommingCityName(level) then
-        return '?'
-    else
-        return entity:GetFromCityName()
-    end
+    return entity:GetDestinationLocation()
 end
 
 function GameUIWatchTower:GetEntityAttackPlayerName(entity)

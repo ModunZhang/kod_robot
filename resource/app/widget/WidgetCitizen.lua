@@ -23,35 +23,35 @@ local items = {
         production_per_hour_text = _("城民增长"),
         tag_color = "green_head_42x98.png",
         tag_icon = "res_citizen_88x82.png",
-        tag_icon_scale = 0.3
+        tag_icon_scale = 0.35
     },
     [FOOD] = {
         production_text = _("农夫"),
         production_per_hour_text = _("粮食产量"),
         tag_color = "yellow_head_42x98.png",
         tag_icon = "res_food_91x74.png",
-        tag_icon_scale = 0.25
+        tag_icon_scale = 0.3
     },
     [WOOD] = {
         production_text = _("伐木工"),
         production_per_hour_text = _("木材产量"),
         tag_color = "brown_head_42x98.png",
         tag_icon = "res_wood_82x73.png",
-        tag_icon_scale = 0.25
+        tag_icon_scale = 0.35
     },
     [IRON] = {
         production_text = _("矿工"),
         production_per_hour_text = _("矿产产量"),
         tag_color = "blue_head_42x98.png",
         tag_icon = "res_iron_91x63.png",
-        tag_icon_scale = 0.25
+        tag_icon_scale = 0.35
     },
     [STONE] = {
         production_text = _("石匠"),
         production_per_hour_text = _("石料产量"),
         tag_color = "grey_head_42x98.png",
         tag_icon = "res_stone_88x82.png",
-        tag_icon_scale = 0.25
+        tag_icon_scale = 0.3
     }
 }
 local function return_item_info(res_type)
@@ -64,11 +64,11 @@ function WidgetCitizen:ctor(city)
 
     self.city = city
     local iconBg = cc.ui.UIImage.new("back_ground_43x43.png")
-        :pos(window.left + 45, window.top - 140)
+        :pos(window.left + 45, window.top - 134)
         :addTo(self)
 
     cc.ui.UIImage.new("res_citizen_88x82.png")
-        :addTo(iconBg):scale(0.45)
+        :addTo(iconBg):scale(0.45):pos(0,4)
 
     cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -79,7 +79,7 @@ function WidgetCitizen:ctor(city)
         color = UIKit:hex2c3b(0x29261c),
         valign = cc.ui.UILabel.TEXT_VALIGN_CENTER
     }):addTo(self)
-        :align(display.LEFT_CENTER, window.left + 100, window.top - 100)
+        :align(display.LEFT_CENTER, window.left + 100, window.top - 94)
 
     self.max_citizen_label = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -90,22 +90,22 @@ function WidgetCitizen:ctor(city)
         color = UIKit:hex2c3b(0x29261c),
         valign = cc.ui.UILabel.TEXT_VALIGN_CENTER
     }):addTo(self)
-        :align(display.LEFT_CENTER, window.left + 100, window.top - 124)
+        :align(display.LEFT_CENTER, window.left + 100, window.top - 118)
 
     local citizen_num_bg = cc.ui.UIImage.new("citizen_num_bg_170x714.png")
         :addTo(self)
-        :pos(window.left + 45, window.top - 150 - 702)
+        :pos(window.left + 45, window.top - 150 - 696)
 
     local tips_label = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
         text = _("提示：预留一定的空闲城民，兵营将这些空闲城民训练成士兵"),
         font = UIKit:getFontFilePath(),
-        size = 20,
+        size = 18,
         align = cc.ui.UILabel.TEXT_ALIGN_LEFT,
         color = UIKit:hex2c3b(0x29261c),
         valign = cc.ui.UILabel.TEXT_VALIGN_CENTER
     }):addTo(self)
-        :align(display.LEFT_CENTER, window.left + 45, window.top - 150 - 702 - 10)
+        :align(display.CENTER, window.cx , window.top - 150 - 702 - 7)
 
 
     self.citizen_ui = {}
@@ -123,7 +123,7 @@ function WidgetCitizen:ctor(city)
 
         local item_info = return_item_info(i)
 
-        local cur_pos = end_pos - (count - i) * 110 - (i~=CITIZEN and 150 or 0)
+        local cur_pos = end_pos - (count - i) * 110 - (i~=CITIZEN and 150 or 0) + 6
 
         local res_info_bg = cc.ui.UIImage.new("res_info_bg_392x106.png"):addTo(self):pos(window.left + 215, cur_pos)
 
@@ -135,7 +135,7 @@ function WidgetCitizen:ctor(city)
             font = UIKit:getFontFilePath(),
             size = 20,
             align = cc.ui.UILabel.TEXT_ALIGN_LEFT,
-            color = UIKit:hex2c3b(0x797154),
+            color = UIKit:hex2c3b(0x615b44),
             valign = cc.ui.UILabel.TEXT_VALIGN_CENTER
         }):addTo(res_info_bg):align(display.LEFT_CENTER, 50, 70)
 
@@ -145,7 +145,7 @@ function WidgetCitizen:ctor(city)
             font = UIKit:getFontFilePath(),
             size = 20,
             align = cc.ui.UILabel.TEXT_ALIGN_LEFT,
-            color = UIKit:hex2c3b(0x797154),
+            color = UIKit:hex2c3b(0x615b44),
             valign = cc.ui.UILabel.TEXT_VALIGN_CENTER
         }):addTo(res_info_bg):align(display.LEFT_CENTER, 50, 25)
 

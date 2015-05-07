@@ -9,20 +9,20 @@ function WidgetTips:ctor(head, body)
         :addTo(self)
 
 
-    local align_x = 30
+    local align_x = 556/2
     self.head = cc.ui.UILabel.new({
         size = 24,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_LEFT,
         color = UIKit:hex2c3b(0x403c2f)
-    }):addTo(self.back_ground, 2):align(display.LEFT_BOTTOM, align_x, 60)
+    }):addTo(self.back_ground, 2):align(display.CENTER_BOTTOM, align_x, 60)
 
     self.body = cc.ui.UILabel.new({
         size = 22,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_LEFT,
         color = UIKit:hex2c3b(0x403c2f)
-    }):addTo(self.back_ground, 2):align(display.LEFT_BOTTOM, align_x, 20)
+    }):addTo(self.back_ground, 2):align(display.CENTER_BOTTOM, align_x, 20)
 
     self:Title(head, body)
 end

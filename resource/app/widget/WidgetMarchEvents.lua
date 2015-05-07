@@ -277,7 +277,7 @@ function WidgetMarchEvents:ResizeBelowHorizon(new_height)
     self.node:setPositionY(- height)
     self.hide_btn:setPositionY(height)
 end
--- 只有加速按钮
+-- 只有加速按钮和部队
 function WidgetMarchEvents:CreateReturnItem(entity)
     local event = entity:WithObject()
     local node = display.newSprite("tab_event_bar.png"):align(display.LEFT_CENTER)
@@ -299,17 +299,32 @@ function WidgetMarchEvents:CreateReturnItem(entity)
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
 
     node.speed_btn = WidgetPushButton.new({
-        normal = "green_btn_up_154x39.png",
-        pressed = "green_btn_down_154x39.png",
-        disabled= "disabled_154x39.png",
+        normal = "march_speedup_btn_up.png",
+        pressed = "march_speedup_btn_down.png",
+        disabled= "disable_75x39.png",
     }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6, half_height)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("加速"),
             size = 18,
-            color = 0xfff3c7
+            color= 0xfff3c7
         }))
         :onButtonClicked(function()
             self:OnSpeedUpButtonClicked(entity)
+        end)
+
+
+    node.return_btn = WidgetPushButton.new({
+        normal = "yellow_btn_up_75x39.png",
+        pressed = "yellow_btn_down_75x39.png",
+        disabled= "disable_75x39.png",
+    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6 - 78, half_height)
+        :setButtonLabel(UIKit:commonButtonLable({
+            text = _("部队"),
+            size = 18,
+            color= 0xfff3c7
+        }))
+        :onButtonClicked(function()
+            self:OnInfoButtonClicked(entity)
         end)
     return node
 end
@@ -336,7 +351,7 @@ function WidgetMarchEvents:CreateAttackItem(entity)
     node.speed_btn = WidgetPushButton.new({
         normal = "march_speedup_btn_up.png",
         pressed = "march_speedup_btn_down.png",
-        disabled= "disabled_154x39.png",
+        disabled= "disable_75x39.png",
     }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6, half_height)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("加速"),
@@ -351,7 +366,7 @@ function WidgetMarchEvents:CreateAttackItem(entity)
     node.return_btn = WidgetPushButton.new({
         normal = "march_return_btn_up.png",
         pressed = "march_return_btn_down.png",
-        disabled= "disabled_154x39.png",
+        disabled= "disable_75x39.png",
     }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6 - 78, half_height)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("撤退"),
@@ -363,7 +378,7 @@ function WidgetMarchEvents:CreateAttackItem(entity)
         end)
     return node
 end
---只有撤退
+--只有撤退和部队
 function WidgetMarchEvents:CreateDefenceItem(entity)
     local event = entity:WithObject()
     local type_str = entity:GetTypeStr()
@@ -394,19 +409,33 @@ function WidgetMarchEvents:CreateDefenceItem(entity)
         size = 16,
         color = 0xd1ca95,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
-
     node.speed_btn = WidgetPushButton.new({
-        normal = "red_button_n_154x39.png",
-        pressed = "red_button_h_154x39.png",
-        disabled= "disabled_154x39.png",
+        normal = "march_return_btn_up.png",
+        pressed = "march_return_btn_down.png",
+        disabled= "disable_75x39.png",
     }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6, half_height)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("撤军"),
             size = 18,
-            color = 0xfff3c7
+            color= 0xfff3c7
         }))
         :onButtonClicked(function()
             self:OnRetreatButtonClicked(entity)
+        end)
+
+
+    node.return_btn = WidgetPushButton.new({
+        normal = "yellow_btn_up_75x39.png",
+        pressed = "yellow_btn_down_75x39.png",
+        disabled= "disable_75x39.png",
+    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6 - 78, half_height)
+        :setButtonLabel(UIKit:commonButtonLable({
+            text = _("部队"),
+            size = 18,
+            color= 0xfff3c7
+        }))
+        :onButtonClicked(function()
+            self:OnInfoButtonClicked(entity)
         end)
     return node
 end
@@ -464,10 +493,12 @@ function WidgetMarchEvents:MoveToTargetAction(entity)
     else
         location,alliance_id = entity:GetDestinationLocationNotString()
     end
-    print("type_str---->",type_str,location.x,location.y,alliance_id)
     local map_layer = display.getRunningScene():GetSceneLayer()
     local point = map_layer:ConvertLogicPositionToMapPosition(location.x,location.y,alliance_id)
     map_layer:GotoMapPositionInMiddle(point.x,point.y)
 end
 
+function WidgetMarchEvents:OnInfoButtonClicked(entity)
+    UIKit:newGameUI("GameUIWatchTowerMyTroopsDetail",entity):AddToCurrentScene(true)
+end
 return WidgetMarchEvents

@@ -15,7 +15,7 @@ function WidgetMailContacts:ctor()
     local size = body:getContentSize()
     UIKit:ttfLabel({
         text = _("向其他玩家发送邮件,会自动添加到最近联系人列表"),
-        size = 24,
+        size = 20,
         color = 0x403c2f
     }):align(display.CENTER,size.width/2,size.height-40)
         :addTo(body)
@@ -66,12 +66,12 @@ function WidgetMailContacts:CreateContactsContent()
     local alliance_tag = UIKit:ttfLabel({
         size = 24,
         color = 0x403c2f
-    }):align(display.LEFT_CENTER,140,40)
+    }):align(display.LEFT_CENTER,134,44)
         :addTo(content,2)
     local name = UIKit:ttfLabel({
-        size = 20,
+        size = 24,
         color = 0x5c553f
-    }):align(display.LEFT_CENTER,140,80)
+    }):align(display.LEFT_CENTER,134,84)
         :addTo(content,2)
     local parent = self
     function content:SetData( idx )
@@ -90,7 +90,7 @@ function WidgetMailContacts:CreateContactsContent()
         if self.icon then
             self.icon:removeFromParent(true)
         end
-        self.icon =UIKit:GetPlayerCommonIcon():align(display.CENTER, 70, item_height/2):addTo(self):scale(0.8)
+        self.icon =UIKit:GetPlayerCommonIcon():align(display.CENTER, 60, item_height/2):addTo(self):scale(0.8)
         if self.button then
             self.button:removeFromParent(true)
         end

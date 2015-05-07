@@ -53,12 +53,20 @@ City.RESOURCE_TYPE_TO_BUILDING_TYPE = {
 local only_one_buildings_map = {
     keep            = true,
     watchTower      = true,
-    barracks        = true,
+    warehouse       = true,
     dragonEyrie     = true,
+    barracks        = true,
+    hospital        = true,
+    academy         = true,
+    materialDepot   = true,
+    blackSmith      = true,
+    tradeGuild      = true,
+    townHall        = true,
+    toolShop        = true,
     trainingGround  = true,
     hunterHall      = true,
+    stable          = true,
     workshop        = true,
-    academy         = true,
 }
 local illegal_map = {
     location_21 = true,
@@ -1016,11 +1024,12 @@ function City:OnUserDataChanged(userData, current_time, deltaData)
     -- 更新基本信息
     local basicInfo = userData.basicInfo
     self.build_queue = basicInfo.buildQueue
-    self:SetCityName(basicInfo.cityName)
+    self:SetCityName(basicInfo.name)
     -- 最后才更新资源
 
     local is_fully_update = deltaData == nil
     local is_delta_update = not is_fully_update and deltaData.resources and deltaData.resources.refreshTime
+    is_delta_update = is_delta_update or (deltaData and deltaData.soldiers)
     if is_delta_update then
         need_update_resouce_buildings = true
     end
@@ -1555,7 +1564,7 @@ function City:CheckDependTechsLockState(tech)
     local changed = {}
     local targetTechs = self:FindDependOnTheTechs(tech)
     for _,tech_ in ipairs(targetTechs) do
-        tech_:SetEnable(tech:Level() >= tech_:UnlockLevel() and tech_:IsOpen())
+        tech_:SetEnable(tech:Level() >= tech_:UnlockLevel() and tech_:IsOpen() and tech_:AcademyLevel() <= self:GetAcademyBuildingLevel())
         table.insert(changed,tech_)
     end
     return changed
@@ -1565,9 +1574,18 @@ function City:FastUpdateAllTechsLockState()
     self:IteratorTechs(function(index,tech)
         local unLockByTech = self:FindTechByIndex(tech:UnlockBy())
         if unLockByTech then
-            tech:SetEnable(tech:UnlockLevel() <= unLockByTech:Level() and tech:IsOpen())
+            tech:SetEnable(tech:UnlockLevel() <= unLockByTech:Level() and tech:IsOpen() and tech:AcademyLevel() <= self:GetAcademyBuildingLevel())
         end
     end)
+end
+
+function City:GetAcademyBuildingLevel()
+    local building = self:GetFirstBuildingByType('academy')
+    if building then 
+        return building:GetLevel()
+    else
+        return 0
+    end
 end
 
 

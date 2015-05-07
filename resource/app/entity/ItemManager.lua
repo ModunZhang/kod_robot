@@ -172,7 +172,7 @@ function ItemManager:IsBuffActived( type )
     return tolua.type(self.itemEvents[type]) ~= "nil"
 end
 function ItemManager:GetBuffEffect( type )
-    return buffTypes[type].effect
+    return buffTypes[type].effect1 , buffTypes[type].effect2
 end
 function ItemManager:GetAllResourceTypes()
     local RESOURCE_TYPE = ResourceManager.RESOURCE_TYPE

@@ -34,9 +34,9 @@ end
 function MarchAttackEvent:Reset()
 	self:RemoveAllObserver()
 end
-
-function MarchAttackEvent:IsMarchAttackEvent()
-	return true
+--是否为返回事件
+function MarchAttackEvent:IsReturnEvent()
+	return false
 end
 
 function MarchAttackEvent:OnTimer(current_time)

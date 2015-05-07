@@ -14,7 +14,7 @@ function FullScreenPopDialogUI:Init(listener)
     self:addTouchAbleChild(bg)
     local size = bg:getContentSize()
     -- title bg
-    local title_bg =display.newSprite("title_blue_600x52.png", size.width/2, size.height+10):addTo(bg)
+    local title_bg =display.newSprite("title_blue_600x56.png", size.width/2, size.height+10):addTo(bg)
     -- title label
     self.title = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,

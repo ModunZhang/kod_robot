@@ -15,10 +15,11 @@ function WidgetPVEWarriorsTomb:GetDesc()
 end
 function WidgetPVEWarriorsTomb:SetUpButtons()
     return self:GetObject():IsSearched() and
-        { { label = _("离开") } } or
+        { { label = _("离开"), icon = "pve_icon_leave.png", } } or
         {
             {
-                label = _("安葬"), callback = function()
+                label = _("安葬"), 
+                callback = function()
                     if self:HasGem(10) then
                         local rollback = self:Search()
                         self:GetRewardsFromServer(nil, 10):fail(function()
@@ -29,7 +30,8 @@ function WidgetPVEWarriorsTomb:SetUpButtons()
                 end
             },
             {
-                label = _("离开")
+                label = _("离开"),
+                icon = "pve_icon_leave.png",
             }
         }
 end

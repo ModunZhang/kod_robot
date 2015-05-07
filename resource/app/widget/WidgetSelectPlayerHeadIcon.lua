@@ -42,16 +42,14 @@ function WidgetSelectPlayerHeadIcon:AddIconOption(icon_key,icon)
     local content = display.newScale9Sprite(body_image,0,0,cc.size(item_width,item_height),cc.rect(10,10,500,26))
     list.which_bg = not list.which_bg
 
-    local head_bg = display.newSprite("player_head_bg_104x104.png"):addTo(content)
-        :pos(60,item_height/2)
-    display.newSprite(icon):addTo(head_bg):pos(head_bg:getContentSize().width/2,head_bg:getContentSize().height/2)
-        :scale(100/128)
+    UIKit:GetPlayerCommonIcon(icon_key):addTo(content)
+        :pos(60,item_height/2):scale(0.82)
 
     UIKit:ttfLabel({
         text = Localize.player_icon[icon_key],
         size = 24,
         color = 0x403c2f
-    }):align(display.LEFT_CENTER,130,80)
+    }):align(display.LEFT_CENTER,130,84)
         :addTo(content)
     UIKit:ttfLabel({
         text = Localize.player_icon_unlock[icon_key],
@@ -86,7 +84,7 @@ function WidgetSelectPlayerHeadIcon:AddIconOption(icon_key,icon)
             text = _("已装备"),
             size = 24,
             color = 0x403c2f,
-        }):addTo(content):align(display.RIGHT_CENTER,item_width-50,40)
+        }):addTo(content):align(display.RIGHT_CENTER,item_width-50,58)
     end
 
 

@@ -17,10 +17,11 @@ local WidgetUpgradeMilitaryTech = class("WidgetUpgradeMilitaryTech", WidgetPopDi
 local function create_line_item(icon,text_1,text_2)
     local line = display.newSprite("dividing_line_546x2.png")
     local icon = display.newSprite(icon):addTo(line,2):align(display.LEFT_BOTTOM, 0, 0)
+    icon:scale(40/icon:getContentSize().width)
     local text1 = UIKit:ttfLabel({
         text = text_1,
         size = 20,
-        color = 0x797154,
+        color = 0x615b44,
     }):align(display.LEFT_BOTTOM, 50 , 0)
         :addTo(line)
     local text2 = UIKit:ttfLabel({
@@ -72,7 +73,7 @@ function WidgetUpgradeMilitaryTech:CurrentInfo()
     }):align(display.CENTER, bg:getContentSize().width/2 , bg:getContentSize().height/2)
         :addTo(bg)
     self.line1 = create_line_item("battle_33x33.png",tech:GetTechLocalize(),"+"..(tech:GetNextLevlAtkEff()*100).."%"):addTo(body):align(display.CENTER, size.width/2, size.height-120)
-    self.line2 = create_line_item("icon_teac.png",tech:GetTechCategory(),"+"..tech:GetNextLevlTechPoint()):addTo(body):align(display.CENTER, size.width/2, size.height-170)
+    self.line2 = create_line_item("bottom_icon_package_77x67.png",tech:GetTechCategory(),"+"..tech:GetNextLevlTechPoint()):addTo(body):align(display.CENTER, size.width/2, size.height-170)
 end
 function WidgetUpgradeMilitaryTech:UpgradeButtons()
     local body = self.body

@@ -219,7 +219,7 @@ function GameUIAllianceBattle:InitBattleStatistics()
         local intro_1 = UIKit:ttfLabel({
             text = intro_1_text,
             size = 22,
-            color = 0x797154,
+            color = 0x615b44,
             dimensions = cc.size(530,0),
         }):addTo(layer)
             :align(display.CENTER,window.cx,isEqualOrGreater and window.top-320 or window.top-370)
@@ -228,7 +228,7 @@ function GameUIAllianceBattle:InitBattleStatistics()
         local intro_2 = UIKit:ttfLabel({
             text = _("联盟会战会根据联盟战斗力匹配,你可以通过以下方式提升联盟战斗力"),
             size = 22,
-            color = 0x797154,
+            color = 0x615b44,
             dimensions = cc.size(530,0),
         }):addTo(layer)
             :align(display.CENTER,window.cx,intro_1:getPositionY()-intro_1:getContentSize().height-40)
@@ -435,7 +435,7 @@ function GameUIAllianceBattle:InitBattleStatistics()
             UIKit:ttfLabel({
                 text = _("本次联盟会战结束后奖励,总击杀越高奖励越高.获胜方获得70%的总奖励,失败方获得剩下的,获胜联盟击杀前5名的玩家还将平分奖励的金龙币"),
                 size = 20,
-                color = 0x797154,
+                color = 0x615b44,
                 -- align = cc.ui.TEXT_ALIGN_CENTER,
                 dimensions = cc.size(500,0),
             }):addTo(layer)
@@ -598,7 +598,7 @@ function GameUIAllianceBattle:OpenAllianceDetails(isOur)
         local attr_title = UIKit:ttfLabel({
             text = title,
             size = 20,
-            color = 0x797154,
+            color = 0x615b44,
         }):align(display.LEFT_CENTER, x, y)
             :addTo(body)
         UIKit:ttfLabel({
@@ -792,12 +792,12 @@ function GameUIAllianceBattle:CreateHistoryContent()
     -- 战斗发生时间
     local fight_time_label = UIKit:ttfLabel({
         size = 20,
-        color = 0x797154,
-    }):align(display.LEFT_CENTER,30, 60)
+        color = 0x615b44,
+    }):align(display.LEFT_CENTER,20, 40)
         :addTo(content)
 
     local fight_bg = display.newSprite("report_back_ground.png")
-        :align(display.TOP_CENTER, w/2,h-10)
+        :align(display.TOP_CENTER, w/2,h-8)
         :addTo(content)
         :scale(0.95)
     local our_win_label = UIKit:ttfLabel({
@@ -873,7 +873,7 @@ function GameUIAllianceBattle:CreateHistoryContent()
         :addTo(content)
     local title_label = UIKit:ttfLabel({
         size = 24,
-        color = 0x797154,
+        color = 0x615b44,
     }):align(display.LEFT_CENTER, 30, 30)
         :addTo(content)
 
@@ -1070,7 +1070,7 @@ function GameUIAllianceBattle:CreateAllianceItem(alliance,index)
     local a_helper = WidgetAllianceHelper.new()
     local flag_sprite = a_helper:CreateFlagWithRhombusTerrain(basic.terrain
         ,Flag.new():DecodeFromJson(basic.flag))
-    flag_sprite:scale(0.85)
+    flag_sprite:scale(1.2)
     flag_sprite:align(display.CENTER,0,-20)
         :addTo(flag_bg)
 
@@ -1099,23 +1099,23 @@ function GameUIAllianceBattle:CreateAllianceItem(alliance,index)
         :addTo(title_bg,2)
     -- 联盟power
     display.newSprite("dragon_strength_27x31.png")
-        :align(display.CENTER, 180,70)
+        :align(display.CENTER, 168,78)
         :addTo(content)
     local power_label  = UIKit:ttfLabel({
         text = string.formatnumberthousands(basic.power),
         size = 20,
         color = 0x403c2f,
-    }):align(display.LEFT_CENTER,200,70)
+    }):align(display.LEFT_CENTER,188,78)
         :addTo(content)
     -- 联盟击杀
     display.newSprite("battle_33x33.png")
-        :align(display.CENTER, 180,30)
+        :align(display.CENTER, 168,38)
         :addTo(content)
     local hit_label  = UIKit:ttfLabel({
         text = string.formatnumberthousands(basic.kill),
         size = 20,
         color = 0x403c2f,
-    }):align(display.LEFT_CENTER,200,30)
+    }):align(display.LEFT_CENTER,188,38)
         :addTo(content)
     if alliance._id ~= self.alliance:Id() then
         -- 进入按钮
@@ -1205,7 +1205,7 @@ function GameUIAllianceBattle:OpenOtherAllianceDetails(alliance)
         local attr_title = UIKit:ttfLabel({
             text = title,
             size = 20,
-            color = 0x797154,
+            color = 0x615b44,
         }):align(display.LEFT_CENTER, x, y)
             :addTo(attr_bg)
         UIKit:ttfLabel({

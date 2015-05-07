@@ -24,7 +24,7 @@ function GameUIAllianceShrineRewardList:BuildUI()
 	local background = WidgetUIBackGround.new({height = HEIGHT})
 		:pos(window.left+22,window.top - 101 - HEIGHT)
 	self:addTouchAbleChild(background)
-	local title_bar = display.newSprite("title_blue_600x52.png"):align(display.CENTER_BOTTOM, 304,HEIGHT - 15):addTo(background)
+	local title_bar = display.newSprite("title_blue_600x56.png"):align(display.CENTER_BOTTOM, 304,HEIGHT - 15):addTo(background)
 	UIKit:ttfLabel({
 		text = _("事件完成奖励"),
 		size = 22,

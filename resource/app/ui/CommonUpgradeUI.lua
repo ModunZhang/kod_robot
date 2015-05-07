@@ -144,12 +144,10 @@ function CommonUpgradeUI:SetBuildingLevel()
 end
 
 function CommonUpgradeUI:InitBuildingIntroduces()
-    self.building_introduces = cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        font = UIKit:getFontFilePath(),
+    self.building_introduces = UIKit:ttfLabel({
         size = 18,
         dimensions = cc.size(380, 90),
-        color = UIKit:hex2c3b(0x797154)
+        color = 0x615b44
     }):align(display.LEFT_CENTER,display.cx-110, display.top-190):addTo(self)
     self:SetBuildingIntroduces()
 end
@@ -172,12 +170,12 @@ function CommonUpgradeUI:InitNextLevelEfficiency()
     local efficiency_bg_size = efficiency_bg:getContentSize()
     self.efficiency = UIKit:ttfLabel({
         size = 20,
-        dimensions = cc.size(380,0),
+        dimensions = cc.size(370,0),
         valign = cc.ui.UILabel.TEXT_VALIGN_CENTER,
         align = cc.ui.UILabel.TEXT_ALIGN_CENTER,
         color = 0x403c2f
     }):addTo(efficiency_bg):align(display.LEFT_CENTER)
-    self.efficiency:pos(10,efficiency_bg_size.height/2)
+    self.efficiency:pos(14,efficiency_bg_size.height/2)
     self:SetUpgradeEfficiency()
 end
 

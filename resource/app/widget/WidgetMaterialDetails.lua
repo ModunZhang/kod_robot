@@ -21,7 +21,7 @@ function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
     -- bg
     local bg_width,bg_height = bg:getContentSize().width,bg:getContentSize().height
     -- title bg
-    local title_bg = display.newSprite("title_blue_600x52.png", bg_width/2,bg_height+10):addTo(bg,2)
+    local title_bg = display.newSprite("title_blue_600x56.png", bg_width/2,bg_height+10):addTo(bg,2)
     UIKit:ttfLabel(
         {
             text = _("材料详情"),
@@ -56,7 +56,7 @@ function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
             size = 22,
             valign = ui.TEXT_VALIGN_TOP,
             dimensions = cc.size(320, 120),
-            color = UIKit:hex2c3b(0x797154)
+            color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_TOP, 150,bg_height-70)
         :addTo(bg)
    

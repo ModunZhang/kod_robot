@@ -18,6 +18,7 @@ function ProductionTechnology:ctor()
 	property(self,"unlockLevel","")
 	property(self,"effectPerLevel","")
 	property(self,"enable",true)
+	property(self,"academyLevel",0)
 end
 
 function ProductionTechnology:UpdateData(name,json_data)
@@ -28,6 +29,7 @@ function ProductionTechnology:UpdateData(name,json_data)
 	self:SetUnlockBy(tech.unlockBy)
 	self:SetUnlockLevel(tech.unlockLevel)
 	self:SetEffectPerLevel(tech.effectPerLevel)
+	self:SetAcademyLevel(tech.academyLevel)
 end
 
 function ProductionTechnology:OnPropertyChange()
@@ -48,10 +50,10 @@ function ProductionTechnology:GetNextLevelUpCost()
 end
 
 function ProductionTechnology:GetNextLevel()
-	if self:Level() < 15 then
+	if self:Level() < self:MaxLevel() then
 		return self:Level() + 1
 	else
-		return 15
+		return self:MaxLevel()
 	end
 end
 
@@ -70,23 +72,37 @@ end
 function ProductionTechnology:GetBuffEffectVal()
 	return self:Level() * self:EffectPerLevel()
 end
-function ProductionTechnology:GetNextNexLevelBuffEffectVal()
-	if self:GetNextLevel() then
-		return (self:GetNextLevel() + 1) * self:EffectPerLevel()
-	end
-end
 function ProductionTechnology:GetNextLevelBuffEffectVal()
 	if self:GetNextLevel() then
 		return self:GetNextLevel() * self:EffectPerLevel()
 	end
 end
 function ProductionTechnology:IsReachLimitLevel()
-	return self:Level() >= 15
-end
-function ProductionTechnology:MaxLevel()
-	return 15
+	return self:Level() >= self:MaxLevel()
 end
 
+function ProductionTechnology:MaxLevel()
+	return #config_productiontechlevelup[self:Name()]
+end
+
+function ProductionTechnology:GetCurrentLevelPower()
+	local config = config_productiontechlevelup[self:Name()]
+	if config and config[self:Level()] then
+		return config[self:Level()].power
+	end
+	return 0
+end
+
+function ProductionTechnology:GetNextLevelPower()
+	if self:GetNextLevel() then
+		local config = config_productiontechlevelup[self:Name()]
+		if config and config[self:GetNextLevel()] then
+			return config[self:GetNextLevel()].power
+		end
+	end
+	return 0
+end
+--是否开放
 function ProductionTechnology:IsOpen()
 	return self:Index() < 10
 end

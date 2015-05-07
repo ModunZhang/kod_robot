@@ -51,7 +51,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
 
     local label_origin_x = 190
     -- bg
-    local back_ground = WidgetUIBackGround.new({height=500}):addTo(self)
+    local back_ground = WidgetUIBackGround.new({height=500,isFrame="yes"}):addTo(self)
     back_ground:setTouchEnabled(true)
 
     -- title
@@ -92,7 +92,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x5bb800)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_BOTTOM, label_origin_x, size.height - 85 - 11)
+        :align(display.LEFT_BOTTOM, label_origin_x -12 , size.height - 85 - 11)
 
     local vs_map = return_vs_soldiers_map(soldier_name)
     local strong_vs = {}
@@ -106,7 +106,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x403c2f)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_CENTER, label_origin_x + label:getContentSize().width, size.height - 85)
+        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, size.height - 85 - 11)
 
     local label = cc.ui.UILabel.new({
         text = _("弱势对抗"),
@@ -115,7 +115,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x890000)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_BOTTOM, label_origin_x, size.height - 120 - 11)
+        :align(display.LEFT_BOTTOM, label_origin_x-12, size.height - 120 - 11)
 
     local weak_vs = {}
     for i, v in ipairs(vs_map.weak_vs) do
@@ -128,19 +128,19 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x403c2f)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_CENTER, label_origin_x + label:getContentSize().width, size.height - 120)
+        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, size.height - 120 - 11)
 
 
     -- food icon
     cc.ui.UIImage.new("res_food_91x74.png"):addTo(back_ground, 2)
-        :align(display.CENTER, size.width - 130, size.height - 90):scale(0.5)
+        :align(display.CENTER, size.width - 133, size.height - 100):scale(0.4)
 
     cc.ui.UILabel.new({
         text = _("维护费"),
         size = 18,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0x7f775f)
+        color = UIKit:hex2c3b(0x615b44)
     }):addTo(back_ground, 2)
         :align(display.LEFT_CENTER, size.width - 100, size.height - 90)
 
@@ -164,7 +164,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
     if soldier_config.specialMaterials then
         local margin_x = 100
         local length = size.width - margin_x * 2
-        local origin_x, origin_y, gap_x = margin_x, 30, length / 3
+        local origin_x, origin_y, gap_x = margin_x, 32, length / 3
         local specialMaterials = string.split(soldier_config.specialMaterials,",")
         table.insert(specialMaterials, { "citizen", "res_citizen_44x50.png" })
         for k,v in pairs(specialMaterials) do
@@ -178,16 +178,21 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
                 res_type = v[1]
                 need_image = v[2]
             end
+            if res_type ~= "citizen" then
+                local icon_bg = cc.ui.UIImage.new("box_118x118.png"):addTo(need, 2)
+                    :align(display.CENTER, x, size.height - origin_y)
+                icon_bg:scale(46/icon_bg:getContentSize().width)
+            end
             local icon_iamge = cc.ui.UIImage.new(need_image):addTo(need, 2)
                 :align(display.CENTER, x, size.height - origin_y)
-            icon_iamge:scale(50/icon_iamge:getContentSize().width)
+            icon_iamge:scale(38/icon_iamge:getContentSize().width)
             local total = cc.ui.UILabel.new({
                 size = 20,
                 font = UIKit:getFontFilePath(),
                 align = cc.ui.TEXT_ALIGN_CENTER,
                 color = UIKit:hex2c3b(0x403c2f)
             }):addTo(need, 2)
-                :align(display.CENTER, x, size.height - origin_y - 40)
+                :align(display.CENTER, x, size.height - origin_y - 36)
 
             local need = cc.ui.UILabel.new({
                 size = 20,
@@ -196,7 +201,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
                 color = UIKit:hex2c3b(0x403c2f)
             -- color = display.COLOR_RED
             }):addTo(need, 2)
-                :align(display.CENTER, x, size.height - origin_y - 60)
+                :align(display.CENTER, x, size.height - origin_y - 56)
             self.res_map[res_type] = { total = total, need = need }
 
         end
@@ -215,7 +220,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
             local res_type = v[1]
             local png = v[2]
             local x = origin_x + (i - 1) * gap_x
-            local scale = 0.4
+            local scale = 0.5
             cc.ui.UIImage.new(png):addTo(need, 2)
                 :align(display.CENTER, x, size.height - origin_y):scale(scale)
 
@@ -225,7 +230,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
                 align = cc.ui.TEXT_ALIGN_CENTER,
                 color = UIKit:hex2c3b(0x403c2f)
             }):addTo(need, 2)
-                :align(display.CENTER, x, size.height - origin_y - 40)
+                :align(display.CENTER, x, size.height - origin_y - 36)
 
             local need = cc.ui.UILabel.new({
                 size = 20,
@@ -234,7 +239,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
                 color = UIKit:hex2c3b(0x403c2f)
             -- color = display.COLOR_RED
             }):addTo(need, 2)
-                :align(display.CENTER, x, size.height - origin_y - 60)
+                :align(display.CENTER, x, size.height - origin_y - 56)
 
             self.res_map[res_type] = { total = total, need = need }
         end
@@ -260,11 +265,11 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
             })
             :addTo(back_ground, 2)
             :align(display.CENTER, 160, 110)
-            :setButtonLabel(cc.ui.UILabel.new({
-                UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+            :setButtonLabel(UIKit:ttfLabel({
                 text = _("立即招募"),
                 size = 24,
-                color = UIKit:hex2c3b(0xfff3c7)
+                color = 0xfff3c7,
+                shadow = true
             }))
             :onButtonClicked(function(event)
                 if City:GetUser():GetGemResource():GetValue()< tonumber(self.gem_label:getString())then
@@ -321,11 +326,11 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
             })
             :addTo(back_ground, 2)
             :align(display.CENTER, size.width - 120, 110)
-            :setButtonLabel(cc.ui.UILabel.new({
-                UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+            :setButtonLabel(UIKit:ttfLabel({
                 text = _("招募"),
                 size = 27,
-                color = UIKit:hex2c3b(0xfff3c7)
+                color = 0xfff3c7,
+                shadow = true
             }))
             :onButtonClicked(function(event)
                 local current_time = app.timer:GetServerTime()
@@ -428,9 +433,7 @@ function WidgetRecruitSoldier:onEnter()
     self.slider_input:SetValue(max)
 
     self.city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
-    UIKit:CheckOpenUI(self)
     app.timer:AddListener(self)
-
 end
 function WidgetRecruitSoldier:onExit()
     self.barracks:RemoveBarracksListener(self)
@@ -475,7 +478,6 @@ end
 function WidgetRecruitSoldier:GetConfigBySoldierTypeAndStar(soldier_name, star)
     local soldier_name_with_star = soldier_name..(star == nil and "" or string.format("_%d", star))
     local soldier_config = NORMAL[soldier_name_with_star] == nil and SPECIAL[soldier_name] or NORMAL[soldier_name_with_star]
-    print("GetConfigBySoldierTypeAndStar>>>>>>",soldier_name_with_star,star)
     local soldier_ui_config = UILib.soldier_image[soldier_name][star]
     return soldier_config, soldier_ui_config
 end
@@ -666,6 +668,7 @@ end
 
 
 return WidgetRecruitSoldier
+
 
 
 

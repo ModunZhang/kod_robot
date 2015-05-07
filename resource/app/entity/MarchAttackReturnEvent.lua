@@ -25,8 +25,8 @@ function MarchAttackReturnEvent:TargetLocation()
 end
 
 
-function MarchAttackEvent:IsMarchAttackEvent()
-	return false
+function MarchAttackReturnEvent:IsReturnEvent()
+	return true
 end
 
 return MarchAttackReturnEvent

@@ -97,8 +97,13 @@ function ChatManager:sortMessage_(t)
 end
 
 function ChatManager:__checkIsBlocked(msg)
-	if msg.fromId == User:Id() then
-		msg.fromName = User:Name()
+	if msg.id == User:Id() then
+		msg.name = User:Name()
+		msg.icon = User:Icon()
+		local alliacne = Alliance_Manager:GetMyAlliance()
+		if not alliacne:IsDefault() then
+			msg.allianceTag = alliacne:Tag()
+		end
 	end
 	return self._blockedIdList_[msg.fromId] ~= nil
 end

@@ -57,12 +57,12 @@ intInit["dragonReviveNeedMinutes"] = {
 }
 intInit["casinoTokenNeededPerNormalGacha"] = {
 	["type"] = "casinoTokenNeededPerNormalGacha",
-	["value"] = 100,
+	["value"] = 5000,
 	["desc"] = "普通gacha一次需要多少赌币"
 }
 intInit["casinoTokenNeededPerAdvancedGacha"] = {
 	["type"] = "casinoTokenNeededPerAdvancedGacha",
-	["value"] = 1000,
+	["value"] = 150000,
 	["desc"] = "高级gacha一次需要多少赌币"
 }
 intInit["dragonMarchSpeed"] = {
@@ -137,6 +137,16 @@ intInit["specialSoldierRecruitAbleDays"] = {
 }
 intInit["unlockPlayerSecondMarchQueue"] = {
 	["type"] = "unlockPlayerSecondMarchQueue",
-	["value"] = 1000,
+	["value"] = 1500,
 	["desc"] = "解锁第二条队列"
+}
+intInit["playerResourceProtectPercent"] = {
+	["type"] = "playerResourceProtectPercent",
+	["value"] = 10,
+	["desc"] = "玩家资源保护基础百分比"
+}
+intInit["dragonStrengthTerrainAddPercent"] = {
+	["type"] = "dragonStrengthTerrainAddPercent",
+	["value"] = 10,
+	["desc"] = "龙在相应地形下的力量加成比例"
 }

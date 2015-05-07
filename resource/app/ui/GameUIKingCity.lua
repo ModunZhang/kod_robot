@@ -31,7 +31,7 @@ function GameUIKingCity:InitInfo()
         {
             text = _("联盟"),
             size = 20,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER, 80, 234)
         :addTo(background)
     UIKit:ttfLabel(
@@ -46,7 +46,7 @@ function GameUIKingCity:InitInfo()
         {
             text = _("国王"),
             size = 20,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER, 80, 190)
         :addTo(background)
     UIKit:ttfLabel(

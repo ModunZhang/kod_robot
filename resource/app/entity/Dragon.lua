@@ -162,7 +162,7 @@ function Dragon:ctor(drag_type,strength,vitality,status,star,level,exp,hp)
 end
 --自身的领导力
 function Dragon:Leadership()
-	return config_dragonLevel[self:Level()].leadership
+	return config_dragonLevel[self:Level()].leadership +  config_dragonStar[self:Star()].initLeadership
 end
 --总带兵量
 function Dragon:LeadCitizen()
@@ -172,11 +172,11 @@ end
 
 --自身的力量
 function Dragon:Strength()
-  	return config_dragonLevel[self:Level()].strength
+  	return config_dragonLevel[self:Level()].strength + config_dragonStar[self:Star()].initStrength
 end
 --自身的活力
 function Dragon:Vitality()
-	return config_dragonLevel[self:Level()].vitality
+	return config_dragonLevel[self:Level()].vitality + config_dragonStar[self:Star()].initVitality
 end
 function Dragon:IsHpLow()
 	return math.floor(self.hp/self:GetMaxHP()*100)<20

@@ -25,7 +25,7 @@ function GameUIAttackVillage:onEnter()
     local report = self.report
     local report_body = self.body
     local rb_size = report_body:getContentSize()
-    local title = display.newSprite("title_blue_600x52.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
+    local title = display.newSprite("title_blue_600x56.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
         :addTo(report_body)
     local title_label = UIKit:ttfLabel(
         {
@@ -80,7 +80,7 @@ function GameUIAttackVillage:onEnter()
         {
             text = self:GetFightTarget(),
             size = 18,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER, 20, rb_size.height-170)
         :addTo(report_body)
 
@@ -88,7 +88,7 @@ function GameUIAttackVillage:onEnter()
         {
             text = _("战斗地形：沙漠（派出红龙获得额外力量）--服务器未推送战斗地形数据"),
             size = 18,
-            color = 0x797154
+            color = 0x615b44
         }):align(display.LEFT_CENTER, 20, rb_size.height-195)
         :addTo(report_body)
 
@@ -682,7 +682,7 @@ function GameUIAttackVillage:GetWarResult()
 end
 function GameUIAttackVillage:GetFightTarget()
     local t = self.report:GetAttackTarget()
-    return _("Battle at ")..t.cityName.." ("..t.location.x..","..t.location.y..")"
+    return _("Battle at ")..t.name.." ("..t.location.x..","..t.location.y..")"
 end
 function GameUIAttackVillage:GetRewards()
     return  self.report:GetMyRewards()

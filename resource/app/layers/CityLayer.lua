@@ -293,10 +293,10 @@ function CityLayer:ReloadSceneBackground()
     end
     self.background = display.newNode():addTo(self, SCENE_BACKGROUND)
     local terrain = self:Terrain()
-    local left_1 = string.format("left_background_1_%s.png", terrain)
-    local left_2 = string.format("left_background_2_%s.png", terrain)
-    local right_1 = string.format("right_background_1_%s.png", terrain)
-    local right_2 = string.format("right_background_2_%s.png", terrain)
+    local left_1 = string.format("left_background_1_%s.jpg", terrain)
+    local left_2 = string.format("left_background_2_%s.jpg", terrain)
+    local right_1 = string.format("right_background_1_%s.jpg", terrain)
+    local right_2 = string.format("right_background_2_%s.jpg", terrain)
     local left1 = display.newSprite(left_1):addTo(self.background):align(display.LEFT_BOTTOM)
     local left2 = display.newSprite(left_2):addTo(self.background):align(display.LEFT_BOTTOM, 0, left1:getContentSize().height)
     local right1 = display.newSprite(right_1):addTo(self.background):align(display.LEFT_BOTTOM, left2:getContentSize().width, 0)
@@ -457,6 +457,7 @@ function CityLayer:UpdateTilesWithCity(city)
         v:removeFromParent()
     end
     self.tiles = {}
+    math.randomseed(123456789)
     city:IteratorTilesByFunc(function(x, y, tile)
         if tile.locked or (tile.x == 2 and tile.y == 5) then
             table.insert(self.tiles, self:CreateTileWithTile(tile):addTo(city_node))
@@ -543,20 +544,20 @@ function CityLayer:RefreshSoldiers(soldier_manager)
     end
     local soldiers = {}
     for i, v in ipairs({
-        {x = 6, y = 17, soldier_type = "skeletonWarrior", scale = 1},
-        {x = 4, y = 17, soldier_type = "skeletonArcher", scale = 1},
-        {x = 8, y = 17, soldier_type = "deathKnight", scale = 1},
-        {x = 2, y = 17, soldier_type = "meatWagon", scale = 1},
+        {x = 6, y = 18, soldier_type = "skeletonWarrior", scale = 1},
+        {x = 4, y = 18, soldier_type = "skeletonArcher", scale = 1},
+        {x = 8, y = 18, soldier_type = "deathKnight", scale = 1},
+        {x = 2, y = 18, soldier_type = "meatWagon", scale = 1},
 
-        {x = 8, y = 14.5, soldier_type = "lancer", scale = 1},
-        {x = 6, y = 14.5, soldier_type = "swordsman", scale = 1},
-        {x = 4, y = 14.5, soldier_type = "ranger", scale = 1},
-        {x = 2, y = 14.5, soldier_type = "catapult", scale = 0.8},
+        {x = 8, y = 15.5, soldier_type = "lancer", scale = 1},
+        {x = 6, y = 15.5, soldier_type = "swordsman", scale = 1},
+        {x = 4, y = 15.5, soldier_type = "ranger", scale = 1},
+        {x = 2, y = 15.5, soldier_type = "catapult", scale = 0.8},
 
-        {x = 8, y = 12, soldier_type = "horseArcher", scale = 1},
-        {x = 6, y = 12, soldier_type = "sentinel", scale = 1},
-        {x = 4, y = 12, soldier_type = "crossbowman", scale = 1},
-        {x = 2, y = 12, soldier_type = "ballista", scale = 0.8},
+        {x = 8, y = 13, soldier_type = "horseArcher", scale = 1},
+        {x = 6, y = 13, soldier_type = "sentinel", scale = 1},
+        {x = 4, y = 13, soldier_type = "crossbowman", scale = 1},
+        {x = 2, y = 13, soldier_type = "ballista", scale = 0.8},
     }) do
         local star = soldier_manager:GetStarBySoldierType(v.soldier_type)
         local soldier = self:CreateSoldier(v.soldier_type, star, v.x, v.y):addTo(self:GetCityNode())
@@ -796,14 +797,9 @@ local function on_move(_, sprite)
     sprite:OnSceneMove()
 end
 function CityLayer:OnSceneMove()
-    -- self:IteratorCanUpgradingBuilding(on_move)
     table.foreach(self.tiles, function(_, sprite)
         sprite:OnSceneMove()
     end)
-    -- table.foreach(self.ruins, on_move)
-    -- if self.road then
-    --     on_move(nil, self.road)
-    -- end
     local move_widget = self.city_scene:GetSceneUILayer():getChildByTag(989)
     if move_widget then
         local ruins = move_widget:GetRuins()
@@ -812,7 +808,9 @@ function CityLayer:OnSceneMove()
             move_widget:setPosition(world_pos.x, world_pos.y)
         end
     end
-    -- self:UpdateWeather()
+    for i,v in ipairs(self.city_scene:GetMarkBuildings()) do
+        v:OnSceneMove()
+    end
     self.city_scene:GetSceneUILayer():OnSceneMove()
 end
 function CityLayer:UpdateWeather()

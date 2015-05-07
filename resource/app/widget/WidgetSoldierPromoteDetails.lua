@@ -45,7 +45,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("对步兵的攻击"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.infantry,
@@ -62,7 +62,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("对弓手的攻击"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.archer,
@@ -79,7 +79,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("对骑兵的攻击"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.cavalry,
@@ -96,7 +96,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("对攻城器械的攻击"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.siege,
@@ -113,7 +113,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("对城墙的攻击"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.wall,
@@ -130,7 +130,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("生命值"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.hp,
@@ -147,7 +147,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("负重"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.load,
@@ -164,7 +164,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("行军速度"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.march,
@@ -181,7 +181,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("需要人口"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = next_config.citizen,
@@ -198,7 +198,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = _("维护费费用"),
                 size = 20,
-                color = 0x675f45,
+                color = 0x615b44,
             },
             {
                 text = "-"..next_config.consumeFoodPerHour,

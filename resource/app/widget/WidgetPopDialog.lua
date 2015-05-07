@@ -9,7 +9,7 @@ function WidgetPopDialog:ctor(height,title_text,y,title_bg)
     local body = self.body
     self:addTouchAbleChild(body)
     local rb_size = body:getContentSize()
-    local title = display.newSprite(title_bg or "title_blue_600x52.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
+    local title = display.newSprite(title_bg or "title_blue_600x56.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
         :addTo(body)
     self.title_label = UIKit:ttfLabel({
         text = title_text,
@@ -23,7 +23,7 @@ function WidgetPopDialog:ctor(height,title_text,y,title_bg)
             if event.name == "CLICKED_EVENT" then
                 self:LeftButtonClicked()
             end
-        end):align(display.CENTER, rb_size.width-34,rb_size.height+14):addTo(body)
+        end):align(display.RIGHT_CENTER, title:getContentSize().width,title:getContentSize().height/2+2):addTo(title)
 end
 
 function WidgetPopDialog:GetBody()

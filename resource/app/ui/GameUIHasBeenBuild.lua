@@ -460,7 +460,7 @@ function GameUIHasBeenBuild:LoadBuildingQueue()
         size = 20,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_LEFT,
-        color = UIKit:hex2c3b(0x797154)
+        color = UIKit:hex2c3b(0x615b44)
     }):addTo(back_ground, 2)
         :align(display.LEFT_CENTER, 60, back_ground:getContentSize().height/2)
 

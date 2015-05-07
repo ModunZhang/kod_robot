@@ -3,12 +3,14 @@
 -- Date: 2015-01-27 10:37:38
 --
 local GameUIEmojiSelect = UIKit:createUIClass("GameUIEmojiSelect","UIAutoClose")
-local EmojiTable = import("..utils.EmojiTable")
+local EmojiTable = import("..utils.EmojiTable") -- 220 count of emoji
 local WidgetPushButton = import("..widget.WidgetPushButton")
-local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
-local WidgetDropList = import("..widget.WidgetDropList")
 local window = import("..utils.window")
-local UIScrollView = import(".UIScrollView")
+local UIPageView = import("..ui.UIPageView")
+local PAGE_VIEW_WIDTH = 517
+local PAGE_VIEW_HEIGHT = 410
+local UIListView = import(".UIListView")
+
 
 function GameUIEmojiSelect:ctor(func)
 	GameUIEmojiSelect.super.ctor(self)
@@ -17,108 +19,71 @@ end
 
 function GameUIEmojiSelect:onEnter()
 	GameUIEmojiSelect.super.onEnter(self)
-    local bg =  WidgetUIBackGround.new({height=658}):pos(window.left+20,window.bottom+100)
-    self:addTouchAbleChild(bg)
-    local header = display.newSprite("title_blue_600x52.png")
-        :addTo(bg,3)
-        :align(display.CENTER_BOTTOM, 304, 644)
-    UIKit:closeButton():addTo(header)
-        :align(display.BOTTOM_RIGHT,header:getContentSize().width, 0)
-        :onButtonClicked(function ()
-            self:LeftButtonClicked()
-        end)
-    local title_label = UIKit:ttfLabel({
-        text = _("表情"),
-        size = 24,
-        color = 0xffedae,
-    }):align(display.CENTER,header:getContentSize().width/2, header:getContentSize().height/2):addTo(header)
-    self.bg = bg
-    local dropList = WidgetDropList.new(
-		{
-			{tag = "Smiley",label = _("笑脸"),default = true},
-			{tag = "Flower",label = _("花")},
-		},
-		function(tag)
-			if self.content then 
-				self.content:hide()
-			end
-			if self['DisplayEmojiWith_' .. tag] then
-				self.content = self['DisplayEmojiWith_' .. tag](self)
-				self.content:show()
-			end
-		end
-	)
-	dropList:align(display.CENTER_TOP,bg:getContentSize().width/2,640):addTo(bg,2)
+	self:BuildUI()
 end
 
-function GameUIEmojiSelect:DisplayEmojiWith_Smiley()
-	if self.emoji_node_smiley then
-		return self.emoji_node_smiley
-	end
-	local emoji_node = display.newNode():size(self.bg:getContentSize().width - 60,560):pos(10,20):addTo(self.bg,1)
-	local emojis = EmojiTable:GetSmileyImages()
-	local x,y = 32,518
-	for i,v in ipairs(emojis) do
-		local img = "#" .. v
-        local __,e = string.find(v,"%.")
-        local key = string.sub(v,1,e - 1)
-        local button = WidgetPushButton.new({normal = img,pressed = img})
-            :align(display.CENTER, x,y):addTo(emoji_node)
-            :scale(0.7)
-        button:onButtonClicked(function()
-            	self:__callFunc(key)
-            	local action =  transition.sequence({cc.ScaleTo:create(0.1,1),cc.ScaleTo:create(0.1,0.7)})
-        		button:runAction(action)
-        end)
-        x = x + 20 + 32
-        if i % 11 == 0 then
-            y = y - 52
-            x = 32
+function GameUIEmojiSelect:BuildUI()
+	local bg = display.newSprite("emoji_bg_536x478.png"):align(display.BOTTOM_CENTER, window.cx, window.bottom+200)
+	self:addTouchAbleChild(bg)
+	local one_x,two_x = 238,290
+	local page = display.newSprite("emoji_page_8x8.png"):align(display.LEFT_CENTER,one_x, 39):addTo(bg)
+	self.page = page
+	local pv = UIPageView.new {
+        viewRect = cc.rect(10, 56, PAGE_VIEW_WIDTH, PAGE_VIEW_HEIGHT),
+        row = 1,
+        padding = {left = 0, right = 0, top = 10, bottom = 0},
+        gap = 10,
+        speed_limit = 5,
+    }:onTouch(function (event)
+        if event.name == "pageChange" then
+            if 1 == event.pageIdx then
+              	self.page:setPositionX(one_x)
+            elseif 2 == event.pageIdx then
+              	self.page:setPositionX(two_x)
+            end
         end
-	end
-	self.emoji_node_smiley = emoji_node
-	return self.emoji_node_smiley 
+    end):addTo(bg)
+    pv:setTouchEnabled(true)
+    pv:setTouchSwallowEnabled(false)
+    pv:setCascadeOpacityEnabled(true)
+    local item = pv:newItem()
+    local content = self:BuildEmojiNode(1,110)
+    item:addChild(content)
+    pv:addItem(item)    
+    item = pv:newItem()
+    content = self:BuildEmojiNode(111,220)
+    item:addChild(content)
+    pv:addItem(item)   
+    pv:reload()
 end
 
-
-function GameUIEmojiSelect:DisplayEmojiWith_Flower()
-	if self.emoji_node_flower then
-		return self.emoji_node_flower
-	end
-	local emoji_node = display.newNode():size(self.bg:getContentSize().width - 60,560):pos(10,20):addTo(self.bg,1)
-	local emojis = EmojiTable:GetFlowerImages()
-	local x,y = 32,518
-	for i,v in ipairs(emojis) do
-		local img = "#" .. v
-        local __,e = string.find(v,"%.")
-        local key = string.sub(v,1,e - 1)
-        local button = WidgetPushButton.new({normal = img,pressed = img})
-            :align(display.CENTER, x,y):addTo(emoji_node)
-            :scale(0.7)
-        button:onButtonClicked(function()
-            	self:__callFunc(key)
-            	local action =  transition.sequence({cc.ScaleTo:create(0.1,1),cc.ScaleTo:create(0.1,0.7)})
-        		button:runAction(action)
-        end)
-        x = x + 20 + 32
-        if i % 11 == 0 then
+function GameUIEmojiSelect:BuildEmojiNode(start_index,end_index)
+	if not end_index then end_index = #EmojiTable end
+	local emoji_node = display.newNode():size(PAGE_VIEW_WIDTH,PAGE_VIEW_HEIGHT)
+	local x,y = 22,488
+	for index = start_index,end_index do
+		local img = EmojiTable[index]
+		local __,__,key = string.find(img, "(.+)%.")
+		local button = WidgetPushButton.new({normal = "#" .. img}):addTo(emoji_node):pos(x,y):scale(0.7)
+		button:onButtonClicked(function()
+			self:callFunc__(key)
+			local action =  transition.sequence({cc.ScaleTo:create(0.1,1),cc.ScaleTo:create(0.1,0.7)})
+			button:runAction(action)
+		end)			
+		x = x + 20 + 32
+        if index % 11 == 0 then
             y = y - 52
-            x = 32
+            x = 22
         end
 	end
-	self.emoji_node_flower = emoji_node
-	return self.emoji_node_flower 
+	return emoji_node
 end
 
 function GameUIEmojiSelect:OnMoveOutStage()
-	self.content = nil
-	self.emoji_node_smiley = nil
-	self.emoji_node_flower = nil
-
 	GameUIEmojiSelect.super.OnMoveOutStage(self)
 end
 
-function GameUIEmojiSelect:__callFunc(key)
+function GameUIEmojiSelect:callFunc__(key)
 	if self.selectFunc_ then
 		self.selectFunc_("[" .. key .. "]")
 	end
