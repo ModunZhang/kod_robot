@@ -105,7 +105,7 @@ function  AllianceFightApi:SpeedUpMarchEvent()
     for k,march_event in pairs(my_events) do
         if march_event:WithObject():GetTime() > 10 then
             print("加速行军事件",march_event:WithObject():Id(),march_event:GetEventServerType(),march_event:WithObject():GetTime())
-            NetManager:getBuyAndUseItemPromise("warSpeedupClass_2",{
+            return NetManager:getBuyAndUseItemPromise("warSpeedupClass_2",{
                 ["warSpeedupClass_2"]={
                     eventType = march_event:GetEventServerType(),
                     eventId=march_event:WithObject():Id()

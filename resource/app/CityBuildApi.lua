@@ -23,9 +23,9 @@ end
 
 function CityBuildApi:UpgradingBuilding(building)
     local tile = City:GetTileWhichBuildingBelongs(building)
-    local location_id = tile.location_id
     if building:IsAbleToUpgrade(true) == nil then
         if building:IsHouse() then
+            local location_id = tile.location_id
             local sub_location_id = tile:GetBuildingLocation(building)
             return NetManager:getInstantUpgradeHouseByLocationPromise(location_id, sub_location_id)
         elseif building:GetType() == "tower" then
@@ -33,6 +33,7 @@ function CityBuildApi:UpgradingBuilding(building)
         elseif building:GetType() == "wall" then
             return NetManager:getInstantUpgradeWallByLocationPromise()
         else
+            local location_id = tile.location_id
             return NetManager:getInstantUpgradeBuildingByLocationPromise(location_id)
         end
     end
