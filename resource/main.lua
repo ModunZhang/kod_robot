@@ -110,17 +110,18 @@ local d_id = string.split(device.getOpenUDID(), "_")
 local number = tonumber(d_id[1]) * 10 + tonumber(d_id[2])
 math.randomseed(tostring(os.time() * number):reverse():sub(1, 6))
 
-local count_limit = math.random(20)
-
+local count_limit = math.random(10,30)
 function Run()
     run_count = (run_count + 1) > count_limit and 1 or (run_count + 1)
     -- print("main run id =",device.getOpenUDID(),"run_count=",run_count,"count_limit",count_limit)
+
     if running and app and run_count == 1 then
-    -- if running and app then
+        -- if running and app then
         app.timer:OnTimer()
         app:RunAI()
     end
 end
+
 
 
 

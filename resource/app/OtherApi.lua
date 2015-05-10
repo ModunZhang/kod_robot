@@ -9,11 +9,12 @@ local intInit = GameDatas.PlayerInitData.intInit
 -- 个人修改地形
 function OtherApi:SetCityTerrain()
     local rand = math.random(3)
-    if rand == 1 then
+    local current_t = User:Terrain()
+    if rand == 1 and current_t ~= "grassLand" then
         return NetManager:getChangeToGrassPromise()
-    elseif rand == 2 then
+    elseif rand == 2 and current_t ~= "desert" then
         return NetManager:getChangeToDesertPromise()
-    else
+    elseif current_t ~= "iceField" then
         return NetManager:getChangeToIceFieldPromise()
     end
 end

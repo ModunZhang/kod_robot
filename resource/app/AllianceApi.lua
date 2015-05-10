@@ -37,14 +37,14 @@ end
 local function JoinAlliance()
     if Alliance_Manager:GetMyAlliance():IsDefault() then
         NetManager:getFetchCanDirectJoinAlliancesPromise():done(function(response)
-            dump(response)
             if not response.msg or not response.msg.allianceDatas then setRun() return end
             if response.msg.allianceDatas then
-                if response.msg.allianceDatas.members == response.msg.allianceDatas.membersMax then
+                local find_alliance = response.msg.allianceDatas[math.random(#response.msg.allianceDatas)]
+                if find_alliance.members == find_alliance.membersMax then
                     setRun()
                     return
                 end
-                local find_id = response.msg.allianceDatas[math.random(#response.msg.allianceDatas)].id
+                local find_id = find_alliance.id
                 local p = AllianceApi:JoinAlliance(find_id)
                 if p then
                     p:always(setRun)
