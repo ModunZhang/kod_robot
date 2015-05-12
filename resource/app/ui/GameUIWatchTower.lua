@@ -321,7 +321,7 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
                 end
                 local icon_bg = display.newSprite("back_ground_43x43.png")
                     :align(display.LEFT_BOTTOM,164, 20):addTo(bg):scale(0.7)
-                display.newSprite("hourglass_39x46.png"):align(display.CENTER, 22, 22):addTo(icon_bg)
+                display.newSprite("hourglass_30x38.png"):align(display.CENTER, 22, 22):addTo(icon_bg)
 
                 local timer_label = UIKit:ttfLabel({
                     text = GameUtils:formatTimeStyle1(entity:WithObject():GetTime()),
@@ -404,7 +404,7 @@ function GameUIWatchTower:GetOtherEventItem(entity)
     end
     local icon_bg = display.newSprite("back_ground_43x43.png")
         :align(display.LEFT_BOTTOM,164, 20):addTo(bg):scale(0.7)
-    display.newSprite("hourglass_39x46.png"):align(display.CENTER, 22, 22):addTo(icon_bg)
+    display.newSprite("hourglass_30x38.png"):align(display.CENTER, 22, 22):addTo(icon_bg)
 
     local timer_label = UIKit:ttfLabel({
         text = GameUtils:formatTimeStyle1(entity:WithObject():GetTime()),

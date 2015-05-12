@@ -4,7 +4,7 @@
 --
 local UILib = import(".UILib")
 local GameUIAllianceShopEnter = UIKit:createUIClass("GameUIAllianceShopEnter","GameUIAllianceShrineEnter")
-
+local Localize = import("..utils.Localize")
 
 function GameUIAllianceShopEnter:GetUIHeight()
     return 261
@@ -23,7 +23,7 @@ function GameUIAllianceShopEnter:GetBuildingType()
 end
 
 function GameUIAllianceShopEnter:GetBuildingDesc()
-    return "本地化缺失"
+    return Localize.building_description.alliance_building_shop
 end
 
 

@@ -9,7 +9,7 @@ local UIListView = import(".UIListView")
 local AllianceShrine = import("..entity.AllianceShrine")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local UILib = import(".UILib")
-
+local GameUtils = GameUtils
 function GameUIAllianceShrine:ctor(city,default_tab,building)
 	GameUIAllianceShrine.super.ctor(self, city, _("联盟圣地"),default_tab,building)
 	self.default_tab = default_tab
@@ -32,6 +32,9 @@ function GameUIAllianceShrine:OnPerceotionChanged()
 		self.stage_ui.insight_label:setString(display_str)
 		self.stage_ui.progressBar:setPercentage(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())/resource:GetValueLimit()*100)
 	end
+	if self.stage_ui and self.stage_ui.perHour_label then
+		self.stage_ui.perHour_label:setString(string.format("+%s/h",resource:GetProductionPerHour()))
+	end
 end
 
 function GameUIAllianceShrine:OnFightEventTimerChanged(event)
@@ -43,11 +46,18 @@ function GameUIAllianceShrine:OnShrineEventsChanged(change_map)
 	if self:GetSelectedButtonTag() == "fight_event" and (change_map.removed or change_map.added) then
 		self:RefreshFightListView()
 	end
+	if self:GetSelectedButtonTag() == "stage" then
+		self:RefreshStageListView()
+	end
+	self.tab_buttons:SetButtonTipNumber("fight_event",#self:GetAllianceShrine():GetShrineEvents())
 end
 
 function GameUIAllianceShrine:OnShrineEventsRefresh()
 	if self:GetSelectedButtonTag() == "fight_event" then
 		self:RefreshFightListView()
+	end
+	if self:GetSelectedButtonTag() == "stage" then
+		self:RefreshStageListView()
 	end
 end
 
@@ -58,13 +68,17 @@ function  GameUIAllianceShrine:OnNewStageOpened( change_map )
 end
 
 function GameUIAllianceShrine:OnMoveOutStage()
+	GameUIAllianceShrine.super.OnMoveOutStage(self)
+end
+
+function GameUIAllianceShrine:onCleanup()
 	self.event_bind_to_label = nil
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnPerceotionChanged)
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnFightEventTimerChanged)
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnNewStageOpened)
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
-	GameUIAllianceShrine.super.OnMoveOutStage(self)
+	GameUIAllianceShrine.super.onCleanup(self)
 end
 
 
@@ -105,6 +119,7 @@ function GameUIAllianceShrine:OnMoveInStage()
 			end
 		end
 	):pos(window.cx, window.bottom + 34)
+	self.tab_buttons:SetButtonTipNumber("fight_event",#self:GetAllianceShrine():GetShrineEvents())
 end
 
 function GameUIAllianceShrine:CreateBetweenBgAndTitle()
@@ -182,7 +197,14 @@ function GameUIAllianceShrine:TabEvent_stage()
 		color = 0xfff3c7
 	}):align(display.LEFT_CENTER,40,20):addTo(bar_bg)
 	progressBar:setPercentage(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())/resource:GetValueLimit()*100)
+	local perHour_label = UIKit:ttfLabel({
+		text = string.format("+%s/h",resource:GetProductionPerHour()),
+		size = 20,
+		color= 0xfff3c7,
+		align = cc.TEXT_ALIGNMENT_RIGHT
+	}):addTo(bar_bg):align(display.RIGHT_CENTER,530,20)
 	self.stage_ui.insight_label = insight_label
+	self.stage_ui.perHour_label = perHour_label
 	self.stage_ui.progressBar = progressBar
 	--title
 
@@ -192,9 +214,8 @@ function GameUIAllianceShrine:TabEvent_stage()
 
 	local left_button = WidgetPushButton.new(
 			{normal = "shrine_page_btn_normal_52x44.png",pressed = "shrine_page_btn_light_52x44.png"},
-			{scale9 = false},
-			{disabled = {name = "GRAY", params = {0.2, 0.3, 0.5, 0.1}}}
-		):addTo(title_bg):align(display.LEFT_CENTER,7,29)
+			{scale9 = false}
+		):addTo(title_bg):align(display.LEFT_CENTER,9,31)
 		:onButtonClicked(function()
 			self:ChangeStagePage(-1)
 		end)
@@ -205,9 +226,8 @@ function GameUIAllianceShrine:TabEvent_stage()
 
 	local right_button = WidgetPushButton.new(
 			{normal = "shrine_page_btn_normal_52x44.png",pressed = "shrine_page_btn_light_52x44.png"},
-			{scale9 = false},
-			{disabled = {name = "GRAY", params = {0.2, 0.3, 0.5, 0.1}}}
-		):addTo(title_bg):align(display.RIGHT_CENTER,557,29)
+			{scale9 = false}
+		):addTo(title_bg):align(display.RIGHT_CENTER,559,31)
 		:onButtonClicked(function()
 			self:ChangeStagePage(1)
 		end)
@@ -218,9 +238,9 @@ function GameUIAllianceShrine:TabEvent_stage()
 	local stage_label = UIKit:ttfLabel({
 		text = self:GetAllianceShrine():GetMainStageDescName(self:GetStagePage()),
 		size = 20,
-		color = 0x5d563f
+		color = 0xffedae
 		})
-		:align(display.LEFT_BOTTOM,70,15)
+		:align(display.LEFT_CENTER,70,29)
 		:addTo(title_bg)
 	self.stage_ui.stage_label = stage_label
 	local star_bar = StarBar.new({
@@ -228,14 +248,13 @@ function GameUIAllianceShrine:TabEvent_stage()
        		bg = "Stars_bar_bg.png",
        		fill = "Stars_bar_highlight.png", 
        		num = 1,
-       		-- scale = 0.8,
-    }):addTo(title_bg):align(display.RIGHT_BOTTOM,430,13)
+    }):addTo(title_bg):align(display.RIGHT_CENTER,430,29)
     local current,total = self:GetAllianceShrine():GetStarInfoByMainStage(self:GetStagePage())
     local percentLabel = UIKit:ttfLabel({
-    	color = 0x5d563f,
+    	color = 0xffedae,
     	size = 20,
     	text = current .. "/" .. total
-    }):align(display.LEFT_BOTTOM,431,15):addTo(title_bg)
+    }):align(display.LEFT_CENTER,431,29):addTo(title_bg)
     self.stage_ui.percentLabel = percentLabel
     local list,list_node = UIKit:commonListView({
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
@@ -311,19 +330,29 @@ function GameUIAllianceShrine:GetStageListItem(index,stage_obj)
 			size = 20,
 			color = 0xfff3c7
 		}):align(display.LEFT_CENTER,20,13):addTo(power_bg)
-		WidgetPushButton.new({
-				normal = "blue_btn_up_148x58.png",
-				pressed = "blue_btn_down_148x58.png"
-			}):align(display.RIGHT_BOTTOM, 560, 15)
-			:addTo(bg)
-			:setButtonLabel("normal",UIKit:commonButtonLable({
-					text = _("调查"),
-					size = 20,
-					color = 0xfff3c7
-			}))
-			:onButtonClicked(function(event)
-				self:OnResearchButtonClick(stage_obj)
-			end)
+		local event = self:GetAllianceShrine():GetShrineEventByStageName(stage_obj:StageName())
+		if event then
+			UIKit:ttfLabel({
+				text = _("已激活"),
+				size = 22,
+				color= 0x930000,
+				align = cc.TEXT_ALIGNMENT_RIGHT,
+			}):addTo(bg):align(display.CENTER, 486, 44)
+		else
+			local button = WidgetPushButton.new({
+					normal = "blue_btn_up_148x58.png",
+					pressed = "blue_btn_down_148x58.png"
+				}):align(display.RIGHT_BOTTOM, 560, 15)
+				:addTo(bg)
+				:setButtonLabel("normal",UIKit:commonButtonLable({
+						text = _("调查"),
+						size = 20,
+						color = 0xfff3c7
+				}))
+			button:onButtonClicked(function(event)
+					self:OnResearchButtonClick(stage_obj,button)
+				end)
+		end
 		local sp = display.newSprite(troop_image):align(display.RIGHT_BOTTOM, 550, 0):addTo(logo_bg)
 		display.newSprite("alliance_shire_stage_soldier_shadow_128x107.png"):addTo(sp):align(display.LEFT_BOTTOM, 0, 0)
 	end
@@ -341,8 +370,9 @@ function GameUIAllianceShrine:RefreshStageListView()
 	self.stage_list:reload()
 end
 
-function GameUIAllianceShrine:OnResearchButtonClick(stage_obj)
+function GameUIAllianceShrine:OnResearchButtonClick(stage_obj,sender)
 	UIKit:newGameUI("GameUIAllianceShrineDetail",stage_obj,self:GetAllianceShrine(),true):AddToCurrentScene(true)
+	if sender then sender:hide() end
 end
 
 --战斗事件
@@ -351,7 +381,7 @@ function GameUIAllianceShrine:TabEvent_fight_event()
 	local fight_event_node = display.newNode()
 
 	self.fight_list = UIListView.new({
-    	viewRect = cc.rect(22,0,600,window.betweenHeaderAndTab),
+    	viewRect = cc.rect((window.width - 568)/2,0,568,window.betweenHeaderAndTab),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
     }):addTo(fight_event_node)
 	fight_event_node:addTo(self.main_content)
@@ -360,64 +390,58 @@ function GameUIAllianceShrine:TabEvent_fight_event()
 end
 
 function GameUIAllianceShrine:BuildFightItemBox(event)
-	local box = display.newScale9Sprite("box_bg_546x214.png", 0,0, cc.size(400,102), cc.rect(10,13,521,189))
-	local player_strengh_bg = display.newScale9Sprite("box_bg_item_520x48_1.png"):size(377,40):addTo(box,2):align(display.LEFT_BOTTOM, 11,12)
+	local box = display.newScale9Sprite("box_bg_546x214.png", 0,0, cc.size(380,102), cc.rect(10,13,521,189))
+	local player_strengh_bg = display.newScale9Sprite("box_bg_item_520x48_1.png"):size(356,39):addTo(box):align(display.LEFT_BOTTOM, 12,12)
 	local player_count_bg = display.newScale9Sprite("box_bg_item_520x48_0.png")
-			:size(377,40):addTo(box,2)
-			:align(display.LEFT_BOTTOM, 11,player_strengh_bg:getPositionY()+40)
-	display.newSprite("res_citizen_44x50.png"):scale(0.7):align(display.LEFT_CENTER,5,20):addTo(player_count_bg,2)
-	display.newSprite("dragon_strength_27x31.png"):align(display.LEFT_CENTER,5,20):addTo(player_strengh_bg,2)
+			:size(356,39):addTo(box)
+			:align(display.LEFT_BOTTOM, 12,player_strengh_bg:getPositionY()+39)
+	display.newSprite("res_citizen_88x82.png"):scale(0.35):align(display.LEFT_CENTER,5,19):addTo(player_count_bg)
+	display.newSprite("dragon_strength_27x31.png"):align(display.LEFT_CENTER,5,19):addTo(player_strengh_bg)
 	UIKit:ttfLabel({
 		text = _("建议玩家数量"),
 		size = 18,
 		color = 0x5d563f
-	}):align(display.LEFT_CENTER, 40, 20):addTo(player_count_bg,2)
+	}):align(display.LEFT_CENTER, 40, 19):addTo(player_count_bg)
 	UIKit:ttfLabel({
-		text = event:Stage():SuggestPlayer(),
+		text = string.format("%s/%s",#event:PlayerTroops(),event:Stage():SuggestPlayer()) ,
 		size = 20,
 		color = 0x403c2f
-	}):align(display.RIGHT_CENTER, 370, 20):addTo(player_count_bg,2)
+	}):align(display.RIGHT_CENTER, 340, 19):addTo(player_count_bg)
 	UIKit:ttfLabel({
 		text = _("建议部队战斗力"),
 		size = 18,
 		color = 0x5d563f
-	}):align(display.LEFT_CENTER, 40, 20):addTo(player_strengh_bg,2)
+	}):align(display.LEFT_CENTER, 40, 19):addTo(player_strengh_bg)
 	UIKit:ttfLabel({
-		text = "> " .. event:Stage():SuggestPower(),
+		text = "> " .. string.formatnumberthousands(event:Stage():SuggestPower()),
 		size = 20,
 		color = 0x403c2f
-	}):align(display.RIGHT_CENTER, 370, 20):addTo(player_strengh_bg,2)
+	}):align(display.RIGHT_CENTER, 340, 19):addTo(player_strengh_bg)
 	return box
 end
 
 function GameUIAllianceShrine:GetFight_List_Item(event)
-	local bg = display.newScale9Sprite("back_ground_608x227.png"):size(600,178)
-	local top = display.newSprite("shrie_state_item_line_606_16.png"):align(display.LEFT_TOP,-5,177):addTo(bg)
-	local bottom = display.newSprite("shrie_state_item_line_606_16.png")
-	bottom:setFlippedY(true)
-	bottom:align(display.LEFT_BOTTOM,-5,5):addTo(bg,2)
-	local title_bg =  display.newScale9Sprite("alliance_event_type_cyan_222x30.png",0,0, cc.size(568,30), cc.rect(7,7,190,16))
-		:align(display.LEFT_TOP,20,top:getPositionY() - top:getContentSize().height)
-		:addTo(bg)
+	local bg = WidgetUIBackGround.new({width = 568,height = 172},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
+	local title_bg =  display.newSprite("title_blue_558x34.png"):align(display.TOP_CENTER, 284, 168):addTo(bg)
 	UIKit:ttfLabel({
-		text = event:Stage():GetStageDesc(),
+		text =  event:Stage():GetStageDesc(),
 		size = 22,
 		color = 0xffedae,
-	}):align(display.LEFT_BOTTOM, 10, 0):addTo(title_bg)
+	}):align(display.LEFT_CENTER, 10, 17):addTo(title_bg)
 	UIKit:ttfLabel({
-		text = "Begins",
+		text = _("进行中"),
 		size = 22,
 		color = 0xffedae,
 		align = cc.TEXT_ALIGNMENT_RIGHT
-	}):align(display.RIGHT_BOTTOM, 540, 0):addTo(title_bg)
+	}):align(display.RIGHT_CENTER, 522, 17):addTo(title_bg)
 	local box = self:BuildFightItemBox(event)
 		:addTo(bg)
-		:align(display.LEFT_TOP,20,title_bg:getPositionY() - title_bg:getContentSize().height-10)
+		:align(display.LEFT_BOTTOM,8,18)
 	local button = WidgetPushButton.new({
-			normal = "blue_btn_up_142x39.png",
-			pressed = "blue_btn_down_142x39.png"
+			normal = "blue_btn_up_148x58.png",
+			pressed = "blue_btn_down_148x58.png"
 		})
-		:align(display.RIGHT_TOP,580, box:getPositionY() - 10):addTo(bg,2)
+		:align(display.RIGHT_BOTTOM,558, 16):addTo(bg)
 		:setButtonLabel("normal",UIKit:commonButtonLable({
 			text = _("派兵"),
 			size = 20,
@@ -428,10 +452,10 @@ function GameUIAllianceShrine:GetFight_List_Item(event)
 		end)
 	local time_label = UIKit:ttfLabel({
 		text = GameUtils:formatTimeStyle1(event:GetTime()),
-		color = 0x007c23,
+		color = 0x7e0000,
 		size = 20,
 		align = cc.TEXT_ALIGNMENT_CENTER,
-	}):align(display.TOP_CENTER,button:getPositionX()- button:getCascadeBoundingBox().width/2, button:getPositionY() - button:getCascadeBoundingBox().height - 10):addTo(bg,2)
+	}):align(display.BOTTOM_CENTER,button:getPositionX()- button:getCascadeBoundingBox().width/2,88):addTo(bg)
 	self.event_bind_to_label[event:Id()] = time_label
 	return bg
 end
@@ -442,9 +466,10 @@ function GameUIAllianceShrine:RefreshFightListView()
 		local item = self.fight_list:newItem()
 		local content = self:GetFight_List_Item(event)
 		item:addContent(content)
-		item:setItemSize(600,178)
+		item:setItemSize(568,178)
 		self.fight_list:addItem(item)
 	end
+
 	self.fight_list:reload()
 end
 
@@ -457,118 +482,167 @@ function GameUIAllianceShrine:TabEvent_events_history()
 	if self.events_history then return self.events_history end
 	local events_history = display.newNode()
 	self.events_list = UIListView.new({
-    	viewRect = cc.rect(22,0,600,window.betweenHeaderAndTab),
+    	viewRect = cc.rect((window.width - 568)/2,0,568,window.betweenHeaderAndTab),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
+        async = true,
     }):addTo(events_history)
+    self.events_list:setDelegate(handler(self, self.reportsSouceDelegate))
 	events_history:addTo(self.main_content)
 	self.events_history = events_history
 	return self.events_history
 end
 
+function GameUIAllianceShrine:reportsSouceDelegate(listView, tag, idx)
+	if listView == self.events_list then
+        if cc.ui.UIListView.COUNT_TAG == tag then
+            return #self.report_datas
+        elseif cc.ui.UIListView.CELL_TAG == tag then
+            local item
+            local content
+            item = self.events_list:dequeueItem()
+            if not item then
+                item = self.events_list:newItem()
+                content = self:GetReportsItem()
+                item:addContent(content)
+            else
+                content = item:getContent()
+            end
+            local report = self.report_datas[idx]
+            self:fillReportItemContent(content,report,idx)
+            item:setItemSize(568,172)
+            return item
+        end
+    end
+end
 function GameUIAllianceShrine:RefreshEventsListView()
 	self.events_list:removeAllItems()
-	dump(self:GetAllianceShrine():GetShrineReports())
-	for _,report in ipairs(self:GetAllianceShrine():GetShrineReports()) do
-		local item = self.events_list:newItem()
-		local content = self:GetReportsItem(report)
-		item:addContent(content)
-		item:setItemSize(600,178)
-		self.events_list:addItem(item)
-	end
+	local data = clone(self:GetAllianceShrine():GetShrineReports())
+	table.sort( data,function(a,b)
+		return a:Time() > b:Time()
+	end)
+	self.report_datas = data
 	self.events_list:reload()
 end
 
 function GameUIAllianceShrine:BuildReportItemBox(report)
-	local box = display.newScale9Sprite("box_bg_546x214.png", 0,0, cc.size(400,102), cc.rect(10,13,521,189))
-	local player_strengh_bg = display.newScale9Sprite("box_bg_item_520x48_1.png"):size(377,40):addTo(box,2):align(display.LEFT_BOTTOM, 11,12)
+	local box = display.newScale9Sprite("box_bg_546x214.png", 0,0, cc.size(380,102), cc.rect(10,13,521,189))
+	local player_strengh_bg = display.newScale9Sprite("box_bg_item_520x48_1.png"):size(356,39):addTo(box):align(display.LEFT_BOTTOM, 12,12)
 	local player_count_bg = display.newScale9Sprite("box_bg_item_520x48_0.png")
-			:size(377,40):addTo(box,2)
-			:align(display.LEFT_BOTTOM, 11,player_strengh_bg:getPositionY()+40)
-	display.newSprite("res_citizen_44x50.png"):scale(0.7):align(display.LEFT_CENTER,5,20):addTo(player_count_bg,2)
-	display.newSprite("dragon_strength_27x31.png"):align(display.LEFT_CENTER,5,20):addTo(player_strengh_bg,2)
+			:size(356,39):addTo(box)
+			:align(display.LEFT_BOTTOM, 12,player_strengh_bg:getPositionY()+39)
+	display.newSprite("res_citizen_88x82.png"):scale(0.35):align(display.LEFT_CENTER,5,19):addTo(player_count_bg)
+	display.newSprite("dragon_strength_27x31.png"):align(display.LEFT_CENTER,5,19):addTo(player_strengh_bg)
 	UIKit:ttfLabel({
 		text = _("参与玩家"),
 		size = 18,
 		color = 0x5d563f
-	}):align(display.LEFT_CENTER, 40, 20):addTo(player_count_bg,2)
-	UIKit:ttfLabel({
-		text = #report:PlayerDatas(),
+	}):align(display.LEFT_CENTER, 40, 19):addTo(player_count_bg)
+	local player_label = UIKit:ttfLabel({
+		text = "",
 		size = 20,
 		color = 0x403c2f
-	}):align(display.RIGHT_CENTER, 370, 20):addTo(player_count_bg,2)
+	}):align(display.RIGHT_CENTER, 340, 19):addTo(player_count_bg)
 	UIKit:ttfLabel({
 		text = _("人均战斗力"),
 		size = 18,
 		color = 0x5d563f
-	}):align(display.LEFT_CENTER, 40, 20):addTo(player_strengh_bg,2)
-	UIKit:ttfLabel({
-		text = report.playerAvgPower,
+	}):align(display.LEFT_CENTER, 40, 19):addTo(player_strengh_bg)
+	local power_label = UIKit:ttfLabel({
+		text = "",
 		size = 20,
 		color = 0x403c2f
-	}):align(display.RIGHT_CENTER, 370, 20):addTo(player_strengh_bg,2)
+	}):align(display.RIGHT_CENTER, 340, 19):addTo(player_strengh_bg)
+	box.player_label = player_label
+	box.power_label = power_label
 	return box
 end
 
+function GameUIAllianceShrine:fillReportItemContent(content,report,idx)
+	content.idx = idx
+	if report:Star() > 0 then
+		content.title_bg_0:show()
+		content.title_bg_1:hide()
+		content.star_bar:show()
+		content.star_bar:setNum(report:Star())
+		content.faild_label:hide()
+	else
+		content.title_bg_0:hide()
+		content.title_bg_1:show()
+		content.star_bar:hide()
+		content.faild_label:show()
+	end
+	local box = content.box
+	box.player_label:setString(#report:PlayerDatas())
+	box.power_label:setString(report.playerAvgPower)
+	content.date_label:setString(os.date("%Y-%m-%d",report:Time()))
+	content.time_label:setString(os.date("%H:%M:%S",report:Time()))
+	content.title_label:setString(report:Stage():GetStageDesc())
+end
 function GameUIAllianceShrine:GetReportsItem(report)
-	local bg = display.newScale9Sprite("back_ground_608x227.png"):size(600,178)
-	local top = display.newSprite("shrie_state_item_line_606_16.png"):align(display.LEFT_TOP,-5,177):addTo(bg)
-	local bottom = display.newSprite("shrie_state_item_line_606_16.png")
-	bottom:setFlippedY(true)
-	bottom:align(display.LEFT_BOTTOM,-5,5):addTo(bg)
-	local title_iamge_name = report:Star() > 0 and "alliance_event_type_green_222x30.png" or "alliance_event_type_red_222x30.png"
-	local title_bg = display.newScale9Sprite(title_iamge_name,0,0, cc.size(568,30), cc.rect(7,7,190,16))
-		:align(display.LEFT_TOP,20,top:getPositionY() - top:getContentSize().height)
-		:addTo(bg)
-	UIKit:ttfLabel({
-		text = report:Stage():GetStageDesc(),
+	local bg = WidgetUIBackGround.new({width = 568,height = 172},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
+	local title_bg_0 = display.newSprite("title_green_558x34.png"):align(display.TOP_CENTER, 284, 168):addTo(bg)
+	local title_bg_1 = display.newSprite("title_red_558x34.png"):align(display.TOP_CENTER, 284, 168):addTo(bg)
+	local title_label = UIKit:ttfLabel({
+		text =  "",--,
 		size = 22,
 		color = 0xffedae,
-	}):align(display.LEFT_BOTTOM, 10, 0):addTo(title_bg)
-	if report:Star() > 0 then
-		local star_bar = StarBar.new({
-       		max = 3,
-       		bg = "Stars_bar_bg.png",
-       		fill = "Stars_bar_highlight.png", 
-       		num = report:Star(),
-    	}):addTo(title_bg):align(display.RIGHT_BOTTOM,540,0)
-	else
-		UIKit:ttfLabel({
+	}):align(display.LEFT_CENTER, 10, title_bg_1:getPositionY() - 17):addTo(bg)
+	local star_bar = StarBar.new({
+   		max = 3,
+   		bg = "Stars_bar_bg.png",
+   		fill = "Stars_bar_highlight.png", 
+	}):addTo(bg):align(display.RIGHT_CENTER,540,title_bg_1:getPositionY() -17)
+	local faild_label = UIKit:ttfLabel({
 			text = _("失败"),
 			size = 22,
 			color = 0xffedae,
-		}):align(display.RIGHT_BOTTOM, 540, 0):addTo(title_bg)
-	end
+		}):align(display.RIGHT_CENTER, 540,title_bg_1:getPositionY() - 17):addTo(bg)
 	local box = self:BuildReportItemBox(report)
 		:addTo(bg)
-		:align(display.LEFT_TOP,20,title_bg:getPositionY() - title_bg:getContentSize().height-10)
+		:align(display.LEFT_BOTTOM,12,12)
 	local button = WidgetPushButton.new({
-			normal = "blue_btn_up_142x39.png",
-			pressed = "blue_btn_down_142x39.png"
+			normal = "blue_btn_up_148x58.png",
+			pressed = "blue_btn_down_148x58.png"
 		})
-		:align(display.RIGHT_BOTTOM,580, box:getPositionY() - box:getContentSize().height):addTo(bg)
+		:align(display.RIGHT_BOTTOM,558, 16):addTo(bg)
 		:setButtonLabel("normal",UIKit:commonButtonLable({
 			text = _("详情"),
 			size = 20,
 			color = 0xfff3c7
 		}))
 		:onButtonClicked(function()
-			self:OnReportButtonClicked(report)
+
+			self:OnReportButtonClicked(bg.idx )
 		end)
 	local date_label = UIKit:ttfLabel({
-		text = os.date("%Y-%m-%d",report:Time()),
-		size = 20,
+		text = "",
+		size = 18,
 		color = 0x403c2f,
-	}):align(display.CENTER_TOP, button:getPositionX() - 71, box:getPositionY()):addTo(bg)
+	}):align(display.CENTER_TOP, button:getPositionX() - 74, box:getPositionY() + box:getContentSize().height + 4):addTo(bg)
 
 	local time_label = UIKit:ttfLabel({
-		text = os.date("%H:%M:%S",report:Time()),
-		size = 20,
+		text = "",
+		size = 18,
 		color = 0x403c2f,
-	}):align(display.CENTER_TOP, date_label:getPositionX(), date_label:getPositionY() - date_label:getContentSize().height - 4):addTo(bg)
+	}):align(display.CENTER_TOP, date_label:getPositionX(), box:getPositionY() + box:getContentSize().height - 16):addTo(bg)
+
+	bg.title_bg_0 = title_bg_0
+	bg.title_bg_1 = title_bg_1
+	bg.title_label = title_label
+	bg.star_bar = star_bar
+	bg.faild_label = faild_label
+	bg.box = box
+	bg.button = button
+	bg.date_label = date_label
+	bg.time_label = time_label
 	return bg	
 end
 
-function GameUIAllianceShrine:OnReportButtonClicked(shrineReport)
-	UIKit:newGameUI("GameUIShrineReport",shrineReport):AddToCurrentScene(true)
+function GameUIAllianceShrine:OnReportButtonClicked(idx)
+	print(idx)
+	local report = self.report_datas[idx]
+	if report then
+		UIKit:newGameUI("GameUIShrineReport",report):AddToCurrentScene(true)
+	end
 end
 return GameUIAllianceShrine

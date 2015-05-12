@@ -161,7 +161,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
 
     -- food icon
     cc.ui.UIImage.new("res_food_91x74.png"):addTo(back_ground, 2)
-        :align(display.CENTER, size.width - 130, size.height - 100):scale(0.5)
+        :align(display.CENTER, size.width - 133, size.height - 100):scale(0.4)
 
     cc.ui.UILabel.new({
         text = _("维护费"),
@@ -170,7 +170,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x615b44)
     }):addTo(back_ground, 2)
-        :align(display.LEFT_CENTER, size.width - 90, size.height - 80)
+        :align(display.LEFT_CENTER, size.width - 100, size.height - 80)
 
     -- upkeep
     self.upkeep = cc.ui.UILabel.new({
@@ -179,13 +179,14 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x403c2f)
     }):addTo(back_ground, 2)
-        :align(display.CENTER, size.width - 60, size.height - 110)
+        :align(display.CENTER, size.width - 75, size.height - 110)
 
 
     -- progress
-    WidgetSliderWithInput.new({max = treat_max}):addTo(back_ground):align(display.LEFT_CENTER, 25, 330)
+    self.slider_input = WidgetSliderWithInput.new({max = treat_max}):addTo(back_ground):align(display.LEFT_CENTER, 25, 330)
         :SetSliderSize(445, 24)
         :OnSliderValueChanged(function(event)
+            dump(event)
             self:OnCountChanged(math.floor(event.value))
         end)
         :LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.RIGHT,0)
@@ -359,7 +360,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         })
 
     -- 时间glass
-    cc.ui.UIImage.new("hourglass_39x46.png"):addTo(button, 2)
+    cc.ui.UIImage.new("hourglass_30x38.png"):addTo(button, 2)
         :align(display.LEFT_CENTER, -90, -55):scale(0.7)
 
     -- 时间
@@ -385,9 +386,9 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
     self.back_ground = back_ground
 
     self:SetSoldier(soldier_type, star)
-    self:OnCountChanged(0)
 end
 function WidgetTreatSoldier:onEnter()
+    City:GetResourceManager():AddObserver(self)
     City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
 end
 function WidgetTreatSoldier:onExit()
@@ -414,6 +415,13 @@ function WidgetTreatSoldier:SetSoldier(soldier_type, star)
     self.soldier_config = soldier_config
     self.soldier_ui_config = soldier_ui_config
     return self
+end
+function WidgetTreatSoldier:GetMaxTreatNum()
+    local soldier_config = self.soldier_config
+    local total = City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local temp_max = math.floor(total / soldier_config.treatCoin)
+    local max_count = math.min(self.treat_max,temp_max)
+    return max_count
 end
 function WidgetTreatSoldier:OnSoliderStarCountChanged(soldier_manager,star_changed_map)
     for i,v in pairs(star_changed_map) do
@@ -448,6 +456,7 @@ function WidgetTreatSoldier:OnResourceChanged(resource_manager)
         v.total:setString(GameUtils:formatNumber(total))
     end
     self.res_total_map = res_map
+    self.slider_input:SetValue(self:GetMaxTreatNum())
 end
 function WidgetTreatSoldier:OnInstantButtonClicked(func)
     self.instant_button_clicked = func
@@ -485,6 +494,7 @@ function WidgetTreatSoldier:OnCountChanged(count)
     self.gem_label:setString(self.treat_now_gems)
 end
 return WidgetTreatSoldier
+
 
 
 

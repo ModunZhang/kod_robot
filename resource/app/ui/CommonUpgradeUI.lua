@@ -301,7 +301,7 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
             efficiency = string.format("%s+%d,",bd.miner_poduction,addtion)
         end
     else
-        efficiency = (_("本地化未添加"))
+        assert(false,"本地化丢失")
     end
     -- 增加power,每个建筑都有的属性
     efficiency = efficiency ..string.format("%s+%d",bd.power,building:GetNextLevelPower()-building:GetPower())
@@ -402,7 +402,7 @@ function CommonUpgradeUI:InitUpgradePart()
     }):align(display.LEFT_CENTER,display.cx - 240,display.top-474):addTo(self.upgrade_layer)
     self:SetUpgradeNowNeedGems()
     --升级所需时间
-    display.newSprite("hourglass_39x46.png", display.cx+100, display.top-470):addTo(self.upgrade_layer):setScale(0.6)
+    display.newSprite("hourglass_30x38.png", display.cx+100, display.top-470):addTo(self.upgrade_layer):setScale(0.6)
     self.upgrade_time = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
         font = UIKit:getFontFilePath(),
@@ -586,7 +586,7 @@ function CommonUpgradeUI:InitAccelerationPart()
 
     -- 进度条头图标
     display.newSprite("back_ground_43x43.png", display.cx - 250, display.top - 450):addTo(self.acc_layer)
-    display.newSprite("hourglass_39x46.png", display.cx - 250, display.top - 450):addTo(self.acc_layer):setScale(0.8)
+    display.newSprite("hourglass_30x38.png", display.cx - 250, display.top - 450):addTo(self.acc_layer):setScale(0.8)
     -- 免费加速按钮
     self:CreateFreeSpeedUpBuildingUpgradeButton()
     -- 可免费加速提示

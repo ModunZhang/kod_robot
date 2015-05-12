@@ -66,9 +66,9 @@ function CityLayer:GetClickedObject(world_x, world_y)
     }
     self:IteratorClickAble(function(_, v)
         if v:isVisible() then
-            local is_available = v:GetEntity():GetType() == "tower" 
-            or v:GetEntity():GetType() == "wall" 
-            or (v:GetEntity().IsUnlocked == nil and true or v:GetEntity():IsUnlocked())
+            local is_available = v:GetEntity():GetType() == "tower"
+                or v:GetEntity():GetType() == "wall"
+                or (v:GetEntity().IsUnlocked == nil and true or v:GetEntity():IsUnlocked())
             if is_available then
                 local check = v:IsContainPointWithFullCheck(logic_x, logic_y, world_x, world_y)
                 if check.logic_clicked then
@@ -114,7 +114,6 @@ function CityLayer:GetClickedObject(world_x, world_y)
             end
         end
     end
-    print("=======>", #clicked_list.sprite_clicked)
     for _,v in ipairs(clicked_list.sprite_clicked) do
         print(v:GetEntity():GetType(), v:getLocalZOrder())
     end
@@ -314,6 +313,7 @@ function CityLayer:InitWithCity(city)
 
     local city_node = self:GetCityNode()
     -- 加废墟
+    math.randomseed(123456789)
     for k, ruin in pairs(city.ruins) do
         local building = self:CreateRuin(ruin):addTo(city_node)
         local tile = city:GetTileWhichBuildingBelongs(ruin)
@@ -598,10 +598,8 @@ function CityLayer:FindBuildingBy(x, y)
             return true
         end
     end)
+    assert(building, "没有找到建筑")
     return cocos_promise.defer(function()
-        if not building then
-            promise.reject({code = -1, msg = ""}, "没有找到对应坐标的建筑")
-        end
         return building
     end)
 end
@@ -797,6 +795,7 @@ local function on_move(_, sprite)
     sprite:OnSceneMove()
 end
 function CityLayer:OnSceneMove()
+    CityLayer.super.OnSceneMove(self)
     table.foreach(self.tiles, function(_, sprite)
         sprite:OnSceneMove()
     end)
@@ -808,18 +807,11 @@ function CityLayer:OnSceneMove()
             move_widget:setPosition(world_pos.x, world_pos.y)
         end
     end
-    for i,v in ipairs(self.city_scene:GetMarkBuildings()) do
-        v:OnSceneMove()
-    end
-    self.city_scene:GetSceneUILayer():OnSceneMove()
 end
 function CityLayer:UpdateWeather()
     local size = self:getContentSize()
     local pos = self:convertToNodeSpace(cc.p(display.cx, display.cy))
     self.weather_glstate:setUniformVec2("u_position", {x = pos.x / size.width, y = pos.y / size.height})
-end
-function CityLayer:OnSceneScale()
-    self.city_scene:OnSceneScale(self)
 end
 function CityLayer:HideLevelUpNode()
     self:IteratorCanUpgradingBuilding(function(_, sprite)
@@ -833,6 +825,7 @@ function CityLayer:ShowLevelUpNode()
 end
 
 return CityLayer
+
 
 
 

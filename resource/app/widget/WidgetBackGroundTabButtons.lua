@@ -1,5 +1,6 @@
 local promise = import("..utils.promise")
 local WidgetTab = import(".WidgetTab")
+local WidgetNumberTips = import(".WidgetNumberTips")
 local WidgetBackGroundTabButtons = class("WidgetBackGroundTabButtons", function()
     return display.newNode()
 end)
@@ -43,8 +44,8 @@ function WidgetBackGroundTabButtons:ctor(buttons, listener)
 end
 function WidgetBackGroundTabButtons:SelectTab(tag)
     for _, tab in pairs(self.tabs) do
-        if button.tag == tag then
-            self:PushButton(button)
+        if tab.tag == tag then
+            self:PushButton(tab)
             return
         end
     end
@@ -105,6 +106,14 @@ function WidgetBackGroundTabButtons:PromiseOfTag(tag)
     return p
 end
 
+function WidgetBackGroundTabButtons:SetButtonTipNumber(tab_tag,number)
+    local tab = self:GetTabByTag(tab_tag)
+    if not tab then return end
+    if not tab.tip_numbers then
+        tab.tip_numbers = WidgetNumberTips.new():addTo(tab):align(display.RIGHT_CENTER, 150,25)
+    end
+    tab.tip_numbers:SetNumber(number)
+end
 return WidgetBackGroundTabButtons
 
 

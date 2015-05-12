@@ -80,6 +80,7 @@ function AllianceManager:RefreshAllianceSceneIf(old_alliance_status)
     if old_alliance_status == my_alliance_status then return end
     local scene_name = display.getRunningScene().__cname
     if (my_alliance_status == 'protect' or my_alliance_status == 'peace') then
+        self.tipUserWar = false
         if self:HaveEnemyAlliance() then
             self:GetEnemyAlliance():Reset()
         end
@@ -88,18 +89,22 @@ function AllianceManager:RefreshAllianceSceneIf(old_alliance_status)
         end
     end
     if (my_alliance_status == 'prepare' or my_alliance_status == 'fight') then
-        if scene_name == 'AllianceScene' then
-            app:EnterMyAllianceSceneWithTips(_("联盟对战已开始，您将进入自己联盟对战地图。"))
-        elseif scene_name == 'MyCityScene' then
-            UIKit:showMessageDialogCanCanleNotAutoClose(
-                nil,
-                _("联盟对战已开始，您将进入自己联盟对战地图。"),
-                function()
-                    app:EnterMyAllianceScene()
-                end,
-                function()
-                end
-            )
+        if not self.tipUserWar then
+            if scene_name == 'AllianceScene' then
+                app:EnterMyAllianceSceneWithTips(_("联盟对战已开始，您将进入自己联盟对战地图。"))
+                self.tipUserWar = true
+            elseif scene_name == 'MyCityScene' then
+                self.tipUserWar = true
+                UIKit:showMessageDialogCanCanleNotAutoClose(
+                    nil,
+                    _("联盟对战已开始，您将进入自己联盟对战地图。"),
+                    function()
+                        app:EnterMyAllianceScene()
+                    end,
+                    function()
+                    end
+                )
+            end
         end
     end
     

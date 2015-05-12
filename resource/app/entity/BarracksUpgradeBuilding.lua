@@ -85,6 +85,9 @@ function BarracksUpgradeBuilding:CreateEvent()
     return event
 end
 function BarracksUpgradeBuilding:ResetAllListeners()
+    self.recruit_soldier_callbacks = {}
+    self.finish_soldier_callbacks = {}
+    
     BarracksUpgradeBuilding.super.ResetAllListeners(self)
     self.barracks_building_observer:RemoveAllObserver()
 end

@@ -7,11 +7,10 @@ local ResourceManager = import("..entity.ResourceManager")
 local WidgetInfoWithTitle = import("..widget.WidgetInfoWithTitle")
 local WidgetMoveHouse = import("..widget.WidgetMoveHouse")
 local UILib = import(".UILib")
-local City = City
 local UIListView = import(".UIListView")
 local window = import("..utils.window")
-function GameUIResource:ctor(building,default_tab)
-    GameUIResource.super.ctor(self, City, self:GetTitleByType(building),building,default_tab)
+function GameUIResource:ctor(city, building, default_tab)
+    GameUIResource.super.ctor(self, city, self:GetTitleByType(building),building,default_tab)
     self.building = building
     self.dataSource = self:GetDataSource()
 end
@@ -224,7 +223,7 @@ function GameUIResource:CreateInfomation()
 
     self.listView = self.info:GetListView()
 
-    local resource = City.resource_manager:GetResourceByType(self.building:GetUpdateResourceType())
+    local resource = self.city.resource_manager:GetResourceByType(self.building:GetUpdateResourceType())
     local citizen = self.building:GetCitizen()
     self.firstValueLabel:setString(string.format('%d',citizen))
     local __,resource_title = self:GetTitleByType(self.building)
@@ -236,7 +235,7 @@ function GameUIResource:CreateInfomation()
         self.firstValueLabel:setString(string.format("-%d/h",self.building:GetProductionPerHour()))
     else
         local reduce = self.building:GetProductionPerHour()
-        local buffMap,__ = City.resource_manager:GetTotalBuffData(City)
+        local buffMap,__ = self.city.resource_manager:GetTotalBuffData(self.city)
         local key = ResourceManager.RESOURCE_TYPE[self.building:GetUpdateResourceType()]
         if buffMap[key] then
             reduce = reduce * (1 + buffMap[key])
@@ -281,15 +280,15 @@ function GameUIResource:RefreshListView()
 end
 
 function GameUIResource:GetDataSource()
-    local dataSource = {{_('待建地基'),'x' .. #City:GetRuinsNotBeenOccupied()}}
-    local decorators = City:GetDecoratorsByType(self.building:GetType())
-    table.insert(dataSource,{_('可建造数量'),#decorators .. '/' .. City:GetMaxHouseCanBeBuilt(self.building:GetType())})
-    local resource = City.resource_manager:GetResourceByType(self.building:GetUpdateResourceType())
+    local dataSource = {{_("待建地基"),'x' .. #self.city:GetRuinsNotBeenOccupied()}}
+    local decorators = self.city:GetDecoratorsByType(self.building:GetType())
+    table.insert(dataSource,{_("可建造数量"),#decorators .. '/' .. self.city:GetMaxHouseCanBeBuilt(self.building:GetType())})
+    local resource = self.city.resource_manager:GetResourceByType(self.building:GetUpdateResourceType())
     local __,__,title = self:GetTitleByType(self.building)
     table.insert(dataSource,{title,string.format("%d/h",resource:GetProductionPerHour())})
 
     if self.building:GetUpdateResourceType() == ResourceManager.RESOURCE_TYPE.POPULATION then
-        local coin_resource = City.resource_manager:GetCoinResource()
+        local coin_resource = self.city.resource_manager:GetCoinResource()
         local desc = string.format("%d/h",coin_resource:GetProductionPerHour())
         table.insert(dataSource,{_("当前产出银币"),desc})
     end
@@ -319,23 +318,23 @@ end
 function GameUIResource:GetTitleByType(building)
     local type = building:GetUpdateResourceType()
     if type == ResourceManager.RESOURCE_TYPE.WOOD then
-        return _('木工小屋'),_('木材产量'),_("当前产出木材")
+        return _("木工小屋"),_("木材产量"),_("当前产出木材")
     elseif type == ResourceManager.RESOURCE_TYPE.IRON then
-        return _('矿工小屋'),_('铁矿产量'),_("当前产出铁矿")
+        return _("矿工小屋"),_("铁矿产量"),_("当前产出铁矿")
     elseif type == ResourceManager.RESOURCE_TYPE.STONE then
-        return _('石匠小屋'),_('石料产量'),_("当前产出铁矿")
+        return _("石匠小屋"),_("石料产量"),_("当前产出铁矿")
     elseif type == ResourceManager.RESOURCE_TYPE.FOOD then
-        return _('农夫小屋'),_('粮食产量'),_("当前产出铁矿")
+        return _("农夫小屋"),_("粮食产量"),_("当前产出铁矿")
     elseif type == ResourceManager.RESOURCE_TYPE.POPULATION then
-        return _('住宅'),_('城民上限'),_("当前城民增长")
+        return _("住宅"),_("城民上限"),_("当前城民增长")
     else
         assert(false)
     end
 end
 
 function GameUIResource:OnMoveInStage()
-    GameUIResource.super.OnMoveInStage(self)
     self:CreateUI()
+    GameUIResource.super.OnMoveInStage(self)
 end
 
 function GameUIResource:ChaiButtonAction( event )
@@ -401,7 +400,7 @@ end
 function GameUIResource:OnResourceChanged(resource_manager)
     GameUIResource.super.OnResourceChanged(self,resource_manager)
     -- if self.listView:getItems():count() < 2 then return end
-    local number = City.resource_manager:GetResourceByType(self.building:GetUpdateResourceType()):GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local number = self.city.resource_manager:GetResourceByType(self.building:GetUpdateResourceType()):GetResourceValueByCurrentTime(app.timer:GetServerTime())
     -- print("update cout:",number)
 end
 

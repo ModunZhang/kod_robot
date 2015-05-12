@@ -5,6 +5,7 @@
 local UILib = import(".UILib")
 local GameUIAllianceShrineEnter = UIKit:createUIClass("GameUIAllianceShrineEnter","GameUIAllianceEnterBase")
 local buildingName = GameDatas.AllianceInitData.buildingName
+local Localize = import("..utils.Localize")
 
 function GameUIAllianceShrineEnter:ctor(building,isMyAlliance,alliance,enemy_alliance)
 	GameUIAllianceShrineEnter.super.ctor(self,building,isMyAlliance,alliance,enemy_alliance)
@@ -75,7 +76,7 @@ function GameUIAllianceShrineEnter:GetBuildingType()
 end
 
 function GameUIAllianceShrineEnter:GetBuildingDesc()
-	return "本地化缺失"
+	return Localize.building_description.alliance_building_shrine
 end
 
 function GameUIAllianceShrineEnter:FixedUI()
@@ -150,6 +151,10 @@ function GameUIAllianceShrineEnter:GetReallyButtons()
 end
 
 function GameUIAllianceShrineEnter:GetNormalButton()
+	local info_button = self:BuildOneButton("icon_info_56x56.png",_("事件记录")):onButtonClicked(function()
+		UIKit:newGameUI('GameUIAllianceShrine',City,"events_history",self:GetBuilding()):AddToCurrentScene(true)
+		self:LeftButtonClicked()
+	end)
 	local fight_event_button = self:BuildOneButton("icon_war_48x54.png",_("战争事件")):onButtonClicked(function()
 			UIKit:newGameUI('GameUIAllianceShrine',City,"fight_event",self:GetBuilding()):AddToCurrentScene(true)
 			self:LeftButtonClicked()
@@ -162,7 +167,7 @@ function GameUIAllianceShrineEnter:GetNormalButton()
 		UIKit:newGameUI('GameUIAllianceShrine',City,"upgrade",self:GetBuilding()):AddToCurrentScene(true)
 		self:LeftButtonClicked()
 	end)
-	return {fight_event_button,alliance_shirine_event_button,upgrade_button}
+	return {info_button,fight_event_button,alliance_shirine_event_button,upgrade_button}
 end
 
 --是否开启移动联盟建筑功能

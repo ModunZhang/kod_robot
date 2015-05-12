@@ -27,8 +27,6 @@ function GameUIBuild:ctor(city, building)
     app:GetAudioManager():PlayBuildingEffectByType("woodcutter")
 end
 function GameUIBuild:OnMoveInStage()
-    GameUIBuild.super.OnMoveInStage(self)
-
     self.queue = self:LoadBuildingQueue():addTo(self:GetView())
     self:UpdateBuildingQueue(self.build_city)
 
@@ -48,6 +46,8 @@ function GameUIBuild:OnMoveInStage()
     end
     self.base_list_view:reload()
     self:OnCityChanged()
+
+    GameUIBuild.super.OnMoveInStage(self)
 end
 function GameUIBuild:onExit()
     self.build_city:RemoveListenerOnType(self, self.build_city.LISTEN_TYPE.UPGRADE_BUILDING)
@@ -333,44 +333,6 @@ function GameUIBuild:CreateItemWithListView(list_view)
     return item
 end
 
---- fte
-function GameUIBuild:Lock()
-    self.base_list_view:getScrollNode():setTouchEnabled(false)
-    return cocos_promise.defer(function() return self end)
-end
-function GameUIBuild:Find(building_type)
-    local item
-    table.foreach(self.base_resource_building_items, function(_, v)
-        if v.building.building_type == building_type then
-            item = v:GetBuildButton()
-            return true
-        end
-    end)
-    return cocos_promise.defer(function()
-        if not item then
-            promise.reject({code = -1, msg = "没有找到对应item"}, building_type)
-        end
-        return item
-    end)
-end
-
-
 return GameUIBuild
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

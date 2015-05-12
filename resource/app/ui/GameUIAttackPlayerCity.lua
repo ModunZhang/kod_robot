@@ -105,7 +105,7 @@ function GameUIAttackPlayerCity:BuildUI()
 	:onButtonClicked(handler(self, self.OnAttackButtonClicked))
 	
      -- 行军所需时间
-    local icon = display.newSprite("hourglass_39x46.png"):align(display.LEFT_TOP,260,button:getPositionY()-20)
+    local icon = display.newSprite("hourglass_30x38.png"):align(display.LEFT_TOP,260,button:getPositionY()-20)
         :addTo(bg_node):scale(0.6)
     self.march_time = UIKit:ttfLabel({
         text = "20:00:00",

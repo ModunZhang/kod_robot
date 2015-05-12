@@ -38,12 +38,12 @@ end
 
 function GameUIWatchTowerMyTroopsDetail:onEnter()
 	GameUIWatchTowerMyTroopsDetail.super.onEnter(self)
-	self.backgroundImage = WidgetUIBackGround.new({height=824})
-	self.backgroundImage:pos((display.width - self.backgroundImage:getContentSize().width)/2,window.bottom_top)
+	self.backgroundImage = WidgetUIBackGround.new({height=718})
+	self.backgroundImage:pos((display.width - self.backgroundImage:getContentSize().width)/2,window.bottom_top + 106)
 	self:addTouchAbleChild(self.backgroundImage)
 	local title_bar = display.newSprite("title_blue_600x56.png")
 		:addTo(self.backgroundImage)
-		:align(display.CENTER_BOTTOM, 304, 810)
+		:align(display.CENTER_BOTTOM, 304, 704)
 	UIKit:closeButton():addTo(title_bar)
 	   	:align(display.BOTTOM_RIGHT,title_bar:getContentSize().width, 0)
 	   	:onButtonClicked(function ()
@@ -57,12 +57,12 @@ function GameUIWatchTowerMyTroopsDetail:onEnter()
 		:addTo(title_bar)
 
 	local listBg = display.newScale9Sprite("alliance_title_list_572x436.png")
-		:size(568,754)
+		:size(568,648)
 		:align(display.CENTER_BOTTOM, self.backgroundImage:getContentSize().width/2, 30)
 		:addTo(self.backgroundImage)
 
 	self.listView = UIListView.new {
-    	viewRect = cc.rect(10, 12, 548,730),
+    	viewRect = cc.rect(10, 12, 548,624),
         direction = UIScrollView.DIRECTION_VERTICAL,
     }:addTo(listBg)
 	if self:GetEntity():GetTypeStr() == 'HELPTO' then
@@ -118,10 +118,8 @@ function GameUIWatchTowerMyTroopsDetail:RefreshListView()
 	local item = self:GetItem(self.ITEM_TYPE.DRAGON_INFO,self:GetData())
 	self.listView:addItem(item)
 	local type_str = self:GetEntity():GetTypeStr()
-	if  type_str ~= 'STRIKE_OUT' and  type_str ~= 'STRIKE_RETURN' then
-		item = self:GetItem(self.ITEM_TYPE.SOLIDERS,self:GetData()) 
-		self.listView:addItem(item)	
-	end
+	item = self:GetItem(self.ITEM_TYPE.SOLIDERS,self:GetData()) 
+	self.listView:addItem(item)	
 	self.listView:reload()
 end
 
@@ -132,7 +130,14 @@ function GameUIWatchTowerMyTroopsDetail:GetItem(ITEM_TYPE,item_data)
 		sub_line = 3
 		height   = sub_line * 38
 	elseif ITEM_TYPE == self.ITEM_TYPE.SOLIDERS then
-		sub_line = #item_data.soldiers
+		if not item_data.soldiers then
+			sub_line = 0
+		else
+			table.sort( item_data.soldiers, function(a,b)
+				return a.count < b.count
+			end)
+			sub_line = #item_data.soldiers
+		end
 		height   = sub_line * 36
 	end
 	local bg = display.newScale9Sprite("transparent_1x1.png"):size(548,height + 38)
@@ -173,7 +178,7 @@ function GameUIWatchTowerMyTroopsDetail:GetItem(ITEM_TYPE,item_data)
     		size = 20,
     		color= 0xffedae,
     	}):addTo(title_bar):align(display.CENTER, 274, 19)
-    	if ITEM_TYPE == self.ITEM_TYPE.SOLIDERS then
+    	if ITEM_TYPE == self.ITEM_TYPE.SOLIDERS  and item_data.soldiers then
     		local y = 0
     		for i,v in ipairs(item_data.soldiers) do
     			local name = Localize.soldier_name[v.name]

@@ -88,7 +88,7 @@ function WidgetPlayerNode:GetTitleItemNode(basic_data)
 		display.newSprite(data_source.image, 51, 51):addTo(title_button)
 	end
 	UIKit:ttfLabel({
-		text = data_source.desc or _("头衔为空，占领主城后可以给其他玩家指定头衔"),
+		text = data_source.desc or _("头衔为空，占领王城后可以给其他玩家指定头衔"),
 		size = 20,
 		color= 0x403c2f,
 		dimensions = cc.size(389, 79)
@@ -184,7 +184,7 @@ function WidgetPlayerNode:GetBasicInfoItemNode(basic_data)
 	}):align(display.LEFT_CENTER,xp:getPositionX()+xp:getCascadeBoundingBox().width + 10, 20):addTo(progress_bg)
 
 	UIKit:ttfLabel({
-		text =  data_source.currentExp  .. "/" .. data_source.maxExp,
+		text =  string.formatnumberthousands(data_source.currentExp)  .. "/" .. string.formatnumberthousands(data_source.maxExp),
 		size = 20,
 		color= 0xfff3c7,
 		shadow= true
@@ -193,7 +193,7 @@ function WidgetPlayerNode:GetBasicInfoItemNode(basic_data)
         :align(display.LEFT_TOP, progress_bg:getPositionX() - 10,progress_bg:getPositionY() - progress_bg:getContentSize().height - 20)
         :addTo(node)
  	local power_label = UIKit:ttfLabel({
-		text = _("战斗力") .. ":" .. data_source.power,
+		text = _("战斗力") .. ":" .. string.formatnumberthousands(data_source.power),
 		size = 22,
 		color = 0x403c2f,
 	}):addTo(node)

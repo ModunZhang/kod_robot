@@ -51,7 +51,8 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
 
     local label_origin_x = 190
     -- bg
-    local back_ground = WidgetUIBackGround.new({height=500,isFrame="yes"}):addTo(self)
+    local back_ground = WidgetUIBackGround.new({height=500,isFrame="yes"})
+        :addTo(self):align(display.BOTTOM_CENTER, display.cx, 0)
     back_ground:setTouchEnabled(true)
 
     -- title
@@ -166,7 +167,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
         local length = size.width - margin_x * 2
         local origin_x, origin_y, gap_x = margin_x, 32, length / 3
         local specialMaterials = string.split(soldier_config.specialMaterials,",")
-        table.insert(specialMaterials, { "citizen", "res_citizen_44x50.png" })
+        table.insert(specialMaterials, { "citizen", "res_citizen_88x82.png" })
         for k,v in pairs(specialMaterials) do
             local x = origin_x + (k - 1) * gap_x
             local need_image,res_type
@@ -318,7 +319,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
 
 
         -- 招募
-        local button = WidgetPushButton.new(
+        self.normal_button = WidgetPushButton.new(
             {normal = "yellow_btn_up_185x65.png",pressed = "yellow_btn_down_185x65.png"}
             ,{}
             ,{
@@ -370,11 +371,10 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
                     end
                 end
             end)
-        assert(not self.normal_button)
-        self.normal_button = button
+        local anchorNode = display.newNode():addTo(back_ground, 3):pos(size.width - 120, 110)
 
         -- 时间glass
-        cc.ui.UIImage.new("hourglass_39x46.png"):addTo(button, 2)
+        cc.ui.UIImage.new("hourglass_30x38.png"):addTo(self.normal_button, 2)
             :align(display.LEFT_CENTER, -90, -55):scale(0.7)
 
         -- 时间
@@ -384,7 +384,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
             font = UIKit:getFontFilePath(),
             align = cc.ui.TEXT_ALIGN_CENTER,
             color = UIKit:hex2c3b(0x403c2f)
-        }):addTo(button, 2)
+        }):addTo(anchorNode, 2)
             :align(display.CENTER, center, -50)
 
         self.recruit_buff_time = cc.ui.UILabel.new({
@@ -393,7 +393,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
             font = UIKit:getFontFilePath(),
             align = cc.ui.TEXT_ALIGN_CENTER,
             color = UIKit:hex2c3b(0x068329)
-        }):addTo(button, 2)
+        }):addTo(anchorNode, 2)
             :align(display.CENTER, center, -70)
     else
         -- 招募时间限制
@@ -417,8 +417,6 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name,soldier_star)
 
 
     self.back_ground = back_ground
-
-
 end
 function WidgetRecruitSoldier:onEnter()
     self:SetSoldier(self.soldier_name, self.star)
@@ -434,6 +432,10 @@ function WidgetRecruitSoldier:onEnter()
 
     self.city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
     app.timer:AddListener(self)
+
+    if #WidgetRecruitSoldier.open_callbacks > 0 then
+        table.remove(WidgetRecruitSoldier.open_callbacks, 1)(self)
+    end
 end
 function WidgetRecruitSoldier:onExit()
     self.barracks:RemoveBarracksListener(self)
@@ -587,7 +589,6 @@ function WidgetRecruitSoldier:CheckNeedResource(total_resouce, count)
 end
 function WidgetRecruitSoldier:GetCurrentMaxRecruitNum(total_resouce)
     local soldier_config = self.soldier_config
-    local current_res_map = {}
     local total_map = total_resouce
     local max_count = math.huge
     for k, v in pairs(self.res_map) do
@@ -650,62 +651,47 @@ function WidgetRecruitSoldier:OnSoliderStarCountChanged(soldier_manager,star_cha
         end
     end
 end
+
 -- fte
-function WidgetRecruitSoldier:Lock()
-    return cocos_promise.defer(function() return self end)
+local mockData = import("..fte.mockData")
+local promise = import("..utils.promise")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
+WidgetRecruitSoldier.open_callbacks = {}
+function WidgetRecruitSoldier:PormiseOfOpen()
+    local p = promise.new()
+    WidgetRecruitSoldier.open_callbacks = {}
+    table.insert(WidgetRecruitSoldier.open_callbacks, function(ui)
+        p:resolve(ui)
+    end)
+    return p
 end
-function WidgetRecruitSoldier:Find(control_type)
-    if control_type == "progress" then
-        return cocos_promise.defer(function()
-            return self.slider
-        end)
-    elseif control_type == "recruit" then
-        return cocos_promise.defer(function()
-            return self.normal_button
-        end)
-    end
+function WidgetRecruitSoldier:Find()
+    return self.normal_button
+end
+function WidgetRecruitSoldier:PormiseOfFte()
+    local fte_layer = self:getParent():GetFteLayer()
+    fte_layer:Enable():SetTouchObject(self:Find())
+
+    self:Find():removeEventListenersByEvent("CLICKED_EVENT")
+    self:Find():onButtonClicked(function()
+        self:Find():setButtonEnabled(false)
+
+        mockData.RecruitSoldier(self.soldier_name, self.count)
+
+        self:Close()
+    end)
+    
+    local r = self:Find():getCascadeBoundingBox()
+    WidgetFteArrow.new(_("立即开始招募，招募士兵会消耗城民")):addTo(fte_layer)
+        :TurnRight():align(display.RIGHT_CENTER, r.x - 10, r.y + r.height/2)
+    
+    return self.city:PromiseOfRecruitSoldier("swordsman"):next(function()
+        fte_layer:removeFromParent()
+    end)
 end
 
 
 return WidgetRecruitSoldier
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

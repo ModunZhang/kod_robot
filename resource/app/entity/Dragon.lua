@@ -36,6 +36,10 @@ function DragonSkill:LoadConfig_()
 	self.config_skill = config_dragonSkill[self:Level()]
 end
 
+function DragonSkill:IsMaxLevel()
+	return #config_dragonSkill == self:Level()
+end
+
 function DragonSkill:GetSkillConfig()
 	return self.config_skill
 end

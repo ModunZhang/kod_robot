@@ -15,6 +15,14 @@ function WidgetGachaItemBox:ctor(gacha_item,isSenior,include_tips_node)
     self.gacha_item = gacha_item
     self.isSenior = isSenior
     local gacha_box = display.newSprite("box_gacha_92x92.png"):addTo(self)
+    local num_bg = display.newSprite("gacha_num_bg.png"):addTo(self,2):align(display.RIGHT_BOTTOM, 39,-40)
+    dump(gacha_item.itemCount)
+    UIKit:ttfLabel({
+        text = "X"..gacha_item.itemCount,
+        size = 16,
+        color = 0xffedae
+    }):align(display.RIGHT_CENTER, num_bg:getContentSize().width, num_bg:getContentSize().height/2)
+        :addTo(num_bg)
     -- item icon
     local item_icon = display.newScale9Sprite(self:GetGachaItemIcon()):addTo(self)
     item_icon:scale(74/item_icon:getContentSize().width)
@@ -119,7 +127,7 @@ function WidgetGachaItemBox:ResetLigt()
 
 end
 function WidgetGachaItemBox:GetGachaItemName()
-   return self.gacha_item.itemName
+    return self.gacha_item.itemName
 end
 function WidgetGachaItemBox:GetGachaItemIcon( )
     local name = self:GetGachaItemName()
@@ -132,6 +140,7 @@ function WidgetGachaItemBox:RemoveSelectStatus( )
     end
 end
 return WidgetGachaItemBox
+
 
 
 

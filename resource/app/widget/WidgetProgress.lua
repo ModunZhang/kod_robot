@@ -26,7 +26,7 @@ function WidgetProgress:ctor(label_color, bg, bar, params)
         local icon_bg = cc.ui.UIImage.new(params.icon_bg or "back_ground_43x43.png")
             :addTo(progress_bg, 2):align(display.CENTER, 0, progress_bg:getContentSize().height/2)
         local pos = icon_bg:getAnchorPointInPoints()
-        cc.ui.UIImage.new(params.icon or "hourglass_39x46.png"):addTo(icon_bg):align(display.CENTER, pos.x, pos.y):scale(0.8)
+        cc.ui.UIImage.new(params.icon or "hourglass_30x38.png"):addTo(icon_bg):align(display.CENTER, pos.x, pos.y):scale(0.8)
     end
 
     progress_bg:opacity(params.has_bg and 255 or 0)

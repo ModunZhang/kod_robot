@@ -6,11 +6,11 @@ local promise = import("..utils.promise")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local manager = ccs.ArmatureDataManager:getInstance()
 local UILib = import(".UILib")
-local GameUIShowDragonUpStarAnimation = class("GameUIShowDragonUpStarAnimation",function()
-	return display.newNode()
-end)
+local GameUIShowDragonUpStarAnimation = UIKit:createUIClass("GameUIShowDragonUpStarAnimation","UIAutoClose")
 
 function GameUIShowDragonUpStarAnimation:ctor(dragon)
+	self:DisableAutoClose()
+	GameUIShowDragonUpStarAnimation.super.ctor(self)
 	local add_strenth,add_vitality,add_leadershiip = dragon:GetPromotionedDifferentVal()
 	self.buff_value = {
 		string.format("%d(+%d)",dragon:Strength(),add_strenth),
@@ -20,17 +20,19 @@ function GameUIShowDragonUpStarAnimation:ctor(dragon)
 	self.dragon_iamge = UILib.dragon_head[dragon:Type()]
 	self:setNodeEventEnabled(true)
 	manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH("animations/jinjichenggong.ExportJson"))
-	self:setTouchEnabled(true)
 	self.star_val = dragon:Star()
 end
 
 function GameUIShowDragonUpStarAnimation:onEnter()
+	GameUIShowDragonUpStarAnimation.super.onEnter(self)
+	self:DisableAutoClose()
 	--构建UI
-	local shadowLayer = UIKit:shadowLayer():addTo(self)
-	local bg = ccs.Armature:create("jinjichenggong"):addTo(self):center() -- 201 
-	local juhua = ccs.Armature:create("jinjichenggong"):addTo(self):center()
-	local header = ccs.Armature:create("jinjichenggong"):addTo(self):center() -- 301
-	local star = ccs.Armature:create("jinjichenggong"):addTo(self):center()
+	local node = display.newNode()
+	self:addTouchAbleChild(node)
+	local bg = ccs.Armature:create("jinjichenggong"):addTo(node):center() -- 201 
+	local juhua = ccs.Armature:create("jinjichenggong"):addTo(node):center()
+	local header = ccs.Armature:create("jinjichenggong"):addTo(node):center() -- 301
+	local star = ccs.Armature:create("jinjichenggong"):addTo(node):center()
 	self.dragon_icon = display.newSprite(self.dragon_iamge):pos(0,202):addTo(header):zorder(100):hide()
 	self.title_label = UIKit:ttfLabel({
 		text = _("晋级成功"),
@@ -95,11 +97,13 @@ function GameUIShowDragonUpStarAnimation:onEnter()
 		self.strength_val_label:show()
 		self.vitality_val_label:show()
 		self.leadship_val_label:show()
+		self:DisableAutoClose(false)
 	end)
 	self:PlayStarPromise(star,tonumber(self.star_val))
 end
 
 function GameUIShowDragonUpStarAnimation:onCleanup()
+	GameUIShowDragonUpStarAnimation.super.onCleanup(self)
 	manager:removeArmatureFileInfo(DEBUG_GET_ANIMATION_PATH("animations/jinjichenggong.ExportJson"))
 end
 

@@ -57,7 +57,7 @@ function WidgetMilitaryTechnologyStatus:CreateUpgradingStatus()
     --进度条
     local progress = WidgetProgress.new(UIKit:hex2c3b(0xffedae), nil, nil, {
         icon_bg = "back_ground_43x43.png",
-        icon = "hourglass_39x46.png",
+        icon = "hourglass_30x38.png",
         bar_pos = {x = 0,y = 0}
     }):addTo(upgrading_node)
         :align(display.LEFT_CENTER, 34, 36)

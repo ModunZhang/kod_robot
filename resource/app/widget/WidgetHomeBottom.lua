@@ -46,7 +46,9 @@ function WidgetHomeBottom:ctor(city)
             size = 16,
             color = 0xf5e8c4})
             :addTo(self):align(display.CENTER,x, y-40)
+
         if i == 1 then
+            self.task_btn = button
             self.task_count = WidgetNumberTips.new():addTo(self):pos(x+20, first_row+20)
             self.task_count:setLocalZOrder(11)
         elseif i == 3 then

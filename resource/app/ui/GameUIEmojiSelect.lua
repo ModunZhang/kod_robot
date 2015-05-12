@@ -7,7 +7,7 @@ local EmojiTable = import("..utils.EmojiTable") -- 220 count of emoji
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local window = import("..utils.window")
 local UIPageView = import("..ui.UIPageView")
-local PAGE_VIEW_WIDTH = 517
+local PAGE_VIEW_WIDTH = 510
 local PAGE_VIEW_HEIGHT = 410
 local UIListView = import(".UIListView")
 
@@ -60,20 +60,20 @@ end
 function GameUIEmojiSelect:BuildEmojiNode(start_index,end_index)
 	if not end_index then end_index = #EmojiTable end
 	local emoji_node = display.newNode():size(PAGE_VIEW_WIDTH,PAGE_VIEW_HEIGHT)
-	local x,y = 22,488
+	local x,y = 16,394 --392
 	for index = start_index,end_index do
 		local img = EmojiTable[index]
 		local __,__,key = string.find(img, "(.+)%.")
-		local button = WidgetPushButton.new({normal = "#" .. img}):addTo(emoji_node):pos(x,y):scale(0.7)
+		local button = WidgetPushButton.new({normal = "#" .. img}):pos(x, y):addTo(emoji_node):scale(0.5)
 		button:onButtonClicked(function()
 			self:callFunc__(key)
-			local action =  transition.sequence({cc.ScaleTo:create(0.1,1),cc.ScaleTo:create(0.1,0.7)})
+			local action =  transition.sequence({cc.ScaleTo:create(0.1,0.6),cc.ScaleTo:create(0.1,0.5)})
 			button:runAction(action)
 		end)			
-		x = x + 20 + 32
+		x = x + 48
         if index % 11 == 0 then
-            y = y - 52
-            x = 22
+            y = y - 42
+            x = 16
         end
 	end
 	return emoji_node

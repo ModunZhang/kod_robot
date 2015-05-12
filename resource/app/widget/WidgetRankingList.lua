@@ -4,6 +4,7 @@ local window = import("..utils.window")
 local Flag = import("..entity.Flag")
 local UIListView = import("..ui.UIListView")
 local WidgetPushButton = import(".WidgetPushButton")
+local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetPopDialog = import(".WidgetPopDialog")
 local WidgetAllianceHelper = import(".WidgetAllianceHelper")
 local WidgetDropList = import("..widget.WidgetDropList")
@@ -57,9 +58,8 @@ local function load_more(rank_list, new_datas)
         table.insert(rank_list, v)
     end
 end
-function WidgetRankingList:onEnter()
-    WidgetRankingList.super.onEnter(self)
-
+function WidgetRankingList:OnMoveInStage()
+    WidgetRankingList.super.OnMoveInStage(self)
     local body = self:GetBody()
     local size = body:getContentSize()
 
@@ -73,8 +73,8 @@ function WidgetRankingList:onEnter()
     }):align(display.CENTER, bg:getContentSize().width/2, bg:getContentSize().height/2)
         :addTo(bg)
 
-
-    display.newSprite("background_568x556.png"):addTo(body):align(display.CENTER, size.width / 2, size.height / 2 - 80)
+    WidgetUIBackGround.new({width = 568,height = 550},WidgetUIBackGround.STYLE_TYPE.STYLE_6)
+        :addTo(body):align(display.CENTER, size.width / 2, size.height / 2 - 80)
 
     self.listview = UIListView.new{
         async = true, --异步加载
@@ -157,7 +157,12 @@ function WidgetRankingList:ReloadRank(rank)
     if rank.myData.rank == json.null then
         self.my_ranking:setString(_("暂无排名"))
     else
-        local str = self.type_ == "player" and _("我的战斗力排行") or _("我的联盟战斗力排行")
+        local str 
+        if self.type_ == "player" then
+            str = self.drop_list:GetSelectdTag() == "power" and _("我的战斗力排行") or _("我的击杀排行")
+        else
+            str = self.drop_list:GetSelectdTag() == "power" and _("我的联盟战斗力排行") or _("我的联盟击杀排行")
+        end
         self.my_ranking:setString(string.format("%s : %d", str, rank.myData.rank))
     end
     self.current_rank = rank

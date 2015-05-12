@@ -67,7 +67,7 @@ function resource_meta:Desc()
     return Localize.fight_reward[self.name]
 end
 function resource_meta:CountDesc()
-    return self.count
+    return GameUtils:formatNumber(self.count)
 end
 function resource_meta:Icon()
     return rewards_icon_map[self.name]
@@ -412,6 +412,9 @@ function GrowUpTaskManager:ctor()
         self.growUpTasks[k] = {}
     end
 end
+function GrowUpTaskManager:CompleteTasksByType(type_)
+    return self.growUpTasks[type_]
+end
 function GrowUpTaskManager:GetFirstCompleteTasks()
     local r = {}
     for category,v in ipairs(CATEGORY) do
@@ -436,7 +439,8 @@ function GrowUpTaskManager:GetFirstCompleteTasksByCategory(category)
     local r = {}
     for _,tag in ipairs(category_map[category]) do
         local mark_map = {}
-        local tasks = clone(self.growUpTasks[tag])
+        local tasks = {}
+        for i,v in ipairs(self.growUpTasks[tag]) do tasks[i] = v end
         table.sort(tasks, function(a, b) return a.id < b.id end)
         for _,v in ipairs(tasks) do
             local category_name = v.name
@@ -669,13 +673,35 @@ function GrowUpTaskManager:OnUserDataChanged(userData, deltaData)
     local is_delta_update = not is_fully_update and deltaData.growUpTasks
     if is_fully_update or is_delta_update then
         self.growUpTasks = userData.growUpTasks
+        if GrowUpTaskManager.reward_callback and self:IsGetAnyCityBuildRewards() then
+            GrowUpTaskManager.reward_callback()
+            GrowUpTaskManager.reward_callback = nil
+        end
         return true
     end
+end
+function GrowUpTaskManager:IsGetAnyCityBuildRewards()
+    for i,v in ipairs(self:CompleteTasksByType("cityBuild")) do
+        if v.id >= 0 and v.rewarded then
+            return true
+        end
+    end
+end
+local promise = import("..utils.promise")
+function GrowUpTaskManager:PromiseOfGetCityBuildRewards()
+    local p = promise.new()
+    GrowUpTaskManager.reward_callback = function()
+        p:resolve()
+    end
+    return p
 end
 
 
 
 return GrowUpTaskManager
+
+
+
 
 
 

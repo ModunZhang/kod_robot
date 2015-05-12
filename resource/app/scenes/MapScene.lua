@@ -32,10 +32,13 @@ function MapScene:onEnter()
     self.scene_node = display.newClippingRegionNode(cc.rect(0, 0, display.width, display.height)):addTo(self)
     self.scene_node:setContentSize(cc.size(display.width, display.height))
     self.scene_layer = self:CreateSceneLayer():addTo(self:GetSceneNode(), 0)
+    self.scene_layer.scene = self
     self.touch_layer = self:CreateMultiTouchLayer():addTo(self:GetSceneNode(), 1)
     if type(self.CreateSceneUILayer) == "function" then
         self.scene_ui_layer = self:CreateSceneUILayer():addTo(self:GetSceneNode(), 2)
     end
+    self.info_layer = display.newNode():addTo(self:GetSceneNode(), 3)
+    self.info_layer:setTouchSwallowEnabled(false)
 end
 function MapScene:onExit()
     self.touch_judgment:destructor()
@@ -83,6 +86,9 @@ end
 function MapScene:GetSceneLayer()
     return self.scene_layer
 end
+function MapScene:GetInfoLayer()
+    return self.info_layer
+end
 function MapScene:CreateSceneLayer()
     assert(false, "必须在子类实现生成场景的方法")
 end
@@ -96,6 +102,47 @@ function MapScene:CreateMultiTouchLayer()
         return true
     end)
     return touch_layer
+end
+local FTE_TAG = 119
+function MapScene:GetFteLayer()
+    local child = self:getChildByTag(FTE_TAG)
+    if not child then
+        return self:CreateFteLayer()
+    end
+    return child
+end
+function MapScene:CreateFteLayer()
+    local layer = display.newLayer():addTo(self, 2000, FTE_TAG)
+    layer:setTouchSwallowEnabled(true)
+    local touch_judgment = self.touch_judgment
+    layer:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
+        if touch_judgment then
+            local touch_type, pre_x, pre_y, x, y = event.name, event.prevX, event.prevY, event.x, event.y
+            if touch_type == "began" then
+                touch_judgment:OnTouchBegan(pre_x, pre_y, x, y)
+                return true
+            elseif touch_type == "moved" then
+            -- touch_judgment:OnTouchMove(pre_x, pre_y, x, y)
+            elseif touch_type == "ended" then
+                touch_judgment:OnTouchEnd(pre_x, pre_y, x, y)
+            elseif touch_type == "cancelled" then
+                touch_judgment:OnTouchCancelled(pre_x, pre_y, x, y)
+            end
+        end
+        return true
+    end)
+    function layer:Enable()
+        self:setTouchEnabled(true)
+        return self
+    end
+    function layer:Disable()
+        self:setTouchEnabled(false)
+        return self
+    end
+    function layer:Reset()
+        return self:Disable()
+    end
+    return layer:Reset()
 end
 function MapScene:OnOneTouch(pre_x, pre_y, x, y, touch_type)
     self:OneTouch(pre_x, pre_y, x, y, touch_type)
@@ -161,6 +208,7 @@ function MapScene:OnTouchMove(pre_x, pre_y, x, y)
     local diffX = new_point.x - old_point.x
     local diffY = new_point.y - old_point.y 
     self.scene_layer:setPosition(cc.p(old_x + diffX, old_y + diffY))
+    self:GetInfoLayer():pos(self.scene_layer:getPosition())
     -- local mx, my, ELASTIC = self.scene_layer:GetCollideLength()
     -- local rx, ry = 1- sqrt((abs(mx)/ELASTIC)), 1 - sqrt((abs(my)/ELASTIC))
     -- self.scene_layer:setPosition(cc.p(old_x + diffX * rx, old_y + diffY * ry))
@@ -177,13 +225,20 @@ function MapScene:OnTouchExtend(old_speed_x, old_speed_y, new_speed_x, new_speed
     speed.x = speed.x > max_speed and max_speed or speed.x
     speed.y = speed.y > max_speed and max_speed or speed.y
     self.scene_layer:setPosition(cc.p(x + sp.x, y + sp.y))
-
     -- local mx, my, ELASTIC = self.scene_layer:GetCollideLength()
     -- local rx, ry = 1- sqrt((abs(mx)/ELASTIC)), 1 - sqrt((abs(my)/ELASTIC))
     -- self.scene_layer:setPosition(cc.p(x + sp.x * rx, y + sp.y * ry))
     -- if self.scene_layer:MakeElastic() then
     --     self.touch_judgment:ResetTouch()
     -- end
+end
+function MapScene:OnSceneScale()
+end
+function MapScene:OnSceneMove()
+    self:GetInfoLayer():pos(self.scene_layer:getPosition())
+    if self:GetSceneUILayer().OnSceneMove then
+        self:GetSceneUILayer():OnSceneMove()
+    end
 end
 
 return MapScene

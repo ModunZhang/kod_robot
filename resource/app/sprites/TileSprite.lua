@@ -4,12 +4,21 @@ local random = math.random
 
 
 local surface = {
-    "unlock_tile_surface_1_grassLand.png",
-    "unlock_tile_surface_2_grassLand.png",
-    "unlock_tile_surface_3_grassLand.png",
-    "unlock_tile_surface_4_grassLand.png",
-    "unlock_tile_surface_5_grassLand.png",
-    "unlock_tile_surface_6_grassLand.png",
+    grassLand = {
+
+        "unlock_tile_surface_1_grassLand.png",
+        "unlock_tile_surface_2_grassLand.png",
+        "unlock_tile_surface_3_grassLand.png",
+        "unlock_tile_surface_4_grassLand.png",
+        "unlock_tile_surface_5_grassLand.png",
+        "unlock_tile_surface_6_grassLand.png",
+    },
+    desert = {
+        "unlock_tile_surface_1_desert.png",
+        "unlock_tile_surface_2_desert.png",
+        "unlock_tile_surface_3_desert.png",
+        "unlock_tile_surface_4_desert.png",
+    }
 }
 
 function TileSprite:ctor(city_layer, entity, x, y)
@@ -18,9 +27,10 @@ function TileSprite:ctor(city_layer, entity, x, y)
         self:GetSprite():hide()
     end
     local sx,ex,sy,ey = 200,250,150,200
+    local maps = surface[self:GetMapLayer():Terrain()]
     for i = 1,2 do
-        display.newSprite(surface[math.random(#surface)]):addTo(self:GetSprite())
-        :pos(sx + math.random(ex - sx), sy + math.random(ey - sy))
+        display.newSprite(maps[math.random(#maps)]):addTo(self:GetSprite())
+            :pos(sx + math.random(ex - sx), sy + math.random(ey - sy))
     end
 end
 function TileSprite:ReloadSpriteCauseTerrainChanged()
@@ -34,8 +44,8 @@ function TileSprite:CreateSprite()
     if y == 5 and x == 2 then
         local dx, dy = 510/2, 310/2
         for i = 1, 2 do
-            display.newSprite(string.format("unlock_road_%s.png", 
-            self:GetMapLayer():Terrain())):addTo(self):pos(-dx * i, -dy * i)
+            display.newSprite(string.format("unlock_road_%s.png",
+                self:GetMapLayer():Terrain())):addTo(self):pos(-dx * i, -dy * i)
         end
     end
     return sprite
@@ -61,6 +71,7 @@ function TileSprite:GetLogicZorder()
     return - 1
 end
 return TileSprite
+
 
 
 

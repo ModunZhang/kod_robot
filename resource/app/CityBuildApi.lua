@@ -24,17 +24,34 @@ end
 function CityBuildApi:UpgradingBuilding(building)
     local tile = City:GetTileWhichBuildingBelongs(building)
     if building:IsAbleToUpgrade(true) == nil then
+        local finishNow = math.random(2) == 2
         if building:IsHouse() then
             local location_id = tile.location_id
             local sub_location_id = tile:GetBuildingLocation(building)
-            return NetManager:getInstantUpgradeHouseByLocationPromise(location_id, sub_location_id)
+            if finishNow then
+                return NetManager:getInstantUpgradeHouseByLocationPromise(location_id, sub_location_id)
+            else
+                return NetManager:getUpgradeHouseByLocationPromise(location_id, sub_location_id)
+            end
         elseif building:GetType() == "tower" then
-            return NetManager:getInstantUpgradeTowerPromise()
+            if finishNow then
+                return NetManager:getInstantUpgradeTowerPromise()
+            else
+                return NetManager:getUpgradeTowerPromise()
+            end
         elseif building:GetType() == "wall" then
-            return NetManager:getInstantUpgradeWallByLocationPromise()
+            if finishNow then
+                return NetManager:getInstantUpgradeWallByLocationPromise()
+            else
+                return NetManager:getUpgradeWallByLocationPromise()
+            end
         else
             local location_id = tile.location_id
-            return NetManager:getInstantUpgradeBuildingByLocationPromise(location_id)
+            if finishNow then
+                return NetManager:getInstantUpgradeBuildingByLocationPromise(location_id)
+            else
+                return NetManager:getUpgradeBuildingByLocationPromise(location_id)
+            end
         end
     end
 end
@@ -92,6 +109,28 @@ function CityBuildApi:BuildRandomHouse()
         self:BuildHouseByType("dwelling")
 end
 
+function CityBuildApi:SpeedUpBuildingEvents()
+    local can_upgrade = {}
+    City:IteratorCanUpgradeBuildings(function (building )
+        if building:UniqueUpgradingKey() then
+            table.insert(can_upgrade, building)
+
+        end
+    end)
+    if #can_upgrade > 0 then
+        -- 随机找一个加速
+        local u_building = can_upgrade[math.random(#can_upgrade)]
+        -- 加速建筑升级
+        -- 随机使用事件加速道具
+        local speedUp_item_name = "speedup_"..math.random(8)
+        print("使用"..speedUp_item_name.."加速"..u_building:GetType()..","..u_building:EventType().." ,id:",u_building:UniqueUpgradingKey())
+        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+            eventType = u_building:EventType(),
+            eventId = u_building:UniqueUpgradingKey()
+        }})
+    end
+end
+
 local function Recommend()
     local p = CityBuildApi:Recommend()
     if p then
@@ -116,6 +155,15 @@ local function UnlockBuilding()
         setRun()
     end
 end
+local function SpeedUpBuildingEvents()
+    local p = CityBuildApi:SpeedUpBuildingEvents()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+
 local function SetUserName()
     local p = CityBuildApi:SetUserName()
     if p then
@@ -131,6 +179,10 @@ return {
     BuildRandomHouse,
     UnlockBuilding,
     Recommend,
+    SpeedUpBuildingEvents,
 }
+
+
+
 
 

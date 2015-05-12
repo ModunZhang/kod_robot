@@ -43,12 +43,12 @@ function WidgetRoundTabButtons:ctor(buttons, listener,style)
     self.style = style
     self.callbacks = {}
     self.tabListener = listener
-    local width = 548
+    local width = 562
     local node = display.newNode():addTo(self)
     self.node = node
 
-    local unit_width = width / #buttons
     local origin_x = 7
+    local unit_width = (width - 2 * origin_x - (#buttons-1)) / #buttons 
     local tabs = {}
     local default
 
@@ -58,7 +58,7 @@ function WidgetRoundTabButtons:ctor(buttons, listener,style)
         
         local widget = WidgetTab.new(images, unit_width, 60)
             :addTo(node)
-            :align(display.LEFT_CENTER, origin_x + unit_width * (i - 1)+(i~=1 and 1 or 0), 37)
+            :align(display.LEFT_CENTER, origin_x + (unit_width + 1) * (i - 1), 37)
             :OnTabPress(handler(self, self.OnTabClicked))
         widget.tag = v.tag
         widget.label = UIKit:ttfLabel({text = v.label, size = 22, color = 0xa0956e})

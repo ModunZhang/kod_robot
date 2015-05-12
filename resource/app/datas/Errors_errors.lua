@@ -925,3 +925,13 @@ errors["playerSecondMarchQueueAlreadyUnlocked"] = {
 	["code"] = 685,
 	["message"] = "玩家第二条队列已经解锁"
 }
+errors["illegalRequest"] = {
+	["key"] = "illegalRequest",
+	["code"] = 686,
+	["message"] = "非法的请求"
+}
+errors["playerDataAlreadyInited"] = {
+	["key"] = "playerDataAlreadyInited",
+	["code"] = 687,
+	["message"] = "玩家数据已经初始化"
+}

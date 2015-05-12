@@ -11,7 +11,7 @@ function WidgetAllianceBuildingInfo:ctor()
     -- 建筑详情介绍
     UIKit:ttfLabel(
         {
-            text = _("联盟的核心建筑，升级可提升联盟人数上限，想占领城市征税，更改联盟地形"),
+            text = "",
             size = 20,
             align = cc.ui.TEXT_ALIGN_CENTER,
             dimensions = cc.size(360,0),
@@ -43,7 +43,7 @@ function WidgetAllianceBuildingInfo:ctor()
         end
         UIKit:ttfLabel(
             {
-                text = i.._(".   成员总数+4， 联盟战斗力+300"),
+                text = "",
                 size = 20,
                 color = 0x403c2f
             }):align(display.LEFT_CENTER, 10, 20)

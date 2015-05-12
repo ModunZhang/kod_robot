@@ -43,12 +43,10 @@ function GameUIHome:OnResourceChanged(resource_manager)
     self.coin_label:setString(GameUtils:formatNumber(coin_number))
     self.gem_label:setString(string.formatnumberthousands(gem_number))
 
-    self.wood_label:setColor(wood_resource:IsOverLimit() and UIKit:hex2c4b(0x7e0000) or wood_resource:IsOverWarning() and UIKit:hex2c4b(0xff8400) or UIKit:hex2c4b(0xf3f0b6))
-    self.food_label:setColor(food_resource:IsOverLimit() and UIKit:hex2c4b(0x7e0000) or food_resource:IsOverWarning() and UIKit:hex2c4b(0xff8400) or UIKit:hex2c4b(0xf3f0b6))
-    self.iron_label:setColor(iron_resource:IsOverLimit() and UIKit:hex2c4b(0x7e0000) or iron_resource:IsOverWarning() and UIKit:hex2c4b(0xff8400) or UIKit:hex2c4b(0xf3f0b6))
-    self.stone_label:setColor(stone_resource:IsOverLimit() and UIKit:hex2c4b(0x7e0000) or stone_resource:IsOverWarning() and UIKit:hex2c4b(0xff8400) or UIKit:hex2c4b(0xf3f0b6))
-    self.citizen_label:setColor(citizen_resource:IsOverLimit() and UIKit:hex2c4b(0x7e0000) or citizen_resource:IsOverWarning() and UIKit:hex2c4b(0xff8400) or UIKit:hex2c4b(0xf3f0b6))
-
+    self.wood_label:setColor(wood_resource:IsOverLimit() and UIKit:hex2c4b(0xff3c00) or UIKit:hex2c4b(0xf3f0b6))
+    self.food_label:setColor(food_resource:IsOverLimit() and UIKit:hex2c4b(0xff3c00) or UIKit:hex2c4b(0xf3f0b6))
+    self.iron_label:setColor(iron_resource:IsOverLimit() and UIKit:hex2c4b(0xff3c00) or UIKit:hex2c4b(0xf3f0b6))
+    self.stone_label:setColor(stone_resource:IsOverLimit() and UIKit:hex2c4b(0xff3c00) or UIKit:hex2c4b(0xf3f0b6))
 end
 function GameUIHome:OnUpgradingBegin()
     self:OnTaskChanged()
@@ -62,8 +60,10 @@ end
 function GameUIHome:OnTaskChanged()
     self.task = self.city:GetRecommendTask()
     if self.task then
+        self.quest_bar_bg:show()
         self.quest_label:setString(self.task:Title())
     else
+        self.quest_bar_bg:hide()
         self.quest_label:setString(_("当前没有推荐任务!"))
     end
 end
@@ -94,7 +94,7 @@ end
 function GameUIHome:FadeToSelf(isFullDisplay)
     self:setCascadeOpacityEnabled(true)
     local opacity = isFullDisplay == true and 255 or 0
-    local p = isFullDisplay and 0 or 99999999
+    local p = isFullDisplay and 0 or 0
     transition.fadeTo(self, {opacity = opacity, time = 0.2,
         onComplete = function()
             self:pos(p, p)
@@ -211,7 +211,7 @@ function GameUIHome:CreateTop()
         {scale9 = false}
     ):onButtonClicked(function(event)
         if event.name == "CLICKED_EVENT" then
-            UIKit:newGameUI('GameUIVip', City,"info"):AddToCurrentScene(true)
+            UIKit:newGameUI('GameUIVip', self.city,"info"):AddToCurrentScene(true)
         end
     end):addTo(top_bg):align(display.LEFT_CENTER,top_bg:getContentSize().width/2-2, top_bg:getContentSize().height/2+10)
     button:setRotationSkewY(180)
@@ -306,16 +306,16 @@ function GameUIHome:CreateTop()
     local vip_btn = cc.ui.UIPushButton.new(
         {},
         {scale9 = false}
-    ):addTo(top_bg):align(display.CENTER, ox + 195, 50)
+    ):addTo(top_bg):align(display.CENTER, ox + 195, 65)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                UIKit:newGameUI('GameUIVip', City,"VIP"):AddToCurrentScene(true)
+                UIKit:newGameUI('GameUIVip', self.city,"VIP"):AddToCurrentScene(true)
             end
         end)
     local vip_btn_img = User:IsVIPActived() and "vip_bg_110x124.png" or "vip_bg_disable_110x124.png"
     vip_btn:setButtonImage(cc.ui.UIPushButton.NORMAL, vip_btn_img, true)
     vip_btn:setButtonImage(cc.ui.UIPushButton.PRESSED, vip_btn_img, true)
-    self.vip_level = display.newNode():addTo(vip_btn):pos(-3, 15):scale(0.8)
+    self.vip_level = display.newNode():addTo(vip_btn):pos(-3, 0):scale(0.8)
     self.vip_btn = vip_btn
 
 
@@ -354,6 +354,7 @@ function GameUIHome:CreateTop()
             end
         end
     end)
+    self.quest_bar_bg = quest_bar_bg
     display.newSprite("quest_icon_27x42.png"):addTo(quest_bar_bg):pos(-162, 0)
     self.quest_label = cc.ui.UILabel.new({
         size = 20,
@@ -369,7 +370,7 @@ function GameUIHome:CreateTop()
         {scale9 = false}
     ):onButtonClicked(function(event)
         if event.name == "CLICKED_EVENT" then
-            UIKit:newGameUI("GameUIActivity",City):AddToCurrentScene(true)
+            UIKit:newGameUI("GameUIActivity",self.city):AddToCurrentScene(true)
         end
     end):addTo(self):pos(display.left+40, display.top-200)
     local order = WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM,20):addTo(self):pos(display.right-50, display.top-200)
@@ -453,10 +454,7 @@ function GameUIHome:OnVipEventOver( vip_event )
     self:RefreshVIP()
 end
 function GameUIHome:RefreshExp()
-    local exp_config = GameDatas.PlayerInitData.playerLevel[User:Level()]
-    local currentExp = User:LevelExp() - exp_config.expFrom
-    local maxExp = exp_config.expTo - exp_config.expFrom
-    self.exp:setPercentage(currentExp/maxExp*100)
+    self.exp:setPercentage(User:LevelExp()/User:GetCurrentLevelMaxExp(User:GetPlayerLevelByExp(User:LevelExp()))*100)
 end
 function GameUIHome:RefreshVIP()
     local vip_btn = self.vip_btn
@@ -474,9 +472,9 @@ function GameUIHome:RefreshVIP()
 end
 
 -- fte
-function GameUIHome:DefferShow(tab_type)
-    return self.event_tab:PromiseOfShowTab(tab_type):next(function() return self end)
-end
+local mockData = import("..fte.mockData")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
+local WidgetFteMark = import("..widget.WidgetFteMark")
 function GameUIHome:Find()
     local item
     self.event_tab:IteratorAllItem(function(_, v)
@@ -485,59 +483,98 @@ function GameUIHome:Find()
             return true
         end
     end)
-    return cocos_promise.defer(function()
-        if not item then
-            promise.reject({code = -1, msg = "没有找到对应item"}, "")
+    return item
+end
+function GameUIHome:FindVip()
+    return self.vip_btn
+end
+function GameUIHome:PromiseOfFteFreeSpeedUp()
+    if #self.city:GetUpgradingBuildings() > 0 then
+        if not self.event_tab:IsShow() then
+            self.event_tab:EventChangeOn("build", true)
         end
-        return item
+        self:GetFteLayer()
+        self.event_tab:PromiseOfPopUp():next(function()
+            self:GetFteLayer():SetTouchObject(self:Find())
+            self:Find():removeEventListenersByEvent("CLICKED_EVENT")
+            self:Find():onButtonClicked(function()
+                self:Find():setButtonEnabled(false)
+
+                mockData.FinishBuildHouseAt(self:GetBuildingLocation(), 1)
+            end)
+
+            local r = self:Find():getCascadeBoundingBox()
+            self:GetFteLayer().arrow = WidgetFteArrow.new(_("5分钟以下免费加速，激活VIP提升免费加速时间，VIP等级越高，可免费加速时间越高"))
+                :addTo(self:GetFteLayer()):TurnUp(true):align(display.RIGHT_TOP, r.x + r.width/2, r.y - 10)
+        end)
+
+        return self.city:PromiseOfFinishUpgradingByLevel(nil, nil):next(function()
+            self:GetFteLayer():removeFromParent()
+        end)
+    end
+    return cocos_promise.defer()
+end
+function GameUIHome:PromiseOfFteInstantSpeedUp()
+    if #self.city:GetUpgradingBuildings() > 0 then
+        if not self.event_tab:IsShow() then
+            self.event_tab:EventChangeOn("build", true)
+        end
+        self:GetFteLayer()
+        self.event_tab:PromiseOfPopUp():next(function()
+            self:GetFteLayer():SetTouchObject(self:Find())
+
+            self:Find():removeEventListenersByEvent("CLICKED_EVENT")
+            self:Find():onButtonClicked(function()
+                self:Find():setButtonEnabled(false)
+
+                local building = self:GetBuilding()
+                if building:IsHouse() then
+                    mockData.FinishBuildHouseAt(self:GetBuildingLocation(), building:GetNextLevel())
+                else
+                    mockData.FinishUpgradingBuilding(building:GetType(), building:GetNextLevel())
+                end
+
+            end)
+
+            local r = self:Find():getCascadeBoundingBox()
+            self:GetFteLayer().arrow = WidgetFteArrow.new(_("立即完成升级"))
+                :addTo(self:GetFteLayer()):TurnRight(true):align(display.RIGHT_CENTER, r.x - 10, r.y + r.height/2)
+
+
+        end)
+
+        return self.city:PromiseOfFinishUpgradingByLevel():next(function()
+            self:GetFteLayer():removeFromParent()
+        end)
+    end
+    return cocos_promise.defer()
+end
+function GameUIHome:GetBuildingLocation()
+    local building = self.city:GetUpgradingBuildings()[1]
+    assert(building)
+    local x,y = building:GetLogicPosition()
+    local tile = self.city:GetTileByBuildingPosition(x, y)
+    return tile.location_id
+end
+function GameUIHome:GetBuilding()
+    local building = self.city:GetUpgradingBuildings()[1]
+    assert(building)
+    return building
+end
+function GameUIHome:PromiseOfActivePromise()
+    self:GetFteLayer():SetTouchObject(self:FindVip())
+    local r = self:FindVip():getCascadeBoundingBox()
+
+    WidgetFteArrow.new(_("点击VIP，免费激活VIP")):addTo(self:GetFteLayer())
+    :TurnUp():align(display.TOP_CENTER, r.x + r.width/2, r.y)
+
+    return UIKit:PromiseOfOpen("GameUIVip"):next(function(ui)
+        self:GetFteLayer():removeFromParent()
+        return ui:PromiseOfFte()
     end)
 end
 
 return GameUIHome
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

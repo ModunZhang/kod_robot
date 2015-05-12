@@ -132,7 +132,7 @@ function GameUIQuickTechnology:BuildTipsUI(technology_node,y)
 	}):align(display.LEFT_TOP,10,96):addTo(tips_bg)
 	self.upgrade_label = upgrade_label
 	local icon_bg = display.newSprite("back_ground_43x43.png"):align(display.LEFT_BOTTOM, 10, 15):addTo(tips_bg,2)
-	display.newSprite("hourglass_39x46.png"):align(display.CENTER, 22, 22):addTo(icon_bg):scale(0.8)
+	display.newSprite("hourglass_30x38.png"):align(display.CENTER, 22, 22):addTo(icon_bg):scale(0.8)
 	self.icon_bg = icon_bg
 	local process_bg = display.newSprite("progress_bar_364x40_1.png")
 		:align(display.LEFT_BOTTOM,icon_bg:getPositionX()+icon_bg:getCascadeBoundingBox().width/2, 15):addTo(tips_bg,1)

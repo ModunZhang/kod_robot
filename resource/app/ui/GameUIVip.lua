@@ -46,14 +46,14 @@ local VIP_EFFECIVE_ALL_TYPE = Enum(
 -- VIP 效果总览
 local VIP_EFFECIVE_ALL = {
     freeSpeedup = _("立即完成建筑时间"),
-    helpSpeedup = _("协助加速(城建和科技) 1分钟+升级事件剩余时间的"),
+    helpSpeedup = _("协助加速效果提升"),
     woodProductionAdd = _("木材产量增加"),
     stoneProductionAdd = _("石料产量增加"),
     ironProductionAdd = _("铁矿产量增加"),
     foodProductionAdd = _("粮食产量增加"),
     citizenRecoveryAdd = _("城民增长速度"),
     marchSpeedAdd = _("提升行军速度"),
-    normalGachaAdd = _("每日免费Gacha+"),
+    normalGachaAdd = _("每日游乐场免费抽奖次数+"),
     storageProtectAdd = _("暗仓保护上限提升"),
     wallHpRecoveryAdd = _("城墙修复速度提升"),
     dragonExpAdd =  _("巨龙获得经验值加成"),
@@ -65,7 +65,7 @@ local VIP_EFFECIVE_ALL = {
 }
 
 function GameUIVip:ctor(city,default_tag)
-    GameUIVip.super.ctor(self,city,_("PLAYER INFO"))
+    GameUIVip.super.ctor(self,city,_("玩家信息"))
     self.default_tag = default_tag
 end
 
@@ -148,7 +148,6 @@ function GameUIVip:WidgetPlayerNode_DataSource(name)
     end
 end
 function GameUIVip:OnMoveInStage()
-    GameUIVip.super.OnMoveInStage(self)
     self:CreateTabButtons({
         {
             label = _("信息"),
@@ -187,7 +186,7 @@ function GameUIVip:OnMoveInStage()
         end
     end):pos(window.cx, window.bottom + 34)
     User:AddListenOnType(self, User.LISTEN_TYPE.BASIC)
-
+    GameUIVip.super.OnMoveInStage(self)
 end
 function GameUIVip:onExit()
     User:RemoveListenerOnType(self, User.LISTEN_TYPE.BASIC)
@@ -504,7 +503,7 @@ function GameUIVip:CreateVIPStatus()
     local widget_info = WidgetInfoNotListView.new(
         {
             info={
-                {_("当前VIP等级"),_("Lv").." "..User:GetVipLevel()},
+                {_("当前VIP等级"),_("等级").." "..User:GetVipLevel()},
                 {_("下一次登录"),"+"..loginDays[User:GetCountInfo().vipLoginDaysCount].expAdd},
                 {_("连续登录"),User:GetCountInfo().vipLoginDaysCount},
             }
@@ -757,7 +756,7 @@ function GameUIVip:SetVIPInfo(level)
     self.widget_info:SetInfo(info)
 end
 function GameUIVip:OpenVIPDetails(show_vip_level)
-    local layer = WidgetPopDialog.new( 737,_("VIP"),display.top-140,"title_purple_600x52.png")
+    local layer = WidgetPopDialog.new( 737,_("VIP"),display.top-140,"title_purple_600x56.png")
         :addTo(self,201)
     local body = layer:GetBody()
     local size = body:getContentSize()
@@ -798,20 +797,11 @@ function GameUIVip:OpenVIPDetails(show_vip_level)
                     cc.ui.UILabel.new(
                         {
                             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-                            text = _("到达等级赠送"),
+                            text = _("到达等级后自动激活24小时"),
                             font = UIKit:getFontFilePath(),
                             size = 20,
                             color = UIKit:hex2c3b(0xefdea3)
-                        }):align(display.LEFT_CENTER, 120, 70)
-                        :addTo(not_reach_bg)
-                    cc.ui.UILabel.new(
-                        {
-                            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-                            text = _("7 DAY"),
-                            font = UIKit:getFontFilePath(),
-                            size = 18,
-                            color = UIKit:hex2c3b(0x403c2f)
-                        }):align(display.CENTER, 70, 12)
+                        }):align(display.LEFT_CENTER, 120, 47)
                         :addTo(not_reach_bg)
                     layer.status_node = not_reach_bg
                 end
@@ -838,6 +828,7 @@ function GameUIVip:OpenVIPDetails(show_vip_level)
                             end
                         end)
                     layer.status_node = active_button
+                    self.active_button = active_button
                 else
                     local reach_bg = display.newSprite("vip_bg_4.png")
                     reach_bg:align(display.CENTER, size.width/2, 40)
@@ -891,60 +882,27 @@ function GameUIVip:OnVipEventTimer( vip_event_new )
     end
 end
 
+-- fte
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
+local WidgetFteMark = import("..widget.WidgetFteMark")
+function GameUIVip:FindActiveBtn()
+    return self.active_button
+end
+function GameUIVip:PromiseOfFte()
+    self:GetFteLayer():SetTouchObject(self:FindActiveBtn())
+    local r = self:FindActiveBtn():getCascadeBoundingBox()
+    WidgetFteArrow.new(_("激活VIP")):addTo(self:GetFteLayer())
+    :TurnUp():align(display.TOP_CENTER, r.x + r.width/2, r.y - 20)
+
+    return WidgetUseItems:PromiseOfOpen("vipActive"):next(function(ui)
+        self:GetFteLayer():removeFromParent()
+        return ui:PromiseOfFte()
+    end):next(function()
+        return self:PromsieOfExit("GameUIVip")
+    end)
+end
+
 return GameUIVip
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

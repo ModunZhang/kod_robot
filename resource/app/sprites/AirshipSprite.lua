@@ -1,7 +1,19 @@
 local Sprite = import(".Sprite")
 local AirshipSprite = class("AirshipSprite", Sprite)
 
+
+function AirshipSprite:OnSceneMove()
+    local world_point, top = self:GetWorldPosition()
+    self:NotifyObservers(function(listener)
+        listener:OnPositionChanged(world_point.x, world_point.y, top.x, top.y)
+    end)
+end
+function AirshipSprite:GetWorldPosition()
+    return self:convertToWorldSpace(cc.p(self:GetSpriteOffset())),
+        self:convertToWorldSpace(cc.p(self:GetSpriteTopPosition()))
+end
 function AirshipSprite:ctor(city_layer, x, y)
+    self.logic_x, self.logic_y = x, y
     AirshipSprite.super.ctor(self, city_layer, nil, city_layer:GetLogicMap():ConvertToMapPosition(x, y))
     self:GetSprite():runAction(cc.RepeatForever:create(transition.sequence{
         cc.MoveBy:create(5, cc.p(0, 10)),
@@ -18,7 +30,10 @@ function AirshipSprite:GetEntity()
             return "airship"
         end,
         GetLogicPosition = function()
-            return -1, -1
+            return self.logic_x, self.logic_y
+        end,
+        GetMidLogicPosition = function()
+            return self.logic_x, self.logic_y
         end
     }
 end

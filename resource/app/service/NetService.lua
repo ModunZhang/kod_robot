@@ -55,7 +55,7 @@ function NetService:request(route, lmsg, cb)
         return 
     end
     lmsg = lmsg or {}
-    lmsg.__time__ = ext.now() + self.m_deltatime
+    -- lmsg.__time__ = ext.now() + self.m_deltatime
     self.m_pomelo:request(route, json.encode(lmsg), function ( success, jmsg )
             if not success then  self.net_state = self.NET_STATE.DISCONNECT end 
             if jmsg then
@@ -74,7 +74,7 @@ function NetService:notify( route, lmsg, cb )
         end)
     return end
     lmsg = lmsg or {}
-    lmsg.__time__ = ext.now() + self.m_deltatime
+    -- lmsg.__time__ = ext.now() + self.m_deltatime
     self.m_pomelo:notify(route, json.encode(lmsg), function ( success )
         if not success then  self.net_state = self.NET_STATE.DISCONNECT end 
         cb(success)

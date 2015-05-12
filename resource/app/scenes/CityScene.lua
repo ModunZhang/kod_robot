@@ -16,8 +16,9 @@ local app = app
 local timer = app.timer
 local DEBUG_LOCAL = false
 function CityScene:ctor(city)
-    CityScene.super.ctor(self)
+    self.mark_buildings = {}
     self.city = city
+    CityScene.super.ctor(self)
 end
 function CityScene:onEnter()
     self:LoadAnimation()
@@ -206,51 +207,6 @@ end
 function CityScene:ChangeTerrain()
     self:GetSceneLayer():ChangeTerrain()
 end
-function CityScene:CreateArrowLayer()
-    local arrow_layer = display.newLayer():addTo(self, 2)
-    arrow_layer:setTouchSwallowEnabled(false)
-    return arrow_layer
-end
-function CityScene:CreateTutorialLayer()
-    local layer = display.newLayer():addTo(self, 2000)
-    layer:setTouchSwallowEnabled(true)
-    local touch_judgment = self.touch_judgment
-    layer:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
-        if touch_judgment then
-            local touch_type, pre_x, pre_y, x, y = event.name, event.prevX, event.prevY, event.x, event.y
-            if touch_type == "began" then
-                touch_judgment:OnTouchBegan(pre_x, pre_y, x, y)
-                return true
-            elseif touch_type == "moved" then
-            -- touch_judgment:OnTouchMove(pre_x, pre_y, x, y)
-            elseif touch_type == "ended" then
-                touch_judgment:OnTouchEnd(pre_x, pre_y, x, y)
-            elseif touch_type == "cancelled" then
-                touch_judgment:OnTouchCancelled(pre_x, pre_y, x, y)
-            end
-        end
-        return true
-    end)
-    local count = 0
-    function layer:Enable()
-        count = count + 1
-        if count > 0 then
-            layer:setTouchEnabled(true)
-        end
-    end
-    function layer:Disable()
-        count = count - 1
-        if count <= 0 then
-            layer:setTouchEnabled(false)
-        end
-    end
-    function layer:Reset()
-        count = 0
-        layer:setTouchEnabled(false)
-        return self
-    end
-    return layer:Reset()
-end
 function CityScene:EnterEditMode()
     self:GetSceneLayer():EnterEditMode()
 end
@@ -273,7 +229,7 @@ function CityScene:OnTowersChanged(old_towers, new_towers)
 end
 function CityScene:OnGateChanged(old_walls, new_walls)
 end
-function CityScene:OnSceneScale(scene_layer)
+function CityScene:OnSceneScale(s)
 end
 function CityScene:OnTouchBegan(pre_x, pre_y, x, y)
     if not DEBUG_LOCAL then return end
@@ -325,6 +281,16 @@ function CityScene:OnTouchMove(pre_x, pre_y, x, y)
     end
     CityScene.super.OnTouchMove(self, pre_x, pre_y, x, y)
 end
+
+-- function CityScene:InsertMarkBuildings(building)
+--     table.insert(self.mark_buildings, building)
+-- end
+-- function CityScene:GetMarkBuildings()
+--     return self.mark_buildings
+-- end
+-- function CityScene:RemoveAllMarkBuildings()
+--     self.mark_buildings = {}
+-- end
 
 
 

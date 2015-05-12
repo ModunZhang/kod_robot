@@ -75,11 +75,13 @@ function GameUIAllianceSendTroops:RefreshMarchTimeAndBuff(soldier_show_table)
     local time,buffTime = self:GetMarchTime(soldier_show_table)
     self.march_time:setString(GameUtils:formatTimeStyle1(time))
     self.buff_reduce_time:setString(string.format("-(%s)",GameUtils:formatTimeStyle1(buffTime)))
+    self.total_march_time = time - buffTime
 end
 
 function GameUIAllianceSendTroops:ctor(march_callback,params)
     checktable(params)
     self.isPVE = type(params.isPVE) == 'boolean' and params.isPVE or false
+    self.returnCloseAction = type(params.returnCloseAction) == 'boolean' and params.returnCloseAction or false
     self.toLocation = params.toLocation or cc.p(0,0)
     self.targetIsMyAlliance = type(params.targetIsMyAlliance) == 'boolean' and params.targetIsMyAlliance or true
     GameUIAllianceSendTroops.super.ctor(self,City,_("准备进攻"))
@@ -220,14 +222,16 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                                 listener =  function ()
                                     if self.dragon:IsDefenced() then
                                         NetManager:getCancelDefenceDragonPromise():done(function()
-                                            self.march_callback(dragonType,soldiers)
-                                            -- 确认派兵后关闭界面
-                                            self:LeftButtonClicked()
+                                                -- self.march_callback(dragonType,soldiers)
+                                                -- -- 确认派兵后关闭界面
+                                                -- self:LeftButtonClicked()
+                                                self:CallFuncMarch_Callback(dragonType,soldiers)
                                         end)
                                     else
-                                        self.march_callback(dragonType,soldiers)
-                                        -- 确认派兵后关闭界面
-                                        self:LeftButtonClicked()
+                                        -- self.march_callback(dragonType,soldiers)
+                                        -- -- 确认派兵后关闭界面
+                                        -- self:LeftButtonClicked()
+                                        self:CallFuncMarch_Callback(dragonType,soldiers)
                                     end
                                 end
                             }
@@ -235,14 +239,16 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                 else
                     if self.dragon:IsDefenced() then
                         NetManager:getCancelDefenceDragonPromise():done(function()
-                            self.march_callback(dragonType,soldiers)
-                            -- 确认派兵后关闭界面
-                            self:LeftButtonClicked()
+                            -- self.march_callback(dragonType,soldiers)
+                            -- -- 确认派兵后关闭界面
+                            -- self:LeftButtonClicked()
+                            self:CallFuncMarch_Callback(dragonType,soldiers)
                         end)
                     else
-                        self.march_callback(dragonType,soldiers)
+                        -- self.march_callback(dragonType,soldiers)
                         -- 确认派兵后关闭界面
-                        self:LeftButtonClicked()
+                        -- self:LeftButtonClicked()
+                        self:CallFuncMarch_Callback(dragonType,soldiers)
                     end
                 end
             end
@@ -250,7 +256,7 @@ function GameUIAllianceSendTroops:OnMoveInStage()
         end):align(display.RIGHT_CENTER,window.right-50,window.top-910):addTo(self:GetView())
     if not self.isPVE then
         --行军所需时间
-        display.newSprite("hourglass_39x46.png", window.cx, window.top-910)
+        display.newSprite("hourglass_30x38.png", window.cx, window.top-910)
             :addTo(self):scale(0.6)
         self.march_time = UIKit:ttfLabel({
             text = "00:00:00",
@@ -267,6 +273,16 @@ function GameUIAllianceSendTroops:OnMoveInStage()
     end
     City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
 end
+
+function GameUIAllianceSendTroops:CallFuncMarch_Callback(dragonType,soldiers)
+    if not self.returnCloseAction then
+        self.march_callback(dragonType,soldiers,self.total_march_time)
+        self:LeftButtonClicked()
+    else
+        self.march_callback(dragonType,soldiers,self.total_march_time,self)
+    end
+end
+
 function GameUIAllianceSendTroops:AdapterMaxButton(max)
     local btn_labe = max and _("最大") or self.is_now_max and _("最大") or _("最小")
     if max then

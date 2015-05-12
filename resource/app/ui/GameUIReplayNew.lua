@@ -21,6 +21,20 @@ local LEFT_TAG1  = tags.LEFT_TAG1
 local RIGHT_TAG1 = tags.RIGHT_TAG1
 
 
+local function iter(a, i)
+    local v1 = a[i]
+    i = i + 1
+    local v2 = a[i]
+    if v2 then
+        return i, v1, v2
+    end
+end
+
+local function tuple_ipairs(a)
+    return iter, a, 0
+end
+
+
 local function decode_battle_from_report(report)
     local attacks = clone(report:GetFightAttackSoldierRoundData())
     local defends = clone(report:GetFightDefenceSoldierRoundData())
@@ -301,12 +315,12 @@ local function newDragonBattle(replay_ui, dragonAttack, dragonAttackLevel, drago
     dragon_battle.result = ccs.Armature:create("paizi"):addTo(dragon_battle, 100):hide()
 
     local left_bone = dragon_battle:getBone("Layer4")
-    local left_dragon = newDragon(replay_ui, dragonAttack.dragonType, dragonAttackLevel):addTo(left_bone):pos(-360, -50)
+    local left_dragon = newDragon(replay_ui, dragonAttack.type, dragonAttackLevel):addTo(left_bone):pos(-360, -50)
     left_bone:addDisplay(left_dragon, 0)
     left_bone:changeDisplayWithIndex(0, true)
 
     local right_bone = dragon_battle:getBone("Layer5")
-    local right_dragon = newDragon(replay_ui, dragonDefence.dragonType, dragonDefenceLevel):TurnLeft():addTo(right_bone):pos(238, -82)
+    local right_dragon = newDragon(replay_ui, dragonDefence.type, dragonDefenceLevel):TurnLeft():addTo(right_bone):pos(238, -82)
     right_bone:addDisplay(right_dragon, 0)
     right_bone:changeDisplayWithIndex(0, true)
     function dragon_battle:GetAttackDragon()
@@ -440,7 +454,7 @@ local report_ = {
     GetDefenceDragonLevel = function() return 2 end,
     GetFightAttackDragonRoundData = function()
         return {
-            dragonType = "redDragon",
+            type = "redDragon",
             hp = 1000,
             hpDecreased = 90,
             hpMax = 1000,
@@ -449,7 +463,7 @@ local report_ = {
     end,
     GetFightDefenceDragonRoundData = function()
         return {
-            dragonType = "blackDragon",
+            type = "blackDragon",
             hp = 1000,
             hpDecreased = 90,
             hpMax = 1000,
@@ -550,6 +564,7 @@ local report_ = {
     IsFightWall = function() return false end,
     IsPveBattle = function() return false end,
     GetAttackTargetTerrain = function() return "iceField" end,
+    IsAttackCamp = function() return true end,
 }
 
 
@@ -1083,6 +1098,8 @@ function GameUIReplayNew:PlayDragonBattle()
     local defend_dragon = self.report:GetFightDefenceDragonRoundData()
     local defend_dragon_level = self.report:GetDefenceDragonLevel()
 
+    dump(attack_dragon)
+
     self.dragon_battle = newDragonBattle(self, attack_dragon, attack_dragon_level, defend_dragon, defend_dragon_level)
         :addTo(self.ui_map.dragon_node):align(display.CENTER, 275, 155)
     self.dragon_battle:GetAttackDragon():SetHp(attack_dragon.hp, attack_dragon.hpMax)
@@ -1245,7 +1262,7 @@ function GameUIReplayNew:HurtSoldierLeft(corps)
     local soldier = self:TopSoldierLeft()
     local soldierCount = round.soldierCount or round.wallHp
     local soldierDamagedCount = round.soldierDamagedCount or round.wallDamagedHp
-    local morale = round.morale or 100
+    local morale = round.morale or self.ui_map.soldier_morale_attack:GetPercent()
     local moraleDecreased = round.moraleDecreased or 0
     local x,y = corps:getPosition()
     return promise.all(
@@ -1642,6 +1659,9 @@ function GameUIReplayNew:BuildUI()
             progress:setPercentage(percent)
             return self
         end
+        function node:GetPercent()
+            return progress:getPercentage()
+        end
         function node:PromiseOfProgressTo(time, percent)
             local p = promise.new()
             local speed = cc.Speed:create(transition.sequence({
@@ -1740,6 +1760,7 @@ function GameUIReplayNew:BuildUI()
 end
 
 return GameUIReplayNew
+
 
 
 

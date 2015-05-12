@@ -4,6 +4,7 @@
 -- GameUIBase is a CCLayer
 local cocos_promise = import("..utils.cocos_promise")
 local window = import("..utils.window")
+local TutorialLayer = import(".TutorialLayer")
 local UIListView = import(".UIListView")
 local WidgetBackGroundTabButtons = import('..widget.WidgetBackGroundTabButtons')
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
@@ -69,6 +70,7 @@ function GameUIBase:onCleanup()
     if UIKit:getRegistry().isObjectExists(self.__cname) then
         UIKit:getRegistry().removeObject(self.__cname)
     end
+    UIKit:CheckCloseUI(self.__cname)
 end
 
 
@@ -223,7 +225,7 @@ function GameUIBase:CreateVerticalListViewDetached(left_bottom_x, left_bottom_y,
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }
 end
-function GameUIBase:CreateTutorialLayer()
+function GameUIBase:CreateFteLayer()
     local node = display.newNode():addTo(self, 3000)
     local left = display.newColorLayer(cc.c4b(255, 0, 0, 50)):addTo(node, 0)
     local right = display.newColorLayer(cc.c4b(255, 0, 0, 50)):addTo(node, 0)
@@ -299,6 +301,17 @@ function GameUIBase:Lock()
 end
 function GameUIBase:Find()
     assert(false)
+end
+
+local FTE_TAG = 119
+function GameUIBase:GetFteLayer()
+    if not self:getChildByTag(FTE_TAG) then
+        return self:CreateFteLayer()
+    end
+    return self:getChildByTag(FTE_TAG):Enable()
+end
+function GameUIBase:CreateFteLayer()
+    return TutorialLayer.new():addTo(self, 2000, FTE_TAG):Enable()
 end
 
 return GameUIBase

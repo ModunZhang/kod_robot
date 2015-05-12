@@ -71,10 +71,11 @@ function WidgetPVEDialog:Refresh()
         size = 18,
         color = 0x615b44,
         dimensions = cc.size(300,0)
-    }):align(display.LEFT_TOP, 220, h*0.5 + 50):addTo(dialog)
+    }):align(display.LEFT_TOP, 220, h*0.5 + 86):addTo(dialog)
 
     --
     local param = self:SetUpButtons()
+    self.btns = {}
     for i = #param, 1, -1 do
         local btn = cc.ui.UIPushButton.new({normal = "btn_138x110.png",pressed = "btn_pressed_138x110.png"})
             :addTo(dialog):pos(w - (#param - i + 0.5) * 138, - 110*0.5 + 10)
@@ -94,6 +95,8 @@ function WidgetPVEDialog:Refresh()
                     end
                 end
             end)
+        btn.param = param
+        self.btns[i] = btn
         if param[i].icon then
             display.newSprite(param[i].icon):addTo(btn, -1):pos(0, 12)
         end
@@ -107,11 +110,11 @@ function WidgetPVEDialog:GetTitle()
 end
 function WidgetPVEDialog:GetBrief()
     if self:GetObject():IsUnSearched() then
-        return _('未探索')
+        return _("未探索")
     elseif self:GetObject():IsSearched() then
         return _("已探索")
-    else
-        return string.format("%s%d%s", _("还剩"), self:GetObject():Left(), _("层"))
+    else 
+        return string.format(_("剩余层数:%d"),self:GetObject():Left())
     end
 end
 function WidgetPVEDialog:GetDesc()

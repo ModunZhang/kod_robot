@@ -3,6 +3,9 @@ local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 function Timer:ctor()
 	self.time_listeners = {}
 end
+function Timer:Clear()
+    self.time_listeners = {}
+end
 function Timer:AddListener(listener)
 	table.insert(self.time_listeners, listener)
 end

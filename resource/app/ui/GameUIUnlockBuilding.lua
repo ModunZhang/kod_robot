@@ -21,6 +21,8 @@ function GameUIUnlockBuilding:ctor( city, tile )
     self:setNodeEventEnabled(true)
     self:Init()
     self.city:GetResourceManager():AddObserver(self)
+    
+    self.__type  = UIKit.UITYPE.BACKGROUND
 end
 function GameUIUnlockBuilding:OnResourceChanged(resource_manager)
     self:SetUpgradeRequirementListview()
@@ -122,7 +124,7 @@ function GameUIUnlockBuilding:Init()
     }):align(display.LEFT_CENTER,display.cx-240,display.top-440):addTo(self)
     self:SetUpgradeNowNeedGems()
     --升级所需时间
-    display.newSprite("hourglass_39x46.png", display.cx+100, display.top-440):addTo(self):setScale(0.6)
+    display.newSprite("hourglass_30x38.png", display.cx+100, display.top-440):addTo(self):setScale(0.6)
     self.upgrade_time = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
         font = UIKit:getFontFilePath(),
@@ -315,10 +317,31 @@ end
 
 
 -- fte
+local mockData = import("..fte.mockData")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
 function GameUIUnlockBuilding:Find()
-    return cocos_promise.defer(function()
-        return self.upgrade_btn
+    return self.upgrade_btn
+end
+function GameUIUnlockBuilding:PormiseOfFte()
+    self:GetFteLayer():SetTouchObject(self:Find())
+    local r = self:Find():getCascadeBoundingBox()
+
+    self:Find().button:removeEventListenersByEvent("CLICKED_EVENT")
+    self:Find().button:onButtonClicked(function()
+        self:Find().button:setButtonEnabled(false)
+
+        mockData.UpgradeBuildingTo(self.building:GetType(), self.building:GetNextLevel())
+
+        self:removeFromParent()
     end)
+
+
+    local str = string.format(_("点击解锁新建筑：%s"), Localize.building_name[self.building:GetType()])
+    self:GetFteLayer().arrow = WidgetFteArrow.new(str):addTo(self:GetFteLayer())
+    :TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
+
+
+    return self.city:PromiseOfUpgradingByLevel(self.building:GetType())
 end
 
 

@@ -103,7 +103,7 @@ end
 
 function WidgetAllianceBuildingUpgrade:SetBuildingIntroduces()
     local bd = Localize.building_description
-    self.building_introduces:setString(bd[self.building.name])
+    self.building_introduces:setString(bd[string.format("alliance_building_%s",self.building.name)])
 end
 
 function WidgetAllianceBuildingUpgrade:InitNextLevelEfficiency()
@@ -134,14 +134,14 @@ end
 function WidgetAllianceBuildingUpgrade:SetBuildingLevel()
     self.builging_level:setString(_("等级").." ".. self.building.level)
     if #self.building_config == self.building.level then
-        self.next_level:setString(_("等级已满 "))
+        self.next_level:setString(_("等级已满"))
     else
-        self.next_level:setString(_("等级 ")..self.building.level+1)
+        self.next_level:setString(_("等级") .. " ".. self.building.level+1)
     end
 end
 
 function WidgetAllianceBuildingUpgrade:SetUpgradeEfficiency()
-    local bd = Localize.building_description
+
     local building = self.building
     local now_c = self.building_config[building.level]
     local next_c = self:getNextLevelConfig__()
@@ -150,9 +150,15 @@ function WidgetAllianceBuildingUpgrade:SetUpgradeEfficiency()
         efficiency = _("已达到最大等级")
     else
         if building.name == "palace" then
-            efficiency = string.format("%s+%d,%s+%d",bd.palace_total_members,next_c.memberCount-now_c.memberCount,bd.palace_alliance_power,next_c.power)
+            efficiency = string.format(_("成员总数+%d,联盟战斗力+%d"),next_c.memberCount-now_c.memberCount,next_c.power - now_c.power)
+        elseif building.name == "shrine" then
+            efficiency = string.format(_("联盟洞察力恢复速度+%d"),next_c.pRecoveryPerHour - now_c.pRecoveryPerHour)
+        elseif building.name == "shop" then
+            efficiency = string.format(_("道具个数+%d"),#string.split(next_c.itemsUnlock,",") - #string.split(now_c.itemsUnlock,","))
+        elseif building.name == "orderHall" then
+            efficiency = _("各类型的村落个数+1")
         else
-            efficiency = _("本地化缺失")
+            efficiency = "本地化缺失" .. building.name
         end
     end
 

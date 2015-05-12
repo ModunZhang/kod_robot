@@ -44,7 +44,6 @@ local ITEMS_TYPE = {
     "moveTheCity"
 }
 
-
 function WidgetUseItems:GetItemByType(item_type,params)
     local im = ItemManager
     local item
@@ -115,6 +114,11 @@ function WidgetUseItems:Create(params)
     else
         dialog = self:OpenNormalDialog(params.item)
     end
+    if WidgetUseItems.open_data and
+        WidgetUseItems.open_data.item_type == item_type then
+        WidgetUseItems.open_data.open_callback(dialog)
+    end
+    WidgetUseItems.open_data = nil
     return dialog
 end
 function WidgetUseItems:OpenChangePlayerOrCityName(item)
@@ -872,6 +876,7 @@ function WidgetUseItems:OpenVipActive( item )
     else
         vip_status_label:setString(_("未激活"))
     end
+    dialog.vip_status_label = vip_status_label
 
 
 
@@ -923,6 +928,7 @@ function WidgetUseItems:OpenVipActive( item )
         end
     end
     list:reload()
+    dialog.list = list
     return dialog
 end
 function WidgetUseItems:OpenWarSpeedupDialog( item ,march_event)
@@ -1143,6 +1149,8 @@ function WidgetUseItems:CreateItemBox(item,checkUseFunc,useItemFunc,buyAndUseFun
         if item:Count()<1 and not item:IsSell() then
             use_btn:setVisible(false)
         end
+
+        self.use_btn = use_btn
     end
     body:Init()
     ItemManager:AddListenOnType(body,ItemManager.LISTEN_TYPE.ITEM_CHANGED)
@@ -1150,38 +1158,85 @@ function WidgetUseItems:CreateItemBox(item,checkUseFunc,useItemFunc,buyAndUseFun
 end
 
 function WidgetUseItems:GetListBg(x,y,width,height)
-    return display.newScale9Sprite("background_568x556.png",x,y,cc.size(width,height),cc.rect(10,10,548,536))
+    return display.newScale9Sprite("background_568x120.png",x,y,cc.size(width,height),cc.rect(10,10,548,100))
 end
+
+
+-- fte
+local promise = import("..utils.promise")
+local mockData = import("..fte.mockData")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
+local WidgetFteMark = import("..widget.WidgetFteMark")
+function WidgetUseItems:PromiseOfOpen(item_type)
+    local p = promise.new()
+    WidgetUseItems.open_data = { item_type = item_type, open_callback = function(ui)
+            ui.__type  = UIKit.UITYPE.BACKGROUND
+            function ui:Find()
+                return self.list.items_[1]:getContent().use_btn
+            end
+            function ui:FindLabel()
+                return self.vip_status_label
+            end
+            function ui:FindCloseBtn()
+                return self.close_btn
+            end
+            function ui:PromiseOfFte()
+                self.list:getScrollNode():setTouchEnabled(false)
+                self:Find():setTouchSwallowEnabled(true)
+
+                self:GetFteLayer():SetTouchObject(self:Find())
+                local r = self:Find():getCascadeBoundingBox()
+                WidgetFteArrow.new(_("使用VIP激活1天")):addTo(self:GetFteLayer()):TurnRight()
+                :align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
+
+
+                local p1 = promise.new(function()
+                    local r = self:FindLabel():getCascadeBoundingBox()
+                    r.x = r.x - 20
+                    r.width = r.width + 40
+                    WidgetFteMark.new():addTo(self:GetFteLayer()):Size(r.width, r.height)
+                    :pos(r.x + r.width/2, r.y + r.height/2)
+
+                    self:GetFteLayer():SetTouchObject(self:FindCloseBtn())
+                    local r = self:FindCloseBtn():getCascadeBoundingBox()
+                    WidgetFteArrow.new(_("已经激活VIP，关闭窗口")):addTo(self:GetFteLayer())
+                    :TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
+
+                    local p2 = promise.new()
+                    self:FindCloseBtn():onButtonClicked(function()
+                        p2:resolve()
+                    end)
+                    return p2
+                end)
+
+
+                self:Find():removeEventListenersByEvent("CLICKED_EVENT")
+                self:Find():onButtonClicked(function()
+                    self:GetFteLayer():removeFromParent()
+                    mockData.ActiveVip()
+                    p1:resolve()
+                end)
+
+
+                return p1
+            end
+
+        return p:resolve(ui)
+    end}
+    return p
+end
+
+
+
+
+
+
+
+
+
+
+
 return WidgetUseItems
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

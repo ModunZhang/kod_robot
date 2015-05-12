@@ -14,7 +14,6 @@ local abs = math.abs
 function MapLayer:ctor(min_scale, max_scale)
     self.min_scale = min_scale
     self.max_scale = max_scale
-
     self.target_position = nil
     self.target_scale = nil
     self.move_callbacks = {}
@@ -218,10 +217,10 @@ function MapLayer:getContentSize()
     assert(false, "你应该在子类实现这个函数 getContentSize")
 end
 function MapLayer:OnSceneMove()
-
+    self.scene:OnSceneMove()
 end
-function MapLayer:OnSceneScale()
-
+function MapLayer:OnSceneScale(s)
+    self.scene:OnSceneScale(s)
 end
 return MapLayer
 

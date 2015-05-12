@@ -507,7 +507,7 @@ local function move_soldiers(corps, ani, dir_index, first_soldier)
             :align(display.CENTER, x, y):getAnimation():play(ani)
     end
 end
-function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, finish_time, dragonType, soldiers)
+function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, finish_time, dragonType, soldiers, is_enemy)
     local march_info = self:GetMarchInfoWith(id, start_pos, end_pos)
     march_info.start_time = start_time
     march_info.finish_time = finish_time

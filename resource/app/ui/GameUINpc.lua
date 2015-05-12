@@ -74,6 +74,7 @@ function GameUINpc:ctor(...)
     GameUINpc.super.ctor(self)
     self.unenable = true
     self:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
+        -- dump(event)
         if event.name == "ended" and not self.unenable then
             self:OnClick()
         end
@@ -82,6 +83,7 @@ function GameUINpc:ctor(...)
     self:InitDialog(...)
     self.enter_callbacks = {}
     self.leave_callbacks = {}
+    self.__type  = UIKit.UITYPE.BACKGROUND
 end
 function GameUINpc:InitDialog(...)
     self.dialog_index = 1
@@ -136,6 +138,7 @@ function GameUINpc:OnMoveInStage()
     end
     self:OnEnter()
     self:Resume()
+    self:RefreshNpc(self:CurrentDialog())
 end
 function GameUINpc:onExit()
     GameUINpc.super.onExit(self)
@@ -143,10 +146,12 @@ function GameUINpc:onExit()
 end
 function GameUINpc:StartDialog()
     self:ShowWords(self:CurrentDialog())
+    return self
 end
 function GameUINpc:OnClick()
     if self.label and self.label:getActionByTag(LETTER_ACTION) then
         self:ShowWords(self:CurrentDialog(), false)
+        self:OnDialogEnded(self.dialog_index)
     else
         local index = self.dialog_index
         self:NextDialog()
@@ -171,16 +176,26 @@ function GameUINpc:ShowWords(dialog, ani)
     if self.npc_brow ~= dialog.brow then
         self.npc_brow = dialog.brow
         if self.npc_brow then
-            self.ui_map.npc:getAnimation():play(self.npc_brow, -1, 0)
+            self.ui_map.woman:getAnimation():play(self.npc_brow, -1, 0)
         else
-            self.ui_map.npc:getAnimation():playWithIndex(0, -1, 0)
+            self.ui_map.woman:getAnimation():playWithIndex(0, -1, 0)
         end
     end
+    self:RefreshNpc(dialog)
     self.label = self:CreateLabel()
     self.label:setString(dialog.real_words or "")
     self.label:updateContent()
     self:hide_letter(self.label)
     self:show_letter(self.label, ani == nil and true or ani)
+end
+function GameUINpc:RefreshNpc(dialog)
+    if dialog.npc == "man" then
+        self.ui_map.man:show()
+        self.ui_map.woman:hide()
+    else
+        self.ui_map.man:hide()
+        self.ui_map.woman:show()
+    end
 end
 function GameUINpc:Reset()
     self.dialog = {}
@@ -203,7 +218,7 @@ function GameUINpc:CreateLabel()
         align = cc.ui.UILabel.TEXT_ALIGN_CENTER,
     }):addTo(self.ui_map.dialog_bg):align(display.LEFT_TOP, size.width / 2 - 20, size.height - 40)
     label:setLineBreakWithoutSpace(true)
-    label:setMaxLineWidth(310)
+    label:setMaxLineWidth(300)
     return label
 end
 function GameUINpc:Wait()
@@ -294,6 +309,24 @@ function GameUINpc:PromiseOfSay(...)
     end
     return instance:PromiseOfDialogEndWithClicked(#{...})
 end
+function GameUINpc:PromiseOfSayImportant(...)
+    assert(#{...} == 1)
+    local instance
+    if UIKit:getRegistry().isObjectExists("GameUINpc") then
+        instance = UIKit:getRegistry().getObject("GameUINpc")
+        instance:Reset()
+        instance:InitDialog(...)
+        instance:StartDialog()
+    else
+        instance = UIKit:newGameUI('GameUINpc', ...):AddToCurrentScene(true)
+        instance.is_should_start = true
+    end
+    instance:EnableReceiveClickMsg(false)
+    instance:PromiseOfDialogEnded(1):next(function()
+        instance:EnableReceiveClickMsg(true)
+    end)
+    return instance:PromiseOfDialogEndWithClicked(1)
+end
 function GameUINpc:OnLeave()
     local callbacks = self.leave_callbacks
     if #callbacks > 0 then
@@ -305,9 +338,8 @@ function GameUINpc:PromiseOfLeave()
     if UIKit:getRegistry().isObjectExists("GameUINpc") then
         local instance = UIKit:getRegistry().getObject("GameUINpc")
         local p = promise.new()
-        local callbacks = instance.leave_callbacks
-        assert(#callbacks == 0)
-        table.insert(callbacks, function()
+        instance.leave_callbacks = {}
+        table.insert(instance.leave_callbacks, function()
             return p:resolve()
         end)
         instance:LeftButtonClicked()
@@ -326,9 +358,8 @@ function GameUINpc:PromiseOfEnter()
     if UIKit:getRegistry().isObjectExists("GameUINpc") then
         local instance = UIKit:getRegistry().getObject("GameUINpc")
         local p = promise.new()
-        local callbacks = instance.enter_callbacks
-        assert(#callbacks == 0)
-        table.insert(callbacks, function()
+        instance.enter_callbacks = {}
+        table.insert(instance.enter_callbacks, function()
             return p:resolve()
         end)
         return p
@@ -337,27 +368,29 @@ function GameUINpc:PromiseOfEnter()
 end
 function GameUINpc:BuildUI()
     local ui_map = {}
-    display.newColorLayer(cc.c4b(0,0,0,180)):addTo(self):setTouchEnabled(false)
+    ui_map.background = display.newColorLayer(cc.c4b(0,0,0,180)):addTo(self):setTouchEnabled(false)
     ui_map.dialog_bg = display.newSprite("fte_background.png")
         :addTo(self):align(display.CENTER_BOTTOM, display.cx, 0)
     local size = ui_map.dialog_bg:getContentSize()
 
     ui_map.next = display.newSprite("fte_next_arrow.png"):addTo(ui_map.dialog_bg)
-    :align(display.CENTER_BOTTOM, size.width - 50, 20)
+        :align(display.CENTER_BOTTOM, size.width - 50, 20)
     ui_map.next:runAction(cc.RepeatForever:create(transition.sequence{
         cc.MoveBy:create(0.4, cc.p(5, 0)),
         cc.MoveBy:create(0.4, cc.p(-5, 0))
     }))
-        
+
     local manager = ccs.ArmatureDataManager:getInstance()
     manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH("animations/npc_nv.ExportJson"))
-    ui_map.npc = ccs.Armature:create("npc_nv"):addTo(ui_map.dialog_bg)
-    :align(display.BOTTOM_CENTER, 130, 0)
-
+    ui_map.woman = ccs.Armature:create("npc_nv"):addTo(ui_map.dialog_bg)
+        :align(display.BOTTOM_CENTER, 130, 0):hide()
+    ui_map.man = display.newSprite("npc_man.png"):addTo(ui_map.dialog_bg)
+        :align(display.BOTTOM_CENTER, 130, 0):hide()
     return ui_map
 end
 
 return GameUINpc
+
 
 
 

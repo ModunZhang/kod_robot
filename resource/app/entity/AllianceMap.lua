@@ -307,7 +307,7 @@ function AllianceMap:OnAllianceBuildingInfoChange(allianceData, deltaData)
                 self:NotifyListeneOnType(AllianceMap.LISTEN_TYPE.BUILDING_INFO, function(listener)
                     listener:OnBuildingInfoChange(v)
                 end)
-                GameGlobalUI:showTips(_("提示"),string.format(_('建造%s至%d级完成'),Localize.alliance_buildings[v.name],v.level))
+                GameGlobalUI:showTips(_("提示"),string.format(_("建造%s至%d级完成"),Localize.alliance_buildings[v.name],v.level))
             end
         end
     end

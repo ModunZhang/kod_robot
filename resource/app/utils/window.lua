@@ -1,9 +1,7 @@
-print("window")
 local window = {}
 
 window.width 					= 640
 window.height 				= 960
-
 local width_diff = (display.width - window.width)
 local half_width_diff = width_diff / 2
 window.left 					= display.left + half_width_diff

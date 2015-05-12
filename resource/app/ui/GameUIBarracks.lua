@@ -2,7 +2,6 @@
 -- Author: gaozhou
 -- Date: 2014-08-18 14:33:28
 --
-local cocos_promise = import("..utils.cocos_promise")
 local window = import("..utils.window")
 local Localize = import("..utils.Localize")
 local WidgetTips = import("..widget.WidgetTips")
@@ -21,7 +20,6 @@ function GameUIBarracks:ctor(city, barracks,default_tab)
     self.special_soldier_items={}
 end
 function GameUIBarracks:OnMoveInStage()
-    GameUIBarracks.super.OnMoveInStage(self)
     self.soldier_map = {}
     self.timerAndTips = self:CreateTimerAndTips()
     self.recruit = self:CreateSoldierUI()
@@ -32,6 +30,7 @@ function GameUIBarracks:OnMoveInStage()
     self.barracks_city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
     self.barracks_city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
     app.timer:AddListener(self)
+    GameUIBarracks.super.OnMoveInStage(self)
 end
 function GameUIBarracks:onExit()
     self.barracks:RemoveUpgradeListener(self)
@@ -220,8 +219,7 @@ function GameUIBarracks:CreateItemWithListView(list_view, soldiers)
                     return
                 end
                 WidgetRecruitSoldier.new(self.barracks, self.barracks_city, soldier_name)
-                    :addTo(self,1000, WidgetRecruitSoldier_tag)
-                    :align(display.CENTER, window.cx, 500 / 2)
+                    :addTo(self,1000, WidgetRecruitSoldier_tag):pos(0,0)
             end):addTo(row_item)
                 :alignByPoint(cc.p(0.5, 0.5), origin_x + (unit_width + gap_x) * (i - 1) + unit_width / 2, 0)
                 :SetSoldier(soldier_name, self.barracks_city:GetSoldierManager():GetStarBySoldierType(soldier_name))
@@ -328,27 +326,6 @@ function GameUIBarracks:OnTimer(current_time)
             v:SetRecruitStatus(_("下一次开启招募:")..GameUtils:formatTimeStyle1(re_time-current_time))
         end
     end
-end
---fte
-function GameUIBarracks:Lock()
-    self.list_view:getScrollNode():setTouchEnabled(false)
-    return cocos_promise.defer(function() return self end)
-end
-function GameUIBarracks:Find(control_type)
-    if control_type == "recruit" then
-        return cocos_promise.defer(function()
-            return self.tab_buttons:GetTabByTag("recruit")
-        end)
-    elseif control_type == "swordsman" then
-        return cocos_promise.defer(function()
-            return self.soldier_map["swordsman"]
-        end)
-    end
-end
-function GameUIBarracks:WaitTag(type_)
-    return self.tab_buttons:PromiseOfTag(type_):next(function()
-        return self
-    end)
 end
 
 

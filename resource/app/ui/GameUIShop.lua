@@ -21,7 +21,7 @@ function GameUIShop:onEnter()
     local item = list_view:newItem()
     local content = display.newNode()
     content:setContentSize(cc.size(640, 0))
-    local add_gem = 100000
+    local add_gem = 100000000
     local button = WidgetPushButton.new(
         {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"}
         ,{scale9 = false}

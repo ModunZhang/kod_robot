@@ -194,7 +194,7 @@ function GameUIHospital:CreateHealAllSoldierItem()
     }):align(display.LEFT_CENTER,bg_size.width/2 - 240,50):addTo(self.treate_all_soldiers_item)
     self:SetTreatAllSoldiersNowNeedGems()
     --治愈所需时间
-    display.newSprite("hourglass_39x46.png", bg_size.width/2+100, 50):addTo(self.treate_all_soldiers_item):setScale(0.6)
+    display.newSprite("hourglass_30x38.png", bg_size.width/2+100, 50):addTo(self.treate_all_soldiers_item):setScale(0.6)
     self.heal_time = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
         font = UIKit:getFontFilePath(),
@@ -341,7 +341,7 @@ function GameUIHospital:CreateCasualtyRateBar()
 
     -- 进度条头图标
     display.newSprite("back_ground_43x43.png"):addTo(bar):pos(0, 20)
-    display.newSprite("icon_treat_soldier.png"):addTo(bar):pos(0, 20)
+    display.newSprite("icon_treat_soldier_41x50.png"):addTo(bar):pos(2, 22)
 end
 
 -- 设置伤兵比例条

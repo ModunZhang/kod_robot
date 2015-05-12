@@ -56,9 +56,11 @@ function WidgetChangeMap:ctor(map_type)
     end
     display.newSprite(change_icon):addTo(btn):align(display.CENTER, 50, 10)
     btn:setTouchSwallowEnabled(true)
-
+    self.btn = btn
 end
-
+function WidgetChangeMap:GetWorldRect()
+    return self.btn:getCascadeBoundingBox()
+end
 return WidgetChangeMap
 
 

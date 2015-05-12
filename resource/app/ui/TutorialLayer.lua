@@ -5,15 +5,20 @@ local TutorialLayer = class('TutorialLayer', function()
     return display.newNode()
 end)
 
+local debug = false
+
 function TutorialLayer:ctor(obj)
-    self.left = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, 0)
-    self.right = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, 0)
-    self.top = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, 0)
-    self.bottom = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, 0)
-    -- self.left = display.newLayer():addTo(self, 0)
-    -- self.right = display.newLayer():addTo(self, 0)
-    -- self.top = display.newLayer():addTo(self, 0)
-    -- self.bottom = display.newLayer():addTo(self, 0)
+    if debug then
+        self.left = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, -1)
+        self.right = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, -1)
+        self.top = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, -1)
+        self.bottom = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, -1)
+    else
+        self.left = display.newLayer():addTo(self, 0)
+        self.right = display.newLayer():addTo(self, 0)
+        self.top = display.newLayer():addTo(self, 0)
+        self.bottom = display.newLayer():addTo(self, 0)
+    end
     local left, right, top, bottom = self.left, self.right, self.top, self.bottom
     for _, v in pairs{ left, right, top, bottom } do
         v:setContentSize(cc.size(display.width, display.height))
@@ -44,6 +49,7 @@ end
 function TutorialLayer:Reset()
     self.count = 0
     for _, v in pairs{ self.left, self.right, self.top, self.bottom } do
+        v:pos(0,0)
         v:setTouchEnabled(false)
     end
     self.object = nil
@@ -59,6 +65,7 @@ function TutorialLayer:SetTouchObject(obj)
 end
 function TutorialLayer:SetTouchRect(world_rect)
     self.world_rect = world_rect
+    self:UpdateClickedRegion(self.world_rect)
     return self
 end
 function TutorialLayer:UpdateClickedRegion(rect)
@@ -76,6 +83,13 @@ function TutorialLayer:GetClickedRect()
         return cc.rect(0, 0, display.width, display.height)
     end
 end
+function TutorialLayer:RemoveAllOtherChildren()
+    for i,v in ipairs(self:getChildren()) do
+        if self.left ~= v or self.right ~= v or self.top ~= v or self.bottom ~= v then
+            v:removeFromParent()
+        end
+    end
+end
 -- function TutorialLayer:DeferShow(control, angle, offset_x, offset_y)
 --     local rect = control:getCascadeBoundingBox()
 --     local x = rect.x + rect.width * 0.5
@@ -91,6 +105,8 @@ end
 -- end
 
 return TutorialLayer
+
+
 
 
 

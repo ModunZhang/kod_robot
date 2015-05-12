@@ -184,6 +184,10 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
             if self:IsAbleToMakeEqui(false) then
                 NetManager:getMakeDragonEquipmentPromise(equip_type):catch(function(err)
                     dump(err:reason())
+                end):done(function()
+                    if not UIKit:GetUIInstance("GameUIBlackSmith") then
+                        app:GetAudioManager():PlayeEffectSoundWithKey("UI_BLACKSMITH_FORGE")
+                    end
                 end)
                 self:Close()
             end
@@ -191,7 +195,7 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
     self.normal_build_btn = button
 
     -- 时间glass
-    cc.ui.UIImage.new("hourglass_39x46.png"):addTo(button, 2)
+    cc.ui.UIImage.new("hourglass_30x38.png"):addTo(button, 2)
         :align(display.LEFT_CENTER, -90, -55):scale(0.7)
 
     -- 时间
@@ -481,6 +485,10 @@ function WidgetMakeEquip:IsAbleToMakeEqui(isFinishNow)
             UIKit:showMessageDialog(_("提示"),message,function()
                 NetManager:getMakeDragonEquipmentPromise(self.equip_type):catch(function(err)
                     dump(err:reason())
+                end):done(function()
+                    if not UIKit:GetUIInstance("GameUIBlackSmith") then
+                        app:GetAudioManager():PlayeEffectSoundWithKey("UI_BLACKSMITH_FORGE")
+                    end
                 end)
                 self:Close()
             end):CreateNeeds({value = need_gems})

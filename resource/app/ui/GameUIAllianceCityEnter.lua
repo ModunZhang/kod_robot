@@ -104,7 +104,7 @@ function GameUIAllianceCityEnter:GetBuildingType()
 end
 
 function GameUIAllianceCityEnter:GetBuildingDesc()
-    return "本地化缺失"
+    return ""
 end
 
 
@@ -128,9 +128,9 @@ end
 function GameUIAllianceCityEnter:GetEnterButtons()
     local buttons = {}
     local member = self:GetMember()
-    if self:IsMyAlliance() then --自己
+    if self:IsMyAlliance() then --我方玩家
         local alliance = self:GetMyAlliance()
-        if DataManager:getUserData()._id == self:GetMember():Id() then
+        if User:Id() == self:GetMember():Id() then -- me
             local enter_button = self:BuildOneButton("alliance_enter_city_56x68.png",_("进入")):onButtonClicked(function()
                 app:EnterMyCityScene()
                 self:LeftButtonClicked()

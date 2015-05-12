@@ -111,7 +111,7 @@ function GameUIDragonEquipmentMake:GetMakeRequirement()
     end)
 	local desc = ""
 	if self.blackSmith:IsUnlocked() then
-		desc = self.blackSmith:IsEquipmentEventEmpty() and "1/0" or "1/1"
+		desc = self.blackSmith:IsEquipmentEventEmpty() and "1/1" or "0/1"
 	else
 		desc = _("铁匠铺还未解锁")
 	end
@@ -131,7 +131,7 @@ function GameUIDragonEquipmentMake:GetMakeRequirement()
         isVisible = true,
         isSatisfy = coin >= need_coin,
         icon="res_coin_81x68.png",
-        description= GameUtils:formatNumber(coin) .."/".. GameUtils:formatNumber(need_coin)
+        description = coin .. "/" .. need_coin
     })
 
    	for __,v in ipairs(matrials) do

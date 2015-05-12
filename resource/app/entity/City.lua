@@ -231,6 +231,9 @@ function City:InitWithJsonData(userData)
     self:GenerateWalls()
 end
 function City:ResetAllListeners()
+    self.upgrading_building_callbacks = {}
+    self.finish_upgrading_callbacks = {}
+    
     self.resource_manager:RemoveAllObserver()
     self.soldier_manager:ClearAllListener()
     self.material_manager:RemoveAllObserver()
@@ -1454,12 +1457,10 @@ end
 
 -- promise
 local function promiseOfBuilding(callbacks, building_type, level)
-    assert(building_type)
     assert(#callbacks == 0)
     local p = promise.new()
     table.insert(callbacks, function(building)
-        if (building:GetType() == building_type) and
-            (not level or level == building:GetLevel()) then
+        if building_type == nil or (building:GetType() == building_type and (not level or level == building:GetLevel())) then
             return p:resolve(building)
         end
     end)
@@ -1574,7 +1575,11 @@ function City:FastUpdateAllTechsLockState()
     self:IteratorTechs(function(index,tech)
         local unLockByTech = self:FindTechByIndex(tech:UnlockBy())
         if unLockByTech then
-            tech:SetEnable(tech:UnlockLevel() <= unLockByTech:Level() and tech:IsOpen() and tech:AcademyLevel() <= self:GetAcademyBuildingLevel())
+            if unLockByTech:Index() == tech:Index() then
+                tech:SetEnable(true)
+            else
+                tech:SetEnable(tech:UnlockLevel() <= unLockByTech:Level() and tech:IsOpen() and tech:AcademyLevel() <= self:GetAcademyBuildingLevel())
+            end
         end
     end)
 end

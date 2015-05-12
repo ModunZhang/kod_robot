@@ -41,7 +41,6 @@ function GameUIKeep:ctor(city,building,default_tab)
 end
 
 function GameUIKeep:OnMoveInStage()
-    GameUIKeep.super.OnMoveInStage(self)
     self:CreateTabButtons({
         {
             label = _("信息"),
@@ -63,7 +62,7 @@ function GameUIKeep:OnMoveInStage()
             end
         end
     end):pos(window.cx, window.bottom + 34)
-
+    GameUIKeep.super.OnMoveInStage(self)
 end
 
 function GameUIKeep:onExit()
@@ -362,8 +361,7 @@ function GameUIKeep:CreateChangeTerrainWindow()
 
 
     group:getButtonAtIndex(default_index):setButtonSelected(true)
-
-    local bg2 = display.newScale9Sprite("background_568x556.png",x,y,cc.size(568,140),cc.rect(10,10,548,536))
+    local bg2 = WidgetUIBackGround.new({width = 568,height = 140},WidgetUIBackGround.STYLE_TYPE.STYLE_6)
         :addTo(body):align(display.CENTER, 304, 84)
 
     local prop_bg = display.newSprite("box_118x118.png")
@@ -502,43 +500,7 @@ end
 
 
 
----
-function GameUIKeep:Find()
-    return cocos_promise.defer(function()
-        return self.upgrade_layer.upgrade_btn
-    end)
-end
-
-
-
 return GameUIKeep
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

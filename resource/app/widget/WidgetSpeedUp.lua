@@ -21,7 +21,7 @@ function WidgetSpeedUp:ctor()
 	--进度条
 	self.progress = WidgetProgress.new(UIKit:hex2c3b(0xffedae), nil, nil, {
         icon_bg = "back_ground_43x43.png",
-        icon = "hourglass_39x46.png",
+        icon = "hourglass_30x38.png",
         bar_pos = {x = 0,y = 0}
     }):addTo(body)
     :align(display.LEFT_CENTER, 40, 450)

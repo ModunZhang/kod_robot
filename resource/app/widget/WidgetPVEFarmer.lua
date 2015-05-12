@@ -6,7 +6,7 @@ function WidgetPVEFarmer:ctor(...)
     WidgetPVEFarmer.super.ctor(self, ...)
 end
 function WidgetPVEFarmer:GetTitle()
-    return string.format("%s %s%d", _('废弃的农夫小屋'), _('等级'), self:GetPVEMap():GetIndex())
+    return string.format("%s %s%d", _("废弃的农夫小屋"), _("等级"), self:GetPVEMap():GetIndex())
 end
 
 

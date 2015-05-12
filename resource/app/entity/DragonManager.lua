@@ -10,7 +10,6 @@ local DragonManager = class("DragonManager", MultiObserver)
 local AutomaticUpdateResource = import(".AutomaticUpdateResource")
 local Dragon = import(".Dragon")
 local promise = import("..utils.promise")
-DragonManager.promise_callbacks = {}
 local DragonEvent = import(".DragonEvent")
 local DragonDeathEvent = import(".DragonDeathEvent")
 local config_intInit = GameDatas.PlayerInitData.intInit
@@ -142,7 +141,7 @@ end
 
 function DragonManager:RefreshDragonEvents(user_data,deltaData)
     if not user_data.dragonHatchEvents then return end
-    local is_fully_update = deltaData == nil 
+    local is_fully_update = deltaData == nil
     local is_delta_update = not is_fully_update and deltaData.dragonHatchEvents ~= nil
     if is_fully_update then
         self.dragon_events = {}
@@ -179,7 +178,7 @@ function DragonManager:RefreshDragonEvents(user_data,deltaData)
                     dragonEvent = DragonEvent.new()
                     dragonEvent:UpdateData(event_data)
 
-                    GameGlobalUI:showTips(_("提示"),string.format(_('孵化%s完成'),Localize.dragon[event_data.dragonType]))
+                    GameGlobalUI:showTips(_("提示"),string.format(_("孵化%s完成"),Localize.dragon[event_data.dragonType]))
 
                     return dragonEvent
                 end
@@ -206,7 +205,7 @@ end
 --复活事件
 function DragonManager:RefreshDragonDeathEvents(user_data,deltaData)
     if not user_data.dragonDeathEvents then return end
-    local is_fully_update = deltaData == nil 
+    local is_fully_update = deltaData == nil
     local is_delta_update = not is_fully_update and deltaData.dragonDeathEvents ~= nil
     local is_full_array = is_delta_update and not deltaData.dragonDeathEvents.add and not deltaData.dragonDeathEvents.edit and not deltaData.dragonDeathEvents.remove
 
@@ -251,7 +250,7 @@ function DragonManager:RefreshDragonDeathEvents(user_data,deltaData)
                     self.dragonDeathEvents[event_data.dragonType] = nil
                     dragonDeathEvent = DragonDeathEvent.new()
                     dragonDeathEvent:UpdateData(event_data)
-                    GameGlobalUI:showTips(_("提示"),string.format(_('%s已经复活'),Localize.dragon[event_data.dragonType]))
+                    GameGlobalUI:showTips(_("提示"),string.format(_("%s已经复活"),Localize.dragon[event_data.dragonType]))
                     return dragonDeathEvent
                 end
             end
@@ -264,7 +263,7 @@ end
 
 function DragonManager:IteratorDragonDeathEvents(func)
     for __,v in pairs(self.dragonDeathEvents) do
-       func(v)
+        func(v)
     end
 end
 
@@ -306,6 +305,10 @@ function DragonManager:RefreshDragonData( dragons,resource_refresh_time,hp_recov
                     self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDragonHatched,function(listener)
                         listener.OnDragonHatched(listener,dragon)
                     end)
+                    if DragonManager.hate_callback then
+                        DragonManager.hate_callback()
+                        DragonManager.hate_callback = nil
+                    end
                 else
                     self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnBasicChanged,function(listener)
                         listener.OnBasicChanged(listener,dragon,star_chaned)
@@ -316,8 +319,12 @@ function DragonManager:RefreshDragonData( dragons,resource_refresh_time,hp_recov
         end
         if need_notify_defence then
             self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDefencedDragonChanged,function(listener)
-                    listener.OnDefencedDragonChanged(listener,self:GetDefenceDragon())
+                listener.OnDefencedDragonChanged(listener,self:GetDefenceDragon())
             end)
+            if DragonManager.defence_callback then
+                DragonManager.defence_callback()
+                DragonManager.defence_callback = nil
+            end
         end
     end
     self:CheckFinishEquipementDragonPormise()
@@ -347,7 +354,7 @@ function DragonManager:AddHPResource(dragon_type)
 end
 
 function DragonManager:RemoveHPResource(dragon_type)
-    if self:GetHPResource(dragon_type) then 
+    if self:GetHPResource(dragon_type) then
         self.dragons_hp[dragon_type] = nil
     else
         return true
@@ -406,6 +413,7 @@ function DragonManager:NoDragonHated()
 end
 
 --新手引导
+DragonManager.promise_callbacks = {}
 function DragonManager:PromiseOfFinishEquipementDragon()
     local p = promise.new()
     table.insert(self.promise_callbacks, function(dragon)
@@ -427,7 +435,22 @@ function DragonManager:CheckFinishEquipementDragonPormise()
         end
     end
 end
+function DragonManager:PromiseOfHate()
+    local p = promise.new()
+    DragonManager.hate_callback = function()
+        return p:resolve()
+    end
+    return p
+end
+function DragonManager:PromiseOfDefence()
+    local p = promise.new()
+    DragonManager.defence_callback = function()
+        return p:resolve()
+    end
+    return p
+end
 
 
 
 return DragonManager
+

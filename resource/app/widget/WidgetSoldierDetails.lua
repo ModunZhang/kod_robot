@@ -97,7 +97,7 @@ function WidgetSoldierDetails:CreateDismissSoldierSilder()
     local bg_width,bg_height = bg:getContentSize().width,bg:getContentSize().height
 
     -- -- icon
-    display.newSprite("res_citizen_44x50.png", bg_width/2-106, bg_height-126):addTo(bg)
+    display.newSprite("res_citizen_88x82.png", bg_width/2-106, bg_height-126):addTo(bg)
     local citizen_label = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
         text = "0",

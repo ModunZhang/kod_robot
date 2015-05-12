@@ -28,10 +28,10 @@ function GameUIMission:ctor(city,mission_type)
     self.action_node = display.newNode():addTo(self)
 end
 function GameUIMission:OnMoveInStage()
-    GameUIMission.super.OnMoveInStage(self)
     self:CreateTabButtons()
     self.city:GetUser():AddListenOnType(self, User.LISTEN_TYPE.TASK)
     self.city:GetUser():AddListenOnType(self, User.LISTEN_TYPE.DAILY_TASKS)
+    GameUIMission.super.OnMoveInStage(self)
 end
 function GameUIMission:OnMoveOutStage()
     self.city:GetUser():RemoveListenerOnType(self, User.LISTEN_TYPE.TASK)
@@ -203,7 +203,7 @@ function GameUIMission:GetAchievementListItem(isFinished,data)
     if not isFinished then
         display.newSprite("activity_next_32x37.png"):align(display.RIGHT_CENTER, 548, 33):addTo(content)
     else
-        local button = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+        content.button = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
             :align(display.RIGHT_CENTER, 552, 33)
             :addTo(content)
             :setButtonLabel("normal", UIKit:commonButtonLable({
@@ -277,7 +277,7 @@ function GameUIMission:OnGetAchievementRewardButtonClicked(data)
         if not self.is_hooray_on then
             self.is_hooray_on = true
             app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
-            
+
             self:performWithDelay(function()
                 self.is_hooray_on = false
             end, 1.5)
@@ -434,7 +434,34 @@ function GameUIMission:dailyListviewListener(event)
         UIKit:newGameUI("GameUIDailyMissionInfo",keys_of_daily):AddToCurrentScene(true)
     end
 end
+
+
+-- fte
+local promise = import("..utils.promise")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
+function GameUIMission:Find()
+    return self.achievement_list.items_[2]:getContent().button
+end
+function GameUIMission:PromiseOfFte()
+    self.achievement_list:getScrollNode():setTouchEnabled(false)
+    self:Find():setTouchSwallowEnabled(true)
+    self:GetFteLayer():SetTouchObject(self:Find())
+    local r = self:Find():getCascadeBoundingBox()
+    self:GetFteLayer().arrow = WidgetFteArrow.new(_("点击领取奖励"))
+        :addTo(self:GetFteLayer())
+        :TurnRight():align(display.RIGHT_CENTER, r.x - 10, r.y + r.height/2)
+
+    return self.city:GetUser():GetTaskManager():PromiseOfGetCityBuildRewards():next(function()
+        return self:PromsieOfExit("GameUIMission")
+    end)
+end
+
+
+
+
+
 return GameUIMission
+
 
 
 

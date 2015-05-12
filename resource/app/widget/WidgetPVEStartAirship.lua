@@ -9,7 +9,7 @@ function WidgetPVEStartAirship:GetTitle()
     return _("飞艇")
 end
 function WidgetPVEStartAirship:GetDesc()
-    return _('手下向你汇报, 飞艇一切准备就绪, "长官希望前往何处?"')
+    return _("手下向你汇报, 飞艇一切准备就绪, \"长官希望前往何处?\"")
 end
 function WidgetPVEStartAirship:GetBrief()
     return _("起点")

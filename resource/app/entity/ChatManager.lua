@@ -105,7 +105,7 @@ function ChatManager:__checkIsBlocked(msg)
 			msg.allianceTag = alliacne:Tag()
 		end
 	end
-	return self._blockedIdList_[msg.fromId] ~= nil
+	return self._blockedIdList_[msg.id] ~= nil
 end
 
 function ChatManager:__getMessageWithChannel(channel)
@@ -221,6 +221,7 @@ function ChatManager:FetchLastChannelMessage()
 end
 
 function ChatManager:FetchAllChatMessageFromServer()
+	self:emptyChannel_()
 	NetManager:getFetchChatPromise():done(function(messages)
 		-- self:HandleNetMessage('onAllChat',messages)
 	end)
@@ -243,7 +244,7 @@ function ChatManager:Reset()
 end
 
 function ChatManager:AddBlockChat(chat)
-	if self:__checkIsBlocked(chat) then return true end
+	if self:__checkIsBlocked(chat) then return false end
 	self._blockedIdList_[chat.id] = chat
 	self:__flush()
 	return true

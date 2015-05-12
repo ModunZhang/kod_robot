@@ -4,7 +4,6 @@ local GameUIUpgradeBuilding = class('GameUIUpgradeBuilding', GameUIWithCommonHea
 
 function GameUIUpgradeBuilding:ctor(city, title , building, default_tab)
     GameUIUpgradeBuilding.super.ctor(self,city, title)
-    self.upgrade_city = city
     self.default_tab = default_tab
     self.building = building
     app:GetAudioManager():PlayBuildingEffectByType(building:GetType())
@@ -25,10 +24,10 @@ function GameUIUpgradeBuilding:CreateTabButtons(param, cb)
             v.default = true
         end
     end
-    return GameUIUpgradeBuilding.super.CreateTabButtons(self,param,function(tag)
+    self.tabs = GameUIUpgradeBuilding.super.CreateTabButtons(self,param,function(tag)
         if tag == "upgrade" then
             if not self.upgrade_layer then
-                self.upgrade_layer = CommonUpgradeUI.new(self.upgrade_city, self.building):addTo(self:GetView())
+                self.upgrade_layer = CommonUpgradeUI.new(self.city, self.building):addTo(self:GetView())
             end
             self.upgrade_layer:setVisible(true)
         else
@@ -38,13 +37,48 @@ function GameUIUpgradeBuilding:CreateTabButtons(param, cb)
         end
         cb(tag)
     end)
+    return self.tabs
 end
 
 function GameUIUpgradeBuilding:GetBuilding()
     return self.building
 end
 
+
+
+--
+local mockData = import("..fte.mockData")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
+function GameUIUpgradeBuilding:Find()
+    return self.upgrade_layer.upgrade_btn
+end
+function GameUIUpgradeBuilding:PromiseOfFte()
+    self.tabs:SelectTab("upgrade")
+    self:GetFteLayer():SetTouchObject(self:Find())
+
+    self:Find():removeEventListenersByEvent("CLICKED_EVENT")
+    self:Find():onButtonClicked(function()
+        self:Find():setButtonEnabled(false)
+        if self.building:IsHouse() then
+            local tile = self.building:BelongCity():GetTileWhichBuildingBelongs(self.building)
+            mockData.UpgradeHouseTo(tile.location_id, tile:GetBuildingLocation(self.building),
+                self.building:GetType(), self.building:GetNextLevel())
+        else
+            mockData.UpgradeBuildingTo(self.building:GetType(), self.building:GetNextLevel())
+        end
+
+        self:LeftButtonClicked()
+    end)
+
+    local r = self:Find():getCascadeBoundingBox()
+    self:GetFteLayer().arrow = WidgetFteArrow.new(_("点击升级"))
+        :addTo(self:GetFteLayer()):TurnDown():align(display.BOTTOM_CENTER, r.x + r.width/2, r.y + r.height + 10)
+
+    return self.building:BelongCity():PromiseOfUpgradingByLevel(self:GetBuilding():GetType())
+end
+
 return GameUIUpgradeBuilding
+
 
 
 

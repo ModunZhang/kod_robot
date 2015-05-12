@@ -21,11 +21,34 @@ function AllianceBuildingSprite:ctor(city_layer, entity, is_my_alliance)
     self:setNodeEventEnabled(true)
     self.is_my_alliance = is_my_alliance
     local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
-    AllianceBuildingSprite.super.ctor(self, city_layer, entity, x, y)
-    self:CheckEvent()
+    AllianceBuildingSprite.super.ctor(self, city_layer, entity, x, y)   
+    self:CheckEventIf(true)
     -- self:CreateBase()
 end
+
+function AllianceBuildingSprite:CheckEventIf(yesOrno)
+    if self:GetEntity():GetAllianceBuildingInfo().name == "shrine" then
+        local alliance_shirine = self:GetEntity():GetAlliance():GetAllianceShrine()
+        if not alliance_shirine then return end
+        if yesOrno then
+            self:CheckEvent()
+            alliance_shirine:AddListenOnType(self,alliance_shirine.LISTEN_TYPE.OnShrineEventsChanged)
+            alliance_shirine:AddListenOnType(self,alliance_shirine.LISTEN_TYPE.OnShrineEventsRefresh)
+        else
+            alliance_shirine:RemoveListenerOnType(self,alliance_shirine.LISTEN_TYPE.OnShrineEventsChanged)
+            alliance_shirine:RemoveListenerOnType(self,alliance_shirine.LISTEN_TYPE.OnShrineEventsRefresh) 
+        end
+    end
+end
+
+function AllianceBuildingSprite:OnShrineEventsChanged()
+    self:CheckEvent()
+end
+function AllianceBuildingSprite:OnShrineEventsRefresh()
+    self:CheckEvent()
+end
 function AllianceBuildingSprite:onExit()
+    self:CheckEventIf(false)
     if self.info then
         self.info:removeFromParent()
     end
@@ -72,9 +95,14 @@ end
 local ANI_TAG = 1
 function AllianceBuildingSprite:CheckEvent()
     if self:GetEntity():GetAllianceBuildingInfo().name == "shrine" then
-        self:PlayAni()
-    else
-        self:StopAni()
+        if self:GetEntity():GetAllianceMap():GetAlliance():GetAllianceShrine():HaveEvent() then
+            local armature = self:getChildByTag(ANI_TAG)
+            if not armature then
+                self:PlayAni()
+            end
+        else
+            self:StopAni()
+        end
     end
 end
 function AllianceBuildingSprite:PlayAni()

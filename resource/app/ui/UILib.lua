@@ -88,7 +88,7 @@ local BUILDING_ANIMATIONS_FILES = {
 }
 local BUILDING_ANIMATIONS = getAniNameFromAnimationFiles(BUILDING_ANIMATIONS_FILES)
 local RESOURCE = {
-    blood = "dragonskill_blood_51x63.png",
+    blood = "heroBlood_3_128x128.png",
     food = "res_food_91x74.png",
     wood = "res_wood_82x73.png",
     stone = "res_stone_88x82.png",
@@ -637,9 +637,9 @@ local ITEM = {
     coinClass_5 = "coinClass_5_128x128.png",
     coinClass_6 = "coinClass_6_128x128.png",
     coinClass_7 = "coinClass_7_128x128.png",
-    gemClass_1 = "gem_icon_62x61.png",
-    gemClass_2 = "gem_icon_62x61.png",
-    gemClass_3 = "gem_icon_62x61.png",
+    gemClass_1 = "gemClass_1_128x128.png",
+    gemClass_2 = "gemClass_2_128x128.png",
+    gemClass_3 = "gemClass_3_128x128.png",
 
     siegeAtkBonus_1 = "siegeAtkBonus_1_128x128.png",
     siegeAtkBonus_2 = "siegeAtkBonus_2_128x128.png",

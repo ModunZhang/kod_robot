@@ -4,7 +4,7 @@
 --
 local UILib = import(".UILib")
 local  GameUIAllianceMoonGateEnter = UIKit:createUIClass("GameUIAllianceMoonGateEnter","GameUIAllianceShrineEnter")
-
+local Localize = import("..utils.Localize")
 
 function GameUIAllianceMoonGateEnter:GetUIHeight()
 	return 282
@@ -23,7 +23,7 @@ function GameUIAllianceMoonGateEnter:GetBuildingType()
 end
 
 function GameUIAllianceMoonGateEnter:GetBuildingDesc()
-	return "本地化缺失"
+	return Localize.building_description.alliance_building_moonGate
 end
 
 

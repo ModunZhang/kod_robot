@@ -93,11 +93,7 @@ property(User, "allianceDonate", {
     coin = 1,
     gem = 1,
 })
----[[
-function User:Terrain()
-    return "grassLand"
-end
---]]
+
 function User:ctor(p)
     User.super.ctor(self)
     self.resources = {
@@ -592,11 +588,11 @@ function User:OnBasicInfoChanged(userData, deltaData)
     local is_delta_update = not is_fully_update and deltaData.basicInfo
     if is_fully_update or is_delta_update then
         local basicInfo = userData.basicInfo
-        self:SetTerrain(basicInfo.terrain)
+        self:SetTerrain(DataManager:getUserData().basicInfo.terrain)
         self:SetLevelExp(basicInfo.levelExp)
         self:SetLevel(self:GetPlayerLevelByExp(self:LevelExp()))
         self:SetPower(basicInfo.power)
-        self:SetName(basicInfo.name)
+        self:SetName(DataManager:getUserData().basicInfo.name)
         self:SetVipExp(basicInfo.vipExp)
         self:SetIcon(basicInfo.icon)
         self:SetMarchQueue(basicInfo.marchQueue)
@@ -732,7 +728,7 @@ function User:OnDailyQuestsEventsChanged(userData,deltaData)
                         table.insert(edit,data)
 
                         if data.finishTime == 0 then
-                            GameGlobalUI:showTips(_("提示"),string.format(_('每日任务%s完成'),Localize.daily_quests_name[data.index]))
+                            GameGlobalUI:showTips(_("提示"),string.format(_("每日任务%s完成"),Localize.daily_quests_name[data.index]))
                         end
                     end
                 end

@@ -38,7 +38,13 @@ display = {
             WaitForNet = _,
             NoWaitForNet = _,
         }
-    end
+    end,
+    width = 0,
+    left = 0,
+    right = 0,
+    top = 0,
+    bottom = 0,
+    height = 0,
 }
 
 local m = {
@@ -68,9 +74,11 @@ UIKit = {
     end,
     getErrorCodeData = function() return {} end,
     showMessageDialog = function ()
+    end,
+    createUIClass = function ()
+        return {}
     end
 }
-
 device = { getOpenUDID = function() return GlobalDeviceId end,
     platform = "mac" }
 
@@ -110,7 +118,8 @@ local d_id = string.split(device.getOpenUDID(), "_")
 local number = tonumber(d_id[1]) * 10 + tonumber(d_id[2])
 math.randomseed(tostring(os.time() * number):reverse():sub(1, 6))
 
-local count_limit = math.random(10,30)
+-- local count_limit = 1
+local count_limit = math.random(5,15)
 function Run()
     run_count = (run_count + 1) > count_limit and 1 or (run_count + 1)
     -- print("main run id =",device.getOpenUDID(),"run_count=",run_count,"count_limit",count_limit)

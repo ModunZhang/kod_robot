@@ -25,11 +25,12 @@ local STAR_BG = {
 local function return_map_of_list_view_and_ui_map(list_view, ui_map,list_node)
     return { list_view = list_view, ui_map = ui_map,list_node=list_node}
 end
-function GameUIBlackSmith:ctor(city, black_smith)
+function GameUIBlackSmith:ctor(city, black_smith,defeat_tab_name)
     GameUIBlackSmith.super.ctor(self, city, _("铁匠铺"), black_smith)
     self.dragon_map = {}
     self.black_smith_city = city
     self.black_smith = black_smith
+    self.defeat_tab_name = defeat_tab_name
 end
 function GameUIBlackSmith:OnMoveInStage()
     GameUIBlackSmith.super.OnMoveInStage(self)
@@ -88,14 +89,17 @@ function GameUIBlackSmith:TabButtons()
         {
             label = _("红龙装备"),
             tag = "redDragon",
+            default = self.defeat_tab_name == 'redDragon',
         },
         {
             label = _("蓝龙装备"),
             tag = "blueDragon",
+            default = self.defeat_tab_name == 'blueDragon',
         },
         {
             label = _("绿龙装备"),
             tag = "greenDragon",
+            default = self.defeat_tab_name == 'greenDragon',
         }
     },
     function(tag)

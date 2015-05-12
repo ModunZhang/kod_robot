@@ -73,8 +73,11 @@ function UIAutoClose:onCleanup()
     end
 end
 
-function UIAutoClose:DisableAutoClose()
-    self.disable = true
+function UIAutoClose:DisableAutoClose(disable)
+    if type(disable) ~= 'boolean'  then
+        disable = true
+    end
+    self.disable = disable
 end
 
 function UIAutoClose:addCloseCleanFunc(func)

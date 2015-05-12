@@ -142,7 +142,7 @@ end
 function UpgradeBuilding:GeneralLocalPush()
     if ext and ext.localpush then
         local pushIdentity = self.x .. self.y .. self.w .. self.h .. self.orient
-        local title = Localize.getLocaliedKeyByType(self.building_type) .. _("升级完成")
+        local title = string.format(_("修建%s到LV%d完成"),Localize.getLocaliedKeyByType(self.building_type),(self.level+1))
         app:GetPushManager():UpdateBuildPush(self.upgrade_to_next_level_time,title,pushIdentity)
     end
 end
@@ -194,7 +194,7 @@ function UpgradeBuilding:OnUserDataChanged(userData, current_time, location_id, 
     self:OnEvent(event)
     if level and finished_time then
         if display.getRunningScene().__cname ~= "MainScene" and level ~= self.level then
-            GameGlobalUI:showTips(_("提示"),string.format(_('建造%s至%d级完成'),Localize.building_name[self:GetType()],level))
+            GameGlobalUI:showTips(_("提示"),string.format(_("建造%s至%d级完成"),Localize.building_name[self:GetType()],level))
         end
         self:OnHandle(level, finished_time)
     end
@@ -512,6 +512,7 @@ function UpgradeBuilding:getUpgradeRequiredGems()
 end
 
 return UpgradeBuilding
+
 
 
 

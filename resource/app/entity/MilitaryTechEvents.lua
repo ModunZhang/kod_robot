@@ -56,9 +56,9 @@ function MilitaryTechEvents:GetLocalizeDesc()
     local level = City:GetSoldierManager():GetMilitaryTechsLevelByName(name)
     local sp_name = string.split(name, "_")
     if sp_name[2] == "hpAdd" then
-        return string.format(_("研发%s血量增加到 Lv %d"),Localize.soldier_category[string.split(name, "_")[1]],level+1)
+        return string.format(_("研发科技-%s血量增加到 Lv %d"),Localize.soldier_category[string.split(name, "_")[1]],level+1)
     end
-    return string.format(_("研发%s对%s的攻击到 Lv %d"),Localize.soldier_category[string.split(name, "_")[1]],Localize.soldier_category[string.split(name, "_")[2]],level+1)
+    return string.format(_("研发科技-%s对%s的攻击到 Lv %d"),Localize.soldier_category[string.split(name, "_")[1]],Localize.soldier_category[string.split(name, "_")[2]],level+1)
 end
 function MilitaryTechEvents:GetEventType()
     return "militaryTechEvents"

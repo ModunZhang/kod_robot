@@ -4,7 +4,7 @@
 --
 local UILib = import(".UILib")
 local  GameUIAllianceOrderHallEnter = UIKit:createUIClass("GameUIAllianceOrderHallEnter","GameUIAllianceShrineEnter")
-
+local Localize = import("..utils.Localize")
 
 function GameUIAllianceOrderHallEnter:GetUIHeight()
 	return 261
@@ -23,7 +23,7 @@ function GameUIAllianceOrderHallEnter:GetBuildingType()
 end
 
 function GameUIAllianceOrderHallEnter:GetBuildingDesc()
-	return "本地化缺失"
+	return Localize.building_description.alliance_building_orderHall
 end
 
 function GameUIAllianceOrderHallEnter:GetBuildImageInfomation(sprite)

@@ -9,6 +9,14 @@ local RichText = import("..widget.RichText")
 local ChatManager = import("..entity.ChatManager")
 local WidgetChat = import("..widget.WidgetChat")
 local timer = app.timer
+
+
+function GameUIPVEHome:DisplayOn()
+
+end
+function GameUIPVEHome:DisplayOff()
+
+end
 function GameUIPVEHome:ctor(user, scene)
     self.user = user
     self.scene = scene
@@ -96,6 +104,7 @@ function GameUIPVEHome:CreateTop()
 
     local pve_back = display.newSprite("back_ground_pve.png")
         :addTo(top_bg):align(display.RIGHT_TOP, size.width - 45, 20)
+    self.pve_back = pve_back
     local size = pve_back:getContentSize()
     display.newSprite("dragon_lv_icon.png"):addTo(pve_back):pos(20, 25)
     local add_btn = cc.ui.UIPushButton.new(
@@ -122,6 +131,7 @@ function GameUIPVEHome:CreateTop()
             self.box:getAnimation():playWithIndex(0, -1, 0)
             -- self.box:getAnimation():gotoAndPause(85)
         end)
+    self.box_bg = box
     self.box = ccs.Armature:create("lanse"):addTo(box)
         :align(display.CENTER, - 20, 10):scale(0.25)
 
@@ -142,7 +152,7 @@ function GameUIPVEHome:CreateBottom()
         :align(display.BOTTOM_CENTER, display.cx, display.bottom)
     WidgetChat.new():addTo(bottom_bg)
         :align(display.CENTER, bottom_bg:getContentSize().width/2, bottom_bg:getContentSize().height-11)
-    WidgetChangeMap.new(WidgetChangeMap.MAP_TYPE.PVE):addTo(self)
+    self.change_map = WidgetChangeMap.new(WidgetChangeMap.MAP_TYPE.PVE):addTo(self)
 end
 
 

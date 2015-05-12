@@ -81,17 +81,19 @@ function GameUIChatChannel:CreateTextFieldBody()
             end
             if self._channelType == ChatManager.CHANNNEL_TYPE.ALLIANCE then
                 if Alliance_Manager:GetMyAlliance():IsDefault() then
-                    UIKit:showMessageDialog(_("错误"),_("未加入联盟"),function()end,nil,false)
+                    GameGlobalUI:showTips(_("错误"),_("未加入联盟"))
                     return
                 end
             end
             local msg = editbox:getText()
             if not msg or string.len(string.trim(msg)) == 0 then 
-                UIKit:showMessageDialog(_("错误"), _("聊天内容不能为空"),function()end,nil,false)
+                GameGlobalUI:showTips(_("错误"), _("聊天内容不能为空"))
                 return 
             end  
             editbox:setText('')
-            self:GetChatManager():SendChat(self._channelType,msg)
+            self:GetChatManager():SendChat(self._channelType,msg,function()
+                self.sendChatButton:StartTimer()
+            end)
         end
     end
 
@@ -114,13 +116,13 @@ function GameUIChatChannel:CreateTextFieldBody()
     sendChatButton:onButtonClicked(function()
        if self._channelType == ChatManager.CHANNNEL_TYPE.ALLIANCE then
             if Alliance_Manager:GetMyAlliance():IsDefault() then 
-                UIKit:showMessageDialog(_("错误"),_("未加入联盟"),function()end)
+                GameGlobalUI:showTips(_("错误"),_("未加入联盟"))
                 return
             end
         end
         local msg = editbox:getText()
         if not msg or string.len(string.trim(msg)) == 0 then 
-            UIKit:showMessageDialog(_("错误"), _("聊天内容不能为空"),function()end)
+            GameGlobalUI:showTips(_("错误"), _("聊天内容不能为空"))
             return 
         end  
         editbox:setText('')
@@ -129,39 +131,6 @@ function GameUIChatChannel:CreateTextFieldBody()
         end)
     end)
     self.sendChatButton = sendChatButton
-    
-    -- body button
-
-	-- local emojiButton = cc.ui.UIPushButton.new({normal = "chat_expression.png",pressed = "chat_expression_highlight.png",},{scale9 = false})
-	-- 	:onButtonClicked(function(event)
- --            -- if CONFIG_IS_DEBUG then
- --                self:CreateEmojiPanel()
- --            -- end
- --    	end)
- --    	:addTo(self:GetView())
- --    	:align(display.LEFT_TOP,self.editbox:getPositionX()+self.editbox:getContentSize().width+10, window.top - 100)
- --        :zorder(2)
- --    local plusButton = cc.ui.UIPushButton.new({normal = "chat_add.png",pressed = "chat_add_highlight.png",}, {scale9 = false})
- --    	:onButtonClicked(function(event)
- --            if CONFIG_IS_DEBUG then
- --                if self._channelType == ChatManager.CHANNNEL_TYPE.ALLIANCE then
- --                    if Alliance_Manager:GetMyAlliance():IsDefault() then 
- --                        UIKit:showMessageDialog(_("错误"),_("未加入联盟"),function()end)
- --                        return
- --                    end
- --                end
- --                local msg = editbox:getText()
- --                if not msg or string.len(string.trim(msg)) == 0 then 
- --                    UIKit:showMessageDialog(_("错误"), _("聊天内容不能为空"),function()end)
- --                    return 
- --                end  
- --                editbox:setText('')
- --                self:GetChatManager():SendChat(self._channelType,msg)
- --            end
-	-- 	end)
-	-- 	:addTo(self:GetView())
-	-- 	:align(display.LEFT_TOP, emojiButton:getPositionX()+emojiButton:getCascadeBoundingBox().size.width+10,emojiButton:getPositionY()-2)
- --        :zorder(2)
 end
 
 function GameUIChatChannel:CreateShopButton()
@@ -208,7 +177,6 @@ function GameUIChatChannel:GetChatIcon(icon)
     local bg = display.newSprite("chat_hero_background_66x66.png")
     local icon = UIKit:GetPlayerIconOnly(icon):addTo(bg):align(display.LEFT_BOTTOM,-5, 1)
     bg.icon = icon
-    -- local size = icon:getContentSize()
     icon:scale(0.6)
     return bg
 end
@@ -490,7 +458,7 @@ function GameUIChatChannel:GetBlackListItem(chat,width)
     local bg = display.newScale9Sprite("chat_setting_item_bg.png")
     bg:size(width,bg:getContentSize().height)
     --content
-    local iconBg = UIKit:GetPlayerCommonIcon():scale(0.8):addTo(bg,2):pos(60,math.floor(bg:getContentSize().height/2))
+    local iconBg = UIKit:GetPlayerCommonIcon(chat.icon):scale(0.8):addTo(bg,2):pos(60,math.floor(bg:getContentSize().height/2))
     local nameLabel = cc.ui.UILabel.new({
         UILabelType = 2,
         text = chat.name or "player" ,
@@ -657,10 +625,11 @@ function GameUIChatChannel:CreatePlayerMenu(event,chat)
             color= 0xffedae
         }))
         :onButtonClicked(function(event)
-            self:GetChatManager():AddBlockChat(chat)
+            if self:GetChatManager():AddBlockChat(chat) then
+                UIKit:showMessageDialog(nil,_("屏蔽成功!"))
+                self:RefreshListView()
+            end
             menuLayer:removeFromParent(true)
-            self:RefreshListView()
-            UIKit:showMessageDialog(nil,_("屏蔽成功"))
         end)
         :align(display.LEFT_BOTTOM,  window.left + 258,window.bottom +  2)
         :addTo(menuLayer)
@@ -670,14 +639,14 @@ function GameUIChatChannel:CreatePlayerMenu(event,chat)
     shieldButton:setButtonLabelOffset(0,-30)
 
     --chat_report
-    local reportButton = WidgetPushButton.new({normal="chat_button_n_124x92.png",pressed="chat_button_h_124x92.png",disabled = "chat_button_d_124x92.png"}, {scale9 = false})
+    local reportButton = WidgetPushButton.new({normal="chat_button_d_124x92.png",pressed="chat_button_d_124x92.png",disabled = "chat_button_d_124x92.png"}, {scale9 = false})
         :setButtonLabel("normal", UIKit:commonButtonLable({
             text = _("举报"),
             size = 16,
             color= 0xffedae
         }))
         :onButtonClicked(function(event)
-            menuLayer:removeFromParent(true)
+            -- menuLayer:removeFromParent(true)
         end)
         :align(display.LEFT_BOTTOM, window.left + 382,window.bottom +  2)
         :addTo(menuLayer)
@@ -685,7 +654,6 @@ function GameUIChatChannel:CreatePlayerMenu(event,chat)
     local label = reportButton:getButtonLabel()
     display.newSprite("chat_report_62x56.png"):align(display.CENTER,label:getPositionX(), label:getPositionY()+10):addTo(reportButton)
     reportButton:setButtonLabelOffset(0,-30)
-    reportButton:setButtonEnabled(false)
     --chat_mail
     local mailButton = WidgetPushButton.new({normal="chat_button_n_124x92.png",pressed="chat_button_h_124x92.png"}, {scale9 = false})
         :setButtonLabel("normal",  UIKit:commonButtonLable({

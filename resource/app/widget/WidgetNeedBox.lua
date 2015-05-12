@@ -70,7 +70,7 @@ function WidgetNeedBox:ctor()
         :align(display.LEFT_CENTER, col3_x + label_relate_x, row_y + label_relate_y)
 
 
-    cc.ui.UIImage.new("hourglass_39x46.png")
+    cc.ui.UIImage.new("hourglass_30x38.png")
         :addTo(back_ground_556x56)
         :align(display.CENTER, col4_x, row_y)
         :scale(0.8)

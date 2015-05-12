@@ -43,7 +43,7 @@ pve_npc["KEEL"] = {
 pve_npc["WARRIORS_TOMB"] = {
 	["type"] = "WARRIORS_TOMB",
 	["rewards"] = "items,heroBlood_1,1,40;items,heroBlood_2,1,20;items,warSpeedupClass_1,1,40",
-	["rewards_type"] = "all"
+	["rewards_type"] = "random"
 }
 pve_npc["OBELISK"] = {
 	["type"] = "OBELISK",

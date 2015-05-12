@@ -12,36 +12,36 @@ local GameUIHasBeenBuild = UIKit:createUIClass('GameUIHasBeenBuild', "GameUIWith
 local NOT_ABLE_TO_UPGRADE = UpgradeBuilding.NOT_ABLE_TO_UPGRADE
 local timer = app.timer
 local building_config_map = {
-    ["keep"] = {scale = 0.25, offset = {x = 10, y = -20}},
-    ["watchTower"] = {scale = 0.3, offset = {x = 10, y = -10}},
-    ["warehouse"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["dragonEyrie"] = {scale = 0.3, offset = {x = 0, y = -10}},
-    ["toolShop"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["materialDepot"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["armyCamp"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["barracks"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["blackSmith"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["foundry"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["stoneMason"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["lumbermill"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["mill"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["hospital"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["townHall"] = {scale = 0.4, offset = {x = 10, y = -10}},
-    ["tradeGuild"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["academy"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["prison"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["hunterHall"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["trainingGround"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["stable"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["workshop"] = {scale = 0.5, offset = {x = 10, y = -10}},
-    ["wall"] = {scale = 0.5, offset = {x = 0, y = -10}},
-    ["tower"] = {scale = 0.5, offset = {x = 0, y = -10}},
+    ["keep"] = {scale = 0.3, offset = {x = 80, y = 74}},
+    ["watchTower"] = {scale = 0.35, offset = {x = 90, y = 70}},
+    ["warehouse"] = {scale = 0.5, offset = {x = 84, y = 70}},
+    ["dragonEyrie"] = {scale = 0.35, offset = {x = 74, y = 70}},
+    ["toolShop"] = {scale = 0.5, offset = {x = 80, y = 70}},
+    ["materialDepot"] = {scale = 0.5, offset = {x = 70, y = 70}},
+    ["barracks"] = {scale = 0.5, offset = {x = 80, y = 70}},
+    ["blackSmith"] = {scale = 0.5, offset = {x = 75, y = 70}},
+    ["foundry"] = {scale = 0.47, offset = {x = 75, y = 74}},
+    ["stoneMason"] = {scale = 0.47, offset = {x = 76, y = 75}},
+    ["lumbermill"] = {scale = 0.45, offset = {x = 80, y = 74}},
+    ["mill"] = {scale = 0.45, offset = {x = 76, y = 74}},
+    ["hospital"] = {scale = 0.5, offset = {x = 80, y = 75}},
+    ["townHall"] = {scale = 0.45, offset = {x = 76, y = 74}},
+    ["tradeGuild"] = {scale = 0.5, offset = {x = 74, y = 74}},
+    ["academy"] = {scale = 0.5, offset = {x = 80, y = 74}},
+    ["prison"] = {scale = 0.4, offset = {x = 80, y = 80}},
+    ["hunterHall"] = {scale = 0.5, offset = {x = 74, y = 74}},
+    ["trainingGround"] = {scale = 0.5, offset = {x = 76, y = 74}},
+    ["stable"] = {scale = 0.46, offset = {x = 74, y = 74}},
+    ["workshop"] = {scale = 0.46, offset = {x = 74, y = 74}},
+
+    ["wall"] = {scale = 0.5, offset = {x = 74, y = 74}},
+    ["tower"] = {scale = 0.5, offset = {x = 74, y = 74}},
     --
-    ["dwelling"] = {scale = 0.8, offset = {x = 0, y = -10}},
-    ["farmer"] = {scale = 0.8, offset = {x = 0, y = -10}},
-    ["woodcutter"] = {scale = 0.8, offset = {x = 0, y = -10}},
-    ["quarrier"] = {scale = 0.8, offset = {x = 0, y = -10}},
-    ["miner"] = {scale = 0.8, offset = {x = 0, y = -10}},
+    ["dwelling"] = {scale = 0.8, offset = {x = 74, y = 74}},
+    ["farmer"] = {scale = 0.8, offset = {x = 74, y = 74}},
+    ["woodcutter"] = {scale = 0.8, offset = {x = 74, y = 74}},
+    ["quarrier"] = {scale = 0.8, offset = {x = 74, y = 74}},
+    ["miner"] = {scale = 0.8, offset = {x = 74, y = 74}},
 }
 
 
@@ -137,6 +137,7 @@ function Item:SetBuildingType(building_type, level)
     local png = SpriteConfig[building_type]:GetConfigByLevel(level).png
     self.title_label:setString(Localize.building_name[building_type])
     self.building_icon:setTexture(png)
+    self.building_icon:setPosition(building_config_map[building_type].offset.x,building_config_map[building_type].offset.y)
     self.building_icon:scale(building_config_map[building_type].scale)
     self.building_icon:removeAllChildren()
     local p = self.building_icon:getAnchorPointInPoints()

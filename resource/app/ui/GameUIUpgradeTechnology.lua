@@ -271,20 +271,20 @@ function GameUIUpgradeTechnology:BuildUI()
         :align(display.LEFT_TOP, btn_now:getPositionX(), btn_now:getPositionY() - 65 - 10)
     self.need_gems_icon = gem
     self.need_gems_label = UIKit:ttfLabel({
-        text = "",--self:GetUpgradeNowGems(),
+        text = "",
         size = 20,
         color= 0x403c2f
     }):align(display.LEFT_TOP,gem:getPositionX() + gem:getCascadeBoundingBox().width + 10, gem:getPositionY()):addTo(bg_node)
 
 
     --升级所需时间
-    local time_icon = display.newSprite("hourglass_39x46.png")
+    local time_icon = display.newSprite("hourglass_30x38.png")
         :addTo(bg_node)
         :scale(0.6)
         :align(display.LEFT_TOP, btn_bg:getPositionX() - 185,btn_bg:getPositionY() - 65 - 10)
     self.time_icon = time_icon
     self.time_label = UIKit:ttfLabel({
-        text = "",--GameUtils:formatTimeStyle1(self:GetProductionTechnology():GetLevelUpCost().buildTime),
+        text = "",
         size = 18,
         color= 0x403c2f
     }):align(display.LEFT_TOP, time_icon:getPositionX()+time_icon:getCascadeBoundingBox().width + 10, time_icon:getPositionY()):addTo(bg_node)

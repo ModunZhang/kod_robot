@@ -5,6 +5,7 @@
 import('app.utils.Minheap')
 local Localize = import("..utils.Localize")
 local GameGlobalUIUtils = class('GameGlobalUIUtils')
+local GameUICommonTips = import(".GameUICommonTips")
 
 function GameGlobalUIUtils:ctor()
 	self.tipsHeap = Minheap.new(function(a,b)
@@ -16,7 +17,7 @@ end
 function GameGlobalUIUtils:showTips(title,content)
 	local instance = cc.Director:getInstance():getRunningScene():getChildByTag(1020)
 	if not instance then
-		self.commonTips = UIKit:newGameUI('GameUICommonTips',self,2)
+		self.commonTips = GameUICommonTips.new(self,2)
 		assert(self.commonTips)
 		cc.Director:getInstance():getRunningScene():addChild(self.commonTips, 1000000, 1020)
 		-- self.commonTips:setVisible(false)

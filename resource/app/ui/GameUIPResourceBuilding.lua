@@ -192,7 +192,7 @@ function GameUIPResourceBuilding:RebuildPart()
             #City:GetBuildingByType(self.building:GetHouseType())<=after_rebuild_max_house_num and "yes_40x40.png" or "no_40x40.png"
         },
         {
-            _("魔法石"),
+            _("金龙币"),
             string.format("%d/"..intInit.switchProductionBuilding.value,City:GetUser():GetGemResource():GetValue()),
             City:GetUser():GetGemResource():GetValue()>need_gems and "yes_40x40.png" or "no_40x40.png"
         },

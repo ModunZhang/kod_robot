@@ -21,9 +21,6 @@ end
 function Resource:IsOverLimit()
     return self.resource_value > self.resource_value_limit
 end
-function Resource:IsOverWarning()
-    return (self.resource_value / self.resource_value_limit) > 0.8
-end
 
 
 

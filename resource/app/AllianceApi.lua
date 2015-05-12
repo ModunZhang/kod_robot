@@ -28,6 +28,29 @@ function AllianceApi:getQuitAlliancePromise()
         return NetManager:getQuitAlliancePromise()
     end
 end
+-- function AllianceApi:RequestSpeedUp()
+--     if not Alliance_Manager:GetMyAlliance():IsDefault() and
+--         -- 城市建筑升级
+
+--      local eventType = building:EventType()
+--     if self:IsAbleToFreeSpeedup(building) then
+--         NetManager:getFreeSpeedUpPromise(eventType,building:UniqueUpgradingKey())
+--     else
+--         if not Alliance_Manager:GetMyAlliance():IsDefault() then
+--             -- 是否已经申请过联盟加速
+--             local isRequested = Alliance_Manager:GetMyAlliance()
+--                 :HasBeenRequestedToHelpSpeedup(building:UniqueUpgradingKey())
+--             if not isRequested then
+--                 NetManager:getRequestAllianceToSpeedUpPromise(eventType,building:UniqueUpgradingKey())
+--                 return
+--             end
+--         end
+--         -- 没加入联盟或者已加入联盟并且申请过帮助时执行使用道具加速
+--         UIKit:newGameUI("GameUIBuildingSpeedUp", building):AddToCurrentScene(true)
+--     end
+
+--     end
+-- endp
 
 local function setRun()
     app:setRun()

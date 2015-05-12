@@ -164,7 +164,7 @@ function WidgetPromoteSoldier:UpgradeButtons()
     --升级所需时间
     local level_up_config = self:GetNextLevelConfig()
 
-    display.newSprite("hourglass_39x46.png", size.width/2+100, size.height-290):addTo(body):setScale(0.6)
+    display.newSprite("hourglass_30x38.png", size.width/2+100, size.height-290):addTo(body):setScale(0.6)
     self.upgrade_time = UIKit:ttfLabel({
         text = GameUtils:formatTimeStyle1(level_up_config.upgradeTimeSecondsNeed),
         size = 18,
