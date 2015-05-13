@@ -54,7 +54,66 @@ function DragonApi:SetDefenceDragon()
         end
     end
 end
+-- 打造龙的装备
+function DragonApi:MakeEquipment()
+    -- 铁匠铺是否已解锁
+    if not app:IsBuildingUnLocked(9) then
+        return
+    end
+    local black_smith = City:GetBuildingByLocationId(9)
+    if black_smith:IsMakingEquipment() then
+        -- 加速
+        -- 随机使用事件加速道具
+        local making_event = black_smith:GetMakeEquipmentEvent()
+        local speedUp_item_name = "speedup_"..math.random(8)
+        print("使用"..speedUp_item_name.."加速制造装备 ,id:",making_event:Id())
+        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+            eventType = "dragonEquipmentEvents",
+            eventId = making_event:Id()
+        }})
+    else
+        -- 制造装备
+        local isFinishNow = math.random(2) == 2
 
+        local city = City
+        local EQUIPMENTS = GameDatas.DragonEquipments.equipments
+        local map_equipments = {}
+        for k,v in pairs(EQUIPMENTS) do
+            if v.maxStar < 5  then
+                table.insert(map_equipments, v)
+            end
+        end
+        -- 随机制造一个
+        local equip_type = map_equipments[math.random(#map_equipments)].name
+        local equip_config = EQUIPMENTS[equip_type]
+        local material_manager = city:GetMaterialManager()
+        local matrials = LuaUtils:table_map(string.split(equip_config.materials, ","), function(k, v)
+            return k, string.split(v, ":")
+        end)
+        local is_material_enough = true
+        for k,v in pairs(matrials) do
+            if not is_material_enough then
+                break
+            end
+            material_manager:IteratorDragonMaterialsByType(function (m_name,m_count)
+                if m_name == v[1] then
+                    if tonumber(v[2]) > m_count then
+                        is_material_enough = false
+                    end
+                end
+            end)
+        end
+        if not is_material_enough  then
+            return 
+        end
+        print("制造龙的装备->",equip_type)
+        if not isFinishNow then
+            return NetManager:getMakeDragonEquipmentPromise(equip_type)
+        else
+            return NetManager:getInstantMakeDragonEquipmentPromise(equip_type)
+        end
+    end
+end
 
 local function setRun()
     app:setRun()
@@ -76,12 +135,26 @@ local function SetDefenceDragon()
         setRun()
     end
 end
+local function MakeEquipment()
+    local p = DragonApi:MakeEquipment()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 
 return {
     setRun,
     HatchDragon,
     SetDefenceDragon,
+    MakeEquipment,
 }
+
+
+
+
+
 
 
 

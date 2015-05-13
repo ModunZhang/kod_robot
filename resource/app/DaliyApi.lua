@@ -130,7 +130,178 @@ function DaliyApi:MilitaryTech()
         end
     end
 end
+-- 工具作坊
+function DaliyApi:ToolShop()
+    -- 工具作坊是否已解锁
+    if not app:IsBuildingUnLocked(16) then
+        return
+    end
+    local tool_shop = City:GetBuildingByLocationId(16)
+    local technology_event = tool_shop:GetTechnologyEvent()
+    local building_event = tool_shop:GetBuildingEvent()
+    local current_time = app.timer:GetServerTime()
+    if technology_event:IsStored(current_time) then
+        return NetManager:getFetchMaterialsPromise(technology_event:Id())
+    elseif building_event:IsStored(current_time) then
+        return NetManager:getFetchMaterialsPromise(building_event:Id())
+    elseif not tool_shop:IsMakingAny(current_time) then
+        local make_which = math.random(2) == 2
+        if make_which then
+            return NetManager:getMakeBuildingMaterialPromise()
+        else
+            return NetManager:getMakeTechnologyMaterialPromise()
+        end
+    elseif technology_event:IsMaking(current_time) or building_event:IsMaking(current_time) then
+        local event = technology_event:IsMaking(current_time) and technology_event or building_event
+        -- 随机使用事件加速道具
+        local speedUp_item_name = "speedup_"..math.random(8)
+        print("使用"..speedUp_item_name.."加速材料制造 ,id:",event:Id())
+        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+            eventType = "materialEvents",
+            eventId = event:Id()
+        }})
+    end
+end
+-- 贸易行会
+function DaliyApi:TradeGuild()
+    -- 贸易行会是否已解锁
+    if not app:IsBuildingUnLocked(14) then
+        return
+    end
+    local city = City
+    -- 检查是否有出售了的订单
+    local my_deals = User:GetTradeManager():GetMyDeals()
+    for k,v in pairs(my_deals) do
+        if v.isSold then
+            return NetManager:getGetMyItemSoldMoneyPromise(v.id)
+        end
+    end
 
+    -- 随机是否下架商品
+    local is_remove_item = math.random(10) == 2 and #my_deals > 0
+    if is_remove_item then
+        for k,v in pairs(my_deals) do
+            dump(v,"下架贸易行会商品")
+            return NetManager:getRemoveMySellItemPromise(v.id)
+        end
+    else
+        local trade_guild = city:GetBuildingByLocationId(14)
+
+        local is_sell = trade_guild:GetMaxSellQueue() > #my_deals
+        local sell_sub_types = {
+            resources =  {
+                [1] = "wood",
+                [2] = "stone",
+                [3] = "iron",
+                [4] = "food",
+            },
+            buildingMaterials = {
+                [1] = "blueprints",
+                [2] = "tools",
+                [3] = "tiles",
+                [4] = "pulley",
+            },
+            technologyMaterials = {
+                [1] = "trainingFigure",
+                [2] = "bowTarget",
+                [3] = "saddle",
+                [4] = "ironPart",
+            }
+        }
+        if is_sell then
+            -- 出售物品
+            local current_time = app.timer:GetServerTime()
+            local resource_manager = city:GetResourceManager()
+            local material_manager = city:GetMaterialManager()
+            local has_materials = material_manager:GetMaterialsByType(material_manager.MATERIAL_TYPE.BUILD)
+            local has_technology_materials = material_manager:GetMaterialsByType(material_manager.MATERIAL_TYPE.TECHNOLOGY)
+
+            local can_sell_values = {
+                resources =  {
+                    [1] = math.floor(resource_manager:GetWoodResource():GetResourceValueByCurrentTime(current_time)/1000),
+                    [2] = math.floor(resource_manager:GetStoneResource():GetResourceValueByCurrentTime(current_time)/1000),
+                    [3] = math.floor(resource_manager:GetIronResource():GetResourceValueByCurrentTime(current_time)/1000),
+                    [4] = math.floor(resource_manager:GetFoodResource():GetResourceValueByCurrentTime(current_time)/1000),
+                },
+                buildingMaterials =  {
+                    [1] = has_materials.blueprints,
+                    [2] = has_materials.tools,
+                    [3] = has_materials.tiles,
+                    [4] = has_materials.pulley,
+                },
+                technologyMaterials =  {
+                    [1] = has_technology_materials.trainingFigure,
+                    [2] = has_technology_materials.bowTarget,
+                    [3] = has_technology_materials.saddle,
+                    [4] = has_technology_materials.ironPart,
+                }
+            }
+
+            -- 小车数量
+            local cart_num = resource_manager:GetCartResource():GetResourceValueByCurrentTime(current_time)
+
+            local types = {
+                "resources",
+                "buildingMaterials",
+                "technologyMaterials",
+            }
+
+            local sell_type = types[math.random(3)]
+            local sub_index = math.random(4)
+            local sell_sub_type = sell_sub_types[sell_type][sub_index]
+            local sell_current_value = can_sell_values[sell_type][sub_index]
+            print("cart_num=",cart_num,",sell_current_value,",sell_current_value,"sell_sub_type",sell_sub_type)
+
+            -- 最大出售数量
+            local max_sell = math.min(cart_num,sell_current_value)
+            if max_sell < 1 then
+                return
+            end
+            -- 随机出售数量
+            local sell_count = math.random(max_sell)
+
+            -- 资源，材料出售价格区间
+            local PRICE_SCOPE = {
+                resource = {
+                    min = 100,
+                    max = 1000
+                },
+                material = {
+                    min = 1000,
+                    max = 5000
+                }
+            }
+            local sell_price
+            if sell_type == "resources" then
+                sell_price = math.random(100,100)
+            else
+                sell_price = math.random(1000,5000)
+            end
+            print("贸易行会出售：",sell_type,sell_sub_type,"数量：",sell_count,"价格：",sell_price)
+            return NetManager:getSellItemPromise(sell_type,sell_sub_type,sell_count,sell_price)
+        else
+            -- 购买物品
+            -- 获取商品列表
+            local types = {
+                "resources",
+                "buildingMaterials",
+                "technologyMaterials",
+            }
+            local sell_type = types[math.random(3)]
+            local sub_index = math.random(4)
+            local sell_sub_type = sell_sub_types[sell_type][sub_index]
+            return NetManager:getGetSellItemsPromise(sell_type,sell_sub_type):done(function(response)
+                local itemDocs = response.msg.itemDocs
+                if #itemDocs > 0 then
+                    -- 随机购买一个
+                    local item = itemDocs[math.random(#itemDocs)]
+                    dump(item,"随机购买一个商品")
+                    NetManager:getBuySellItemPromise(item._id)
+                end
+            end)
+        end
+    end
+end
 local function setRun()
     app:setRun()
 end
@@ -151,12 +322,46 @@ local function MilitaryTech()
         setRun()
     end
 end
+local function ToolShop()
+    local p = DaliyApi:ToolShop()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function TradeGuild()
+    local p = DaliyApi:TradeGuild()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 
 return {
     setRun,
     DailyQuests,
     MilitaryTech,
+    ToolShop,
+    TradeGuild,
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

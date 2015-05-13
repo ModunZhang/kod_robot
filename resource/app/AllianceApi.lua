@@ -28,29 +28,111 @@ function AllianceApi:getQuitAlliancePromise()
         return NetManager:getQuitAlliancePromise()
     end
 end
--- function AllianceApi:RequestSpeedUp()
---     if not Alliance_Manager:GetMyAlliance():IsDefault() and
---         -- 城市建筑升级
+function AllianceApi:RequestSpeedUp()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() then
+        -- 城市建筑升级
+        local can_request = {}
+        City:IteratorCanUpgradeBuildings(function ( building )
+            -- 正在升级
+            if building:IsUpgrading() then
+                local eventType = building:EventType()
+                -- 可以免费加速则不申请联盟协助加速
+                if not building:IsAbleToFreeSpeedUpByTime(app.timer:GetServerTime()) then
+                    -- 是否已经申请过联盟加速
+                    local isRequested = alliance:HasBeenRequestedToHelpSpeedup(building:UniqueUpgradingKey())
+                    if not isRequested then
+                        table.insert(can_request, building)
+                    end
+                end
+            end
+        end)
+        if #can_request > 0 then
+            -- 随机一个申请
+            local building = can_request[math.random(#can_request)]
+            return NetManager:getRequestAllianceToSpeedUpPromise(building:EventType(),building:UniqueUpgradingKey())
+        end
 
---      local eventType = building:EventType()
---     if self:IsAbleToFreeSpeedup(building) then
---         NetManager:getFreeSpeedUpPromise(eventType,building:UniqueUpgradingKey())
---     else
---         if not Alliance_Manager:GetMyAlliance():IsDefault() then
---             -- 是否已经申请过联盟加速
---             local isRequested = Alliance_Manager:GetMyAlliance()
---                 :HasBeenRequestedToHelpSpeedup(building:UniqueUpgradingKey())
---             if not isRequested then
---                 NetManager:getRequestAllianceToSpeedUpPromise(eventType,building:UniqueUpgradingKey())
---                 return
---             end
---         end
---         -- 没加入联盟或者已加入联盟并且申请过帮助时执行使用道具加速
---         UIKit:newGameUI("GameUIBuildingSpeedUp", building):AddToCurrentScene(true)
---     end
+        -- 军事科技
+        local soldier_manager = City:GetSoldierManager()
+        local can_request = {}
+        soldier_manager:IteratorMilitaryTechEvents(function ( event )
+            if DataUtils:getFreeSpeedUpLimitTime() < event:GetTime() then
+                -- 是否已经申请过联盟加速
+                local isRequested = alliance
+                    :HasBeenRequestedToHelpSpeedup(event:Id())
+                if not isRequested then
+                    table.insert(can_request, event)
+                end
+            end
+        end)
+        if #can_request > 0 then
+            -- 随机一个申请
+            local event = can_request[math.random(#can_request)]
+            return NetManager:getRequestAllianceToSpeedUpPromise(event:GetEventType(),event:Id())
+        end
 
---     end
--- endp
+        -- 士兵晋升
+        local can_request = {}
+        soldier_manager:IteratorSoldierStarEvents(function ( event )
+            if DataUtils:getFreeSpeedUpLimitTime() < event:GetTime() then
+                -- 是否已经申请过联盟加速
+                local isRequested = alliance
+                    :HasBeenRequestedToHelpSpeedup(event:Id())
+                if not isRequested then
+                    table.insert(can_request, event)
+                end
+            end
+        end)
+        if #can_request > 0 then
+            -- 随机一个申请
+            local event = can_request[math.random(#can_request)]
+            return NetManager:getRequestAllianceToSpeedUpPromise(event:GetEventType(),event:Id())
+        end
+
+        -- 生产科技
+        local can_request = {}
+        City:IteratorProductionTechEvents(function ( event )
+            if DataUtils:getFreeSpeedUpLimitTime() < event:GetTime() then
+                -- 是否已经申请过联盟加速
+                local isRequested = alliance
+                    :HasBeenRequestedToHelpSpeedup(event:Id())
+                if not isRequested then
+                    table.insert(can_request, event)
+                end
+            end
+        end)
+        if #can_request > 0 then
+            -- 随机一个申请
+            local event = can_request[math.random(#can_request)]
+            return NetManager:getRequestAllianceToSpeedUpPromise("productionTechEvents",event:Id())
+        end
+    end
+end
+-- 协助加速
+function AllianceApi:HelpSpeedUp()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() then
+        -- 帮助全部
+        local help_events = alliance:GetCouldShowHelpEvents()
+        local can_help = {}
+        for k,event in pairs(help_events) do
+            if User:Id() ~= event:GetPlayerData():Id() then
+                table.insert(can_help, event)
+            end
+        end
+        if #can_help > 0 then
+            local help_all = math.random(2) == 2
+            if help_all then
+                return NetManager:getHelpAllAllianceMemberSpeedUpPromise()
+            else
+                local event = can_help[#math.random(#can_help)]
+                return NetManager:getHelpAllianceMemberSpeedUpPromise(event:Id())
+            end
+        end
+
+    end
+end
 
 local function setRun()
     app:setRun()
@@ -88,6 +170,22 @@ local function CreateAlliance()
         setRun()
     end
 end
+local function RequestSpeedUp()
+    local p = AllianceApi:RequestSpeedUp()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function HelpSpeedUp()
+    local p = AllianceApi:HelpSpeedUp()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 local function getQuitAlliancePromise()
     local p = AllianceApi:getQuitAlliancePromise()
     if p then
@@ -101,8 +199,15 @@ return {
     setRun,
     JoinAlliance,
     CreateAlliance,
+    RequestSpeedUp,
+    HelpSpeedUp,
 -- getQuitAlliancePromise,
 }
+
+
+
+
+
 
 
 

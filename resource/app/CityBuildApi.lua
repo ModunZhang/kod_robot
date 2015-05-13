@@ -118,16 +118,24 @@ function CityBuildApi:SpeedUpBuildingEvents()
         end
     end)
     if #can_upgrade > 0 then
+        -- 加速建筑升级
         -- 随机找一个加速
         local u_building = can_upgrade[math.random(#can_upgrade)]
-        -- 加速建筑升级
-        -- 随机使用事件加速道具
-        local speedUp_item_name = "speedup_"..math.random(8)
-        print("使用"..speedUp_item_name.."加速"..u_building:GetType()..","..u_building:EventType().." ,id:",u_building:UniqueUpgradingKey())
-        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
-            eventType = u_building:EventType(),
-            eventId = u_building:UniqueUpgradingKey()
-        }})
+        local eventType = u_building:EventType()
+        local eventId = u_building:UniqueUpgradingKey()
+        -- 免费加速
+        if u_building:IsAbleToFreeSpeedUpByTime(app.timer:GetServerTime()) then
+            print("免费加速",u_building:GetType())
+            return NetManager:getFreeSpeedUpPromise(eventType,eventId)
+        else
+            -- 随机使用事件加速道具
+            local speedUp_item_name = "speedup_"..math.random(8)
+            print("使用"..speedUp_item_name.."加速"..u_building:GetType()..","..u_building:EventType().." ,id:",u_building:UniqueUpgradingKey())
+            return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+                eventType = eventType,
+                eventId = eventId
+            }})
+        end
     end
 end
 
@@ -179,8 +187,9 @@ return {
     BuildRandomHouse,
     UnlockBuilding,
     Recommend,
-    SpeedUpBuildingEvents,
+    -- SpeedUpBuildingEvents,
 }
+
 
 
 

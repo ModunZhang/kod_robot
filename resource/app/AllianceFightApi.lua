@@ -67,21 +67,41 @@ function AllianceFightApi:March()
             return NetManager:getUnlockPlayerSecondMarchQueuePromise()
         end
         if not alliance:GetAllianceBelvedere():IsReachEventLimit() then
+            local function __getSoldierConfig(soldier_type,level)
+                local normal = GameDatas.Soldiers.normal
+                local SPECIAL = GameDatas.Soldiers.special
+                local level = level or 1
+                return normal[soldier_type.."_"..level] or SPECIAL[soldier_type]
+            end
             -- 首先检查是否有条件攻打，龙，兵
             local dragonType
             local dragonWidget = 0
+            local dragon
             for k,dragon in pairs(dragon_manager:GetDragons()) do
                 if dragon:Status()=="free" and not dragon:IsDead() then
                     if dragon:GetWeight() > dragonWidget then
                         dragonWidget = dragon:GetWeight()
                         dragonType = k
+                        dragon = dragon
                     end
                 end
             end
             local fight_soldiers = {}
-            for k,v in pairs(City:GetSoldierManager():GetSoldierMap()) do
-                if v > 0 then
-                    table.insert(fight_soldiers,{ name = k,count = math.random(v)})
+            if dragon then
+                -- 带兵量判定
+                local leadCitizen = dragon:LeadCitizen()
+                local soldiers_citizen = 0
+                for k,v in pairs(City:GetSoldierManager():GetSoldierMap()) do
+                    if v > 0 then
+                        local count = math.random(v)
+                        soldiers_citizen=soldiers_citizen+count*__getSoldierConfig(k,City:GetSoldierManager():GetStarBySoldierType(k)).citizen
+
+                        if leadCitizen >= soldiers_citizen then
+                            table.insert(fight_soldiers,{ name = k,count = math.random(v)})
+                        else
+                            break
+                        end
+                    end
                 end
             end
             if #fight_soldiers < 1 or not dragonType then
@@ -93,8 +113,8 @@ function AllianceFightApi:March()
                 "attackCity", -- 攻打城市
                 -- "village", -- 村落
                 -- "shrine", -- 圣地
-                -- "helpDefence", -- 协防
-                -- "retreatHelped", -- 撤防
+                "helpDefence", -- 协防
+                "retreatHelped", -- 撤防
             }
             local excute = march_types[math.random(#march_types)]
             if excute == "attackCity" then
@@ -233,6 +253,11 @@ return {
     March,
     SpeedUpMarchEvent,
 }
+
+
+
+
+
 
 
 

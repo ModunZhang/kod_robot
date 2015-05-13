@@ -47,7 +47,6 @@ end
 function MyApp:run()
     local file = io.open("log", "a+")
 
-
     if file then
         file:write("login : "..device.getOpenUDID().."\n")
         io.close(file)
@@ -67,18 +66,22 @@ function MyApp:run()
             }
             return NetManager:initPlayerData(terrains[math.random(#terrains)])
         end
-    end)
-    :next(function()
+    end):next(function()
         print("登录游戏成功!")
         return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
-    end)
-    -- :next(function()
-    --     print("登录游戏成功!")
-    --     return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
-    -- end)
-    :catch(function(err)
+    end):next(function()
+        print("登录游戏成功!")
+        return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
+    end):catch(function(err)
         dump(err:reason())
-        threadExit()
+        -- local content, title = err:reason()
+        -- local code = content.code
+        -- if content.code == 684 then
+        NetManager:disconnect()
+        self:run()
+        -- else
+        -- threadExit()
+        -- end
     end)
 end
 
@@ -133,6 +136,12 @@ function MyApp:IsBuildingUnLocked(location_id)
 end
 
 return MyApp
+
+
+
+
+
+
 
 
 

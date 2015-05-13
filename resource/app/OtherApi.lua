@@ -244,7 +244,6 @@ function OtherApi:MailApi()
         end
     end
 end
-
 local function setRun()
     app:setRun()
 end
