@@ -28,6 +28,135 @@ function AllianceApi:getQuitAlliancePromise()
         return NetManager:getQuitAlliancePromise()
     end
 end
+-- 联盟捐赠
+function AllianceApi:Contribute()
+    if not Alliance_Manager:GetMyAlliance():IsDefault() then
+        local donate_types = {
+            "wood",
+            "stone",
+            "food",
+            "iron",
+            "coin",
+            "gem",
+        }
+        local ResourceManager = City:GetResourceManager()
+        local CON_TYPE = {
+            wood = ResourceManager.RESOURCE_TYPE.WOOD,
+            food = ResourceManager.RESOURCE_TYPE.FOOD,
+            iron = ResourceManager.RESOURCE_TYPE.IRON,
+            stone = ResourceManager.RESOURCE_TYPE.STONE,
+            coin = ResourceManager.RESOURCE_TYPE.COIN,
+            gem = ResourceManager.RESOURCE_TYPE.GEM,
+        }
+        local r_type = donate_types[math.random(#donate_types)]
+
+        local donate_status = User:AllianceDonate()
+        local donate_level = donate_status[r_type]
+        local donate
+        for _,v in pairs(GameDatas.AllianceInitData.donate) do
+            if v.level == donate_level and r_type == v.type then
+                donate = v
+            end
+        end
+        local count  = donate.count
+        local r_count
+        if r_type == "gem" then
+            r_count = User:GetGemResource():GetValue()
+        else
+            r_count = City.resource_manager:GetResourceByType(CON_TYPE[r_type]):GetResourceValueByCurrentTime(app.timer:GetServerTime())
+        end
+        if r_count < count then
+            return
+        end
+        print("联盟捐赠成功:",r_type,count,donate_level)
+        return NetManager:getDonateToAlliancePromise(r_type)
+    end
+end
+-- 升级联盟建筑
+function AllianceApi:UpgradeAllianceBuilding()
+    if not Alliance_Manager:GetMyAlliance():IsDefault() then
+        local alliance = Alliance_Manager:GetMyAlliance()
+        local alliance_map = alliance:GetAllianceMap()
+        local building_names = {
+            "orderHall",
+            "palace",
+            "shop",
+            "shrine",
+        }
+        local building_name = building_names[math.random(#building_names)]
+        local building = alliance_map:FindAllianceBuildingInfoByName(building_name)
+        local building_config = GameDatas.AllianceBuilding[building.name]
+        local now_c = building_config[building.level+1]
+        if not alliance:GetSelf():CanUpgradeAllianceBuilding() then
+            return
+        elseif alliance:Honour() < now_c.needHonour then
+            return
+        end
+        print("升级联盟建筑:",building.name,"到",building.level+1)
+        return NetManager:getUpgradeAllianceBuildingPromise(building.name)
+    end
+end
+-- 升级联盟村落
+function AllianceApi:UpgradeAllianceVillage()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() and alliance:GetSelf():CanUpgradeAllianceBuilding() then
+        local villages = {
+            "foodVillage",
+            "ironVillage",
+            "stoneVillage",
+            "woodVillage",
+        }
+        local village_type = villages[math.random(#villages)]
+        local village_level = alliance:GetVillageLevels()[village_type]
+        local config = GameDatas.AllianceVillage[village_type]
+        local to_level = village_level + 1 > #config and village_level or (village_level + 1)
+        local level_config = config[to_level]
+        if village_level == #config then
+            return
+        end
+        if alliance:Honour () >= level_config.needHonour then
+            print("升级联盟村落:",village_type,to_level)
+            return NetManager:getUpgradeAllianceVillagePromise(village_type)
+        end
+    end
+end
+-- 修改联盟地形
+function AllianceApi:EditTerrain()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() and alliance:GetSelf():CanEditAlliance() and alliance:Status() ~= "fight" then
+        local terrains = {
+            "grassLand",
+            "desert",
+            "iceField",
+        }
+        local current_terrain = alliance:Terrain()
+        local to_terrain = clone(current_terrain)
+        while to_terrain == current_terrain do
+            to_terrain = terrains[math.random(#terrains)]
+        end
+        print("修改联盟地形:",current_terrain,"到",to_terrain)
+        return NetManager:getEditAllianceTerrianPromise(to_terrain)
+    end
+end
+-- 发忠诚值给联盟成员
+function AllianceApi:GiveLoyalty()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() and alliance:GetSelf():IsArchon() and alliance:Honour() > 0 then
+        local members = alliance:GetAllMembers()
+        local member_index = math.random(LuaUtils:table_size(members))
+        local count = 0
+        local member
+        alliance:IteratorAllMembers(function ( id,v )
+            count = count + 1
+            if count == member_index then
+                member = v
+            end
+        end)
+        local loyalty_value = math.random(alliance:Honour())
+        print("奖励",member:Name(),loyalty_value,"忠诚值")
+        return NetManager:getGiveLoyaltyToAllianceMemberPromise(member:Id(),loyalty_value)
+    end
+end
 function AllianceApi:RequestSpeedUp()
     local alliance = Alliance_Manager:GetMyAlliance()
     if not alliance:IsDefault() then
@@ -194,15 +323,68 @@ local function getQuitAlliancePromise()
         setRun()
     end
 end
-
+function Contribute()
+    local p = AllianceApi:Contribute()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+function UpgradeAllianceBuilding()
+    local p = AllianceApi:UpgradeAllianceBuilding()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+function UpgradeAllianceVillage()
+    local p = AllianceApi:UpgradeAllianceVillage()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+function EditTerrain()
+    local p = AllianceApi:EditTerrain()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+function GiveLoyalty()
+    local p = AllianceApi:GiveLoyalty()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 return {
     setRun,
     JoinAlliance,
     CreateAlliance,
     RequestSpeedUp,
     HelpSpeedUp,
+    Contribute,
+    UpgradeAllianceBuilding,
+    UpgradeAllianceVillage,
+    EditTerrain,
+    GiveLoyalty,
 -- getQuitAlliancePromise,
 }
+
+
+
+
+
+
+
+
+
 
 
 

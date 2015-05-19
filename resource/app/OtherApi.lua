@@ -244,6 +244,34 @@ function OtherApi:MailApi()
         end
     end
 end
+
+-- 道具api
+function OtherApi:Items()
+    local is_buy = math.random(2) == 2
+    if is_buy then
+        local item_index = math.random(4)
+        local items
+        if item_index == 1 then
+            items = ItemManager:GetSpecialItems()
+        elseif item_index == 2 then
+            items = ItemManager:GetBuffItems()
+        elseif item_index == 3 then
+            items = ItemManager:GetResourcetItems()
+        elseif item_index == 4 then
+            items = ItemManager:GetSpeedUpItems()
+        end
+        local buy_index = math.random(LuaUtils:table_size(items))
+        local count = 0
+        for k,v in pairs(items) do
+            count = count + 1
+            if count == buy_index then
+                print("购买一个道具：",v:Name())
+                return NetManager:getBuyItemPromise(v:Name(),1)
+            end
+        end
+    end
+end
+
 local function setRun()
     app:setRun()
 end

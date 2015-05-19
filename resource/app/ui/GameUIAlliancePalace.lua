@@ -436,6 +436,8 @@ function GameUIAlliancePalace:InitInfoPart()
             if event.name == "CLICKED_EVENT" then
                 if need_honour>self.alliance:Honour() then
                     UIKit:showMessageDialog(_("提示"),_("联盟荣耀值不足"))
+                elseif self.alliance:Status() == "fight" then
+                    UIKit:showMessageDialog(_("提示"),_("战争期不能修改联盟地形"))
                 else
                     if self.alliance:GetSelf():CanEditAlliance() then
                         NetManager:getEditAllianceTerrianPromise(self:MapIndexToTerrian(self.select_terrian_index))
