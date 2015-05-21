@@ -281,14 +281,7 @@ function GameUIPResourceBuilding:CheckSwitch(switch_to_building_type)
     return true
 end
 function GameUIPResourceBuilding:GotoPreconditionBuilding(preName)
-    local city = self.building:BelongCity()
-    local highest_level_building
-    if preName ~= "tower" then
-        highest_level_building = city:GetHighestBuildingByType(preName)
-    else
-        highest_level_building = city:GetNearGateTower()
-    end
-    local jump_building = highest_level_building or city:GetRuinsNotBeenOccupied()[1] or preName
+    local jump_building = self.building:BelongCity():PreconditionByBuildingType(preName) or city:GetRuinsNotBeenOccupied()[1] or preName
     UIKit:GotoPreconditionBuilding(jump_building)
     self:LeftButtonClicked()
 end

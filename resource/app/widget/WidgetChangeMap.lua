@@ -13,7 +13,7 @@ local WidgetChangeMap = class("WidgetChangeMap", function ()
 end)
 WidgetChangeMap.MAP_TYPE = Enum("OUR_CITY", "OTHER_CITY", "OUR_ALLIANCE", "OTHER_ALLIANCE", "PVE")
 
-function WidgetChangeMap:ctor(map_type)
+function WidgetChangeMap:ctor(map_type, location)
     -- 设置位置位移参数
     local scale_x = 1
     if display.width >640 then
@@ -30,16 +30,22 @@ function WidgetChangeMap:ctor(map_type)
                     UIKit:showMessageDialog(_("陛下"),_("未加入联盟!"))
                     return
                 end
-                app:EnterMyAllianceScene()
+                app:EnterMyAllianceScene(location)
             elseif map_type == WidgetChangeMap.MAP_TYPE.OTHER_CITY then
-                app:EnterMyAllianceSceneOrMyCityScene()
+                app:EnterMyAllianceSceneOrMyCityScene(location)
             elseif map_type == WidgetChangeMap.MAP_TYPE.OUR_ALLIANCE then
                 app:EnterMyCityScene()
             elseif map_type == WidgetChangeMap.MAP_TYPE.OTHER_ALLIANCE then
-                app:EnterMyAllianceScene()
+                app:EnterMyAllianceScene(location)
             elseif map_type == WidgetChangeMap.MAP_TYPE.PVE then
                 app:EnterMyCityScene()
             end
+
+        end)
+        :onButtonPressed(function(event)
+            self.icon:runAction(cc.ScaleTo:create(0.1, 1.2))
+        end):onButtonRelease(function(event)
+        self.icon:runAction(cc.ScaleTo:create(0.1, 1))
         end)
         :scale(scale_x)
     local change_icon
@@ -54,7 +60,7 @@ function WidgetChangeMap:ctor(map_type)
     elseif map_type == WidgetChangeMap.MAP_TYPE.PVE then
         change_icon = "map_city_81x102.png"
     end
-    display.newSprite(change_icon):addTo(btn):align(display.CENTER, 50, 10)
+    self.icon = display.newSprite(change_icon):addTo(btn):align(display.CENTER, 50, 10)
     btn:setTouchSwallowEnabled(true)
     self.btn = btn
 end
@@ -62,6 +68,7 @@ function WidgetChangeMap:GetWorldRect()
     return self.btn:getCascadeBoundingBox()
 end
 return WidgetChangeMap
+
 
 
 

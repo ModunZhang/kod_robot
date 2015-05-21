@@ -9,7 +9,7 @@ hospital[1] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 160
+	["buildTime"] = 2
 }
 hospital[2] = {
 	["level"] = 2,
@@ -20,7 +20,7 @@ hospital[2] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 240
+	["buildTime"] = 120
 }
 hospital[3] = {
 	["level"] = 3,
@@ -31,7 +31,7 @@ hospital[3] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 320
+	["buildTime"] = 240
 }
 hospital[4] = {
 	["level"] = 4,
@@ -42,7 +42,7 @@ hospital[4] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 440
+	["buildTime"] = 480
 }
 hospital[5] = {
 	["level"] = 5,

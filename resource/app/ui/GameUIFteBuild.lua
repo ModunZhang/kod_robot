@@ -28,6 +28,7 @@ local house_map = setmetatable({
 function GameUIFteBuild:PromiseOfFte(house_type)
     self.base_list_view:getScrollNode():setTouchEnabled(false)
     self:GetFteLayer():SetTouchObject(self:Find(house_type))
+    self.OnUpgradingFinished = function() end
 
     local city = self.build_city
     
@@ -46,7 +47,7 @@ function GameUIFteBuild:PromiseOfFte(house_type)
     self:GetFteLayer().arrow = WidgetFteArrow.new(house_map[house_type]):addTo(self:GetFteLayer())
 
     if house_type == "dwelling" then
-        self:GetFteLayer().arrow:TurnUp(true):align(display.RIGHT_TOP, r.x + r.width/2, r.y - 10)
+        self:GetFteLayer().arrow:TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2 )
     else
         self:GetFteLayer().arrow:TurnDown():align(display.BOTTOM_CENTER, r.x + r.width/2, r.y + r.height + 10)
     end

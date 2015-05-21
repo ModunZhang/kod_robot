@@ -7,34 +7,47 @@ local MapScene = import(".MapScene")
 local AllianceScene = class("AllianceScene", MapScene)
 local Alliance = import("..entity.Alliance")
 local GameUIAllianceHome = import("..ui.GameUIAllianceHome")
-function AllianceScene:ctor()
+function AllianceScene:ctor(location)
+    self.location = location
     self.util_node = display.newNode():addTo(self)
     AllianceScene.super.ctor(self)
 end
 function AllianceScene:onEnter()
     self:LoadAnimation()
-
     AllianceScene.super.onEnter(self)
-
     self:CreateAllianceUI()
-    self:GotoCurrectPosition()
     app:GetAudioManager():PlayGameMusic()
     self:GetSceneLayer():ZoomTo(0.8)
-
     self:GetAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.BASIC)
     self:GetAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.OPERATION)
     local alliance_map = self:GetAlliance():GetAllianceMap()
     local allianceShirine = self:GetAlliance():GetAllianceShrine()
     alliance_map:AddListenOnType(allianceShirine,alliance_map.LISTEN_TYPE.BUILDING_INFO)
+
+    if not app:GetGameDefautlt():getBasicInfoValueForKey("SHOW_REGION_TIPS") then
+        UIKit:newGameUI("GameUITips","region"):AddToScene(self, true)
+        app:GetGameDefautlt():getBasicInfoValueForKey("SHOW_REGION_TIPS",true)
+    end
+    if self.location then
+        self:GotoPosition(self.location.x, self.location.y)
+        if self.location.callback then
+            self.location.callback(self)
+        end
+    else
+        self:GotoCurrentPosition()
+    end
 end
 function AllianceScene:LoadAnimation()
     UILib.loadSolidersAnimation()
     UILib.loadDragonAnimation()
 end
-function AllianceScene:GotoCurrectPosition()
+function AllianceScene:GotoCurrentPosition()
     local mapObject = self:GetAlliance():GetAllianceMap():FindMapObjectById(self:GetAlliance():GetSelf():MapId())
     local location = mapObject.location
-    local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(location.x, location.y)
+    self:GotoPosition(location.x, location.y)
+end
+function AllianceScene:GotoPosition(x,y)
+    local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(x,y)
     self:GetSceneLayer():GotoMapPositionInMiddle(point.x, point.y)
 end
 function AllianceScene:EnterEditMode()
@@ -47,9 +60,7 @@ function AllianceScene:IsEditMode()
     return not self:GetHomePage():IsDisplayOn()
 end
 function AllianceScene:CreateAllianceUI()
-    -- local home_page = UIKit:newGameUI('GameUIAllianceHome',Alliance_Manager:GetMyAlliance()):AddToScene(self)
-    local home_page = GameUIAllianceHome.new(self:GetAlliance()):addTo(self)
-    self:GetSceneLayer():AddObserver(home_page)
+    local home_page = GameUIAllianceHome.new(self:GetAlliance(), self:GetSceneLayer()):addTo(self)
     home_page:setTouchSwallowEnabled(false)
     self.home_page = home_page
 end
@@ -64,15 +75,18 @@ function AllianceScene:onExit()
     AllianceScene.super.onExit(self)
 end
 function AllianceScene:CreateSceneLayer()
-    return MultiAllianceLayer.new(nil, self:GetAlliance())
+    return MultiAllianceLayer.new(self, nil, self:GetAlliance())
 end
 function AllianceScene:GotoLogicPosition(x, y)
     local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(x, y)
     return self:GetSceneLayer():PromiseOfMove(point.x, point.y)
 end
 function AllianceScene:OnTouchClicked(pre_x, pre_y, x, y)
-    if not AllianceScene.super.OnTouchClicked(self, pre_x, pre_y, x, y) then return end
-    if self.util_node:getNumberOfRunningActions() > 0 then return end
+    if self.event_manager:TouchCounts() ~= 0 or
+        self.util_node:getNumberOfRunningActions() > 0 then 
+        return 
+    end
+    
     local building = self:GetSceneLayer():GetClickedObject(x, y)
     if building then
         app:lockInput(true)
@@ -210,6 +224,7 @@ function AllianceScene:ReEnterScene()
     app:enterScene("AllianceScene")
 end
 return AllianceScene
+
 
 
 

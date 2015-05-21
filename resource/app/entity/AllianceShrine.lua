@@ -256,8 +256,15 @@ function AllianceShrine:RefreshEvents(alliance_data,deltaData,refresh_time)
 		self:OnShrineEventsChanged(GameUtils:pack_event_table(change_map))
 	end
 
-	is_fully_update = deltaData == nil
-	is_delta_update = not is_fully_update and deltaData.shrineReports ~= nil
+end
+
+function AllianceShrine:IsNeedRequestReportFromServer()
+	return not DataManager:getUserAllianceData().shrineReports
+end
+
+function AllianceShrine:OnShrineReportsDataChanged(alliance_data,deltaData)	
+	local is_fully_update = deltaData == nil
+	local is_delta_update = not is_fully_update and deltaData.shrineReports ~= nil
 
 	if is_fully_update then
 		if alliance_data.shrineReports then
@@ -328,6 +335,7 @@ function AllianceShrine:DecodeObjectsFromJsonAlliance(alliance_data,deltaData,re
 	self:GetMaxStageFromServer(alliance_data,deltaData)
 	self:InitOrUpdatePerception(alliance_data)
 	self:RefreshEvents(alliance_data,deltaData,refresh_time)
+	self:OnShrineReportsDataChanged(alliance_data,deltaData)
 end
 
 function AllianceShrine:GetShireObjectFromMap()

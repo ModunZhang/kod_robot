@@ -16,7 +16,7 @@ function AllianceItemsManager:ctor()
     self.items_resource = {}
     self.items_special = {}
     self.items_speedUp = {}
-    self.item_logs = {}
+    self.item_logs = nil
     self:InitAllItems()
 end
 -- 是否有新货物

@@ -40,8 +40,8 @@ local pve_color = {
 }
 
 
-function PVELayer:ctor(user)
-    PVELayer.super.ctor(self, 0.5, 1)
+function PVELayer:ctor(scene, user)
+    PVELayer.super.ctor(self, scene, 0.5, 1)
     self.pve_listener = Observer.new()
     self.user = user
     self.pve_map = user:GetCurrentPVEMap()
@@ -135,7 +135,7 @@ function PVELayer:LoadPlayer()
     local p = ariship:getAnchorPointInPoints()
     armature:align(display.CENTER, p.x - 10, p.y + 40):getAnimation():playWithIndex(0)
     armature:getAnimation():setSpeedScale(2)
-    ariship:setAnchorPoint(cc.p(0.3, 0.5))
+    ariship:setAnchorPoint(cc.p(0.4, 0.6))
     ariship:runAction(cc.RepeatForever:create(transition.sequence{
         cc.MoveBy:create(5, cc.p(0, 10)),
         cc.MoveBy:create(5, cc.p(0, -10))
@@ -153,6 +153,20 @@ function PVELayer:OnObjectChanged(object)
         self:NotifyExploring()
     end
 end
+local offset_map = {
+    [PVEDefine.WOODCUTTER] = {70, 0},
+    [PVEDefine.QUARRIER] = {80, 0},
+    [PVEDefine.MINER] = {80, 0},
+    [PVEDefine.FARMER] = {60, 0},
+    [PVEDefine.CAMP] = {0, -80},
+    [PVEDefine.CRASHED_AIRSHIP] = {80, 0},
+    [PVEDefine.CONSTRUCTION_RUINS] = {100, 0},
+    [PVEDefine.KEEL] = {150, 0},
+    [PVEDefine.WARRIORS_TOMB] = {80, 0},
+    [PVEDefine.OBELISK] = {0, -50},
+    [PVEDefine.ANCIENT_RUINS] = {90, 50},
+    [PVEDefine.ENTRANCE_DOOR] = {100, 0},
+}
 function PVELayer:SetObjectStatus(object)
     if not object:Type() then
         object:SetType(self:GetTileInfo(object:Position()))
@@ -160,12 +174,11 @@ function PVELayer:SetObjectStatus(object)
     if object:IsSearched() then
         local sprite = self:GetSpriteBy(object:Position())
         if sprite then
+            local x,y = unpack(offset_map[object:Type()])
             local size1 = sprite:getContentSize()
-            local flag = display.newSprite("alliacne_search_29x33.png")
-            local size2 = flag:getContentSize()
-            local x = size1.width - size2.width*0.5
-            local y = size2.height * 0.5
-            flag:pos(x, y):addTo(sprite)
+            local flag = display.newSprite("pve_icon_flag.png")
+            :align(display.BOTTOM_RIGHT, x, y):scale(1.5)
+            :addTo(sprite, 10)
         end
     end
 end
@@ -187,7 +200,7 @@ function PVELayer:PromiseOfTrap()
     local exclamation_scale = 1
     local size = self.char:getContentSize()
     local s = display.newSprite("exclamation.png")
-        :addTo(self.char):pos(size.width*0.4, size.height*0.4):scale(0)
+        :addTo(self.char):pos(size.width*0.3, size.height*0.3):scale(0)
     self.char:runAction(transition.sequence({
         cc.RotateBy:create(t, r),
         cc.RotateBy:create(t, -r),
@@ -304,12 +317,6 @@ function PVELayer:getContentSize()
         self.content_size.height = self.content_size.height * 3
     end
     return self.content_size
-end
-function PVELayer:OnSceneMove()
-
-end
-function PVELayer:OnSceneScale()
-
 end
 function PVELayer:GotoLogicPointInstant(x, y)
     local point = self:ConvertLogicPositionToMapPosition(x, y)

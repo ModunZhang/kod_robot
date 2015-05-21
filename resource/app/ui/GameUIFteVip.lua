@@ -18,8 +18,9 @@ end
 function GameUIFteVip:PromiseOfFte()
     self:GetFteLayer():SetTouchObject(self:FindActiveBtn())
     local r = self:FindActiveBtn():getCascadeBoundingBox()
+
     WidgetFteArrow.new(_("激活VIP")):addTo(self:GetFteLayer())
-    :TurnUp():align(display.TOP_CENTER, r.x + r.width/2, r.y - 20)
+    :TurnDown():align(display.BOTTOM_CENTER, r.x + r.width/2, r.y + r.width + 20)
 
     return WidgetUseItems:PromiseOfOpen("vipActive"):next(function(ui)
         self:GetFteLayer():removeFromParent()
@@ -28,6 +29,5 @@ function GameUIFteVip:PromiseOfFte()
         return self:PromsieOfExit("GameUIFteVip")
     end)
 end
-
 
 return GameUIFteVip

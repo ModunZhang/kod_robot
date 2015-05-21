@@ -143,7 +143,7 @@ function GameUIDragonEquipment:TabButtonEvent_info()
           :align(display.RIGHT_BOTTOM,name_bar:getPositionX() + 468,mainEquipment:getPositionY() - mainEquipment:getContentSize().height)
           :setButtonLabel("normal", UIKit:commonButtonLable({
               text = _("重置"),
-              size = 24,
+              size = 22,
           }))
           :onButtonClicked(function()
               local equipment = self:GetEquipment()
@@ -194,7 +194,7 @@ function GameUIDragonEquipment:TabButtonEvent_intensify()
           :align(display.RIGHT_BOTTOM,name_bar:getPositionX() + 468,mainEquipment:getPositionY() - mainEquipment:getContentSize().height)
           :setButtonLabel("normal", UIKit:commonButtonLable({
               text = _("强化"),
-              size = 24,
+              size = 22,
           }))
           :onButtonClicked(function()
               self:IntensifyButtonClicked()
@@ -235,7 +235,8 @@ function GameUIDragonEquipment:TabButtonEvent_intensify()
         local exp_label = UIKit:ttfLabel({
             text = "120/120 + 300",
             size = 20,
-            color= 0xfff3c7
+            color= 0xfff3c7,
+            shadow= true,
         }):align(display.LEFT_CENTER,10, 20):addTo(progressBg)
 
         self.exp_label = exp_label

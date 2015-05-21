@@ -45,10 +45,10 @@ function SoldierStarEvents:Percent(current_time)
     return elapse_time * 100.0 / total_time
 end
 function SoldierStarEvents:GetTime()
-    return self.times_ or 0
+    return self.times_ or math.ceil(self:FinishTime() - app.timer:GetServerTime())
 end
 function SoldierStarEvents:LeftTime()
-    return self.times_ or 0
+    return self.times_ or math.ceil(self:FinishTime() - app.timer:GetServerTime())
 end
 function SoldierStarEvents:GetLocalizeDesc()
     local star = City:GetSoldierManager():GetStarBySoldierType(self.name)

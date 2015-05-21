@@ -1,22 +1,13 @@
-local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 local UILib = import("..ui.UILib")
-local SpriteButton = import("..ui.SpriteButton")
-local BuildingLevelUpUINode = import("..ui.BuildingLevelUpUINode")
-local BuildingUpgradeUINode = import("..ui.BuildingUpgradeUINode")
 local CityLayer = import("..layers.CityLayer")
-local EventManager = import("..layers.EventManager")
-local TouchJudgment = import("..layers.TouchJudgment")
 local IsoMapAnchorBottomLeft = import("..map.IsoMapAnchorBottomLeft")
 local MapScene = import(".MapScene")
-local promise = import("..utils.promise")
-local Alliance = import("..entity.Alliance")
 local CityScene = class("CityScene", MapScene)
 
 local app = app
 local timer = app.timer
 local DEBUG_LOCAL = false
 function CityScene:ctor(city)
-    self.mark_buildings = {}
     self.city = city
     CityScene.super.ctor(self)
 end
@@ -29,21 +20,11 @@ function CityScene:onEnter()
     self:GotoLogicPointInstant(6, 4)
     self:GetSceneLayer():ZoomTo(1)
 
-    -- local sprite = display.newSprite("batcat_logo_368x390.png", 0, 0, {class=cc.FilteredSpriteWithOne}):addTo(self):align(display.LEFT_BOTTOM)
-    -- sprite:setScaleX(display.width/368)
-    -- sprite:setScaleY(display.height/390)
-    -- sprite:setFilter(filter.newFilter("CUSTOM", json.encode({
-    --     frag = "shaders/snow.fs",
-    --     shaderName = "snow",
-    --     u_resolution = {display.width, display.height},
-    --     curTime = 0,
-    -- })))
-    -- local time = 0
-    -- sprite:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
-    --     time = time + dt
-    --     sprite:getFilter():getGLProgramState():setUniformFloat("curTime", time)
+    --  cc.ui.UIPushButton.new({normal = "lock_btn.png",pressed = "lock_btn.png"})
+    -- :addTo(self, 1000000):pos(display.cx, display.cy + 300)
+    -- :onButtonClicked(function()
+    --     app:ReloadGame()
     -- end)
-    -- sprite:scheduleUpdate()
 end
 function CityScene:onExit()
     UILib.unLoadBuildingAnimation()
@@ -69,127 +50,6 @@ function CityScene:CreateSceneLayer()
     })
     return scene
 end
-function CityScene:CreateSceneUILayer()
-    local city = self.city
-    local scene_ui_layer = display.newLayer()
-    scene_ui_layer:setTouchEnabled(true)
-    scene_ui_layer:setTouchSwallowEnabled(false)
-    function scene_ui_layer:Init()
-        self.action_node = display.newNode():addTo(self)
-        self.levelup_node = display.newNode():addTo(self)
-        self.levelup_node:setCascadeOpacityEnabled(true)
-        self.ui = {}
-        self.level_up_ui = {}
-        self.lock_buttons = {}
-        self.status = nil
-    end
-    function scene_ui_layer:NewLockButtonFromBuildingSprite(building_sprite)
-        local lock_button = SpriteButton.new(building_sprite, city):addTo(self, 1)
-        building_sprite:AddObserver(lock_button)
-        city:AddListenOnType(lock_button, city.LISTEN_TYPE.UPGRADE_BUILDING)
-        table.insert(self.lock_buttons, lock_button)
-        building_sprite:OnSceneMove()
-    end
-    function scene_ui_layer:RemoveAllLockButtons()
-        for _, v in pairs(self.lock_buttons) do
-            v:removeFromParent()
-            city:RemoveListenerOnType(v, city.LISTEN_TYPE.UPGRADE_BUILDING)
-        end
-        self.lock_buttons = {}
-    end
-    function scene_ui_layer:ShowIndicatorOnBuilding(building_sprite)
-        if not self.indicator then
-            self.building__ = building_sprite
-            self.indicator = display.newNode():addTo(self):zorder(1001)
-            local r = 30
-            local len = 50
-            local x = math.sin(math.rad(r)) * len
-            local y = math.sin(math.rad(90 - r)) * len
-            display.newSprite("arrow_home.png")
-                :addTo(self.indicator)
-                :align(display.BOTTOM_CENTER, 10, 10)
-                :rotation(r)
-                :runAction(cc.RepeatForever:create(transition.sequence{
-                    cc.MoveBy:create(0.4, cc.p(-x, -y)),
-                    cc.MoveBy:create(0.4, cc.p(x, y)),
-                }))
-            self.action_node:stopAllActions()
-            self.action_node:performWithDelay(function()
-                self:HideIndicator()
-            end, 4.0)
-            self:OnSceneMove()
-        end
-    end
-    function scene_ui_layer:HideIndicator()
-        if self.indicator then
-            self.action_node:stopAllActions()
-            self.indicator:removeFromParent()
-            self.indicator = nil
-        end
-    end
-    function scene_ui_layer:OnSceneMove()
-        if self.indicator and self.building__.GetWorldPosition then
-            local _,top = self.building__:GetWorldPosition()
-            self.indicator:pos(top.x, top.y)
-        end
-    end
-    -- function scene_ui_layer:NewUIFromBuildingSprite(building_sprite)
-    --     local progress = BuildingUpgradeUINode.new():addTo(self)
-    --     building_sprite:AddObserver(progress)
-    --     table.insert(self.ui, progress)
-
-    --     local levelup = BuildingLevelUpUINode.new():addTo(self.levelup_node)
-    --     building_sprite:AddObserver(levelup)
-    --     table.insert(self.ui, levelup)
-
-    --     building_sprite:CheckCondition()
-    --     building_sprite:OnSceneMove()
-    -- end
-    -- function scene_ui_layer:RemoveUIFromBuildingSprite(building_sprite)
-    --     building_sprite:NotifyObservers(function(ob)
-    --         table.foreachi(self.ui, function(i, v)
-    --             if ob == v then
-    --                 table.remove(self.ui, i)
-    --                 v:removeFromParent()
-    --             end
-    --         end)
-    --     end)
-    -- end
-    function scene_ui_layer:ShowLevelUpNode()
-        if self.status == "show" then
-            return
-        end
-        self.levelup_node:stopAllActions()
-        self.levelup_node:fadeTo(0.5, 255)
-        self.status = "show"
-    end
-    function scene_ui_layer:HideLevelUpNode()
-        if self.status == "hide" then
-            return
-        end
-        self.levelup_node:stopAllActions()
-        self.levelup_node:fadeTo(0.5, 0)
-        self.status = "hide"
-    end
-    function scene_ui_layer:IteratorLockButtons(func)
-        table.foreach(self.lock_buttons, func)
-    end
-    function scene_ui_layer:EnterEditMode()
-        table.foreach(self.lock_buttons, function(_, v)
-            v:hide()
-        end)
-        self.levelup_node:hide()
-    end
-    function scene_ui_layer:LeaveEditMode()
-        table.foreach(self.lock_buttons, function(_, v)
-            v:show()
-        end)
-        self.levelup_node:show()
-    end
-    scene_ui_layer:Init()
-    return scene_ui_layer
-end
--- function
 function CityScene:GotoLogicPointInstant(x, y)
     local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(x, y)
     self:GetSceneLayer():GotoMapPositionInMiddle(point.x, point.y)
@@ -217,19 +77,7 @@ function CityScene:IsEditMode()
     return self:GetSceneLayer():IsEditMode()
 end
 --- callback override
-function CityScene:OnCreateDecoratorSprite(building_sprite)
-end
-function CityScene:OnDestoryDecoratorSprite(building_sprite)
-end
 function CityScene:OnTilesChanged(tiles)
-end
-function CityScene:OnTreesChanged(trees, road)
-end
-function CityScene:OnTowersChanged(old_towers, new_towers)
-end
-function CityScene:OnGateChanged(old_walls, new_walls)
-end
-function CityScene:OnSceneScale(s)
 end
 function CityScene:OnTouchBegan(pre_x, pre_y, x, y)
     if not DEBUG_LOCAL then return end
@@ -282,20 +130,30 @@ function CityScene:OnTouchMove(pre_x, pre_y, x, y)
     CityScene.super.OnTouchMove(self, pre_x, pre_y, x, y)
 end
 
--- function CityScene:InsertMarkBuildings(building)
---     table.insert(self.mark_buildings, building)
--- end
--- function CityScene:GetMarkBuildings()
---     return self.mark_buildings
--- end
--- function CityScene:RemoveAllMarkBuildings()
---     self.mark_buildings = {}
--- end
+function CityScene:CollectBuildings(building_sprite)
+    local r = {}
+    if building_sprite:GetEntity():GetType() == "wall" then
+        for _,v in ipairs(self:GetSceneLayer():GetWalls()) do
+            table.insert(r, v)
+        end
+        for _,v in ipairs(self:GetSceneLayer():GetTowers()) do
+            table.insert(r, v)
+        end
+    elseif building_sprite:GetEntity():GetType() == "tower" then
+        r = {unpack(self:GetSceneLayer():GetTowers())}
+    else
+        r = {building_sprite}
+    end
+    return r
+end
 
-
-
+function CityScene:onEnterTransitionFinish()
+    CityScene.super.onEnterTransitionFinish(self)
+end
 
 return CityScene
+
+
 
 
 

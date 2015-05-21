@@ -118,14 +118,6 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
         :addTo(content):pos(75, 70)
     building_image:setAnchorPoint(cc.p(0.5,0.5))
     building_image:setScale(113/math.max(building_image:getContentSize().width,building_image:getContentSize().height))
-    -- local level_bg = display.newSprite("back_ground_138x34.png")
-    --     :addTo(content):pos(76, 34)
-    -- local villageLevel = UIKit:ttfLabel({
-    --     text = _("等级")..village_level,
-    --     size = 20,
-    --     color = 0x514d3e,
-    -- }):align(display.CENTER, level_bg:getContentSize().width/2 , level_bg:getContentSize().height/2)
-    --     :addTo(level_bg)
     -- 村落名字
     local title_bg = display.newScale9Sprite("title_blue_430x30.png", item_width/2, 175,cc.size(550,30),cc.rect(15,10,400,10))
            :align(display.CENTER):addTo(content)
@@ -192,7 +184,7 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
     self.village_listview:addItem(item)
 
     function item:LevelUpRefresh(village_type,village_level)
-        villageLevel:setString(_("等级")..village_level)
+        current_level:SetValue(_("等级")..village_level)
         local build_png = SpriteConfig[village_type]:GetConfigByLevel(village_level).png
         building_image:setTexture(build_png)
         total_resource:SetValue(config[village_level].production)

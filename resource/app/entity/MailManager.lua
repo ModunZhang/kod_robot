@@ -7,15 +7,23 @@ MailManager.LISTEN_TYPE = Enum("MAILS_CHANGED","UNREAD_MAILS_CHANGED","REPORTS_C
 
 function MailManager:ctor()
     MailManager.super.ctor(self)
-    self.mails = {}
-    self.savedMails = {}
-    self.sendMails = {}
-    self.reports = {}
-    self.savedReports = {}
+    self.mails = nil
+    self.savedMails = nil
+    self.sendMails = nil
+    self.reports = nil
+    self.savedReports = nil
+
+    local user_data = DataManager:getUserData()
+    print("DataManager>>> mails",user_data.mails)
+    print("DataManager>>> savedMails",user_data.savedMails)
+    print("DataManager>>> sendMails",user_data.sendMails)
+    print("DataManager>>> reports",user_data.reports)
+    print("DataManager>>> savedReports",user_data.savedReports)
 end
 
 function MailManager:IncreaseUnReadMailsNum(num)
     self.unread_mail = self.unread_mail + num
+    GameGlobalUI:showTips(_("提示"),_("你有一封新的邮件"))
     self:NotifyListeneOnType(MailManager.LISTEN_TYPE.UNREAD_MAILS_CHANGED,function(listener)
         listener:MailUnreadChanged({mail=self.unread_mail})
     end)
@@ -151,18 +159,20 @@ function MailManager:ModifyMail(mail)
         end
     end
     -- 如果收件箱没找到对应邮件,则在收藏夹找一下
-    for k,v in pairs(self.savedMails) do
-        if v.id == mail.id then
-            if mail.isSaved ~= v.isSaved then
-                self:OnNewSavedMailsChanged(mail)
+    if self.savedMails then
+        for k,v in pairs(self.savedMails) do
+            if v.id == mail.id then
+                if mail.isSaved ~= v.isSaved then
+                    self:OnNewSavedMailsChanged(mail)
+                end
+                if mail.isRead then
+                    self:OnNewSavedMailsChanged(mail,true)
+                end
+                for i,modify in pairs(mail) do
+                    v[i] = modify
+                end
+                return v
             end
-            if mail.isRead then
-                self:OnNewSavedMailsChanged(mail,true)
-            end
-            for i,modify in pairs(mail) do
-                v[i] = modify
-            end
-            return v
         end
     end
 end
@@ -241,11 +251,15 @@ function MailManager:FetchMailsFromServer(fromIndex)
     return NetManager:getFetchMailsPromise(fromIndex):done(function(response)
         if response.msg.mails then
             local user_data = DataManager:getUserData()
-            local fetch_mails = {}
             for i,v in ipairs(response.msg.mails) do
+                if not user_data.mails then
+                    user_data.mails = {}
+                end
                 table.insert(user_data.mails, v)
+                if not self.mails then
+                    self.mails = {}
+                end
                 self:AddMailsToEnd(clone(v))
-                table.insert(fetch_mails, clone(v))
             end
         end
         return response
@@ -258,27 +272,40 @@ function MailManager:FetchSavedMailsFromServer(fromIndex)
     return NetManager:getFetchSavedMailsPromise(fromIndex):done(function (response)
         if response.msg.mails then
             local user_data = DataManager:getUserData()
-            local fetch_mails = {}
             for i,v in ipairs(response.msg.mails) do
+                if not user_data.savedMails then
+                    user_data.savedMails = {}
+                end
                 table.insert(user_data.savedMails, v)
+                if not self.savedMails then
+                    self.savedMails = {}
+                end
                 self:AddSavedMailsToEnd(clone(v))
-                table.insert(fetch_mails, clone(v))
             end
         end
     end)
 end
 function MailManager:GetSendMails()
+    if not self.sendMails then return end
+    -- 按时间排序
+    table.sort(self.sendMails,function ( a , b )
+        return a.sendTime > b.sendTime
+    end)
     return self.sendMails
 end
 function MailManager:FetchSendMailsFromServer(fromIndex)
     return NetManager:getFetchSendMailsPromise(fromIndex):done(function(response)
         if response.msg.mails then
             local user_data = DataManager:getUserData()
-            local fetch_mails = {}
             for i,v in ipairs(response.msg.mails) do
+                if not user_data.sendMails then
+                    user_data.sendMails = {}
+                end
                 table.insert(user_data.sendMails, v)
+                if not self.sendMails then
+                    self.sendMails = {}
+                end
                 self:AddSendMailsToEnd(clone(v))
-                table.insert(fetch_mails, clone(v))
             end
         end
     end)
@@ -300,20 +327,19 @@ function MailManager:OnMailStatusChanged( mailStatus )
     end)
 end
 function MailManager:OnMailsChanged( mails )
-    self.mails = clone(mails)
+    self.mails = mails and clone(mails)
 end
 function MailManager:OnSavedMailsChanged( savedMails )
-    self.savedMails = clone(savedMails)
+    self.savedMails = savedMails and clone(savedMails)
 end
 function MailManager:OnSendMailsChanged( sendMails )
-    self.sendMails = clone(sendMails)
+    self.sendMails = sendMails and clone(sendMails)
 end
 
 function MailManager:OnNewMailsChanged( mails )
     local add_mails = {}
     local remove_mails = {}
     local edit_mails = {}
-    dump(mails,"OnNewMailsChanged")
     for type,mail in pairs(mails) do
         if type == "add" then
             for i,data in ipairs(mail) do
@@ -354,10 +380,10 @@ function MailManager:OnNewMailsChanged( mails )
     end)
 end
 function MailManager:OnNewSavedMailsChanged( savedMails,isRead )
+    if not self.savedMails then return end
     local add_mails = {}
     local remove_mails = {}
     local edit_mails = {}
-    dump(savedMails,"savedMails")
     if isRead then
         table.insert(edit_mails, savedMails)
         for i,v in ipairs(self.savedMails) do
@@ -447,13 +473,13 @@ function MailManager:OnUserDataChanged(userData,timer,deltaData)
 end
 
 function MailManager:OnReportsChanged( reports )
-    self.reports = {}
+    if not reports then return end
     for k,v in pairs(reports) do
         table.insert(self.reports, Report:DecodeFromJsonData(clone(v)))
     end
 end
 function MailManager:OnSavedReportsChanged( savedReports )
-    self.savedReports = {}
+    if not savedReports then return end
     for k,v in pairs(savedReports) do
         table.insert(self.savedReports, Report:DecodeFromJsonData(clone(v)))
     end
@@ -502,16 +528,27 @@ function MailManager:OnNewReportsChanged( __reports )
         })
     end)
 end
-function MailManager:OnNewSavedReportsChanged( __savedReports )
+function MailManager:OnNewSavedReportsChanged( __savedReports , modifyIsRead)
+    if not self.savedReports then return end
     local add_reports = {}
     local remove_reports = {}
     local edit_reports = {}
-    if __savedReports:IsSaved() then
-        table.insert(add_reports, __savedReports)
-        table.insert(self.savedReports, __savedReports)
+    if modifyIsRead then
+        table.insert(edit_reports, __savedReports)
+        for k,v in pairs(self.savedReports) do
+            if v:Id() == __savedReports:Id() then
+                self.savedReports[k] = __savedReports
+            end
+        end
     else
-        table.insert(remove_reports, __savedReports)
-        self:DeleteSavedReport(__savedReports)
+        if __savedReports:IsSaved() then
+            table.insert(add_reports, __savedReports)
+            table.insert(self.savedReports, 1 , __savedReports)
+        else
+            table.insert(remove_reports, __savedReports)
+            self:DeleteSavedReport(__savedReports)
+        end
+
     end
 
 
@@ -519,6 +556,7 @@ function MailManager:OnNewSavedReportsChanged( __savedReports )
         listener:OnSavedReportsChanged({
             add = add_reports,
             remove = remove_reports,
+            edit = edit_reports,
         })
     end)
 
@@ -548,6 +586,10 @@ function MailManager:ModifyReport( report )
             if v:IsSaved() ~= report.isSaved then
                 self:OnNewSavedReportsChanged(Report:DecodeFromJsonData(report))
             end
+            print("v:IsRead()",v:IsRead(),"report.isRead ",report.isRead )
+            if v:IsRead() ~= report.isRead then
+                self:OnNewSavedReportsChanged(Report:DecodeFromJsonData(report),true)
+            end
             v:Update(report)
             return self.reports[k]
         end
@@ -570,11 +612,16 @@ function MailManager:FetchReportsFromServer(fromIndex)
         :done(function (response)
             if response.msg.reports then
                 local user_data = DataManager:getUserData()
-                local fetch_reports = {}
+                dump(response.msg.reports,"response.msg.reports")
                 for i,v in ipairs(response.msg.reports) do
+                    if not user_data.reports then
+                        user_data.reports = {}
+                    end
                     table.insert(user_data.reports, v)
+                    if not self.reports then
+                        self.reports = {}
+                    end
                     self:AddReportsToEnd(clone(v))
-                    table.insert(fetch_reports, clone(v))
                 end
             end
         end)
@@ -583,18 +630,27 @@ function MailManager:GetSavedReports()
     return self.savedReports
 end
 function MailManager:FetchSavedReportsFromServer(fromIndex)
-    NetManager:getSavedReportsPromise(fromIndex):done(function (response)
+    return NetManager:getSavedReportsPromise(fromIndex):done(function (response)
         if response.msg.reports then
             local user_data = DataManager:getUserData()
-            local fetch_reports = {}
             for i,v in ipairs(response.msg.reports) do
-                table.insert(user_data.reports, v)
+                if not user_data.savedReports then
+                    user_data.savedReports = {}
+                end
+                table.insert(user_data.savedReports, v)
+                if not self.savedReports then
+                    self.savedReports = {}
+                end
                 self:AddSavedReportsToEnd(clone(v))
-                table.insert(fetch_reports, v)
             end
         end
     end)
 end
 return MailManager
+
+
+
+
+
 
 

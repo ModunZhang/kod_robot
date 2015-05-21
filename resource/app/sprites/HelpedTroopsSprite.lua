@@ -10,6 +10,19 @@ end
 function HelpedTroopsSprite:GetSpriteFile()
     return "armyCamp.png"
 end
+function HelpedTroopsSprite:GetEntity()
+    return {
+        GetType = function()
+            return "helpedTroops"
+        end,
+        GetLogicPosition = function()
+            return self.x, self.y
+        end,
+        GetMidLogicPosition = function()
+            return self.x, self.y
+        end
+    }
+end
 function HelpedTroopsSprite:GetIndex()
 	return self.index
 end

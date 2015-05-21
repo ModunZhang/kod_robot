@@ -241,6 +241,7 @@ function GameUIMission:listviewListener(event)
         local really_pos = pos - 2 - #self:GetAchievementMissionData(true)
         if really_pos > 0 then
             local data = self:GetAchievementMissionData(false)[really_pos]
+            app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
             self:OnTodoAchievementMissionClicked(data)
         end
     end
@@ -322,7 +323,7 @@ function GameUIMission:GetDailyListData()
         local text_table = Localize.daily_tasks[v]
         local tmp_data = dailyTasks[v]
         if text_table and tmp_data then
-            table.insert(r,{category = v,percent = #tmp_data/5,title = text_table.title ,image = UILib.daily_task_icon[v],desc = text_table.desc})
+            table.insert(r,{category = v,percent = #tmp_data/4,title = text_table.title ,image = UILib.daily_task_icon[v],desc = text_table.desc})
         end
     end
     dump(r,"GetDailyListData----->")
@@ -332,7 +333,7 @@ end
 
 function GameUIMission:RefreshDailyListWithItemAndKeyOfDaily(item,key_of_daily)
     local tmp_data = self.city:GetUser():GetDailyTasksInfo(key_of_daily)
-    local percent = #tmp_data/5
+    local percent = #tmp_data/4
     if percent >= 1 then
         item.finfish_tip_label:show()
         item.progress_bg:hide()
@@ -431,6 +432,7 @@ function GameUIMission:dailyListviewListener(event)
     if "clicked" == event.name then
         local pos = event.itemPos
         local keys_of_daily = KEYS_OF_DAILY[pos]
+        app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
         UIKit:newGameUI("GameUIDailyMissionInfo",keys_of_daily):AddToCurrentScene(true)
     end
 end

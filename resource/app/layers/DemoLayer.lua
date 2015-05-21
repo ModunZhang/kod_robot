@@ -59,12 +59,6 @@ function DemoLayer:getContentSize()
     end
     return self.content_size
 end
-function DemoLayer:OnSceneMove()
-
-end
-function DemoLayer:OnSceneScale()
-
-end
 function DemoLayer:GotoLogicPointInstant(x, y)
     local point = self:ConvertLogicPositionToMapPosition(x, y)
     self:GotoMapPositionInMiddle(point.x, point.y)

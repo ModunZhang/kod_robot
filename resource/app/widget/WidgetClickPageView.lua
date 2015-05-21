@@ -28,23 +28,22 @@ function WidgetClickPageView:ctor(params)
     self:setContentSize(cc.size(self.width,self.height))
 
     self.left_btn =  WidgetPushButton.new(
-        {normal = "brown_btn_up_26x165.png", pressed = "brown_btn_down_26x165.png"},
+        {normal = "brown_btn_up_34x165.png", pressed = "brown_btn_down_34x165.png"},
         {scale9 = false}
     )
-        :addTo(self.bg):align(display.CENTER, 15,self.height/2)
+        :addTo(self.bg):align(display.CENTER, 17,self.height/2)
         :onButtonClicked(function(event)
             self:changePage(false)
         end)
-    display.newSprite("icon_arrow_14x26.png"):addTo(self.left_btn)
+    self.left_btn:setRotationSkewY(180)
     self.right_btn =  WidgetPushButton.new(
-        {normal = "brown_btn_up_26x165.png", pressed = "brown_btn_down_26x165.png"},
+        {normal = "brown_btn_up_34x165.png", pressed = "brown_btn_down_34x165.png"},
         {scale9 = false}
     )
-        :addTo(self.bg):align(display.CENTER, self.width-15,self.height/2)
+        :addTo(self.bg):align(display.CENTER, self.width-17,self.height/2)
         :onButtonClicked(function(event)
             self:changePage(true)
         end)
-    display.newSprite("icon_arrow_14x26.png"):addTo(self.right_btn):flipX(true)
 end
 --[[--
 

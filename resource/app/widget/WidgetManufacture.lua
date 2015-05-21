@@ -1,4 +1,5 @@
 local window = import("..utils.window")
+local Localize = import("..utils.Localize")
 local UIListView = import("..ui.UIListView")
 local GameUIToolShopSpeedUp = import("..ui.GameUIToolShopSpeedUp")
 local MaterialManager = import("..entity.MaterialManager")
@@ -125,7 +126,14 @@ function WidgetManufacture:Manufacture()
         end
     end)
     item:GetMaterial():SetClicked(function()
-        NetManager:getFetchMaterialsPromise(self.toolShop:GetBuildingEvent():Id())
+        local content = self.toolShop:GetBuildingEvent():Content()
+        NetManager:getFetchMaterialsPromise(self.toolShop:GetBuildingEvent():Id()):done(function()
+            local desc_t = {}
+            for i,v in ipairs(content) do
+                table.insert(desc_t, string.format("%sx%d", Localize.materials[v.type], v.count)) 
+            end
+            GameGlobalUI:showTips(_("获取建筑材料"), table.concat(desc_t, ", "))
+        end)
     end)
     item:SetStoreMaterials(materials)
 
@@ -168,7 +176,14 @@ function WidgetManufacture:Manufacture()
         end
     end)
     item:GetMaterial():SetClicked(function()
-        NetManager:getFetchMaterialsPromise(self.toolShop:GetTechnologyEvent():Id())
+        local content = self.toolShop:GetTechnologyEvent():Content()
+        NetManager:getFetchMaterialsPromise(self.toolShop:GetTechnologyEvent():Id()):done(function()
+            local desc_t = {}
+            for i,v in ipairs(content) do
+                table.insert(desc_t, string.format("%sx%d", Localize.materials[v.type], v.count)) 
+            end
+            GameGlobalUI:showTips(_("获取科技材料"), table.concat(desc_t, ", "))
+        end)
     end)
     item:SetStoreMaterials(materials)
 

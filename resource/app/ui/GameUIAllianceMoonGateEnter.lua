@@ -23,7 +23,7 @@ function GameUIAllianceMoonGateEnter:GetBuildingType()
 end
 
 function GameUIAllianceMoonGateEnter:GetBuildingDesc()
-	return Localize.building_description.alliance_building_moonGate
+	return Localize.building_description.moonGate
 end
 
 

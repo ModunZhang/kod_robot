@@ -4,17 +4,9 @@ local Sprite = import(".Sprite")
 local UpgradingSprite = class("UpgradingSprite", Sprite)
 ----
 
-function UpgradingSprite:OnSceneMove()
-    local world_point, top = self:GetWorldPosition()
-    self:NotifyObservers(function(listener)
-        listener:OnPositionChanged(world_point.x, world_point.y, top.x, top.y)
-    end)
-end
 function UpgradingSprite:GetWorldPosition()
     return self:convertToWorldSpace(cc.p(self:GetSpriteOffset())),
         self:convertToWorldSpace(cc.p(self:GetSpriteTopPosition()))
-end
-function UpgradingSprite:OnOrientChanged()
 end
 function UpgradingSprite:OnLogicPositionChanged(x, y)
     self:SetPositionWithZOrder(self:GetLogicMap():ConvertToMapPosition(x, y))
@@ -41,7 +33,6 @@ function UpgradingSprite:OnBuildingUpgradeFinished(building)
     -- end)
     self:RefreshSprite()
     -- self:RefreshShadow()
-    -- self:OnSceneMove()
 
     -- animation
     self:StopBuildingAnimation()
@@ -86,8 +77,7 @@ function UpgradingSprite:CheckCondition()
     --     listener:OnCheckUpgradingCondition(self)
     -- end)
     if not self.level_bg then return end
-    local city = self:GetEntity():BelongCity()
-    building = self:GetEntity():GetType() == "tower" and city:GetTower() or self:GetEntity()
+    local building = self:GetEntity():GetRealEntity()
     local level = building:GetLevel()
     local canUpgrade = building:CanUpgrade()
     self.level_bg:setVisible(level > 0)
@@ -110,7 +100,6 @@ function UpgradingSprite:ctor(city_layer, entity)
         self:CreateLevelNode()
     end
     self:CheckCondition()
-
 
     -- if entity:IsUnlocked() and self:GetShadowConfig() then
     --     self:CreateShadow(self:GetShadowConfig())
@@ -171,14 +160,14 @@ function UpgradingSprite:GetAniArray()
 end
 function UpgradingSprite:GetCurrentConfig()
     if self.config then
-        return self.config:GetConfigByLevel(self.entity:GetLevel())
+        return self.config:GetConfigByLevel(self:GetEntity():GetRealEntity():GetLevel())
     else
         return nil
     end
 end
 function UpgradingSprite:GetBeforeConfig()
     if self.config then
-        return self.config:GetConfigByLevel(self.entity:GetBeforeLevel())
+        return self.config:GetConfigByLevel(self:GetEntity():GetRealEntity():GetBeforeLevel())
     else
         return nil
     end
@@ -209,20 +198,12 @@ function UpgradingSprite:CreateLevelNode()
     self.text_field:setSkewY(-30)
 end
 function UpgradingSprite:ShowLevelUpNode()
-    if self.status == "show" then
-        return
-    end
     self.level_bg:stopAllActions()
     self.level_bg:fadeTo(0.5, 255)
-    self.status = "show"
 end
 function UpgradingSprite:HideLevelUpNode()
-    if self.status == "hide" then
-        return
-    end
     self.level_bg:stopAllActions()
     self.level_bg:fadeTo(0.5, 0)
-    self.status = "hide"
 end
 return UpgradingSprite
 

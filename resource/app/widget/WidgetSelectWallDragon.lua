@@ -107,7 +107,7 @@ function WidgetSelectWallDragon:ctor(params)
         :setLayoutSize(100, 500)
         :align(display.TOP_CENTER, 500 , 110)
     group:getButtonAtIndex(default_select_dragon_index):setButtonSelected(true)
-    local defence_button =  WidgetPushButton.new({normal = "yellow_button_146x42.png",pressed = "yellow_button_highlight_146x42.png"})
+    local defence_button =  WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
         :setButtonLabel(UIKit:ttfLabel({
             text = _("驻防"),
             size = 24,
@@ -132,10 +132,10 @@ function WidgetSelectWallDragon:ctor(params)
 		        	end
 		        end
             end
-        end):align(display.CENTER,rb_size.width/2+150,50):addTo(body)
+        end):align(display.CENTER,rb_size.width/2,50):addTo(body)
     defence_button:setVisible(not default_dragon:IsDefenced())
 
-   local removal_button = WidgetPushButton.new({normal = "red_button_146x42.png",pressed = "red_button_highlight_146x42.png"})
+   local removal_button = WidgetPushButton.new({normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"})
             :setButtonLabel(UIKit:ttfLabel({
                 text = _("撤防"),
                 size = 24,
@@ -147,7 +147,7 @@ function WidgetSelectWallDragon:ctor(params)
                 	params.callback[2]()
                 	self:removeSelf()
                 end
-            end):align(display.CENTER,rb_size.width/2+150,50):addTo(body)
+            end):align(display.CENTER,rb_size.width/2,50):addTo(body)
     removal_button:setVisible(default_dragon:IsDefenced())
     group:onButtonSelectChanged(function()
     	local dragon 

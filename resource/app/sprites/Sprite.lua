@@ -1,3 +1,4 @@
+local cocos_promise = import("..utils.cocos_promise")
 local promise = import("..utils.promise")
 local Orient = import("..entity.Orient")
 local Observer = import("..entity.Observer")
@@ -6,14 +7,8 @@ local Sprite = class("Sprite", function(...)
     return Observer.extend(display.newNode(), ...)
 end)
 
+local modf = math.modf
 local SPRITE = 0
----- 回调
-function Sprite:OnSceneMove()
-    local world_point = self:GetWorldPosition()
-    self:NotifyObservers(function(listener)
-        listener:OnPositionChanged(world_point.x, world_point.y)
-    end)
-end
 function Sprite:GetWorldPosition()
     return self:getParent():convertToWorldSpace(cc.p(self:GetCenterPosition()))
 end
@@ -145,43 +140,40 @@ function Sprite:GetLogicMap()
 end
 
 --- effects
-local FLASH_TIME = 0.5
+local FLASH_TIME = 0.3
 function Sprite:PromiseOfFlash(...)
-    local p = promise.new()
     local sprites = {...}
     local director = cc.Director:getInstance()
     for _,v in ipairs(sprites) do
         v:Flash(FLASH_TIME)
     end
-    scheduler.performWithDelayGlobal(function()
-        p:resolve()
-    end, FLASH_TIME)
-    return p
+    return cocos_promise.Delay(FLASH_TIME)
 end
 function Sprite:Flash(time)
     self:ResetFlashStatus()
     self:BeginFlash(time)
 end
 function Sprite:ResetFlashStatus()
-    self:GetSprite():clearFilter()
+    self:unscheduleUpdate()
     self:GetSprite():removeNodeEventListenersByEvent(cc.NODE_ENTER_FRAME_EVENT)
+    self:GetSprite():clearFilter()
 end
-function Sprite:BeginFlash(time)
-    self.flash_time = 0
+function Sprite:BeginFlash(lastTime)
+    self.time = 0
+    local _,fract = modf(self.time, lastTime) 
+    local ratio = fract / lastTime
     self:GetSprite():setFilter(filter.newFilter("CUSTOM", json.encode({
         frag = "shaders/flash.fs",
         shaderName = "flash",
-        startTime = self.flash_time,
-        curTime = self.flash_time,
-        lastTime = time,
+        ratio = ratio,
     })))
-
     self:GetSprite():addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
-        self.flash_time = self.flash_time + dt
-        if self.flash_time > time then
+        self.time = self.time + dt
+        if self.time > lastTime then
             self:ResetFlashStatus()
         else
-            self:GetSprite():getFilter():getGLProgramState():setUniformFloat("curTime", self.flash_time)
+            local _,fract = modf(self.time, lastTime) 
+            self:GetSprite():getFilter():getGLProgramState():setUniformFloat("ratio", fract / lastTime)
         end
     end)
     self:GetSprite():scheduleUpdate()

@@ -110,13 +110,19 @@ function GameUIAllianceEnterBase:GetBuildImageInfomation(sprite)
     return 110/480,97,self:GetUIHeight() - 90 
 end
 
+function GameUIAllianceEnterBase:IsShowBuildingBox()
+    return true
+end
+
 function GameUIAllianceEnterBase:InitBuildingImage()
     local body = self:GetBody()
-    -- 建筑图片 放置区域左右边框
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.LEFT_CENTER, 30,self:GetUIHeight()-90)
-        :addTo(body):flipX(true)
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.RIGHT_CENTER, 163, self:GetUIHeight()-90)
-        :addTo(body)
+    if self:IsShowBuildingBox() then
+        -- 建筑图片 放置区域左右边框
+        cc.ui.UIImage.new("building_frame_36x136.png"):align(display.LEFT_CENTER, 30,self:GetUIHeight()-90)
+            :addTo(body):flipX(true)
+        cc.ui.UIImage.new("building_frame_36x136.png"):align(display.RIGHT_CENTER, 163, self:GetUIHeight()-90)
+            :addTo(body)
+    end
     local sprite = self:GetBuildImageSprite()
     if not sprite then
         local building_image = display.newSprite(self:GetBuildingImage())
@@ -289,8 +295,8 @@ function GameUIAllianceEnterBase:GetEnterButtonByIndex( idx )
     return self.EnterButtonNodes[idx]
 end
 function GameUIAllianceEnterBase:GetEnterButtons()
-    if self:IsMyAlliance() then
-        local move_city_button = self:BuildOneButton("icon_move_city.png",_("迁移城市")):onButtonClicked(function()
+    if self:IsMyAlliance() then 
+        local move_city_button = self:BuildOneButton("icon_move_player_city.png",_("迁移城市")):onButtonClicked(function()
             if self:GetMyAlliance():Status() == 'fight' then
                 UIKit:showMessageDialog(nil, _("战争期不能移动"),function()end)
                 return

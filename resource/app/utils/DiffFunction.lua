@@ -2,12 +2,13 @@ local unpack = unpack
 local ipairs = ipairs
 local insert = table.insert
 local tonumber = tonumber
+local split = string.split
 return function(base, delta)
     local edit = {}
     for _,v in ipairs(delta) do
         local origin_key,value = unpack(v)
         local is_json_null = value == json.null
-        local keys = string.split(origin_key, ".")
+        local keys = split(origin_key, ".")
         if #keys == 1 then
             local k = unpack(keys)
             k = tonumber(k) or k
@@ -23,10 +24,12 @@ return function(base, delta)
                     edit[k].add = edit[k].add or {}
                     insert(edit[k].add, value)
                 end
-            else -- key更新
+            elseif base[k] then
                 edit[k] = value
             end
-            base[k] = value
+            if base[k] then
+                base[k] = value
+            end
         else
             local tmp = edit
             local curRoot = base
@@ -40,6 +43,8 @@ return function(base, delta)
                     if type(k) == "number" then
                         tmp.edit = tmp.edit or {}
                         insert(tmp.edit, curRoot[k])
+                    elseif not curRoot[k] then
+                        break
                     end
                     curRoot[k] = curRoot[k] or {}
                     curRoot = curRoot[k]

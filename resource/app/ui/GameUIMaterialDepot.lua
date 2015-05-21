@@ -9,7 +9,6 @@ function GameUIMaterialDepot:ctor(city,building,default_tab)
 end
 
 function GameUIMaterialDepot:OnMoveInStage()
-    GameUIMaterialDepot.super.OnMoveInStage(self)
     self:CreateTabButtons({
         {
             label = _("信息"),
@@ -27,6 +26,7 @@ function GameUIMaterialDepot:OnMoveInStage()
             end
         end
     end):pos(window.cx, window.bottom + 34)
+    GameUIMaterialDepot.super.OnMoveInStage(self)
 end
 
 return GameUIMaterialDepot

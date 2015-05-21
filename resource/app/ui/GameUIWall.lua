@@ -61,7 +61,7 @@ function GameUIWall:CreateMilitaryUIIf()
 		})
 		:addTo(top_bg)
 		:align(display.CENTER_BOTTOM, 304,20)
-		:setButtonLabel("normal", UIKit:ttfLabel({text = _("选择")}))
+		:setButtonLabel("normal", UIKit:ttfLabel({text = _("选择"),size = 22,color = 0xffedae,shadow = true}))
 		:onButtonClicked(function()
 			self:OnSelectDragonButtonClicked()
 	end)
@@ -131,7 +131,7 @@ function GameUIWall:CreateMilitaryUIIf()
     end
 
    	local button = WidgetPushButton.new({normal = 'add_btn_up_50x50.png',pressed = 'add_btn_down_50x50.png'})
-   		:addTo(progressTimer_bg):align(display.RIGHT_CENTER, 410, 20)
+   		:addTo(progressTimer_bg):align(display.RIGHT_CENTER, 415, 20)
    		:onButtonClicked(handler(self, self.OnDragonHpItemUseButtonClicked))
 
    	local tips_label = UIKit:ttfLabel({
@@ -199,7 +199,15 @@ function GameUIWall:CreateMilitaryUIIf()
 		text = "+" .. wallHpResource:GetProductionPerHour() .. "/h",
 		size = 22,
 		color= 0xfff3c7
-	}):align(display.RIGHT_CENTER, 530, 20):addTo(process_wall_bg)
+	}):align(display.RIGHT_CENTER, 480, 20):addTo(process_wall_bg)
+
+	WidgetPushButton.new({normal = "add_btn_up_50x50.png",pressed = "add_btn_down_50x50.png"})
+        :addTo(process_wall_bg)
+        :align(display.CENTER_RIGHT,546,20)
+        :onButtonClicked(function()
+            WidgetUseItems.new():Create({item = ItemManager:GetItemByName("restoreWall_1")}):AddToCurrentScene(true)
+        end)
+
 	local iconbg = display.newSprite("drgon_process_icon_bg.png")
      		:addTo(process_wall_bg)
      		:align(display.LEFT_BOTTOM, -15,0)

@@ -91,12 +91,20 @@ end
 function GameUIStorePackage:GetItem(index,reward)
 	local item = self.info_list:newItem()
 	local content = display.newScale9Sprite(string.format("resource_item_bg%d.png",index % 2)):size(524,48)
-
-	local icon = display.newSprite(UILib.item[reward.key]):align(display.LEFT_CENTER, 14, 24):addTo(content)
-	icon:scale(36/math.max(icon:getContentSize().width,icon:getContentSize().height))
-
+	local bg = display.newSprite("box_118x118.png"):align(display.LEFT_CENTER, 14, 24):addTo(content)
+	local icon = display.newSprite(UILib.item[reward.key]):align(display.CENTER, 59, 58):addTo(bg)
+	icon:scale(100/math.max(icon:getContentSize().width,icon:getContentSize().height))
+	bg:scale(0.3)
+	-- local icon = display.newSprite(UILib.item[reward.key]):align(display.LEFT_CENTER, 14, 24):addTo(content)
+	-- icon:scale(36/math.max(icon:getContentSize().width,icon:getContentSize().height))
+	local item_name = ""
+	if reward.isToAlliance then
+		item_name = string.format(_("赠送给联盟成员的%s"),Localize_item.item_name[reward.key])
+	else
+		item_name = Localize_item.item_name[reward.key]
+	end
 	UIKit:ttfLabel({
-		text = Localize_item.item_name[reward.key],
+		text = item_name,
 		size = 22,
 		color= 0x403c2f
 	}):align(display.LEFT_CENTER, 62, 24):addTo(content)
@@ -121,7 +129,8 @@ function GameUIStorePackage:CreateBuyButton()
 	local label = UIKit:ttfLabel({
 		text = _("购买"),
 		size = 24,
-		color= 0xfff3c7
+		color= 0xfff3c7,
+		shadow= true,
 	})
 	button:setButtonLabel("normal", label)
 	button:setButtonLabelOffset(0, 20)
@@ -137,7 +146,6 @@ function GameUIStorePackage:CreateBuyButton()
 end
 
 function GameUIStorePackage:OnBuyButtonClicked()
-	dump(self:GetData().productId,"buy----->")
 	app:getStore().purchaseWithProductId(self:GetData().productId,1)
 	device.showActivityIndicator()
 end

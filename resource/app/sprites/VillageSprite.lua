@@ -72,8 +72,8 @@ function VillageSprite:RefreshSprite()
 end
 function VillageSprite:RefreshInfo()
     local info = self:VillageInfo()
-    self.level:setString(info.level)
-    self.name:setString(Localize.village_name[self:GetEntity():GetName()])
+    -- self.level:setString(info.level)
+    -- self.name:setString(Localize.village_name[self:GetEntity():GetName()])
 end
 
 

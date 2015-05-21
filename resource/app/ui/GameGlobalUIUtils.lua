@@ -59,4 +59,8 @@ function GameGlobalUIUtils:showHouseLevelUp(msg)
     self:showTips(_("小屋升级完成"),string.format('%s(LV %d)',_(houseName),msg.level))
 end
 
+
+function GameGlobalUIUtils:clearMessageQueue()
+	if self.tipsHeap then self.tipsHeap:clear() end
+end
 GameGlobalUI = GameGlobalUIUtils.new()

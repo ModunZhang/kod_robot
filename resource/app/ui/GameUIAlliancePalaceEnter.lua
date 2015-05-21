@@ -4,6 +4,7 @@
 --
 local UILib = import("..ui.UILib")
 local GameUIAlliancePalaceEnter = UIKit:createUIClass("GameUIAlliancePalaceEnter","GameUIAllianceShrineEnter")
+local Localize = import("..utils.Localize")
 
 function GameUIAlliancePalaceEnter:GetUIHeight()
 	return 261
@@ -27,7 +28,7 @@ function GameUIAlliancePalaceEnter:GetBuildingType()
 end
 
 function GameUIAlliancePalaceEnter:GetBuildingDesc()
-	return _("联盟的核心建筑，升级可提升联盟人数上限，向占领城市征税，更改联盟地形。")
+	return Localize.building_description.palace
 end
 
 

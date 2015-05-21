@@ -5,16 +5,37 @@ local WidgetPVEFteMiner = class("WidgetPVEFteMiner", WidgetPVEMiner)
 function WidgetPVEFteMiner:ctor(...)
     WidgetPVEFteMiner.super.ctor(self, ...)
     self.__type  = UIKit.UITYPE.BACKGROUND
+    self:DisableAutoClose()
 end
 
 
 -- fte
 local mockData = import("..fte.mockData")
 local WidgetFteArrow = import("..widget.WidgetFteArrow")
+local fte = {
+        {
+            ["soldiers"] = "deathKnight,1;skeletonWarrior,1",
+            ["rewards"] = "soldierMaterials,deathHand,1;soldierMaterials,soulStone,1"
+        },
+        {
+            ["soldiers"] = "meatWagon,1;skeletonArcher,1",
+            ["rewards"] = "soldierMaterials,heroBones,1;soldierMaterials,magicBox,1"
+        }
+    }
 function WidgetPVEFteMiner:PormiseOfFte()
     local ui = self
+
     function ui:Fight()
-        local enemy = self:GetObject():GetNextEnemy()
+        local obj = self:GetObject()
+            
+        function obj:GetEnemyByIndex(index)
+            if index == 1 then
+                return self:DecodeToEnemy(self:GetEnemyInfo(index))
+            end
+            return self:DecodeToEnemy(fte[index - 1])
+        end
+
+        local enemy = obj:GetNextEnemy()
         UIKit:newGameUI('GameUIPVEFteSendTroop',
             enemy.soldiers,-- pve 怪数据
             function(dragonType, soldiers)
@@ -39,7 +60,7 @@ function WidgetPVEFteMiner:PormiseOfFte()
                 local report = GameUtils:DoBattle(
                     {dragon = attack_dragon, soldiers = attack_soldier},
                     {dragon = enemy.dragon, soldiers = enemy.soldiers},
-                    self:GetObject():GetMap():Terrain()
+                    self:GetObject():GetMap():Terrain(), self:GetTitle()
                 )
 
                 if report:IsAttackWin() then
@@ -50,8 +71,7 @@ function WidgetPVEFteMiner:PormiseOfFte()
                             GameGlobalUI:showTips(_("获得奖励"), rewards)
                         end
                     end):AddToCurrentScene(true)
-
-                    mockData.FightWithNpc()
+                    mockData.FightWithNpc(self:GetObject():Searched())
                 else
                     UIKit:newGameUI("GameUIReplayNew", report):AddToCurrentScene(true)
                 end
@@ -69,16 +89,15 @@ function WidgetPVEFteMiner:PormiseOfFte()
         :next(function(ui)
             self:GetFteLayer():removeFromParent()
             return ui:PormiseOfFte()
-        end):next(function()
-        return self:PromiseOfExit()
         end)
 end
 function WidgetPVEFteMiner:PromiseOfExit()
-    local r = self.btns[2]:getCascadeBoundingBox()
-    self:GetFteLayer():SetTouchObject(self.btns[2])
+    local btn = self.btns[2] or self.btns[1]
+    local r = btn:getCascadeBoundingBox()
+    self:GetFteLayer():SetTouchObject(btn)
 
     WidgetFteArrow.new(_("点击离开")):addTo(self:GetFteLayer())
-        :TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
+        :TurnRight():align(display.RIGHT_CENTER, r.x, r.y + r.height/2)
 
     return UIKit:PromiseOfClose("WidgetPVEFteMiner")
 end

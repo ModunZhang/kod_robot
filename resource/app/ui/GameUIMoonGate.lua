@@ -251,8 +251,15 @@ function GameUIMoonGate:InitWonderDetails()
     node:align(display.BOTTOM_CENTER)
 
     function map:Refresh(wonder)
+        dump(wonder,"wonder")
         self:setPosition(window.left+140-wonder.x,window.bottom+740-wonder.y)
-        honour_perday:setString(_("联盟荣耀").." +"..wonder.awardHonourPerDay)
+        local add_honour = ""
+        if wonder.name == "highcastle" or wonder.name == "rockwarren" or wonder.name == "whitemoon" then
+            add_honour = _("大量联盟荣耀值")
+        else
+            add_honour = _("少量联盟荣耀值")
+        end
+        honour_perday:setString(add_honour)
         local titles = string.split(wonder.title,",")
         listview:removeAllItems()
         for k,v in pairs(titles) do
@@ -298,6 +305,7 @@ function GameUIMoonGate:onExit()
 end
 
 return GameUIMoonGate
+
 
 
 

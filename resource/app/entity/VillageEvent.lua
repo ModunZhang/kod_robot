@@ -11,6 +11,16 @@ local VillageConfig = GameDatas.AllianceVillage
 
 VillageEvent.EVENT_PLAYER_ROLE = Enum("Me","Ally")
 
+
+property(VillageEvent, "id", "")
+property(VillageEvent, "startTime", "")
+property(VillageEvent, "finishTime", "")
+property(VillageEvent, "playerData", "")
+property(VillageEvent, "villageData", "")
+property(VillageEvent, "collectPercent", 0)
+property(VillageEvent, "collectCount", 0)
+
+
 function VillageEvent:OnPropertyChange()
 end
 
@@ -23,15 +33,9 @@ function VillageEvent:GetPlayerRole()
 	end
 end
 
+
 function VillageEvent:ctor()
 	VillageEvent.super.ctor(self)
-	property(self,"id","")
-	property(self,"startTime","")
-	property(self,"finishTime","")
-	property(self,"playerData","")
-	property(self,"villageData","")
-	property(self,"collectPercent",0)
-	property(self,"collectCount",0)
 end
 
 function VillageEvent:UpdateData(json_data,refresh_time)

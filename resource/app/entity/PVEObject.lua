@@ -67,18 +67,18 @@ end
 function PVEObject:GetNextEnemy()
     return self:GetEnemyByIndex(self.searched + 1)
 end
--- 当前数值*关卡数^3-(关卡数-1)*20
--- 当前数值*关卡数^2
 function PVEObject:GetEnemyByIndex(index)
+    return self:DecodeToEnemy(self:GetEnemyInfo(index))
+end
+function PVEObject:GetEnemyInfo(index)
     local unique = self.type == PVEDefine.TRAP and random(#pve_normal) or self.x * self.y * (index + self.type)
     if normal_map[self.type] then
-        return self:DecodeToEnemy(pve_normal[unique % #pve_normal + 1])
+        return pve_normal[unique % #pve_normal + 1]
     elseif elite_map[self.type] then
-        return self:DecodeToEnemy(pve_elite[unique % #pve_elite + 1])
+        return pve_elite[unique % #pve_elite + 1]
     elseif self.type == PVEDefine.ENTRANCE_DOOR then
-        return self:DecodeToEnemy(pve_boss[self:Floor()])
+        return pve_boss[self:Floor()]
     end
-    return {}
 end
 function PVEObject:DecodeToEnemy(raw_data)
     local raw_dragon
@@ -122,6 +122,7 @@ local m = getmetatable(NotifyItem)
 function PVEObject:GetNpcRewards(select)
     for k, v in pairs(PVEDefine) do
         if v == self.type then
+            assert(pve_npc[k])
             local rewards = self:DecodeToRewards(pve_npc[k].rewards)
             if pve_npc[k].rewards_type == "all" then
                 return rewards
@@ -159,7 +160,7 @@ function PVEObject:DecodeToRewards(raw, func)
         return k, {
             type = rtype,
             name = rname,
-            count = func(self:Floor(), count),
+            count = is_not_boss and func(self:Floor(), count) or count,
             probability = probability
         }
     end)
@@ -174,8 +175,11 @@ end
 function PVEObject:SearchNext()
     self.searched = self.searched + 1
 end
+function PVEObject:IsBoss()
+    return not (normal_map[self.type] or elite_map[self.type])
+end
 function PVEObject:IsLast()
-    return self:Left() == 1
+    return self:Left() == 0
 end
 function PVEObject:Left()
     return self:Total() - self:Searched()
@@ -197,6 +201,8 @@ function PVEObject:Dump()
 end
 
 return PVEObject
+
+
 
 
 

@@ -29,7 +29,7 @@ function GameUISettingLanguage:BuildUI()
 		size = 22,
 		shadow = true,
 		color = 0xffedae
-	}):addTo(titleBar):align(display.CENTER,300,24)
+	}):addTo(titleBar):align(display.CENTER,300,28)
 	local code = app:GetGameLanguage()
 	local languages = {
 		{image = 'flag_en_83x83.png',code = 'en_US'},

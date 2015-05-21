@@ -166,7 +166,11 @@ function GameUIUpgradeTechnology:GetTechIcon()
 end
 
 function GameUIUpgradeTechnology:BuildUI()
-    local bg_node =  WidgetUIBackGround.new({height = HEIGHT,isFrame = "no"}):align(display.TOP_CENTER, window.cx, window.top_bottom - 50)
+    local y = window.top_bottom - 50
+    if HEIGHT == 200 then
+        y = window.top_bottom - 200
+    end
+    local bg_node =  WidgetUIBackGround.new({height = HEIGHT,isFrame = "no"}):align(display.TOP_CENTER, window.cx, y)
     self:addTouchAbleChild(bg_node)
     local title_bar = display.newSprite("title_blue_600x56.png"):align(display.BOTTOM_CENTER,304,HEIGHT - 15):addTo(bg_node)
     UIKit:closeButton():align(display.RIGHT_BOTTOM,600, 0):addTo(title_bar):onButtonClicked(function()
@@ -175,17 +179,18 @@ function GameUIUpgradeTechnology:BuildUI()
     UIKit:ttfLabel({text = _("科技研发"),
         size = 22,
         color = 0xffedae
-    }):align(display.CENTER,300, 22):addTo(title_bar)
+    }):align(display.CENTER,300, 28):addTo(title_bar)
     local box = display.newSprite("alliance_item_flag_box_126X126.png"):align(display.LEFT_TOP, 20, title_bar:getPositionY() - 20):addTo(bg_node)
     self.tech_bg = self:GetTechIcon():pos(63,63):addTo(box):scale(0.95)
-    local title = display.newSprite("technology_title_438x30.png")
+
+    local title = display.newScale9Sprite("alliance_event_type_darkblue_222x30.png",0,0, cc.size(438,30), cc.rect(7,7,190,16))
         :align(display.LEFT_TOP,box:getPositionX()+box:getContentSize().width + 10, box:getPositionY())
         :addTo(bg_node)
     self.lv_label = UIKit:ttfLabel({
         text = self:GetTechLevelStr(),
         size = 22,
         color= 0xffedae
-    }):align(display.LEFT_CENTER, 20, 15):addTo(title)
+    }):align(display.LEFT_CENTER, 10, 15):addTo(title)
     local line_2 = display.newScale9Sprite("dividing_line_594x2.png"):size(422,1)
         :align(display.LEFT_BOTTOM,box:getPositionX()+box:getContentSize().width + 10, box:getPositionY()-box:getContentSize().height)
         :addTo(bg_node)
@@ -197,48 +202,48 @@ function GameUIUpgradeTechnology:BuildUI()
         text = self:GetProductionTechnology():GetBuffLocalizedDesc(),
         size = 20,
         color= 0x615b44
-    }):align(display.LEFT_BOTTOM,line_1:getPositionX(), line_1:getPositionY() + 5):addTo(bg_node)
+    }):align(display.LEFT_BOTTOM,line_1:getPositionX()+6, line_1:getPositionY() + 5):addTo(bg_node)
     local next_effect_val_label = UIKit:ttfLabel({
-        text = "", --self:GetProductionTechnology():GetNextLevelBuffEffectVal() * 100  .. "%",
+        text = "",
         size = 22,
         color= 0x403c2f,
         align = cc.TEXT_ALIGNMENT_RIGHT,
     }):align(display.RIGHT_BOTTOM,line_1:getPositionX()+ 422,current_effect_desc:getPositionY()):addTo(bg_node)
     self.next_effect_val_label = next_effect_val_label
 
-    self.upgrade_info_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.RIGHT_BOTTOM, next_effect_val_label:getPositionX() - 50,
+    self.upgrade_info_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.RIGHT_BOTTOM, next_effect_val_label:getPositionX() - 70,
         next_effect_val_label:getPositionY() + 5):addTo(bg_node)
 
     local current_effect_val_label = UIKit:ttfLabel({
-        text = "",--self:GetProductionTechnology():GetBuffEffectVal() * 100  .. "%",
+        text = "",
         size = 22,
         color= 0x403c2f,
         align = cc.TEXT_ALIGNMENT_RIGHT,
-    }):align(display.RIGHT_BOTTOM,self.upgrade_info_icon:getPositionX() - 35, next_effect_val_label:getPositionY()):addTo(bg_node)
+    }):align(display.RIGHT_BOTTOM,self.upgrade_info_icon:getPositionX() - 55, next_effect_val_label:getPositionY()):addTo(bg_node)
     self.current_effect_val_label = current_effect_val_label
 
     local current_power_desc = UIKit:ttfLabel({
         text = _("战斗力"),
         size = 20,
         color= 0x615b44
-    }):addTo(bg_node):align(display.LEFT_BOTTOM,line_2:getPositionX(), line_2:getPositionY() + 5)
+    }):addTo(bg_node):align(display.LEFT_BOTTOM,line_2:getPositionX()+6, line_2:getPositionY() + 5)
 
     local next_power_val_label = UIKit:ttfLabel({
-        text = "123", --self:GetProductionTechnology():GetNextLevelBuffEffectVal() * 100  .. "%",
+        text = "123", 
         size = 22,
         color= 0x403c2f,
         align = cc.TEXT_ALIGNMENT_RIGHT,
     }):align(display.RIGHT_BOTTOM,line_2:getPositionX()+ 422,current_power_desc:getPositionY()):addTo(bg_node)
     self.next_power_val_label = next_power_val_label
-    self.upgrade_power_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.RIGHT_BOTTOM, next_power_val_label:getPositionX() - 50,
+    self.upgrade_power_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.RIGHT_BOTTOM, next_power_val_label:getPositionX() - 70,
         next_power_val_label:getPositionY() + 5):addTo(bg_node)
 
     local current_power_val_label = UIKit:ttfLabel({
-        text = "0",--self:GetProductionTechnology():GetBuffEffectVal() * 100  .. "%",
+        text = "0",
         size = 22,
         color= 0x403c2f,
         align = cc.TEXT_ALIGNMENT_RIGHT,
-    }):align(display.RIGHT_BOTTOM,self.upgrade_power_icon:getPositionX() - 35, next_power_val_label:getPositionY()):addTo(bg_node)
+    }):align(display.RIGHT_BOTTOM,self.upgrade_power_icon:getPositionX() - 55, next_power_val_label:getPositionY()):addTo(bg_node)
     self.current_power_val_label = current_power_val_label
     local btn_now = UIKit:commonButtonWithBG(
         {
@@ -332,7 +337,7 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             resource_type = _("升级队列"),
             isVisible = true,
             isSatisfy = not City:HaveProductionTechEvent(),
-            icon="hammer_31x33.png",
+            icon="hammer_33x40.png",
             description= City:HaveProductionTechEvent() and "0/1" or "1/1"
         })
     if unLockByTech:Index() ~= current_tech:Index() then
@@ -342,7 +347,8 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
                 isVisible = true,
                 isSatisfy = unLockByTech:Level() >= current_tech:UnlockLevel(),
                 icon= unLockByTech:GetImageName(),
-                description= _("等级达到") .. current_tech:UnlockLevel()
+                description= _("等级达到") .. current_tech:UnlockLevel(),
+                canNotBuy = true,
             })
     end
      table.insert(requirements,
@@ -351,7 +357,8 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             isVisible = true,
             isSatisfy = current_tech:AcademyLevel() <= City:GetAcademyBuildingLevel(),
             icon="academy.png",
-            description = _("等级达到") .. current_tech:AcademyLevel()
+            description = _("等级达到") .. current_tech:AcademyLevel(),
+            canNotBuy = true,
         })
     table.insert(requirements,
         {
@@ -394,7 +401,9 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             description = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["pulley"] .. "/" .. cost.pulley
         })  
    
-
+    -- table.sort( requirements, function(a,b)
+    --     return not a.isSatisfy and b.isSatisfy
+    -- end)
     return requirements
 end
 
@@ -435,6 +444,10 @@ function GameUIUpgradeTechnology:ForceUpgrade(gem_cost)
     else
         NetManager:getUpgradeProductionTechPromise(self:GetProductionTechnology():Name(),false):done(function(msg)
             self:LeftButtonClicked()
+            local acdemy = UIKit:GetUIInstance("GameUIAcademy")
+            if acdemy then
+                acdemy:LeftButtonClicked()
+            end
         end)
     end
 end

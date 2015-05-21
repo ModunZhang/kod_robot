@@ -51,7 +51,6 @@ function GameUIBlackSmith:OnBeginMakeEquipmentWithEvent(black_smith, event)
     self.tips:setVisible(false)
     self.timer:setVisible(true)
     self:OnMakingEquipmentWithEvent(black_smith, event, app.timer:GetServerTime())
-    app:GetAudioManager():PlayeEffectSoundWithKey("UI_BLACKSMITH_FORGE")
     self:LeftButtonClicked()
 end
 function GameUIBlackSmith:OnMakingEquipmentWithEvent(black_smith, event, current_time)

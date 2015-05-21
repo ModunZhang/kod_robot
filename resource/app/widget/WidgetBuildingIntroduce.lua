@@ -31,7 +31,7 @@ function WidgetBuildingIntroduce:SetUpgradeRequirementListview()
     local materials = self.city:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)
     local requirements = {
         {resource_type = _("建造队列"),isVisible = true, isSatisfy = #City:GetUpgradingBuildings()<1,
-            icon="hammer_31x33.png",description=(City:BuildQueueCounts()-#City:GetUpgradingBuildings()).."/1"},
+            icon="hammer_33x40.png",description=(City:BuildQueueCounts()-#City:GetUpgradingBuildings()).."/1"},
         {resource_type = _("木材"),isVisible = self.building:GetLevelUpWood()>0,      isSatisfy = wood>self.building:GetLevelUpWood(),
             icon="res_wood_82x73.png",description=self.building:GetLevelUpWood().."/"..wood},
 

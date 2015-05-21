@@ -189,14 +189,14 @@ function GameUIUnlockBuilding:SetUpgradeRequirementListview()
             isVisible = building:GetLevel()>5,
             isSatisfy = not pre_condition,
             canNotBuy=true,
-            icon="hammer_31x33.png",
+            icon="hammer_33x40.png",
             description = building:GetPreConditionDesc()
         },
         {
             resource_type = _("建造队列"),
             isVisible = true,
             isSatisfy = #City:GetUpgradingBuildings()<City:BuildQueueCounts(),
-            icon="hammer_31x33.png",
+            icon="hammer_33x40.png",
             description=_("建造队列")..(City:BuildQueueCounts()-#City:GetUpgradingBuildings()).."/"..1
         },
         {

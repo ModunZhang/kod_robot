@@ -11,77 +11,79 @@ local bg_music_map = {
 	AllianceScene = "bgm_peace.mp3",
 	PVEScene = "bgm_battle.mp3",
 	AllianceBattleScene = "bgm_battle.mp3",
-	grassLand = "sfx_glassland.mp3",
-	iceField = "sfx_icefiled.mp3",
-	desert = "sfx_desert.mp3",
+	AllianceBattleScene_sfx = "sfx_battle.mp3",
 }
 
 local effect_sound_map = {
-	NORMAL_DOWN = "sfx_tap_button.wav",
-	NORMAL_UP = "ui_button_down.wav",
-	HOME_PAGE = "sfx_tap_homePage.wav",
-	OPEN_MAIL = "sfx_open_mail.wav",
-	USE_ITEM = "sfx_use_item.wav",
-	BUY_ITEM = "sfx_buy_item.wav",
-	HOORAY = "sfx_hooray.wav",
-	COMPLETE = "sfx_complete.wav",
-	TROOP_LOSE = "sfx_troop_lose.wav",
-	TROOP_SENDOUT = "sfx_troop_sendOut.wav",
-	TROOP_RECRUIT = "sfx_troop_recruit.wav",
-	TROOP_BACK = "sfx_troops_back.wav",
-	BATTLE_DEFEATED = "sfx_battle_defeated.wav",
-	BATTLE_VICTORY = "sfx_battle_victory.wav",
-	DRAGON_STRIKE = "sfx_select_dragon2.wav",
-	BATTLE_DRAGON = "sfx_dragonPK.wav",
+	NORMAL_DOWN = "sfx_tap_button.mp3",
+	NORMAL_UP = "ui_button_down.mp3",
+	HOME_PAGE = "sfx_tap_homePage.mp3",
+	OPEN_MAIL = "sfx_open_mail.mp3",
+	USE_ITEM = "sfx_use_item.mp3",
+	BUY_ITEM = "sfx_buy_item.mp3",
+	HOORAY = "sfx_hooray.mp3",
+	COMPLETE = "sfx_complete.mp3",
+	TROOP_LOSE = "sfx_troop_lose.mp3",
+	TROOP_SENDOUT = "sfx_troop_sendOut.mp3",
+	TROOP_RECRUIT = "sfx_troop_recruit.mp3",
+	TROOP_BACK = "sfx_troops_back.mp3",
+	BATTLE_DEFEATED = "sfx_battle_defeated.mp3",
+	BATTLE_VICTORY = "sfx_battle_victory.mp3",
+	DRAGON_STRIKE = "sfx_select_dragon2.mp3",
+	BATTLE_DRAGON = "sfx_dragonPK.mp3",
 	SPLASH_BUTTON_START = "sfx_click_start.mp3",
-	UI_BUILDING_UPGRADE_START = "ui_building_upgrade.wav",
-	UI_BUILDING_DESTROY = "sfx_building_destroy.wav",
+	UI_BUILDING_UPGRADE_START = "ui_building_upgrade.mp3",
+	UI_BUILDING_DESTROY = "sfx_building_destroy.mp3",
 	UI_BLACKSMITH_FORGE = "ui_blacksmith_forge.mp3",
 	UI_TOOLSHOP_CRAFT_START = "ui_toolShop_craft_start.mp3",
-	SELECT_ENEMY_ALLIANCE_CITY = "sfx_select_keep_enemy.wav",
-	ATTACK_PLAYER_ARRIVE = "sfx_select_armyCamp.wav",
-	STRIKE_PLAYER_ARRIVE = "sfx_select_dragon3.wav",
+	SELECT_ENEMY_ALLIANCE_CITY = "sfx_select_keep_enemy.mp3",
+	ATTACK_PLAYER_ARRIVE = "sfx_select_armyCamp.mp3",
+	STRIKE_PLAYER_ARRIVE = "sfx_select_dragon3.mp3",
 	TREATE_SOLDIER = "sfx_heal.mp3",
 	INSTANT_TREATE_SOLDIER = "sfx_instant_heal.mp3",
 	BATTLE_START = "sfx_battle_start.mp3",
+	AIRSHIP = "sfx_pve.mp3",
+	PVE_MOVE1 = "sfx_pve_move1.mp3",
+	PVE_MOVE2 = "sfx_pve_move2.mp3",
+	PVE_MOVE3 = "sfx_pve_move3.mp3",
 }
 
 local soldier_step_sfx_map = {
-	infantry = {"sfx_step_infantry01.wav", "sfx_step_infantry02.wav", "sfx_step_infantry03.wav"},
-	archer = {"sfx_step_archer01.wav", "sfx_step_archer02.wav", "sfx_step_archer03.wav"},
-	cavalry = {"sfx_step_cavalry01.wav", "sfx_step_cavalry02.wav", "sfx_step_cavalry03.wav"},
-	siege = {"sfx_step_siege01.wav", "sfx_step_siege02.wav", "sfx_step_siege03.wav"},
+	infantry = {"sfx_step_infantry01.mp3", "sfx_step_infantry02.mp3", "sfx_step_infantry03.mp3"},
+	archer = {"sfx_step_archer01.mp3", "sfx_step_archer02.mp3", "sfx_step_archer03.mp3"},
+	cavalry = {"sfx_step_cavalry01.mp3", "sfx_step_cavalry02.mp3", "sfx_step_cavalry03.mp3"},
+	siege = {"sfx_step_siege01.mp3", "sfx_step_siege02.mp3", "sfx_step_siege03.mp3"},
 }
 
 local building_sfx_map = {
-    keep = {"sfx_select_keep.wav"},
-    watchTower = {"sfx_select_watchtower.wav"},
-    warehouse = {"sfx_select_warehouse.wav"},
-    dragonEyrie = {"sfx_select_dragon1.wav", "sfx_select_dragon2.wav", "sfx_select_dragon3.wav"},
-    barracks = {"sfx_select_barracks.wav"},
-    hospital = {"sfx_select_hospital.wav"},
-    academy = {"sfx_select_academy.wav"},
-    materialDepot = {"sfx_select_warehouse.wav"},
-    blackSmith = {"sfx_select_blackSmith.wav"},
-    foundry = {"sfx_select_foundry.wav"},
-    hunterHall = {"sfx_select_hunterHall.wav"},
-    lumbermill = {"sfx_select_lumbermill.wav"},
-    stoneMason = {"sfx_select_stonemason.wav"},
-    mill = {"sfx_select_mill.wav"},
-    townHall = {"sfx_select_townHall.wav"},
-    toolShop = {"sfx_select_toolshop.wav"},
-    tradeGuild = {"sfx_select_tradeGuild.wav"},
-    trainingGround = {"sfx_select_trainingGround.wav"},
-    hunterHall = {"sfx_select_hunterHall.wav"},
-    workshop = {"sfx_select_workshop.wav"},
-    stable = {"sfx_select_stable.wav"},
-    wall = {"sfx_select_wall.wav"},
-    tower = {"sfx_select_tower.wav"},
-    dwelling = {"sfx_select_dwelling.wav"},
-    farmer = {"sfx_select_resourceBuilding.wav"},
-    woodcutter = {"sfx_select_resourceBuilding.wav"},
-    quarrier = {"sfx_select_resourceBuilding.wav"},
-    miner = {"sfx_select_resourceBuilding.wav"},
+    keep = {"sfx_select_keep.mp3"},
+    watchTower = {"sfx_select_watchtower.mp3"},
+    warehouse = {"sfx_select_warehouse.mp3"},
+    dragonEyrie = {"sfx_select_dragon1.mp3", "sfx_select_dragon2.mp3", "sfx_select_dragon3.mp3"},
+    barracks = {"sfx_select_barracks.mp3"},
+    hospital = {"sfx_select_hospital.mp3"},
+    academy = {"sfx_select_academy.mp3"},
+    materialDepot = {"sfx_select_warehouse.mp3"},
+    blackSmith = {"sfx_select_blackSmith.mp3"},
+    foundry = {"sfx_select_foundry.mp3"},
+    hunterHall = {"sfx_select_hunterHall.mp3"},
+    lumbermill = {"sfx_select_lumbermill.mp3"},
+    stoneMason = {"sfx_select_stonemason.mp3"},
+    mill = {"sfx_select_mill.mp3"},
+    townHall = {"sfx_select_townHall.mp3"},
+    toolShop = {"sfx_select_toolshop.mp3"},
+    tradeGuild = {"sfx_select_tradeGuild.mp3"},
+    trainingGround = {"sfx_select_trainingGround.mp3"},
+    hunterHall = {"sfx_select_hunterHall.mp3"},
+    workshop = {"sfx_select_workshop.mp3"},
+    stable = {"sfx_select_stable.mp3"},
+    wall = {"sfx_select_wall.mp3"},
+    tower = {"sfx_select_tower.mp3"},
+    dwelling = {"sfx_select_dwelling.mp3"},
+    farmer = {"sfx_select_resourceBuilding.mp3"},
+    woodcutter = {"sfx_select_resourceBuilding.mp3"},
+    quarrier = {"sfx_select_resourceBuilding.mp3"},
+    miner = {"sfx_select_resourceBuilding.mp3"},
 }
 
 
@@ -138,7 +140,7 @@ function AudioManager:PlayeEffectSound(filename)
 end
 
 function AudioManager:PlayeAttackSoundBySoldierName(soldier_name)
-	local audio_name = string.format("sfx_%s_attack.wav", soldier_name)
+	local audio_name = string.format("sfx_%s_attack.mp3", soldier_name)
 	assert(audio_name, audio_name.." 音乐不存在")
 	self:PlayeEffectSound(audio_name)
 end
@@ -304,15 +306,17 @@ function AudioManager:OnBackgroundMusicCompletion()
 		or lastFilename == 'sfx_glassland' 
 		or lastFilename == 'sfx_icefiled' 
 		then
-			if lastFilename == 'bgm_peace' or lastFilename == 'bgm_battle' then
+			if lastFilename == 'bgm_peace' or lastFilename == 'bgm_battle'  or lastFilename == 'sfx_battle' then
 				if scene_name == 'MyCityScene' then
 					self:PlayGameMusic("MyCityScene",false) -- sfx_city
 				elseif scene_name == 'AllianceBattleScene' then
 					local alliance = Alliance_Manager:GetMyAlliance()
 					local status = alliance:Status()
 					if status == 'prepare' or status == 'fight' then
-						if current_scene.PlayCurrentTerrainMusic then
-							current_scene:PlayCurrentTerrainMusic()
+						if  lastFilename == 'sfx_battle' then
+							self:PlayGameMusic("AllianceBattleScene",false)
+						elseif lastFilename == 'bgm_battle' then
+							self:PlayGameMusic("AllianceBattleScene_sfx",false)
 						end
 					else
 						self:PlayGameMusic("AllianceScene",false)

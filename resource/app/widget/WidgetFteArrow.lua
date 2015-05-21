@@ -57,9 +57,18 @@ function WidgetFteArrow:TurnRight()
 
     return self
 end
-function WidgetFteArrow:TurnDown()
+function WidgetFteArrow:TurnDown(stay_right)
+    local offset_x, offset_y = 0, 0
     local s = self.back:getContentSize()
-    self.arrow:align(display.TOP_CENTER, s.width/2, 10)
+    local s1 = self.arrow:getContentSize()
+    if stay_right == nil then
+    elseif stay_right == false then
+        offset_x = s1.width/2 - s.width/2
+    elseif stay_right == true then
+        offset_x = s.width/2 - s1.width/2
+    end
+
+    self.arrow:align(display.TOP_CENTER, s.width/2 + offset_x, 10)
     self.arrow:rotation(0)
 
     self.back:stopAllActions()
@@ -70,7 +79,7 @@ function WidgetFteArrow:TurnDown()
     return self
 end
 function WidgetFteArrow:TurnUp(stay_right)
-    offset_x, offset_y = 0, 0
+    local offset_x, offset_y = 0, 0
     local s = self.back:getContentSize()
     local s1 = self.arrow:getContentSize()
     if stay_right == nil then

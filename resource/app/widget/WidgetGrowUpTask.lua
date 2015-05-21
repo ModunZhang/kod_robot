@@ -45,8 +45,10 @@ function WidgetGrowUpTask:RefreshItems()
         self.listview:addItem(self:CreateItem(self.listview, v))
     end
     self.listview:reload()
-    if self.listview.items_[1] then
-        self.listview.items_[1]:getContent():OnOpen(false)
+    if #self.category.tasks > 0 then
+        if self.listview.items_[1] then
+            self.listview.items_[1]:getContent():OnOpen(false)
+        end
     end
 end
 function WidgetGrowUpTask:CreateItem(listview, task)

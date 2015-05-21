@@ -19,10 +19,14 @@ function GameUISplashBeta:onEnter()
 	app:GetAudioManager():PlayGameMusic("MainScene")
 	self.bottom_layer = self:CreateOneLayer():addTo(self,GLOBAL_ZORDER.BOTTOM)
 	self.ui_layer = self:CreateOneLayer():addTo(self,GLOBAL_ZORDER.UI)
-	display.newSprite("splash_beta_logo_467x113.png")
-		:align(display.TOP_CENTER, display.cx, display.top - 80)
+	display.newSprite("splash_logo_515x92.png")
+		:align(display.TOP_CENTER, display.cx, display.top - 100)
 		:addTo(self.ui_layer)
-	self:CreateBottomAnimate()
+		self:CreateBottomAnimate()
+end
+-- 仅仅显示背景图
+function GameUISplashBeta:CreateNormalBg()
+	local sp = self:CreateBgSprite():align(display.LEFT_BOTTOM, 0, 0):addTo(self.bottom_layer)
 end
 
 function GameUISplashBeta:CreateBottomAnimate()

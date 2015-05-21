@@ -186,7 +186,6 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
     self.slider_input = WidgetSliderWithInput.new({max = treat_max}):addTo(back_ground):align(display.LEFT_CENTER, 25, 330)
         :SetSliderSize(445, 24)
         :OnSliderValueChanged(function(event)
-            dump(event)
             self:OnCountChanged(math.floor(event.value))
         end)
         :LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.RIGHT,0)
@@ -260,7 +259,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
             end
             if self.count<1 then
                 UIKit:showMessageDialog(_("陛下"),_("请设置要治愈的伤兵数"))
-            elseif self.treat_now_gems>City:GetUser():GetGemResource():GetValue() then
+            elseif self.treat_now_gems > City:GetUser():GetGemResource():GetValue() then
                 UIKit:showMessageDialog(_("陛下"),_("金龙币不足"))
                     :CreateOKButton(
                         {
@@ -456,7 +455,10 @@ function WidgetTreatSoldier:OnResourceChanged(resource_manager)
         v.total:setString(GameUtils:formatNumber(total))
     end
     self.res_total_map = res_map
-    self.slider_input:SetValue(self:GetMaxTreatNum())
+    if not self.isSet then
+        self.slider_input:SetValue(self:GetMaxTreatNum())
+        self.isSet = true
+    end
 end
 function WidgetTreatSoldier:OnInstantButtonClicked(func)
     self.instant_button_clicked = func
@@ -482,7 +484,7 @@ function WidgetTreatSoldier:OnCountChanged(count)
     for k, v in pairs(self.res_map) do
         local total = total_map[k] == nil and 0 or total_map[k]
         local current = soldier_config[k] * count
-        local rs_k = "treatCoin"
+        local rs_k = "coin"
         current_res_map[rs_k] = current
         local color = total >= current and UIKit:hex2c3b(0x403c2f) or display.COLOR_RED
         v.need:setString(string.format("/ %s", GameUtils:formatNumber(current)))
@@ -494,6 +496,7 @@ function WidgetTreatSoldier:OnCountChanged(count)
     self.gem_label:setString(self.treat_now_gems)
 end
 return WidgetTreatSoldier
+
 
 
 

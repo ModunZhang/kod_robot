@@ -10,6 +10,7 @@ local AllianceShrine = import("..entity.AllianceShrine")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local UILib = import(".UILib")
 local GameUtils = GameUtils
+--异步列表按钮事件修复
 function GameUIAllianceShrine:ctor(city,default_tab,building)
 	GameUIAllianceShrine.super.ctor(self, city, _("联盟圣地"),default_tab,building)
 	self.default_tab = default_tab
@@ -20,6 +21,8 @@ function GameUIAllianceShrine:ctor(city,default_tab,building)
 	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
 	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnNewStageOpened)
 	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
+	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineReportsChanged)
+	self.my_alliance:AddListenOnType(self, self.my_alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged)
 	assert(self.allianceShrine)
 	self.event_bind_to_label = {}
 end
@@ -35,6 +38,10 @@ function GameUIAllianceShrine:OnPerceotionChanged()
 	if self.stage_ui and self.stage_ui.perHour_label then
 		self.stage_ui.perHour_label:setString(string.format("+%s/h",resource:GetProductionPerHour()))
 	end
+end
+
+function GameUIAllianceShrine:OnShrineReportsChanged(change_map)
+	self:RefreshUI()
 end
 
 function GameUIAllianceShrine:OnFightEventTimerChanged(event)
@@ -71,6 +78,19 @@ function GameUIAllianceShrine:OnMoveOutStage()
 	GameUIAllianceShrine.super.OnMoveOutStage(self)
 end
 
+function GameUIAllianceShrine:OnAttackMarchEventDataChanged(change_map)
+	if change_map.removed then
+		for __,event in ipairs(change_map.removed) do
+			if event:MarchType() == "shrine" then
+				if self:GetSelectedButtonTag() == "fight_event" then
+					self:RefreshFightListView()
+				end
+				break
+			end
+		end
+	end
+end
+
 function GameUIAllianceShrine:onCleanup()
 	self.event_bind_to_label = nil
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnPerceotionChanged)
@@ -78,6 +98,8 @@ function GameUIAllianceShrine:onCleanup()
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnNewStageOpened)
 	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
+	self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineReportsChanged)
+	self.my_alliance:RemoveListenerOnType(self, self.my_alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged)
 	GameUIAllianceShrine.super.onCleanup(self)
 end
 
@@ -146,7 +168,13 @@ function GameUIAllianceShrine:RefreshUI()
 	elseif tag == 'fight_event' then
 		self:RefreshFightListView()
 	elseif tag == 'events_history' then
-		self:RefreshEventsListView()
+		if self:GetAllianceShrine():IsNeedRequestReportFromServer() then
+			NetManager:getShrineReportsPromise():done(function()
+				self:RefreshEventsListView()
+			end)
+		else
+			self:RefreshEventsListView()
+		end
 	end
 end
 
@@ -577,6 +605,23 @@ function GameUIAllianceShrine:fillReportItemContent(content,report,idx)
 	content.date_label:setString(os.date("%Y-%m-%d",report:Time()))
 	content.time_label:setString(os.date("%H:%M:%S",report:Time()))
 	content.title_label:setString(report:Stage():GetStageDesc())
+	if content.button then
+		content.button:removeSelf()
+	end
+	local button = WidgetPushButton.new({
+			normal = "blue_btn_up_148x58.png",
+			pressed = "blue_btn_down_148x58.png"
+		})
+		:align(display.RIGHT_BOTTOM,558, 16):addTo(content)
+		:setButtonLabel("normal",UIKit:commonButtonLable({
+			text = _("详情"),
+			size = 20,
+			color = 0xfff3c7
+		}))
+		:onButtonClicked(function()
+			self:OnReportButtonClicked(content.idx )
+		end)
+	content.button = button
 end
 function GameUIAllianceShrine:GetReportsItem(report)
 	local bg = WidgetUIBackGround.new({width = 568,height = 172},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
@@ -600,25 +645,12 @@ function GameUIAllianceShrine:GetReportsItem(report)
 	local box = self:BuildReportItemBox(report)
 		:addTo(bg)
 		:align(display.LEFT_BOTTOM,12,12)
-	local button = WidgetPushButton.new({
-			normal = "blue_btn_up_148x58.png",
-			pressed = "blue_btn_down_148x58.png"
-		})
-		:align(display.RIGHT_BOTTOM,558, 16):addTo(bg)
-		:setButtonLabel("normal",UIKit:commonButtonLable({
-			text = _("详情"),
-			size = 20,
-			color = 0xfff3c7
-		}))
-		:onButtonClicked(function()
-
-			self:OnReportButtonClicked(bg.idx )
-		end)
+	
 	local date_label = UIKit:ttfLabel({
 		text = "",
 		size = 18,
 		color = 0x403c2f,
-	}):align(display.CENTER_TOP, button:getPositionX() - 74, box:getPositionY() + box:getContentSize().height + 4):addTo(bg)
+	}):align(display.CENTER_TOP, 484, box:getPositionY() + box:getContentSize().height + 4):addTo(bg)
 
 	local time_label = UIKit:ttfLabel({
 		text = "",
@@ -632,7 +664,6 @@ function GameUIAllianceShrine:GetReportsItem(report)
 	bg.star_bar = star_bar
 	bg.faild_label = faild_label
 	bg.box = box
-	bg.button = button
 	bg.date_label = date_label
 	bg.time_label = time_label
 	return bg	

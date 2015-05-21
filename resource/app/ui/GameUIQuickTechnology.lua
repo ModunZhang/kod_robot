@@ -72,6 +72,7 @@ function GameUIQuickTechnology:onEnter()
     City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_DATA_CHANGED)
     City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
     City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_TIMER)
+    City:AddListenOnType(self,City.LISTEN_TYPE.UPGRADE_BUILDING)
 end
 
 function GameUIQuickTechnology:OnProductionTechsDataChanged(changed_map)
@@ -86,6 +87,24 @@ function GameUIQuickTechnology:OnProductionTechsDataChanged(changed_map)
 	end
 end
 
+function GameUIQuickTechnology:OnUpgradingBegin()
+end
+
+function GameUIQuickTechnology:OnUpgradingFinished(building)
+    if building:GetType() == self:GetBuilding():GetType() and self.technology_node then
+    	City:FastUpdateAllTechsLockState()
+    	City:IteratorTechs(function(__,tech)
+    		local item = self:GetItemByTag(tech:Index())
+			if item and item.changeState then
+				item.changeState(tech:Enable())
+			end
+		end)
+    end
+end
+
+function GameUIQuickTechnology:OnUpgrading()
+end
+
 function GameUIQuickTechnology:OnProductionTechnologyEventDataChanged(changed_map)
 	self:CheckUIChanged()
 end
@@ -98,10 +117,11 @@ function GameUIQuickTechnology:OnProductionTechnologyEventTimer(event)
 end
 
 function GameUIQuickTechnology:OnMoveOutStage()
-	GameUIQuickTechnology.super.OnMoveOutStage(self)
 	City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_DATA_CHANGED)
 	City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
 	City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_TIMER)
+	City:RemoveListenerOnType(self,City.LISTEN_TYPE.UPGRADE_BUILDING)
+	GameUIQuickTechnology.super.OnMoveOutStage(self)
 end
 
 function GameUIQuickTechnology:CreateBetweenBgAndTitle()

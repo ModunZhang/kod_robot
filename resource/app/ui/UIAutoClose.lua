@@ -32,7 +32,7 @@ function UIAutoClose:ctor(params)
             if not cc.rectContainsPoint(cc.rect(lbpoint.x, lbpoint.y, rtpoint.x - lbpoint.x, rtpoint.y - lbpoint.y), event) then
                 if is_began_out then
                     if type(self.out_func) == "function" then
-                        self.out_func()
+                        self:out_func()
                     else
                         self:LeftButtonClicked()
                     end

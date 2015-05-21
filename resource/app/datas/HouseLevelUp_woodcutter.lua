@@ -9,7 +9,7 @@ woodcutter[1] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 15,
+	["buildTime"] = 2,
 	["citizen"] = 10
 }
 woodcutter[2] = {

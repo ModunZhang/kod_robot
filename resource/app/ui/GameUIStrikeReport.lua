@@ -501,13 +501,14 @@ function GameUIStrikeReport:CreateEnemyTechnology()
 
     -- 敌方科技列表部分高度
     local militaryTechs = self.report:GetStrikeIntelligence().militaryTechs
+    if not militaryTechs then return end
     local r_count = #militaryTechs
     local r_list_height = r_count * r_tip_height
 
     -- 敌方科技列表
 
     local group_width , group_height = 548,r_list_height+34
-    local group = self:CreateSmallBackGround({width = group_width,height = group_height,title=_("军事科技水平"),isSelf=false})
+    local group = self:CreateSmallBackGround({width = group_width,height = group_height,title= r_count == 0 and _("无军事科技") or _("军事科技水平"),isSelf=false})
 
     -- 构建所有科技标签项
     local r_item_bg_color_flag = true

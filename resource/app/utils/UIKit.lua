@@ -21,6 +21,7 @@ UIKit =
     {
         Registry   = import('framework.cc.Registry'),
         GameUIBase = import('..ui.GameUIBase'),
+        messageDialogs = {}
     }
 local CURRENT_MODULE_NAME = ...
 
@@ -29,10 +30,17 @@ UIKit.UITYPE = Enum("BACKGROUND","WIDGET","MESSAGEDIALOG")
 UIKit.open_ui_callbacks = {}
 UIKit.close_ui_callbacks = {}
 
-function UIKit:CheckOpenUI(ui)
+function UIKit:CheckOpenUI(ui, isopen)
     local callbacks = self.open_ui_callbacks
-    if #callbacks > 0 and callbacks[1](ui) then
-        table.remove(callbacks, 1)
+    if #callbacks > 0 then
+        if isopen then
+            ui.__type  = UIKit.UITYPE.BACKGROUND
+            ui:GetFteLayer()
+        else
+            if callbacks[1](ui) then
+                table.remove(callbacks, 1)
+            end
+        end
     end
 end
 function UIKit:PromiseOfOpen(ui_name)
@@ -80,7 +88,8 @@ function UIKit:createUIClass(className, baseName)
 end
 
 function UIKit:newGameUI(gameUIName,... )
-    if gameUIName ~= 'FullScreenPopDialogUI' then
+    if gameUIName == 'FullScreenPopDialogUI' then
+    else
         if self.Registry.isObjectExists(gameUIName) then
             print("已经创建过一个Object-->",gameUIName)
             return {AddToCurrentScene=function(...)end,AddToScene=function(...)end} -- 适配后面的调用不报错
@@ -89,13 +98,16 @@ function UIKit:newGameUI(gameUIName,... )
     local viewPackageName = app.packageRoot .. ".ui." .. gameUIName
     local viewClass = require(viewPackageName)
     local instance = viewClass.new(...)
-    if gameUIName ~= 'FullScreenPopDialogUI' then
+    if gameUIName == 'FullScreenPopDialogUI' then
+        self:addMessageDialog(instance)
+    else
         self.Registry.setObject(instance,gameUIName)
     end
     return instance
 end
 function UIKit:newWidgetUI(gameUIName,... )
-    if gameUIName ~= 'FullScreenPopDialogUI' then
+    if gameUIName == 'FullScreenPopDialogUI' then
+    else
         if self.Registry.isObjectExists(gameUIName) then
             print("已经创建过一个Object-->",gameUIName)
             return {AddToCurrentScene=function(...)end,AddToScene=function(...)end} -- 适配后面的调用不报错
@@ -115,23 +127,26 @@ function UIKit:getEditBoxFont()
     return "DroidSansFallback"
 end
 
+local color_map = {}
 function UIKit:hex2rgba(hexNum)
-    local a = bit:_rshift(hexNum,24)
-    if a < 0 then
-        a = a + 0x100
+    if not color_map[hexNum] then
+        local a = bit:_rshift(hexNum,24)
+        if a < 0 then
+            a = a + 0x100
+        end
+        local r = bit:_and(bit:_rshift(hexNum,16),0xff)
+        local g = bit:_and(bit:_rshift(hexNum,8),0xff)
+        local b = bit:_and(hexNum,0xff)
+        print(string.format("hex2rgba:%x --> %d %d %d %d",hexNum,r,g,b,a))
+        color_map[hexNum] = {r,g,b,a}
     end
-    local r = bit:_and(bit:_rshift(hexNum,16),0xff)
-    local g = bit:_and(bit:_rshift(hexNum,8),0xff)
-    local b = bit:_and(hexNum,0xff)
-    -- print(string.format("hex2rgba:%x --> %d %d %d %d",hexNum,r,g,b,a))
-    return r,g,b,a
+    return unpack(color_map[hexNum])
 end
 
 function UIKit:hex2c3b(hexNum)
     local r,g,b = self:hex2rgba(hexNum)
     return cc.c3b(r,g,b)
 end
-
 function UIKit:hex2c4b(hexNum)
     local r,g,b,a = self:hex2rgba(hexNum)
     return cc.c4b(r,g,b,a)
@@ -161,11 +176,18 @@ function UIKit:getRegistry()
     return self.Registry
 end
 
-function UIKit:closeAllUI()
-    UIKit.open_ui_callbacks = {}
-    UIKit.close_ui_callbacks = {}
+function UIKit:closeAllUI(force)
+    if force then
+        self.open_ui_callbacks = {}
+        self.close_ui_callbacks = {}
+    end
     for name,v in pairs(self:getRegistry().objects_) do
-        if v.__isBase and v.__type ~= self.UITYPE.BACKGROUND then
+        if v.__isBase and v.__type ~= self.UITYPE.BACKGROUND and v.__cname ~= 'GameUISelenaQuestion' then
+            v:LeftButtonClicked()
+        end
+    end
+    for __,v in pairs(self.messageDialogs) do
+        if v:GetUserData() ~= '__key__dialog' then
             v:LeftButtonClicked()
         end
     end
@@ -412,7 +434,7 @@ end
 function UIKit:commonButtonLable(params)
     if not params then params = {} end
     params.color = params.color or 0xffedae
-    params.size  = params.size or 24
+    params.size  = params.size or 22
     params.shadow = true
     return UIKit:ttfLabel(params)
 end
@@ -471,7 +493,7 @@ function UIKit:commonButtonWithBG(options)
     return btn_bg
 end
 
-function UIKit:commonListView(params,topEnding,bottomEnding)
+function UIKit:commonListView(params,topEnding,bottomEnding,useSysUI)
     assert(params.direction==cc.ui.UIScrollView.DIRECTION_VERTICAL,"错误！只支持上下滑动")
     local viewRect = params.viewRect
     viewRect.x = 0
@@ -479,7 +501,9 @@ function UIKit:commonListView(params,topEnding,bottomEnding)
     local list_node = display.newNode()
     list_node:ignoreAnchorPointForPosition(false)
     list_node:setContentSize(cc.size(viewRect.width,viewRect.height))
-    local list = UIListView.new(params):addTo(list_node)
+    local ui_class = UIListView
+    if useSysUI then  ui_class = cc.ui.UIListView end
+    local list = ui_class.new(params):addTo(list_node)
     -- 是否有顶部的边界条，默认有
     local isTopEnding
     if tolua.type(topEnding)~="nil" then
@@ -506,8 +530,7 @@ function UIKit:commonListView_1(params)
 end
 function UIKit:createLineItem(params)
     -- 分割线
-    local line = display.newScale9Sprite("dividing_line.png")
-    line:size(params.width,2)
+    local line = display.newScale9Sprite("dividing_line.png",0,0,cc.size(params.width,2),cc.rect(10,2,382,2))
     local line_size = line:getContentSize()
     self:ttfLabel(
         {
@@ -529,37 +552,77 @@ function UIKit:createLineItem(params)
     end
     return line
 end
-
+-- MessageDialog
+------------------------------------------------------------------------------------------------------------------------------------------------
 function UIKit:showMessageDialogCanCanleNotAutoClose(title,tips,ok_callback,cancel_callback)
-    title = title or _("提示")
-    local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback)
-        :SetTitle(title)
-        :SetPopMessage(tips)
-        :CreateOKButton({
-            listener =  function ()
-                if ok_callback then
-                    ok_callback()
-                end
-            end
-        })
-    dialog:CreateCancelButton({
-        listener = function ()
-            if cancel_callback then
-                cancel_callback()
-            end
-        end,
-        btn_name = _("取消")
+    -- title = title or _("提示")
+    -- local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback)
+    --     :SetTitle(title)
+    --     :SetPopMessage(tips)
+    --     :CreateOKButton({
+    --         listener =  function ()
+    --             if ok_callback then
+    --                 ok_callback()
+    --             end
+    --         end
+    --     })
+    -- dialog:CreateCancelButton({
+    --     listener = function ()
+    --         if cancel_callback then
+    --             cancel_callback()
+    --         end
+    --     end,
+    --     btn_name = _("取消")
+    -- })
+    -- dialog:DisableAutoClose()
+    -- self:__addMessageDialogToCurrentScene(dialog)
+    -- return dialog
+    return self:showMessageDialogWithParams({
+        title = title,
+        content = tips,
+        ok_callback = ok_callback,
+        cancel_callback = cancel_callback,
+        auto_close = false,
     })
-    dialog:DisableAutoClose()
-    dialog:AddToCurrentScene()
-    return dialog
 end
 
-function UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_x_button,x_button_callback)
+function UIKit:addMessageDialog(instance)
+    print(instance:GetUserData(),"addMessageDialog---->")
+    self.messageDialogs[instance:GetUserData()] = instance
+    dump(self.messageDialogs,"self.messageDialogs----->")
+end
+
+function UIKit:removeMesssageDialog(instance)
+    print(instance:GetUserData(),"removeMesssageDialog---->")
+    self.messageDialogs[instance:GetUserData()] = nil
+    dump(self.messageDialogs,"self.messageDialogs----->")
+end
+
+function UIKit:isKeyMessageDialogShow()
+    return self.messageDialogs['__key__dialog'] ~= nil
+end
+
+function UIKit:isMessageDialogShow(instance)
+    return instance and instance.__cname == 'FullScreenPopDialogUI' and self:isMessageDialogShowWithUserData(instance:GetUserData())
+end
+
+function UIKit:isMessageDialogShowWithUserData(userData)
+    return self.messageDialogs[userData] ~= nil
+end
+
+function UIKit:showKeyMessageDialog(title,tips,ok_callback,cancel_callback)
+    if self:isKeyMessageDialogShow() then
+        print("忽略了一次关键性弹窗")
+        return
+    end
+    local dialog =  UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,false,nil,"__key__dialog")
+end
+
+function UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_x_button,x_button_callback,user_data)
     title = title or _("提示")
     tips = tips or ""
     if type(visible_x_button) ~= 'boolean' then visible_x_button = true end
-    local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback):SetTitle(title):SetPopMessage(tips)
+    local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback,user_data):SetTitle(title):SetPopMessage(tips)
     if ok_callback then
         dialog:CreateOKButton({
             listener =  function ()
@@ -580,8 +643,40 @@ function UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_
     if not visible_x_button then
         dialog:DisableAutoClose()
     end
-    dialog:zorder(3000)
-    dialog:AddToCurrentScene()
+    self:__addMessageDialogToCurrentScene(dialog)
+    dialog:zorder(3001)
+    return dialog
+end
+
+function UIKit:showMessageDialogWithParams(params)
+    local title = params.title or _("提示")
+    local content = params.content or ""
+    local ok_callback = params.ok_callback or function()end
+    local ok_string = params.ok_string or _("确定")
+    local cancel_string = params.cancel_string or _("取消")
+    local visible_x_button = true
+    if  type(params.visible_x_button) == 'boolean' then
+        visible_x_button = params.visible_x_button
+    end
+    local x_button_callback = params.x_button_callback or function()end
+    local user_data = params.user_data or nil
+    local zorder = params.zorder or  3001
+
+    local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback,user_data):SetTitle(title):SetPopMessage(content):zorder(zorder)
+
+    dialog:CreateOKButton({listener = ok_callback,btn_name = ok_string})
+    if cancel_callback then
+        dialog:CreateCancelButton({listener = cancel_callback,btn_name = _("取消")})
+    end
+    dialog:VisibleXButton(visible_x_button)
+    if type(params.auto_close) ~= "boolean" then
+        if not visible_x_button then dialog:DisableAutoClose() end
+    else
+        if not params.auto_close then
+            dialog:DisableAutoClose()
+        end
+    end
+    self:__addMessageDialogToCurrentScene(dialog)
     return dialog
 end
 
@@ -595,10 +690,40 @@ function UIKit:showEvaluateDialog()
         :CreateCancelButton({
             listener = function ()
             end,btn_name = _("残忍的拒绝")
-        })dialog:AddToCurrentScene()
+        })
+    self:__addMessageDialogToCurrentScene(dialog)
     return dialog
 end
 
+function UIKit:__addMessageDialogToCurrentScene(dialog)
+    local current_scene = display.getRunningScene()
+    if current_scene then
+        if tolua.type(current_scene) ~= 'cc.Scene' then
+            self:addMessageDialogWillShow(dialog)
+        else
+            dialog:AddToScene(current_scene, true)
+        end
+    end
+end
+
+function UIKit:getMessageDialogWillShow()
+    printLog("info", "getMessageDialogWillShow--->%s",self.willShowMessage_ or "nil")
+    return self.willShowMessage_
+end
+function UIKit:clearMessageDialogWillShow()
+    self.willShowMessage_ = nil
+end
+--如果是__key__dialog强制替换
+function UIKit:addMessageDialogWillShow(messageDialog)
+    if self.willShowMessage_ then
+        if messageDialog:GetUserData() == '__key__dialog' then
+            self.willShowMessage_ = messageDialog
+        end
+    else
+        self.willShowMessage_ = messageDialog
+    end
+end
+------------------------------------------------------------------------------------------------------------
 function UIKit:WaitForNet(delay)
     local scene = display.getRunningScene()
     if scene.WaitForNet then
@@ -625,15 +750,16 @@ function UIKit:GotoPreconditionBuilding(jump_building)
     local city = jump_building:BelongCity()
     if tolua.type(jump_building) == "string" then
         UIKit:showMessageDialog(_("提示"),string.format(_("请首先建造%s"),Localize.building_name[jump_building]),function()end)
-            :AddToCurrentScene()
         return
     end
     local current_scene = display.getRunningScene()
     local building_sprite = current_scene:GetSceneLayer():FindBuildingSpriteByBuilding(jump_building, city)
-    current_scene:GotoLogicPoint(jump_building:GetMidLogicPosition())
-    if current_scene.AddIndicateForBuilding then
-        current_scene:AddIndicateForBuilding(building_sprite)
-    end
+    local x,y = jump_building:GetMidLogicPosition()
+    current_scene:GotoLogicPoint(x,y,40):next(function()
+        if current_scene.AddIndicateForBuilding then
+            current_scene:AddIndicateForBuilding(building_sprite)
+        end
+    end)
 end
 -- 暂时只有宝箱
 function UIKit:PlayUseItemAni(items)
@@ -690,33 +816,69 @@ end
 function UIKit:addTipsToNode( node,tips , include_node)
     node:setTouchEnabled(true)
     node:setTouchSwallowEnabled(false)
+    local tips_bg
+    if not include_node:getChildByTag(9090) then
+        tips_bg = display.newScale9Sprite("back_ground_240x73.png",0,0,cc.size(240,73),cc.rect(10,10,220,53))
+            :addTo(include_node):align(display.BOTTOM_CENTER)
+        tips_bg:setTag(9090)
+        local text_1 = UIKit:ttfLabel({text = tips,size = 20 ,color = 0xfff2b3})
+            :addTo(tips_bg)
+        tips_bg:size(text_1:getContentSize().width+20,text_1:getContentSize().height+40)
+        local t_size = tips_bg:getContentSize()
+        text_1:align(display.CENTER, t_size.width/2, t_size.height/2)
+        tips_bg:zorder(999999)
+        tips_bg:hide()
+        function tips_bg:SetTips( tips )
+            text_1:setString(tips)
+            self:size(text_1:getContentSize().width+20,text_1:getContentSize().height+40)
+            local t_size = self:getContentSize()
+            text_1:align(display.CENTER, t_size.width/2, t_size.height/2)
+        end
+    else
+        tips_bg = include_node:getChildByTag(9090)
+    end
     node:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
         if event.name == "began" then
             local world_postion = node:getParent():convertToWorldSpace(cc.p(node:getPosition()))
-            local tips_bg = display.newScale9Sprite("back_ground_240x73.png",0,0,cc.size(240,73),cc.rect(10,10,220,53))
-                :addTo(include_node):align(display.BOTTOM_CENTER)
-            tips_bg:setTag(100)
-            local text_1 = UIKit:ttfLabel({text = tips,size = 20 ,color = 0xfff2b3})
-                :addTo(tips_bg)
-            tips_bg:size(text_1:getContentSize().width+20,text_1:getContentSize().height+40)
-            local t_size = tips_bg:getContentSize()
-            text_1:align(display.CENTER, t_size.width/2, t_size.height/2)
-            tips_bg:zorder(999999)
-            local node_postioon = include_node:convertToNodeSpace(world_postion) 
+            local node_postioon = include_node:convertToNodeSpace(world_postion)
             tips_bg:setPosition(node_postioon.x, node_postioon.y + node:getContentSize().height/2)
+            tips_bg:SetTips(tips)
+            tips_bg:show()
         elseif event.name == "ended" then
-            if include_node:getChildByTag(100) then
-                include_node:removeChildByTag(100, true)
-            end
+            tips_bg:hide()
         elseif event.name == "moved" then
             local rect = node:convertToNodeSpace(cc.p(event.x,event.y))
             local box = node:getContentSize()
             if box.width < rect.x or rect.x < 0 or box.height < rect.y or rect.y < 0 then
-                if include_node:getChildByTag(100) then
-                    include_node:removeChildByTag(100, true)
-                end
+                tips_bg:hide()
             end
         end
         return true
     end)
+    return tips_bg
 end
+
+function UIKit:GetItemImage(reward_type,item_key)
+    if reward_type == 'soldiers' then
+        return UILib.soldier_image[item_key][1]
+    elseif reward_type == 'resource'
+        or reward_type == 'special'
+        or reward_type == 'speedup'
+        or reward_type == 'buff'
+        or reward_type == 'buff' then
+        return UILib.item[item_key]
+    elseif reward_type == 'dragonMaterials' then
+        return UILib.dragon_material_pic_map[item_key]
+    elseif reward_type == 'allianceInfo' then
+        if item_key == 'loyalty' then
+            return "loyalty_128x128.png"
+        end
+    end
+end
+
+
+
+
+
+
+

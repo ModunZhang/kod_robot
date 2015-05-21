@@ -128,10 +128,10 @@ function WidgetDropList:SetSelectByTag(tag,dispathEvent)
 	end
 	self.title_label:setString(text) 
 	if self.selected_tag ~= tag then
+		self.selected_tag = tag
 		if dispathEvent and self.callback_ then
 			self.callback_(tag)
 		end
-		self.selected_tag = tag
 	end
 end
 

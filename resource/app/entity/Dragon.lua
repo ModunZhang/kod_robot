@@ -477,13 +477,13 @@ function Dragon:__getDragonLeadershipBuff()
 	if ItemManager:IsBuffActived("troopSizeBonus") then
 		effect = effect + ItemManager:GetBuffEffect("troopSizeBonus")
 	end
-	effect = effect + User:GetVIPDragonLeaderShipAdd() 
 	local eq_buffs = self:GetAllEquipmentBuffEffect()
 	table.foreachi(eq_buffs,function(__,buffData)
 		if buffData[1] == 'troopSizeAdd' then
 			effect = effect + buffData[2]
 		end
 	end)
+	effect = effect + User:GetVIPDragonLeaderShipAdd()
 	return effect
 end
 return Dragon

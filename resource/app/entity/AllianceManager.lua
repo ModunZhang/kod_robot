@@ -25,6 +25,7 @@ function AllianceManager:OnUserDataChanged(user_data,time,deltaData)
     local my_alliance = self:GetMyAlliance()
     if (allianceId == json.null or not allianceId) and not my_alliance:IsDefault() then
         my_alliance:Reset()
+        app:GetChatManager():emptyChannel_('alliance')
         DataManager:setUserAllianceData(json.null)
         DataManager:setEnemyAllianceData(json.null) -- 清除敌方联盟数据
     else

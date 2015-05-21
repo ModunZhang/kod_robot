@@ -9,7 +9,7 @@ end)
 function FteScene:ctor()
     local text = _("数周之后。。。")
     self.several = UIKit:ttfLabel({
-        text = text,
+        text = "",
         size = 30,
         color = 0xffedae,
     }):addTo(self):align(display.CENTER, display.cx, display.cy):hide()
@@ -21,12 +21,12 @@ function FteScene:ctor()
     	GameUINpc:PromiseOfLeave()
         return UIKit:newGameUI('GameUISelectTerrain'):AddToScene(self, true):PromiseOfSelectDragon()
     end):next(function()
-        UIKit:closeAllUI()
+        UIKit:GetUIInstance("GameUISelectTerrain"):removeFromParent()
         self.several:show()
     end):next(self:PormiseOfSchedule(1, function(percent)
         self.several:setString(utf8.substr(text, 1, math.ceil(utf8.len(text) * percent)))
     end)):next(cocos_promise.delay(1)):next(function()
-        app:EnterMyCityScene()
+        app:EnterMyCityFteScene()
     end)
 end
 function FteScene:onEnter()
@@ -34,6 +34,12 @@ function FteScene:onEnter()
 end
 function FteScene:onEnterTransitionFinish()
     self.npc:StartDialog()
+    printLog("Info", "Check MessageDialog :%s",self.__cname)
+    local message = UIKit:getMessageDialogWillShow()
+    if message then
+        message:AddToScene(self,true)
+        UIKit:clearMessageDialogWillShow()
+    end
 end
 function FteScene:onExit()
 

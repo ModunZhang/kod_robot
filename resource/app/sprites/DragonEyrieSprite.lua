@@ -22,7 +22,7 @@ function DragonEyrieSprite:ReloadSpriteCaseDragonDefencedChanged(dragon)
 	elseif dragon then
 		if not self.dragon_sprite then
 		    local x, y = self:GetSpriteOffset()
-		    self.dragon_sprite = DragonSprite.new(self:GetMapLayer(),dragon:GetTerrain()):addTo(self, DRAGON_ZORDER):scale(0.5):pos(x, y+80)
+		    self.dragon_sprite = DragonSprite.new(self:GetMapLayer(),dragon:GetTerrain()):addTo(self, DRAGON_ZORDER):scale(0.5):pos(x+20, y+100)
 		else
 			self.dragon_sprite:ReloadSpriteCauseTerrainChanged(dragon:GetTerrain())
 		end

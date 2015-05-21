@@ -4,12 +4,19 @@ local WidgetMaterialBox = import("..widget.WidgetMaterialBox")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetMaterialDetails = import("..widget.WidgetMaterialDetails")
 local MaterialManager = import("..entity.MaterialManager")
-local WidgetDropList = import("..widget.WidgetDropList")
+local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local BUILDING_MATERIALS = {
     "blueprints" ,
     "tools",
     "tiles" ,
     "pulley" ,
+}
+
+local TECHNOLOGY_MATERIALS = {
+    "saddle",
+    "bowTarget",
+    "ironPart",
+    "trainingFigure",
 }
 
 local DRAGON_MATERIALS = {
@@ -49,59 +56,7 @@ local SOLDIER_METARIALS = {
     "soulStone" ,
     "deathHand" ,
 }
-local EQUIPMENT = {
-    "redCrown_s1" ,
-    "redCrown_s2" ,
-    "redCrown_s3" ,
-    "redCrown_s4" ,
-    "blueCrown_s1",
-    "blueCrown_s2",
-    "blueCrown_s3",
-    "blueCrown_s4",
-    "greenCrown_s1",
-    "greenCrown_s2",
-    "greenCrown_s3",
-    "greenCrown_s4",
-    "redChest_s2" ,
-    "redChest_s3" ,
-    "redChest_s4" ,
-    "blueChest_s2",
-    "blueChest_s3",
-    "blueChest_s4" ,
-    "greenChest_s2",
-    "greenChest_s3",
-    "greenChest_s4",
-    "redSting_s2" ,
-    "redSting_s3" ,
-    "redSting_s4" ,
-    "blueSting_s2" ,
-    "blueSting_s3" ,
-    "blueSting_s4" ,
-    "greenSting_s2" ,
-    "greenSting_s3" ,
-    "greenSting_s4" ,
-    "redOrd_s2" ,
-    "redOrd_s3",
-    "redOrd_s4" ,
-    "blueOrd_s2" ,
-    "blueOrd_s3" ,
-    "blueOrd_s4" ,
-    "greenOrd_s2",
-    "greenOrd_s3" ,
-    "greenOrd_s4" ,
-    "redArmguard_s1" ,
-    "redArmguard_s2" ,
-    "redArmguard_s3" ,
-    "redArmguard_s4" ,
-    "blueArmguard_s1",
-    "blueArmguard_s2" ,
-    "blueArmguard_s3" ,
-    "blueArmguard_s4" ,
-    "greenArmguard_s1",
-    "greenArmguard_s2",
-    "greenArmguard_s3" ,
-    "greenArmguard_s4" ,
-}
+
 local WidgetMaterials = class("WidgetMaterials", function ()
     return display.newLayer()
 end)
@@ -120,14 +75,13 @@ end
 
 function WidgetMaterials:onEnter()
     local list,list_node = UIKit:commonListView({
-        viewRect = cc.rect(0, 0,568, 690),
+        viewRect = cc.rect(0, 0,568, 675),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
     })
     list_node:align(display.BOTTOM_CENTER, window.cx, window.bottom_top+20):addTo(self)
     self.material_listview = list
     self:CreateSelectButton()
     self.building:AddUpgradeListener(self)
-    dump(self.material_box_table)
 end
 function WidgetMaterials:OnBuildingUpgradingBegin()
 end
@@ -141,9 +95,12 @@ function WidgetMaterials:OnBuildingUpgradeFinished(building)
 end
 function WidgetMaterials:OnBuildingUpgrading()
 end
-function WidgetMaterials:CreateItemWithListView(material_type,materials)
+function WidgetMaterials:CreateItemWithListView(material_type,materials,notClean)
     local list_view = self.material_listview
-    list_view:removeAllItems()
+    if not notClean then
+        list_view:removeAllItems()
+        self.material_box_table = {}
+    end
     local material_map = self.city:GetMaterialManager():GetMaterialMap()[material_type]
     local rect = list_view:getViewRect()
     local origin_x = - rect.width / 2
@@ -151,7 +108,6 @@ function WidgetMaterials:CreateItemWithListView(material_type,materials)
     local gap_x = (568 - unit_width * 4) / 3
     local row_item = display.newNode()
     local row_count = 0
-    self.material_box_table = {}
     self.material_box_table[material_type]={}
     for i,material_name in ipairs(materials) do
         local material_box = WidgetMaterialBox.new(material_type,material_name,function ()
@@ -173,11 +129,17 @@ function WidgetMaterials:CreateItemWithListView(material_type,materials)
     list_view:reload()
 end
 function WidgetMaterials:SelectOneTypeMaterials(m_type)
-    self:CreateItemWithListView(m_type,self:GetMateriasl(m_type))
+    local material_1 , material_2 = self:GetMateriasl(m_type)
+    if material_1 then
+        self:CreateItemWithListView(m_type,material_1)
+    end
+    if material_2 then
+        self:CreateItemWithListView(MaterialManager.MATERIAL_TYPE.TECHNOLOGY,material_2,true)
+    end
 end
 function WidgetMaterials:GetMateriasl( m_type )
     if m_type == MaterialManager.MATERIAL_TYPE.BUILD then
-        return BUILDING_MATERIALS
+        return BUILDING_MATERIALS,TECHNOLOGY_MATERIALS
     end
     if m_type == MaterialManager.MATERIAL_TYPE.DRAGON then
         return DRAGON_MATERIALS
@@ -185,37 +147,30 @@ function WidgetMaterials:GetMateriasl( m_type )
     if m_type == MaterialManager.MATERIAL_TYPE.SOLDIER then
         return SOLDIER_METARIALS
     end
-    if m_type == MaterialManager.MATERIAL_TYPE.EQUIPMENT then
-        return EQUIPMENT
-    end
 end
 function WidgetMaterials:OpenMaterialDetails(material_type,material_name,num)
     UIKit:newWidgetUI("WidgetMaterialDetails",material_type,material_name,num):AddToCurrentScene()
 end
 function WidgetMaterials:CreateSelectButton()
-    self.dropList = WidgetDropList.new(
+    self.dropList = WidgetRoundTabButtons.new(
         {
-            {tag = "1",label = "工具材料",default = true},
-            {tag = "2",label = "龙的装备材料"},
-            {tag = "3",label = "招募特殊兵种的材料"},
-            {tag = "4",label = "龙的装备"},
+            {tag = "1",label = _("特殊兵种"),default = true},
+            {tag = "2",label = _("建筑&科技")},
+            {tag = "3",label = _("龙")},
         },
         function(tag)
             if tag == '1' then
-                self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.BUILD)
-            end
-            if tag == '2' then
-                self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.DRAGON)
-            end
-            if tag == '3' then
                 self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.SOLDIER)
             end
-            if tag == '4' then
-                self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.EQUIPMENT)
+            if tag == '2' then
+                self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.BUILD)
+            end
+            if tag == '3' then
+                self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.DRAGON)
             end
         end
     )
-    self.dropList:align(display.TOP_CENTER,window.cx,window.top-96):addTo(self,2)
+    self.dropList:align(display.TOP_CENTER,window.cx,window.top-86):addTo(self,2)
 
 end
 
@@ -229,6 +184,8 @@ function WidgetMaterials:OnMaterialsChanged(material_manager,material_type,chang
 end
 
 return WidgetMaterials
+
+
 
 
 

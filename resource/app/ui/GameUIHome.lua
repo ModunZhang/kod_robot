@@ -9,25 +9,34 @@ local WidgetEventTabButtons = import("..widget.WidgetEventTabButtons")
 local SoldierManager = import("..entity.SoldierManager")
 local WidgetAutoOrder = import("..widget.WidgetAutoOrder")
 local UILib = import(".UILib")
-local Arrow = import(".Arrow")
 local WidgetChangeMap = import("..widget.WidgetChangeMap")
 local GameUIHelp = import(".GameUIHelp")
 local Alliance = import("..entity.Alliance")
+local ResourceManager = import("..entity.ResourceManager")
 local GrowUpTaskManager = import("..entity.GrowUpTaskManager")
 local GameUIHome = UIKit:createUIClass('GameUIHome')
-
+local WidgetAutoOrderAwardButton = import("..widget.WidgetAutoOrderAwardButton")
 
 local app = app
 local timer = app.timer
+local WOOD          = ResourceManager.RESOURCE_TYPE.WOOD
+local FOOD          = ResourceManager.RESOURCE_TYPE.FOOD
+local IRON          = ResourceManager.RESOURCE_TYPE.IRON
+local STONE         = ResourceManager.RESOURCE_TYPE.STONE
+local POPULATION    = ResourceManager.RESOURCE_TYPE.POPULATION
+local COIN          = ResourceManager.RESOURCE_TYPE.COIN
 
+local red_color = UIKit:hex2c4b(0xff3c00)
+local normal_color = UIKit:hex2c4b(0xf3f0b6)
 function GameUIHome:OnResourceChanged(resource_manager)
     local server_time = timer:GetServerTime()
-    local wood_resource = resource_manager:GetWoodResource()
-    local food_resource = resource_manager:GetFoodResource()
-    local iron_resource = resource_manager:GetIronResource()
-    local stone_resource = resource_manager:GetStoneResource()
-    local citizen_resource = resource_manager:GetPopulationResource()
-    local coin_resource = resource_manager:GetCoinResource()
+    local allresources = resource_manager:GetAllResources()
+    local wood_resource = allresources[WOOD]
+    local food_resource = allresources[FOOD]
+    local iron_resource = allresources[IRON]
+    local stone_resource = allresources[STONE]
+    local citizen_resource = allresources[POPULATION]
+    local coin_resource = allresources[COIN]
     local wood_number = wood_resource:GetResourceValueByCurrentTime(server_time)
     local food_number = food_resource:GetResourceValueByCurrentTime(server_time)
     local iron_number = iron_resource:GetResourceValueByCurrentTime(server_time)
@@ -42,11 +51,10 @@ function GameUIHome:OnResourceChanged(resource_manager)
     self.citizen_label:setString(GameUtils:formatNumber(citizen_number))
     self.coin_label:setString(GameUtils:formatNumber(coin_number))
     self.gem_label:setString(string.formatnumberthousands(gem_number))
-
-    self.wood_label:setColor(wood_resource:IsOverLimit() and UIKit:hex2c4b(0xff3c00) or UIKit:hex2c4b(0xf3f0b6))
-    self.food_label:setColor(food_resource:IsOverLimit() and UIKit:hex2c4b(0xff3c00) or UIKit:hex2c4b(0xf3f0b6))
-    self.iron_label:setColor(iron_resource:IsOverLimit() and UIKit:hex2c4b(0xff3c00) or UIKit:hex2c4b(0xf3f0b6))
-    self.stone_label:setColor(stone_resource:IsOverLimit() and UIKit:hex2c4b(0xff3c00) or UIKit:hex2c4b(0xf3f0b6))
+    self.wood_label:setColor(wood_resource:IsOverLimit() and red_color or normal_color)
+    self.food_label:setColor(food_resource:IsOverLimit() and red_color or normal_color)
+    self.iron_label:setColor(iron_resource:IsOverLimit() and red_color or normal_color)
+    self.stone_label:setColor(stone_resource:IsOverLimit() and red_color or normal_color)
 end
 function GameUIHome:OnUpgradingBegin()
     self:OnTaskChanged()
@@ -146,6 +154,7 @@ function GameUIHome:AddOrRemoveListener(isAdd)
         user:AddListenOnType(self, user.LISTEN_TYPE.TASK)
         user:AddListenOnType(self, user.LISTEN_TYPE.VIP_EVENT_ACTIVE)
         user:AddListenOnType(self, user.LISTEN_TYPE.VIP_EVENT_OVER)
+        user:AddListenOnType(self, user.LISTEN_TYPE.COUNT_INFO)
     else
         city:RemoveListenerOnType(self, self.city.LISTEN_TYPE.UPGRADE_BUILDING)
         city:RemoveListenerOnType(self,city.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
@@ -159,6 +168,7 @@ function GameUIHome:AddOrRemoveListener(isAdd)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.TASK)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.VIP_EVENT_ACTIVE)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.VIP_EVENT_OVER)
+        user:RemoveListenerOnType(self, user.LISTEN_TYPE.COUNT_INFO)
     end
 end
 function GameUIHome:OnAllianceBasicChanged(fromEntity,changed_map)
@@ -204,7 +214,6 @@ function GameUIHome:CreateTop()
     if display.width>640 then
         top_bg:scale(display.width/768)
     end
-
     -- 玩家按钮
     local button = cc.ui.UIPushButton.new(
         {normal = "player_btn_up_314x86.png", pressed = "player_btn_down_314x86.png"},
@@ -215,8 +224,6 @@ function GameUIHome:CreateTop()
         end
     end):addTo(top_bg):align(display.LEFT_CENTER,top_bg:getContentSize().width/2-2, top_bg:getContentSize().height/2+10)
     button:setRotationSkewY(180)
-
-
     -- 玩家名字背景加文字
     local ox = 150
     local name_bg = display.newSprite("player_name_bg_168x30.png"):addTo(top_bg)
@@ -248,9 +255,6 @@ function GameUIHome:CreateTop()
         shadow = true
     }):addTo(top_bg):align(display.LEFT_CENTER, ox + 14, 42)
 
-
-
-    -----------------------
     -- 资源按钮
     local button = cc.ui.UIPushButton.new(
         {normal = "player_btn_up_314x86.png", pressed = "player_btn_down_314x86.png"},
@@ -279,6 +283,7 @@ function GameUIHome:CreateTop()
         local col = (i - 1) % 3
         local x, y = first_col + col * padding_width, first_row - (row * padding_height)
         display.newSprite(v[1]):addTo(button):pos(x, y):scale(0.3)
+
         self[v[2]] = UIKit:ttfLabel({text = "",
             size = 18,
             color = 0xf3f0b6,
@@ -287,16 +292,19 @@ function GameUIHome:CreateTop()
     end
 
     -- 玩家信息背景
-    local player_bg = display.newSprite("player_bg_110x106.png"):addTo(top_bg, 2)
-        :align(display.LEFT_BOTTOM, display.width>640 and 58 or 64, 10):setCascadeOpacityEnabled(true)
-    self.player_icon = UIKit:GetPlayerIconOnly(User:Icon()):addTo(player_bg):pos(55, 64):scale(0.72)
-    -- self.exp = display.newSprite("player_exp_bar_110x106.png"):addTo(player_bg):pos(55, 53)
-    self.exp = display.newProgressTimer("player_exp_bar_110x106.png", display.PROGRESS_TIMER_RADIAL):addTo(player_bg):pos(55, 53)
+    local player_bg = display.newSprite("player_bg_110x106.png")
+        :align(display.LEFT_BOTTOM, display.width>640 and 58 or 60, 10)
+        :addTo(top_bg, 2):setCascadeOpacityEnabled(true)
+    self.player_icon = UIKit:GetPlayerIconOnly(User:Icon())
+        :addTo(player_bg):pos(55, 64):scale(0.72)
+    self.exp = display.newProgressTimer("player_exp_bar_110x106.png",
+        display.PROGRESS_TIMER_RADIAL):addTo(player_bg):pos(55, 53)
     self.exp:setRotationSkewY(180)
     self:RefreshExp()
 
     local level_bg = display.newSprite("level_bg_72x19.png"):addTo(player_bg):pos(55, 18):setCascadeOpacityEnabled(true)
     self.level_label = UIKit:ttfLabel({
+        text = "",
         size = 14,
         color = 0xfff1cc,
         shadow = true,
@@ -340,17 +348,15 @@ function GameUIHome:CreateTop()
         {scale9 = false}
     ):addTo(top_bg):pos(255, -10):onButtonClicked(function(event)
         if self.task then
-            local building
-            if self.task:BuildingType() == "tower" then
-                building = self.city:GetNearGateTower()
-            else
-                building = self.city:GetHighestBuildingByType(self.task:BuildingType())
-            end
+            local building_type = self.task:BuildingType()
+            local building = self.city:PreconditionByBuildingType(building_type)
             if building then
                 local current_scene = display.getRunningScene()
-                current_scene:GotoLogicPoint(building:GetMidLogicPosition())
                 local building_sprite = current_scene:GetSceneLayer():FindBuildingSpriteByBuilding(building, self.city)
-                current_scene:AddIndicateForBuilding(building_sprite)
+                local x,y = building:GetMidLogicPosition()
+                current_scene:GotoLogicPoint(x,y,40):next(function()
+                    current_scene:AddIndicateForBuilding(building_sprite)
+                end)
             end
         end
     end)
@@ -363,16 +369,39 @@ function GameUIHome:CreateTop()
         color = UIKit:hex2c3b(0xfffeb3)})
         :addTo(quest_bar_bg):align(display.LEFT_CENTER, -120, 0)
 
-
-    -- 礼物按钮
+    local left_order =  WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM,20):addTo(self):pos(display.left+40, display.top-200)
+    -- 活动按钮
     local button = cc.ui.UIPushButton.new(
-        {normal = "activity_68x78.png"},
+        {normal = "tips_66x64.png", pressed = "tips_66x64.png"},
         {scale9 = false}
-    ):onButtonClicked(function(event)
+    )
+    button:onButtonClicked(function(event)
         if event.name == "CLICKED_EVENT" then
-            UIKit:newGameUI("GameUIActivity",self.city):AddToCurrentScene(true)
+            UIKit:newGameUI("GameUIActivityNew",self.city):AddToCurrentScene(true)
         end
-    end):addTo(self):pos(display.left+40, display.top-200)
+    end)
+    function button:CheckVisible()
+        return true
+    end
+    function button:GetElementSize()
+        return button:getCascadeBoundingBox().size
+    end
+    left_order:AddElement(button)
+    --在线活动
+    local activity_button = WidgetAutoOrderAwardButton.new(self)
+
+
+
+    -- function activity_button:CheckVisible()
+    --     return true
+    -- end
+
+    -- function activity_button:GetElementSize()
+    --     return activity_button:getCascadeBoundingBox().size
+    -- end
+
+    left_order:AddElement(activity_button)
+    left_order:RefreshOrder()
     local order = WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM,20):addTo(self):pos(display.right-50, display.top-200)
     -- BUFF按钮
     local buff_button = cc.ui.UIPushButton.new(
@@ -389,25 +418,6 @@ function GameUIHome:CreateTop()
         return buff_button:getCascadeBoundingBox().size
     end
     order:AddElement(buff_button)
-    -- tips
-    local button = cc.ui.UIPushButton.new(
-        {normal = "tips_66x64.png", pressed = "tips_66x64.png"},
-        {scale9 = false}
-    )
-    button:onButtonClicked(function(event)
-        if event.name == "CLICKED_EVENT" then
-            UIKit:newGameUI("GameUITips",button,function ()
-                order:RefreshOrder()
-            end):AddToCurrentScene(true)
-        end
-    end)
-    function button:CheckVisible()
-        return not app:GetGameDefautlt():getBasicInfoValueForKey("NEVER_SHOW_TIP_ICON")
-    end
-    function button:GetElementSize()
-        return button:getCascadeBoundingBox().size
-    end
-    order:AddElement(button)
 
     -- 协助加速按钮
     self.help_button = cc.ui.UIPushButton.new(
@@ -437,8 +447,10 @@ function GameUIHome:CreateTop()
 
     order:RefreshOrder()
     self.top_order_group = order
+    self.left_order_group = left_order
     return top_bg
 end
+
 function GameUIHome:CreateBottom()
     local bottom_bg = WidgetHomeBottom.new(self.city):addTo(self)
         :align(display.BOTTOM_CENTER, display.cx, display.bottom)
@@ -454,7 +466,8 @@ function GameUIHome:OnVipEventOver( vip_event )
     self:RefreshVIP()
 end
 function GameUIHome:RefreshExp()
-    self.exp:setPercentage(User:LevelExp()/User:GetCurrentLevelMaxExp(User:GetPlayerLevelByExp(User:LevelExp()))*100)
+    local current_level = User:GetPlayerLevelByExp(User:LevelExp())
+    self.exp:setPercentage( (User:LevelExp() - User:GetCurrentLevelExp(current_level))/(User:GetCurrentLevelMaxExp(current_level) - User:GetCurrentLevelExp(current_level)) * 100)
 end
 function GameUIHome:RefreshVIP()
     local vip_btn = self.vip_btn
@@ -488,6 +501,18 @@ end
 function GameUIHome:FindVip()
     return self.vip_btn
 end
+function GameUIHome:PromiseOfFteWaitFinish()
+    if #self.city:GetUpgradingBuildings() > 0 then
+        if not self.event_tab:IsShow() then
+            self.event_tab:EventChangeOn("build", true)
+        end
+        self:GetFteLayer()
+        return self.city:PromiseOfFinishUpgradingByLevel(nil, nil):next(function()
+            self:GetFteLayer():removeFromParent()
+        end)
+    end
+    return cocos_promise.defer()
+end
 function GameUIHome:PromiseOfFteFreeSpeedUp()
     if #self.city:GetUpgradingBuildings() > 0 then
         if not self.event_tab:IsShow() then
@@ -500,12 +525,19 @@ function GameUIHome:PromiseOfFteFreeSpeedUp()
             self:Find():onButtonClicked(function()
                 self:Find():setButtonEnabled(false)
 
-                mockData.FinishBuildHouseAt(self:GetBuildingLocation(), 1)
+                local building = self:GetBuilding()
+                if building then
+                    if building:IsHouse() then
+                        mockData.FinishBuildHouseAt(self:GetBuildingLocation(), building:GetNextLevel())
+                    else
+                        mockData.FinishUpgradingBuilding(building:GetType(), building:GetNextLevel())
+                    end
+                end
             end)
 
             local r = self:Find():getCascadeBoundingBox()
-            self:GetFteLayer().arrow = WidgetFteArrow.new(_("5分钟以下免费加速，激活VIP提升免费加速时间，VIP等级越高，可免费加速时间越高"))
-                :addTo(self:GetFteLayer()):TurnUp(true):align(display.RIGHT_TOP, r.x + r.width/2, r.y - 10)
+            WidgetFteArrow.new(_("5分钟以下免费加速")):addTo(self:GetFteLayer())
+            :TurnDown(true):align(display.RIGHT_BOTTOM, r.x + r.width/2 + 30, r.y + 50)
         end)
 
         return self.city:PromiseOfFinishUpgradingByLevel(nil, nil):next(function()
@@ -528,18 +560,20 @@ function GameUIHome:PromiseOfFteInstantSpeedUp()
                 self:Find():setButtonEnabled(false)
 
                 local building = self:GetBuilding()
-                if building:IsHouse() then
-                    mockData.FinishBuildHouseAt(self:GetBuildingLocation(), building:GetNextLevel())
-                else
-                    mockData.FinishUpgradingBuilding(building:GetType(), building:GetNextLevel())
+                if building then
+                    if building:IsHouse() then
+                        mockData.FinishBuildHouseAt(self:GetBuildingLocation(), building:GetNextLevel())
+                    else
+                        mockData.FinishUpgradingBuilding(building:GetType(), building:GetNextLevel())
+                    end
                 end
 
             end)
 
             local r = self:Find():getCascadeBoundingBox()
-            self:GetFteLayer().arrow = WidgetFteArrow.new(_("立即完成升级"))
-                :addTo(self:GetFteLayer()):TurnRight(true):align(display.RIGHT_CENTER, r.x - 10, r.y + r.height/2)
-
+            WidgetFteArrow.new(_("立即完成升级"))
+                :addTo(self:GetFteLayer()):TurnDown(true)
+                :align(display.RIGHT_BOTTOM, r.x + r.width/2 + 30, r.y + 50)
 
         end)
 
@@ -566,7 +600,7 @@ function GameUIHome:PromiseOfActivePromise()
     local r = self:FindVip():getCascadeBoundingBox()
 
     WidgetFteArrow.new(_("点击VIP，免费激活VIP")):addTo(self:GetFteLayer())
-    :TurnUp():align(display.TOP_CENTER, r.x + r.width/2, r.y)
+        :TurnUp():align(display.TOP_CENTER, r.x + r.width/2, r.y)
 
     return UIKit:PromiseOfOpen("GameUIVip"):next(function(ui)
         self:GetFteLayer():removeFromParent()
@@ -574,7 +608,15 @@ function GameUIHome:PromiseOfActivePromise()
     end)
 end
 
+function GameUIHome:OnCountInfoChanged()
+    self.left_order_group:RefreshOrder()
+end
+
 return GameUIHome
+
+
+
+
 
 
 

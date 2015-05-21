@@ -3,31 +3,28 @@
 -- Date: 2015-02-10 14:30:55
 --
 --
-local GameUITips = UIKit:createUIClass("GameUITips")
+local GameUITips = UIKit:createUIClass("GameUITips","UIAutoClose")
 local UILib = import(".UILib")
 local UIListView = import(".UIListView")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local window = import("..utils.window")
 local WidgetPushButton = import("..widget.WidgetPushButton")
+local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 
-function GameUITips:ctor(active_button,callback)
+function GameUITips:ctor(default_tab)
 	GameUITips.super.ctor(self)
-	self.show_never_again = true
-	self.never_show_again = app:GetGameDefautlt():getBasicInfoValueForKey("NEVER_SHOW_TIP_ICON")
-	self.active_button = active_button
-	self.callback = callback
+	self.default_tab = default_tab or "city"
 end
-
 
 function GameUITips:onEnter()
 	GameUITips.super.onEnter(self)
 	self:BuildUI()
 end
 
-
 function GameUITips:BuildUI()
-	local shadowLayer = UIKit:shadowLayer():addTo(self)
-	local bg = WidgetUIBackGround.new({height=762}):addTo(shadowLayer)
+	local bg = WidgetUIBackGround.new({height=762})
+	self:addTouchAbleChild(bg)
+	self.bg = bg
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
 	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
@@ -37,51 +34,46 @@ function GameUITips:BuildUI()
 	   		self:LeftButtonClicked()
 	   	end)
 	UIKit:ttfLabel({
-		text = _("帮助"),
+		text = _("游戏说明"),
 		size = 22,
 		shadow = true,
 		color = 0xffedae
-	}):addTo(titleBar):align(display.CENTER,300,24)
-	local list_bg = display.newScale9Sprite("box_bg_546x214.png"):size(568,636):addTo(bg):align(display.TOP_CENTER, 304, 732)
-	self.info_list = UIListView.new({
+	}):addTo(titleBar):align(display.CENTER,300,28)
+	
+	self.tab_buttons = WidgetRoundTabButtons.new({
+        {tag = "city",label = _("城市"),default = self.default_tab == "city"},
+        {tag = "region",label = _("区域地图"),default = self.default_tab == "region"},
+    }, function(tag)
+       self:OnTabButtonClicked(tag)
+    end,2):align(display.CENTER_BOTTOM,304,15):addTo(bg)
+end
+
+function GameUITips:OnTabButtonClicked(tag)
+	local method = string.format("CreateUIIf_%s", tag)
+	if self[method] then
+		if self.cur_tab then self.cur_tab:hide() end
+		self.cur_tab = self[method](self)
+		self.cur_tab:show()
+	end
+end
+
+function GameUITips:CreateUIIf_city()
+	if self.city_node then
+		self:RefreshCityListView()
+		return self.city_node
+	end
+	local list_bg = display.newScale9Sprite("box_bg_546x214.png"):size(568,636):addTo(self.bg):align(display.TOP_CENTER, 304, 732)
+	self.city_node = list_bg
+
+	self.city_list = UIListView.new({
         viewRect = cc.rect(11,10, 546, 616),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
 	}):addTo(list_bg)
-	WidgetPushButton.new({normal = 'yellow_btn_up_185x65.png',pressed = 'yellow_btn_down_185x65.png'})
-		:setButtonLabel('normal', UIKit:commonButtonLable({
-			text = _("我知道了!")
-		}))
-		:addTo(bg):pos(500,50)
-		:onButtonClicked(function()
-			self:LeftButtonClicked()
-		end)
-	local checkbox_image = {
-	        off = "checkbox_unselected.png",
-	        off_pressed = "checkbox_unselected.png",
-	        off_disabled = "checkbox_unselected.png",
-	        on = "checkbox_selectd.png",
-	        on_pressed = "checkbox_selectd.png",
-	        on_disabled = "checkbox_selectd.png",
-
-	}
-	if self.show_never_again then
-		local button = WidgetPushButton.new({normal = 'activity_check_bg_55x51.png'})
-			:addTo(bg)
-			:align(display.LEFT_BOTTOM,15, 25)
-		local check_state = display.newSprite("activity_check_body_55x51.png"):addTo(button):pos(27,25)
-		check_state:setVisible(self.never_show_again)
-		button.check_state = check_state
-		button:onButtonClicked(function()
-			self.never_show_again = not self.never_show_again
-			app:GetGameDefautlt():setBasicInfoBoolValueForKey("NEVER_SHOW_TIP_ICON",self.never_show_again)
-			app:GetGameDefautlt():flush()
-			button.check_state:setVisible(self.never_show_again)
-			self.callback()
-		end)
-		UIKit:ttfLabel({text = _("不再显示"),size = 22,color = 0x514d3e}):align(display.LEFT_CENTER, 80, 50):addTo(bg)
-	end
-	self:RefreshListView()
+	self:RefreshCityListView()
+	return self.city_node
 end
+
+
 
 function GameUITips:Tips()
 	local tips = {
@@ -95,17 +87,18 @@ function GameUITips:Tips()
 	return tips
 end
 
-function GameUITips:RefreshListView()
+function GameUITips:RefreshCityListView()
+	self.city_list:removeAllItems()
 	local data = self:Tips()
 	for index,v in ipairs(data) do
 		local item = self:GetItem(index,v.image,v.title,v.text,v.scale)
-		self.info_list:addItem(item)
+		self.city_list:addItem(item)
 	end
-	self.info_list:reload()
+	self.city_list:reload()
 end
 
 function GameUITips:GetItem(index,image,title,text,scale)
-	local item = self.info_list:newItem()
+	local item = self.city_list:newItem()
 	local content = display.newScale9Sprite(string.format("resource_item_bg%d.png",index % 2)):size(548,122)
 	local image = display.newSprite(image):align(display.LEFT_CENTER, 10, 61):addTo(content):scale(scale)
 	local title_label = UIKit:ttfLabel({
@@ -124,13 +117,40 @@ function GameUITips:GetItem(index,image,title,text,scale)
 	item:setItemSize(548,122)
 	return item
 end
+-- Region tips
+function GameUITips:RegionTips()
+	local tips = {
+		_("选择木材、石料、铁矿、粮食村落采集资源，满足发展城市和联盟的需求"),
+		_("激活并参与圣地战，和盟友并肩作战，赢取丰厚的稀缺材料"),
+		_("参加联盟会战，来一场争锋相对的较量，进攻敌方联盟的城市获得大量积分和资源"),
+		_("如果你的盟友不幸成为敌方攻击的目标，协助盟友击退外敌"),
+		_("联盟会战胜利后，联盟获得大量的荣誉点数"),
+	}
+	return tips
+end
 
-function GameUITips:LeftButtonClicked()
-	if self.active_button then
-		self.active_button:setVisible(not app:GetGameDefautlt():getBasicInfoValueForKey("NEVER_SHOW_TIP_ICON"))
-		print(tolua.type(self.active_button),"self.active_button---->")
+function GameUITips:CreateUIIf_region()
+	if self.region_node then
+		return self.region_node
 	end
-	GameUITips.super.LeftButtonClicked(self)
+	local node = display.newNode():size(608,747):addTo(self.bg)
+	display.newSprite("region_tips_556x344.png"):align(display.CENTER_TOP, 304, 740):addTo(node)
+
+
+	local tips_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 263}):align(display.BOTTOM_CENTER, 304, 120):addTo(node)
+	local x,y = 10,250
+	for index,v in ipairs(self:RegionTips()) do
+		local star = display.newSprite("alliance_star_23x23.png"):align(display.LEFT_TOP, x, y):addTo(tips_bg)
+		UIKit:ttfLabel({
+			text = v,
+			size = 18,
+			color=0x403c2f,
+			dimensions = cc.size(496,56)
+		}):align(display.LEFT_TOP,x + 28, y+2):addTo(tips_bg)
+		y = y - 52
+	end
+	self.region_node = node
+	return self.region_node
 end
 
 return GameUITips

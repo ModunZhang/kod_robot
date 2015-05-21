@@ -322,6 +322,9 @@ function GameUIHelp:OnHelpEventChanged(changed_help_event)
         for _,event in pairs(removed) do
             self:DeleteHelpItem(event:Id())
         end
+        self:performWithDelay(function ()
+            self.help_listview:reload()
+        end, 0.3)
     end
     if changed_help_event.edit then
         local edit = changed_help_event.edit
@@ -335,6 +338,9 @@ function GameUIHelp:OnHelpEventChanged(changed_help_event)
                 end
             end
         end
+        self:performWithDelay(function ()
+            self.help_listview:reload()
+        end, 0.3)
     end
     self.help_all_button:setVisible(self:IsAbleToHelpAll())
 end

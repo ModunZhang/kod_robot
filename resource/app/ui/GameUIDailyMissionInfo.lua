@@ -11,10 +11,31 @@ local UIKit = UIKit
 local UIListView = import(".UIListView")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
+local config_stringInit = GameDatas.PlayerInitData.stringInit
+local Localize_item = import("..utils.Localize_item")
 
 function GameUIDailyMissionInfo:ctor(key_of_daily)
 	GameUIDailyMissionInfo.super.ctor(self)
 	self.key_of_daily = key_of_daily
+end
+
+function GameUIDailyMissionInfo:GetRewardsStr()
+    local key_of_daily = self:GetKeyOfDaily()
+    local config_key = ""
+    if key_of_daily == 'empireRise' then
+        config_key = 'empireRiseDailyTaskRewards'
+    elseif key_of_daily == 'brotherClub' then
+        config_key = 'brotherClubDailyTaskRewards'
+    elseif key_of_daily == 'conqueror' then
+        config_key = 'conquerorDailyTaskRewards'  
+    elseif key_of_daily == 'growUp' then
+        config_key = 'growUpDailyTaskRewards'
+    end
+    local config_rewards = config_stringInit[config_key].value
+    if config_rewards then
+        local reward_type,reward_key,count = unpack(string.split(config_rewards,":"))
+        return string.format("%s x%s",Localize_item.item_name[reward_key],count)
+    end
 end
 
 function GameUIDailyMissionInfo:onEnter()
@@ -25,10 +46,10 @@ end
 
 
 function GameUIDailyMissionInfo:BuildUI()
-	local bg = WidgetUIBackGround.new({height=630})
+	local bg = WidgetUIBackGround.new({height=552})
     self:addTouchAbleChild(bg)
-	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top + 100)
-	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,615):addTo(bg)
+	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top + 178)
+	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,537):addTo(bg)
 	local closeButton = UIKit:closeButton()
 	   	:addTo(titleBar)
 	   	:align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
@@ -40,10 +61,10 @@ function GameUIDailyMissionInfo:BuildUI()
 		size = 22,
 		shadow = true,
 		color = 0xffedae
-	}):addTo(titleBar):align(display.CENTER,300,24)
-	local list_bg = display.newScale9Sprite("box_bg_546x214.png"):size(568,404):addTo(bg):align(display.BOTTOM_CENTER, 304, 25)
+	}):addTo(titleBar):align(display.CENTER,300,28)
+	local list_bg = display.newScale9Sprite("box_bg_546x214.png"):size(568,326):addTo(bg):align(display.BOTTOM_CENTER, 304, 25)
 	self.info_list = UIListView.new({
-        viewRect = cc.rect(11,10, 546, 384),
+        viewRect = cc.rect(11,10, 546, 306),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
 	}):addTo(list_bg)
 
@@ -51,23 +72,27 @@ function GameUIDailyMissionInfo:BuildUI()
 		text = _("完成下列任务,领取奖励"),
 		color= 0x403c2f,
 		size = 20,
-	}):align(display.LEFT_BOTTOM, 22, 474):addTo(bg)
+	}):align(display.LEFT_BOTTOM, 22, 396):addTo(bg)
 	local progress_bg,progress = self:GetProgressBar()
-	progress_bg:align(display.LEFT_BOTTOM, 22, 516):addTo(bg)
+	progress_bg:align(display.LEFT_BOTTOM, 22, 436):addTo(bg)
 	self.progress = progress
 	UIKit:ttfLabel({
 		text = _("当前进度"),
 		color= 0x403c2f,
 		size = 20,
-	}):align(display.LEFT_BOTTOM,22,562):addTo(bg)
+	}):align(display.LEFT_BOTTOM,22,484):addTo(bg)
 
     local yin_box = ccs.Armature:create("yin_box")
-        :align(display.RIGHT_BOTTOM, 562,456)
+        :align(display.RIGHT_BOTTOM, 562,378)
         :addTo(bg)
         :scale(174/400)
     self.button_finish_animation = yin_box
+    local button_finish_sprite = display.newSprite("#root/yin/a0002.png"):align(display.RIGHT_BOTTOM, 562,378)
+        :addTo(bg)
+        :scale(174/400)
+    self.button_finish_sprite = button_finish_sprite
     local button = WidgetPushTransparentButton.new(cc.rect(0,0,174,141))
-        :align(display.RIGHT_BOTTOM, 562,456)
+        :align(display.RIGHT_BOTTOM, 562,378)
         :addTo(bg)
 		:onButtonClicked(function()
 			self:GetRewardFromServer()
@@ -81,10 +106,17 @@ function GameUIDailyMissionInfo:BuildUI()
 end
 
 function GameUIDailyMissionInfo:RefreshListUI()
-    local percentage = #User:GetDailyTasksInfo(self:GetKeyOfDaily()) / 5 
+    local percentage = #User:GetDailyTasksInfo(self:GetKeyOfDaily()) / 4
     self.progress:setPercentage(percentage * 100)
     self.button_finish_icon:setVisible(User:CheckDailyTasksWasRewarded(self:GetKeyOfDaily()))
 	self:RefreshListView()
+    if User:CheckDailyTasksWasRewarded(self:GetKeyOfDaily()) then
+        self.button_finish_sprite:show()
+        self.button_finish_animation:hide()
+    else
+        self.button_finish_sprite:hide()
+        self.button_finish_animation:show()
+    end
 end
 
 
@@ -96,10 +128,19 @@ function GameUIDailyMissionInfo:GetProgressBar()
 end
 
 function GameUIDailyMissionInfo:GetRewardFromServer()
+    local percentage = #User:GetDailyTasksInfo(self:GetKeyOfDaily()) / 4
+    if percentage < 1 then
+        GameGlobalUI:showTips(_("提示"),_("你还未完成所有任务"))
+        return
+    end
     if not User:CheckDailyTasksWasRewarded(self:GetKeyOfDaily()) then
         NetManager:getDailyTaskRewards(self:GetKeyOfDaily()):done(function()
             self.button_finish_animation:getAnimation():play("Animation1", -1, 0)
+            app:GetAudioManager():PlayeEffectSoundWithKey("USE_ITEM")
+            GameGlobalUI:showTips(_("恭喜"),self:GetRewardsStr())
         end)
+    else
+        GameGlobalUI:showTips(_("提示"),_("你已经领取了该奖励"))
     end
 end
 
@@ -129,24 +170,36 @@ function GameUIDailyMissionInfo:GetItem(index,item_data,isFinish)
 	if isFinish then
        display.newSprite("minssion_finish_icon_51x51.png"):align(display.CENTER, 462, 39):addTo(content)
 	else
-		WidgetPushButton.new({
-			normal = "yellow_btn_up_148x58.png",
-			pressed= "yellow_btn_down_148x58.png"
-		})
-			:align(display.RIGHT_CENTER, 536, 39)
-			:addTo(content)
-			:onButtonClicked(function()
-				if item_data.func then
-					item_data.func()
-				end
-			end)
-			:setButtonLabel("normal", UIKit:commonButtonLable({
-				text = item_data.isDesc and _("说明") or _("前往"),
-			}))
+        if not item_data.isDesc then
+    		WidgetPushButton.new({
+    			normal = "yellow_btn_up_148x58.png",
+    			pressed= "yellow_btn_down_148x58.png"
+    		})
+    			:align(display.RIGHT_CENTER, 536, 39)
+    			:addTo(content)
+    			:onButtonClicked(function()
+                    if item_data.func then
+                        if item_data.func() then
+                            self:CloseUIIf("GameUIDailyMissionInfo")
+                            self:CloseUIIf("GameUIMission")
+                        end
+    				end
+    			end)
+    			:setButtonLabel("normal", UIKit:commonButtonLable({
+    				text = _("前往"),
+    			}))
+        end
 	end
 	item:addContent(content)
 	item:setItemSize(546,78)
 	return item
+end
+
+function GameUIDailyMissionInfo:CloseUIIf(class_name)
+    local ui = UIKit:GetUIInstance(class_name)
+    if ui then
+        ui:LeftButtonClicked()
+    end
 end
 
 function GameUIDailyMissionInfo:GetMissionConfig()
@@ -158,6 +211,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
                 isDesc = false,
         		func = function()
         			UIKit:newGameUI("GameUIHasBeenBuild", City):AddToCurrentScene(true)
+                    return true
         		end
         	},
         	{
@@ -168,34 +222,23 @@ function GameUIDailyMissionInfo:GetMissionConfig()
         			local building = City:GetFirstBuildingByType("barracks") 
         			if  not building:IsUnlocked() then
         				GameGlobalUI:showTips(_("错误"),_("你还未建造兵营"))
-        				return
+        				return false
         			end
-        			UIKit:newGameUI("GameUIBarracks", City,building):AddToCurrentScene(true)
+        			UIKit:newGameUI("GameUIBarracks", City,building,"recruit"):AddToCurrentScene(true)
+                    return true
         		end
         	},
         	{
         		index = 3,
-        		title = _("升级一次科技"),
-                isDesc = false,
-        		func = function()
-        			local building = City:GetFirstBuildingByType("academy") 
-        			if not building:IsUnlocked() then
-        				GameGlobalUI:showTips(_("错误"),_("你还未建造学院"))
-        				return
-        			end
-        			UIKit:newGameUI("GameUIAcademy", City,building):AddToCurrentScene(true)
-        		end
-        	},
-        	{
-        		index = 4,
         		title = _("成功通关塞琳娜的考验"),
                 isDesc = false,
         		func = function()
         			UIKit:newGameUI("GameUISelenaQuestion"):AddToCurrentScene(true)
+                    return false
         		end
         	},
         	{
-        		index = 5,
+        		index = 4,
         		title = _("制造一批建筑材料"),
                 isDesc = false,
         		func = function()
@@ -203,9 +246,10 @@ function GameUIDailyMissionInfo:GetMissionConfig()
         			local building = City:GetFirstBuildingByType("toolShop") 
         			if not building:IsUnlocked() then
         				GameGlobalUI:showTips(_("错误"),_("你还未建造工具作坊"))
-        				return
+        				return false
         			end
         			UIKit:newGameUI("GameUIToolShop", City,building):AddToCurrentScene(true)
+                    return false
         		end
         	}
     	},
@@ -215,19 +259,10 @@ function GameUIDailyMissionInfo:GetMissionConfig()
         		title = _("参加一次联盟会战"),
                 isDesc = true,
         		func = function()
-        			GameGlobalUI:showTips(_("说明"),_("参加一次联盟会战"))
         		end
         	},
         	{
         		index = 2,
-        		title = _("对敌方玩家城市进行一次突袭"),
-                isDesc = true,
-        		func = function()
-        		  
-        		end
-        	},
-        	{
-        		index = 3,
         		title = _("对地方玩家城市进行一次进攻"),
                 isDesc = true,
         		func = function()
@@ -235,7 +270,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
         		end
         	},
         	{
-        		index = 4,
+        		index = 3,
         		title = _("占领一座村落"),
                 isDesc = true,
         		func = function()
@@ -243,7 +278,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
         		end
         	},
         	{
-        		index = 5,
+        		index = 4,
         		title = _("搭乘飞艇进行一次探索"),
                 isDesc = false,
         		func = function()
@@ -253,6 +288,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
 		                app:EnterPVEScene(index)
 		            else
 		                GameGlobalUI:showTips(_("错误"),_("必须有一条空闲的龙，才能进入pve"))
+                        return false
 		            end
         		end
         	}
@@ -261,44 +297,54 @@ function GameUIDailyMissionInfo:GetMissionConfig()
 	        {
         		index = 1,
         		title = _("进行一次联盟捐赠"),
-                isDesc = true,
+                isDesc = false,
         		func = function()
         			if Alliance_Manager:GetMyAlliance():IsDefault() then
         				GameGlobalUI:showTips(_("错误"),_("你还未加入联盟"))
-        				return 
+        				return false
         			end
+                    UIKit:newGameUI("GameUIAllianceContribute"):AddToCurrentScene(true)
+                    return false
         		end
         	},
         	{
         		index = 2,
         		title = _("在联盟商店购买一次道具"),
-                isDesc = true,
+                isDesc = false,
         		func = function()
-        			
+        			if Alliance_Manager:GetMyAlliance():IsDefault() then
+                        GameGlobalUI:showTips(_("错误"),_("你还未加入联盟"))
+                        return false
+                    end
+                    local building = Alliance_Manager:GetMyAlliance():GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+                    UIKit:newGameUI("GameUIAllianceShop",City,"goods",building):AddToCurrentScene(true)
+                    return false
         		end
         	},
         	{
         		index = 3,
         		title = _("协助一次盟友建造加速"),
-                isDesc = true,
+                isDesc = false,
         		func = function()
-        			
+        			if Alliance_Manager:GetMyAlliance():IsDefault() then
+                        GameGlobalUI:showTips(_("错误"),_("你还未加入联盟"))
+                        return false
+                    end
+                    UIKit:newGameUI("GameUIHelp"):AddToCurrentScene(true)
+                    return false
         		end
         	},
         	{
         		index = 4,
-        		title = "?",
-                isDesc = true,
-        		func = function()
-        			
-        		end
-        	},
-        	{
-        		index = 5,
         		title = _("对盟友进行一次协防"),
                 isDesc = true,
         		func = function()
-        			
+        			if Alliance_Manager:GetMyAlliance():IsDefault() then
+                        GameGlobalUI:showTips(_("错误"),_("你还未加入联盟"))
+                        return false
+                    end
+                    app:EnterMyAllianceScene()
+                    return true
         		end
         	}
 	    },
@@ -316,7 +362,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
         		title = _("加速一支正在招募的兵种"),
                 isDesc = true,
         		func = function()
-        			
+        			return true
         		end
         	},
         	{
@@ -324,23 +370,23 @@ function GameUIDailyMissionInfo:GetMissionConfig()
         		title = _("打造一件龙的装备"),
                 isDesc = false,
         		func = function()
-        			
+        			local blackSmith = City:GetFirstBuildingByType("blackSmith")
+                        if blackSmith:IsUnlocked() then
+                            UIKit:newGameUI("GameUIBlackSmith",City,blackSmith):AddToCurrentScene(true)
+                            return false
+                        else
+                            GameGlobalUI:showTips(_("错误"),_("你还未建造铁匠铺"))
+                            return false
+                        end
         		end
         	},
         	{
         		index = 4,
-        		title = _("进行一次高级抽奖"),
-                isDesc = false,
-        		func = function()
-        			
-        		end
-        	},
-        	{
-        		index = 5,
         		title = _("在商店购买任意一个道具"),
                 isDesc = false,
         		func = function()
-        			UIKit:newGameUI("GameUIShop",City):AddToCurrentScene(true)
+        			UIKit:newGameUI("GameUIItems",City,"shop"):AddToCurrentScene(true)
+                    return false
         		end
         	}
 	    }

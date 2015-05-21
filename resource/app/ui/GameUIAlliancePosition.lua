@@ -9,7 +9,7 @@ function GameUIAlliancePosition:ctor()
     -- 根据是否处于联盟战状态构建不同UI
     local my_alliance = Alliance_Manager:GetMyAlliance()
     local enemy_alliance = Alliance_Manager:GetEnemyAlliance()
-    local isFight = enemy_alliance:IsDefault()
+    local isFight = my_alliance:Status() == "peace" or my_alliance:Status() == "protect"
     local height = isFight and 258 or 386
     GameUIAlliancePosition.super.ctor(self,height,_("定位坐标"),window.top-200)
     local body = self.body

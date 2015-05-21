@@ -68,11 +68,11 @@ property(Alliance, "fightPosition", "")
 property(Alliance, "fightRequests", {})
 property(Alliance, "countInfo", {})
 property(Alliance, "events", {})
-property(Alliance, "joinRequestEvents", {})
+property(Alliance, "joinRequestEvents", nil)
 property(Alliance, "villages", {})
 property(Alliance, "villageLevels", {})
 property(Alliance, "allianceFight", {})
-property(Alliance, "allianceFightReports", {})
+property(Alliance, "allianceFightReports", nil)
 function Alliance:ctor()
     Alliance.super.ctor(self)
     self.flag = Flag:RandomFlag()
@@ -108,6 +108,7 @@ function Alliance:GetItemsManager()
     return self.items_manager
 end
 function Alliance:ResetAllListeners()
+    self.alliance_shrine:ClearAllListener()
     self.alliance_map:ClearAllListener()
     self:ClearAllListener()
 end
@@ -188,9 +189,6 @@ function Alliance:OnPropertyChange(property_name, old_value, new_value)
     if is_new_alliance then
         self:OnOperation("join")
     end
-    if property_name == "status" and new_value == "fight" and display.getRunningScene().__cname ~= "MainScene" then
-        app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_START")
-    end
     self:OnBasicChanged{
         [property_name] = {old = old_value, new = new_value}
     }
@@ -260,14 +258,15 @@ function Alliance:IsRequested()
         end
     end
 end
-function Alliance:GetAllianceFightReports()
-    return self.allianceFightReports
-end
 function Alliance:GetLastAllianceFightReports()
     local last_report
     for _,v in pairs(self.allianceFightReports) do
-        if not last_report or v.fightTime > last_report.fightTime then
+        if not last_report then
             last_report = v
+        else
+            if v.fightTime > last_report.fightTime then
+                last_report = v
+            end
         end
     end
     return last_report
@@ -649,6 +648,10 @@ function Alliance:OnTimer(current_time)
     self:IteratorVillageEvents(function(villageEvent)
         villageEvent:OnTimer(current_time)
     end)
+    if self:Status() == "prepare" and math.floor(self:StatusFinishTime() / 1000) == math.floor(current_time) then
+        app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_START")
+    end
+
 end
 
 --行军事件
@@ -915,7 +918,7 @@ function Alliance:OnStrikeMarchEventsDataChanged(alliance_data,deltaData,refresh
         end)
         self.strikeMarchEvents = {}
         for _,v in ipairs(alliance_data.strikeMarchEvents) do
-            local strikeMarchEvent = MarchAttackEvent.new()
+            local strikeMarchEvent = MarchAttackEvent.new(true)
             strikeMarchEvent:UpdateData(v,refresh_time)
             self.strikeMarchEvents[strikeMarchEvent:Id()] = strikeMarchEvent
             strikeMarchEvent:AddObserver(self)
@@ -926,7 +929,7 @@ function Alliance:OnStrikeMarchEventsDataChanged(alliance_data,deltaData,refresh
         local changed_map = GameUtils:Handler_DeltaData_Func(
             deltaData.strikeMarchEvents
             ,function(event_data)
-                local strikeMarchEvent = MarchAttackEvent.new()
+                local strikeMarchEvent = MarchAttackEvent.new(true)
                 strikeMarchEvent:UpdateData(event_data,refresh_time)
                 self.strikeMarchEvents[strikeMarchEvent:Id()] = strikeMarchEvent
                 strikeMarchEvent:AddObserver(self)
@@ -944,7 +947,7 @@ function Alliance:OnStrikeMarchEventsDataChanged(alliance_data,deltaData,refresh
                     local strikeMarchEvent = self.strikeMarchEvents[event_data.id]
                     strikeMarchEvent:Reset()
                     self.strikeMarchEvents[event_data.id] = nil
-                    strikeMarchEvent = MarchAttackEvent.new()
+                    strikeMarchEvent = MarchAttackEvent.new(true)
                     strikeMarchEvent:UpdateData(event_data,refresh_time)
                     return strikeMarchEvent
                 end
@@ -970,7 +973,7 @@ function Alliance:OnStrikeMarchReturnEventsDataChanged(alliance_data,deltaData,r
         end)
         self.strikeMarchReturnEvents = {}
         for _,v in ipairs(alliance_data.strikeMarchReturnEvents) do
-            local strikeMarchReturnEvent = MarchAttackReturnEvent.new()
+            local strikeMarchReturnEvent = MarchAttackReturnEvent.new(true)
             strikeMarchReturnEvent:UpdateData(v,refresh_time)
             self.strikeMarchReturnEvents[strikeMarchReturnEvent:Id()] = strikeMarchReturnEvent
             strikeMarchReturnEvent:AddObserver(self)
@@ -981,7 +984,7 @@ function Alliance:OnStrikeMarchReturnEventsDataChanged(alliance_data,deltaData,r
         local changed_map = GameUtils:Handler_DeltaData_Func(
             deltaData.strikeMarchReturnEvents
             ,function(event_data)
-                local strikeMarchReturnEvent = MarchAttackReturnEvent.new()
+                local strikeMarchReturnEvent = MarchAttackReturnEvent.new(true)
                 strikeMarchReturnEvent:UpdateData(event_data,refresh_time)
                 self.strikeMarchReturnEvents[strikeMarchReturnEvent:Id()] = strikeMarchReturnEvent
                 strikeMarchReturnEvent:AddObserver(self)
@@ -999,7 +1002,7 @@ function Alliance:OnStrikeMarchReturnEventsDataChanged(alliance_data,deltaData,r
                     local strikeMarchReturnEvent = self.strikeMarchReturnEvents[event_data.id]
                     strikeMarchReturnEvent:Reset()
                     self.strikeMarchReturnEvents[event_data.id] = nil
-                    strikeMarchReturnEvent = MarchAttackReturnEvent.new()
+                    strikeMarchReturnEvent = MarchAttackReturnEvent.new(true)
                     strikeMarchReturnEvent:UpdateData(event_data,refresh_time)
                     return strikeMarchReturnEvent
                 end
@@ -1238,5 +1241,6 @@ function Alliance:IsMyAlliance()
 end
 
 return Alliance
+
 
 

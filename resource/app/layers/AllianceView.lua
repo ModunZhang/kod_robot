@@ -18,6 +18,7 @@ local random = math.random
 local max = math.max
 local min = math.min
 local ipairs = ipairs
+local pairs = pairs
 local function random_indexes_in_rect(number, rect)
     local indexes = {}
     local count = 0
@@ -47,6 +48,7 @@ function AllianceView:ctor(layer, alliance, logic_base_x, logic_base_y)
     self.layer = layer
     self.alliance = alliance
     self.objects = {}
+    self.village_map = {}
     logic_base_x = logic_base_x or 0
     logic_base_y = logic_base_y or 53
     self.normal_map = NormalMapAnchorBottomLeftReverseY.new{
@@ -102,7 +104,9 @@ local terrain_map = {
         "027.png",
     }
 }
+local Alliance_Manager = Alliance_Manager
 function AllianceView:InitAlliance()
+    self.is_my_alliance = Alliance_Manager:GetMyAlliance():Id() == self.alliance:Id()
     local background = self:GetLayer():GetBackGround()
     local array = terrain_map[self:Terrain()]
     if #array > 0 then
@@ -143,6 +147,9 @@ function AllianceView:GetZOrderBy(sprite, x, y)
     local width, _ = self:GetLogicMap():GetSize()
     return x + y * width + 100
 end
+function AllianceView:GetMapObjects()
+    return self.objects
+end
 function AllianceView:OnMemberChanged(alliance)
     for _,v in pairs(alliance:GetAllMembers()) do
         local entity = self.objects[v.mapId]
@@ -161,7 +168,6 @@ function AllianceView:OnBuildingInfoChange()
 end
 function AllianceView:OnBuildingFullUpdate(allianceMap)
     self:RefreshBuildings(allianceMap)
-    self:OnSceneScale()
 end
 function AllianceView:RefreshBuildings(alliance_map)
     self:IteratorAllianceObjects(function(_,v) v:removeFromParent() end)
@@ -169,6 +175,7 @@ function AllianceView:RefreshBuildings(alliance_map)
     alliance_map:IteratorAllObjects(function(_, entity)
         self.objects[entity:Id()] = self:CreateObject(entity)
     end)
+    self.layer:RefreshAllVillageEvents()
 end
 function AllianceView:OnBuildingDeltaUpdate(allianceMap, deltaMapObjects)
     for _,entity in ipairs(deltaMapObjects.add or {}) do
@@ -186,24 +193,23 @@ function AllianceView:OnBuildingDeltaUpdate(allianceMap, deltaMapObjects)
             self:RefreshEntity(allianceMap:GetMapObjects()[index])
         end
     end
-    self:OnSceneScale()
+    self.layer:RefreshAllVillageEvents()
 end
 function AllianceView:RefreshEntity(entity)
     self.objects[entity:Id()]:removeFromParent()
     self.objects[entity:Id()] = self:CreateObject(entity)
 end
 function AllianceView:CreateObject(entity)
-    local is_my_alliance = Alliance_Manager:GetMyAlliance():Id() == self.alliance:Id()
     local type_ = entity:GetType()
     local object
     if type_ == "building" then
-        object = AllianceBuildingSprite.new(self, entity, is_my_alliance):addTo(self:GetBuildingNode())
+        object = AllianceBuildingSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
     elseif type_ == "member" then
-        object = CitySprite.new(self, entity, is_my_alliance):addTo(self:GetBuildingNode())
+        object = CitySprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
     elseif type_ == "village" then
-        object = VillageSprite.new(self, entity, is_my_alliance):addTo(self:GetBuildingNode())
+        object = VillageSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
     elseif type_ == "decorate" then
-        object = AllianceDecoratorSprite.new(self, entity, is_my_alliance):addTo(self:GetBuildingNode())
+        object = AllianceDecoratorSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
     end
     return object
 end
@@ -252,16 +258,14 @@ function AllianceView:EmptyGround(x, y)
     end
 end
 
-function AllianceView:OnSceneScale(s)
-    if s then self.scale = s end
-    local scale = self.scale
-    local l = max(0.5, scale) - 0.5
-    local r = 0.8 - min(0.8, scale)
-    self:GetLayer():GetInfoNode():opacity(l / (l + r) * 255)
-end
+
 
 
 return AllianceView
+
+
+
+
 
 
 

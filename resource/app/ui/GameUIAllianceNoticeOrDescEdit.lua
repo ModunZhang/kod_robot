@@ -36,6 +36,7 @@ function GameUIAllianceNoticeOrDescEdit:OnMoveInStage()
     textView:setReturnType(cc.KEYBOARD_RETURNTYPE_DEFAULT)    
     textView:setFont(UIKit:getEditBoxFont(), 24)
     textView:setPlaceHolder(_("最多输入600个字符"))
+    textView:setMaxLength(600)
     textView:setFontColor(UIKit:hex2c3b(0x000000))
     if self.isNotice_ then
     	textView:setText(Alliance_Manager:GetMyAlliance():Notice() or "")
@@ -49,9 +50,9 @@ function GameUIAllianceNoticeOrDescEdit:OnMoveInStage()
         :setButtonLabel(
         	UIKit:ttfLabel({
 				text = _("取消"),
-				size = 20,
+				size = 22,
 				shadow = true,
-				color = 0xfff3c7
+				color = 0xffedae
 			})
 		)
 		:onButtonClicked(function()
@@ -63,14 +64,14 @@ function GameUIAllianceNoticeOrDescEdit:OnMoveInStage()
         :setButtonLabel(
         	UIKit:ttfLabel({
 				text = _("确定"),
-				size = 20,
+				size = 22,
 				shadow = true,
-				color = 0xfff3c7
+				color = 0xffedae
 			})
 		)
 		:onButtonClicked(handler(self, self.onOkButtonClicked))
 		:addTo(bg_node)
-		:align(display.RIGHT_BOTTOM,bg_node:getCascadeBoundingBox().width - 120, 20)
+		:align(display.RIGHT_BOTTOM,bg_node:getCascadeBoundingBox().width - 100, 20)
 end
 
 function GameUIAllianceNoticeOrDescEdit:onOkButtonClicked()

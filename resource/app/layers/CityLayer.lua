@@ -88,12 +88,12 @@ function CityLayer:GetClickedObject(world_x, world_y)
     end)
     if clicked_list.logic_clicked[1] then
         if clicked_list.logic_clicked[1]:GetEntity():GetType() == "wall" then
-            clicked_list.logic_clicked[1] = self:GetGate()
+            clicked_list.logic_clicked[1] = self:GetCityGate()
         end
     end
     if clicked_list.sprite_clicked[1] then
         if clicked_list.sprite_clicked[1]:GetEntity():GetType() == "wall" then
-            clicked_list.sprite_clicked[1] = self:GetGate()
+            clicked_list.sprite_clicked[1] = self:GetCityGate()
         end
     end
     if self:IsEditMode() then
@@ -117,7 +117,15 @@ function CityLayer:GetClickedObject(world_x, world_y)
     for _,v in ipairs(clicked_list.sprite_clicked) do
         print(v:GetEntity():GetType(), v:getLocalZOrder())
     end
-    return clicked_list.logic_clicked[1] or clicked_list.sprite_clicked[1]
+    local building = clicked_list.logic_clicked[1] or clicked_list.sprite_clicked[1]
+    if building then
+        return building
+    else
+        local tile = self.scene:GetCity():GetTileByBuildingPosition(logic_x, logic_y)
+        if tile and tile.location_id == 2 then
+            return self.square
+        end
+    end
 end
 function CityLayer:OnTileLocked(city)
     self:OnTileChanged(city)
@@ -149,20 +157,18 @@ function CityLayer:OnCreateDecorator(building)
     city_node:addChild(house)
     table.insert(self.houses, house)
 
-    self:NotifyObservers(function(listener)
-        listener:OnCreateDecoratorSprite(house)
-    end)
+    -- self:NotifyObservers(function(listener)
+    --     listener:OnCreateDecoratorSprite(house)
+    -- end)
 end
 function CityLayer:OnDestoryDecorator(destory_decorator, release_ruins)
     for i, house in pairs(self.houses) do
         local x, y = house:GetLogicPosition()
         if destory_decorator:IsSamePositionWith(house) then
-            self:NotifyObservers(function(listener)
-                listener:OnDestoryDecoratorSprite(house)
-            end)
-
-            table.remove(self.houses, i)
-            house:removeFromParent()
+            -- self:NotifyObservers(function(listener)
+            --     listener:OnDestoryDecoratorSprite(house)
+            -- end)
+            table.remove(self.houses, i):removeFromParent()
             break
         end
     end
@@ -189,14 +195,15 @@ local SCENE_BACKGROUND = 1
 local BACK_NODE = 2
 local CITY_LAYER = 3
 local SKY_LAYER = 4
+local INFO_LAYER = 5
 local CITY_BACKGROUND = 1
 local ROAD_NODE = 2
 local BUILDING_NODE = 3
 local WEATHER_NODE = 4
 function CityLayer:ctor(city_scene)
     Observer.extend(self)
-    CityLayer.super.ctor(self, 0.6, 1.5)
-    self.city_scene = city_scene
+    CityLayer.super.ctor(self, city_scene, 0.6, 1.5)
+    self.scene = city_scene
     self.buildings = {}
     self.houses = {}
     self.towers = {}
@@ -222,7 +229,7 @@ function CityLayer:ConvertLogicPositionToMapPosition(lx, ly)
     return self:convertToNodeSpace(self:GetCityNode():convertToWorldSpace(map_pos))
 end
 function CityLayer:Terrain()
-    return self.city_scene:GetCity():GetUser():Terrain()
+    return self.scene:GetCity():GetUser():Terrain()
 end
 --
 function CityLayer:InitBackground()
@@ -231,6 +238,7 @@ end
 function CityLayer:InitCity()
     self.city_layer = display.newLayer():addTo(self, CITY_LAYER):align(display.BOTTOM_LEFT, 47, 158 + 250)
     self.sky_layer = display.newLayer():addTo(self, SKY_LAYER):align(display.BOTTOM_LEFT)
+    self.info_layer = display.newLayer():addTo(self, INFO_LAYER):align(display.BOTTOM_LEFT)
     self.position_node = cc.TMXTiledMap:create("tmxmaps/city_road2.tmx"):addTo(self.city_layer):hide()
     self.city_node = display.newLayer():addTo(self.city_layer, BUILDING_NODE):align(display.BOTTOM_LEFT)
     local origin_point = self:GetPositionIndex(0, 0)
@@ -242,6 +250,9 @@ function CityLayer:InitCity()
         base_x = origin_point.x,
         base_y = origin_point.y
     })
+end
+function CityLayer:GetInfoLayer()
+    return self.info_layer
 end
 function CityLayer:GetPositionIndex(x, y)
     return self:GetPositionLayer():getPositionAt(cc.p(x, y))
@@ -297,9 +308,53 @@ function CityLayer:ReloadSceneBackground()
     local right_1 = string.format("right_background_1_%s.jpg", terrain)
     local right_2 = string.format("right_background_2_%s.jpg", terrain)
     local left1 = display.newSprite(left_1):addTo(self.background):align(display.LEFT_BOTTOM)
-    local left2 = display.newSprite(left_2):addTo(self.background):align(display.LEFT_BOTTOM, 0, left1:getContentSize().height)
-    local right1 = display.newSprite(right_1):addTo(self.background):align(display.LEFT_BOTTOM, left2:getContentSize().width, 0)
-    local right2 = display.newSprite(right_2):addTo(self.background):align(display.LEFT_BOTTOM, left2:getContentSize().width, right1:getContentSize().height)
+    -- local left2 = display.newSprite(left_2):addTo(self.background):align(display.LEFT_BOTTOM, 0, left1:getContentSize().height)
+    local square = display.newSprite(left_2, nil, nil, {class=cc.FilteredSpriteWithOne}):addTo(self.background)
+        :align(display.LEFT_BOTTOM, 0, left1:getContentSize().height)
+    local right1 = display.newSprite(right_1):addTo(self.background):align(display.LEFT_BOTTOM, square:getContentSize().width, 0)
+    local right2 = display.newSprite(right_2):addTo(self.background):align(display.LEFT_BOTTOM, square:getContentSize().width, right1:getContentSize().height)
+
+    function square:GetEntity()
+        return {
+            GetType = function()
+                return "square"
+            end,
+            GetLogicPosition = function()
+                return -1, -1
+            end,
+        }
+    end
+    function square:BeginFlash(time)
+        local start = 0
+        self:setFilter(filter.newFilter("CUSTOM", json.encode({
+            frag = "shaders/flashAt.fs",
+            shaderName = "flash1",
+            startTime = start,
+            curTime = start,
+            lastTime = 0.5,
+            rect = {0.815,0.543,0.21,0.26},
+            srm = {1.0, 1.54, -45, 0.4},
+        })))
+        self:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
+            start = start + dt
+            if start > time then
+                self:ResetFlashStatus()
+            else
+                self:getFilter():getGLProgramState():setUniformFloat("curTime", start)
+            end
+        end)
+        self:scheduleUpdate()
+    end
+    function square:Flash(time)
+        self:ResetFlashStatus()
+        self:BeginFlash(time)
+    end
+    function square:ResetFlashStatus()
+        self:unscheduleUpdate()
+        self:removeNodeEventListenersByEvent(cc.NODE_ENTER_FRAME_EVENT)
+        self:clearFilter()
+    end
+    self.square = square
 end
 function CityLayer:InitWithCity(city)
     city:AddListenOnType(self, city.LISTEN_TYPE.UNLOCK_TILE)
@@ -490,9 +545,9 @@ function CityLayer:UpdateWallsWithCity(city)
     end
     self.walls = new_walls
 
-    self:NotifyObservers(function(listener)
-        listener:OnGateChanged(old_walls, new_walls)
-    end)
+    -- self:NotifyObservers(function(listener)
+    --     listener:OnGateChanged(old_walls, new_walls)
+    -- end)
 
     for _, v in pairs(old_walls) do
         v:DestorySelf()
@@ -509,9 +564,9 @@ function CityLayer:UpdateTowersWithCity(city)
     end
     self.towers = new_towers
 
-    self:NotifyObservers(function(listener)
-        listener:OnTowersChanged(old_towers, new_towers)
-    end)
+    -- self:NotifyObservers(function(listener)
+    --     listener:OnTowersChanged(old_towers, new_towers)
+    -- end)
 
     for k, v in pairs(old_towers) do
         v:DestorySelf()
@@ -722,7 +777,7 @@ end
 function CityLayer:IteratorRuins(func)
     table.foreach(self.ruins, func)
 end
-function CityLayer:GetGate()
+function CityLayer:GetCityGate()
     local gate
     table.foreach(self.walls, function(_, v)
         if v:GetEntity():IsGate() then
@@ -791,23 +846,6 @@ function CityLayer:getContentSize()
     end
     return self.content_size
 end
-local function on_move(_, sprite)
-    sprite:OnSceneMove()
-end
-function CityLayer:OnSceneMove()
-    CityLayer.super.OnSceneMove(self)
-    table.foreach(self.tiles, function(_, sprite)
-        sprite:OnSceneMove()
-    end)
-    local move_widget = self.city_scene:GetSceneUILayer():getChildByTag(989)
-    if move_widget then
-        local ruins = move_widget:GetRuins()
-        if ruins then
-            local world_pos = ruins:GetWorldPosition()
-            move_widget:setPosition(world_pos.x, world_pos.y)
-        end
-    end
-end
 function CityLayer:UpdateWeather()
     local size = self:getContentSize()
     local pos = self:convertToNodeSpace(cc.p(display.cx, display.cy))
@@ -825,31 +863,6 @@ function CityLayer:ShowLevelUpNode()
 end
 
 return CityLayer
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

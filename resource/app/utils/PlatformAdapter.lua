@@ -6,12 +6,13 @@
 local PlatformAdapter = {}
 
 function PlatformAdapter:android()
+    device.getOpenUDID = ext.getOpenUDID
     --openudid
-    if ext.getOpenUDID then
-        device.getOpenUDID = function ()
-            return ext.getOpenUDID()
-        end
-    end
+    -- if ext.getOpenUDID then
+    --     device.getOpenUDID = function ()
+    --         return ext.getOpenUDID()
+    --     end
+    -- end
 end
 
 --[[
@@ -29,6 +30,7 @@ end
 ]]--
 
 function PlatformAdapter:ios()
+    device.getOpenUDID = ext.getOpenUDID
     if CONFIG_LOG_DEBUG_FILE then
         local print__ = print
          print = function ( ... )
@@ -79,6 +81,17 @@ function PlatformAdapter:mac()
         filePath = string.gsub(filePath,"animations/","animations_mac/")
         return filePath
     end
+    local print__ = print 
+    printLog = function(tag, fmt, ...)
+        local t = {
+            "[",
+            string.upper(tostring(tag)),
+            "] ",
+            string.format(tostring(fmt), ...)
+        }
+        print__(table.concat(t))
+    end
+    print = function(...)end
 end
 
 

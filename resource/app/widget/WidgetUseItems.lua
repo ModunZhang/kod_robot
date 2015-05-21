@@ -4,7 +4,6 @@
 --
 
 local WidgetPushButton = import(".WidgetPushButton")
-local WidgetUIBackGround = import(".WidgetUIBackGround")
 local Enum = import("..utils.Enum")
 local window = import("..utils.window")
 local Localize = import("..utils.Localize")
@@ -98,7 +97,7 @@ function WidgetUseItems:Create(params)
     elseif item_type == "chest" then
         dialog = self:OpenChestDialog(item)
     elseif item_type == "vipPoint" then
-        dialog = self:OpenNormalDialog(item)
+        dialog = self:OpenVipPointDialog(item)
     elseif item_type == "vipActive" then
         dialog = self:OpenVipActive(item)
     elseif item_type == "buff" or item:Category() == Item.CATEGORY.BUFF then
@@ -493,7 +492,6 @@ function WidgetUseItems:OpenOneDragonHPItemDialog( item ,dragon)
         dragon_manager:RemoveListenerOnType(dialog,dragon_manager.LISTEN_TYPE.OnHPChanged)
     end)
     function dialog:OnHPChanged()
-        print("OnHPChanged>>>")
         dragon_hp_label:setString(dragon:Hp().."/"..dragon:GetMaxHP())
         progressTimer:setPercentage(math.floor(dragon:Hp()/dragon:GetMaxHP()*100))
     end
@@ -506,7 +504,7 @@ function WidgetUseItems:OpenStrengthDialog( item )
     local size = body:getContentSize()
     local blood_bg = display.newScale9Sprite("back_ground_398x97.png",size.width/2,size.height-50,cc.size(556,58),cc.rect(10,10,378,77))
         :addTo(body)
-    local blood_icon = display.newSprite("buff_tool.png"):addTo(blood_bg):align(display.CENTER, 40, blood_bg:getContentSize().height/2):scale(0.2)
+    local blood_icon = display.newSprite("stamina_3_128x128.png"):addTo(blood_bg):align(display.CENTER, 40, blood_bg:getContentSize().height/2):scale(0.4)
     UIKit:ttfLabel({
         text = _("探索体力值"),
         size = 22,
@@ -824,9 +822,13 @@ function WidgetUseItems:OpenMoveTheCityDialog( item ,params)
     ):addTo(item_box_bg):align(display.CENTER,item_box_bg:getContentSize().width/2,item_box_bg:getContentSize().height/2)
     return dialog
 end
-function WidgetUseItems:OpenNormalDialog( item )
+function WidgetUseItems:OpenVipPointDialog(item)
+    return self:OpenNormalDialog(item,_("增加VIP点数"))
+end
+
+function WidgetUseItems:OpenNormalDialog( item ,title)
     local same_items = ItemManager:GetSameTypeItems(item)
-    local dialog = UIKit:newWidgetUI("WidgetPopDialog",#same_items * 130 +100,item:GetLocalizeName(),window.top-230)
+    local dialog = UIKit:newWidgetUI("WidgetPopDialog",#same_items * 130 +100,title or item:GetLocalizeName(),window.top-230)
     local body = dialog:GetBody()
     local size = body:getContentSize()
 
@@ -937,11 +939,28 @@ function WidgetUseItems:OpenWarSpeedupDialog( item ,march_event)
     local body = dialog:GetBody()
     local size = body:getContentSize()
 
+    -- 金龙币数量
+    local gem_label = UIKit:ttfLabel({
+        text = string.formatnumberthousands(User:GetGemResource():GetValue()),
+        size = 20,
+        color = 0x403c2f,
+    }):addTo(body):align(display.RIGHT_CENTER,size.width - 30 ,size.height-50)
+    -- gem icon
+    local gem_icon = display.newSprite("gem_icon_62x61.png")
+        :align(display.RIGHT_CENTER,gem_label:getPositionX() - gem_label:getContentSize().width - 10,size.height-50)
+        :addTo(body)
+        :scale(0.6)
+    UIKit:ttfLabel({
+        text = _("拥有:"),
+        size = 20,
+        color = 0x403c2f,
+    }):addTo(body):align(display.RIGHT_CENTER,gem_icon:getPositionX() - gem_icon:getContentSize().width * 0.6 - 10,size.height-50)
+
     local buff_status_label = UIKit:ttfLabel({
         text = _("剩余时间:")..GameUtils:formatTimeStyle1(march_event:WithObject():GetTime()),
         size = 22,
         color = 0x007c23,
-    }):addTo(body):align(display.CENTER,size.width/2, size.height-50)
+    }):addTo(body):align(display.LEFT_CENTER,30, size.height-50)
 
     local list_bg = self:GetListBg(size.width/2,(#same_items * 130+24)/2+30, 568, #same_items * 130+24)
         :addTo(body)
@@ -982,25 +1001,93 @@ function WidgetUseItems:OpenWarSpeedupDialog( item ,march_event)
         if march_event:WithObject():Id() == attackMarchEvent:Id() and (attackMarchEvent:GetPlayerRole() == attackMarchEvent.MARCH_EVENT_PLAYER_ROLE.SENDER
             or attackMarchEvent:GetPlayerRole() == attackMarchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER) then
             buff_status_label:setString(_("剩余时间:")..GameUtils:formatTimeStyle1(attackMarchEvent:GetTime()))
-            if attackMarchEvent:GetTime()==1 then
-                dialog:LeftButtonClicked()
+        end
+    end
+
+    function dialog:OnAttackMarchEventDataChanged(changed_map,alliance)
+        if changed_map.removed then
+            for i,v in ipairs(changed_map.removed) do
+                if v:Id() == march_event:WithObject():Id() then
+                    self:LeftButtonClicked()
+                end
             end
         end
+    end
+    function dialog:OnAttackMarchReturnEventDataChanged(changed_map)
+        if changed_map.removed then
+            for i,v in ipairs(changed_map.removed) do
+                if v:Id() == march_event:WithObject():Id() then
+                    self:LeftButtonClicked()
+                end
+            end
+        end
+    end
+    function dialog:OnStrikeMarchEventDataChanged(changed_map)
+        if changed_map.removed then
+            for i,v in ipairs(changed_map.removed) do
+                if v:Id() == march_event:WithObject():Id() then
+                    self:LeftButtonClicked()
+                end
+            end
+        end
+    end
+    function dialog:OnStrikeMarchReturnEventDataChanged(changed_map)
+        if changed_map.removed then
+            for i,v in ipairs(changed_map.removed) do
+                if v:Id() == march_event:WithObject():Id() then
+                    self:LeftButtonClicked()
+                end
+            end
+        end
+    end
+
+    function dialog:OnResourceChanged(resource_manager)
+        gem_label:setString(string.formatnumberthousands(User:GetGemResource():GetValue()))
     end
 
     local alliance = Alliance_Manager:GetMyAlliance()
 
     alliance:AddListenOnType(dialog,Alliance.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
+    alliance:AddListenOnType(dialog,Alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged)
+    alliance:AddListenOnType(dialog,Alliance.LISTEN_TYPE.OnAttackMarchReturnEventDataChanged)
+    alliance:AddListenOnType(dialog,Alliance.LISTEN_TYPE.OnStrikeMarchEventDataChanged)
+    alliance:AddListenOnType(dialog,Alliance.LISTEN_TYPE.OnStrikeMarchReturnEventDataChanged)
+
+
+
+    City:GetResourceManager():AddObserver(dialog)
 
     dialog:addCloseCleanFunc(function ()
         alliance:RemoveListenerOnType(dialog,Alliance.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
+        alliance:RemoveListenerOnType(dialog,Alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged)
+        alliance:RemoveListenerOnType(dialog,Alliance.LISTEN_TYPE.OnAttackMarchReturnEventDataChanged)
+        alliance:RemoveListenerOnType(dialog,Alliance.LISTEN_TYPE.OnStrikeMarchEventDataChanged)
+        alliance:RemoveListenerOnType(dialog,Alliance.LISTEN_TYPE.OnStrikeMarchReturnEventDataChanged)
+        City:GetResourceManager():RemoveObserver(dialog)
     end)
     return dialog
 end
 function WidgetUseItems:OpenRetreatTroopDialog( item,event )
-    local dialog = UIKit:newWidgetUI("WidgetPopDialog", 130 +80,item:GetLocalizeName(),window.top-230)
+    local dialog = UIKit:newWidgetUI("WidgetPopDialog", 130 + 80 + 40,item:GetLocalizeName(),window.top-230)
     local body = dialog:GetBody()
     local size = body:getContentSize()
+    -- 金龙币数量
+    local gem_label = UIKit:ttfLabel({
+        text = string.formatnumberthousands(User:GetGemResource():GetValue()),
+        size = 20,
+        color = 0x403c2f,
+    }):addTo(body):align(display.RIGHT_CENTER,size.width - 30 ,size.height-45)
+    -- gem icon
+    local gem_icon = display.newSprite("gem_icon_62x61.png")
+        :align(display.RIGHT_CENTER,gem_label:getPositionX() - gem_label:getContentSize().width - 10,size.height-45)
+        :addTo(body)
+        :scale(0.6)
+    UIKit:ttfLabel({
+        text = _("拥有:"),
+        size = 20,
+        color = 0x403c2f,
+    }):addTo(body):align(display.RIGHT_CENTER,gem_icon:getPositionX() - gem_icon:getContentSize().width * 0.6 - 10,size.height-45)
+
 
     local item_box_bg = self:GetListBg(size.width/2,100,568,154):addTo(body)
 
@@ -1041,13 +1128,17 @@ function WidgetUseItems:OpenRetreatTroopDialog( item,event )
             end
         end
     end
+    function dialog:OnResourceChanged(resource_manager)
+        gem_label:setString(string.formatnumberthousands(User:GetGemResource():GetValue()))
+    end
 
     local alliance = Alliance_Manager:GetMyAlliance()
-
+    City:GetResourceManager():AddObserver(dialog)
     alliance:AddListenOnType(dialog,Alliance.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
 
     dialog:addCloseCleanFunc(function ()
         alliance:RemoveListenerOnType(dialog,Alliance.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
+        City:GetResourceManager():RemoveObserver(dialog)
     end)
     return dialog
 end
@@ -1170,56 +1261,57 @@ local WidgetFteMark = import("..widget.WidgetFteMark")
 function WidgetUseItems:PromiseOfOpen(item_type)
     local p = promise.new()
     WidgetUseItems.open_data = { item_type = item_type, open_callback = function(ui)
-            ui.__type  = UIKit.UITYPE.BACKGROUND
-            function ui:Find()
-                return self.list.items_[1]:getContent().use_btn
-            end
-            function ui:FindLabel()
-                return self.vip_status_label
-            end
-            function ui:FindCloseBtn()
-                return self.close_btn
-            end
-            function ui:PromiseOfFte()
-                self.list:getScrollNode():setTouchEnabled(false)
-                self:Find():setTouchSwallowEnabled(true)
+        ui.__type  = UIKit.UITYPE.BACKGROUND
+        function ui:Find()
+            return self.list.items_[1]:getContent().use_btn
+        end
+        function ui:FindLabel()
+            return self.vip_status_label
+        end
+        function ui:FindCloseBtn()
+            return self.close_btn
+        end
+        function ui:PromiseOfFte()
+            self.list:getScrollNode():setTouchEnabled(false)
+            self:Find():setTouchSwallowEnabled(true)
 
-                self:GetFteLayer():SetTouchObject(self:Find())
-                local r = self:Find():getCascadeBoundingBox()
-                WidgetFteArrow.new(_("使用VIP激活1天")):addTo(self:GetFteLayer()):TurnRight()
+            self:GetFteLayer():SetTouchObject(self:Find())
+            local r = self:Find():getCascadeBoundingBox()
+            WidgetFteArrow.new(_("使用VIP激活1天")):addTo(self:GetFteLayer()):TurnRight()
                 :align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
 
 
-                local p1 = promise.new(function()
-                    local r = self:FindLabel():getCascadeBoundingBox()
-                    r.x = r.x - 20
-                    r.width = r.width + 40
-                    WidgetFteMark.new():addTo(self:GetFteLayer()):Size(r.width, r.height)
+            local p1 = promise.new(function()
+                local r = self:FindLabel():getCascadeBoundingBox()
+                r.x = r.x - 20
+                r.width = r.width + 40
+                WidgetFteMark.new():addTo(self:GetFteLayer()):Size(r.width, r.height)
                     :pos(r.x + r.width/2, r.y + r.height/2)
 
-                    self:GetFteLayer():SetTouchObject(self:FindCloseBtn())
-                    local r = self:FindCloseBtn():getCascadeBoundingBox()
-                    WidgetFteArrow.new(_("已经激活VIP，关闭窗口")):addTo(self:GetFteLayer())
+                self:GetFteLayer():SetTouchObject(self:FindCloseBtn())
+                local r = self:FindCloseBtn():getCascadeBoundingBox()
+                WidgetFteArrow.new(_("已经激活VIP，关闭窗口")):addTo(self:GetFteLayer())
                     :TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
 
-                    local p2 = promise.new()
-                    self:FindCloseBtn():onButtonClicked(function()
-                        p2:resolve()
-                    end)
-                    return p2
+                local p2 = promise.new()
+                self:FindCloseBtn():onButtonClicked(function()
+                    p2:resolve()
                 end)
+                return p2
+            end)
 
 
-                self:Find():removeEventListenersByEvent("CLICKED_EVENT")
-                self:Find():onButtonClicked(function()
-                    self:GetFteLayer():removeFromParent()
-                    mockData.ActiveVip()
-                    p1:resolve()
-                end)
+            self:Find():removeEventListenersByEvent("CLICKED_EVENT")
+            self:Find():onButtonClicked(function()
+                self:GetFteLayer():removeFromParent()
+                mockData.ActiveVip()
+                app.timer:OnTimer(0)
+                p1:resolve()
+            end)
 
 
-                return p1
-            end
+            return p1
+        end
 
         return p:resolve(ui)
     end}
@@ -1237,6 +1329,20 @@ end
 
 
 return WidgetUseItems
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

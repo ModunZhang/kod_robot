@@ -109,7 +109,7 @@ function GameUIBuild:OnUpgradingFinished(building)
 end
 function GameUIBuild:OnCityChanged()
     local citizen = self.build_city:GetResourceManager():GetPopulationResource():GetValueLimit()
-    table.foreachi(self.base_resource_building_items, function(i, v)
+    table.foreachi(self.base_resource_building_items or {}, function(i, v)
         local building_type = base_items[i].building_type
         local number = #self.build_city:GetDecoratorsByType(building_type)
         local max_number = City:GetMaxHouseCanBeBuilt(building_type)

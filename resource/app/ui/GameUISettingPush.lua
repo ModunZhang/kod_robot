@@ -33,7 +33,7 @@ function GameUISettingPush:BuildUI()
 		size = 22,
 		shadow = true,
 		color = 0xffedae
-	}):addTo(titleBar):align(display.CENTER,300,24)
+	}):addTo(titleBar):align(display.CENTER,300,28)
  	local building_push_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 96})
  		:align(display.CENTER_TOP,304,732)
  		:addTo(bg)
@@ -85,6 +85,43 @@ function GameUISettingPush:BuildUI()
     	:addTo(technology_push_bg)
     	:setButtonSelected(app:GetPushManager():GetTechnologyPushState(),true)
     technology_push_button:setTag(3)
+
+    local tool_equipment_push_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 96})
+        :align(display.CENTER_TOP,304,408)
+        :addTo(bg)
+    UIKit:ttfLabel({
+        text = _("工具&装备制造完成提醒"),
+        size = 20,
+        color= 0x615b44
+    }):align(display.CENTER_LEFT,15,48):addTo(tool_equipment_push_bg)
+    local tool_push_button = UICheckBoxButton.new(CHECKBOX_BUTTON_IMAGES)
+        :setButtonLabelAlignment(display.CENTER)
+        :onButtonStateChanged(function(event)
+            self:onButtonStateChanged(event.target)
+        end)
+        :align(display.RIGHT_CENTER, 540, 48)
+        :addTo(tool_equipment_push_bg)
+        :setButtonSelected(app:GetPushManager():GetToolEquipemtPushState(),true)
+    tool_push_button:setTag(4)
+
+
+    local watch_tower_push_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 96})
+        :align(display.CENTER_TOP,304,300)
+        :addTo(bg)
+    UIKit:ttfLabel({
+        text = _("瞭望塔预警提醒"),
+        size = 20,
+        color= 0x615b44
+    }):align(display.CENTER_LEFT,15,48):addTo(watch_tower_push_bg)
+    local watch_tower_push_button = UICheckBoxButton.new(CHECKBOX_BUTTON_IMAGES)
+        :setButtonLabelAlignment(display.CENTER)
+        :onButtonStateChanged(function(event)
+            self:onButtonStateChanged(event.target)
+        end)
+        :align(display.RIGHT_CENTER, 540, 48)
+        :addTo(watch_tower_push_bg)
+        :setButtonSelected(app:GetPushManager():GetWatchTowerPushState(),true)
+    watch_tower_push_button:setTag(5)
 end
 function GameUISettingPush:onButtonStateChanged(button)
     local tag = button:getTag()
@@ -95,6 +132,10 @@ function GameUISettingPush:onButtonStateChanged(button)
         app:GetPushManager():SwitchSoldierPush(isOn)
     elseif tag == 3 then
         app:GetPushManager():SwitchTechnologyPush(isOn)
+    elseif tag == 4 then
+        app:GetPushManager():SwitchToolEquipmentPush(isOn)
+    elseif tag == 5 then
+        app:GetPushManager():SwitchWatchTowerPush(isOn)
     end
 end
 

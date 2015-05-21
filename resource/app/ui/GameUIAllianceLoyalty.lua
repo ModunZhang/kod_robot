@@ -14,7 +14,7 @@ function GameUIAllianceLoyalty:ctor()
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
                 local building = Alliance_Manager:GetMyAlliance():GetAllianceMap():FindAllianceBuildingInfoByName("shop")
-                UIKit:newGameUI('GameUIAllianceShop',City,"upgrade",building):AddToCurrentScene(true)
+                UIKit:newGameUI('GameUIAllianceShop',City,"goods",building):AddToCurrentScene(true)
                 self:removeFromParent(true)
             end
         end)

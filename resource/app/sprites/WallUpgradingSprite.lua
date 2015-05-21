@@ -18,7 +18,7 @@ local offset_map = {
         gate = {-63, 73}
     },
     [3] = {
-        [Orient.X] = {13, 46},
+        [Orient.X] = {12, 48},
         [Orient.Y] = {-10, 49},
         [Orient.NEG_X] = {15, 49},
         [Orient.NEG_Y] = {-16, 49},

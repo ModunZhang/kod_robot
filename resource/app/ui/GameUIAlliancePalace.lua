@@ -4,10 +4,10 @@ local WidgetUIBackGround2 = import("..widget.WidgetUIBackGround2")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetAllianceBuildingUpgrade = import("..widget.WidgetAllianceBuildingUpgrade")
 local GameUIAlliancePalace = UIKit:createUIClass('GameUIAlliancePalace', "GameUIAllianceBuilding")
+local UIListView = import(".UIListView")
 local Flag = import("..entity.Flag")
 local NetService = import('..service.NetService')
 local Alliance = import("..entity.Alliance")
-local UIListView = import(".UIListView")
 local WidgetInfoWithTitle = import("..widget.WidgetInfoWithTitle")
 local WidgetInfoNotListView = import("..widget.WidgetInfoNotListView")
 local Localize = import("..utils.Localize")
@@ -58,13 +58,13 @@ function GameUIAlliancePalace:OnMoveInStage()
 end
 function GameUIAlliancePalace:CreateBetweenBgAndTitle()
     GameUIAlliancePalace.super.CreateBetweenBgAndTitle(self)
-
+    local parent = self
     -- impose_layer
     local impose_layer = display.newLayer():addTo(self:GetView())
     function impose_layer:Clear()
         self:removeAllChildren()
-        self.current_honour = nil
-        self.award_menmber_listview = nil
+        parent.current_honour = nil
+        parent.award_menmber_listview = nil
     end
     self.impose_layer = impose_layer
     -- info_layer
@@ -92,7 +92,7 @@ function GameUIAlliancePalace:InitImposePart()
 
     -- 荣耀值
     self.current_honour = self:GetHonourNode():addTo(layer):align(display.CENTER,window.right-100, window.top_bottom-5)
-    
+
     self.sort_member = self:GetSortMembers()
     -- 可发放奖励成员列表
     local list,list_node = UIKit:commonListView({
@@ -137,7 +137,15 @@ function GameUIAlliancePalace:DelegateAwardList(  listView, tag, idx )
         local size = content:getContentSize()
         item:setItemSize(size.width, size.height)
         return item
-    else
+    elseif UIListView.ASY_REFRESH == tag then
+        for i,v in ipairs(listView:getItems()) do
+            if v.idx_ == idx then
+                local content = v:getContent()
+                content:SetData(idx)
+                local size = content:getContentSize()
+                v:setItemSize(size.width, size.height)
+            end
+        end
     end
 end
 function GameUIAlliancePalace:CreateAwardContent()
@@ -228,11 +236,16 @@ function GameUIAlliancePalace:OpenAwardDialog(member)
         size = 20,
         color = 0x403c2f,
     }):addTo(body):align(display.CENTER,current_honour_label:getPositionX()+ current_honour_label:getContentSize().width + 6,current_honour_label:getPositionY())
+
     local deduct_honour_label = UIKit:ttfLabel({
         text = "0",
         size = 22,
         color = 0x7e0000,
     }):addTo(body):align(display.LEFT_CENTER,divide:getPositionX()+6,current_honour_label:getPositionY())
+    current_honour_label:hide()
+    deduct_honour_label:hide()
+    divide:hide()
+    honour_icon:hide()
 
     -- 滑动条部分
     local slider_bg = display.newSprite("back_ground_580x136.png"):addTo(body)
@@ -256,6 +269,10 @@ function GameUIAlliancePalace:OpenAwardDialog(member)
             deduct_honour_label:setString(GameUtils:formatNumber(value))
             divide:setPositionX(current_honour_label:getPositionX()+ current_honour_label:getContentSize().width + 6)
             deduct_honour_label:setPositionX(divide:getPositionX()+6)
+            current_honour_label:setVisible(value ~= 0)
+            deduct_honour_label:setVisible(value ~= 0)
+            divide:setVisible(value ~= 0)
+            honour_icon:setVisible(value ~= 0)
         end)
         :LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.TOP,75)
     -- icon
@@ -427,7 +444,7 @@ function GameUIAlliancePalace:InitInfoPart()
     -- 购买使用按钮
     WidgetPushButton.new({normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"})
         :setButtonLabel(UIKit:ttfLabel({
-            text = _("购买使用"),
+            text = _("修改"),
             size = 24,
             color = 0xffedae,
             shadow= true
@@ -501,6 +518,8 @@ function GameUIAlliancePalace:OnMemberChanged(alliance,changed_map)
     end
 end
 return GameUIAlliancePalace
+
+
 
 
 

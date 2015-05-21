@@ -155,7 +155,6 @@ end
 
 function GameUIWarReport:GetBooty()
     local booty = {}
-    dump(self:GetRewards())
     for k,v in pairs(self:GetRewards()) do
         table.insert(booty, {
             resource_type = Localize.fight_reward[v.name] or Localize.equip_material[v.name],
@@ -227,8 +226,12 @@ function GameUIWarReport:CreateBootyPart()
 end
 
 function GameUIWarReport:CreateWarStatisticsPart()
-    self:FightWithHelpDefencePlayerReports()
-    self:FightWithDefencePlayerReports()
+    local report = self.report
+    if report:IsHasHelpDefencePlayer() then
+        self:FightWithHelpDefencePlayerReports()
+    else
+        self:FightWithDefencePlayerReports()
+    end
 end
 
 function GameUIWarReport:FightWithHelpDefencePlayerReports()
@@ -695,6 +698,7 @@ function GameUIWarReport:GetRewards()
     return  self.report:GetMyRewards()
 end
 return GameUIWarReport
+
 
 
 

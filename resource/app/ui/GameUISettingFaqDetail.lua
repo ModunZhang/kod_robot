@@ -30,7 +30,7 @@ function GameUISettingFaqDetail:BuildUI()
 		size = 22,
 		shadow = true,
 		color = 0xffedae
-	}):addTo(titleBar):align(display.CENTER,300,24)
+	}):addTo(titleBar):align(display.CENTER,300,28)
 	UIKit:ttfLabel({
 		text = self.data.title,
 		size = 20,

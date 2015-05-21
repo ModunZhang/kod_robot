@@ -46,7 +46,7 @@ function GameUISelenaQuestion:BuildUI()
 		size = 22,
 		shadow = true,
 		color = 0xffedae
-	}):addTo(titleBar):align(display.CENTER,300,24)
+	}):addTo(titleBar):align(display.CENTER,300,28)
 	local npc_bg = display.newSprite("selenaquestion_bg_580x536.png"):align(display.TOP_CENTER, 304, 860):addTo(bg)
 	local npc_animation = ccs.Armature:create("npc_nv"):addTo(npc_bg):align(display.BOTTOM_CENTER, 290, 6)
 	self.npc_animation = npc_animation
@@ -179,6 +179,8 @@ function GameUISelenaQuestion:GetListItem(index,question)
 		end)
 	local check_state = display.newSprite("activity_check_body_55x51.png"):addTo(button):pos(27,0):hide()
 	button.check_state = check_state
+	local wrong_state = display.newSprite("wrong_41x45.png"):addTo(button):pos(27,0):hide()
+	button.wrong_state = wrong_state
 	content:size(560,height)
 	item:addContent(content)
 	item:setMargin({left = 0, right = 0, top = 0, bottom = 11})
@@ -202,9 +204,9 @@ function GameUISelenaQuestion:RefreshQuestionLayer(question)
 end
 
 function GameUISelenaQuestion:GetWelcomeLayer(welcome_ui_type)
-	self._question_index = -1
 	welcome_ui_type = welcome_ui_type or self.WELCOME_UI_TYPE.WELCOME
 	local msg,button_title = self:GetMsgAndButtonTitleByWelcomeType(welcome_ui_type)
+	self._question_index = -1
 	if self.welcome_layer then
 		self.welcome_layer.setInfo(msg,button_title)
 		return self.welcome_layer
@@ -271,15 +273,18 @@ function GameUISelenaQuestion:LoadNextQuestion()
 end
 
 function GameUISelenaQuestion:OnAnswerButtonClicked(index,button)
-	if button then
-		button.check_state:show()
-	end
 	local question = self:GetCurrentQuestion()
 	if question.correct == index then --correct! 
+		if button then
+			button.check_state:show()
+		end
 		self:ShowTips(true,function()
 			self:LoadNextQuestion()
 		end)
 	else
+		if button then
+			button.wrong_state:show()
+		end
 		self:ShowTips(false,function()
 			self:GetWelcomeLayer(self.WELCOME_UI_TYPE.FAILED):show()
 			self:GetQuestionLayer():hide()
@@ -340,7 +345,7 @@ end
 function GameUISelenaQuestion:CheckFinishSelenaTestIf()
 	local data = User:GetDailyTasksInfo("empireRise")
 	for __,v in ipairs(data) do
-		if v == 4 then
+		if v == 3 then
 			return true
 		end
 	end

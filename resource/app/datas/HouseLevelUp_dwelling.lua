@@ -9,7 +9,7 @@ dwelling[1] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 30,
+	["buildTime"] = 2,
 	["citizen"] = 0
 }
 dwelling[2] = {
@@ -45,7 +45,7 @@ dwelling[4] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 240,
+	["buildTime"] = 180,
 	["citizen"] = 0
 }
 dwelling[5] = {

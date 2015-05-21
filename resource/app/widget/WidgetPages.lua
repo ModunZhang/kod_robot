@@ -25,7 +25,7 @@ function WidgetPages:ctor(params)
         color = 0xffedae,
         shadow = true
     })
-        :align(display.LEFT_BOTTOM,icon and icon:getContentSize().width + 80 or 70,17)
+        :align(display.LEFT_BOTTOM,icon and icon:getContentSize().width + 80 or 74,20)
         :addTo(self)
     if params.fixed_title_position then
         self.title_label:pos(params.fixed_title_position.x,params.fixed_title_position.y)
@@ -36,7 +36,7 @@ function WidgetPages:ctor(params)
         color = 0xffedae,
         shadow = true
     })
-        :align(display.RIGHT_BOTTOM,480,17)
+        :align(display.RIGHT_BOTTOM,480,20)
         :addTo(self)
     self.current_page_label = UIKit:ttfLabel({
         text = self.current_page,
@@ -44,7 +44,7 @@ function WidgetPages:ctor(params)
         color = 0xffedae,
         shadow = true
     })
-        :align(display.RIGHT_BOTTOM,page_label:getPositionX() - page_label:getContentSize().width,17)
+        :align(display.RIGHT_BOTTOM,page_label:getPositionX() - page_label:getContentSize().width,20)
         :addTo(self)
 
     self.left_button = cc.ui.UIPushButton.new(

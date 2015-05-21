@@ -1,11 +1,11 @@
 local WidgetChangeMap = import("..widget.WidgetChangeMap")
 local UIPageView = import("..ui.UIPageView")
 local UILib = import("..ui.UILib")
+local Localize_item = import("..utils.Localize_item")
 local window = import("..utils.window")
 local GameUIPVEHome = UIKit:createUIClass('GameUIPVEHome')
 local WidgetHomeBottom = import("..widget.WidgetHomeBottom")
 local WidgetUseItems = import("..widget.WidgetUseItems")
-local RichText = import("..widget.RichText")
 local ChatManager = import("..entity.ChatManager")
 local WidgetChat = import("..widget.WidgetChat")
 local timer = app.timer
@@ -19,9 +19,8 @@ function GameUIPVEHome:DisplayOff()
 end
 function GameUIPVEHome:ctor(user, scene)
     self.user = user
-    self.scene = scene
     self.layer = scene:GetSceneLayer()
-    GameUIPVEHome.super.ctor(self)
+    GameUIPVEHome.super.ctor(self, {type = UIKit.UITYPE.BACKGROUND})
 end
 function GameUIPVEHome:onEnter()
     self:CreateTop()
@@ -91,7 +90,7 @@ function GameUIPVEHome:CreateTop()
     local gem_button = cc.ui.UIPushButton.new(
         {normal = "gem_btn_up.png", pressed = "gem_btn_down.png"}
     ):onButtonClicked(function(event)
-        UIKit:newGameUI('GameUIShop', City):AddToCurrentScene(true)
+        UIKit:newGameUI('GameUIStore'):AddToCurrentScene(true)
     end):addTo(top_bg):align(display.RIGHT_TOP, size.width - 45, 85)
     cc.ui.UIImage.new("gem_icon_62x61.png"):addTo(gem_button):pos(-60, -62)
     self.gem_label = UIKit:ttfLabel({
@@ -128,12 +127,16 @@ function GameUIPVEHome:CreateTop()
         ,{})
         :addTo(top_bg, 1):align(display.CENTER, 80, 55):scale(0.8)
         :onButtonClicked(function(event)
-            self.box:getAnimation():playWithIndex(0, -1, 0)
-            -- self.box:getAnimation():gotoAndPause(85)
+            if self.layer:ExploreDegree() >= 1.0 then
+                self.box:hide()
+                self:GetRewards()
+            end
         end)
     self.box_bg = box
     self.box = ccs.Armature:create("lanse"):addTo(box)
         :align(display.CENTER, - 20, 10):scale(0.25)
+
+    self:SetBoxStatus(not self.layer:CurrentPVEMap():IsRewarded())
 
     UIKit:ttfLabel({
         text = string.format("%d. %s", self.layer:CurrentPVEMap():GetIndex(), self.layer:CurrentPVEMap():Name()),
@@ -155,11 +158,44 @@ function GameUIPVEHome:CreateBottom()
     self.change_map = WidgetChangeMap.new(WidgetChangeMap.MAP_TYPE.PVE):addTo(self)
 end
 
+function GameUIPVEHome:SetBoxStatus(can_get)
+    self.box:show()
+    self.box_bg:setButtonEnabled(can_get)
+    if can_get then
+        self.box:getAnimation():stop()
+    else
+        self.box:getAnimation():playWithIndex(0)
+        self.box:getAnimation():gotoAndPause(85)
+    end
+end
+function GameUIPVEHome:GetRewards()
+    local index = self.layer:CurrentPVEMap():GetIndex()
+    local rewards = GameDatas.PlayerInitData.pveLevel[index]
+    local _1,name = unpack(string.split(rewards.itemName, ":"))
+    self.user:ResetPveData()
+    self.user:SetPveData(nil, {
+        {
+            type = "items",
+            name = name,
+            count = rewards.count,
+        },
+    }, nil)
+    local data = self.user:EncodePveDataAndResetFightRewardsData()
+    data.pveData.rewardedFloor = index
+    NetManager:getSetPveDataPromise(data):done(function()
+        local wp = self.box:getParent():convertToWorldSpace(cc.p(self.box:getPosition()))
+        UIKit:newGameUI("GameUIPveGetRewards", wp.x, wp.y):AddToCurrentScene(true)
+            :AddClickOutFunc(function(ui)
+                ui:LeftButtonClicked()
+                self:SetBoxStatus(not self.layer:CurrentPVEMap():IsRewarded())
+                GameGlobalUI:showTips(_("获得奖励"), Localize_item.item_name[name].."x"..rewards.count)
+            end)
+    end)
+end
+
 
 
 return GameUIPVEHome
-
-
 
 
 

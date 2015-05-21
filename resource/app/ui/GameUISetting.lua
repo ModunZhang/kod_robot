@@ -99,8 +99,11 @@ function GameUISetting:OnButtonClicked(button)
 	elseif tag == 3 then
 		UIKit:newGameUI("GameUISettingLanguage"):AddToCurrentScene(true)
 	elseif tag == 4 then
-		UIKit:newGameUI('GameUIShop', City):AddToCurrentScene(true)
-		-- UIKit:newGameUI("GameUITips"):AddToCurrentScene(true)
+		if CONFIG_IS_DEBUG then
+			UIKit:newGameUI('GameUIShop', City):AddToCurrentScene(true)
+		else
+			UIKit:newGameUI("GameUITips"):AddToCurrentScene(true)
+		end
 	elseif tag == 5 then
 		UIKit:newWidgetUI("WidgetRankingList", "player"):AddToCurrentScene(true)
 	elseif tag == 6 then
@@ -122,15 +125,15 @@ function GameUISetting:OnButtonClicked(button)
 		button.normal_image:setVisible(is_open)
 		button.state_image:setVisible(not is_open)
 	elseif tag == 9 then
-		UIKit:newGameUI("GameUISettingPush"):AddToCurrentScene(self)
+		UIKit:newGameUI("GameUISettingPush"):AddToCurrentScene(true)
 	elseif tag == 10 then
-		UIKit:newGameUI("GameUISettingShield"):AddToCurrentScene(self)
+		UIKit:newGameUI("GameUISettingShield"):AddToCurrentScene(true)
 	elseif tag == 11 then
 		if ext.userVoice then
-			ext.userVoice()
+			ext.userVoice("dannyhe.uservoice.com",280112,"example@batcat.com","DragonFall","DragonFall")
 		end
 	elseif tag == 12 then
-		UIKit:newGameUI("GameUISettingFaq"):AddToCurrentScene(self)
+       	UIKit:newGameUI("GameUISettingContactUs"):AddToCurrentScene(true)
 	end
 end
 

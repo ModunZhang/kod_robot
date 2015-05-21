@@ -73,6 +73,7 @@ GameDatas.AllianceInitData = {
 	["shrineStage"] = {},
 	["buildingName"] = {},
 	["buildings"] = {},
+	["fightRewards"] = {},
 }
 require("app.datas.AllianceInitData_intInit")
 require("app.datas.AllianceInitData_stringInit")
@@ -81,6 +82,7 @@ require("app.datas.AllianceInitData_donate")
 require("app.datas.AllianceInitData_shrineStage")
 require("app.datas.AllianceInitData_buildingName")
 require("app.datas.AllianceInitData_buildings")
+require("app.datas.AllianceInitData_fightRewards")
 
 GameDatas.AllianceVillage = {
 	["woodVillage"] = {},

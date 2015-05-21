@@ -9,6 +9,7 @@ local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetAccelerateGroup = import("..widget.WidgetAccelerateGroup")
 
+
 local SpriteConfig = import("..sprites.SpriteConfig")
 
 
@@ -96,10 +97,16 @@ function CommonUpgradeUI:InitCommonPart()
         :addTo(level_bg)
     -- 建筑功能介绍
     -- 建筑图片 放置区域左右边框
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.CENTER, display.cx-250, display.top-175)
-        :addTo(self):setFlippedX(true)
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.CENTER, display.cx-145, display.top-175)
-        :addTo(self)
+    -- cc.ui.UIImage.new("building_frame_36x136.png"):align(display.CENTER, display.cx-250, display.top-175)
+    --     :addTo(self):setFlippedX(true)
+    WidgetPushButton.new({normal = "alliance_item_flag_box_126X126.png"})
+        :onButtonClicked(function(event)
+            if event.name == "CLICKED_EVENT" then
+                UIKit:newGameUI("GameUICityBuildingInfo", self.building):AddToCurrentScene(true)
+            end
+        end):align(display.CENTER, display.cx-200, display.top-175)
+        :addTo(self):scale(136/126)
+   
     self:ReloadBuildingImage()
     self:InitBuildingIntroduces()
     self:InitNextLevelEfficiency()
@@ -112,12 +119,12 @@ function CommonUpgradeUI:ReloadBuildingImage()
     local config = SpriteConfig[self.building:GetType()]:GetConfigByLevel(self.building:GetLevel())
     local configs = SpriteConfig[self.building:GetType()]:GetAnimationConfigsByLevel(self.building:GetLevel())
     self.building_image = display.newSprite(config.png, 0, 0)
-    :addTo(self):pos(display.cx-196, display.top-158)
+        :addTo(self):pos(display.cx-196, display.top-158)
     local p = self.building_image:getAnchorPointInPoints()
     for _,v in ipairs(configs) do
         if v.deco_type == "image" then
             display.newSprite(v.deco_name):addTo(self.building_image)
-            :pos(p.x + v.offset.x, p.y + v.offset.y)
+                :pos(p.x + v.offset.x, p.y + v.offset.y)
         elseif v.deco_type == "animation" then
             local offset = v.offset
             local armature = ccs.Armature:create(v.deco_name)
@@ -300,6 +307,50 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
         if addtion>0 then
             efficiency = string.format("%s+%d,",bd.miner_poduction,addtion)
         end
+    elseif self.building:GetType()=="wall" then
+        local current_config = self.building:GetWallConfig()
+        local next_config = self.building:GetWallNextLevelConfig()
+        if next_config.wallHp - current_config.wallHp > 0 then
+            efficiency = string.format(_("城墙血量+%d,"),next_config.wallHp - current_config.wallHp)
+        end
+        if next_config.wallRecovery - current_config.wallRecovery > 0 then
+            efficiency = efficiency .. string.format(_("城墙血量回复+%d/小时,"),next_config.wallRecovery - current_config.wallRecovery)
+        end
+    elseif self.building:GetType()=="tower" then
+        local current_config = self.building:GetTowerConfig()
+        local next_config = self.building:GetTowerNextLevelConfig()
+        if next_config.infantry - current_config.infantry > 0 then
+            efficiency = string.format(_("攻击+%d,"),next_config.infantry - current_config.infantry)
+        end
+        if next_config.defencePower - current_config.defencePower > 0 then
+            efficiency = efficiency .. string.format(_("防御力+%d,"),next_config.defencePower - current_config.defencePower)
+        end
+    elseif self.building:GetType()=="academy" then
+        local current_config = self.building:GetAcademyConfig()
+        local next_config = self.building:GetAcademyNextLevelConfig()
+        if next_config.efficiency - current_config.efficiency > 0 then
+            efficiency = string.format(_("学院科技研发速度+%d%%,"),(next_config.efficiency - current_config.efficiency)*100)
+        end
+    elseif self.building:GetType()=="tradeGuild" then
+        local cart = self.building:GetMaxCart()
+        local next_cart = self.building:GetNextLevelMaxCart()
+        local recovery = self.building:GetCartRecovery()
+        local next_recovery = self.building:GetNextLevelCartRecovery()
+        if next_cart - cart > 0 then
+            efficiency = string.format(_("资源小车上限+%d,"),(next_cart - cart))
+        end
+        if next_recovery - recovery > 0 then
+            efficiency = efficiency .. string.format(_("资源小车回复速度+%d/小时,"),(next_recovery - recovery))
+        end
+    elseif self.building:GetType()=="trainingGround"
+        or self.building:GetType()=="stable"
+        or self.building:GetType()=="hunterHall"
+        or self.building:GetType()=="workshop" then
+        local eff = self.building:GetEfficiency()
+        local next_eff = self.building:GetNextLevelEfficiency()
+        if next_eff - eff > 0 then
+            efficiency = string.format(_("科技升级速度+%d%%,"),(next_eff - eff) * 100)
+        end
     else
         assert(false,"本地化丢失")
     end
@@ -460,14 +511,14 @@ function CommonUpgradeUI:SetUpgradeRequirementListview()
             resource_type = _("前置条件"),
             isVisible = building:GetLevel()>5,
             isSatisfy = not pre_condition,canNotBuy=true,
-            icon="hammer_31x33.png",
+            icon="hammer_33x40.png",
             description = building:GetPreConditionDesc(),jump_call = handler(self,self.GotoPreconditionBuilding)
         },
         {
             resource_type = "building_queue",
             isVisible = #city:GetUpgradingBuildings()>=city:BuildQueueCounts(),
             isSatisfy = #city:GetUpgradingBuildings()<city:BuildQueueCounts(),
-            icon="hammer_31x33.png",
+            icon="hammer_33x40.png",
             description=_("建造队列已满")..(city:BuildQueueCounts()-#city:GetUpgradingBuildings()).."/"..1
         },
         {
@@ -755,10 +806,12 @@ function CommonUpgradeUI:PopNotSatisfyDialog(listener,can_not_update_type)
                         local current_scene = display.getRunningScene()
                         local building_sprite = current_scene:GetSceneLayer():FindBuildingSpriteByBuilding(jump_building, city)
                         self:getParent():getParent():LeftButtonClicked()
-                        current_scene:GotoLogicPoint(jump_building:GetMidLogicPosition())
-                        if current_scene.AddIndicateForBuilding then
-                            current_scene:AddIndicateForBuilding(building_sprite)
-                        end
+                        local x,y = jump_building:GetMidLogicPosition()
+                        current_scene:GotoLogicPoint(x,y,40):next(function()
+                            if current_scene.AddIndicateForBuilding then
+                                current_scene:AddIndicateForBuilding(building_sprite)
+                            end
+                        end)
                     end,
                     btn_name= _("前往")
                 }
@@ -783,32 +836,3 @@ function CommonUpgradeUI:PopNotSatisfyDialog(listener,can_not_update_type)
 end
 
 return CommonUpgradeUI
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

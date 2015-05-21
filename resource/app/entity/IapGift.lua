@@ -7,13 +7,13 @@ local IapGift = class("IapGift",Observer)
 local property = import("..utils.property")
 local config_intInit = GameDatas.PlayerInitData.intInit
 
+property(IapGift,"count",0)
+property(IapGift,"time",0)
+property(IapGift,"id","")
+property(IapGift,"from","")
+property(IapGift,"name","")
 function IapGift:ctor()
 	IapGift.super.ctor(self)
-	property(self,"count",0)
-	property(self,"time",0)
-	property(self,"id","")
-	property(self,"from","")
-	property(self,"name","")
 end
 
 function IapGift:OnPropertyChange()

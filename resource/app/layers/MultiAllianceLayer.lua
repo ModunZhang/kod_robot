@@ -12,12 +12,20 @@ local floor = math.floor
 local min = math.min
 local max = math.max
 local timer = app.timer
-
+local ipairs = ipairs
+local pairs = pairs
+local MINE,FRIEND,ENEMY,VILLAGE_TAG = 1,2,3,4
 MultiAllianceLayer.ARRANGE = Enum("H", "V")
 
-function MultiAllianceLayer:ctor(arrange, ...)
+function MultiAllianceLayer:ctor(scene, arrange, ...)
+    self.refresh_village_node = display.newNode():addTo(self)
+    self.my_allinace_id = Alliance_Manager:GetMyAlliance():Id()
+    self.mine_player_id = Alliance_Manager:GetMyAlliance():GetSelf():Id()
+
+
     Observer.extend(self)
-    MultiAllianceLayer.super.ctor(self, 0.4, 1.2)
+    MultiAllianceLayer.super.ctor(self, scene, 0.4, 1.2)
+    self.info_action = display.newNode():addTo(self)
     self.arrange = arrange
     self.alliances = {...}
     self.alliance_views = {}
@@ -31,6 +39,8 @@ function MultiAllianceLayer:ctor(arrange, ...)
     self:AddOrRemoveAllianceEvent(true)
     self:AddAllianceBelvedereEvent(true)
     self:StartCorpsTimer()
+    self:Schedule()
+    self:RefreshAllVillageEvents()
 
 
     -- local x, y = 13, 36
@@ -47,8 +57,14 @@ function MultiAllianceLayer:ctor(arrange, ...)
     --     )
     --     count = count + 1
     -- end
-
-
+end
+function MultiAllianceLayer:Schedule()
+    self.info_action:schedule(function()
+        local scale = self:getScale()
+        local l = max(0.5, scale) - 0.5
+        local r = 0.8 - min(0.8, scale)
+        self:GetInfoNode():opacity(l / (l + r) * 255)
+    end, 0.1)
 end
 function MultiAllianceLayer:onCleanup()
     self:AddOrRemoveAllianceEvent(false)
@@ -149,6 +165,7 @@ function MultiAllianceLayer:AddOrRemoveAllianceEvent(isAdd)
             v:AddListenOnType(self,Alliance.LISTEN_TYPE.OnStrikeMarchEventDataChanged)
             v:AddListenOnType(self,Alliance.LISTEN_TYPE.OnStrikeMarchReturnEventDataChanged)
             v:AddListenOnType(self,Alliance.LISTEN_TYPE.OnMarchEventRefreshed)
+            v:AddListenOnType(self,Alliance.LISTEN_TYPE.OnVillageEventsDataChanged)
         end
     else
         for _, v in ipairs(self.alliances) do
@@ -157,10 +174,76 @@ function MultiAllianceLayer:AddOrRemoveAllianceEvent(isAdd)
             v:RemoveListenerOnType(self,Alliance.LISTEN_TYPE.OnStrikeMarchEventDataChanged)
             v:RemoveListenerOnType(self,Alliance.LISTEN_TYPE.OnStrikeMarchReturnEventDataChanged)
             v:RemoveListenerOnType(self,Alliance.LISTEN_TYPE.OnMarchEventRefreshed)
+            v:RemoveListenerOnType(self,Alliance.LISTEN_TYPE.OnVillageEventsDataChanged)
         end
     end
 end
+function MultiAllianceLayer:OnVillageEventsDataChanged(changed_map)
+    for k,v in pairs(changed_map.added or {}) do
+        self:RefreshVillageEvent(v, true)
+    end
+    for k,v in pairs(changed_map.removed or {}) do
+        self:RefreshVillageEvent(v, false)
+    end
+end
+function MultiAllianceLayer:RefreshAllVillageEvents()
+    self.refresh_village_node:stopAllActions()
+    self.refresh_village_node:performWithDelay(function()
+        for i,v in ipairs(self.alliances) do
+            v:IteratorVillageEvents(function(event)
+                self:RefreshVillageEvent(event, true)
+            end)
+        end
+    end, 0.0001)
 
+end
+function MultiAllianceLayer:RefreshVillageEvent(village_event, is_add)
+    for i,v in ipairs(self.alliance_views) do
+        local obj = v:GetMapObjects()[village_event:VillageData().id]
+        if obj then
+            local player_data = village_event:PlayerData()
+            local aid = player_data.alliance.id
+            local pid = player_data.id
+            if is_add then
+                local ally = pid == self.mine_player_id and MINE or
+                    (self.my_allinace_id == aid and FRIEND or ENEMY)
+                local flag = obj:getChildByTag(VILLAGE_TAG)
+                if flag then
+                    flag:SetAlly(ally)
+                else
+                    local x,y = obj:GetSpriteTopPosition()
+                    self:CreateVillageFlag(ally)
+                        :addTo(obj, 1, VILLAGE_TAG)
+                        :pos(x,y+50):scale(1.5)
+                end
+            else
+                obj:removeChildByTag(VILLAGE_TAG)
+            end
+        end
+    end
+end
+local flag_map = {
+    [MINE] = {"village_flag_mine.png", "village_icon_mine.png"},
+    [FRIEND] = {"village_flag_friend.png", "village_icon_friend.png"},
+    [ENEMY] = {"village_flag_enemy.png", "village_icon_enemy.png"},
+}
+function MultiAllianceLayer:CreateVillageFlag(e)
+    local head,circle = unpack(flag_map[e])
+    local flag = display.newSprite(head)
+    flag:setAnchorPoint(cc.p(0.5, 0.62))
+    local p = flag:getAnchorPointInPoints()
+    display.newSprite(circle)
+        :addTo(flag,0,1):pos(p.x, p.y)
+        :runAction(
+            cc.RepeatForever:create(transition.sequence{cc.RotateBy:create(2, -360)})
+        )
+    function flag:SetAlly(e)
+        local head,circle = unpack(flag_map[e])
+        self.flag:setTexture(head)
+        self.flag:getChildByTag(1):setTexture(circle)
+    end
+    return flag
+end
 function MultiAllianceLayer:AddAllianceBelvedereEvent(isAdd)
     local alliance_belvedere = self:GetMyAlliance():GetAllianceBelvedere()
     if isAdd then
@@ -217,7 +300,9 @@ function MultiAllianceLayer:StartCorpsTimer()
                 end
                 local line = self.lines_map[id]
                 if line then
-                    line:getFilter():getGLProgramState():setUniformFloat("percent", fmod(time - floor(time), 1.0))
+                    local program = line:getFilter():getGLProgramState()
+                    program:setUniformFloat("percent", fmod(time - floor(time), 1.0))
+                    program:setUniformFloat("elapse", line.is_enemy and elapse_time / total_time or 0)
                 end
             end
         end
@@ -315,7 +400,7 @@ function MultiAllianceLayer:ManagerCorpsFromChangedMap(changed_map,is_strkie,all
                             app:GetAudioManager():PlayeEffectSoundWithKey("ATTACK_PLAYER_ARRIVE")
                         end
                     elseif player_role == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
-                        if marchEvent:IsReturnEvent() then -- return 
+                        if marchEvent:IsReturnEvent() and not marchEvent:IsStrikeEvent() then -- return
                             app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_BACK")
                         end
                     end
@@ -360,8 +445,24 @@ function MultiAllianceLayer:CreateCorpsIf(marchEvent)
     local is_enemy = false
     if not marchEvent:IsReturnEvent() then
         is_enemy = self:GetMyAlliance():Id() ~= from_alliance_id
-    else -- return 
+    else -- return
         is_enemy = self:GetMyAlliance():Id() ~= to_alliance_id
+    end
+    local ally = ENEMY
+    if not is_enemy then
+        if not marchEvent:IsReturnEvent() then
+            if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.SENDER  then
+                ally = MINE
+            else
+                ally = FRIEND
+            end
+        else -- return
+            if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER  then
+                ally = MINE
+            else
+                ally = FRIEND
+            end
+        end
     end
     self:CreateCorps(
         marchEvent:Id(),
@@ -371,7 +472,7 @@ function MultiAllianceLayer:CreateCorpsIf(marchEvent)
         marchEvent:ArriveTime(),
         marchEvent:AttackPlayerData().dragon.type,
         marchEvent:AttackPlayerData().soldiers,
-        is_enemy
+        ally
     )
 end
 local dragon_dir_map = {
@@ -507,7 +608,7 @@ local function move_soldiers(corps, ani, dir_index, first_soldier)
             :align(display.CENTER, x, y):getAnimation():play(ani)
     end
 end
-function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, finish_time, dragonType, soldiers, is_enemy)
+function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, finish_time, dragonType, soldiers, ally)
     local march_info = self:GetMarchInfoWith(id, start_pos, end_pos)
     march_info.start_time = start_time
     march_info.finish_time = finish_time
@@ -531,7 +632,7 @@ function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, fini
         corps:setScaleY(math.abs(scalex))
         corps.march_info = march_info
         self.corps_map[id] = corps
-        self:CreateLine(id, march_info, is_enemy)
+        self:CreateLine(id, march_info, ally)
     else
         self:UpdateCorpsBy(self.corps_map[id], march_info)
     end
@@ -563,16 +664,19 @@ end
 function MultiAllianceLayer:IsExistCorps(id)
     return self.corps_map[id] ~= nil
 end
-function MultiAllianceLayer:CreateLine(id, march_info, is_enemy)
+local line_ally_map = {
+    [MINE] = "arrow_green_22x32.png",
+    [FRIEND] = "arrow_blue_22x32.png",
+    [ENEMY] = "arrow_red_22x32.png",
+}
+function MultiAllianceLayer:CreateLine(id, march_info, ally)
     if self.lines_map[id] then
         self.lines_map[id]:removeFromParent()
     end
     local middle = cc.pMidpoint(march_info.start_info.real, march_info.end_info.real)
     local scale = march_info.length / 32
     local unit_count = math.floor(scale)
-    local sprite = display.newSprite(is_enemy and
-        "arrow_red_22x32.png" or
-        "arrow_blue_22x32.png"
+    local sprite = display.newSprite(line_ally_map[ally]
         , nil, nil, {class=cc.FilteredSpriteWithOne})
         :addTo(self:GetLineNode())
         :pos(middle.x, middle.y)
@@ -582,10 +686,13 @@ function MultiAllianceLayer:CreateLine(id, march_info, is_enemy)
             frag = "shaders/multi_tex.fs",
             shaderName = "lineShader"..unit_count,
             unit_count = unit_count,
+            unit_len = 1 / unit_count,
             percent = 0,
+            elapse = 0,
         })
     ))
     sprite:setScaleY(scale)
+    sprite.is_enemy = is_enemy
     self.lines_map[id] = sprite
     return sprite
 end
@@ -660,15 +767,6 @@ function MultiAllianceLayer:getContentSize()
     end
     return self.content_size
 end
-function MultiAllianceLayer:OnSceneMove()
-    -- for _, v in ipairs(self.alliance_views) do
-    --     v:OnSceneMove()
-    -- end
-    local logic_x, logic_y, alliance_view = self:GetCurrentViewAllianceCoordinate()
-    self:NotifyObservers(function(listener)
-        listener:OnSceneMove(logic_x, logic_y, alliance_view)
-    end)
-end
 function MultiAllianceLayer:GetCurrentViewAllianceCoordinate()
     local logic_x, logic_y, alliance_view = self:GetAllianceCoordWithPoint(display.cx, display.cy)
     return logic_x, logic_y, alliance_view
@@ -699,11 +797,6 @@ function MultiAllianceLayer:GetAllianceCoordWithPoint(x, y)
     end
     return logic_x, logic_y, alliance_view
 end
-function MultiAllianceLayer:OnSceneScale(s)
-    for _,v in pairs(self.alliance_views) do
-        v:OnSceneScale(s)
-    end
-end
 
 
 
@@ -712,23 +805,6 @@ end
 
 
 return MultiAllianceLayer
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

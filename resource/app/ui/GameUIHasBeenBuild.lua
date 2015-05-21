@@ -239,8 +239,10 @@ function Item:RebindEventListener()
             and cur_scene.AddIndicateForBuilding then
             UIKit:showMessageDialog(_("提示"), _("前置建筑条件不满足, 请前往。"), function()
                 local building_sprite = cur_scene:GetSceneLayer():FindBuildingSpriteByBuilding(jump_building, city)
-                cur_scene:GotoLogicPoint(jump_building:GetMidLogicPosition())
-                cur_scene:AddIndicateForBuilding(building_sprite)
+                local x,y = jump_building:GetMidLogicPosition()
+                cur_scene:GotoLogicPoint(x,y,40):next(function()
+                    cur_scene:AddIndicateForBuilding(building_sprite)
+                end)
                 self.parent_ui:LeftButtonClicked()
             end)
             return

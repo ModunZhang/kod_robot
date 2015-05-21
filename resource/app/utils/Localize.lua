@@ -1,3 +1,90 @@
+local EQUIP_MATERIAL_DESC_LOCALIZE = {
+    ["ingo_1"] = _("打造红龙，蓝龙和绿龙1星装备所必须的材料"),
+    ["ingo_2"] = _("打造红龙，蓝龙和绿龙2星装备所必须的材料"),
+    ["ingo_3"] = _("打造红龙，蓝龙和绿龙3星装备所必须的材料"),
+    ["ingo_4"] = _("打造红龙，蓝龙和绿龙4星装备所必须的材料"),
+    ["redSoul_2"] = _("打造红龙2星装备所必须的材料"),
+    ["redSoul_3"] = _("打造红龙3星装备所必须的材料"),
+    ["redSoul_4"] = _("打造红龙4星装备所必须的材料"),
+    ["blueSoul_2"] = _("打造蓝龙2星装备所必须的材料"),
+    ["blueSoul_3"] = _("打造蓝龙3星装备所必须的材料"),
+    ["blueSoul_4"] = _("打造蓝龙4星装备所必须的材料"),
+    ["greenSoul_2"] = _("打造绿龙2星装备所必须的材料"),
+    ["greenSoul_3"] = _("打造绿龙3星装备所必须的材料"),
+    ["greenSoul_4"] = _("打造绿龙4星装备所必须的材料"),
+    ["redCrystal_1"] = _("打造红龙1星装备所必须的材料"),
+    ["redCrystal_2"] = _("打造红龙2星装备所必须的材料"),
+    ["redCrystal_3"] = _("打造红龙3星装备所必须的材料"),
+    ["redCrystal_4"] = _("打造红龙4星装备所必须的材料"),
+    ["blueCrystal_1"] = _("打造蓝龙1星装备所必须的材料"),
+    ["blueCrystal_2"] = _("打造蓝龙2星装备所必须的材料"),
+    ["blueCrystal_3"] = _("打造蓝龙3星装备所必须的材料"),
+    ["blueCrystal_4"] = _("打造蓝龙4星装备所必须的材料"),
+    ["greenCrystal_1"] = _("打造绿龙1星装备所必须的材料"),
+    ["greenCrystal_2"] = _("打造绿龙2星装备所必须的材料"),
+    ["greenCrystal_3"] = _("打造绿龙3星装备所必须的材料"),
+    ["greenCrystal_4"] = _("打造绿龙4星装备所必须的材料"),
+    ["runes_1"] = _("打造红龙，蓝龙和绿龙1星装备所必须的材料"),
+    ["runes_2"] = _("打造红龙，蓝龙和绿龙2星装备所必须的材料"),
+    ["runes_3"] = _("打造红龙，蓝龙和绿龙3星装备所必须的材料"),
+    ["runes_4"] = _("打造红龙，蓝龙和绿龙4星装备所必须的材料"),
+}
+
+local MATERIALS_DESC_MAP = {
+    blueprints =  _("用于建造高等级建筑和研发高级科技"),
+    tools =  _("用于建造高等级建筑和研发高级科技"),
+    tiles =  _("用于建造高等级建筑和研发高级科技"),
+    pulley =  _("用于建造高等级建筑和研发高级科技"),
+    trainingFigure =   _("用于在训练营地提升步兵的属性"),
+    bowTarget = _("用于在猎手大厅提升弓手的属性"),
+    saddle =  _("用于在马厩提升骑兵的属性"),
+    ironPart =   _("用于在马厩提升骑兵的属性"),
+}
+
+local EQUIP_MATERIAL_DESC_LOCALIZE = {
+    ["ingo_1"] = _("打造红龙，蓝龙和绿龙1星装备所必须的材料"),
+    ["ingo_2"] = _("打造红龙，蓝龙和绿龙2星装备所必须的材料"),
+    ["ingo_3"] = _("打造红龙，蓝龙和绿龙3星装备所必须的材料"),
+    ["ingo_4"] = _("打造红龙，蓝龙和绿龙4星装备所必须的材料"),
+    ["redSoul_2"] = _("打造红龙2星装备所必须的材料"),
+    ["redSoul_3"] = _("打造红龙3星装备所必须的材料"),
+    ["redSoul_4"] = _("打造红龙4星装备所必须的材料"),
+    ["blueSoul_2"] = _("打造蓝龙2星装备所必须的材料"),
+    ["blueSoul_3"] = _("打造蓝龙3星装备所必须的材料"),
+    ["blueSoul_4"] = _("打造蓝龙4星装备所必须的材料"),
+    ["greenSoul_2"] = _("打造绿龙2星装备所必须的材料"),
+    ["greenSoul_3"] = _("打造绿龙3星装备所必须的材料"),
+    ["greenSoul_4"] = _("打造绿龙4星装备所必须的材料"),
+    ["redCrystal_1"] = _("打造红龙1星装备所必须的材料"),
+    ["redCrystal_2"] = _("打造红龙2星装备所必须的材料"),
+    ["redCrystal_3"] = _("打造红龙3星装备所必须的材料"),
+    ["redCrystal_4"] = _("打造红龙4星装备所必须的材料"),
+    ["blueCrystal_1"] = _("打造蓝龙1星装备所必须的材料"),
+    ["blueCrystal_2"] = _("打造蓝龙2星装备所必须的材料"),
+    ["blueCrystal_3"] = _("打造蓝龙3星装备所必须的材料"),
+    ["blueCrystal_4"] = _("打造蓝龙4星装备所必须的材料"),
+    ["greenCrystal_1"] = _("打造绿龙1星装备所必须的材料"),
+    ["greenCrystal_2"] = _("打造绿龙2星装备所必须的材料"),
+    ["greenCrystal_3"] = _("打造绿龙3星装备所必须的材料"),
+    ["greenCrystal_4"] = _("打造绿龙4星装备所必须的材料"),
+    ["runes_1"] = _("打造红龙，蓝龙和绿龙1星装备所必须的材料"),
+    ["runes_2"] = _("打造红龙，蓝龙和绿龙2星装备所必须的材料"),
+    ["runes_3"] = _("打造红龙，蓝龙和绿龙3星装备所必须的材料"),
+    ["runes_4"] = _("打造红龙，蓝龙和绿龙4星装备所必须的材料"),
+}
+
+local SOLDIER_DESC_MATERIAL = {
+    ["deathHand"] = _("用于招募亡灵兵种的材料。在探险过程中有一定几率会遭遇亡灵部队，击败他们后获得"),
+    ["heroBones"] = _("用于招募亡灵兵种的材料。在探险过程中有一定几率会遭遇亡灵部队，击败他们后获得"),
+    ["soulStone"] = _("用于招募亡灵兵种的材料。在探险过程中有一定几率会遭遇亡灵部队，击败他们后获得"),
+    ["magicBox"] = _("用于招募亡灵兵种的材料。在探险过程中有一定几率会遭遇亡灵部队，击败他们后获得"),
+    ["confessionHood"] = _("士兵材料"),
+    ["brightRing"] = _("士兵材料"),
+    ["holyBook"] = _("士兵材料"),
+    ["brightAlloy"] = _("士兵材料")
+}
+
+
 local EQUIP_MATERIAL_LOCALIZE = {
     ["ingo_1"] = _("铁锭"),
     ["ingo_2"] = _("钢锭"),
@@ -168,54 +255,54 @@ local DRAGON_BUFF_EFFECTION = {
     ["troopSizeAdd"] = _("带兵上限加成"),
     ["recoverAdd"] = _("可治愈伤兵几率加成"),
 }
-
 local BUILDING_DESCRIPTION = {
     ["keep"] = _("城堡是权力的的象征，城市的核心建筑，升级能够解锁更多的地块，提供更高的建筑等级"),
     ["unlock"] = _("可解锁的地块"),
     ["beHelpCount"] = _("被协助加速次数"),
     ["power"] = _("战斗力"),
 
-    ["watchTower"] = _("瞭望塔提供查看部队的情况，并提供敌方来袭时的信息，"),
-    ["watchTower_1"] = _("能够看到来袭部队，NPC titles，自己的出征部队，告诉你前来的部队的行军目的，达到时间"),
-    ["watchTower_2"] = _("可以进入其他联盟的领地，查看他们的行军事件"),
-    ["watchTower_3"] = _("显示敌方突袭你部队的龙的类型(之前显示“?”)"),
-    ["watchTower_4"] = _("显示突袭的龙的等级"),
-    ["watchTower_5"] = _("显示进攻的龙的等级"),
-    ["watchTower_6"] = _("显示突袭的龙的装备信息"),
-    ["watchTower_7"] = _("显示进攻的龙的装备信息"),
-    ["watchTower_8"] = _("显示突袭的龙的技能信息"),
-    ["watchTower_9"] = _("显示进攻的龙的技能信息"),
-    ["watchTower_10"] = _("显示进攻部队的兵种类型和排序"),
-    ["watchTower_11"] = _("显示进攻部队的兵种星级"),
-    ["watchTower_12"] = _("可以在敌方领土上预警到敌方部队来袭(之前只会在敌方穿过传送门后才预警，现在还会显示传送门到敌方玩家城市的路径)"),
-    ["watchTower_13"] = _("可以查看突袭的龙的力量和活力属性"),
-    ["watchTower_14"] = _("可以查看进攻的龙的力量和活力属性"),
-    ["watchTower_15"] = _("显示进攻部队的大致数量"),
-    ["watchTower_16"] = _("显示进攻敌方的科技水平(训练营地，猎手大厅，马厩，车间的科技研发值)"),
-    ["watchTower_17"] = _("可以在敌方领地上查看敌方玩家的城市布局(不能点击建筑)"),
-    ["watchTower_18"] = _("可以在敌方领地上查看敌方玩家的城市建筑等级信息(不能点击建筑)"),
-    ["watchTower_19"] = _("显示进攻部队兵种的准确数量"),
-    ["watchTower_20"] = _("显示敌方进攻部队的战斗力预估(之前显示“?”)"),
-    ["watchTower_21"] = _("减少敌方行军速度10%"),
-    ["watchTower_22"] = _("增加己方行军速度10%"),
-    ["watchTower_23"] = _("增加己方行军速度10%"),
-    ["watchTower_24"] = _("增加己方行军速度10%"),
-    ["watchTower_25"] = _("增加己方行军速度10%"),
-    ["watchTower_26"] = _("增加己方行军速度10%"),
-    ["watchTower_27"] = _("增加己方行军速度10%"),
-    ["watchTower_28"] = _("增加己方行军速度10%"),
-    ["watchTower_29"] = _("增加己方行军速度10%"),
-    ["watchTower_30"] = _("增加己方行军速度10%"),
-    ["watchTower_31"] = _("增加己方行军速度10%"),
-    ["watchTower_32"] = _("增加己方行军速度10%"),
-    ["watchTower_33"] = _("增加己方行军速度10%"),
-    ["watchTower_34"] = _("增加己方行军速度10%"),
-    ["watchTower_35"] = _("增加己方行军速度10%"),
-    ["watchTower_36"] = _("增加己方行军速度10%"),
-    ["watchTower_37"] = _("增加己方行军速度10%"),
-    ["watchTower_38"] = _("增加己方行军速度10%"),
-    ["watchTower_39"] = _("增加己方行军速度10%"),
-    ["watchTower_40"] = _("增加己方行军速度10%"),
+    ["watchTower"] = _("瞭望塔显示部队在联盟领地上的行军情况，同时也能预警敌方部队来袭，并提供相关信息"),
+    ["watchTower_1"] = _("显示己方领地上的行军事件及其路线，预警%d分钟内的敌方行军事件"),
+    ["watchTower_2"] = _("提供来袭部队的玩家名称，预警%d分钟内的敌方行军事件"),
+    ["watchTower_3"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_4"] = _("显示敌方的所有行军事件及其路线，预警%d分钟内的敌方行军事件"),
+    ["watchTower_5"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_6"] = _("提供来袭部队的龙的类型，预警%d分钟内的敌方行军事件"),
+    ["watchTower_7"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_8"] = _("可以在敌方领地，查看敌方玩家的城市布局(不能点击建筑)，预警%d分钟内的敌方行军事件"),
+    ["watchTower_9"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_10"] = _("提供详情按钮，可以查看敌军的详细信息：龙的等级和星级，预警%d分钟内的敌方行军事件"),
+    ["watchTower_11"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_12"] = _("可以查看敌军的详细信息：显示龙的当前HP和HP上限，预警%d分钟内的敌方行军事件"),
+    ["watchTower_13"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_14"] = _("可以查看敌军的详细信息：显示敌方部队的兵种名称，预警%d分钟内的敌方行军事件"),
+    ["watchTower_15"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_16"] = _("可以查看敌军的详细信息：显示龙的力量，预警%d分钟内的敌方行军事件"),
+    ["watchTower_17"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_18"] = _("可以查看敌军的详细信息: 显示敌方部队的兵种名称，预警%d分钟内的敌方行军事件"),
+    ["watchTower_19"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_20"] = _("可以查看敌军的详细信息：显示龙的已装备的装备及其星级，预警%d分钟内的敌方行军事件"),
+    ["watchTower_21"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_22"] = _("可以查看敌军的详细信息：显示敌方部队的星级和模糊数量，预警%d分钟内的敌方行军事件"),
+    ["watchTower_23"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_24"] = _("可以在敌方领地，查看其他联盟领地的玩家的城市建筑具体等级，预警%d分钟内的敌方行军事件"),
+    ["watchTower_25"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_26"] = _("显示敌方激活的战争增益，预警%d分钟内的敌方行军事件"),
+    ["watchTower_27"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_28"] = _("可以查看敌军的详细信息：显示龙的技能等级，预警%d分钟内的敌方行军事件"),
+    ["watchTower_29"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_30"] = _("可以查看敌军的详细信息：显示敌方部队的具体数量，预警%d分钟内的敌方行军事件"),
+    ["watchTower_31"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_32"] = _("可以查看敌方城市中得协防部队的详细信息：龙的详细信息，预警%d分钟内的敌方行军事件"),
+    ["watchTower_33"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_34"] = _("可以查看敌方城市中得协防部队的详细信息：显示敌方部队的兵种名称，预警%d分钟内的敌方行军事件"),
+    ["watchTower_35"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_36"] = _("可以查看敌方城市中得协防部队的详细信息：龙的装备情况和龙的力量，预警%d分钟内的敌方行军事件"),
+    ["watchTower_37"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_38"] = _("可以查看敌军的详细信息：显示敌方部队的星级和模糊数量，预警%d分钟内的敌方行军事件"),
+    ["watchTower_39"] = _("预警%d分钟内的敌方行军事件"),
+    ["watchTower_40"] = _("可以查看敌军的详细信息：显示龙的技能等级，预警%d分钟内的敌方行军事件"),
+
 
     ["academy"] = _("学院提供的科技能够提升城市的生产和防御能力，等级越高研发速度越快"),
     ["acdemy_efficiency"] = _("研发速度"),
@@ -274,7 +361,7 @@ local BUILDING_DESCRIPTION = {
     ["mill_farmer"] = _("农夫小屋数量"),
     ["mill_protection"] = _("粮食保护"),
 
-    ["stoneMason"] = _("石匠作坊能够提升可建造的石匠小屋数量和石料的生产效率，周围修建一定数量的石匠小屋还能获得额外的石料产量加成"),
+    ["stoneMason"] = _("石匠工坊能够提升可建造的石匠小屋数量和石料的生产效率，周围修建一定数量的石匠小屋还能获得额外的石料产量加成"),
     ["stoneMason_quarrier"] = _("石匠小屋数量"),
     ["stoneMason_protection"] = _("石料保护"),
 
@@ -314,20 +401,11 @@ local BUILDING_DESCRIPTION = {
 
     -- 联盟建筑
 
-    ["shop"] = _("联盟商店"),
-
-    ["orderHall"] = _("秩序大厅"),
-
-    ["moonGate"] = _("月门"),
-
-    ["shrine"] = _("圣地"),
-    
-    ["alliance_building_palace"] = _("联盟的核心建筑，升级可提升联盟人数上限，向占领城市征税，更改联盟地形。"),
-
-    ["alliance_building_shop"] = _("联盟商店建筑描述内容"),
-    ["alliance_building_orderHall"] = _("秩序大厅建筑描述内容"),
-    ["alliance_building_moonGate"] = _("月门建筑描述内容"),
-    ["alliance_building_shrine"] = _("圣地建筑描述内容"),
+    ["shop"] = _("联盟商店允许玩家消耗忠诚值购买付费道具.部分高级道具需要消耗联盟荣耀值进货."),
+    ["orderHall"] = _("秩序大厅管理着联盟领地上的大大小小的存量.秩序大厅等级月高,定期生成的村落就越多.还可以通过科技提升每种村落的等级."),
+    ["moonGate"] = _("月门可以通往失落的王朝.每当月门开启时,将不对驻防在月门来争夺王城.月门等级越高,可驻防的部队越多."),
+    ["shrine"] = _("圣地通过消耗感知力预测联盟将要发生的危机,解决这些危机可以获得丰厚的奖励.建筑等级越高,可使用的感知力越多."),
+    ["palace"] = _("联盟宫殿是联盟的核心建筑,联盟盟主可以在这里给忠诚的拥护者颁发奖励.建筑等级越高,联盟的成员就越多."),
 }
 --圣地本地化
 local SHRINE_DESC = {
@@ -384,7 +462,7 @@ local BUILDING_NAME = {
     ["blackSmith"] = _("铁匠铺"),
     ["lumbermill"] = _("锯木坊"),
     ["mill"] = _("磨坊"),
-    ["stoneMason"] = _("石匠作坊"),
+    ["stoneMason"] = _("石匠工坊"),
     ["foundry"] = _("铸造坊"),
     ["townHall"] = _("市政厅"),
     ["warehouse"] = _("资源仓库"),
@@ -395,6 +473,11 @@ local BUILDING_NAME = {
     ["farmer"] = _("农夫小屋"),
     ["quarrier"] = _("石匠小屋"),
     ["miner"] = _("矿工小屋"),
+    ["shop"] = _("联盟商店"),
+    ["orderHall"] = _("秩序大厅"),
+    ["moonGate"] = _("月门"),
+    ["shrine"] = _("圣地"),
+    ["palace"] = _("联盟宫殿"),
 }
 local ALLIANCE_TITLE = {
     ["archon"] = _("联盟盟主"),
@@ -670,6 +753,12 @@ local WONDER_TITLE_BUFF = {
     curse_7 = _("木材产量-10%，石料产量-10%，建造速度-5%"),
 }
 
+local MAILS = {
+    __system = _("系统邮件"),
+    __archon = _("盟主"),
+    __allianceMembers = _("联盟所有成员"),
+}
+
 local  getBuildingLocalizedKeyByBuildingType = function(name)
     local building_config = GameDatas.Buildings.buildings
     for _,v in ipairs(building_config) do
@@ -751,13 +840,13 @@ local ALLIANCE_BUILDINGS = {
     palace = _("联盟宫殿")
 }
 
-local IAP_PACKAGE_NAME = {
-    product_1 = _("新手大礼包"),
-    product_2 = _("探险家礼包"),
-    product__3 = _("铁血军团礼包"),
-    product_4 = _("帝国荣耀礼包"),
-    product_5 = _("龙族王朝礼包"),
-}
+local IAP_PACKAGE_NAME = {}
+IAP_PACKAGE_NAME["com.dragonfall.2500dragoncoins"] = _("新手大礼包")
+IAP_PACKAGE_NAME["com.dragonfall.5500dragoncoins"] = _("探险家礼包")
+IAP_PACKAGE_NAME["com.dragonfall.12000dragoncoins"] = _("铁血军团礼包")
+IAP_PACKAGE_NAME["com.dragonfall.35000dragoncoins"] = _("帝国荣耀礼包")
+IAP_PACKAGE_NAME["com.dragonfall.80000dragoncoins"] = _("龙族王朝礼包")
+
 
 local DAILY_QUESTS_NAME = {
     [0] = _("修复起重机"),
@@ -817,7 +906,27 @@ local ALLIANCE_DECORATE_NAME = {
     decorate_mountain = _("山"),
     decorate_tree = _("树")
 }
+local LOGIN_TIPS = {
+    _("提示：预留一定的空闲城民，兵营将他们训练成士兵"),
+    _("登录提示帮助2"),
+    _("登录提示帮助3"),
+    _("登录提示帮助4"),
+    _("登录提示帮助5"),
+    _("登录提示帮助6"),
+    _("登录提示帮助7"),
+    _("登录提示帮助8"),
+    _("登录提示帮助9"),
+    _("登录提示帮助10"),
+}
 
+local SERVER_NAME = {
+    bronze = _("青铜级"),
+    silver = _("白银级"),
+    gold  = _("黄金级"),
+    platinum = _("铂金级"),
+    diamond = _("钻石级"),
+    master = _("大师级"),
+}
 return {
     equip_material = EQUIP_MATERIAL_LOCALIZE,
     equip = EQUIP_LOCALIZE,
@@ -871,5 +980,15 @@ return {
     alliance_language = ALLIANCE_LANGUAGE,
     alliance_decorate_name = ALLIANCE_DECORATE_NAME,
     shrine_desc = SHRINE_DESC,
+    login_tips = LOGIN_TIPS,
+    server_name = SERVER_NAME,
+    equip_material_desc_localize = EQUIP_MATERIAL_DESC_LOCALIZE,
+    materials_desc_map = MATERIALS_DESC_MAP,
+    equip_material_desc_localize  = EQUIP_MATERIAL_DESC_LOCALIZE,
+    soldier_desc_material = SOLDIER_DESC_MATERIAL,
+    mails = MAILS,
 }
+
+
+
 

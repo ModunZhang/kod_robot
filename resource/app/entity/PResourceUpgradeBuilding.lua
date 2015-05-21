@@ -1,5 +1,5 @@
 
--- 包括锻造坊，锯木工坊，磨坊，石匠作坊
+-- 包括锻造坊，锯木工坊，磨坊，石匠工坊
 local config_function = GameDatas.BuildingFunction
 local UpgradeBuilding = import(".UpgradeBuilding")
 local PResourceUpgradeBuilding = class("PResourceUpgradeBuilding", UpgradeBuilding)

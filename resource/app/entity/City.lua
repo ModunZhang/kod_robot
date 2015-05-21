@@ -10,6 +10,7 @@ local SoldierManager = import(".SoldierManager")
 local MaterialManager = import(".MaterialManager")
 local ResourceManager = import(".ResourceManager")
 local Building = import(".Building")
+local GateEntity = import(".GateEntity")
 local TowerEntity = import(".TowerEntity")
 local TowerUpgradeBuilding = import(".TowerUpgradeBuilding")
 local MultiObserver = import(".MultiObserver")
@@ -21,6 +22,10 @@ local floor = math.floor
 local ceil = math.ceil
 local abs = math.abs
 local max = math.max
+local ipairs = ipairs
+local pairs = pairs
+local insert = table.insert
+local format = string.format
 -- 枚举定义
 City.RETURN_CODE = Enum(
     "INNER_ROUND_NOT_UNLOCKED",
@@ -77,15 +82,15 @@ local function illegal_filter(key, func)
     func()
 end
 -- 初始化
-function City:ctor(json_data)
+function City:ctor(user)
     City.super.ctor(self)
-    self.resource_manager = ResourceManager.new()
-    self.soldier_manager = SoldierManager.new()
-    self.material_manager = MaterialManager.new()
-
-    self.belong_user = nil
+    self.belong_user = user
+    self.resource_manager = ResourceManager.new(self)
+    self.soldier_manager = SoldierManager.new(self)
+    self.material_manager = MaterialManager.new(self)
     self.buildings = {}
     self.walls = {}
+    self.gate = GateEntity.new({building_type = "wall", city = self}):AddUpgradeListener(self)
     self.tower = TowerEntity.new({building_type = "tower", city = self}):AddUpgradeListener(self)
     self.visible_towers = {}
     self.decorators = {}
@@ -94,15 +99,12 @@ function City:ctor(json_data)
     self.productionTechs = {}
     self.productionTechEvents = {}
     self.build_queue = 0
-    self.locations_decorators = {}
+    self.need_update_buildings = {}
+    self.building_location_map = {}
     self:InitLocations()
     self:InitRuins()
 
-    if json_data then
-        self:InitWithJsonData(json_data)
-    end
-
-    --
+    -- fte
     self.upgrading_building_callbacks = {}
     self.finish_upgrading_callbacks = {}
 end
@@ -111,10 +113,10 @@ function City:GetRecommendTask()
     self:IteratorCanUpgradeBuildings(function(building)
         if building:IsUnlocked() then
             local highest = building_map[building:GetType()]
-            building_map[building:GetType()] = not highest and 
-            building or 
-            (building:GetLevel() > highest:GetLevel() and 
-                building or 
+            building_map[building:GetType()] = not highest and
+                building or
+                (building:GetLevel() > highest:GetLevel() and
+                building or
                 highest)
         end
     end)
@@ -134,11 +136,6 @@ function City:GetRecommendTask()
 end
 function City:GetUser()
     return self.belong_user
-end
-function City:SetUser(user)
-    assert(not self.belong_user, "用户一经指定就不可更改")
-    self.belong_user = user
-    return self
 end
 local function get_building_event_by_location(location_id, building_events)
     for k, v in pairs(building_events or {}) do
@@ -165,7 +162,7 @@ function City:InitWithJsonData(userData)
             local location_config = self:GetLocationById(location.location)
             local event = get_building_event_by_location(location.location, building_events)
             local finishTime = event == nil and 0 or event.finishTime / 1000
-            table.insert(init_buildings,
+            insert(init_buildings,
                 self:NewBuildingWithType(location.type,
                     location_config.x,
                     location_config.y,
@@ -175,7 +172,7 @@ function City:InitWithJsonData(userData)
                     finishTime)
             )
             if location.level > 0 then
-                table.insert(init_unlock_tiles, {x = location_config.tile_x, y = location_config.tile_y})
+                insert(init_unlock_tiles, {x = location_config.tile_x, y = location_config.tile_y})
             end
         end)
     end)
@@ -214,7 +211,7 @@ function City:InitWithJsonData(userData)
                     local absolute_x, absolute_y = tile:GetAbsolutePositionByLocation(house.location)
                     local event = get_house_event_by_location(location.location, house.location, hosue_events)
                     local finishTime = event == nil and 0 or event.finishTime / 1000
-                    table.insert(init_decorators,
+                    insert(init_decorators,
                         self:NewBuildingWithType(house.type,
                             absolute_x,
                             absolute_y,
@@ -229,11 +226,20 @@ function City:InitWithJsonData(userData)
     end)
     self:InitDecorators(init_decorators)
     self:GenerateWalls()
+
+
+
+    for i,v in ipairs(self:GetAllBuildings()) do
+        self.building_location_map[self:GetLocationIdByBuilding(v)] = v
+    end
+    self.building_location_map[21] = self:GetGate()
+    self.building_location_map[22] = self:GetTower()
+    return self
 end
 function City:ResetAllListeners()
     self.upgrading_building_callbacks = {}
     self.finish_upgrading_callbacks = {}
-    
+
     self.resource_manager:RemoveAllObserver()
     self.soldier_manager:ClearAllListener()
     self.material_manager:RemoveAllObserver()
@@ -258,7 +264,7 @@ end
 function City:InitRuins()
     self.ruins = {}
     for _,v in ipairs(GameDatas.ClientInitGame['ruins']) do
-        table.insert(self.ruins,
+        insert(self.ruins,
             Building.new{
                 building_type = v.building_type,
                 x = v.x,
@@ -273,7 +279,7 @@ end
 function City:InitTiles(w, h, unlocked)
     self.tiles = {}
     for y = 1, h do
-        table.insert(self.tiles, {})
+        insert(self.tiles, {})
         for x = 1, w do
             for location_id, location in pairs(self.locations) do
                 if location.tile_x == x and location.tile_y == y then
@@ -301,6 +307,7 @@ function City:InitBuildings(buildings)
 end
 function City:InitLocations()
     self.locations = GameDatas.ClientInitGame.locations
+    self.locations_decorators = {}
     table.foreach(self.locations, function(location_id, location)
         self.locations_decorators[location_id] = {}
     end)
@@ -318,6 +325,15 @@ function City:InitDecorators(decorators)
     self:CheckIfDecoratorsIntersectWithRuins()
 end
 -- 取值函数
+function City:PreconditionByBuildingType(preName)
+    if preName == "tower" then
+        return self:GetNearGateTower()
+    elseif preName == "wall" then
+        return self:GetVisibleGate()
+    else
+        return self:GetHighestBuildingByType(preName)
+    end
+end
 function City:GetDragonEyrie()
     return self:GetFirstBuildingByType("dragonEyrie")
 end
@@ -332,7 +348,7 @@ function City:GetHousesAroundFunctionBuildingWithFilter(building, len, filter)
     local r = {}
     self:IteratorDecoratorBuildingsByFunc(function(_,v)
         if building:IsNearByBuildingWithLength(v, len) and type(filter) == "function" and filter(v) then
-            table.insert(r, v)
+            insert(r, v)
         end
     end)
     return r
@@ -350,9 +366,7 @@ function City:IsTower(building)
     return iskindof(building, "TowerEntity")
 end
 function City:IsGate(building)
-    if iskindof(building, "WallUpgradeBuilding") then
-        return building:IsGate()
-    end
+    return iskindof(building, "GateEntity")
 end
 function City:GetSoldierManager()
     return self.soldier_manager
@@ -376,7 +390,7 @@ function City:GetUpgradingBuildings(need_sort)
     local builds = {}
     self:IteratorCanUpgradeBuildings(function(building)
         if building:IsUpgrading() then
-            table.insert(builds, building)
+            insert(builds, building)
         end
     end)
     if need_sort then
@@ -400,7 +414,7 @@ function City:GetUpgradingBuildingsWithOrder(current_time)
     local builds = {}
     self:IteratorCanUpgradeBuildings(function(building)
         if building:IsUpgrading() then
-            table.insert(builds, building)
+            insert(builds, building)
         end
     end)
     table.sort(builds, function(a, b)
@@ -445,8 +459,8 @@ function City:FindAPointWayFromTileAt(tile, point)
     local path_point = LuaUtils:table_map(path_tiles, function(k, v)
         return k, v:GetCrossPoint()
     end)
-    table.insert(path_point, 1, point or path_tiles[1]:RandomPoint())
-    table.insert(path_point, #path_point + 1, path_tiles[#path_tiles]:RandomPoint())
+    insert(path_point, 1, point or path_tiles[1]:RandomPoint())
+    insert(path_point, #path_point + 1, path_tiles[#path_tiles]:RandomPoint())
     return alignmeng_path(path_point)
 end
 local function find_path_tile(connectedness, start_tile)
@@ -462,11 +476,11 @@ local function find_path_tile(connectedness, start_tile)
         for i, v in ipairs(connectedness) do
             local cur = r[index]
             if cur:IsNearBy(v) then
-                table.insert(cur_nearbys, i)
+                insert(cur_nearbys, i)
             end
         end
         if #cur_nearbys > 0 then
-            table.insert(r, table.remove(connectedness, cur_nearbys[math.random(#cur_nearbys)]))
+            insert(r, table.remove(connectedness, cur_nearbys[math.random(#cur_nearbys)]))
             index = index + 1
             changed = true
         else
@@ -483,7 +497,7 @@ function City:GetConnectedTiles()
     local r = {}
     self:IteratorTilesByFunc(function(x, y, tile)
         if tile:IsConnected() then
-            table.insert(r, tile)
+            insert(r, tile)
         end
     end)
     return r
@@ -506,16 +520,10 @@ function City:GetMaxHouseCanBeBuilt(house_type)
 end
 function City:GetBuildingsIsUnlocked()
     local r = {}
-    for _,v in pairs(self:GetAllBuildings()) do
+    for k,v in pairs(self.building_location_map) do
         if v:IsUnlocked() or v:IsUnlocking() then
-            table.insert(r, v)
+            insert(r, v)
         end
-    end
-    if self:GetTower():IsUnlocked() or self:GetTower():IsUnlocking() then
-        table.insert(r, self:GetTower())
-    end
-    if self:GetGate():IsUnlocked() or self:GetGate():IsUnlocking() then
-        table.insert(r, self:GetGate())
     end
     table.sort(r, function(a, b)
         if a:GetLevel() < b:GetLevel() then
@@ -527,22 +535,13 @@ function City:GetBuildingsIsUnlocked()
     end)
     return r
 end
-function City:GetUnlockedFunctionBuildings()
-    local r = {}
-    for _,v in ipairs(self.buildings) do
-        if v:IsUnlocked() or v:IsUnlocking() then
-            table.insert(r, v)
-        end
-    end
-    return r
-end
 function City:GetAllBuildings()
     return self.buildings
 end
 function City:GetHousesWhichIsBuilded()
     local r = {}
     for i, v in ipairs(self:GetAllDecorators()) do
-        table.insert(r, v)
+        insert(r, v)
     end
     table.sort(r, function(a, b)
         local compare = b:GetLevel() - a:GetLevel()
@@ -556,6 +555,7 @@ end
 function City:GetDecoratorsByLocationId(location_id)
     if not self.locations_decorators[location_id] then
         self.locations_decorators[location_id] = {}
+        return
     end
     return self.locations_decorators[location_id]
 end
@@ -572,27 +572,7 @@ function City:GetLocationIdByBuildingType(building_type)
     return nil
 end
 function City:GetBuildingByLocationId(location_id)
-    if location_id == 2 then
-        return self:GetFirstBuildingByType("watchTower")
-    elseif location_id == 21 then
-        return self:GetGate()
-    elseif location_id == 22 then
-        return self:GetTower()
-    end
-    for _,v in pairs(self:GetAllBuildings()) do
-        if self:GetTileByLocationId(location_id):IsContainBuilding(v) then
-            return v
-        end
-    end
-    return nil
-end
-function City:GetBuildingByTypeWithSpecificPosition(building_type, x, y)
-    for _, v in pairs(self:GetBuildingByType(building_type)) do
-        if v.x == x and v.y == y then
-            return v
-        end
-    end
-    return nil
+    return self.building_location_map[location_id]
 end
 function City:GetFirstBuildingByType(type_)
     if only_one_buildings_map[type_] then
@@ -622,17 +602,14 @@ function City:GetBuildingByType(type_)
     local find_buildings = {}
     local filter = function(_, building)
         if building:GetType() == type_ then
-            table.insert(find_buildings, building)
+            insert(find_buildings, building)
         end
     end
-    self:IteratorFunctionBuildingsByFunc(filter)
+    for _,v in pairs(self.building_location_map) do
+        filter(nil, v)
+    end
     self:IteratorDecoratorBuildingsByFunc(filter)
-    filter(nil, self:GetGate())
-    filter(nil, self:GetTower())
     return find_buildings
-end
-function City:GetHouseByPosition(x, y)
-    return self:GetDecoratorByPosition(x, y)
 end
 function City:GetDecoratorByPosition(x, y)
     local find_decorator = nil
@@ -644,30 +621,6 @@ function City:GetDecoratorByPosition(x, y)
     end)
     return find_decorator
 end
-function City:GetTilesFaceToGate()
-    local r = {}
-    local tile = self:GetTileFaceToGate()
-    if tile then
-        local x = tile.x
-        for i = tile.y, 5 do
-            table.insert(r, self:GetTileByIndex(x, i))
-        end
-    end
-    return r
-end
-function City:GetTileFaceToGate()
-    for k, v in pairs(self.walls) do
-        if v:IsGate() then
-            local tile = self:GetTileWhichBuildingBelongs(v)
-            if tile then
-                return tile
-            else
-                local x, y = self:GetTileIndexPosition(v.x, v.y)
-                return Tile.new({x = x, y = y, locked = false, city = self})
-            end
-        end
-    end
-end
 function City:GetTileWhichBuildingBelongs(building)
     if building:GetType() == "watchTower" then
         return self:GetTileByLocationId(2)
@@ -675,10 +628,7 @@ function City:GetTileWhichBuildingBelongs(building)
     return self:GetTileByBuildingPosition(building.x, building.y)
 end
 function City:GetTileByBuildingPosition(x, y)
-    return self:GetTileByIndex(self:GetTileIndexPosition(x, y))
-end
-function City:GetTileIndexPosition(x, y)
-    return floor(x / 10) + 1, floor(y / 10) + 1
+    return self:GetTileByIndex(floor(x / 10) + 1, floor(y / 10) + 1)
 end
 function City:GetTileByLocationId(location_id)
     local location_info = self:GetLocationById(location_id)
@@ -721,25 +671,25 @@ function City:IsTileCanbeUnlockAt(x, y)
     -- 临边未解锁
     return false, self.RETURN_CODE.EDGE_BESIDE_NOT_UNLOCKED
 end
-function City:GetUnlockTowerLimit()
-    local t = {
-        [1] = 3,
-        [2] = 5,
-        [3] = 7,
-        [4] = 9,
-        [5] = 11,
-    }
-    return t[self:GetUnlockAround()]
-end
-function City:GetUnlockAround()
-    local t = { 5, 4, 3, 2, 1 }
-    for _, round_number in ipairs(t) do
-        if self:IsUnlockedInAroundNumber(round_number) then
-            return round_number
-        end
-    end
-    assert(false)
-end
+-- local t = {
+--     [1] = 3,
+--     [2] = 5,
+--     [3] = 7,
+--     [4] = 9,
+--     [5] = 11,
+-- }
+-- function City:GetUnlockTowerLimit()
+--     return t[self:GetUnlockAround()]
+-- end
+-- function City:GetUnlockAround()
+--     local t = { 5, 4, 3, 2, 1 }
+--     for _, round_number in ipairs(t) do
+--         if self:IsUnlockedInAroundNumber(round_number) then
+--             return round_number
+--         end
+--     end
+--     assert(false)
+-- end
 function City:IsUnlockedInAroundNumber(roundNumber)
     if roundNumber <= 0 then
         return true
@@ -764,6 +714,9 @@ end
 function City:GetWalls()
     return self.walls
 end
+function City:GetVisibleGate()
+    return self.visible_gate
+end
 function City:GetGate()
     return self.gate
 end
@@ -774,7 +727,7 @@ function City:GetVisibleTowers()
     return self.visible_towers
 end
 function City:GetNearGateTower()
-    local gate = self:GetGate()
+    local gate = self:GetVisibleGate()
     for _,v in pairs(self:GetVisibleTowers()) do
         if v:IsNearByBuildingWithLength(gate, 5) then
             return v
@@ -793,48 +746,105 @@ end
 -- end
 -- 工具
 function City:IteratorCanUpgradeBuildings(func)
+    for _,v in pairs(self.building_location_map) do
+        func(v)
+    end
     self:IteratorDecoratorBuildingsByFunc(function(key, building)
         func(building)
     end)
-    self:IteratorFunctionBuildingsByFunc(function(key, building)
-        func(building)
-    end)
-    func(self:GetTower())
-    func(self:GetGate())
 end
 function City:IteratorCanUpgradeBuildingsByUserData(user_data, current_time, deltaData)
     local is_fully_update = deltaData == nil
     local is_delta_update = not is_fully_update and (deltaData.buildings or deltaData.buildingEvents or deltaData.houseEvents)
-    if is_fully_update or is_delta_update then
-        self:IteratorDecoratorBuildingsByFunc(function(key, building)
-            local tile = self:GetTileWhichBuildingBelongs(building)
-            building:OnUserDataChanged(user_data, current_time, tile.location_id, tile:GetBuildingLocation(building), deltaData)
-        end)
-        self:IteratorFunctionBuildingsByFunc(function(key, building)
-            building:OnUserDataChanged(user_data, current_time, self:GetLocationIdByBuilding(building), nil, deltaData)
-        end)
-        self:GetTower():OnUserDataChanged(user_data, current_time, deltaData)
-        self:GetGate():OnUserDataChanged(user_data, current_time, deltaData)
+
+    local need_delta_update_buildings = {}
+    local building_events_map = {}
+    for _,v in ipairs(user_data.buildingEvents or {}) do
+        building_events_map[v.location] = v
+        insert(need_delta_update_buildings, v.location)
+    end
+
+    local need_delta_update_houses_events = {}
+    local house_events_map = {}
+    for _,v in ipairs(user_data.houseEvents or {}) do
+        local key = v.buildingLocation * 100 + v.houseLocation
+        house_events_map[key] = v
+        need_delta_update_houses_events[key] = v
+    end
+
+    local buildings = user_data.buildings
+    if is_fully_update then
+        for location_id,v in ipairs(self.building_location_map) do
+            local location_info = buildings["location_"..location_id]
+            v:OnUserDataChanged(user_data, current_time, location_info, nil, deltaData, building_events_map[location_id])
+            local houses = self:GetDecoratorsByLocationId(location_id)
+            for _,house_info in pairs(location_info.houses) do
+                local house_location = house_info.location
+                houses[house_location]:OnUserDataChanged(user_data, current_time, nil, house_info, deltaData, house_events_map[location_id * 100 + house_location])
+            end
+        end
+    elseif is_delta_update then
+        local need_delta_update_houses = {}
+        for k,location_info in pairs(deltaData.buildings or {}) do
+            if location_info then
+                local location_id = buildings[k].location
+                if location_info.level or location_info.type then
+                    insert(need_delta_update_buildings, location_id)
+                end
+                local houses = location_info.houses
+                if houses then
+                    for _,v in ipairs(houses.edit or {}) do
+                        need_delta_update_houses[location_id * 100 + v.location] = v
+                    end
+                end
+            end
+        end
+        local building_location_map = self.building_location_map
+        for i,location_id in ipairs(need_delta_update_buildings) do
+            building_location_map[location_id]:OnUserDataChanged(user_data, current_time, buildings[format("location_%d", location_id)], nil, deltaData, building_events_map[location_id])
+        end
+        for k,v in pairs(need_delta_update_houses) do
+            need_delta_update_houses_events[k] = nil
+            self:GetDecoratorsByLocationId((k - v.location) / 100)[v.location]
+                :OnUserDataChanged(
+                    user_data,
+                    current_time,
+                    nil,
+                    v,
+                    deltaData,
+                    house_events_map[k]
+                )
+        end
+        for k,v in pairs(need_delta_update_houses_events) do
+            local location_info = buildings[format("location_%d", v.buildingLocation)]
+            local house_location_info
+            for _,house in pairs(location_info.houses) do
+                if house.location == v.houseLocation then
+                    house_location_info = house
+                    break
+                end
+            end
+            self:GetDecoratorsByLocationId((k - v.houseLocation) / 100)[v.houseLocation]
+                :OnUserDataChanged(
+                    user_data,
+                    current_time,
+                    nil,
+                    house_location_info,
+                    deltaData,
+                    house_events_map[k]
+                )
+        end
     else
         self:IteratorFunctionBuildingsByFunc(function(key, building)
-            building:OnUserDataChanged(user_data, current_time, self:GetLocationIdByBuilding(building), nil, deltaData)
+            local tile = self:GetTileWhichBuildingBelongs(building)
+            local location_info = buildings[format("location_%d", tile.location_id)]
+            building:OnUserDataChanged(user_data, current_time, location_info, nil, deltaData, building_events_map[tile.location_id])
         end)
     end
 end
 function City:IteratorAllNeedTimerEntity(current_time)
-    self:IteratorFunctionBuildingsByFunc(function(key, building)
-        building:OnTimer(current_time)
-    end)
-    self:IteratorDecoratorBuildingsByFunc(function(key, building)
-        building:OnTimer(current_time)
-    end)
-    -- self:IteratorTowersByFunc(function(key, building)
-    --     building:OnTimer(current_time)
-    -- end)
-    self:GetTower():OnTimer(current_time)
-    local gate = self:GetGate()
-    if gate then
-        gate:OnTimer(current_time)
+    for _,v in ipairs(self.need_update_buildings) do
+        v:OnTimer(current_time)
     end
     self.resource_manager:OnTimer(current_time)
 end
@@ -871,7 +881,7 @@ function City:CheckIfDecoratorsIntersectWithRuins()
             if building:IsIntersectWithOtherBuilding(ruin) and
                 not ruin.has_been_occupied then
                 ruin.has_been_occupied = true
-                table.insert(occupied_ruins, ruin)
+                insert(occupied_ruins, ruin)
             end
         end
     end)
@@ -891,14 +901,14 @@ function City:GetNeighbourRuinWithSpecificRuin(ruin)
     for k, v in pairs(neighbours_position) do
         local is_in_same_tile = self:GetTileByBuildingPosition(v.x, v.y) == belong_tile
         if is_in_same_tile then
-            table.insert(out_put_neighbours_position, v)
+            insert(out_put_neighbours_position, v)
         end
     end
     local neighbours = {}
     for _, position in pairs(out_put_neighbours_position) do
         for _, v in ipairs(self.ruins) do
             if not v.has_been_occupied and v.x == position.x and v.y == position.y then
-                table.insert(neighbours, v)
+                insert(neighbours, v)
                 break
             end
         end
@@ -913,7 +923,7 @@ function City:OnTimer(time)
     end)
 end
 function City:CreateDecorator(current_time, decorator_building)
-    table.insert(self.decorators, decorator_building)
+    insert(self.decorators, decorator_building)
 
     local tile = self:GetTileWhichBuildingBelongs(decorator_building)
     local sub_location = tile:GetBuildingLocation(decorator_building)
@@ -935,7 +945,7 @@ function City:GetRuinsNotBeenOccupied()
     table.foreach(self.ruins, function(key, ruin)
         if not ruin.has_been_occupied  and
             not self:GetTileWhichBuildingBelongs(ruin).locked then
-            table.insert(r,ruin)
+            insert(r,ruin)
         end
     end)
     return r
@@ -952,7 +962,7 @@ function City:GetDecoratorsByType(building_type)
     local r = {}
     self:IteratorDecoratorBuildingsByFunc(function(key, building)
         if building:GetType() == building_type then
-            table.insert(r, building)
+            insert(r, building)
         end
     end)
     return r
@@ -970,7 +980,7 @@ function City:DestoryDecoratorByPosition(current_time, x, y)
                 if ruin:IsIntersectWithOtherBuilding(destory_decorator) and
                     ruin.has_been_occupied then
                     ruin.has_been_occupied = nil
-                    table.insert(release_ruins, ruin)
+                    insert(release_ruins, ruin)
                 end
             end
         end
@@ -1003,9 +1013,7 @@ end
 function City:OnUserDataChanged(userData, current_time, deltaData)
     local need_update_resouce_buildings, is_unlock_any_tiles, unlock_table = self:OnHouseChanged(userData, current_time, deltaData)
     -- 更新建筑信息
-    self:IteratorCanUpgradeBuildingsByUserData(userData, current_time, deltaData)
-
-
+        self:IteratorCanUpgradeBuildingsByUserData(userData, current_time, deltaData)
     -- 更新地块信息
     if is_unlock_any_tiles then
         LuaUtils:outputTable("unlock_table", unlock_table)
@@ -1041,9 +1049,18 @@ function City:OnUserDataChanged(userData, current_time, deltaData)
         resource_refresh_time = userData.resources.refreshTime / 1000
         self.resource_manager:UpdateFromUserDataByTime(userData.resources, resource_refresh_time)
     end
+
     if need_update_resouce_buildings then
         self.resource_manager:UpdateByCity(self, resource_refresh_time)
     end
+
+    local need_update_buildings = {}
+    self:IteratorCanUpgradeBuildings(function(building)
+        if building:IsNeedToUpdate() then
+            insert(need_update_buildings, building)
+        end
+    end)
+    self.need_update_buildings = need_update_buildings
     return self
 end
 local function find_building_info_by_location(houses, location_id)
@@ -1077,33 +1094,36 @@ function City:OnHouseChanged(userData, current_time, deltaData)
             break
         end
     end
-    table.foreach(buildings, function(key, location)
+
+    table.foreach(buildings, function(_, location)
         local location_id = location.location
-        illegal_filter(key, function()
+        illegal_filter(_, function()
             local building = self:GetBuildingByLocationId(location_id)
-            local is_unlocking = building:GetLevel() == 0 and (location.level > 0)
+            local is_unlocked = building:GetLevel() == 0 and (location.level > 0)
             local tile = self:GetTileByLocationId(location_id)
-            if is_unlocking and tile.locked then
+            if is_unlocked and tile.locked then
                 is_unlock_any_tiles = true
-                table.insert(unlock_table, {x = tile.x, y = tile.y})
+                insert(unlock_table, {x = tile.x, y = tile.y})
             end
 
             -- 拆除 or 交换
             local decorators = self:GetDecoratorsByLocationId(location_id)
-            table.foreach(decorators, function(key, building)
+            table.foreach(decorators, function(_, building)
+
                 -- 当前位置有小建筑并且推送的数据里面没有就认为是拆除
-                local tile = self:GetTileWhichBuildingBelongs(building)
-                local location_id = tile:GetBuildingLocation(building)
-                local building_info = find_building_info_by_location(location.houses, location_id)
+                local house_location_id = tile:GetBuildingLocation(building)
+                local house_info = find_building_info_by_location(location.houses, house_location_id)
+                
                 -- 没有找到，就是已经被拆除了
                 -- 如果类型不对，也认为是拆除
-                if not building_info or (building_info.type ~= building:GetType()) then
+                if not house_info or (house_info.type ~= building:GetType()) then
                     self:DestoryDecorator(current_time, building)
                 end
+
             end)
 
             -- 新建的
-            table.foreach(location.houses, function(key, house)
+            table.foreach(location.houses, function(_, house)
                 -- 当前位置没有小建筑并且推送的数据里面有就认为新建小建筑
                 if not decorators[house.location] then
                     local absolute_x, absolute_y = tile:GetAbsolutePositionByLocation(house.location)
@@ -1231,7 +1251,7 @@ function City:GenerateWalls()
     self:IteratorTilesByFunc(function(x, y, tile)
         if tile:NeedWalls() then
             tile:IteratorWallsAroundSelf(function(_, wall)
-                table.insert(walls, wall)
+                insert(walls, wall)
             end)
         end
     end)
@@ -1251,7 +1271,7 @@ function City:GenerateWalls()
     for i = 1, count do
         local w = walls[i]
         if w then
-            table.insert(real_walls, w)
+            insert(real_walls, w)
         end
     end
 
@@ -1263,67 +1283,35 @@ function City:GenerateWalls()
         if index then
             local f = first
             first = table.remove(real_walls, index)
-            table.insert(sort_walls, first)
+            insert(sort_walls, first)
         else
             break
         end
     end
 
     -- 重新生成城门的监听
-    self.walls = self:ReloadWalls(sort_walls)
-
-    -- 生成防御塔
-    self:GenerateTowers(sort_walls)
-end
--- 因为重新生成了城墙，所以必须把添加的listener都转移到新的城门上去
-local function GetGateInWalls(walls)
-    local gate
-    table.foreach(walls, function(k, wall)
-        if wall:IsGate() then
-            gate = wall
-            return true
-        end
-    end)
-    return gate
-end
-function City:ReloadWalls(walls)
-    local old_gate = GetGateInWalls(self.walls)
-    local new_index = nil
-    local new_gate = nil
-    for i, v in ipairs(walls) do
-        if v:IsGate() then
-            new_index = i
-            new_gate = v
-            break
-        end
-    end
-
-    assert(new_index)
-    -- 已经生成过城门了
-    if old_gate then
-        walls[new_index] = old_gate
-        old_gate:CopyValueFrom(new_gate)
-        self.gate = old_gate
-    else
-        -- 如果是第一次生成
-        self.gate = GetGateInWalls(walls)
-        self.gate:AddUpgradeListener(self)
-    end
     local t = {}
-    for _, v in ipairs(walls) do
+    for _, v in ipairs(sort_walls) do
         local x, y = v:GetLogicPosition()
         if (v:GetOrient() == Orient.X) or
             (v:GetOrient() == Orient.Y) or
             (x > 0 and y > 0) then
-            table.insert(t, v)
+            insert(t, v)
+            if v:IsGate() then
+                self.visible_gate = v
+            end
         end
     end
-    return t
+
+    self.walls = t
+
+    -- 生成防御塔
+    self:GenerateTowers(sort_walls)
 end
 function City:GenerateTowers(walls)
     local visible_towers = {}
     local p = walls[#walls]:IntersectWithOtherWall(walls[1])
-    table.insert(visible_towers,
+    insert(visible_towers,
         TowerUpgradeBuilding.new({
             building_type = "tower",
             x = p.x,
@@ -1339,7 +1327,7 @@ function City:GenerateTowers(walls)
         if i < #walls then
             local p = walls[i]:IntersectWithOtherWall(walls[i + 1])
             if p then
-                table.insert(visible_towers,
+                insert(visible_towers,
                     TowerUpgradeBuilding.new({
                         building_type = "tower",
                         x = p.x,
@@ -1357,7 +1345,7 @@ function City:GenerateTowers(walls)
     local visible_tower = {}
     for _, v in ipairs(visible_towers) do
         if v:IsVisible() then
-            table.insert(visible_tower, v)
+            insert(visible_tower, v)
         end
     end
 
@@ -1441,7 +1429,7 @@ function City:GetHelpToTroops(playerId)
     else
         local r = {}
         self:IteratorHelpToTroops(function(v)
-            table.insert(r, v)
+            insert(r, v)
         end)
         return r
     end
@@ -1459,7 +1447,7 @@ end
 local function promiseOfBuilding(callbacks, building_type, level)
     assert(#callbacks == 0)
     local p = promise.new()
-    table.insert(callbacks, function(building)
+    insert(callbacks, function(building)
         if building_type == nil or (building:GetType() == building_type and (not level or level == building:GetLevel())) then
             return p:resolve(building)
         end
@@ -1491,6 +1479,13 @@ function City:PromiseOfFinishSoldier(soldier_type)
     return self:GetFirstBuildingByType("barracks"):PromiseOfFinishSoldier(soldier_type)
 end
 --
+function City:PromiseOfTreatSoldier(soldier_type)
+    return self:GetFirstBuildingByType("hospital"):PromiseOfTreatSoldier(soldier_type)
+end
+function City:PromiseOfFinishTreatSoldier(soldier_type)
+    return self:GetFirstBuildingByType("hospital"):PromiseOfFinishTreatSoldier(soldier_type)
+end
+--
 function City:PromiseOfFinishEquipementDragon()
     return self:GetDragonEyrie():GetDragonManager():PromiseOfFinishEquipementDragon()
 end
@@ -1517,7 +1512,7 @@ function City:OnProductionTechsDataChanged(productionTechs)
                 productionTechnology:SetLevel(v.level)
                 GameGlobalUI:showTips(_("生产科技升级完成"),productionTechnology:GetLocalizedName().."Lv"..productionTechnology:Level())
                 local changed = self:CheckDependTechsLockState(productionTechnology)
-                table.insert(edited, productionTechnology)
+                insert(edited, productionTechnology)
                 table.insertto(edited,changed)
             end
         end
@@ -1555,7 +1550,7 @@ function City:FindDependOnTheTechs(tech)
     local r = {}
     self:IteratorTechs(function(_,tech_)
         if tech_:UnlockBy() == tech:Index() then
-            table.insert(r, tech_)
+            insert(r, tech_)
         end
     end)
     return r
@@ -1566,7 +1561,7 @@ function City:CheckDependTechsLockState(tech)
     local targetTechs = self:FindDependOnTheTechs(tech)
     for _,tech_ in ipairs(targetTechs) do
         tech_:SetEnable(tech:Level() >= tech_:UnlockLevel() and tech_:IsOpen() and tech_:AcademyLevel() <= self:GetAcademyBuildingLevel())
-        table.insert(changed,tech_)
+        insert(changed,tech_)
     end
     return changed
 end
@@ -1586,7 +1581,7 @@ end
 
 function City:GetAcademyBuildingLevel()
     local building = self:GetFirstBuildingByType('academy')
-    if building then 
+    if building then
         return building:GetLevel()
     else
         return 0
@@ -1678,7 +1673,7 @@ end
 function City:GetProductionTechEventsArray()
     local r = {}
     self:IteratorProductionTechEvents(function(event)
-        table.insert(r, event)
+        insert(r, event)
     end)
     return r
 end
@@ -1688,6 +1683,13 @@ function City:FindProductionTechEventById(_id)
 end
 
 return City
+
+
+
+
+
+
+
 
 
 

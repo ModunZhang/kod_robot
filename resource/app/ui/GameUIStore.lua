@@ -20,12 +20,19 @@ function GameUIStore:OnMoveInStage()
 	self:CreateUI()
 end
 
+function GameUIStore:onEnter()
+	GameUIStore.super.onEnter(self)
+	local layer = display.newColorLayer(cc.c4b(13,17,19,255))
+	layer:addTo(self:GetView()):size(614,window.betweenHeaderAndTab + 90)
+	layer:pos(window.left+math.ceil((window.width - 614)/2), window.bottom + 14)
+	self.content_layer = layer
+end
+
 function GameUIStore:CreateUI()
 	self.listView = UIListView.new({
-		bgColor = cc.c4b(13,17,19,255),
-        viewRect = cc.rect(window.left+math.ceil((window.width - 614)/2), window.bottom + 14, 614,window.betweenHeaderAndTab + 90),
+        viewRect = cc.rect(0,0, 614,window.betweenHeaderAndTab + 90),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
-	}):addTo(self:GetView())
+	}):addTo(self.content_layer)
 	self:RefreshListView()
 end
 
@@ -38,16 +45,16 @@ function GameUIStore:GetStoreData()
 		temp_data['gem'] = v.gem
 		temp_data['name'] = Localize.iap_package_name[v.productId]
 		temp_data['order'] = v.order
-		local rewards,rewards_price = self:FormatGemRewards(v.rewards)
+		local rewards,rewards_price = self:FormatGemRewards(v.rewards,v.allianceRewards)
 		temp_data['rewards'] = rewards
 		temp_data['rewards_price'] = rewards_price
-		temp_data['config'] = UILib.iap_package_image[v.productId]
+		temp_data['config'] = UILib.iap_package_image[v.name]
 		table.insert(data,temp_data)
 	end
 	return data
 end
 
-function GameUIStore:FormatGemRewards(rewards)
+function GameUIStore:FormatGemRewards(rewards,allianceRewards)
 	local result_rewards = {}
 	local rewards_price = {}
 	local all_rewards = string.split(rewards, ",")
@@ -56,6 +63,14 @@ function GameUIStore:FormatGemRewards(rewards)
 		local category,key,count = unpack(one_reward)
 		table.insert(result_rewards,{category = category,key = key,count = count})
 		rewards_price[key] = count
+	end
+	if allianceRewards then
+		local all_alliance_rewards = string.split(allianceRewards,",")
+		for __,v in ipairs(all_alliance_rewards) do
+			local one_reward = string.split(v,":")
+			local category,key,count = unpack(one_reward)
+			table.insert(result_rewards,{category = category,key = key,count = count,isToAlliance = true})
+		end
 	end
 	return result_rewards,DataUtils:getItemsPrice(rewards_price)
 end
@@ -126,7 +141,8 @@ function GameUIStore:GetItemBuyButton(data)
 	local label = UIKit:ttfLabel({
 		text = _("购买"),
 		size = 24,
-		color= 0xfff3c7
+		color= 0xfff3c7,
+		shadow= true,
 	})
 	button:onButtonClicked(function()
 		self:OnBuyButtonClicked(data.productId)
@@ -162,8 +178,10 @@ function GameUIStore:AddRewardsForItem(content,data)
 	for i=1,3 do
 		local reward = rewards[i]
 		if reward then
-			local icon = display.newSprite(UILib.item[reward.key]):align(display.LEFT_CENTER, x_1, y):addTo(content)
-			icon:scale(36/math.max(icon:getContentSize().width,icon:getContentSize().height))
+			local bg = display.newSprite("box_118x118.png"):align(display.LEFT_CENTER, x_1, y):addTo(content)
+			local icon = display.newSprite(UILib.item[reward.key]):align(display.CENTER, 59, 59):addTo(bg)
+			icon:scale(100/math.max(icon:getContentSize().width,icon:getContentSize().height))
+			bg:scale(0.3)
 			UIKit:ttfLabel({
 				text = Localize_item.item_name[reward.key],
 				size = 20,

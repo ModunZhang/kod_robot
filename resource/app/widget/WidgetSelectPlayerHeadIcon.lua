@@ -23,8 +23,8 @@ function WidgetSelectPlayerHeadIcon:onEnter()
     })
     list_node:addTo(body):align(display.BOTTOM_CENTER, size.width/2,20)
     self.head_icon_list = list
-    for key,icon in pairs(UILib.player_icon) do
-        self:AddIconOption(key,icon)
+    for key=1,11 do
+        self:AddIconOption(key,UILib.player_icon[key])
     end
 
     self.head_icon_list:reload()

@@ -67,7 +67,6 @@ function GameUIAcademy:GetNodeForKey(key)
 end
 
 function GameUIAcademy:OnMoveInStage()
-	GameUIAcademy.super.OnMoveInStage(self)
 	self:CreateTabButtons({
         {
             label = _("科技"),
@@ -89,6 +88,28 @@ function GameUIAcademy:OnMoveInStage()
     City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
     City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_TIMER)
     City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_REFRESH)
+    City:AddListenOnType(self,City.LISTEN_TYPE.UPGRADE_BUILDING)
+
+    GameUIAcademy.super.OnMoveInStage(self)
+end
+
+
+function GameUIAcademy:OnUpgradingBegin()
+end
+
+function GameUIAcademy:OnUpgradingFinished(building)
+    if building:GetType() == self:GetBuilding():GetType() and self.technology_node then
+    	City:FastUpdateAllTechsLockState()
+    	City:IteratorTechs(function(__,tech)
+    		local item = self:GetItemByTag(tech:Index())
+			if item and item.changeState then
+				item.changeState(tech:Enable())
+			end
+		end)
+    end
+end
+
+function GameUIAcademy:OnUpgrading()
 end
 
 function GameUIAcademy:OnProductionTechsDataChanged(changed_map)
@@ -126,11 +147,12 @@ function GameUIAcademy:OnProductionTechnologyEventTimer(event)
 end
 
 function GameUIAcademy:OnMoveOutStage()
-	GameUIAcademy.super.OnMoveOutStage(self)
 	City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_DATA_CHANGED)
 	City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
 	City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_TIMER)
 	City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_REFRESH)
+	City:RemoveListenerOnType(self,City.LISTEN_TYPE.UPGRADE_BUILDING)
+	GameUIAcademy.super.OnMoveOutStage(self)
 end
 
 function GameUIAcademy:CreateBetweenBgAndTitle()

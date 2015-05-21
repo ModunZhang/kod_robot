@@ -8,13 +8,7 @@ local WidgetPopDialog = import(".WidgetPopDialog")
 local UILib = import("..ui.UILib")
 
 
-local WidgetMakeEquip = class("WidgetMakeEquip", WidgetPopDialog
-    --     function()
-    --     local node = display.newColorLayer(UIKit:hex2c4b(0x7a000000))
-    --     node:setNodeEventEnabled(true)
-    --     return node
-    -- end
-    )
+local WidgetMakeEquip = class("WidgetMakeEquip", WidgetPopDialog)
 local STAR_BG = {
     "box_104x104_1.png",
     "box_104x104_2.png",
@@ -182,13 +176,11 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
         }))
         :onButtonClicked(function(event)
             if self:IsAbleToMakeEqui(false) then
-                NetManager:getMakeDragonEquipmentPromise(equip_type):catch(function(err)
-                    dump(err:reason())
-                end):done(function()
-                    if not UIKit:GetUIInstance("GameUIBlackSmith") then
-                        app:GetAudioManager():PlayeEffectSoundWithKey("UI_BLACKSMITH_FORGE")
-                    end
+                NetManager:getMakeDragonEquipmentPromise(equip_type):done(function (response)
+                    GameGlobalUI:showTips(_("提示"),string.format(_("已在制造%s"),EQUIP_LOCALIZE[equip_type]))
+                    return response
                 end)
+
                 self:Close()
             end
         end)
@@ -254,12 +246,12 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
     local condition_bg = WidgetUIBackGround.new({width = 568,height = 100},WidgetUIBackGround.STYLE_TYPE.STYLE_6)
         :addTo(back_ground)
         :align(display.CENTER, size.width/2, 200)
-   
+
     -- 建造队列
     local  condition_bg_1 = display.newSprite("back_ground_548x40_1.png")
         :addTo(condition_bg)
         :align(display.TOP_CENTER, 284, 90)
-    cc.ui.UIImage.new("hammer_31x33.png"):addTo(condition_bg_1, 2)
+    cc.ui.UIImage.new("hammer_33x40.png"):addTo(condition_bg_1, 2)
         :align(display.CENTER, 30, 20)
 
     self.build_label = cc.ui.UILabel.new({
@@ -483,13 +475,7 @@ function WidgetMakeEquip:IsAbleToMakeEqui(isFinishNow)
                 message = message .. v .. "\n"
             end
             UIKit:showMessageDialog(_("提示"),message,function()
-                NetManager:getMakeDragonEquipmentPromise(self.equip_type):catch(function(err)
-                    dump(err:reason())
-                end):done(function()
-                    if not UIKit:GetUIInstance("GameUIBlackSmith") then
-                        app:GetAudioManager():PlayeEffectSoundWithKey("UI_BLACKSMITH_FORGE")
-                    end
-                end)
+                NetManager:getMakeDragonEquipmentPromise(self.equip_type)
                 self:Close()
             end):CreateNeeds({value = need_gems})
             return false
@@ -499,3 +485,4 @@ function WidgetMakeEquip:IsAbleToMakeEqui(isFinishNow)
 end
 
 return WidgetMakeEquip
+

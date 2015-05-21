@@ -1,14 +1,12 @@
+local WidgetMaskFilter = import("..widget.WidgetMaskFilter")
 local cocos_promise = import("..utils.cocos_promise")
 local promise = import("..utils.promise")
-local Arrow = import(".Arrow")
 local TutorialLayer = class('TutorialLayer', function()
     return display.newNode()
 end)
 
-local debug = false
-
 function TutorialLayer:ctor(obj)
-    if debug then
+    if GLOBAL_FTE_DEBUG then
         self.left = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, -1)
         self.right = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, -1)
         self.top = display.newColorLayer(cc.c4b(255, 0, 0, 100)):addTo(self, -1)
@@ -23,7 +21,7 @@ function TutorialLayer:ctor(obj)
     for _, v in pairs{ left, right, top, bottom } do
         v:setContentSize(cc.size(display.width, display.height))
     end
-    -- self.arrow = Arrow.new():addTo(self):hide()
+    self.mask = WidgetMaskFilter.new():addTo(self):pos(display.cx, display.cy)
     self:Reset()
     self:SetTouchObject(obj)
     self:setLocalZOrder(3000)
@@ -50,10 +48,12 @@ function TutorialLayer:Reset()
     self.count = 0
     for _, v in pairs{ self.left, self.right, self.top, self.bottom } do
         v:pos(0,0)
-        v:setTouchEnabled(false)
+        v:setTouchEnabled(true)
     end
     self.object = nil
     self.world_rect = nil
+    self.mask:hide()
+    self.mask:FocusOnRect()
     return self
 end
 function TutorialLayer:SetTouchObject(obj)
@@ -73,6 +73,9 @@ function TutorialLayer:UpdateClickedRegion(rect)
     self.right:pos(rect.x + rect.width, 0)
     self.top:pos(0, rect.y + rect.height)
     self.bottom:pos(0, rect.y - display.height)
+
+    self.mask:show()
+    self.mask:FocusOnRect(rect)
 end
 function TutorialLayer:GetClickedRect()
     if self.world_rect then
@@ -90,19 +93,7 @@ function TutorialLayer:RemoveAllOtherChildren()
         end
     end
 end
--- function TutorialLayer:DeferShow(control, angle, offset_x, offset_y)
---     local rect = control:getCascadeBoundingBox()
---     local x = rect.x + rect.width * 0.5
---     local y = rect.y + rect.height * 0.5
---     self.arrow:OnPositionChanged(x, y)
---     self.arrow:Set(angle, offset_x, offset_y):show()
---     self:Enable():SetTouchObject(control)
---     return cocos_promise.defer(function() return control end)
--- end
--- function TutorialLayer:DefferHide()
---     self.arrow:hide()
---     return cocos_promise.defer()
--- end
+
 
 return TutorialLayer
 

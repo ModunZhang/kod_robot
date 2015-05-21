@@ -17,30 +17,42 @@ end
 function PVEDatabase:MapLen()
     return #self.pve_maps
 end
+function PVEDatabase:GetRewardedList()
+    return DataManager:getUserData().pve.rewardedFloors
+end
+function PVEDatabase:SetLocationHandle(location_handle)
+    self.location_handle = location_handle
+end
+function PVEDatabase:ResetLocationHander()
+    self.location_handle = nil
+end
 function PVEDatabase:OnUserDataChanged(userData, deltaData)
-    -- local is_fully_update = deltaData == nil
-    -- local is_delta_update = not is_fully_update and deltaData.pve and deltaData.pve.floors
-    -- local pve = userData.pve
-    -- if is_fully_update then
-    --     for _,v in ipairs(pve.floors) do
-    --         self.pve_maps[v.level]:Load(v)
-    --     end
-    -- elseif is_delta_update then
-    --     local floors = deltaData.pve.floors
-    --     for i,v in ipairs(floors.add or {}) do
-    --         self.pve_maps[v.level]:Load(v)
-    --     end
-    --     for i,v in ipairs(floors.edit or {}) do
-    --         self.pve_maps[v.level]:Load(v)
-    --     end
-    -- end
-    -- local location = pve.location
-    -- local is_switch_floor = self.char_floor ~= location.z
-    -- local is_pos_changed = self.char_x ~= location.x or self.char_y ~= location.y
-    -- local location = pve.location
-    -- self.char_x = location.x
-    -- self.char_y = location.y
-    -- self.char_floor = location.z
+    local is_fully_update = deltaData == nil
+    local is_delta_update = not is_fully_update and deltaData.pve and deltaData.pve.floors
+    local pve = userData.pve
+    if is_fully_update then
+        for _,v in ipairs(pve.floors) do
+            self.pve_maps[v.level]:Load(v)
+        end
+    elseif is_delta_update then
+        local floors = deltaData.pve.floors
+        for i,v in ipairs(floors.add or {}) do
+            self.pve_maps[v.level]:Load(v)
+        end
+        for i,v in ipairs(floors.edit or {}) do
+            self.pve_maps[v.level]:Load(v)
+        end
+    end
+    local location = pve.location
+    local is_switch_floor = self.char_floor ~= location.z
+    local is_pos_changed = self.char_x ~= location.x or self.char_y ~= location.y
+    local location = pve.location
+    self.char_x = location.x
+    self.char_y = location.y
+    self.char_floor = location.z
+    if type(self.location_handle) == "function" then
+        self.location_handle:OnLocationChanged(is_pos_changed, is_switch_floor)
+    end
 end
 function PVEDatabase:ReduceNextEnemyStep()
     self.next_enemy_step = self.next_enemy_step - 1
@@ -68,6 +80,7 @@ function PVEDatabase:GetMapByIndex(index)
     return self.pve_maps[index]
 end
 function PVEDatabase:ResetAllMapsListener()
+    self:ResetLocationHander()
     for k,v in pairs(self.pve_maps) do
         v:RemoveAllObserver()
     end

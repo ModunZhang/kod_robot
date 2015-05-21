@@ -18,7 +18,7 @@ function WidgetPVEConstructionRuins:SetUpButtons()
         { { label = _("离开"), icon = "pve_icon_leave.png", } } or
         { { 
             label = _("搜索"), 
-            icon = "alliacne_search_29x33.png",
+            icon = "icon_info_56x56.png",
             callback = function()
             if self:UseStrength(3) then
                 local rollback = self:Search()

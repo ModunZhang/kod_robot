@@ -27,8 +27,10 @@ function AllianceBuildingSprite:ctor(city_layer, entity, is_my_alliance)
 end
 
 function AllianceBuildingSprite:CheckEventIf(yesOrno)
-    if self:GetEntity():GetAllianceBuildingInfo().name == "shrine" then
-        local alliance_shirine = self:GetEntity():GetAlliance():GetAllianceShrine()
+    local entity = self:GetEntity()
+    if not entity:GetAlliance():IsDefault() and 
+    entity:GetAllianceBuildingInfo().name == "shrine" then
+        local alliance_shirine = entity:GetAlliance():GetAllianceShrine()
         if not alliance_shirine then return end
         if yesOrno then
             self:CheckEvent()
@@ -92,7 +94,7 @@ function AllianceBuildingSprite:RefreshInfo()
     self.level:setString(info.level)
     self.name:setString(string.format("[%s]%s", entity:GetAlliance():Tag(), Localize.alliance_buildings[info.name]))
 end
-local ANI_TAG = 1
+local ANI_TAG = 110
 function AllianceBuildingSprite:CheckEvent()
     if self:GetEntity():GetAllianceBuildingInfo().name == "shrine" then
         if self:GetEntity():GetAllianceMap():GetAlliance():GetAllianceShrine():HaveEvent() then

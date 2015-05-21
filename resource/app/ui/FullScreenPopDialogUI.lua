@@ -3,7 +3,8 @@ local UIAutoClose = import(".UIAutoClose")
 
 local FullScreenPopDialogUI = class("FullScreenPopDialogUI", UIAutoClose)
 
-function FullScreenPopDialogUI:ctor(listener)
+function FullScreenPopDialogUI:ctor(listener,user_data)
+    self.__user_data__ = user_data or os.time()
     FullScreenPopDialogUI.super.ctor(self,{type=UIKit.UITYPE.MESSAGEDIALOG})
     self:Init(listener)
 end
@@ -143,6 +144,18 @@ end
 function FullScreenPopDialogUI:VisibleXButton(visible)
     self.close_btn:setVisible(visible)
     return self
+end
+
+function FullScreenPopDialogUI:GetUserData()
+    return self.__user_data__
+end
+
+
+function FullScreenPopDialogUI:onCleanup()
+    print("onCleanup->",self.__cname)
+    if UIKit:isMessageDialogShow(self) then
+         UIKit:removeMesssageDialog(self)
+    end
 end
 return FullScreenPopDialogUI
 

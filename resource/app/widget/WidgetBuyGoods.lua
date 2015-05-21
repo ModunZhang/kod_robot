@@ -89,12 +89,13 @@ function WidgetBuyGoods:ctor(item)
     -- progress
     local slider_height, label_height = size.height - 170, size.height - 170
 
-    local slider = WidgetSliderWithInput.new({max = buy_max,min = buy_max>0 and 1 or 0}):addTo(back_ground):align(display.LEFT_CENTER, 25, slider_height)
+    local slider = WidgetSliderWithInput.new({max = buy_max,min = buy_max > 0 and 1 or 0}):addTo(back_ground):align(display.LEFT_CENTER, 25, slider_height)
         :SetSliderSize(445, 24)
         :OnSliderValueChanged(function(event)
             self:OnCountChanged(math.floor(event.value))
         end)
         :LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.RIGHT,0)
+
     -- 忠诚值
     display.newSprite("loyalty_128x128.png"):align(display.CENTER, 200, 50):addTo(back_ground):scale(42/128)
     local dividing = UIKit:ttfLabel({
@@ -158,6 +159,7 @@ function WidgetBuyGoods:OnCountChanged(count)
     self.loyalty_label:setColor(UIKit:hex2c4b(member:Loyalty()<need_loyalty and 0x7e0000 or 0x403c2f))
 end
 return WidgetBuyGoods
+
 
 
 

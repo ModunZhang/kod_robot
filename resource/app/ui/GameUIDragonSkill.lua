@@ -45,7 +45,11 @@ function GameUIDragonSkill:onEnter()
 	GameUIDragonSkill.super.onEnter(self)
 	self.backgroundImage = WidgetUIBackGround.new({height=BODY_HEIGHT})
   self:addTouchAbleChild(self.backgroundImage)
-	self.backgroundImage:pos((display.width-self.backgroundImage:getContentSize().width)/2,display.height - 680)
+  local y = display.height - 680
+  if BODY_HEIGHT == 180 then
+      y = display.height - 410
+  end
+	self.backgroundImage:pos((display.width-self.backgroundImage:getContentSize().width)/2,y)
 	local titleBar = display.newSprite("title_blue_600x56.png")
 		:align(display.BOTTOM_LEFT, 2,self.backgroundImage:getContentSize().height - 15)
 		:addTo(self.backgroundImage)
@@ -100,6 +104,7 @@ function GameUIDragonSkill:onEnter()
           		self:UpgradeButtonClicked()
           end)
         upgradeButton:setButtonEnabled(self:CanUpgrade())
+
         self.upgradeButton = upgradeButton
      local requirements = self:GetRequirements()
      self.listView = WidgetRequirementListview.new({
@@ -132,7 +137,10 @@ function GameUIDragonSkill:OnMoveOutStage()
 end
 
 function GameUIDragonSkill:UpgradeButtonClicked()
-
+  if self:SkillIsMaxLevel() then
+    UIKit:showMessageDialog(_("提示"),_("技能已经达到最大等级"))
+    return 
+  end
   NetManager:getUpgradeDragonDragonSkillPromise(self.skill:Type(),self.skill:Key()):done(function()
       GameGlobalUI:showTips(_("提示"),_("技能学习成功!"))
       if self:SkillIsMaxLevel() then
@@ -181,6 +189,17 @@ function GameUIDragonSkill:GetRequirements()
       isSatisfy = blood >= self.skill:GetBloodCost(),
       icon="heroBlood_3_128x128.png",
       description= string.format("%s/%s",blood,self.skill:GetBloodCost())
+  })
+  local star = self.skill:Star()
+  local need_star = DataUtils:GetDragonSkillUnLockStar(self.skill:Name())
+  table.insert(requirements,
+  {
+      resource_type = "dragon_star",
+      isVisible = true,
+      isSatisfy = star >= need_star,
+      icon="dragon_star_40x40.png",
+      description= string.format(_("龙的星级达到%d星"),need_star),
+      canNotBuy = true,
   })
   return requirements
 end

@@ -9,6 +9,7 @@ local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPopDialog = import("..widget.WidgetPopDialog")
 local window = import("..utils.window")
 local Localize = import("..utils.Localize")
+local UIListView = import(".UIListView")
 local Localize_item = import("..utils.Localize_item")
 local UILib = import("..ui.UILib")
 local Item = import("..entity.Item")
@@ -17,11 +18,12 @@ local WidgetUseItems = import("..widget.WidgetUseItems")
 
 local GameUIItems = UIKit:createUIClass("GameUIItems","GameUIWithCommonHeader")
 
-function GameUIItems:ctor(city)
+function GameUIItems:ctor(city,default_tab)
     GameUIItems.super.ctor(self,city,_("道具"))
 
     -- 记录选中的tab，切换商城和我的道具标签时，保持切过去的和当前的选中同一个tab
     self.top_tab = nil
+    self.default_tab = default_tab
 end
 function GameUIItems:OnMoveInStage()
     GameUIItems.super.OnMoveInStage(self)
@@ -29,21 +31,22 @@ function GameUIItems:OnMoveInStage()
         {
             label = _("商城"),
             tag = "shop",
-            default = true
+            default = self.default_tab == "shop"
         },
         {
             label = _("我的道具"),
             tag = "myItems",
+            default = self.default_tab == "myItems"
         },
     }, function(tag)
         self.shop_layer:setVisible(tag == 'shop')
         self.myItems_layer:setVisible(tag == 'myItems')
         if tag == 'shop' then
-            if self.top_tab and self.shop_dropList then
-                self.shop_dropList:PushButton(self.shop_dropList:GetTabByTag(self.top_tab))
-            end
             if not self.shop_dropList then
                 self:InitShop()
+            end
+            if self.top_tab and self.shop_dropList then
+                self.shop_dropList:PushButton(self.shop_dropList:GetTabByTag(self.top_tab))
             end
         end
         if tag == 'myItems' then
@@ -83,19 +86,22 @@ function GameUIItems:InitShop()
     self.shop_listview = list
 
     self.shop_dropList = WidgetRoundTabButtons.new({
-        {tag = "menu_1",label = "特殊",default = true},
+        {tag = "menu_1",label = "特殊" , default = self.default_tab == "shop"},
         {tag = "menu_2",label = "持续增益"},
-        {tag = "menu_3",label = "增益"},
+        {tag = "menu_3",label = "资源"},
         {tag = "menu_4",label = "时间加速"},
     }, function(tag)
         self.top_tab = tag
-        self.shop_items = {}
         self:ReloadShopList(tag)
     end):align(display.TOP_CENTER,window.cx,window.top-84):addTo(layer)
 end
-function GameUIItems:ReloadShopList( tag )
+function GameUIItems:ReloadShopList( tag ,isRefresh)
     self.shop_select_tag = tag
-    self.shop_listview:reload()
+    if isRefresh then
+        self.shop_listview:asyncLoadWithCurrentPosition_()
+    else
+        self.shop_listview:reload()
+    end
 end
 function GameUIItems:sourceDelegate(listView, tag, idx)
     if cc.ui.UIListView.COUNT_TAG == tag then
@@ -117,7 +123,15 @@ function GameUIItems:sourceDelegate(listView, tag, idx)
         local size = content:getContentSize()
         item:setItemSize(size.width, size.height)
         return item
-    else
+    elseif UIListView.ASY_REFRESH == tag then
+        for i,v in ipairs(listView:getItems()) do
+            if v.idx_ == idx then
+                local content = v:getContent()
+                content:SetData(idx)
+                local size = content:getContentSize()
+                v:setItemSize(size.width, size.height)
+            end
+        end
     end
 end
 function GameUIItems:FilterShopItems( items )
@@ -262,7 +276,6 @@ function GameUIItems:CreateShopContentByIndex( idx )
             self.use_button:setButtonEnabled(false)
         end
         self:SetOwnCount( items )
-        parent.shop_items[items:Name()] = self
     end
     return content
 end
@@ -305,24 +318,27 @@ function GameUIItems:InitMyItems()
     self.myItems_listview = list
 
     self.myItems_dropList = WidgetRoundTabButtons.new({
-        {tag = "menu_1",label = "特殊"},
+        {tag = "menu_1",label = "特殊",default = self.default_tab == "myItems"},
         {tag = "menu_2",label = "持续增益"},
-        {tag = "menu_3",label = "增益"},
+        {tag = "menu_3",label = "资源"},
         {tag = "menu_4",label = "时间加速"},
     }, function(tag)
         self.top_tab = tag
-        self.my_items = {}
         self:ReloadMyItemsList(tag)
     end):align(display.TOP_CENTER,window.cx,window.top-84):addTo(layer)
 end
-function GameUIItems:ReloadMyItemsList( tag )
+function GameUIItems:ReloadMyItemsList( tag ,isRefresh)
     self.my_item_tag = tag
-    self.myItems_listview:reload()
+    if isRefresh then
+        self.myItems_listview:asyncLoadWithCurrentPosition_()
+    else
+        self.myItems_listview:reload()
+    end
 end
 function GameUIItems:FilterMyItems( items )
     local f_items = {}
     for i,v in ipairs(items) do
-        if v:Count()>0 then
+        if v:Count() > 0 then
             table.insert(f_items, v)
         end
     end
@@ -358,7 +374,15 @@ function GameUIItems:myItemSourceDelegate(listView, tag, idx)
         local size = content:getContentSize()
         item:setItemSize(size.width, size.height)
         return item
-    else
+    elseif UIListView.ASY_REFRESH == tag then
+        for i,v in ipairs(listView:getItems()) do
+            if v.idx_ == idx then
+                local content = v:getContent()
+                content:SetData(idx)
+                local size = content:getContentSize()
+                v:setItemSize(size.width, size.height)
+            end
+        end
     end
 end
 function GameUIItems:CreateMyItemContentByIndex( idx )
@@ -437,7 +461,6 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
                 :align(display.RIGHT_BOTTOM, item_width-10, 15)
                 :addTo(self)
         end
-        parent.my_items[items:Name()] = self
     end
     return content
 end
@@ -449,6 +472,28 @@ function GameUIItems:UseItemFunc( items )
         if string.find(name,"dragonChest") then
             clone_dragon_materials = clone(self.city:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.DRAGON))
         end
+        -- 木,铜,银,金宝箱
+        local clone_items
+        if string.find(name,"chest") then
+            -- 需要对应的钥匙
+            if name == "chest_2" then
+                if ItemManager:GetItemByName("chestKey_2"):Count() < 1 then
+                    UIKit:showMessageDialog(_("陛下"),_("开启铜宝箱需要铜钥匙"))
+                    return
+                end
+            elseif name == "chest_3" then
+                if ItemManager:GetItemByName("chestKey_3"):Count() < 1 then
+                    UIKit:showMessageDialog(_("陛下"),_("开启银宝箱需要银钥匙"))
+                    return
+                end
+            elseif name == "chest_4" then
+                if ItemManager:GetItemByName("chestKey_4"):Count() < 1 then
+                    UIKit:showMessageDialog(_("陛下"),_("开启金宝箱需要金钥匙"))
+                    return
+                end
+            end
+            clone_items = clone(ItemManager:GetItems())
+        end
         NetManager:getUseItemPromise(items:Name(),{}):done(function (response)
             if string.find(name,"dragonChest") then
                 local message = ""
@@ -459,7 +504,17 @@ function GameUIItems:UseItemFunc( items )
                     end
                 end
                 GameGlobalUI:showTips(_("获得"),message)
+            elseif string.find(name,"chest") then
+                local message = ""
+                LuaUtils:outputTable("name", response)
+                for i,v in ipairs(response.msg.playerData) do
+                    if tolua.type(v[2]) == "table" then
+                        message = message .. Localize_item.item_name[v[2].name].."x"..(v[2].count - clone_items[v[2].name]:Count()).." "
+                    end
+                end
+                GameGlobalUI:showTips(_("获得"),message)
             end
+
             UIKit:PlayUseItemAni(items)
         end)
     else
@@ -472,61 +527,42 @@ function GameUIItems:UseItemFunc( items )
     end
 end
 function GameUIItems:OnItemsChanged( changed_map )
-    if changed_map[1] then
-        for k,v in pairs(changed_map[1]) do
-            if self.my_items then
-                local item = self.my_items[v:Name()]
-                print("GameUIItems:OnItemsChanged add",v:Name(),v:Count())
-                if item then
-                    item:SetOwnCount( v:Count() )
-                end
-                self:ReloadMyItemsList( self.my_item_tag)
-            end
-            if self.shop_items then
-                local item = self.shop_items[v:Name()]
-                if item then
-                    item:SetOwnCount( v )
-                end
-            end
+    if changed_map[1] and #changed_map[1] > 0  then
+        if self.myItems_layer:isVisible() then
+            self:ReloadMyItemsList( self.my_item_tag , true)
+        end
+        if self.shop_layer:isVisible() then
+            self:ReloadShopList( self.shop_select_tag, true)
         end
     end
-    if changed_map[2] then
-        for k,v in pairs(changed_map[2]) do
-            if self.my_items then
-                local item = self.my_items[v:Name()]
-                print("GameUIItems:OnItemsChanged edit",v:Name(),v:Count())
-                if item then
-                    item:SetOwnCount( v:Count() )
-                end
-            end
-            if self.shop_items then
-                local item = self.shop_items[v:Name()]
-                if item then
-                    item:SetOwnCount( v )
-                end
-            end
+    if changed_map[2] and #changed_map[2] > 0 then
+        if self.myItems_layer:isVisible() then
+            self:ReloadMyItemsList( self.my_item_tag, true)
+        end
+        if self.shop_layer:isVisible() then
+            self:ReloadShopList( self.shop_select_tag, true)
         end
     end
-    if changed_map[3] then
-        for k,v in pairs(changed_map[3]) do
-            if self.my_items then
-                local item = self.my_items[v:Name()]
-                print("GameUIItems:OnItemsChanged remove",v:Name(),v:Count())
-                if item then
-                    item:SetOwnCount(0)
-                    self:ReloadMyItemsList( self.my_item_tag)
-                end
-            end
-            if self.shop_items then
-                local item = self.shop_items[v:Name()]
-                if item then
-                    item:SetOwnCount(v)
-                end
-            end
+    if changed_map[3] and #changed_map[3] > 0 then
+        if self.myItems_layer:isVisible() then
+            self:ReloadMyItemsList( self.my_item_tag, true)
+        end
+        if self.shop_layer:isVisible() then
+            self:ReloadShopList( self.shop_select_tag, true)
         end
     end
 end
 return GameUIItems
+
+
+
+
+
+
+
+
+
+
 
 
 

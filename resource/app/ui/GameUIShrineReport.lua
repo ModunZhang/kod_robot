@@ -12,12 +12,15 @@ local StarBar = import(".StarBar")
 local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local User = User
 local config_shrineStage = GameDatas.AllianceInitData.shrineStage
+local UILib = import(".UILib")
+local UIKit = UIKit
+
 GameUIShrineReport.LABEL_COLOR = {
     WIN = UIKit:hex2c3b(0x007c23),LOSE = UIKit:hex2c3b(0x980101),
     ME  = UIKit:hex2c3b(0xffedae),OTHER = UIKit:hex2c3b(0x403c2f)
 }
 function GameUIShrineReport:ctor(shrineReport)
-    GameUIShrineReport.super.ctor(self,720,_("事件详情"),window.top - 82)
+    GameUIShrineReport.super.ctor(self,750,_("事件详情"),window.top - 82)
     self.shrineReport_ = shrineReport
     self:adapterFightDataToListView()
     self.stageConfig = config_shrineStage[self:GetShrineReport():StageName()]
@@ -50,7 +53,7 @@ function GameUIShrineReport:BuildUI()
         {tag = "data_statistics",label = _("数据统计")},
     }, function(tag)
         self:OnTabButtonClicked(tag)
-    end,2):align(display.TOP_CENTER,background:getContentSize().width/2,700):addTo(background)
+    end,2):align(display.BOTTOM_CENTER,background:getContentSize().width/2,16):addTo(background)
 end
 
 function GameUIShrineReport:OnTabButtonClicked(tag)
@@ -66,7 +69,7 @@ end
 
 function GameUIShrineReport:CreateIf_fight_detail()
     if self.fight_detail_list_node then return self.fight_detail_list_node end
-    local viewRect = cc.rect(10,12,548,545)
+    local viewRect = cc.rect(10,12,548,595)
     local list_node = display.newScale9Sprite("background_568x120.png",0,0,cc.size(viewRect.width+20,viewRect.height+24),cc.rect(10,10,548,100))
     local list = cc.ui.UIListView.new({
         viewRect = viewRect,
@@ -75,7 +78,7 @@ function GameUIShrineReport:CreateIf_fight_detail()
         async = true,
         -- bgColor = UIKit:hex2c4b(0x7a000000),
     }):addTo(list_node)
-    list_node:addTo(self:GetBody()):align(display.BOTTOM_CENTER, self:GetBody():getContentSize().width/2,30)
+    list_node:addTo(self:GetBody()):align(display.BOTTOM_CENTER, self:GetBody():getContentSize().width/2,100)
     self.fight_detail_list = list
     self.fight_detail_list_node = list_node
     self.fight_detail_list:setDelegate(handler(self, self.sourceDelegate))
@@ -154,10 +157,7 @@ function GameUIShrineReport:GetFightItemContent()
         size = 20,
         color= 0x403c2f
     }):align(display.LEFT_BOTTOM,122, 8):addTo(content_part)
-    local button = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
-        :addTo(content_part):setButtonLabel("normal", UIKit:commonButtonLable({text = _("回放")})):align(display.RIGHT_BOTTOM,538, 8):onButtonClicked(function()
-            self:OnRePlayClicked(content_part.idx)
-        end)
+    
     local result_label = UIKit:ttfLabel({
         text = "",
         size = 20,
@@ -212,6 +212,14 @@ function GameUIShrineReport:fillFightItemContent(item_content,list_data,item,ite
         end
         content:show()
         content.idx = item_idx
+        if content.button then
+            content.button:removeSelf()
+        end
+        local button = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+        :addTo(content):setButtonLabel("normal", UIKit:commonButtonLable({text = _("回放")})):align(display.RIGHT_BOTTOM,538, 8):onButtonClicked(function()
+            self:OnRePlayClicked(content.idx)
+        end)
+        content.button = button
         item_content:size(548,92)
         item:setItemSize(548,92)
     end
@@ -257,7 +265,7 @@ function GameUIShrineReport:CreateIf_data_statistics()
     if self.data_statistics_node then return self.data_statistics_node end
     local data_statistics_node = display.newNode():addTo(self:GetBody())
     local image = self:GetShrineReport():Star() > 0 and "report_victory_590x137.png" or "report_failure_590x137.png"
-    local logo = display.newSprite(image):align(display.LEFT_TOP, 20, 625):addTo(data_statistics_node)
+    local logo = display.newSprite(image):align(display.LEFT_TOP, 20, 727):addTo(data_statistics_node)
     local layer = UIKit:shadowLayer():size(590,30):addTo(logo)
     logo:scale(0.96)
     local honour_icon = display.newSprite("honour_128x128.png"):addTo(layer):pos(295,15):scale(0.2)
@@ -280,7 +288,7 @@ function GameUIShrineReport:CreateIf_data_statistics()
         num = self:GetShrineReport():Star(),
     }):addTo(logo):align(display.CENTER,295,120)
     self.data_statistics_node = data_statistics_node
-    local viewRect = cc.rect(10,12,548,444)
+    local viewRect = cc.rect(10,12,548,464)
     local list_node = display.newScale9Sprite("background_568x120.png",0,0,cc.size(viewRect.width+20,viewRect.height+24),cc.rect(10,10,548,100))
     local list = cc.ui.UIListView.new({
         viewRect = viewRect,
@@ -289,32 +297,74 @@ function GameUIShrineReport:CreateIf_data_statistics()
         async = true,
         -- bgColor = UIKit:hex2c4b(0x7a000000),
     }):addTo(list_node)
-    list_node:addTo(data_statistics_node):align(display.BOTTOM_CENTER, self:GetBody():getContentSize().width/2,15)
+    list_node:addTo(data_statistics_node):align(display.BOTTOM_CENTER, self:GetBody():getContentSize().width/2,100)
     self.data_statistics_list = list
     self.data_statistics_list:setDelegate(handler(self, self.sourceDelegate))
     return data_statistics_node
 end
 
 function GameUIShrineReport:GetPlayerDataItemContent()
-    local content = display.newNode() -- 548 x 66
-    local bg0 = display.newScale9Sprite("resource_item_bg0.png"):size(548,66):align(display.LEFT_BOTTOM,0,0):addTo(content)
-    local bg1 = display.newScale9Sprite("resource_item_bg1.png"):size(548,66):align(display.LEFT_BOTTOM,0,0):addTo(content)
-    local bg2 = display.newSprite("shire_rank_bg_548x66.png"):align(display.LEFT_BOTTOM,0,0):addTo(content)
+    local content = display.newNode() -- 548 x 80
+    local bg0 = display.newScale9Sprite("resource_item_bg0.png"):size(548,80):align(display.LEFT_BOTTOM,0,0):addTo(content)
+    local bg1 = display.newScale9Sprite("resource_item_bg1.png"):size(548,80):align(display.LEFT_BOTTOM,0,0):addTo(content)
+    local bg2 = display.newScale9Sprite("shire_rank_bg_548x66.png"):size(548,80):align(display.LEFT_BOTTOM,0,0):addTo(content)
+    local reward3 = display.newSprite("goldKill_icon_76x84.png"):align(display.LEFT_CENTER,12, 40):addTo(content):scale(0.8)
+    local reward2 = display.newSprite("silverKill_icon_76x84.png"):align(display.LEFT_CENTER,20, 40):addTo(content):scale(0.8)
+    local reward1 = display.newSprite("bronzeKill_icon_76x84.png"):align(display.LEFT_CENTER,20, 40):addTo(content):scale(0.8)
+
     local name_label = UIKit:ttfLabel({
         text = "name",
         size = 22,
         color= 0xffedae
-    }):align(display.LEFT_CENTER, 14, 33):addTo(content)
-    local kill_icon = display.newSprite("battle_33x33.png"):align(display.LEFT_CENTER, 234, 33):addTo(content):scale(0.8)
+    }):align(display.LEFT_TOP, 88, 76):addTo(content)
+    local kill_icon = display.newSprite("battle_33x33.png"):align(display.LEFT_BOTTOM, 88, 10):addTo(content):scale(0.8)
     local kill_label = UIKit:ttfLabel({
         text = "121321",
         size = 22,
-        color= 0x403c2f
-    }):align(display.LEFT_CENTER,270, 33):addTo(content)
-    local reward3 = display.newSprite("goldKill_icon_76x84.png"):align(display.RIGHT_CENTER,532, 33):addTo(content):scale(0.6)
-    local reward2 = display.newSprite("silverKill_icon_76x84.png"):align(display.RIGHT_CENTER,532, 33):addTo(content):scale(0.6)
-    local reward1 = display.newSprite("bronzeKill_icon_76x84.png"):align(display.RIGHT_CENTER,532, 33):addTo(content):scale(0.6)
-    content:size(548,66)
+        color= 0x403c2f,
+        align = cc.TEXT_ALIGNMENT_LEFT,
+    }):align(display.LEFT_BOTTOM,120, 10):addTo(content)
+    local reward_bg1 = display.newSprite("box_118x118.png"):addTo(content):align(display.LEFT_CENTER, 263, 40)
+    local reward_bg2 = display.newSprite("box_118x118.png"):addTo(content):align(display.LEFT_CENTER, 348, 40)
+    local reward_bg3 = display.newSprite("box_118x118.png"):addTo(content):align(display.LEFT_CENTER, 432, 40)
+    local reward_icon_1 = display.newSprite("dragonHp_1_128x128.png"):scale(0.78):addTo(reward_bg1):pos(59,59)
+    local reward_icon_2 = display.newSprite("dragonHp_1_128x128.png"):scale(0.78):addTo(reward_bg2):pos(59,59)
+    local reward_icon_3 = display.newSprite("dragonHp_1_128x128.png"):scale(0.78):addTo(reward_bg3):pos(59,59)
+    reward_bg1.icon = reward_icon_1
+    reward_bg2.icon = reward_icon_2
+    reward_bg3.icon = reward_icon_3
+    local layer = UIKit:shadowLayer():size(100,30):addTo(reward_bg1):pos(10,10)
+
+    local label = UIKit:ttfLabel({
+        text = "x100000",
+        size = 14,
+        color= 0xffedae,
+        align = cc.TEXT_ALIGNMENT_CENTER,
+    }):align(display.CENTER, 54, 15):addTo(layer):scale(1.54)
+    reward_bg1.label = label
+
+    layer = UIKit:shadowLayer():size(100,30):addTo(reward_bg2):pos(10,10)
+    label = UIKit:ttfLabel({
+        text = "x100000",
+        size = 14,
+        color= 0xffedae,
+        align = cc.TEXT_ALIGNMENT_CENTER,
+    }):align(display.CENTER, 54, 15):addTo(layer):scale(1.54)
+
+    reward_bg2.label = label
+    layer = UIKit:shadowLayer():size(100,30):addTo(reward_bg3):pos(10,10)
+    label = UIKit:ttfLabel({
+        text = "x100000",
+        size = 14,
+        color= 0xffedae,
+        align = cc.TEXT_ALIGNMENT_CENTER,
+    }):align(display.CENTER, 54, 15):addTo(layer):scale(1.54)    
+    reward_bg3.label = label
+    reward_bg1:scale(0.54)
+    reward_bg2:scale(0.54)
+    reward_bg3:scale(0.54)
+   
+    content:size(548,80)
     content.bg0 = bg0
     content.bg1 = bg1
     content.bg2 = bg2
@@ -323,10 +373,32 @@ function GameUIShrineReport:GetPlayerDataItemContent()
     content.reward3 = reward3
     content.reward1 = reward1
     content.reward2 = reward2
+    content.reward_bg1 = reward_bg1
+    content.reward_bg2 = reward_bg2
+    content.reward_bg3 = reward_bg3
     return content
 end
 
 function GameUIShrineReport:fillPlayerDataItemContent(content,list_data,item,idx)
+    if content.next_button then
+        content.next_button:removeSelf()
+    end 
+    if content.pre_button then
+        content.pre_button:removeSelf()
+    end
+
+    local next_button = WidgetPushButton.new({normal = "shrine_page_control_26x34.png"}):align(display.RIGHT_CENTER, 540, 40):addTo(content)
+        :onButtonClicked(function()
+            self:OnRewardPageButtonClicked(1,content)
+        end)
+    local pre_button = WidgetPushButton.new({normal = "shrine_page_control_26x34.png"},{flipX = true}):align(display.RIGHT_CENTER, 540, 40):addTo(content)
+        :onButtonClicked(function() 
+            self:OnRewardPageButtonClicked(-1,content)
+        end)
+
+    content.pre_button = pre_button
+    content.next_button = next_button
+
     content.name_label:setString(string.format("%d.%s",idx,list_data.name))
     content.kill_label:setString(string.formatnumberthousands(list_data.kill or 0))
     if list_data.id == User:Id() then
@@ -361,8 +433,98 @@ function GameUIShrineReport:fillPlayerDataItemContent(content,list_data,item,idx
         content.reward1:hide()
         content.reward2:hide()
     end
-    item:setItemSize(548, 66)
+    local reward_data = list_data.rewards
+    local count = #reward_data
+    content.pages = self:GetPageSizeOfReward(count)
+    content.page = 1
+    content.idx = idx
+    for i = 1,3 do
+        local reward = reward_data[i]
+        local node = content[string.format("reward_bg%d",i)]
+        if node and node.icon then
+            if reward then
+                node.icon:setTexture(UIKit:GetItemImage(reward.type,reward.name))
+                node.label:setString(string.format("x%d",reward.count))
+                node:show()
+            else
+                printLog("HIDE", "%s",string.format("reward_bg%d",i))
+                node:hide()
+            end
+        end
+    end
+    content.pre_button:hide()
+    if count > 3 then
+        content.next_button:show()
+    else
+        content.next_button:hide()
+    end
+    item:setItemSize(548, 80)
 end
 
+function GameUIShrineReport:GetPageSizeOfReward(count)
+    return math.ceil(count/3)
+end
+
+function GameUIShrineReport:OnRewardPageButtonClicked(tag,content)
+    local idx = content.idx
+    local pages = content.pages
+    local current_page = content.page
+    if tag == -1 then -- pre
+        if current_page ~= 1 then
+            local next_page = content.page - 1
+            content.page = next_page
+             self:ChangeRewardIcon(content,next_page)
+        end
+    elseif tag == 1 then -- next
+        if current_page < pages then
+            local next_page = content.page + 1
+            content.page = next_page
+            self:ChangeRewardIcon(content,next_page)
+        end
+    end
+end
+
+function GameUIShrineReport:GetRewardPageData(idx,page)
+    local start_index =  (page - 1) * 3 + 1 -- 3 is page size
+    local end_index = page * 3
+    local list_data = self.player_data_source[idx]
+    if list_data then
+        local reward_data = list_data.rewards
+        return LuaUtils:table_slice(reward_data,start_index,end_index)
+    else
+        return {}
+    end
+end
+
+function GameUIShrineReport:ChangeRewardIcon(content,page)
+    printLog("ChangeRewardIcon", "%d",page)
+    local idx = content.idx
+    local reward_data = self:GetRewardPageData(idx,page)
+    for i = 1,3 do
+        local reward = reward_data[i]
+        local node = content[string.format("reward_bg%d",i)]
+        if node and node.icon then
+            if reward then
+                node.icon:setTexture(UIKit:GetItemImage(reward.type,reward.name))
+                node.label:setString(string.format("x%d",reward.count))
+                node:show()
+            else
+                node:hide()
+            end
+        end
+    end
+    if page == content.pages then
+        content.pre_button:show()
+        content.next_button:hide()
+    elseif page == 1 then
+        if content.pages > 1 then
+            content.pre_button:hide()
+            content.next_button:show()
+        else
+            content.pre_button:hide()
+            content.next_button:hide()
+        end
+    end
+end
 return GameUIShrineReport
 

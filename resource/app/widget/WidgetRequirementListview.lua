@@ -1,4 +1,3 @@
--- 需求列表控件
 local UIListView = import("..ui.UIListView")
 local WidgetRequirementListview = class("WidgetRequirementListview", function ()
     local layer = cc.Layer:create()
@@ -32,6 +31,8 @@ function WidgetRequirementListview:ctor(parms)
 
     -- 缓存已经添加的升级条件项,供刷新时使用
     self.added_items = {}
+    self.top_index = 0
+    self.top_index_1 = 0
     self:RefreshListView(self.contents)
 end
 
@@ -46,7 +47,6 @@ function WidgetRequirementListview:RefreshListView(contents)
         if v.isVisible then
             -- 需求已添加，则更新最新资源数据
             if self.added_items[v.resource_type] then
-                -- print("需求已添加，则更新最新资源数据 ",v.resource_type)
                 local added_resource = self.added_items[v.resource_type]
                 local content = added_resource:getContent()
                 if meetFlag then
@@ -73,12 +73,6 @@ function WidgetRequirementListview:RefreshListView(contents)
                         content.mark:setTexture("no_40x40.png")
                         if v.jump_call then
                             content.mark:stopAllActions()
-
-                            local seq_1 = transition.sequence{
-                                cc.ScaleTo:create(0.4, 0.5),
-                                cc.ScaleTo:create(0.4, 1)
-                            }
-                            content.mark:runAction(cc.RepeatForever:create(seq_1))
 
                             content.bg:setNodeEventEnabled(true)
                             content.bg:setTouchEnabled(true)
@@ -147,11 +141,6 @@ function WidgetRequirementListview:RefreshListView(contents)
                             content.mark:removeAllNodeEventListeners()
                             content.mark:stopAllActions()
 
-                            local seq_1 = transition.sequence{
-                                cc.ScaleTo:create(0.4, 0.5),
-                                cc.ScaleTo:create(0.4, 1)
-                            }
-                            content.mark:runAction(cc.RepeatForever:create(seq_1))
                             content.mark:setNodeEventEnabled(true)
                             content.mark:setTouchEnabled(true)
                             content.mark:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
@@ -183,9 +172,18 @@ function WidgetRequirementListview:RefreshListView(contents)
                 end
                 -- 资源类型icon
                 local resource_type_icon = display.newSprite(v.icon, -item_width/2+35, 0):addTo(content)
-                resource_type_icon:setScale(40/resource_type_icon:getContentSize().width)
+                local size = resource_type_icon:getContentSize()
+                resource_type_icon:setScale(40/math.max(size.width,size.height))
                 item:addContent(content)
-                local index = v.canNotBuy and 1
+                local index
+                if  v.canNotBuy then
+                    if not v.isSatisfy then
+                        self.top_index = self.top_index + 1
+                        index = self.top_index
+                    else
+                        index = self.top_index + 1
+                    end
+                end
                 self.listview:addItem(item,index)
                 self.added_items[v.resource_type] = item
                 self.listview:reload()
@@ -193,7 +191,6 @@ function WidgetRequirementListview:RefreshListView(contents)
         else
             -- 刷新时已经没有此项条件时，删除之前添加的项
             if self.added_items[v.resource_type] then
-                -- print("刷新时已经没有此项条件时，删除之前添加的项",v.resource_type)
                 self.listview:removeItem(self.added_items[v.resource_type])
                 self.listview:reload()
                 self.added_items[v.resource_type] = nil
@@ -203,6 +200,10 @@ function WidgetRequirementListview:RefreshListView(contents)
 end
 
 return WidgetRequirementListview
+
+
+
+
 
 
 

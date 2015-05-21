@@ -19,7 +19,7 @@ local GameUIDragonDeathSpeedUp = import(".GameUIDragonDeathSpeedUp")
 local UICheckBoxButton = import(".UICheckBoxButton")
 
 -- lockDragon: 是否锁定选择龙的操作,默认不锁定
-function GameUIDragonEyrieMain:ctor(city,building,lockDragon,default_tab)
+function GameUIDragonEyrieMain:ctor(city,building,default_tab,lockDragon,fte_dragon_type)
     GameUIDragonEyrieMain.super.ctor(self,city,_("龙巢"),building,default_tab)
     self.building = building
     self.city = city
@@ -27,6 +27,7 @@ function GameUIDragonEyrieMain:ctor(city,building,lockDragon,default_tab)
     self.dragon_manager = building:GetDragonManager()
     if type(lockDragon) ~= "boolean" then lockDragon = false end
     self.lockDragon = lockDragon
+    self.fte_dragon_type = fte_dragon_type
 end
 
 function GameUIDragonEyrieMain:IsDragonLock()
@@ -522,7 +523,6 @@ function GameUIDragonEyrieMain:GetCurrentDragon()
     local dragon = self.dragon_manager:GetDragonByIndex(self.draong_index)
     return dragon
 end
-
 function GameUIDragonEyrieMain:CreateDragonScrollNode()
     local clipNode = display.newClippingRegionNode(cc.rect(0,0,620,600))
     local contenNode = WidgetDragons.new(
@@ -532,7 +532,11 @@ function GameUIDragonEyrieMain:CreateDragonScrollNode()
             OnTouchClickEvent = handler(self, self.OnTouchClickEvent),
         }
     ):addTo(clipNode):pos(310,300)
-    self.dragon_manager:SortDragon()
+    if self.fte_dragon_type then
+        self.dragon_manager:SortWithFirstDragon(self.fte_dragon_type)
+    else
+        self.dragon_manager:SortDragon()
+    end
     for i,v in ipairs(contenNode:GetItems()) do
         local dragon = self.dragon_manager:GetDragonByIndex(i)
         local dragon_image = display.newSprite(string.format("%s_egg_176x192.png",dragon:Type()))
@@ -540,14 +544,9 @@ function GameUIDragonEyrieMain:CreateDragonScrollNode()
             :addTo(v)
         v.dragon_image = dragon_image
         dragon_image.resolution = {dragon_image:getContentSize().width,dragon_image:getContentSize().height}
-        local x,y = 240,440
-        if dragon:Type() == 'redDragon' then
-            x = 288
-            y = 450
-        end
         local dragon_armature = DragonSprite.new(display.getRunningScene():GetSceneLayer(),dragon:GetTerrain())
             :addTo(v)
-            :align(display.CENTER,x,y)
+            :pos(240,440)
             :hide()
         v.armature = dragon_armature
         dragon_armature:GetSprite():getAnimation():stop()
@@ -558,7 +557,6 @@ function GameUIDragonEyrieMain:CreateDragonScrollNode()
     end
     return clipNode,contenNode
 end
-
 function GameUIDragonEyrieMain:OnEnterIndexEvent(index)
     if self.draongContentNode then
         self.draong_index = index + 1

@@ -7,7 +7,9 @@ return {
         pulley = 0,
         blueprints = 0
     },
-    items = { },
+    items = {
+        vipActive_3 = 1,
+    },
     deals = { },
     inviteToAllianceEvents = { },
     itemEvents = { },
@@ -155,10 +157,10 @@ return {
         confessionHood = 0,
         brightRing = 0,
         brightAlloy = 0,
-        magicBox = 0,
-        deathHand = 0,
-        soulStone = 0,
-        heroBones = 0
+        magicBox = 1,
+        deathHand = 1,
+        soulStone = 1,
+        heroBones = 1
     },
     dragonEquipments = {
         blueChest_s2 = 0,
@@ -324,7 +326,7 @@ return {
         sentinel = 0,
         crossbowman = 0,
         ranger = 0,
-        swordsman = 0
+        swordsman = 12
     },
     houseEvents = { },
     buildingEvents = { },

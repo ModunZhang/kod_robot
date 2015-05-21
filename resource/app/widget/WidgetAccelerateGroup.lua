@@ -10,6 +10,7 @@ local Enum = import("..utils.Enum")
 local WidgetAccelerateGroup = class("WidgetAccelerateGroup",function ()
     local node = display.newNode()
     node:setContentSize(cc.size(640,500))
+    node:setNodeEventEnabled(true)
     return node
 end)
 
@@ -29,6 +30,8 @@ function WidgetAccelerateGroup:ctor(eventType,eventId)
     local gap_x , gap_y= 148,140
     self.acc_button_table = {}
     self.time_button_tbale = {}
+    self.own_labels = {}
+    self.gem_images = {}
     for i=1,8 do
         -- 按钮背景框
         display.newSprite("upgrade_props_box.png", width/2-220 + gap_x*math.mod(i-1,4), 230-gap_y*math.floor((i-1)/4)):addTo(self)
@@ -39,22 +42,25 @@ function WidgetAccelerateGroup:ctor(eventType,eventId)
         local speedUp_item = ItemManager:GetItemByName(speedUp_item_name)
         local speedUp_item_num = speedUp_item:Count()
         local cost_text = ""
+        local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(cost_bg):align(display.CENTER, 20, cost_bg:getContentSize().height/2):scale(0.6)
+
         if speedUp_item_num>0 then
             cost_text = _("拥有")..speedUp_item_num
+            gem_icon:hide()
         else
-            display.newSprite("gem_icon_62x61.png"):addTo(cost_bg):align(display.CENTER, 20, cost_bg:getContentSize().height/2):scale(0.6)
             cost_text = speedUp_item:Price()
+            gem_icon:show()
         end
-
+        table.insert(self.gem_images, gem_icon)
         -- 花销数值
-        cc.ui.UILabel.new({
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        local own_label = UIKit:ttfLabel({
             text = cost_text,
-            font = UIKit:getFontFilePath(),
             size = 20,
-            color = UIKit:hex2c3b(0x403c2f)
+            color = 0x403c2f
         }):align(display.CENTER, width/2-220+gap_x*math.mod(i-1,4), 160-gap_y*math.floor((i-1)/4))
             :addTo(self)
+        table.insert(self.own_labels, own_label)
+
         -- 时间按钮
         local time_button = WidgetPushButton.new({normal = "upgrade_time_"..i..".png"},{scale9 = false}
             ,{
@@ -95,7 +101,7 @@ function WidgetAccelerateGroup:ctor(eventType,eventId)
             if event.name == "CLICKED_EVENT" then
                 acc_button:setVisible(false)
                 time_button:setVisible(true)
-                if speedUp_item_num>0 then
+                if string.find(own_label:getString(),_("拥有")) then
                     NetManager:getUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
                         eventType = eventType,
                         eventId = eventId
@@ -133,7 +139,30 @@ function WidgetAccelerateGroup:ResetAccButtons()
         v:setVisible(false)
     end
 end
+function WidgetAccelerateGroup:onExit()
+    ItemManager:RemoveListenerOnType(self,ItemManager.LISTEN_TYPE.ITEM_CHANGED)
+end
+function WidgetAccelerateGroup:onEnter()
+    ItemManager:AddListenOnType(self,ItemManager.LISTEN_TYPE.ITEM_CHANGED)
+end
+function WidgetAccelerateGroup:OnItemsChanged( changed_map )
+    for i=1,8 do
+        local speed_item = ItemManager:GetItemByName("speedup_"..i)
+        local count = speed_item:Count()
+        if count>0 then
+            self.own_labels[i]:setString(_("拥有")..count)
+            self.gem_images[i]:hide()
+        else
+            self.own_labels[i]:setString(speed_item:Price())
+            self.gem_images[i]:show()
+        end
+    end
+end
 return WidgetAccelerateGroup
+
+
+
+
 
 
 

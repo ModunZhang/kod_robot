@@ -12,6 +12,7 @@ function WidgetMaterialBox:ctor(material_type,material_name,cb,is_has_i_icon)
         material_bg:onButtonClicked(cb)
     end
         
+    self.material_bg = material_bg
     local rect = material_bg:getCascadeBoundingBox()
 
     -- 图标背景框
@@ -38,6 +39,9 @@ function WidgetMaterialBox:ctor(material_type,material_name,cb,is_has_i_icon)
     }):addTo(number_bg):align(display.CENTER, size.width / 2, size.height/2)
 
 end
+function WidgetMaterialBox:GetButton()
+    return self.material_bg
+end
 function WidgetMaterialBox:SetNumber(number)
     self.number_bg:show()
     self.number:setString(number)
@@ -46,7 +50,7 @@ end
 
 function WidgetMaterialBox:GetMaterialImage(material_type,material_name)
     local metarial = ""
-    if material_type == MaterialManager.MATERIAL_TYPE.BUILD then
+    if material_type == MaterialManager.MATERIAL_TYPE.BUILD or material_type == MaterialManager.MATERIAL_TYPE.TECHNOLOGY then
         metarial = "materials"
     elseif material_type == MaterialManager.MATERIAL_TYPE.DRAGON  then
         metarial = "dragon_material_pic_map"

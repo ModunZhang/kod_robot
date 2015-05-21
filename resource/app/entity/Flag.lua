@@ -4,7 +4,11 @@ local count_config = {
     colors=12,
     graphics=20,
 }
-
+local random_graphics_key = {}
+local random_back_color_1_key = {}
+local random_back_color_2_key = {}
+local random_back_backstyle_key = {}
+local random_front_color_key = {}
 function Flag:ctor()
     self.form_index = 2
     self.form_color_index_1 = 10
@@ -84,14 +88,42 @@ local randomseed = math.randomseed
 
 function Flag:RandomFlag()
     local flag = Flag.new()
-    randomseed(tostring(os.time()):reverse():sub(1, 6))
-    flag:SetBackStyle(random(count_config.backstyle))
+    randomseed(tostring(os.time()):reverse():sub(1, 10))
+    local backStyle_random = random(count_config.backstyle)
+    if LuaUtils:table_size(random_back_backstyle_key) >= count_config.backstyle then random_back_backstyle_key = {} end
+    while random_back_backstyle_key[backStyle_random] do
+        backStyle_random = random(count_config.backstyle)
+    end
+    random_back_backstyle_key[backStyle_random] = true
+    flag:SetBackStyle(backStyle_random)
     local oneColor = random(0,count_config.colors - 1) + 1
+    if LuaUtils:table_size(random_back_color_1_key) >= count_config.colors then random_back_color_1_key = {} end
+    while random_back_color_1_key[oneColor] do
+        oneColor = random(count_config.colors) 
+    end
+    random_back_color_1_key[oneColor] = true
     local otherColor = random(count_config.colors)
+    if LuaUtils:table_size(random_back_color_2_key) >= count_config.colors then random_back_color_2_key = {} end
+    while random_back_color_2_key[otherColor] do
+        otherColor = random(count_config.colors)
+    end
+    random_back_color_2_key[otherColor] = true
     flag:SetBackColors(oneColor, otherColor)
-    flag:SetFrontStyle(random(count_config.graphics))
+    local random_num = random(count_config.graphics)
+    if LuaUtils:table_size(random_graphics_key) >= count_config.graphics then random_graphics_key = {} end
+    while random_graphics_key[random_num] do
+        random_num = random(count_config.graphics)
+    end
+    random_graphics_key[random_num] = true
+    flag:SetFrontStyle(random_num)
     oneColor = random(0,count_config.colors - 2) + 2
+    if LuaUtils:table_size(random_front_color_key) >= count_config.colors then random_front_color_key = {} end
+    while random_front_color_key[oneColor] do
+        oneColor = random(count_config.colors)
+    end
+    random_front_color_key[oneColor] = true
     flag:SetFrontColor(oneColor)
+    
     return flag
 end
 function Flag:EncodeToJson()

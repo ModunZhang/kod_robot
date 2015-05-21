@@ -8,6 +8,7 @@ local GameUIWriteMail = import(".GameUIWriteMail")
 local SpriteConfig = import("..sprites.SpriteConfig")
 local WidgetAllianceEnterButtonProgress = import("..widget.WidgetAllianceEnterButtonProgress")
 local Alliance = import("..entity.Alliance")
+local UILib = import(".UILib")
 
 function GameUIAllianceCityEnter:ctor(building,isMyAlliance,my_alliance,enemy_alliance)
     GameUIAllianceCityEnter.super.ctor(self,building,isMyAlliance,my_alliance)
@@ -84,20 +85,27 @@ function GameUIAllianceCityEnter:GetUITitle()
 end
 
 function GameUIAllianceCityEnter:GetBuildingImage()
-    local sprite_config_key = self:IsMyAlliance() and "my_keep" or "other_keep"
-    local build_png = SpriteConfig[sprite_config_key]:GetConfigByLevel(self:GetMember():KeepLevel()).png
-    return build_png
+    return ""
 end
 
 function GameUIAllianceCityEnter:GetBuildImageSprite()
-    return nil
+    local sprite_config_key = self:IsMyAlliance() and "my_keep" or "other_keep"
+    local build_png = SpriteConfig[sprite_config_key]:GetConfigByLevel(self:GetMember():KeepLevel()).png
+    local bg_png = UILib.city_terrain_icon[self:GetMember():Terrain()]
+    local bg_sprite = display.newSprite(bg_png)
+    local build_sprite = display.newSprite(build_png):addTo(bg_sprite):pos(71,71)
+    local size = build_sprite:getContentSize()
+    build_sprite:scale(110/math.max(size.width,size.height))
+    return bg_sprite
 end
 
 function GameUIAllianceCityEnter:GetBuildImageInfomation(sprite)
-    local size = sprite:getContentSize()
-    return 110/math.max(size.width,size.height),97,self:GetUIHeight() - 90 
+    return 0.9,97,self:GetUIHeight() - 90 
 end
 
+function GameUIAllianceCityEnter:IsShowBuildingBox()
+    return false
+end
 
 function GameUIAllianceCityEnter:GetBuildingType()
     return 'member'
@@ -149,7 +157,9 @@ function GameUIAllianceCityEnter:GetEnterButtons()
                     local playerId = member:Id()
                     if not alliance:CheckHelpDefenceMarchEventsHaveTarget(playerId) then
                         UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers)
-                            NetManager:getHelpAllianceMemberDefencePromise(dragonType, soldiers, playerId)
+                            NetManager:getHelpAllianceMemberDefencePromise(dragonType, soldiers, playerId):done(function()
+                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                            end)
                         end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition()}):AddToCurrentScene(true)
                         self:LeftButtonClicked()
                     else
@@ -160,7 +170,9 @@ function GameUIAllianceCityEnter:GetEnterButtons()
                 end)
             end
             local enter_button = self:BuildOneButton("alliance_enter_city_56x68.png",_("进入")):onButtonClicked(function()
-                app:EnterFriendCityScene(member:Id())
+                local location = self:GetLogicPosition()
+                location.id = self:GetCurrentAlliance():Id()
+                app:EnterFriendCityScene(member:Id(), location)
                 self:LeftButtonClicked()
             end)
             local mail_button = self:BuildOneButton("mail_56x40.png",_("邮件")):onButtonClicked(function()
@@ -188,7 +200,9 @@ function GameUIAllianceCityEnter:GetEnterButtons()
                     UIKit:showMessageDialog(_("提示"),_("玩家处于保护状态,不能进攻或突袭"), function()end)
                     return
                 end
-                NetManager:getAttackPlayerCityPromise(dragonType, soldiers, member:Id())
+                NetManager:getAttackPlayerCityPromise(dragonType, soldiers, member:Id()):done(function()
+                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                end)
             end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition()}):AddToCurrentScene(true)
             self:LeftButtonClicked()
         end)
@@ -207,7 +221,9 @@ function GameUIAllianceCityEnter:GetEnterButtons()
     buttons = {attack_button,strike_button}
     if self:GetMyAlliance():GetAllianceBelvedere():CanEnterEnemyCity() then
         local enter_button = self:BuildOneButton("alliance_enter_city_56x68.png",_("进入")):onButtonClicked(function()
-            app:EnterPlayerCityScene(member:Id())
+            local location = self:GetLogicPosition()
+            location.id = self:GetCurrentAlliance():Id()
+            app:EnterPlayerCityScene(member:Id(), location)
             self:LeftButtonClicked()
         end)
         table.insert(buttons, enter_button)

@@ -14,13 +14,13 @@ end
 function Observer:ctor(...)
 	self.observer = {}
 end
-function Observer:CopyListenerFrom(subject)
-	local observer = {}
-	for i, v in ipairs(subject.observer) do
-		observer[i] = v
-	end
-	self.observer = observer
-end
+-- function Observer:CopyListenerFrom(subject)
+-- 	local observer = {}
+-- 	for i, v in ipairs(subject.observer) do
+-- 		observer[i] = v
+-- 	end
+-- 	self.observer = observer
+-- end
 function Observer:AddObserver(observer)
 	for i,v in ipairs(self.observer) do
 		if v == observer then

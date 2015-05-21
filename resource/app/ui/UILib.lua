@@ -13,6 +13,7 @@ local function getAniNameFromAnimationFiles(animation_files)
 end
 
 local PLAYER_ICON = {
+    [0] = "Icon_empireRise_91x117.png", -- 系统头像
     "player_icon_1.png",
     "player_icon_2.png",
     "player_icon_3.png",
@@ -597,6 +598,7 @@ local ITEM = {
     casinoTokenClass_2 = "casinoTokenClass_2_128x128.png",
     casinoTokenClass_3 = "casinoTokenClass_3_128x128.png",
     casinoTokenClass_4 = "casinoTokenClass_4_128x128.png",
+    casinoTokenClass_5 = "casinoTokenClass_5_128x128.png",
 
     masterOfDefender_1 = "masterOfDefender_1_128x128.png",
     masterOfDefender_2 = "masterOfDefender_2_128x128.png",
@@ -869,7 +871,7 @@ local IAP_PACKAGE_IMAGE = {
         more = {normal = "store_more_black_button_n_584x34.png",pressed = "store_more_black_button_l_584x34.png"},
         small_content = "store_item_content_black_s_588x186.png",
     },
-    product__3 = {
+    product_3 = {
         content = "store_item_black_610x514.png",
         logo = "gem_logo_592x139_3.png",
         desc = "store_desc_red_282x92.png",
@@ -891,6 +893,13 @@ local IAP_PACKAGE_IMAGE = {
         more = {normal = "store_more_red_button_n_584x34.png",pressed = "store_more_red_button_l_584x34.png"},
         small_content = "store_item_content_red_s_588x186.png",
     },
+}
+
+local ACTIVITY_IMAGE_CONFIG = {
+    EVERY_DAY_LOGIN = "activity_logo_589x138.png",
+    CONTINUITY = "gem_logo_592x139_3.png",
+    FIRST_IN_PURGURE = "gem_logo_592x139_4.png",
+    PLAYER_LEVEL_UP = "gem_logo_592x139_1.png"
 }
 
 local PRODUC_TIONTECHS_IMAGE = {
@@ -1034,6 +1043,20 @@ local enemy_city_banner = {
     [5] = "enemy_city_helped_banner.png",
 }
 
+local server_level_image = {
+    bronze = "server_level_bronze_112x114.png",
+    silver = "server_level_silver_112x114.png",
+    gold = "server_level_gold_112x114.png",
+    platinum = "server_level_gold_112x114.png",
+    diamond = "server_level_gold_112x114.png",
+    master = "server_level_gold_112x114.png",
+}
+
+local CITY_TERRAIN_ICON = {
+    desert = "city_terrain_desert_142x142.png",
+    grassLand = "city_terrain_grassLand_142x142.png",
+    iceField = "city_terrain_iceField_142x142.png",
+}
 return {
     resource = RESOURCE,
     soldier_bg = STAR_BG,
@@ -1078,6 +1101,9 @@ return {
     player_icon = PLAYER_ICON,
     my_city_banner = my_city_banner,
     enemy_city_banner = enemy_city_banner,
+    activity_image_config = ACTIVITY_IMAGE_CONFIG,
+    server_level_image = server_level_image,
+    city_terrain_icon = CITY_TERRAIN_ICON,
 }
 
 

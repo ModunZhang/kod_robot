@@ -10,7 +10,7 @@ function GameDefautlt:ctor()
     self.game_base_info = self:getTableForKey("GAME_BASE") or {}
     self.ver_info = self:getStringForKey("GAMEDEFAUTLT_VERSION") == "" and "0.0.1" or self:getStringForKey("GAMEDEFAUTLT_VERSION")
     dump(self.game_base_info,"GameDefautlt-->game_base_info")
-    self:getBasicInfoValueForKey("NEVER_SHOW_TIP_ICON",false)
+    -- self:getBasicInfoValueForKey("NEVER_SHOW_TIP_ICON",false)
 end
 
 function GameDefautlt:flush()

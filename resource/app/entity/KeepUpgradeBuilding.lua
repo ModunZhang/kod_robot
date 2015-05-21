@@ -10,7 +10,7 @@ function KeepUpgradeBuilding:GetFreeUnlockPoint(city)
     local unlock_tile_count = 0
     city:IteratorTilesByFunc(function(x, y, tile)
         local building = city:GetBuildingByLocationId(tile.location_id)
-        if building then
+        if building and x < 5 then
             unlock_tile_count = unlock_tile_count + ((tile:IsUnlocked() or building:IsUpgrading()) and 1 or 0)
         end
     end)

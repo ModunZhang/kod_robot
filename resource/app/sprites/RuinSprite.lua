@@ -48,12 +48,6 @@ function RuinSprite:GetWorldPosition()
     return self:convertToWorldSpace(cc.p(self:GetSpriteOffset())),
         self:convertToWorldSpace(cc.p(self:GetSpriteTopPosition()))
 end
-function RuinSprite:OnSceneMove()
-    local world_point, top = self:GetWorldPosition()
-    self:NotifyObservers(function(listener)
-        listener:OnPositionChanged(world_point.x, world_point.y, top.x, top.y + 30)
-    end)
-end
 return RuinSprite
 
 

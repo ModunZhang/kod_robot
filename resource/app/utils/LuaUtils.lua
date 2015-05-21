@@ -1,5 +1,13 @@
 LuaUtils = {}
 
+
+function LuaUtils:TimeCollect(func, msg)
+    local t = os.clock()
+    func()
+    printLog("INFO", "%s", string.format("%s : eplapse time %.6f\n", msg or "time", (os.clock() - t)))
+end
+
+
 function LuaUtils:Warning(str)
     print(" Warning: " .. str)
 end

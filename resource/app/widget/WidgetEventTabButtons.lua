@@ -238,7 +238,7 @@ function WidgetEventTabButtons:RefreshBuildQueueByType(...)
     local city = self.city
     for _,key in ipairs{...} do
         local item = self.tab_map[key]
-        local able = cur_tab ~= key and self:IsTabEnable(key)
+        local able = self:IsTabEnable(key)
         if key == "build" then
             local count = #city:GetUpgradingBuildings()
             local total = city:BuildQueueCounts()
@@ -248,6 +248,7 @@ function WidgetEventTabButtons:RefreshBuildQueueByType(...)
             local count = self.barracks:IsRecruting() and 1 or 0
             local total = self.barracks:IsUnlocked() and 1 or 0
             if item:IsChanged(count, total) then item:SetOrResetProgress() end
+            printInfo(cur_tab, key, self:IsTabEnable(key))
             item:SetActiveNumber(count, total):Enable(able)
         elseif key == "material" then
             local count = 0
@@ -321,10 +322,10 @@ function WidgetEventTabButtons:CreateTabButtons()
 
 
     local icon_map = {
-        { "technology", "tech_39x38.png" },
-        { "material", "build_39x38.png" },
-        { "soldier", "soldier_44x34.png" },
-        { "build", "build_44x34.png" },
+        { "technology", "tech_42x38.png" },
+        { "material", "material_42x36.png" },
+        { "soldier", "soldier_42x36.png" },
+        { "build", "build_42x36.png" },
     }
     local tab_map = {}
     origin_x = origin_x - 4

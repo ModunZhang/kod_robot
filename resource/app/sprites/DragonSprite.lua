@@ -19,6 +19,11 @@ function DragonSprite:ReloadSpriteCauseTerrainChanged(terrain)
     self:AddAnimationCallbackTo(self.sprite)
     self:PlayAnimation("fly")
 end
+local anchor_map = {
+    grassLand = cc.p(0.435,0.5),
+    desert = cc.p(0.5,0.5),
+    iceField = cc.p(0.432,0.51),
+}
 function DragonSprite:CreateSprite(terrain)
     local dragon_animation
     if terrain == "grassLand" then
@@ -27,10 +32,13 @@ function DragonSprite:CreateSprite(terrain)
         dragon_animation = "red_long"
     elseif terrain == "iceField" then
         dragon_animation = "blue_long"
+    else
+        return display.newNode()
     end
     local armature = ccs.Armature:create(dragon_animation)
-    armature:setAnchorPoint(display.ANCHOR_POINTS[display.CENTER])
-    armature:setScaleX(-1)
+    armature:setAnchorPoint(anchor_map[terrain])
+    armature:setScaleX(-1.1)
+    armature:setScaleY(1.1)
     armature:getAnimation():setMovementEventCallFunc(handler(self, self.OnAnimationCallback))
 
     self.idle_count = 0

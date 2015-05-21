@@ -13,20 +13,16 @@ return function(userData)
     DataManager.user = userData
     timer:Clear()
 
-    if check("ALL") then
-        GLOBAL_FTE = false
-    end
-
-    Alliance_Manager = AllianceManager_.new()
     MailManager = MailManager_.new()
     ItemManager = ItemManager_.new()
+    Alliance_Manager = AllianceManager_.new()
     if GLOBAL_FTE then
         User = User_.new(initData._id)
-        City = City_.new(initData):SetUser(User)
+        City = City_.new(User):InitWithJsonData(initData)
         DataManager:setFteUserDeltaData()
     else
         User = User_.new(userData._id)
-        City = City_.new(userData):SetUser(User)
+        City = City_.new(User):InitWithJsonData(userData)
         DataManager:setUserData(userData)
     end
 
@@ -36,7 +32,11 @@ return function(userData)
     timer:AddListener(Alliance_Manager)
     timer:Start()
 
-    app:GetChatManager():FetchAllChatMessageFromServer()
+
+    if not GLOBAL_FTE then
+        app:GetChatManager():FetchAllChatMessageFromServer()
+    end
+
     if ext.gamecenter.isGameCenterEnabled() and not ext.gamecenter.isAuthenticated() then
          ext.gamecenter.authenticate(false)
     end

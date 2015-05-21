@@ -14,7 +14,7 @@ local WidgetUseItems = import("..widget.WidgetUseItems")
 local config_day14 = GameDatas.Activities.day14
 local SpriteConfig = import("..sprites.SpriteConfig")
 local unlockPlayerSecondMarchQueue_price = GameDatas.PlayerInitData.intInit.unlockPlayerSecondMarchQueue.value
-local GameUIActivityReward = import(".GameUIActivityReward")
+local GameUIActivityRewardNew = import(".GameUIActivityRewardNew")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 
 function GameUIWathTowerRegion:ctor(city,default_tab)
@@ -224,7 +224,7 @@ function GameUIWathTowerRegion:GetMyEventItemWithIndex(index,isOpen,entity)
             text = string.format(_("累计签到%s天，永久+1进攻队列"),#config_day14 ),
             size = 22,
             color= 0x403c2f
-        }):addTo(bg):align(display.LEFT_TOP, 164, event_bg:getPositionY() + 104)
+        }):addTo(bg):align(display.LEFT_TOP, 164, event_bg:getPositionY() + 118)
         display.newSprite(string.format("player_queue_seq_%d_112x112.png",index), 67, 67):addTo(event_bg)
     else
         if not entity then
@@ -256,7 +256,7 @@ function GameUIWathTowerRegion:GetMyEventItemWithIndex(index,isOpen,entity)
             local desctition_label_val =  UIKit:ttfLabel({
                 text = entity:GetDestination(),
                 size = 20,
-                color= 0x615b44
+                color= 0x403c2f
             }):align(display.RIGHT_TOP,554,153):addTo(bg)
             local localtion_label = UIKit:ttfLabel({
                 text = _("坐标"),
@@ -267,7 +267,7 @@ function GameUIWathTowerRegion:GetMyEventItemWithIndex(index,isOpen,entity)
             local localtion_label_val =  UIKit:ttfLabel({
                 text = entity:GetDestinationLocation(),
                 size = 20,
-                color= 0x615b44
+                color= 0x403c2f
             }):align(display.RIGHT_TOP,554,115):addTo(bg)
             tile_label:setString(entity:GetTitle())
             if entity:GetTypeStr() == 'HELPTO' then
@@ -545,7 +545,7 @@ end
 --event
 --签到按钮
 function GameUIWathTowerRegion:OnSignButtonClikced()
-    UIKit:newGameUI("GameUIActivityReward",GameUIActivityReward.REWARD_TYPE.CONTINUITY):AddToCurrentScene()
+    UIKit:newGameUI("GameUIActivityRewardNew",GameUIActivityRewardNew.REWARD_TYPE.CONTINUITY):AddToCurrentScene()
 end
 
 --内容过滤

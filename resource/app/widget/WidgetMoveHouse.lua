@@ -76,9 +76,6 @@ end
 function WidgetMoveHouse:GetRuins( )
     return self.move_to_ruins
 end
-function WidgetMoveHouse:OnSceneScale()
-    self.building_image:scale(self.scene_layer:getScale())
-end
 return WidgetMoveHouse
 
 

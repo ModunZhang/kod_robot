@@ -23,7 +23,7 @@ function GameUIAllianceShopEnter:GetBuildingType()
 end
 
 function GameUIAllianceShopEnter:GetBuildingDesc()
-    return Localize.building_description.alliance_building_shop
+    return Localize.building_description.shop
 end
 
 

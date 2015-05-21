@@ -574,38 +574,10 @@ function GameUIPVESendTroop:CreateTroopsShow()
     end
     -- 获取两个兵种直间的克制关系
     function TroopsShow:GetForbear(my_soldier,pve_soldier)
-        local SOLDIER_VS_MAP = {
-            ["infantry"] = {
-                strong_vs = { "siege"},
-                weak_vs = { "cavalry", "archer" }
-            },
-            ["archer"] = {
-                strong_vs = { "cavalry", "infantry" },
-                weak_vs = {"siege" }
-            },
-            ["cavalry"] = {
-                strong_vs = { "infantry", "siege" },
-                weak_vs = { "archer"}
-            },
-            ["siege"] = {
-                strong_vs = {"archer" },
-                weak_vs = { "infantry", "cavalry" }
-            },
-        }
+        local SOLDIER_VS_MAP = GameDatas.ClientInitGame.soldier_vs
         local my_category = Localize.soldier_category_map[my_soldier]
         local pve_category = Localize.soldier_category_map[pve_soldier]
-        print("my_category",my_category,"pve_category",pve_category)
-        local find_my = SOLDIER_VS_MAP[my_category]
-        for k,v in pairs(find_my.strong_vs) do
-            if v == pve_category then
-                return true
-            end
-        end
-        for k,v in pairs(find_my.weak_vs) do
-            if v == pve_category then
-                return false
-            end
-        end
+        return SOLDIER_VS_MAP[my_category][pve_category] == "strong"
     end
     function TroopsShow:TurnShows( isRight )
         local current_page = self:GetCurrentPage()

@@ -18,7 +18,16 @@ property(MarchAttackEvent, "attackPlayerData", {})
 property(MarchAttackEvent, "defencePlayerData", {})
 property(MarchAttackEvent, "defenceVillageData", {})
 property(MarchAttackEvent, "defenceShrineData", {})
+property(MarchAttackEvent, "isStrikeEvent",false)
 
+
+function MarchAttackEvent:ctor(isStrike)
+	MarchAttackEvent.super.ctor(self)
+	if type(isStrike) ~= 'boolean' then
+		isStrike = false
+	end
+	self:SetIsStrikeEvent(isStrike)
+end
 --判断该玩家是这个事件的发送者/接受者/无关
 function MarchAttackEvent:GetPlayerRole()
 	local Me_Id = User:Id()
@@ -61,9 +70,6 @@ function MarchAttackEvent:TargetLocation()
 end
 
 function MarchAttackEvent:OnPropertyChange()
-end
-function MarchAttackEvent:ctor()
-	MarchAttackEvent.super.ctor(self)
 end
 
 function MarchAttackEvent:GetDefenceData()

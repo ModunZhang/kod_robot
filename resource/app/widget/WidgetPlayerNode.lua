@@ -155,6 +155,14 @@ function WidgetPlayerNode:GetBasicInfoItemNode(basic_data)
 		size = 20,
 		color= 0xffedae
 	}):align(display.LEFT_CENTER, 20, 15):addTo(name_bar)
+	if data_source.location then
+		UIKit:ttfLabel({
+			text = data_source.location ,
+			size = 20,
+			color= 0xffedae,
+			align=cc.TEXT_ALIGNMENT_RIGHT,
+		}):align(display.RIGHT_CENTER, 400, 15):addTo(name_bar)
+	end
 	if self:CallDelegate_(DELEGATE_METHODS.PlayerCanClickedButton,{"PlayerName"}) then
 		local icon_edit = display.newSprite("alliance_notice_icon_26x26.png"):addTo(name_bar):align(display.RIGHT_CENTER,400, 15)
 		WidgetPushTransparentButton.new(cc.rect(0,0,430,30))
@@ -205,11 +213,13 @@ function WidgetPlayerNode:GetBasicInfoItemNode(basic_data)
 		})
 			:align(display.RIGHT_BOTTOM,progress_bg:getPositionX() + progress_bg:getContentSize().width, vip_bg:getPositionY())
 			:addTo(node)
-			:setButtonLabel("normal", UIKit:ttfLabel({
-				text = _("复制玩家ID")
+			:setButtonLabel("normal",UIKit:commonButtonLable({
+				text = _("复制玩家ID"),
+				size = 22,
 			}))
 			:onButtonClicked(function()
 				ext.copyText(data_source.playerId)
+				 GameGlobalUI:showTips(_("提示"),_("复制成功"))
 			end)
 	end
 	item:addContent(node)

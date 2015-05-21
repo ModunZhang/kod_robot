@@ -14,8 +14,9 @@ function DragonEyrieUpgradeBuilding:ctor(building_info)
     DragonEyrieUpgradeBuilding.super.ctor(self,building_info)
     self:SetDragonManager(DragonManager.new())
 end
-
-
+function DragonEyrieUpgradeBuilding:IsNeedToUpdate()
+    return true
+end
 function DragonEyrieUpgradeBuilding:OnTimer(current_time)
     DragonEyrieUpgradeBuilding.super.OnTimer(self,current_time)
     self:GetDragonManager():OnTimer(current_time)
@@ -25,8 +26,10 @@ function DragonEyrieUpgradeBuilding:EnergyMax()
     return config_function[self:GetEfficiencyLevel()].energyMax
 end
 
-function DragonEyrieUpgradeBuilding:OnUserDataChanged(user_data, current_time, location_id,sub_location,deltaData)
-    DragonEyrieUpgradeBuilding.super.OnUserDataChanged(self,user_data, current_time, location_id, sub_location, deltaData)
+function DragonEyrieUpgradeBuilding:OnUserDataChanged(...)
+    DragonEyrieUpgradeBuilding.super.OnUserDataChanged(self, ...)
+
+    local user_data, current_time, location_info, sub_location,deltaData = ...
     self:GetDragonManager():OnUserDataChanged(user_data, current_time, deltaData,self:GetHPRecoveryPerHour())
 end
 

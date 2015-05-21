@@ -158,9 +158,15 @@ function ChatManager:pushMsgToQueue_(msg)
 end
 
 
-function ChatManager:emptyChannel_()
-	self.global_channel = {}
-	self.alliance_channel = {}
+function ChatManager:emptyChannel_(channel)
+	if channel == 'global' then
+		self.global_channel = {}
+	elseif channel == 'alliance' then
+		self.alliance_channel = {}
+	else
+		self.global_channel = {}
+		self.alliance_channel = {}
+	end
 end
 
 function ChatManager:emptyPushQueue_()

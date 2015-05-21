@@ -58,13 +58,13 @@ m.__tostring = function(a)
     return table.concat(LuaUtils:table_map(a, function(k, v)
         local txt
         if v.type == "items" then
-            txt = string.format("%s x%d", Localize_item.item_name[v.name], v.count)
+            txt = string.format("%sx%s", Localize_item.item_name[v.name], GameUtils:formatNumber(v.count))
         elseif v.type == "resources" then
-            txt = string.format("%s x%d", Localize.fight_reward[v.name], v.count)
+            txt = string.format("%sx%s", Localize.fight_reward[v.name], GameUtils:formatNumber(v.count))
         elseif v.type == "soldierMaterials" then
-            txt = string.format("%s x%d", Localize.soldier_material[v.name], v.count)
+            txt = string.format("%sx%s", Localize.soldier_material[v.name], GameUtils:formatNumber(v.count))
         elseif v.type == "soldiers" then
-            txt = string.format("%s x%d", Localize.soldier_name[v.name], v.count)
+            txt = string.format("%sx%s", Localize.soldier_name[v.name], GameUtils:formatNumber(v.count))
         end
         return k, txt
     end), ", ")

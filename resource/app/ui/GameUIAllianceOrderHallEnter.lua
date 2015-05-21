@@ -23,7 +23,7 @@ function GameUIAllianceOrderHallEnter:GetBuildingType()
 end
 
 function GameUIAllianceOrderHallEnter:GetBuildingDesc()
-	return Localize.building_description.alliance_building_orderHall
+	return Localize.building_description.orderHall
 end
 
 function GameUIAllianceOrderHallEnter:GetBuildImageInfomation(sprite)

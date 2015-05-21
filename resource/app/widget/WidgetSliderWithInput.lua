@@ -11,7 +11,7 @@ WidgetSliderWithInput.STYLE_LAYOUT = Enum("LEFT","RIGHT","TOP","BOTTOM")
 
 function WidgetSliderWithInput:ctor(params)
     local max = params.max
-    local min = params.min or 0
+    local min = params.min and max > 1 and params.min or 0
     local unit = params.unit or ""
     local bar = params.bar or "slider_bg_554x24.png"
     local progress = params.progress or "slider_progress_538x24.png"
@@ -103,7 +103,7 @@ function WidgetSliderWithInput:ctor(params)
         :align(display.RIGHT_CENTER, slider:getCascadeBoundingBox().size.width,0)
     self:setContentSize(cc.size(slider:getCascadeBoundingBox().size.width,slider:getCascadeBoundingBox().size.height))
     self.soldier_total_count = soldier_total_count
-    slider:setSliderValue(min)
+    slider:setSliderValue(max > 0 and (min < 1) and 1 or min)
 end
 function WidgetSliderWithInput:SetValue(value)
     self.slider:setSliderValue(value)

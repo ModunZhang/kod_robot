@@ -76,8 +76,9 @@ end
 function GameUIVip:AdapterPlayerList()
     local infos = {}
     local alliance = Alliance_Manager:GetMyAlliance()
+    local member
     if not alliance:IsDefault() then
-        local member = alliance:GetMemeberById(DataManager:getUserData()._id)
+        member = alliance:GetMemeberById(User:Id())
     end
     table.insert(infos,{_("采集粮食熟练度"),User:GetFoodCollectLevel()})
     table.insert(infos,{_("采集铁矿熟练度"),User:GetIronCollectLevel()})
@@ -132,8 +133,8 @@ function GameUIVip:WidgetPlayerNode_DataSource(name)
         return {
             name = User:Name(),
             lv = User:Level(),
-            currentExp = User:LevelExp(),
-            maxExp = exp_config.expTo,
+            currentExp = User:LevelExp() - exp_config.expFrom,
+            maxExp = exp_config.expTo - exp_config.expFrom,
             power = User:Power(),
             playerId = User:Id(),
             playerIcon = User:Icon(),
@@ -242,7 +243,9 @@ function GameUIVip:CreateAD(index)
                 self:LeftButtonClicked()
             end
         end)
-    local info_bg = display.newSprite("back_ground_430X115.png"):addTo(ad)
+
+    local info_bg = display.newSprite(data.config.desc):addTo(ad)
+    display.newSprite("store_gem_260x116.png"):addTo(info_bg):align(display.CENTER, 0, info_bg:getContentSize().height/2)
     if data.config.npc then
         info_bg:align(display.RIGHT_CENTER, 552, 73)
         display.newSprite(data.config.npc):align(display.RIGHT_BOTTOM, 592, 0):addTo(ad)
@@ -254,19 +257,19 @@ function GameUIVip:CreateAD(index)
         color= 0xffd200,
         size = 30,
         align = cc.TEXT_ALIGNMENT_CENTER,
-    }):align(display.CENTER, 290, 80):addTo(info_bg)
+    }):align(display.CENTER, 150, 75):addTo(info_bg)
 
     UIKit:ttfLabel({
         text = data.gem,
         size = 30,
         color= 0xffd200,
-    }):align(display.TOP_CENTER, 290, 72):addTo(info_bg)
+    }):align(display.TOP_CENTER, 150, 65):addTo(info_bg)
 
     UIKit:ttfLabel({
         text = string.format(_("+价值%d的道具"),data.rewards_price),
         size = 20,
         color= 0xffd200
-    }):align(display.CENTER, 290,24):addTo(info_bg)
+    }):align(display.CENTER, 150,15):addTo(info_bg)
 
     return ad
 end
@@ -279,7 +282,7 @@ function GameUIVip:GetStoreData()
         temp_data['name'] = Localize.iap_package_name[v.productId]
         local ___,rewards_price = self:FormatGemRewards(v.rewards)
         temp_data['rewards_price'] = rewards_price
-        temp_data['config'] = UILib.iap_package_image[v.productId]
+        temp_data['config'] = UILib.iap_package_image[v.name]
         table.insert(data,temp_data)
     end
     return data
@@ -891,11 +894,13 @@ end
 function GameUIVip:PromiseOfFte()
     self:GetFteLayer():SetTouchObject(self:FindActiveBtn())
     local r = self:FindActiveBtn():getCascadeBoundingBox()
-    WidgetFteArrow.new(_("激活VIP")):addTo(self:GetFteLayer())
-    :TurnUp():align(display.TOP_CENTER, r.x + r.width/2, r.y - 20)
+
+    local arrow = WidgetFteArrow.new(_("激活VIP")):addTo(self:GetFteLayer())
+    :TurnDown():align(display.BOTTOM_CENTER, r.x + r.width/2, r.y + r.height + 10)
 
     return WidgetUseItems:PromiseOfOpen("vipActive"):next(function(ui)
-        self:GetFteLayer():removeFromParent()
+        arrow:removeFromParent()
+        
         return ui:PromiseOfFte()
     end):next(function()
         return self:PromsieOfExit("GameUIVip")
@@ -903,8 +908,3 @@ function GameUIVip:PromiseOfFte()
 end
 
 return GameUIVip
-
-
-
-
-

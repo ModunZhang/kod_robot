@@ -310,7 +310,7 @@ function GameUIBarracks:RefershUnlockInfo()
             local is_unlock = unlock_soldiers[k] <= level
             v:Enable(is_unlock)
             if not is_unlock then
-                v:SetCondition(string.format("%s%d%s", _("兵营"), unlock_soldiers[k], _("级解锁")))
+                v:SetCondition(string.format(_("兵营%d级解锁"), unlock_soldiers[k]))
             end
         end
     end
@@ -319,13 +319,17 @@ end
 
 function GameUIBarracks:OnTimer(current_time)
     for i,v in ipairs(self.special_soldier_items) do
-        local re_time = DataUtils:GetNextRecruitTime()
-        if tolua.type(re_time) == "boolean" then
+        local ok,time = self:GetRecruitSpecialTime()
+        if ok then
             v:SetRecruitStatus(_("招募开启中"))
         else
-            v:SetRecruitStatus(_("下一次开启招募:")..GameUtils:formatTimeStyle1(re_time-current_time))
+            v:SetRecruitStatus(_("下一次开启招募:")..GameUtils:formatTimeStyle1(time-current_time))
         end
     end
+end
+function GameUIBarracks:GetRecruitSpecialTime()
+    local re_time = DataUtils:GetNextRecruitTime()
+    return tolua.type(re_time) == "boolean", re_time
 end
 
 

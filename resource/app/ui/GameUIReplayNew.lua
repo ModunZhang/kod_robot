@@ -201,7 +201,7 @@ local soldier_arrange = {
 }
 local function NewCorps(replay_ui, soldier, star, is_pve_soldier)
     local arrange = soldier_arrange[soldier]
-    return Corps.new(soldier, star, arrange.row, arrange.col, nil, nil, is_pve_battle, replay_ui)
+    return Corps.new(soldier, star, arrange.row, arrange.col, nil, nil, is_pve_soldier, replay_ui)
 end
 
 local function NewWall(replay_ui)
@@ -568,358 +568,226 @@ local report_ = {
 }
 
 
-local report1 = {
-    ["type"] = "attackCity",
-    ["index"] = 2,
-    ["createTime"] = "1430291447534",
-    ["id"] = "4kOz7dFf",
-    ["isSaved"] = false,
-    ["isRead"] = true,
-    ["attackCity"] = {
-        ["attackPlayerData"] = {
-            ["alliance"] = {
-                ["id"] = "NyeZGSFM",
-                ["flag"] = "10,12,9,14,8",
-                ["name"] = "The Brave Oceanus",
-                ["tag"] = "TBO",
-            }
-            ,
-            ["name"] = "iPad",
-            ["fightWithDefenceWall"] = json.null,
-            ["id"] = "V1IRzeOG",
-            ["rewards"] = {
-                [1] = {
-                    ["type"] = "resources",
-                    ["name"] = "blood",
-                    ["count"] = 1545,
-                }
-            ,
-            }
-            ,
-            ["icon"] = 3,
-            ["fightWithDefenceTroop"] = {
-                ["dragon"] = {
-                    ["type"] = "blueDragon",
-                    ["hpDecreased"] = 61,
-                    ["level"] = 10,
-                    ["hp"] = 88,
-                    ["expAdd"] = 6486,
-                }
-                ,
-                ["soldiers"] = {
-                    [1] = {
-                        ["count"] = 750,
-                        ["star"] = 2,
-                        ["name"] = "meatWagon",
-                        ["countDecreased"] = 212,
-                    }
-                ,
-                }
-            ,
-            }
-        ,
-        }
-        ,
-        ["attackTarget"] = {
-            ["cityName"] = "city_VkgljLxOz",
-            ["name"] = "老干爹",
-            ["terrain"] = "desert",
-            ["alliance"] = {
-                ["id"] = "E12NVxdM",
-                ["flag"] = "10,6,7,19,12",
-                ["name"] = "Stables of Augeas",
-                ["tag"] = "SoA",
-            }
-            ,
-            ["id"] = "41esLxuM",
-            ["location"] = {
-                ["y"] = 21,
-                ["x"] = 44,
-            }
-        ,
-        }
-        ,
-        ["defencePlayerData"] = {
-            ["dragon"] = {
-                ["type"] = "redDragon",
-                ["hpDecreased"] = 26,
-                ["level"] = 20,
-                ["hp"] = 222,
-                ["expAdd"] = 3816,
-            }
-            ,
-            ["alliance"] = {
-                ["id"] = "E12NVxdM",
-                ["flag"] = "10,6,7,19,12",
-                ["name"] = "Stables of Augeas",
-                ["tag"] = "SoA",
-            }
-            ,
-            ["name"] = "老干爹",
-            ["wall"] = json.null,
-            ["id"] = "41esLxuM",
-            ["rewards"] = {
-                [1] = {
-                    ["type"] = "resources",
-                    ["name"] = "blood",
-                    ["count"] = 3605,
-                }
-            ,
-            }
-            ,
-            ["icon"] = 3,
-            ["soldiers"] = {
-                [1] = {
-                    ["count"] = 196,
-                    ["star"] = 2,
-                    ["name"] = "meatWagon",
-                    ["countDecreased"] = 92,
-                }
-                ,
-                [2] = {
-                    ["count"] = 200,
-                    ["star"] = 2,
-                    ["name"] = "deathKnight",
-                    ["countDecreased"] = 140,
-                }
-                ,
-                [3] = {
-                    ["count"] = 200,
-                    ["star"] = 1,
-                    ["name"] = "ballista",
-                    ["countDecreased"] = 140,
-                }
-                ,
-                [4] = {
-                    ["count"] = 200,
-                    ["star"] = 1,
-                    ["name"] = "catapult",
-                    ["countDecreased"] = 140,
-                }
-                ,
-                [5] = {
-                    ["count"] = 200,
-                    ["star"] = 2,
-                    ["name"] = "skeletonArcher",
-                    ["countDecreased"] = 140,
-                }
-                ,
-                [6] = {
-                    ["count"] = 200,
-                    ["star"] = 2,
-                    ["name"] = "skeletonWarrior",
-                    ["countDecreased"] = 126,
-                }
-                ,
-                [7] = {
-                    ["count"] = 200,
-                    ["star"] = 1,
-                    ["name"] = "horseArcher",
-                    ["countDecreased"] = 0,
-                }
-                ,
-                [8] = {
-                    ["count"] = 200,
-                    ["star"] = 1,
-                    ["name"] = "lancer",
-                    ["countDecreased"] = 0,
-                }
-                ,
-                [9] = {
-                    ["count"] = 200,
-                    ["star"] = 1,
-                    ["name"] = "crossbowman",
-                    ["countDecreased"] = 0,
-                }
-                ,
-                [10] = {
-                    ["count"] = 200,
-                    ["star"] = 1,
-                    ["name"] = "ranger",
-                    ["countDecreased"] = 0,
-                }
-                ,
-                [11] = {
-                    ["count"] = 200,
-                    ["star"] = 1,
-                    ["name"] = "sentinel",
-                    ["countDecreased"] = 0,
-                }
-                ,
-                [12] = {
-                    ["count"] = 200,
-                    ["star"] = 1,
-                    ["name"] = "swordsman",
-                    ["countDecreased"] = 0,
-                }
-            ,
-            }
-        ,
-        }
-        ,
-        ["fightWithDefencePlayerReports"] = {
-            ["defencePlayerSoldierRoundDatas"] = {
-                [1] = {
-                    ["soldierName"] = "meatWagon",
-                    ["moraleDecreased"] = 24,
-                    ["soldierWoundedCount"] = 28,
-                    ["morale"] = 100,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = false,
-                    ["soldierDamagedCount"] = 92,
-                    ["soldierCount"] = 196,
-                }
-                ,
-                [2] = {
-                    ["soldierName"] = "deathKnight",
-                    ["moraleDecreased"] = 35,
-                    ["soldierWoundedCount"] = 42,
-                    ["morale"] = 100,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = false,
-                    ["soldierDamagedCount"] = 140,
-                    ["soldierCount"] = 200,
-                }
-                ,
-                [3] = {
-                    ["soldierName"] = "ballista",
-                    ["moraleDecreased"] = 35,
-                    ["soldierWoundedCount"] = 42,
-                    ["morale"] = 100,
-                    ["soldierStar"] = 1,
-                    ["isWin"] = false,
-                    ["soldierDamagedCount"] = 140,
-                    ["soldierCount"] = 200,
-                }
-                ,
-                [4] = {
-                    ["soldierName"] = "catapult",
-                    ["moraleDecreased"] = 35,
-                    ["soldierWoundedCount"] = 42,
-                    ["morale"] = 100,
-                    ["soldierStar"] = 1,
-                    ["isWin"] = false,
-                    ["soldierDamagedCount"] = 140,
-                    ["soldierCount"] = 200,
-                }
-                ,
-                [5] = {
-                    ["soldierName"] = "skeletonArcher",
-                    ["moraleDecreased"] = 35,
-                    ["soldierWoundedCount"] = 42,
-                    ["morale"] = 100,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = false,
-                    ["soldierDamagedCount"] = 140,
-                    ["soldierCount"] = 200,
-                }
-                ,
-                [6] = {
-                    ["soldierName"] = "skeletonWarrior",
-                    ["moraleDecreased"] = 32,
-                    ["soldierWoundedCount"] = 38,
-                    ["morale"] = 100,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = false,
-                    ["soldierDamagedCount"] = 126,
-                    ["soldierCount"] = 200,
-                }
-            ,
-            }
-            ,
-            ["defencePlayerDragonFightData"] = {
-                ["hpMax"] = 1304,
-                ["type"] = "redDragon",
-                ["isWin"] = true,
-                ["hp"] = 222,
-                ["hpDecreased"] = 26,
-            }
-            ,
-            ["attackPlayerSoldierRoundDatas"] = {
-                [1] = {
-                    ["soldierName"] = "meatWagon",
-                    ["moraleDecreased"] = 4,
-                    ["soldierWoundedCount"] = 15,
-                    ["morale"] = 100,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = true,
-                    ["soldierDamagedCount"] = 48,
-                    ["soldierCount"] = 750,
-                }
-                ,
-                [2] = {
-                    ["soldierName"] = "meatWagon",
-                    ["moraleDecreased"] = 7,
-                    ["soldierWoundedCount"] = 14,
-                    ["morale"] = 96,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = true,
-                    ["soldierDamagedCount"] = 46,
-                    ["soldierCount"] = 702,
-                }
-                ,
-                [3] = {
-                    ["soldierName"] = "meatWagon",
-                    ["moraleDecreased"] = 10,
-                    ["soldierWoundedCount"] = 12,
-                    ["morale"] = 89,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = true,
-                    ["soldierDamagedCount"] = 37,
-                    ["soldierCount"] = 656,
-                }
-                ,
-                [4] = {
-                    ["soldierName"] = "meatWagon",
-                    ["moraleDecreased"] = 25,
-                    ["soldierWoundedCount"] = 14,
-                    ["morale"] = 79,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = true,
-                    ["soldierDamagedCount"] = 46,
-                    ["soldierCount"] = 619,
-                }
-                ,
-                [5] = {
-                    ["soldierName"] = "meatWagon",
-                    ["moraleDecreased"] = 20,
-                    ["soldierWoundedCount"] = 6,
-                    ["morale"] = 54,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = true,
-                    ["soldierDamagedCount"] = 18,
-                    ["soldierCount"] = 573,
-                }
-                ,
-                [6] = {
-                    ["soldierName"] = "meatWagon",
-                    ["moraleDecreased"] = 34,
-                    ["soldierWoundedCount"] = 6,
-                    ["morale"] = 34,
-                    ["soldierStar"] = 2,
-                    ["isWin"] = true,
-                    ["soldierDamagedCount"] = 17,
-                    ["soldierCount"] = 555,
-                }
-            ,
-            }
-            ,
-            ["attackPlayerWallRoundDatas"] = json.null,
-            ["defencePlayerWallRoundDatas"] = json.null,
-            ["attackPlayerDragonFightData"] = {
-                ["hpMax"] = 216,
-                ["type"] = "blueDragon",
-                ["isWin"] = false,
-                ["hp"] = 88,
-                ["hpDecreased"] = 61,
-            }
-        ,
-        }
-    ,
-    }
-,
-}
-
+-- local report1 = {
+--     attackCity = {
+--         attackTarget = {
+--             terrain = "grassLand",
+--             id = "41Bltvk5Y7",
+--             name = "机器人1000_4",
+--             location = {
+--                 x = 11,
+--                 y = 20
+--             },
+--             alliance = {
+--                 id = "NJ9E-9tQ",
+--                 name = "Hestia and Loki",
+--                 tag = "HnL",
+--                 flag = "8,1,7,19,5"
+--             }
+--         },
+--         attackPlayerData = {
+--             fightWithDefenceTroop = {
+--                 dragon = {
+--                     type = "redDragon",
+--                     hpDecreased = 8,
+--                     expAdd = 78,
+--                     level = 2,
+--                     hp = 76
+--                 },
+--                 soldiers = {{
+--                     countDecreased = 20,
+--                     name = "ranger",
+--                     star = 1,
+--                     count = 100
+--                 }, {
+--                     countDecreased = 0,
+--                     name = "swordsman",
+--                     star = 1,
+--                     count = 96
+--                 }},},
+--             id = "Eki2AVF7",
+--             name = "p_Vygo2ANt7",
+--             icon = 4,
+--             rewards = {{
+--                 type = "resources",
+--                 name = "blood",
+--                 count = 48
+--             }, {
+--                 type = "resources",
+--                 name = "coin",
+--                 count = 6800
+--             }, {
+--                 type = "resources",
+--                 name = "wood",
+--                 count = 1356
+--             }, {
+--                 type = "resources",
+--                 name = "stone",
+--                 count = 2365
+--             }, {
+--                 type = "resources",
+--                 name = "iron",
+--                 count = 2409
+--             }, {
+--                 type = "resources",
+--                 name = "food",
+--                 count = 1618
+--             }, {
+--                 type = "dragonMaterials",
+--                 name = "runes_2",
+--                 count = 1
+--             }},
+--             alliance = {
+--                 id = "EJ55FtF7",
+--                 name = "The Valiant Uranus",
+--                 tag = "TVU",
+--                 flag = "1,4,8,4,6"
+--             },
+--             fightWithDefenceWall = {
+--                 soldiers = {{
+--                     countDecreased = 5,
+--                     name = "swordsman",
+--                     star = 1,
+--                     count = 96
+--                 }},}
+--         },
+--         defencePlayerData = {
+--             id = "41Bltvk5Y7",
+--             dragon = {
+--                 type = "greenDragon",
+--                 hpDecreased = 7,
+--                 expAdd = 40,
+--                 level = 3,
+--                 hp = 63
+--             },
+--             name = "机器人1000_4",
+--             icon = 3,
+--             rewards = {{
+--                 type = "resources",
+--                 name = "blood",
+--                 count = 35
+--             }, {
+--                 type = "resources",
+--                 name = "coin",
+--                 count = -6800
+--             }, {
+--                 type = "resources",
+--                 name = "wood",
+--                 count = -1356
+--             }, {
+--                 type = "resources",
+--                 name = "stone",
+--                 count = -2365
+--             }, {
+--                 type = "resources",
+--                 name = "iron",
+--                 count = -2409
+--             }, {
+--                 type = "resources",
+--                 name = "food",
+--                 count = -1618
+--             }, {
+--                 type = "dragonMaterials",
+--                 name = "runes_1",
+--                 count = 2
+--             }},
+--             alliance = {
+--                 id = "NJ9E-9tQ",
+--                 name = "Hestia and Loki",
+--                 tag = "HnL",
+--                 flag = "8,1,7,19,5"
+--             },
+--             soldiers = {{
+--                 countDecreased = 29,
+--                 name = "swordsman",
+--                 star = 1,
+--                 count = 57
+--             }, {
+--                 countDecreased = 10,
+--                 name = "ranger",
+--                 star = 1,
+--                 count = 1
+--             }},
+--             wall = {
+--                 hp = 68,
+--                 hpDecreased = 43
+--             }
+--         },
+--         fightWithDefencePlayerReports = {
+--             attackPlayerSoldierRoundDatas = {{
+--                 soldierName = "ranger",
+--                 morale = 100,
+--                 soldierCount = 100,
+--                 soldierWoundedCount = 5,
+--                 soldierStar = 1,
+--                 isWin = true,
+--                 soldierDamagedCount = 18,
+--                 moraleDecreased = 18
+--             }, {
+--                 soldierName = "ranger",
+--                 morale = 82,
+--                 soldierCount = 82,
+--                 soldierWoundedCount = 0,
+--                 soldierStar = 1,
+--                 isWin = true,
+--                 soldierDamagedCount = 2,
+--                 moraleDecreased = 4
+--             }},
+--             attackPlayerDragonFightData = {
+--                 type = "redDragon",
+--                 hpMax = 76,
+--                 hp = 76,
+--                 isWin = false,
+--                 hpDecreased = 8
+--             },
+--             defencePlayerWallRoundDatas = {{
+--                 isWin = true,
+--                 wallMaxHp = 124,
+--                 wallHp = 68,
+--                 wallDamagedHp = 43
+--             }},
+--             defencePlayerDragonFightData = {
+--                 type = "greenDragon",
+--                 hpMax = 88,
+--                 hp = 63,
+--                 isWin = true,
+--                 hpDecreased = 7
+--             },
+--             defencePlayerSoldierRoundDatas = {{
+--                 soldierName = "swordsman",
+--                 morale = 100,
+--                 soldierCount = 57,
+--                 soldierWoundedCount = 8,
+--                 soldierStar = 1,
+--                 isWin = false,
+--                 soldierDamagedCount = 29,
+--                 moraleDecreased = 51
+--             }, {
+--                 soldierName = "ranger",
+--                 morale = 100,
+--                 soldierCount = 1,
+--                 soldierWoundedCount = 3,
+--                 soldierStar = 1,
+--                 isWin = false,
+--                 soldierDamagedCount = 10,
+--                 moraleDecreased = 100
+--             }},
+--             attackPlayerWallRoundDatas = {{
+--                 soldierName = "swordsman",
+--                 soldierCount = 96,
+--                 soldierWoundedCount = 1,
+--                 soldierStar = 1,
+--                 isWin = false,
+--                 soldierDamagedCount = 5
+--             }},}
+--     },
+--     isSaved = false,
+--     type = "attackCity",
+--     id = "E13NJstX",
+--     index = 8,
+--     isRead = true,
+--     createTime = "1431351323688"
+-- }
 
 -- -------------------
 -- local Report = import("..entity.Report")
@@ -1066,7 +934,7 @@ function GameUIReplayNew:ShowStrongOrWeak()
     elseif vs == "weak" then
         self.ui_map.arrow_green:show():flipX(true)
     else
-        self.ui_map.arrow_green:show()
+        self.ui_map.arrow_green:hide()
     end
 end
 function GameUIReplayNew:Replay()
@@ -1760,6 +1628,7 @@ function GameUIReplayNew:BuildUI()
 end
 
 return GameUIReplayNew
+
 
 
 

@@ -5,7 +5,7 @@ local NotifyItem = import(".NotifyItem")
 local GrowUpTaskManager = class("GrowUpTaskManager")
 local CATEGORY = Enum("BUILD", "DRAGON", "TECHNOLOGY", "SOLDIER", "EXPLORE")
 GrowUpTaskManager.TASK_CATEGORY = CATEGORY
-
+local ipairs = ipairs
 local category_map = {
     [CATEGORY.BUILD] = {
         "cityBuild"
@@ -89,7 +89,7 @@ local cityBuild_meta = {}
 cityBuild_meta.__index = cityBuild_meta
 function cityBuild_meta:Title()
     local config = self:Config()
-    return string.format("将%s升级到等级%d", Localize.building_name[config.name], config.level)
+    return string.format(_("将%s升级到等级%d"), Localize.building_name[config.name], config.level)
 end
 function cityBuild_meta:Desc()
     return Localize.building_description[self:Config().name]
@@ -113,7 +113,7 @@ local dragonLevel_meta = {}
 dragonLevel_meta.__index = dragonLevel_meta
 function dragonLevel_meta:Title()
     local config = self:Config()
-    return string.format("将%s升级到等级%d", Localize.dragon[config.type], config.level)
+    return string.format(_("将%s升级到等级%d"), Localize.dragon[config.type], config.level)
 end
 function dragonLevel_meta:Desc()
     return Localize.dragon_buffer[self:Config().type]
@@ -135,7 +135,7 @@ local dragonStar_meta = {}
 dragonStar_meta.__index = dragonStar_meta
 function dragonStar_meta:Title()
     local config = self:Config()
-    return string.format("将%s提升到星级%d", Localize.dragon[config.type], config.star)
+    return string.format(_("将%s提升到星级%d"), Localize.dragon[config.type], config.star)
 end
 function dragonStar_meta:Desc()
     return Localize.dragon_buffer[self:Config().type]
@@ -156,7 +156,7 @@ local dragonSkill_meta = {}
 dragonSkill_meta.__index = dragonSkill_meta
 function dragonSkill_meta:Title()
     local config = self:Config()
-    return string.format("将%s-%s提升到等级%d", Localize.dragon[config.type], Localize.dragon_skill[config.name], config.level)
+    return string.format(_("将%s技能%s提升到等级%d"), Localize.dragon[config.type], Localize.dragon_skill[config.name], config.level)
 end
 function dragonSkill_meta:Desc()
     return Localize.dragon_skill_effection[self:Config().name]
@@ -178,7 +178,7 @@ local productionTech_meta = {}
 productionTech_meta.__index = productionTech_meta
 function productionTech_meta:Title()
     local config = self:Config()
-    return string.format("将%s科技研发到等级%d", Localize.productiontechnology_name[config.name], config.level)
+    return string.format(_("将%s科技研发到等级%d"), Localize.productiontechnology_name[config.name], config.level)
 end
 function productionTech_meta:Desc()
     return Localize.productiontechnology_buffer[self:Config().name]
@@ -199,7 +199,7 @@ local militaryTech_meta = {}
 militaryTech_meta.__index = militaryTech_meta
 function militaryTech_meta:Title()
     local config = self:Config()
-    return string.format("将%s科技研发到等级%d", Localize.getMilitaryTechnologyName(config.name), config.level)
+    return string.format(_("将%s科技研发到等级%d"), Localize.getMilitaryTechnologyName(config.name), config.level)
 end
 function militaryTech_meta:Desc()
     return Localize.getMilitaryTechnologyName(self:Config().name)
@@ -220,7 +220,7 @@ local soldierStar_meta = {}
 soldierStar_meta.__index = soldierStar_meta
 function soldierStar_meta:Title()
     local config = self:Config()
-    return string.format("将%s提升到星级%d", Localize.soldier_name[config.name], config.star)
+    return string.format(_("将%s提升到星级%d"), Localize.soldier_name[config.name], config.star)
 end
 function soldierStar_meta:Desc()
     return Localize.soldier_name[self:Config().name]
@@ -242,7 +242,7 @@ local soldierCount_meta = {}
 soldierCount_meta.__index = soldierCount_meta
 function soldierCount_meta:Title()
     local config = self:Config()
-    return string.format("招募%s个%s", config.count, Localize.soldier_name[config.name])
+    return string.format(_("招募%s个%s"), config.count, Localize.soldier_name[config.name])
 end
 function soldierCount_meta:Desc()
     return Localize.soldier_name[self:Config().name]
@@ -262,10 +262,10 @@ end
 local pveCount_meta = {}
 pveCount_meta.__index = pveCount_meta
 function pveCount_meta:Title()
-    return string.format("探索步数达到%d", self:Config().count)
+    return string.format(_("探索步数达到%d"), self:Config().count)
 end
 function pveCount_meta:Desc()
-    return string.format("探索步数达到%d", self:Config().count)
+    return string.format(_("探索步数达到%d描述"), self:Config().count)
 end
 function pveCount_meta:GetRewards()
     return get_rewards(self:Config())
@@ -282,10 +282,10 @@ end
 local attackWin_meta = {}
 attackWin_meta.__index = attackWin_meta
 function attackWin_meta:Title()
-    return string.format("攻击玩家获胜%d次", self:Config().count)
+    return string.format(_("攻击玩家获胜%d次"), self:Config().count)
 end
 function attackWin_meta:Desc()
-    return string.format("攻击玩家获胜%d次", self:Config().count)
+    return string.format(_("攻击玩家获胜%d次描述"), self:Config().count)
 end
 function attackWin_meta:GetRewards()
     return get_rewards(self:Config())
@@ -302,10 +302,10 @@ end
 local strikeWin_meta = {}
 strikeWin_meta.__index = strikeWin_meta
 function strikeWin_meta:Title()
-    return string.format("突袭玩家获胜%d次", self:Config().count)
+    return string.format(_("突袭玩家获胜%d次"), self:Config().count)
 end
 function strikeWin_meta:Desc()
-    return string.format("突袭玩家获胜%d次", self:Config().count)
+    return string.format(_("突袭玩家获胜%d次描述"), self:Config().count)
 end
 function strikeWin_meta:GetRewards()
     return get_rewards(self:Config())
@@ -323,10 +323,10 @@ end
 local playerKill_meta = {}
 playerKill_meta.__index = playerKill_meta
 function playerKill_meta:Title()
-    return string.format("击杀积分达到%d次", self:Config().kill)
+    return string.format(_("击杀积分达到%d"), self:Config().kill)
 end
 function playerKill_meta:Desc()
-    return string.format("击杀积分达到%d次", self:Config().kill)
+    return string.format(_("击杀积分达到%d描述"), self:Config().kill)
 end
 function playerKill_meta:GetRewards()
     return get_rewards(self:Config())
@@ -343,10 +343,10 @@ end
 local playerPower_meta = {}
 playerPower_meta.__index = playerPower_meta
 function playerPower_meta:Title()
-    return string.format("power值到达%d", self:Config().power)
+    return string.format(_("power值到达%d"), self:Config().power)
 end
 function playerPower_meta:Desc()
-    return string.format("power值到达%d", self:Config().power)
+    return string.format(_("power值到达%d描述"), self:Config().power)
 end
 function playerPower_meta:GetRewards()
     return get_rewards(self:Config())
@@ -374,20 +374,35 @@ local meta_map = {
     playerKill = playerKill_meta,
     playerPower = playerPower_meta,
 }
+local find_gap = function(tag, diff_field)
+    local a = GrowUpTasks[tag]
+    if not diff_field then
+        return #a + 1
+    end
+    for i = 0, #a do
+        local before,current = a[i], a[i+1]
+        if before then
+            if not current or (current and before[diff_field] ~= current[diff_field]) then
+                return before.index
+            end
+        end
+    end
+    assert(false)
+end
 local config_gap_map = {
-    cityBuild = 39,
-    dragonLevel = 69,
-    dragonStar = 3,
-    dragonSkill = 19,
-    productionTech = 14,
-    militaryTech = 14,
-    soldierStar = 2,
-    soldierCount = 2,
-    pveCount = 1,
-    attackWin = 1,
-    strikeWin = 1,
-    playerKill = 1,
-    playerPower = 1,
+    cityBuild = find_gap("cityBuild", "name"),
+    dragonLevel = find_gap("dragonLevel", "type"),
+    dragonStar = find_gap("dragonStar", "type"),
+    dragonSkill = find_gap("dragonSkill", "name"),
+    productionTech = find_gap("productionTech", "name"),
+    militaryTech = find_gap("militaryTech", "name"),
+    soldierStar = find_gap("soldierStar", "name"),
+    soldierCount = find_gap("soldierCount", "name"),
+    pveCount = find_gap("pveCount"),
+    attackWin = find_gap("attackWin"),
+    strikeWin = find_gap("strikeWin"),
+    playerKill = find_gap("playerKill"),
+    playerPower = find_gap("playerPower"),
 }
 
 
@@ -472,13 +487,14 @@ function GrowUpTaskManager:GetAvailableTasksByCategory(category)
     local p = 0
     if category == CATEGORY.BUILD then
         local r1,count1,total1 = self:GetAvailableTaskByTag("cityBuild", function(available, is_init, cur, next_task)
+            local name = cur.name
             if is_init then
-                available[cur.name] = cur.id
+                available[name] = cur.id
             else
-                if next_task and next_task.name == cur.name then
-                    available[cur.name] = next_task.id
+                if next_task and next_task.name == name then
+                    available[name] = next_task.id
                 else
-                    available[cur.name] = nil
+                    available[name] = nil
                 end
             end
         end)
@@ -488,70 +504,80 @@ function GrowUpTaskManager:GetAvailableTasksByCategory(category)
         r = r1
         p = count1 / total1
     elseif category == CATEGORY.DRAGON then
-        local count = 0
-        local total = 0
-        for i,v in ipairs({"redDragon", "blueDragon", "greenDragon"}) do
-            local r1,count1,total1 = self:GetAvailableTaskByTag("dragonLevel", function(available, is_init, cur, next_task)
-                if is_init then
-                    if v == cur.type then
-                        available[v] = cur.id
-                    end
+        local r1,count1,total1 = self:GetAvailableTaskByTag("dragonLevel", function(available, is_init, cur, next_task)
+            local type = cur.type
+            if is_init then
+                available[type] = cur.id
+            else
+                if next_task and next_task.type == type then
+                    available[type] = next_task.id
                 else
-                    if v == cur.type then
-                        if next_task and next_task.type == cur.type then
-                            available[v] = next_task.id
-                        else
-                            available[v] = nil
-                        end
-                    end
+                    available[type] = nil
                 end
-            end)
-            local r2,count2,total2 = self:GetAvailableTaskByTag("dragonStar", function(available, is_init, cur, next_task)
-                if is_init then
-                    if v == cur.type then
-                        available[v] = cur.id
-                    end
-                else
-                    if v == cur.type then
-                        if next_task and next_task.type == cur.type then
-                            available[v] = next_task.id
-                        else
-                            available[v] = nil
-                        end
-                    end
-                end
-            end)
-            local r3,count3,total3 = self:GetAvailableTaskByTag("dragonSkill", function(available, is_init, cur, next_task)
-                if is_init then
-                    if v == cur.type then
-                        available[cur.name] = cur.id
-                    end
-                else
-                    if v == cur.type then
-                        if next_task and next_task.name == cur.name then
-                            available[cur.name] = next_task.id
-                        else
-                            available[cur.name] = nil
-                        end
-                    end
-                end
-            end)
-            for i,v in ipairs(r1) do
-                table.insert(r, v)
             end
-            for i,v in ipairs(r2) do
-                table.insert(r, v)
+        end)
+        local r2,count2,total2 = self:GetAvailableTaskByTag("dragonStar", function(available, is_init, cur, next_task)
+            local type = cur.type
+            if is_init then
+                available[type] = cur.id
+            else
+                if next_task and next_task.type == type then
+                    available[type] = next_task.id
+                else
+                    available[type] = nil
+                end
             end
-            table.sort(r3, function(a, b)
+        end)
+        local r3,count3,total3 = self:GetAvailableTaskByTag("dragonSkill", function(available, is_init, cur, next_task)
+            local name = cur.type.."_"..cur.name
+            if is_init then
+                available[name] = cur.id
+            else
+                if next_task and next_task.name == name then
+                    available[name] = next_task.id
+                else
+                    available[name] = nil
+                end
+            end
+        end)
+        local dragons = {
+            redDragon = {
+                dragonLevel = {}, dragonStar = {}, dragonSkill = {}
+            },
+            greenDragon = {
+                dragonLevel = {}, dragonStar = {}, dragonSkill = {}
+            },
+            blueDragon = {
+                dragonLevel = {}, dragonStar = {}, dragonSkill = {}
+            },
+        }
+        for _,v in ipairs(r1) do
+            table.insert(dragons[v.type].dragonLevel, v)
+        end
+        for _,v in ipairs(r2) do
+            table.insert(dragons[v.type].dragonStar, v)
+        end
+        for _,v in ipairs(r3) do
+            table.insert(dragons[v.type].dragonSkill, v)
+        end
+        for _,v in pairs(dragons) do
+            table.sort(v.dragonSkill, function(a,b)
                 return a.id < b.id
             end)
-            for i,v in ipairs(r3) do
+        end
+        for _,dragon_type in ipairs{"redDragon", "greenDragon", "blueDragon"} do
+            local dragon = dragons[dragon_type]
+            for _,v in ipairs(dragon.dragonLevel) do
                 table.insert(r, v)
             end
-            count = count + count1 + count2 + count3
-            total = total1 + total2 + total3
+            for _,v in ipairs(dragon.dragonStar) do
+                table.insert(r, v)
+            end
+            for _,v in ipairs(dragon.dragonSkill) do
+                table.insert(r, v)
+            end
         end
-        p = count / total
+        p = (count1 + count2 + count3) / (total1 + total2 + total3)
     elseif category == CATEGORY.TECHNOLOGY then
         local count, total = 0, 0
         for i,tag in ipairs(category_map[category]) do
@@ -626,17 +652,9 @@ function GrowUpTaskManager:GetAvailableTaskByTag(tag, func)
     local available_map = {}
     local config = GrowUpTasks[tag]
     -- 默认初始化第一个任务
-    if tag == "soldierCount" then
-        for i = 0, #config do
-            local v = config[i]
-            if not available_map[v.name] then
-                func(available_map, true, v)
-            end
-        end
-    else
-        for i = 0, #config, config_gap_map[tag] do
-            func(available_map, true, config[i])
-        end
+    local gap = config_gap_map[tag]
+    for i = 0, #config, gap do
+        func(available_map, true, config[i])
     end
 
     -- 找到未完成的任务id
@@ -645,17 +663,13 @@ function GrowUpTaskManager:GetAvailableTaskByTag(tag, func)
     end
 
     -- 找到未完成的任务
+    local count = 0
     for k,v in pairs(available_map) do
-        table.insert(r, setmetatable(config[v], meta_map[tag]))
+        local t = config[v]
+        count = count + (gap - t.index + 1)
+        table.insert(r, setmetatable(t, meta_map[tag]))
     end
-
-    -- 算出已完成的任务
-    local count_cur = 0
-    for k,v in pairs(available_map) do
-        count_cur = count_cur + config[v].index - 1
-    end
-
-    return r, count_cur, #config + 1
+    return r, #config + 1 - count, #config + 1
 end
 function GrowUpTaskManager:GetCompleteTaskCount()
     local count = 0
@@ -699,6 +713,9 @@ end
 
 
 return GrowUpTaskManager
+
+
+
 
 
 

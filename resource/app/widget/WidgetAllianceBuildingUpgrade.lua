@@ -3,7 +3,6 @@ local Localize = import("..utils.Localize")
 local AllianceMap = import("..entity.AllianceMap")
 local window = import("..utils.window")
 local WidgetRequirementListview = import("..widget.WidgetRequirementListview")
-local WidgetAllianceBuildingInfo = import("..widget.WidgetAllianceBuildingInfo")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 
 local WidgetAllianceBuildingUpgrade = class("WidgetAllianceBuildingUpgrade", function ()
@@ -49,7 +48,7 @@ function WidgetAllianceBuildingUpgrade:onEnter()
         pressed = UIKit:getImageByBuildingType( self.building.name ,1)})
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                WidgetAllianceBuildingInfo.new():addTo(self)
+                UIKit:newGameUI("GameUICityBuildingInfo", self.building):AddToCurrentScene(true)
             end
         end):align(display.CENTER, display.cx-196, display.top-158):addTo(self)
     self.building_info_btn:setScale(124/self.building_info_btn:getCascadeBoundingBox().size.width)
@@ -103,7 +102,7 @@ end
 
 function WidgetAllianceBuildingUpgrade:SetBuildingIntroduces()
     local bd = Localize.building_description
-    self.building_introduces:setString(bd[string.format("alliance_building_%s",self.building.name)])
+    self.building_introduces:setString(bd[self.building.name])
 end
 
 function WidgetAllianceBuildingUpgrade:InitNextLevelEfficiency()

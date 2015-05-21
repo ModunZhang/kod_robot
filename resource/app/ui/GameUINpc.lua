@@ -2,6 +2,7 @@ local cocos_promise = import("..utils.cocos_promise")
 local utf8 = import("..utils.utf8")
 local promise = import("..utils.promise")
 local window = import("..utils.window")
+local WidgetMaskFilter = import("..widget.WidgetMaskFilter")
 local GameUINpc = UIKit:createUIClass("GameUINpc")
 local LETTER_ACTION = 1001
 
@@ -72,18 +73,13 @@ local function mark_key_word(s, e, key_word, keyword_map)
 end
 function GameUINpc:ctor(...)
     GameUINpc.super.ctor(self)
-    self.unenable = true
-    self:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
-        -- dump(event)
-        if event.name == "ended" and not self.unenable then
-            self:OnClick()
-        end
-        return true
-    end)
-    self:InitDialog(...)
-    self.enter_callbacks = {}
+    self.touch_action_node = display.newNode():addTo(self)
+    self.btn = cc.ui.UIPushButton.new({normal = "+_red.png",pressed = "+_red.png"}, nil, {})
+        :setButtonSize(display.width,display.height):align(display.LEFT_BOTTOM)
+        :addTo(self):setOpacity(0)
     self.leave_callbacks = {}
     self.__type  = UIKit.UITYPE.BACKGROUND
+    self:InitDialog(...)
 end
 function GameUINpc:InitDialog(...)
     self.dialog_index = 1
@@ -136,13 +132,14 @@ function GameUINpc:OnMoveInStage()
     if self.is_should_start then
         self:StartDialog()
     end
-    self:OnEnter()
-    self:Resume()
     self:RefreshNpc(self:CurrentDialog())
+    self.btn:onButtonClicked(function()
+        self:OnClick()
+    end)
 end
 function GameUINpc:onExit()
-    GameUINpc.super.onExit(self)
     self:OnLeave()
+    GameUINpc.super.onExit(self)
 end
 function GameUINpc:StartDialog()
     self:ShowWords(self:CurrentDialog())
@@ -173,6 +170,7 @@ function GameUINpc:ShowWords(dialog, ani)
         self.label:removeFromParent()
         self.label = nil
     end
+    self.ui_map.background:FocusOnRect(dialog.rect)
     if self.npc_brow ~= dialog.brow then
         self.npc_brow = dialog.brow
         if self.npc_brow then
@@ -188,6 +186,10 @@ function GameUINpc:ShowWords(dialog, ani)
     self:hide_letter(self.label)
     self:show_letter(self.label, ani == nil and true or ani)
 end
+function GameUINpc:ResetClick()
+    self.touch_action_node:stopAllActions()
+    self.touch_action_node:performWithDelay(function()end, 0.1)
+end
 function GameUINpc:RefreshNpc(dialog)
     if dialog.npc == "man" then
         self.ui_map.man:show()
@@ -198,11 +200,11 @@ function GameUINpc:RefreshNpc(dialog)
     end
 end
 function GameUINpc:Reset()
+    self:ResetClick()
     self.dialog = {}
     self.dialog_index = 1
     self.dialog_index_callbacks = {}
     self.dialog_clicked_callbacks = {}
-    self.enter_callbacks = {}
     self.leave_callbacks = {}
     if self.label then
         self.label:removeFromParent()
@@ -221,27 +223,13 @@ function GameUINpc:CreateLabel()
     label:setMaxLineWidth(300)
     return label
 end
-function GameUINpc:Wait()
-    self:setTouchSwallowEnabled(false)
-    self:EnableReceiveClickMsg(false)
-end
-function GameUINpc:ResumeToNextDialog()
-    self:Resume()
-    self:NextDialog()
-end
-function GameUINpc:Resume()
-    self:setTouchSwallowEnabled(true)
-    self:EnableReceiveClickMsg(true)
-end
-function GameUINpc:EnableReceiveClickMsg(enable)
-    self.unenable = not enable
-end
 function GameUINpc:OnDialogClicked(index)
     local callbacks = self.dialog_clicked_callbacks[index]
     if callbacks and #callbacks > 0 then
         callbacks[1]()
         table.remove(callbacks, 1)
     end
+    self:ResetClick()
 end
 function GameUINpc:PromiseOfDialogEndWithClicked(index)
     local p = promise.new()
@@ -252,36 +240,13 @@ function GameUINpc:PromiseOfDialogEndWithClicked(index)
     end)
     return p
 end
-function GameUINpc:PromiseOfActive()
-    if UIKit:getRegistry().isObjectExists("GameUINpc") then
-        UIKit:getRegistry().getObject("GameUINpc"):EnableReceiveClickMsg(true)
-    end
-    return cocos_promise.defer()
-end
-function GameUINpc:PromiseOfInActive()
-    if UIKit:getRegistry().isObjectExists("GameUINpc") then
-        UIKit:getRegistry().getObject("GameUINpc"):EnableReceiveClickMsg(false)
-    end
-    return cocos_promise.defer()
-end
-function GameUINpc:PromiseOfInput()
-    if UIKit:getRegistry().isObjectExists("GameUINpc") then
-        UIKit:getRegistry().getObject("GameUINpc"):setTouchSwallowEnabled(false)
-    end
-    return cocos_promise.defer()
-end
-function GameUINpc:PromiseOfLockInput()
-    if UIKit:getRegistry().isObjectExists("GameUINpc") then
-        UIKit:getRegistry().getObject("GameUINpc"):setTouchSwallowEnabled(true)
-    end
-    return cocos_promise.defer()
-end
 function GameUINpc:OnDialogEnded(index)
     local callbacks = self.dialog_index_callbacks[index]
     if callbacks and #callbacks > 0 then
         callbacks[1]()
         table.remove(callbacks, 1)
     end
+    self:ResetClick()
 end
 function GameUINpc:PromiseOfDialogEnded(index)
     local p = promise.new()
@@ -291,10 +256,6 @@ function GameUINpc:PromiseOfDialogEnded(index)
         return p:resolve(self)
     end)
     return p
-end
-function GameUINpc:NextOfSay(...)
-    local args = {...}
-    return function() return GameUINpc:PromiseOfSay(unpack(args)) end
 end
 function GameUINpc:PromiseOfSay(...)
     local instance
@@ -308,24 +269,6 @@ function GameUINpc:PromiseOfSay(...)
         instance.is_should_start = true
     end
     return instance:PromiseOfDialogEndWithClicked(#{...})
-end
-function GameUINpc:PromiseOfSayImportant(...)
-    assert(#{...} == 1)
-    local instance
-    if UIKit:getRegistry().isObjectExists("GameUINpc") then
-        instance = UIKit:getRegistry().getObject("GameUINpc")
-        instance:Reset()
-        instance:InitDialog(...)
-        instance:StartDialog()
-    else
-        instance = UIKit:newGameUI('GameUINpc', ...):AddToCurrentScene(true)
-        instance.is_should_start = true
-    end
-    instance:EnableReceiveClickMsg(false)
-    instance:PromiseOfDialogEnded(1):next(function()
-        instance:EnableReceiveClickMsg(true)
-    end)
-    return instance:PromiseOfDialogEndWithClicked(1)
 end
 function GameUINpc:OnLeave()
     local callbacks = self.leave_callbacks
@@ -347,28 +290,9 @@ function GameUINpc:PromiseOfLeave()
     end
     return cocos_promise.defer()
 end
-function GameUINpc:OnEnter()
-    local callbacks = self.enter_callbacks
-    if #callbacks > 0 then
-        callbacks[1]()
-        table.remove(callbacks, 1)
-    end
-end
-function GameUINpc:PromiseOfEnter()
-    if UIKit:getRegistry().isObjectExists("GameUINpc") then
-        local instance = UIKit:getRegistry().getObject("GameUINpc")
-        local p = promise.new()
-        instance.enter_callbacks = {}
-        table.insert(instance.enter_callbacks, function()
-            return p:resolve()
-        end)
-        return p
-    end
-    return cocos_promise.defer()
-end
 function GameUINpc:BuildUI()
     local ui_map = {}
-    ui_map.background = display.newColorLayer(cc.c4b(0,0,0,180)):addTo(self):setTouchEnabled(false)
+    ui_map.background = WidgetMaskFilter.new():addTo(self):pos(display.cx, display.cy)
     ui_map.dialog_bg = display.newSprite("fte_background.png")
         :addTo(self):align(display.CENTER_BOTTOM, display.cx, 0)
     local size = ui_map.dialog_bg:getContentSize()
@@ -390,6 +314,9 @@ function GameUINpc:BuildUI()
 end
 
 return GameUINpc
+
+
+
 
 
 

@@ -5,7 +5,7 @@
 local LocalPushManager = class("LocalPushManager")
 local localPush = ext.localpush
 local Enum = import("..utils.Enum")
-local LOCAL_PUSH_KEY = Enum("LOCAL_PUSH_KEY_BUILD","LOCAL_PUSH_KEY_SOLDIER","LOCAL_PUSH_KEY_TECHNOLOGY")
+local LOCAL_PUSH_KEY = Enum("LOCAL_PUSH_KEY_BUILD","LOCAL_PUSH_KEY_SOLDIER","LOCAL_PUSH_KEY_TECHNOLOGY","LOCAL_PUSH_KEY_TOOL","LOCAL_PUSH_KEY_WATCH_TOWER")
 
 function LocalPushManager:ctor(game_default)
 	if self:IsSupport() then
@@ -14,9 +14,13 @@ function LocalPushManager:ctor(game_default)
 		self.flag_LOCAL_PUSH_KEY_BUILD = self:GetGameDefault():getBasicInfoValueForKey(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_BUILD],true)
 		self.flag_LOCAL_PUSH_KEY_SOLDIER = self:GetGameDefault():getBasicInfoValueForKey(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_SOLDIER],true)
 		self.flag_LOCAL_PUSH_KEY_TECHNOLOGY = self:GetGameDefault():getBasicInfoValueForKey(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_TECHNOLOGY],true)
+		self.flag_LOCAL_PUSH_KEY_TOOL = self:GetGameDefault():getBasicInfoValueForKey(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_TOOL],true)
+		self.flag_LOCAL_PUSH_KEY_WATCH_TOWER = self:GetGameDefault():getBasicInfoValueForKey(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_WATCH_TOWER],true)
 		localPush.switchNotification(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_BUILD],self.flag_LOCAL_PUSH_KEY_BUILD)
 		localPush.switchNotification(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_SOLDIER],self.flag_LOCAL_PUSH_KEY_SOLDIER)
 		localPush.switchNotification(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_TECHNOLOGY],self.flag_LOCAL_PUSH_KEY_TECHNOLOGY)
+		localPush.switchNotification(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_TOOL],self.flag_LOCAL_PUSH_KEY_TOOL)
+		localPush.switchNotification(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_WATCH_TOWER],self.flag_LOCAL_PUSH_KEY_WATCH_TOWER)
 	end
 end
 
@@ -157,5 +161,37 @@ end
 
 function LocalPushManager:CancelTechnologyPush(identity)
 	self:CancelNotificationByKeyAndIdentity("LOCAL_PUSH_KEY_TECHNOLOGY",identity)
+end
+--工具与装备制造
+function LocalPushManager:GetToolEquipemtPushState()
+	return self:GetLocalPushStateByKey("LOCAL_PUSH_KEY_TOOL")
+end
+
+function LocalPushManager:SwitchToolEquipmentPush(isOn)
+	self:SwitchNotificationByKey("LOCAL_PUSH_KEY_TOOL",isOn)
+end
+
+function LocalPushManager:UpdateToolEquipmentPush(finishTime,msg,identity)
+	self:AddLocalPush("LOCAL_PUSH_KEY_TOOL",finishTime,msg,identity)
+end
+
+function LocalPushManager:CancelToolEquipmentPush(identity)
+	self:CancelNotificationByKeyAndIdentity("LOCAL_PUSH_KEY_TOOL",identity)
+end
+--瞭望塔
+function LocalPushManager:GetWatchTowerPushState()
+	return self:GetLocalPushStateByKey("LOCAL_PUSH_KEY_WATCH_TOWER")
+end
+
+function LocalPushManager:SwitchWatchTowerPush(isOn)
+	self:SwitchNotificationByKey("LOCAL_PUSH_KEY_WATCH_TOWER",isOn)
+end
+
+function LocalPushManager:UpdateWatchTowerPush(finishTime,msg,identity)
+	self:AddLocalPush("LOCAL_PUSH_KEY_WATCH_TOWER",finishTime,msg,identity)
+end
+
+function LocalPushManager:CancelWatchTowerPush(identity)
+	self:CancelNotificationByKeyAndIdentity("LOCAL_PUSH_KEY_WATCH_TOWER",identity)
 end
 return LocalPushManager

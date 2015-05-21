@@ -8,30 +8,43 @@ local AllianceBattleScene = class("AllianceBattleScene", MapScene)
 local GameUIAllianceHome = import("..ui.GameUIAllianceHome")
 local Alliance = import("..entity.Alliance")
 
-function AllianceBattleScene:ctor()
+function AllianceBattleScene:ctor(location)
+    self.location = location
     self.util_node = display.newNode():addTo(self)
     AllianceBattleScene.super.ctor(self)
 end
 function AllianceBattleScene:onEnter()
     self:LoadAnimation()
-
     AllianceBattleScene.super.onEnter(self)
     self:CreateAllianceUI()
-    local mapObject = self:GetAlliance():GetAllianceMap():FindMapObjectById(self:GetAlliance():GetSelf():MapId())
-    local location = mapObject.location
-    local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(location.x, location.y, self:GetAlliance():Id())
-    self:GetSceneLayer():GotoMapPositionInMiddle(point.x, point.y)
     self:GetAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.BASIC)
     app:GetAudioManager():PlayGameMusic()
     self:GetSceneLayer():ZoomTo(0.8)
+
+    if self.location then
+        self:GotoPosition(self.location.x, self.location.y,self.location.id)
+        if self.location.callback then
+            self.location.callback(self)
+        end
+    else
+        self:GotoCurrentPosition()
+    end
+end
+function AllianceBattleScene:GotoCurrentPosition()
+    local mapObject = self:GetAlliance():GetAllianceMap():FindMapObjectById(self:GetAlliance():GetSelf():MapId())
+    local location = mapObject.location
+    self:GotoPosition(location.x,location.y,self:GetAlliance():Id())
+end
+function AllianceBattleScene:GotoPosition(x,y,aid)
+    local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(x,y,aid)
+    self:GetSceneLayer():GotoMapPositionInMiddle(point.x, point.y)
 end
 function AllianceBattleScene:LoadAnimation()
     UILib.loadSolidersAnimation()
     UILib.loadDragonAnimation()
 end
 function AllianceBattleScene:CreateAllianceUI()
-    local home_page = GameUIAllianceHome.new(self:GetAlliance()):addTo(self)
-    self:GetSceneLayer():AddObserver(home_page)
+    local home_page = GameUIAllianceHome.new(self:GetAlliance(), self:GetSceneLayer()):addTo(self)
     home_page:setTouchSwallowEnabled(false)
     self.home_page = home_page
 end
@@ -54,9 +67,9 @@ function AllianceBattleScene:CreateSceneLayer()
     local pos = self:GetAlliance():FightPosition()
     local arrange = (pos == "top" or pos == "bottom") and MultiAllianceLayer.ARRANGE.V or MultiAllianceLayer.ARRANGE.H
     if pos == "top" or pos == "left" then
-        return MultiAllianceLayer.new(arrange, self:GetAlliance(), self:GetEnemyAlliance())
+        return MultiAllianceLayer.new(self, arrange, self:GetAlliance(), self:GetEnemyAlliance())
     else
-        return MultiAllianceLayer.new(arrange, self:GetEnemyAlliance(), self:GetAlliance())
+        return MultiAllianceLayer.new(self, arrange, self:GetEnemyAlliance(), self:GetAlliance())
     end
 end
 function AllianceBattleScene:GotoLogicPosition(x, y, id)
@@ -64,8 +77,10 @@ function AllianceBattleScene:GotoLogicPosition(x, y, id)
     return self:GetSceneLayer():PromiseOfMove(point.x, point.y)
 end
 function AllianceBattleScene:OnTouchClicked(pre_x, pre_y, x, y)
-    if not AllianceBattleScene.super.OnTouchClicked(self, pre_x, pre_y, x, y) then return end
-    if self.util_node:getNumberOfRunningActions() > 0 then return end
+    if self.event_manager:TouchCounts() ~= 0 or 
+        self.util_node:getNumberOfRunningActions() > 0 then 
+        return 
+    end
 
     local building,isMyAlliance = self:GetSceneLayer():GetClickedObject(x, y)
     if building then
@@ -143,10 +158,5 @@ function AllianceBattleScene:EnterNotAllianceBuilding(entity,isMyAlliance)
         end
     end
     UIKit:newGameUI(class_name,entity,isMyAlliance,self:GetAlliance(),self:GetEnemyAlliance()):AddToCurrentScene(true)
-end
-function AllianceBattleScene:PlayCurrentTerrainMusic()
-    local __, __, alliance_view = self:GetSceneLayer():GetCurrentViewAllianceCoordinate()
-    local alliance = alliance_view:GetAlliance()
-    app:GetAudioManager():PlayGameMusic(alliance:Terrain(),false)
 end
 return AllianceBattleScene

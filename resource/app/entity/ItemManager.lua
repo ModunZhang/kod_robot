@@ -274,6 +274,9 @@ function ItemManager:GetCategoryItems(item)
         return self.items_speedUp
     end
 end
+function ItemManager:GetItems()
+    return self.items
+end
 function ItemManager:GetItemByName(name)
     return self.items[name]
 end

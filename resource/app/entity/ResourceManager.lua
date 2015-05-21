@@ -45,7 +45,12 @@ local dump_resources = function(...)
     end), name)
 end
 
-function ResourceManager:ctor()
+local pairs = pairs
+local ipairs = ipairs
+
+function ResourceManager:ctor(city)
+    self.city = city
+    self.user = self.city:GetUser()
     ResourceManager.super.ctor(self)
     self.resources = {
         [WOOD] = AutomaticUpdateResource.new(),
@@ -72,6 +77,9 @@ function ResourceManager:ctor()
 end
 function ResourceManager:OnTimer(current_time)
     self:OnResourceChanged()
+end
+function ResourceManager:GetAllResources()
+    return self.resources
 end
 function ResourceManager:GetWallHpResource()
     return self.resources[WALLHP]
@@ -113,7 +121,7 @@ function ResourceManager:OnResourceChanged()
 end
 --获取食物的生产量
 function ResourceManager:GetFoodProductionPerHour()
-    return City:GetSoldierManager():GetTotalUpkeep() + self:GetFoodResource():GetProductionPerHour()
+    return self.city:GetSoldierManager():GetTotalUpkeep() + self:GetFoodResource():GetProductionPerHour()
 end
 function ResourceManager:UpdateByCity(city, current_time)
     -- 产量
@@ -126,9 +134,7 @@ function ResourceManager:UpdateByCity(city, current_time)
     end
 
     -- 城墙
-    local wallBuilding = city:GetGate()
-    local wall_hp_production_per_hour = wallBuilding:GetWallConfig().wallRecovery
-
+    local wall_config = city:GetGate():GetWallConfig()
     local total_production_map = {
         [WOOD] = 0,
         [FOOD] = 0,
@@ -136,13 +142,12 @@ function ResourceManager:UpdateByCity(city, current_time)
         [STONE] = 0,
         [COIN] = 0,
         [POPULATION] = 0,
-        [WALLHP] = wall_hp_production_per_hour or 0,
+        [WALLHP] = wall_config.wallRecovery or 0,
         [CART] = cart_recovery,
     }
 
     -- 上限
     local max_wood, max_food, max_iron, max_stone = city:GetFirstBuildingByType("warehouse"):GetResourceValueLimit()
-    local wall_max_hp = wallBuilding:GetWallConfig().wallHp
     local total_limit_map = {
         [WOOD] = max_wood,
         [FOOD] = max_food,
@@ -151,7 +156,7 @@ function ResourceManager:UpdateByCity(city, current_time)
         [COIN] = math.huge,
         [POPULATION] = intInit.initCitizen.value,
         [CART] = max_cart,
-        [WALLHP] = wall_max_hp or 0,
+        [WALLHP] = wall_config.wallHp or 0,
     }
 
     local citizen_map = {
@@ -165,7 +170,7 @@ function ResourceManager:UpdateByCity(city, current_time)
     }
     local total_citizen = 0
     --小屋对资源的影响
-    city:IteratorDecoratorBuildingsByFunc(function(key, decorator)
+    city:IteratorDecoratorBuildingsByFunc(function(_, decorator)
         if iskindof(decorator, 'ResourceUpgradeBuilding') then
             local resource_type = decorator:GetUpdateResourceType()
             if resource_type then
@@ -182,8 +187,10 @@ function ResourceManager:UpdateByCity(city, current_time)
             end
         end
     end)
+    dump_resources(total_production_map, "小屋对资源的影响--->")
     -- buff对资源的影响
-    local buff_production_map,buff_limt_map = self:GetTotalBuffData(city)
+    local buff_production_map,buff_limt_map
+    buff_production_map,buff_limt_map = self:GetTotalBuffData(city)
     self.resource_citizen = citizen_map
     self:GetPopulationResource():SetLowLimitResource(total_citizen)
     for resource_type, production in pairs(total_production_map) do
@@ -261,42 +268,40 @@ function ResourceManager:GetTotalBuffData(city)
         }
     -- 建筑对资源的影响
     -- 以及小屋位置对资源的影响
-    city:IteratorFunctionBuildingsByFunc(function(_,v)
-        if v:IsUnlocked() then
-            local resource_type = resource_building_map[v:GetType()]
-            if resource_type then
-                local count = #city:GetHousesAroundFunctionBuildingByType(v, v:GetHouseType(), 2)
-                local house_buff = 0
-                if count >= 6 then
-                    house_buff = 0.1
-                elseif count >= 3 then
-                    house_buff = 0.05
+    local houses = {}
+    city:IteratorDecoratorBuildingsByFunc(function(_,v)houses[v] = v;end)
+    city:IteratorFunctionBuildingsByFunc(function(_,resource_building)
+        local resource_type = resource_building_map[resource_building:GetType()]
+        if resource_building:IsUnlocked() and resource_type then
+            local count = 0
+            local house_type = resource_building:GetHouseType()
+            for k,house in pairs(houses) do
+                if house:GetType() == house_type and
+                    resource_building:IsNearByBuildingWithLength(house, 2) then
+                    count = count + 1
+                    houses[k] = nil
                 end
-                buff_production_map[resource_type] = buff_production_map[resource_type] + house_buff
             end
+            local house_buff = 0
+            if count >= 6 then
+                house_buff = 0.1
+            elseif count >= 3 then
+                house_buff = 0.05
+            end
+            buff_production_map[resource_type] = buff_production_map[resource_type] + house_buff
         end
     end)
     dump_resources(buff_production_map, "建筑对资源的影响--->")
+
     --学院科技
-    local techs_buff_map = {
-        [WOOD] = 0,
-        [FOOD] = 0,
-        [IRON] = 0,
-        [STONE] = 0,
-        [COIN] = 0,
-        [POPULATION] = 0,
-        [WALLHP] = 0,
-        [CART] = 0,
-    }
     city:IteratorTechs(function(__,tech)
         local resource_type,buff_type,buff_value = tech:GetResourceBuffData()
         if resource_type then
             local target_map = buff_type == self.RESOURCE_BUFF_TYPE.PRODUCT and buff_production_map or buff_limt_map
             target_map[resource_type] = target_map[resource_type] + buff_value
-            techs_buff_map[resource_type] = techs_buff_map[resource_type] + buff_value
         end
     end)
-    dump_resources(techs_buff_map, "学院科技对资源的影响--->")
+
     --道具buuff
     local item_buff_map = {
         [WOOD] = 0,
@@ -326,13 +331,14 @@ function ResourceManager:GetTotalBuffData(city)
     end
     dump_resources(item_buff_map, "道具对资源的影响--->")
     --vip buff
+    local user = self.user
     local vip_buff_map = {
-        [WOOD] = User:GetVIPWoodProductionAdd(),
-        [FOOD] = User:GetVIPFoodProductionAdd(),
-        [IRON] = User:GetVIPIronProductionAdd(),
-        [STONE] = User:GetVIPStoneProductionAdd(),
-        [POPULATION] = User:GetVIPCitizenRecoveryAdd(),
-        [WALLHP] = User:GetVIPWallHpRecoveryAdd(),
+        [WOOD] = user:GetVIPWoodProductionAdd(),
+        [FOOD] = user:GetVIPFoodProductionAdd(),
+        [IRON] = user:GetVIPIronProductionAdd(),
+        [STONE] = user:GetVIPStoneProductionAdd(),
+        [POPULATION] = user:GetVIPCitizenRecoveryAdd(),
+        [WALLHP] = user:GetVIPWallHpRecoveryAdd(),
         [COIN] = 0,
         [CART] = 0,
     }
@@ -348,6 +354,11 @@ end
 
 
 return ResourceManager
+
+
+
+
+
 
 
 

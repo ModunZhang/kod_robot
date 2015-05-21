@@ -84,6 +84,7 @@ function GameUIAllianceSendTroops:ctor(march_callback,params)
     self.returnCloseAction = type(params.returnCloseAction) == 'boolean' and params.returnCloseAction or false
     self.toLocation = params.toLocation or cc.p(0,0)
     self.targetIsMyAlliance = type(params.targetIsMyAlliance) == 'boolean' and params.targetIsMyAlliance or true
+    self.terrain = User:Terrain()
     GameUIAllianceSendTroops.super.ctor(self,City,_("准备进攻"))
     local manager = ccs.ArmatureDataManager:getInstance()
     for _, anis in pairs(UILib.soldier_animation_files) do
@@ -171,7 +172,7 @@ function GameUIAllianceSendTroops:OnMoveInStage()
     end):align(display.LEFT_CENTER,window.left+50,window.top-910):addTo(self:GetView())
     self.max_btn = max_btn
 
-    local march_btn = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"},nil,nil,{down = "TROOP_SENDOUT"})
+    local march_btn = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"},nil,nil)
         :setButtonLabel(UIKit:ttfLabel({
             text = _("行军"),
             size = 24,
@@ -222,10 +223,10 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                                 listener =  function ()
                                     if self.dragon:IsDefenced() then
                                         NetManager:getCancelDefenceDragonPromise():done(function()
-                                                -- self.march_callback(dragonType,soldiers)
-                                                -- -- 确认派兵后关闭界面
-                                                -- self:LeftButtonClicked()
-                                                self:CallFuncMarch_Callback(dragonType,soldiers)
+                                            -- self.march_callback(dragonType,soldiers)
+                                            -- -- 确认派兵后关闭界面
+                                            -- self:LeftButtonClicked()
+                                            self:CallFuncMarch_Callback(dragonType,soldiers)
                                         end)
                                     else
                                         -- self.march_callback(dragonType,soldiers)
@@ -575,7 +576,13 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
     local TroopShow = display.newNode()
     TroopShow:setContentSize(cc.size(grass_width,grass_height))
     TroopShow:align(display.BOTTOM_LEFT, window.cx-304, window.top_bottom-250)
-    display.newSprite("battle_bg_grass_611x275.png")
+    local land_image = {
+        desert = "battle_bg_desert_611x275.png",
+        iceField = "battle_bg_iceField_611x275.png",
+        grassLand = "battle_bg_grass_611x275.png"
+    }
+    local land_bg = land_image[self.terrain]
+    display.newSprite(land_bg)
         :align(display.LEFT_BOTTOM,window.cx-304, window.top_bottom-250):addTo(self:GetView())
     TroopShow.offset_x = 0
     TroopShow.bound_box_width = grass_width
@@ -642,16 +649,16 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
     end
 
     function TroopShow:RefreshScrollNode(current_x)
-        -- 因为士兵动画的锚点为CENTER，需要的滑动区域的宽度需要多加士兵动画设计快读180/2
+        -- 因为士兵动画的锚点为CENTER，需要的滑动区域的宽度需要多加士兵动画设计宽度180/2
         current_x = current_x - 180/2
         if current_x<grass_width then
-            table.insert(self.soldier_crops,display.newSprite("battle_bg_grass_611x275.png")
+            table.insert(self.soldier_crops,display.newSprite(land_bg)
                 :align(display.LEFT_BOTTOM,0,0):addTo(self))
         end
         if current_x<0 then
             local need_bg_count = math.ceil(math.abs(current_x)/grass_width)
             for i=1,need_bg_count do
-                table.insert(self.soldier_crops,display.newSprite("battle_bg_grass_611x275.png")
+                table.insert(self.soldier_crops,display.newSprite(land_bg)
                     :align(display.LEFT_BOTTOM,-grass_width*i,0):addTo(self))
             end
             self.offset_x = grass_width -(math.abs(current_x)-(need_bg_count-1)*grass_width)
@@ -782,6 +789,7 @@ function GameUIAllianceSendTroops:onExit()
 end
 
 return GameUIAllianceSendTroops
+
 
 
 

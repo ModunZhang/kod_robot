@@ -71,7 +71,7 @@ function GameUIDragonEquipmentMake:BuildUI()
         text = string.format(_("巨龙%d星装备"),self.dragon:Star()),
         size = 22,
         color= 0x403c2f
-    }):addTo(node):align(display.LEFT_BOTTOM,name_bar:getPositionX(),mainEquipment:getPositionY() - mainEquipment:getContentSize().height + 8)
+    }):addTo(node):align(display.LEFT_BOTTOM,name_bar:getPositionX() + 12,mainEquipment:getPositionY() - mainEquipment:getContentSize().height + 8)
     local load_button = WidgetPushButton.new({normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png",disabled = "grey_btn_148x58.png"})
       :addTo(node)
       :align(display.RIGHT_BOTTOM,name_bar:getPositionX() + 468,mainEquipment:getPositionY() - mainEquipment:getContentSize().height)
@@ -120,7 +120,7 @@ function GameUIDragonEquipmentMake:GetMakeRequirement()
         resource_type = "queue",
         isVisible = true,
         isSatisfy = self.blackSmith:IsUnlocked() and self.blackSmith:IsEquipmentEventEmpty(),
-        icon="hammer_31x33.png",
+        icon="hammer_33x40.png",
         description= desc
     })
     local need_coin = equip_config.coin

@@ -5,9 +5,10 @@ local WidgetChangeMap = import("..widget.WidgetChangeMap")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local GameUICityInfo = UIKit:createUIClass('GameUICityInfo')
 
-function GameUICityInfo:ctor(user)
-    GameUICityInfo.super.ctor(self)
+function GameUICityInfo:ctor(user, location)
+    GameUICityInfo.super.ctor(self, {type = UIKit.UITYPE.BACKGROUND})
     self.user = user
+    self.location = location
 end
 
 function GameUICityInfo:onEnter()
@@ -28,13 +29,16 @@ function GameUICityInfo:CreateTop()
     local button = cc.ui.UIPushButton.new(
         {normal = "player_btn_up_314x86.png", pressed = "player_btn_down_314x86.png"},
         {scale9 = false}
-    ):addTo(top_bg):align(display.LEFT_CENTER,top_bg:getContentSize().width/2-2, top_bg:getContentSize().height/2+10)
+    ):onButtonClicked(function(event)
+        -- if event.name == "CLICKED_EVENT" then
+        --     UIKit:newGameUI('GameUIVip', self.city,"info"):AddToCurrentScene(true)
+        -- end
+        end):addTo(top_bg):align(display.LEFT_CENTER,top_bg:getContentSize().width/2-2, top_bg:getContentSize().height/2+10)
     button:setRotationSkewY(180)
-
     -- 玩家名字背景加文字
     local ox = 159
     local name_bg = display.newSprite("player_name_bg_168x30.png"):addTo(top_bg)
-        :align(display.TOP_LEFT, ox, top_bg:getContentSize().height-10)
+        :align(display.TOP_LEFT, ox, top_bg:getContentSize().height-10):setCascadeOpacityEnabled(true)
     self.name_label = cc.ui.UILabel.new({
         text = self.user:Name(),
         size = 18,
@@ -67,12 +71,16 @@ function GameUICityInfo:CreateTop()
     local button = cc.ui.UIPushButton.new(
         {normal = "player_btn_up_314x86.png", pressed = "player_btn_down_314x86.png"},
         {scale9 = false}
-    ):addTo(top_bg):align(display.LEFT_CENTER, top_bg:getContentSize().width/2+2, top_bg:getContentSize().height/2+10)
+    ):onButtonClicked(function(event)
+        -- if event.name == "CLICKED_EVENT" then
+        --     UIKit:newGameUI("GameUIResourceOverview",self.city):AddToCurrentScene(true)
+        -- end
+        end):addTo(top_bg):align(display.LEFT_CENTER, top_bg:getContentSize().width/2+2, top_bg:getContentSize().height/2+10)
 
     -- 资源图片和文字
     local first_row = 18
-    local first_col = 30
-    local label_padding = 20
+    local first_col = 18
+    local label_padding = 15
     local padding_width = 100
     local padding_height = 35
     for i, v in ipairs({
@@ -87,41 +95,48 @@ function GameUICityInfo:CreateTop()
         local col = (i - 1) % 3
         local x, y = first_col + col * padding_width, first_row - (row * padding_height)
         display.newSprite(v[1]):addTo(button):pos(x, y):scale(0.4)
-        self[v[2]] =
-            UIKit:ttfLabel({text = "-",
-                size = 18,
-                color = 0xf3f0b6,
-                shadow = true
-            })
-                :addTo(button):pos(x + label_padding, y)
+
+        self[v[2]] = UIKit:ttfLabel({text = "-",
+            size = 18,
+            color = 0xf3f0b6,
+            shadow = true
+        }):addTo(button):pos(x + label_padding, y)
     end
 
-
     -- 玩家信息背景
-    local player_bg = display.newSprite("player_bg_110x106.png"):addTo(top_bg, 2)
-        :align(display.LEFT_BOTTOM, display.width>640 and 58 or 64, 10)
-    display.newSprite("player_icon_110x106.png"):addTo(player_bg):pos(55, 53)
-    self.exp = display.newSprite("player_exp_bar_110x106.png"):addTo(player_bg):pos(55, 53)
-    local level_bg = display.newSprite("level_bg_74x21.png"):addTo(player_bg):pos(55, 20)
-    self.level_label = UIKit:ttfLabel({text = "1",
-        size = 20,
+    local player_bg = display.newSprite("player_bg_110x106.png")
+    :align(display.LEFT_BOTTOM, display.width>640 and 58 or 64, 10)
+    :addTo(top_bg, 2):setCascadeOpacityEnabled(true)
+    self.player_icon = UIKit:GetPlayerIconOnly(self.user:Icon())
+    :addTo(player_bg):pos(55, 64):scale(0.72)
+    self.exp = display.newProgressTimer("player_exp_bar_110x106.png", 
+        display.PROGRESS_TIMER_RADIAL):addTo(player_bg):pos(55, 53)
+    self.exp:setRotationSkewY(180)
+
+    local level_bg = display.newSprite("level_bg_72x19.png"):addTo(player_bg):pos(55, 18)
+    self.level_label = UIKit:ttfLabel({
+        text = self.user:Level(),
+        size = 14,
         color = 0xfff1cc,
         shadow = true,
-    }):addTo(level_bg):align(display.CENTER, 37, 12)
-
+    }):addTo(level_bg):align(display.CENTER, 37, 11)
 
     -- vip
     local vip_btn = cc.ui.UIPushButton.new(
-        {normal = "vip_bg_110x124.png", pressed = "vip_bg_110x124.png"},
+        {},
         {scale9 = false}
-    ):addTo(top_bg):align(display.CENTER, ox + 195, 50)
+    ):addTo(top_bg):align(display.CENTER, ox + 195, 65)
         :onButtonClicked(function(event)
-            if event.name == "CLICKED_EVENT" then
-                -- UIKit:newGameUI('GameUIVip', City,"VIP"):AddToCurrentScene(true)
-            end
+            -- if event.name == "CLICKED_EVENT" then
+            --     UIKit:newGameUI('GameUIVip', City,"VIP"):AddToCurrentScene(true)
+            -- end
         end)
-    self.vip_level = display.newNode():addTo(vip_btn):pos(-3, 15):scale(0.8)
-    display.newSprite(string.format("VIP_%d_46x32.png", 1)):addTo(self.vip_level)
+    local vip_btn_img = User:IsVIPActived() and "vip_bg_110x124.png" or "vip_bg_disable_110x124.png"
+    vip_btn:setButtonImage(cc.ui.UIPushButton.NORMAL, vip_btn_img, true)
+    vip_btn:setButtonImage(cc.ui.UIPushButton.PRESSED, vip_btn_img, true)
+    self.vip_level = display.newNode():addTo(vip_btn):pos(-3, 0):scale(0.8)
+    display.newSprite(string.format("VIP_%d_46x32.png", 1))
+    :addTo(self.vip_level)
 
     return top_bg
 end
@@ -138,7 +153,7 @@ function GameUICityInfo:CreateBottom()
     end
 
     self.chat = WidgetChat.new():addTo(bottom_bg)
-    :align(display.CENTER, bottom_bg:getContentSize().width/2, bottom_bg:getContentSize().height-11)
+        :align(display.CENTER, bottom_bg:getContentSize().width/2, bottom_bg:getContentSize().height-11)
 
     cc.ui.UILabel.new({text = "您正在访问其他玩家的城市, 无法使用其他功能, 点击左下角返回城市",
         size = 20,
@@ -149,10 +164,11 @@ function GameUICityInfo:CreateBottom()
         color = UIKit:hex2c3b(0xe19319)})
         :addTo(bottom_bg):align(display.LEFT_CENTER, 250, display.bottom + 101/2)
 
-    local map_node = WidgetChangeMap.new(WidgetChangeMap.MAP_TYPE.OTHER_CITY):addTo(self)
+    local map_node = WidgetChangeMap.new(WidgetChangeMap.MAP_TYPE.OTHER_CITY, self.location):addTo(self)
 end
 
 return GameUICityInfo
+
 
 
 

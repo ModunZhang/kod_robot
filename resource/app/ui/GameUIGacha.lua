@@ -147,7 +147,6 @@ function GameUIGacha:CreateGachaPool(layer)
         table.insert(gacha_item_table,remove_element)
     end
 
-    print("gacha_item_table=",#gacha_item_table)
     -- 当前所在位置
     local current_box,current_index
     for i=1,16 do
@@ -239,16 +238,17 @@ function GameUIGacha:CreateGachaPool(layer)
             transition.moveTo(award, {x = gacha_box:getPositionX(), y=gacha_box:getPositionY() ,time =0.2 ,
                 onComplete = function ( )
                     transition.scaleTo(award, {scale = 74/award:getContentSize().width,time =0.4,onComplete = function ()
-                        -- gacha_box_lable = UIKit:ttfLabel({
-                        --     text = Localize_item.item_name[draw_item_box:GetGachaItemName()],
-                        --     size = 20,
-                        --     color = 0xffedae,
-                        -- }):align(display.CENTER, gacha_box:getPositionX(), gacha_box:getPositionY()-56):addTo(layer)
                         if self.continuous_draw_items and not self.continuous_draw_items[self.continuous_index] or not self.continuous_draw_items then
                             layer:EnAbleButton(true)
                         end
+                        local num_bg = display.newSprite("gacha_num_bg.png"):addTo(award,2):align(display.RIGHT_BOTTOM, award:getContentSize().width,0):scale(128/74)
+                        UIKit:ttfLabel({
+                            text = "X"..draw_item_box:GetGachaItemCount(),
+                            size = 16,
+                            color = 0xffedae
+                        }):align(display.RIGHT_CENTER, num_bg:getContentSize().width, num_bg:getContentSize().height/2)
+                            :addTo(num_bg)
                         table.insert(self.award, award)
-                        -- table.insert(self.award, gacha_box_lable)
                         GameGlobalUI:showTips(_("提示"),string.format(_("获得%s x%d"),Localize_item.item_name[self.current_gacha_item_name],self.current_gacha_item_count))
                         if self.continuous_draw_items and self.continuous_draw_items[self.continuous_index] then
                             self:StartLotteryDraw(self.continuous_draw_items[self.continuous_index])
@@ -421,7 +421,6 @@ function GameUIGacha:InitOrdinary()
                     NetManager:getNormalGachaPromise():done(function(response)
                         if response.msg.playerData then
                             local data = response.msg.playerData
-                            dump(data)
                             local items = {}
                             for i,v in ipairs(data) do
                                 local key = string.split(v[1], ".")[1]
@@ -573,14 +572,15 @@ function GameUIGacha:OnCountInfoChanged()
         button:setButtonLabel(UIKit:commonButtonLable({
             text = _("免费抽奖"),
             size = 24
-
         })):setButtonLabelOffset(0,0)
 
-        local btn_images = {normal = "green_btn_up_250x65.png",
-            pressed = "green_btn_down_250x65.png"
+        local btn_images = {normal = "green_btn_up_252x77.png",
+            pressed = "green_btn_down_252x77.png",
+            disabled = "grey_btn_252x77.png",
         }
         button:setButtonImage(cc.ui.UIPushButton.NORMAL, btn_images["normal"], true)
         button:setButtonImage(cc.ui.UIPushButton.PRESSED, btn_images["pressed"], true)
+        button:setButtonImage(cc.ui.UIPushButton.DISABLED, btn_images["disabled"], true)
     else
         local button = self.normal_gacha_button
         button:setButtonLabel(UIKit:commonButtonLable({
@@ -589,10 +589,12 @@ function GameUIGacha:OnCountInfoChanged()
         })):setButtonLabelOffset(0,20)
 
         local btn_images = {normal = "green_btn_up_252x78.png",
-            pressed = "green_btn_down_252x78.png"
+            pressed = "green_btn_down_252x78.png",
+            disabled = "grey_btn_252x78.png",
         }
         button:setButtonImage(cc.ui.UIPushButton.NORMAL, btn_images["normal"], true)
         button:setButtonImage(cc.ui.UIPushButton.PRESSED, btn_images["pressed"], true)
+        button:setButtonImage(cc.ui.UIPushButton.DISABLED, btn_images["disabled"], true)
 
         button:removeChildByTag(111, true)
         button:removeChildByTag(112, true)
@@ -609,6 +611,8 @@ function GameUIGacha:OnCountInfoChanged()
     end
 end
 return GameUIGacha
+
+
 
 
 

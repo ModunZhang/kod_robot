@@ -171,6 +171,13 @@ function PVEMap:ModifyObject(x, y, searched, type)
 
     return function() self:ModifyObject(x, y, old_searched, type) end
 end
+function PVEMap:IsRewarded()
+    for i,v in ipairs(DataManager:getUserData().pve.rewardedFloors) do
+        if v == self:GetIndex() then
+            return true
+        end
+    end
+end
 function PVEMap:IsComplete()
     local complete = false
     self:IteratorObjects(function(object)

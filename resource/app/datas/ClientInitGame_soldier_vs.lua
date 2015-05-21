@@ -3,21 +3,21 @@ local soldier_vs = GameDatas.ClientInitGame.soldier_vs
 soldier_vs["infantry"] = {
 	["soldier_type"] = "infantry",
 	["archer"] = "weak",
-	["cavalry"] = "weak",
+	["cavalry"] = "strong",
 	["siege"] = "strong",
-	["wall"] = "strong"
+	["wall"] = "weak"
 }
 soldier_vs["archer"] = {
 	["soldier_type"] = "archer",
 	["infantry"] = "strong",
-	["cavalry"] = "strong",
+	["cavalry"] = "weak",
 	["siege"] = "weak",
-	["wall"] = "weak"
+	["wall"] = "strong"
 }
 soldier_vs["cavalry"] = {
 	["soldier_type"] = "cavalry",
-	["infantry"] = "strong",
-	["archer"] = "weak",
+	["infantry"] = "weak",
+	["archer"] = "strong",
 	["siege"] = "strong",
 	["wall"] = "weak"
 }
@@ -29,9 +29,5 @@ soldier_vs["siege"] = {
 	["wall"] = "strong"
 }
 soldier_vs["wall"] = {
-	["soldier_type"] = "wall",
-	["infantry"] = "weak",
-	["archer"] = "strong",
-	["cavalry"] = "strong",
-	["siege"] = "weak"
+	["soldier_type"] = "wall"
 }

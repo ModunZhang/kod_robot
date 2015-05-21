@@ -19,11 +19,11 @@ local BuildingRegister = {
     townHall 	    = import("..entity.PResourceUpgradeBuilding"),
     hospital        = import("..entity.HospitalUpgradeBuilding"),
     tradeGuild 	    = import("..entity.TradeGuildUpgradeBuilding"),
-    academy         = import("..entity.UpgradeBuilding"),
-    trainingGround  = import("..entity.UpgradeBuilding"),
-    stable          = import("..entity.UpgradeBuilding"),
-    hunterHall      = import("..entity.UpgradeBuilding"),
-    workshop        = import("..entity.UpgradeBuilding"),
+    academy         = import("..entity.AcademyUpgradeBuilding"),
+    trainingGround  = import("..entity.MilitaryTechnologyUpgradeBuilding"),
+    stable          = import("..entity.MilitaryTechnologyUpgradeBuilding"),
+    hunterHall      = import("..entity.MilitaryTechnologyUpgradeBuilding"),
+    workshop        = import("..entity.MilitaryTechnologyUpgradeBuilding"),
 }
 setmetatable(BuildingRegister, {__index = function(t, k)
 	return UpgradeBuilding

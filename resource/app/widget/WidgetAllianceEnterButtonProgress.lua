@@ -10,6 +10,25 @@ function WidgetAllianceEnterButtonProgress:ctor()
     self:setTouchEnabled(true)
     self:setNodeEventEnabled(true)
     self:setRotationSkewY(180)
+    local my_allaince = Alliance_Manager:GetMyAlliance()
+    local status = my_allaince:Status()
+    if status == "prepare" then
+        local statusStartTime = math.floor(my_allaince:StatusStartTime()/1000)
+        local statusFinishTime = math.floor(my_allaince:StatusFinishTime()/1000)
+
+        local percent = math.floor((statusFinishTime-app.timer:GetServerTime())/(statusFinishTime-statusStartTime)*100)
+        self:setPercentage(percent)
+        self.time_label = UIKit:ttfLabel(
+            {
+                text = GameUtils:formatTimeStyle1(statusFinishTime-app.timer:GetServerTime()),
+                size = 20,
+                color = 0x7e0000
+            }):align(display.CENTER, 58, 64)
+            :addTo(self)
+        self.time_label:setRotationSkewY(180)
+        self.handle = scheduler.scheduleGlobal(handler(self, self.OnTimer), 1.0, false)
+
+    end
 end
 function WidgetAllianceEnterButtonProgress:OnTimer()
     local current_time = app.timer:GetServerTime()
@@ -31,25 +50,7 @@ function WidgetAllianceEnterButtonProgress:OnTimer()
     end
 end
 function WidgetAllianceEnterButtonProgress:onEnter()
-    local my_allaince = Alliance_Manager:GetMyAlliance()
-    local status = my_allaince:Status()
-    if status == "prepare" then
-        local statusStartTime = math.floor(my_allaince:StatusStartTime()/1000)
-        local statusFinishTime = math.floor(my_allaince:StatusFinishTime()/1000)
-
-        local percent = math.floor((statusFinishTime-app.timer:GetServerTime())/(statusFinishTime-statusStartTime)*100)
-        self:setPercentage(percent)
-        self.time_label = UIKit:ttfLabel(
-            {
-                text = GameUtils:formatTimeStyle1(statusFinishTime-app.timer:GetServerTime()),
-                size = 20,
-                color = 0x7e0000
-            }):align(display.CENTER, 58, 64)
-            :addTo(self)
-        self.time_label:setRotationSkewY(180)
-        self.handle = scheduler.scheduleGlobal(handler(self, self.OnTimer), 1.0, false)
-
-    end
+    
 end
 function WidgetAllianceEnterButtonProgress:onExit()
     if self.handle then

@@ -51,6 +51,17 @@ function DragonManager:SortDragon()
     end
 end
 
+function DragonManager:SortWithFirstDragon(dragon_type)
+    local arr = {"redDragon","greenDragon","blueDragon"}
+    table.sort( arr, function(a,b) 
+        return a == dragon_type
+    end)
+    self.dragon_index_arr = arr
+    for index,v in ipairs(self.dragon_index_arr) do
+        self.dragon_index_arr[v] = index
+    end
+end
+
 function DragonManager:GetDragonIndexByType(dragon_type,needSort)
     if not self.dragon_index_arr or needSort then
         self:SortDragon()

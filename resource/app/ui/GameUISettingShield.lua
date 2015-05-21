@@ -2,7 +2,7 @@
 -- Author: Danny He
 -- Date: 2015-02-24 17:12:47
 --
-local GameUISettingShield = UIKit:createUIClass("GameUISettingShield")
+local GameUISettingShield = UIKit:createUIClass("GameUISettingShield","UIAutoClose")
 local window = import("..utils.window")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
@@ -23,8 +23,8 @@ function GameUISettingShield:GetChatManager()
 end
 
 function GameUISettingShield:BuildUI()
-	local shadowLayer = UIKit:shadowLayer():addTo(self)
-	local bg = WidgetUIBackGround.new({height=762}):addTo(shadowLayer)
+	local bg = WidgetUIBackGround.new({height=762})
+	self:addTouchAbleChild(bg)
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
 	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
@@ -38,7 +38,7 @@ function GameUISettingShield:BuildUI()
 		size = 22,
 		shadow = true,
 		color = 0xffedae
-	}):addTo(titleBar):align(display.CENTER,300,24)
+	}):addTo(titleBar):align(display.CENTER,300,28)
 	local tip_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 106}):addTo(bg):align(display.CENTER_TOP,304,732)
 	UIKit:ttfLabel({
 	  	text = _("你无法收到屏蔽用户发送的邮件。同时在聊天界面也看不到这个用户的任何发言。"),
@@ -72,27 +72,27 @@ function GameUISettingShield:GetBlackListItem(index,chat)
 	local content = display.newScale9Sprite(string.format("resource_item_bg%d.png",index % 2)):size(546,96)
 	local iconBg = UIKit:GetPlayerCommonIcon(chat.icon):scale(0.7):addTo(content):pos(50,48)
 	local name_lable = UIKit:ttfLabel({
-		text = chat.fromName or "player",
+		text = chat.name or "player",
 		size = 22,
 		color= 0x403c2f,
 		align= cc.TEXT_ALIGNMENT_LEFT
 	}):addTo(content):pos(100,68)
 
  	local alliance_label = UIKit:ttfLabel({
- 		text = chat.fromAlliance or "",
+ 		text = chat.allianceTag or "",
  		size = 16,
  		color= 0x403c2f,
  		align= cc.TEXT_ALIGNMENT_LEFT
  	}):addTo(content):pos(100,38)
 
- 	WidgetPushButton.new({normal = 'yellow_btn_up_185x65.png',pressed = 'yellow_btn_down_185x65.png'},{scale9 = true})
+ 	WidgetPushButton.new({normal = 'yellow_btn_up_148x58.png',pressed = 'yellow_btn_down_148x58.png'},{scale9 = true})
  		:setButtonLabel("normal",UIKit:commonButtonLable({
  			text = _("取消屏蔽"),
  			color = 0xfff3c7,
  			size = 22,
+ 			shadow = true
  		}))
- 		:setButtonSize(148, 65)
- 		:addTo(content):pos(448,48)
+ 		:addTo(content):pos(460,48)
  		:onButtonClicked(function()
  			self:GetChatManager():RemoveItemFromBlockList(chat)
  			self:RefreshListView()

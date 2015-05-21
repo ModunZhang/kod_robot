@@ -187,7 +187,7 @@ function WidgetPromoteSoldier:UpgradeRequirement()
             resource_type = "building_queue",
             isVisible = City:GetSoldierManager():GetUpgradingMilitaryTechNum(self.building_type)>0,
             isSatisfy = not  City:GetSoldierManager():IsUpgradingMilitaryTech(self.building_type),
-            icon="hammer_31x33.png",
+            icon="hammer_33x40.png",
             description= _("升级队列已满")..":"..(1-City:GetSoldierManager():GetUpgradingMilitaryTechNum(self.building_type)).."/1"
         },
         {

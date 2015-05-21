@@ -11,7 +11,10 @@ local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local Enum = import("..utils.Enum")
 
 local GameUIBase = class('GameUIBase', function()
-    return display.newLayer()
+    local layer = display.newLayer()
+    layer:setContentSize(cc.size(display.width, display.height))
+    layer:setNodeEventEnabled(true)
+    return layer
 end)
 
 
@@ -19,7 +22,7 @@ function GameUIBase:ctor(params)
     self.__isBase = true
     params = checktable(params)
     self.__type  = params.type or UIKit.UITYPE.WIDGET
-    self:setNodeEventEnabled(true)
+    UIKit:CheckOpenUI(self, true)
     return true
 end
 
@@ -67,6 +70,7 @@ end
 
 function GameUIBase:onCleanup()
     print("onCleanup->",self.__cname)
+    GameGlobalUI:clearMessageQueue()
     if UIKit:getRegistry().isObjectExists(self.__cname) then
         UIKit:getRegistry().removeObject(self.__cname)
     end
@@ -225,84 +229,9 @@ function GameUIBase:CreateVerticalListViewDetached(left_bottom_x, left_bottom_y,
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }
 end
-function GameUIBase:CreateFteLayer()
-    local node = display.newNode():addTo(self, 3000)
-    local left = display.newColorLayer(cc.c4b(255, 0, 0, 50)):addTo(node, 0)
-    local right = display.newColorLayer(cc.c4b(255, 0, 0, 50)):addTo(node, 0)
-    local top = display.newColorLayer(cc.c4b(255, 0, 0, 50)):addTo(node, 0)
-    local bottom = display.newColorLayer(cc.c4b(255, 0, 0, 50)):addTo(node, 0)
-    -- local left = display.newLayer():addTo(node, 0)
-    -- local right = display.newLayer():addTo(node, 0)
-    -- local top = display.newLayer():addTo(node, 0)
-    -- local bottom = display.newLayer():addTo(node, 0)
-    for _, v in pairs{ left, right, top, bottom } do
-        v:setContentSize(cc.size(display.width, display.height))
-        v:setTouchEnabled(true)
-    end
-    local count = 0
-    function node:Enable()
-        count = count + 1
-        if count > 0 then
-            for _, v in pairs{ left, right, top, bottom } do
-                v:setTouchEnabled(true)
-            end
-        end
-        return self
-    end
-    function node:Disable()
-        count = count - 1
-        if count <= 0 then
-            for _, v in pairs{ left, right, top, bottom } do
-                v:setTouchEnabled(false)
-            end
-        end
-        return self
-    end
-    function node:Reset()
-        count = 0
-        for _, v in pairs{ left, right, top, bottom } do
-            v:setTouchEnabled(false)
-        end
-        self.object = nil
-        self.world_rect = nil
-        return self
-    end
-    function node:SetTouchObject(obj)
-        self.object = obj
-        self:UpdateClickedRegion(self:GetClickedRect())
-        return self
-    end
-    function node:SetTouchRect(world_rect)
-        self.world_rect = world_rect
-        return self
-    end
-    function node:UpdateClickedRegion(rect)
-        left:pos(rect.x - display.width, 0)
-        right:pos(rect.x + rect.width, 0)
-        top:pos(0, rect.y + rect.height)
-        bottom:pos(0, rect.y - display.height)
-    end
-    function node:GetClickedRect()
-        if self.world_rect then
-            return self.world_rect
-        elseif self.object then
-            return self.object:getCascadeBoundingBox()
-        else
-            return cc.rect(0, 0, display.width, display.height)
-        end
-    end
-    return node:Reset()
-end
 
-function GameUIBase:Lock()
-    return cocos_promise.defer(function()
-        return self
-    end)
-end
-function GameUIBase:Find()
-    assert(false)
-end
 
+-- fte
 local FTE_TAG = 119
 function GameUIBase:GetFteLayer()
     if not self:getChildByTag(FTE_TAG) then
@@ -312,6 +241,9 @@ function GameUIBase:GetFteLayer()
 end
 function GameUIBase:CreateFteLayer()
     return TutorialLayer.new():addTo(self, 2000, FTE_TAG):Enable()
+end
+function GameUIBase:DestroyFteLayer()
+    self:removeChildByTag(FTE_TAG)
 end
 
 return GameUIBase

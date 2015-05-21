@@ -76,7 +76,7 @@ function GameUIAllianceShrineEnter:GetBuildingType()
 end
 
 function GameUIAllianceShrineEnter:GetBuildingDesc()
-	return Localize.building_description.alliance_building_shrine
+	return Localize.building_description.shrine
 end
 
 function GameUIAllianceShrineEnter:FixedUI()

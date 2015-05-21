@@ -10,12 +10,12 @@ local UILib = import(".UILib")
 local Enum = import("..utils.Enum")
 
 GameUIStrikePlayer.STRIKE_TYPE = Enum("CITY","VILLAGE")
+
 function GameUIStrikePlayer:ctor(params,strike_type)
 	GameUIStrikePlayer.super.ctor(self,City,_("准备突袭"))
 	self.dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
 	self.params = params
 	self.strike_type = strike_type or self.STRIKE_TYPE.CITY
-	assert(params)
 end
 
 function GameUIStrikePlayer:GetDragonManager()
@@ -49,8 +49,8 @@ function GameUIStrikePlayer:BuildUI()
     }):addTo(self.content_node)
 
 	WidgetPushButton.new({
-		normal = "yellow_btn_up_149x47.png",
-		pressed = "yellow_btn_down_149x47.png"
+		normal = "yellow_btn_up_186x66.png",
+		pressed = "yellow_btn_down_186x66.png"
 		})
 		:align(display.CENTER_BOTTOM,window.cx,window.bottom + 20)
 		:addTo(self.content_node)
@@ -60,6 +60,19 @@ function GameUIStrikePlayer:BuildUI()
 		:onButtonClicked(function()
 			local select_DragonType = self:GetSelectDragonType()
 			local dragon = self:GetDragonManager():GetDragon(select_DragonType)
+
+			local alliance = Alliance_Manager:GetMyAlliance()
+			if alliance:GetAllianceBelvedere():IsReachEventLimit() then
+				UIKit:showMessageDialogWithParams({
+        			content = _("没有空闲的行军队列"),
+        			ok_callback = function()
+        				UIKit:newGameUI('GameUIWathTowerRegion',City,'march'):AddToCurrentScene(true)
+        			end,
+        			ok_string = _("前往解锁")
+    			})
+    			return
+			end
+
 			if dragon:WarningStrikeDragon() then
 				UIKit:showMessageDialog(_("提示"),_("您派出的龙可能会因血量过低而死亡，您确定还要派出吗？"), function()
 					self:OnStrikeButtonClicked()
@@ -143,11 +156,30 @@ function GameUIStrikePlayer:OnButtonClickInItem(dragon_type)
 	self.select_dragon_type = dragon_type
 end
 
+function GameUIStrikePlayer:CheckDragonIsFree()
+	local dragon = self:GetDragonManager():GetDragon(self:GetSelectDragonType())
+
+	if not dragon:IsFree() and not dragon:IsDefenced() then
+        UIKit:showMessageDialog(_("提示"),_("龙未处于空闲状态"))
+        return false
+    elseif dragon:IsDead() then
+	    UIKit:showMessageDialog(_("提示"),_("选择的龙已经死亡"))
+	    return false
+	end
+	if dragon:IsDefenced() then
+		 NetManager:getCancelDefenceDragonPromise():done(function()
+		 	self:SendDataToServer()
+		 end)
+		 return
+	end
+	self:SendDataToServer()
+end
+
 function GameUIStrikePlayer:GetSelectDragonType()
 	return self.select_dragon_type
 end
 
-function GameUIStrikePlayer:OnStrikeButtonClicked()
+function GameUIStrikePlayer:SendDataToServer()
 	if self.strike_type == self.STRIKE_TYPE.CITY then
 		NetManager:getStrikePlayerCityPromise(self:GetSelectDragonType(),self.params):done(function()
 			app:GetAudioManager():PlayeEffectSoundWithKey("DRAGON_STRIKE")
@@ -159,6 +191,10 @@ function GameUIStrikePlayer:OnStrikeButtonClicked()
 			self:LeftButtonClicked()
 		end)
 	end
+end
+
+function GameUIStrikePlayer:OnStrikeButtonClicked()
+	self:CheckDragonIsFree()
 end
 
 return GameUIStrikePlayer

@@ -7,14 +7,6 @@ end
 function TowerEntity:UniqueKey()
     return string.format("%s", self:GetType())
 end
-function TowerEntity:OnUserDataChanged(user_data, current_time)
-    local event = self:GetBuildingEventFromUserDataByLocation(user_data, 22)
-    self:OnEvent(event)
-    local level, finished_time = self:GetBuildingInfoByEventAndLocation(user_data, event, 22)
-    if level and finished_time then
-        self:OnHandle(level, finished_time)
-    end
-end
 -- 获取对各兵种攻击力
 function TowerEntity:GetAtk()
     local config = self.config_building_function[self:GetType()]
@@ -22,7 +14,12 @@ function TowerEntity:GetAtk()
     local c = config[level]
     return c.infantry,c.archer,c.cavalry,c.siege,c.defencePower
 end
-
+function TowerEntity:GetTowerConfig()
+    return self.config_building_function[self:GetType()][self:GetLevel()]
+end
+function TowerEntity:GetTowerNextLevelConfig()
+    return self.config_building_function[self:GetType()][self:GetNextLevel()]
+end
 return TowerEntity
 
 

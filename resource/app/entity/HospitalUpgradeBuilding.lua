@@ -4,6 +4,7 @@ local SPECIAL = GameDatas.Soldiers.special
 local config_function = GameDatas.BuildingFunction.hospital
 local Observer = import(".Observer")
 local Enum = import("..utils.Enum")
+local promise = import("..utils.promise")
 local Localize = import("..utils.Localize")
 local UpgradeBuilding = import(".UpgradeBuilding")
 local HospitalUpgradeBuilding = class("HospitalUpgradeBuilding", UpgradeBuilding)
@@ -14,6 +15,11 @@ function HospitalUpgradeBuilding:ctor(building_info)
     self.soldier_star = 1
     self.treat_event = self:CreateEvent()
     HospitalUpgradeBuilding.super.ctor(self, building_info)
+
+
+
+    self.treat_soldier_callbacks = {}
+    self.finish_soldier_callbacks = {}
 end
 function HospitalUpgradeBuilding:CreateEvent()
     local hospital = self
@@ -96,6 +102,9 @@ function HospitalUpgradeBuilding:CancelSoldierLocalPush(id)
     end
 end
 function HospitalUpgradeBuilding:ResetAllListeners()
+    self.treat_soldier_callbacks = {}
+    self.finish_soldier_callbacks = {}
+
     HospitalUpgradeBuilding.super.ResetAllListeners(self)
     self.hospital_building_observer:RemoveAllObserver()
 end
@@ -123,6 +132,8 @@ function HospitalUpgradeBuilding:TreatSoldiersWithFinishTime(soldiers, finish_ti
     self.hospital_building_observer:NotifyObservers(function(listener)
         listener:OnBeginTreat(self, event)
     end)
+
+    self:CheckTreat(soldiers)
 end
 function HospitalUpgradeBuilding:EndTreatSoldiersWithCurrentTime(current_time)
     local event = self.treat_event
@@ -131,6 +142,8 @@ function HospitalUpgradeBuilding:EndTreatSoldiersWithCurrentTime(current_time)
     self.hospital_building_observer:NotifyObservers(function(listener)
         listener:OnEndTreat(self, event, soldiers, current_time)
     end)
+
+    self:CheckFinish(soldiers)
 end
 -- 获取治疗士兵时间
 function HospitalUpgradeBuilding:GetTreatingTimeByTypeWithCount(soldiers)
@@ -149,6 +162,9 @@ function HospitalUpgradeBuilding:GetSoldierConfigByType(soldier_type)
     local config = NORMAL[config_name] or SPECIAL[soldier_type]
     return config
 end
+function HospitalUpgradeBuilding:IsNeedToUpdate()
+    return self.upgrade_to_next_level_time ~= 0 or (self.level > 0 and self.treat_event:IsTreating())
+end
 function HospitalUpgradeBuilding:OnTimer(current_time)
     local event = self.treat_event
     if event:IsTreating() then
@@ -161,7 +177,7 @@ end
 
 function HospitalUpgradeBuilding:OnUserDataChanged(...)
     HospitalUpgradeBuilding.super.OnUserDataChanged(self, ...)
-    local userData, current_time, location_id, sub_location_id, deltaData = ...
+    local userData, current_time, location_info, sub_location_id, deltaData = ...
 
     if not userData.treatSoldierEvents then return end
 
@@ -237,6 +253,42 @@ function HospitalUpgradeBuilding:GetCasualtyRate()
         return config_function[self:GetEfficiencyLevel()].casualtyRate
     end
     return 0
+end
+
+
+
+
+--- fte 
+-- fte
+local function promiseOfSoldier(callbacks, soldier_type)
+    assert(soldier_type)
+    assert(#callbacks == 0)
+    local p = promise.new()
+    table.insert(callbacks, function(soldiers)
+        for _,v in pairs(soldiers) do
+            if v.name == soldier_type then
+                return p:resolve(soldier_type)
+            end
+        end
+    end)
+    return p
+end
+local function checkSoldier(callbacks, soldiers)
+    if #callbacks > 0 and callbacks[1](soldiers) then
+        table.remove(callbacks, 1)
+    end
+end
+function HospitalUpgradeBuilding:CheckTreat(soldiers)
+    checkSoldier(self.treat_soldier_callbacks, soldiers)
+end
+function HospitalUpgradeBuilding:PromiseOfTreatSoldier(soldier_type)
+    return promiseOfSoldier(self.treat_soldier_callbacks, soldier_type)
+end
+function HospitalUpgradeBuilding:CheckFinish(soldiers)
+    checkSoldier(self.finish_soldier_callbacks, soldiers)
+end
+function HospitalUpgradeBuilding:PromiseOfFinishTreatSoldier(soldier_type)
+    return promiseOfSoldier(self.finish_soldier_callbacks, soldier_type)
 end
 
 return HospitalUpgradeBuilding

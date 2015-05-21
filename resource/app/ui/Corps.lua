@@ -127,13 +127,13 @@ local function return_x_y_by_index(start_x, start_y, width, height, row_max, col
     local cur_col = math.floor(index / row_max)
     return start_x + (cur_col + 0.5) * unit_width, start_y + (cur_row + 0.5) * unit_height
 end
-function Corps:ctor(soldier, star, row, col, width, height, is_pve_battle, ui_replay)
+function Corps:ctor(soldier, star, row, col, width, height, is_pve_soldier, ui_replay)
     Corps.super.ctor(self, ui_replay)
     self.soldier = soldier
     self.config = special[self.soldier] or normal[self.soldier.."_"..star]
     self.star = self.config.star
     
-    local corps_config = is_pve_battle and pve_soldier_config or soldier_config
+    local corps_config = is_pve_soldier and pve_soldier_config or soldier_config
     local cur_config = corps_config[self.soldier][self.star]
     local ani_name, start_x, start_y,_ = unpack(cur_config)
 

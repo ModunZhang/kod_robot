@@ -51,17 +51,19 @@ function GameUIShop:onEnter()
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "重置玩家数据和联盟",
+        text = "重新生成OpenUDID",
         size = 20,
         font = UIKit:getFontFilePath(),
         color = UIKit:hex2c3b(0xfff3c7)}))
         :addTo(content)
         :align(display.CENTER, window.left + 500, window.top - 500)
         :onButtonClicked(function()
-            math.randomseed(os.time())
-            cc.UserDefault:getInstance():setStringForKey("udid", math.random(1234567890))
-            cc.UserDefault:getInstance():flush()
-            app:restart()
+            if device.platform == 'ios' then
+                ext.clearOpenUdid()
+                app:restart()
+            elseif device.platform == 'mac' then
+                 device.showAlert("提示","改代码!",{_("确定")})
+            end
         end)
 
 
@@ -142,12 +144,12 @@ function GameUIShop:onEnter()
             end
         end)
 
-    local member_id
-    for _, v in ipairs(Alliance_Manager:GetMyAlliance():JoinRequestEvents()) do
-        if v.id ~=  DataManager:getUserData()._id then
-            member_id = v.id
-        end
-    end
+    -- local member_id
+    -- for _, v in ipairs(Alliance_Manager:GetMyAlliance():JoinRequestEvents()) do
+    --     if v.id ~=  DataManager:getUserData()._id then
+    --         member_id = v.id
+    --     end
+    -- end
     local join_btn = WidgetPushButton.new(
         {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
         {scale9 = false}
@@ -854,39 +856,43 @@ function GameUIShop:onEnter()
             app:GetAudioManager():SwitchEffectSoundState(not app:GetAudioManager():GetEffectSoundState())
             event.target:setButtonLabelString("音效开关->" .. (app:GetAudioManager():GetEffectSoundState() and "on" or "off"))
         end)
-    -- WidgetPushButton.new(
-    --     {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
-    --     {scale9 = false}
-    -- ):setButtonLabel(cc.ui.UILabel.new({
-    --     UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-    --     text = "本地推送->" .. (app:GetPushManager():IsNotificationIsOn() and "on" or "off"),
-    --     size = 20,
-    --     font = UIKit:getFontFilePath(),
-    --     color = UIKit:hex2c3b(0xfff3c7)}))
-    --     :addTo(content)
-    --     :align(display.CENTER, window.left + 500, window.top - 1400)
-    --     :onButtonClicked(function(event)
-    --         app:GetPushManager():SwitchNotification(not app:GetPushManager():IsNotificationIsOn())
-    --         event.target:setButtonLabelString("本地推送->" .. (app:GetPushManager():IsNotificationIsOn() and "on" or "off"))
-    --     end)
+    WidgetPushButton.new(
+        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {scale9 = false}
+    ):setButtonLabel(cc.ui.UILabel.new({
+        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        text = "游戏说明",
+        size = 20,
+        font = UIKit:getFontFilePath(),
+        color = UIKit:hex2c3b(0xfff3c7)}))
+        :addTo(content)
+        :align(display.CENTER, window.left + 500, window.top - 1400)
+        :onButtonClicked(function(event)
+            UIKit:newGameUI("GameUITips"):AddToCurrentScene(true)
+        end)
 
     WidgetPushButton.new(
         {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "语言->"  .. app:GetGameLanguage(),
+        text = "在线人数",
         size = 20,
         font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
+        color = cc.c3b(0,0,255)}))
         :addTo(content)
         :align(display.CENTER, window.left + 140, window.top - 1500)
         :onButtonClicked(function(event)
-            if app:GetGameLanguage() == 'zh_Hans' then
-                app:SetGameLanguage("en_US")
-            else
-                app:SetGameLanguage("zh_Hans")
-            end
+            NetManager:getServersPromise():done(function(response)
+                if response.msg.code == 200 then
+                    local servers = response.msg.servers
+                    local str = ""
+                    for __,v in ipairs(servers) do
+                        str = str .. string.format("%s %d\n",v.id,v.userCount)
+                    end
+                     device.showAlert("在线人数", str,{_("确定")})
+                end
+            end)
         end)
 
     WidgetPushButton.new(
@@ -962,7 +968,7 @@ function GameUIShop:onEnter()
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "iOS购买金龙币",
+        text = "OpenUDID调试",
         size = 20,
         font = UIKit:getFontFilePath(),
         color =  cc.c3b(255,0,0)
@@ -970,18 +976,8 @@ function GameUIShop:onEnter()
         :addTo(content)
         :align(display.CENTER, window.left + 500, window.top - 1600)
         :onButtonClicked(function(event)
-            if device.platform == 'ios' then
-                -- print(Store.canMakePurchases(),"Store.canMakePurchases--->")
-
-                -- Store.loadProducts({"kod.1dollar"}, function(data)
-                --     dump(data,"data---->")
-                -- end)
-                -- Store.purchase("kod.1dollar")
-                app:getStore().purchaseWithProductId("product_1",1)
-            else
-                device.showAlert("提示",device.platform .. " is not support for IAP",{_("确定")})
-            end
-
+                local str = string.format("OpenUDID:%s",device.getOpenUDID())
+                device.showAlert("提示",str,{_("确定")})
         end)
     item:addContent(content)
     item:setItemSize(640, 1000)

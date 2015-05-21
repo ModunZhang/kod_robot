@@ -33,12 +33,17 @@ function GameUISelectTerrain:OnMoveInStage()
 
     self.ui_map.select:onButtonClicked(function(event)
         self.ui_map.select:setButtonEnabled(false)
-        NetManager:initPlayerData(self.terrainType):done(function()
+        if DataManager:getUserData().basicInfo.terrain ~= "__NONE__" then
+            DataManager:setFteUserDeltaData()
+            self.select_promise:resolve()
+        else
+            NetManager:initPlayerData(self.terrainType):done(function()
                 DataManager:setFteUserDeltaData()
                 self.select_promise:resolve()
-        end):fail(function()
-            self.ui_map.select:setButtonEnabled(true)
-        end)
+            end):fail(function()
+                self.ui_map.select:setButtonEnabled(true)
+            end)
+        end
     end)
 end
 local terrain_map = {
@@ -68,7 +73,6 @@ local desc_map = {
 }
 function GameUISelectTerrain:RefreshDragon(terrainType)
     UILib.loadDragonAnimation()
-    terrainType = terrainType or "grassLand"
     self.ui_map.dragon_background:setTexture(string.format("fte_select_dragon_%s.jpg", terrainType))
     self.ui_map.dragon_background:removeAllChildren()
     local ani_name, ox, oy = unpack(terrain_map[terrainType])

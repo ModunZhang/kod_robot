@@ -208,6 +208,7 @@ function User:EncodePveDataAndResetFightRewardsData()
         },
         fightData = fightData,
         rewards = rewards,
+        -- rewardedFloor = nil,
     }
 end
 function User:ResetAllListeners()
@@ -321,7 +322,6 @@ function User:OnUserDataChanged(userData, current_time, deltaData)
     self:OnDailyQuestsEventsChanged(userData,deltaData)
     -- 交易
     self.trade_manager:OnUserDataChanged(userData,deltaData)
-    self:GetPVEDatabase():OnUserDataChanged(userData, deltaData)
 
     -- vip event
     self:OnVipEventDataChange(userData, deltaData)
@@ -416,7 +416,7 @@ end
 
 function User:CheckDailyTasksWasRewarded(task_type)
     for __,v in ipairs(self:GetAllDailyTasks().rewarded) do
-        return v == task_type
+        if v == task_type then return true end
     end
     return false
 end
@@ -789,6 +789,9 @@ function User:GetPlayerLevelByExp(exp)
     end
     return 0
 end
+function User:GetCurrentLevelExp(level)
+    return config_playerLevel[level].expFrom
+end
 function User:GetCurrentLevelMaxExp(level)
     local config = config_playerLevel[tonumber(level) + 1]
     if not config then
@@ -796,7 +799,6 @@ function User:GetCurrentLevelMaxExp(level)
     else
         return config.expFrom
     end
-
 end
 --获得有加成的龙类型
 function User:GetBestDragon()

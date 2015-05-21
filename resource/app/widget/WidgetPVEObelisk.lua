@@ -17,7 +17,7 @@ function WidgetPVEObelisk:SetUpButtons()
         {
             {
                 label = _("探索"), 
-                icon = "alliacne_search_29x33.png",
+                icon = "icon_info_56x56.png",
                 callback = function()
                     local rollback = self:Search()
                     self:GetRewardsFromServer():fail(function()

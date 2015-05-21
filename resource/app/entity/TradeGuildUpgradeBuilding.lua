@@ -31,6 +31,18 @@ function TradeGuildUpgradeBuilding:GetCartRecovery()
     end
     return 0
 end
+function TradeGuildUpgradeBuilding:GetNextLevelMaxCart()
+    if self:GetNextLevel() > 0 then
+        return config_function[self:GetNextLevel()].maxCart
+    end
+    return 0
+end
+function TradeGuildUpgradeBuilding:GetNextLevelCartRecovery()
+    if self:GetNextLevel() > 0 then
+        return config_function[self:GetNextLevel()].cartRecovery
+    end
+    return 0
+end
 function TradeGuildUpgradeBuilding:GetUnlockSellQueueLevel(queueIndex)
     for k,v in pairs(config_function) do
         if v.maxSellQueue==queueIndex then

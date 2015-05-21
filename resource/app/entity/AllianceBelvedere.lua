@@ -265,6 +265,14 @@ function AllianceBelvedere:OnFightEventTimerChanged(fightEvent)
 		self:CallEventsChangedListeners(AllianceBelvedere.LISTEN_TYPE.OnFightEventTimerChanged,{fightEvent}) 
 	end
 end
+-- 刷新事件 我方联盟刷新会发送 OnMarchDataChanged 敌方联盟刷新会发送OnCommingDataChanged
+function AllianceBelvedere:OnMarchEventRefreshed(changed_event_name)
+	if self:GetAlliance():IsMyAlliance() then
+		self:NotifyMarchDataChanged()
+	else
+		Alliance_Manager:GetMyAlliance():GetAllianceBelvedere():NotifyCommingDataChanged()
+	end
+end
 
 function AllianceBelvedere:NotifyMarchDataChanged()
 	self:CallEventsChangedListeners(AllianceBelvedere.LISTEN_TYPE.OnMarchDataChanged,{})

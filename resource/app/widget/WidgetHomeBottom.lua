@@ -78,7 +78,7 @@ function WidgetHomeBottom:OnBottomButtonClicked(event)
     elseif tag == 3 then
         UIKit:newGameUI('GameUIMail',self.city):AddToCurrentScene(true)
     elseif tag == 2 then
-        UIKit:newGameUI('GameUIItems',self.city):AddToCurrentScene(true)
+        UIKit:newGameUI('GameUIItems',self.city,"myItems"):AddToCurrentScene(true)
     elseif tag == 1 then
         UIKit:newGameUI('GameUIMission',self.city):AddToCurrentScene(true)
     elseif tag == 5 then

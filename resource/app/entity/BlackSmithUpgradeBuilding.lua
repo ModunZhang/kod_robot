@@ -75,7 +75,7 @@ function BlackSmithUpgradeBuilding:CreateEvent()
         return self.id
     end
     function event:ContentDesc()
-        return string.format("%s %s", _("正在制作"), Localize.equip[self:Content()])
+        return string.format(_("正在制作 %s"), Localize.equip[self:Content()])
     end
     function event:TimeDesc(time)
         return GameUtils:formatTimeStyle1(self:LeftTime(time)), self:Percent(time)
@@ -115,6 +115,7 @@ end
 function BlackSmithUpgradeBuilding:EndMakeEquipmentWithCurrentTime()
     local event = self.making_event
     local equipment = event:Content()
+    self:CancelToolsLocalPush(event.id)
     event:SetContentWithFinishTime(nil, 0)
     self.black_smith_building_observer:NotifyObservers(function(listener)
         listener:OnEndMakeEquipmentWithEvent(self, event, equipment)
@@ -131,7 +132,9 @@ function BlackSmithUpgradeBuilding:GetMakingTimeByEquipment(equipment)
     local config = config_equipments[equipment]
     return config.makeTime
 end
-
+function BlackSmithUpgradeBuilding:IsNeedToUpdate()
+    return self.upgrade_to_next_level_time ~= 0 or (self.level > 0 and self.making_event:IsMaking())
+end
 function BlackSmithUpgradeBuilding:OnTimer(current_time)
     local event = self.making_event
     if event:IsMaking() then
@@ -143,16 +146,19 @@ function BlackSmithUpgradeBuilding:OnTimer(current_time)
 end
 function BlackSmithUpgradeBuilding:OnUserDataChanged(...)
     BlackSmithUpgradeBuilding.super.OnUserDataChanged(self, ...)
-    local userData, current_time, location_id, sub_location_id, deltaData = ...
-    
-    if not userData.dragonEquipmentEvents then return end
-
+    local userData, current_time, location_info, sub_location_id, deltaData = ...
+    self:OnFunctionDataChange(userData, deltaData, current_time)
+end
+function BlackSmithUpgradeBuilding:OnFunctionDataChange(userData, deltaData, current_time)
     local is_fully_update = deltaData == nil
     local is_delta_update = self:IsUnlocked() and deltaData and deltaData.dragonEquipmentEvents
     if not is_fully_update and not is_delta_update then
-        return 
+        return false
     end
-    print("BlackSmithUpgradeBuilding:OnUserDataChanged")
+
+    if not userData.dragonEquipmentEvents then return end
+
+    print("BlackSmithUpgradeBuilding:OnFunctionDataChange")
 
     if is_delta_update then
         local dragonEquipmentEvents = deltaData.dragonEquipmentEvents
@@ -164,17 +170,30 @@ function BlackSmithUpgradeBuilding:OnUserDataChanged(...)
     local event = userData.dragonEquipmentEvents[1]
     if event then
         local finished_time = event.finishTime / 1000
-        if self:IsEquipmentEventEmpty() then
+        local makingEvent = self:GetMakeEquipmentEvent()
+        if makingEvent:IsEmpty() then
             self:MakeEquipmentWithFinishTime(event.name, finished_time, event.id)
+            self:GeneralToolsLocalPush(makingEvent)
         else
-            local makingEvent = self:GetMakeEquipmentEvent()
             if finished_time ~= makingEvent:FinishTime() then
                 self:SpeedUpMakingEquipment()
                 self:GetMakeEquipmentEvent():SetContentWithFinishTime(event.name, finished_time, event.id)
+                self:GeneralToolsLocalPush(makingEvent)
             end
         end
     elseif not self:IsEquipmentEventEmpty() then
         self:EndMakeEquipmentWithCurrentTime()
+    end
+end
+function BlackSmithUpgradeBuilding:GeneralToolsLocalPush(event)
+    if ext and ext.localpush then
+        local title = string.format(_("制造%s装备完成"), Localize.equip[event:Content()])
+        app:GetPushManager():UpdateToolEquipmentPush(event:FinishTime(), title, event.id)
+    end
+end
+function BlackSmithUpgradeBuilding:CancelToolsLocalPush(event_id)
+    if ext and ext.localpush then
+        app:GetPushManager():CancelToolEquipmentPush(event_id)
     end
 end
 

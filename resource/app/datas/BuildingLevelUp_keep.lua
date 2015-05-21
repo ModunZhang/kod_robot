@@ -42,7 +42,7 @@ keep[4] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 360
+	["buildTime"] = 240
 }
 keep[5] = {
 	["level"] = 5,
@@ -53,7 +53,7 @@ keep[5] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 480
+	["buildTime"] = 300
 }
 keep[6] = {
 	["level"] = 6,

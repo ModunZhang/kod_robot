@@ -90,7 +90,3 @@ end
 
 return BitBaseN
 
-
-
-
-

@@ -42,6 +42,7 @@ local sort_map = Enum(
     "wall",
     "tower"
 )
+local pairs = pairs
 
 
 function Building:ctor(building_info)
@@ -69,7 +70,7 @@ function Building:ResetAllListeners()
     self:GetBaseObserver():RemoveAllObserver()
 end
 function Building:AddBaseListener(listener)
-    assert(listener.OnOrientChanged)
+    -- assert(listener.OnOrientChanged)
     assert(listener.OnLogicPositionChanged)
     assert(listener.OnTransformed)
     return self.base_building_observer:AddObserver(listener)
@@ -77,9 +78,9 @@ end
 function Building:RemoveBaseListener(listener)
     self.base_building_observer:RemoveObserver(listener)
 end
-function Building:CopyListenerFrom(building)
-    self.base_building_observer:CopyListenerFrom(building:GetBaseObserver())
-end
+-- function Building:CopyListenerFrom(building)
+--     self.base_building_observer:CopyListenerFrom(building:GetBaseObserver())
+-- end
 function Building:CopyValueFrom(building)
     self.x = building.x
     self.y = building.y
@@ -106,23 +107,23 @@ local house_type = {
     ["miner"] = true,
 }
 function Building:IsHouse()
-    return house_type[self:GetType()]
+    return house_type[self.building_type]
 end
 function Building:GetOrient()
     return self.orient
 end
-function Building:SetOrient(orient)
-    if not self.can_change_head then return end
-    assert(orient == Orient.X or orient == Orient.Y)
-    if self.orient ~= orient then
-        local old_orient = self.orient
-        self.orient = orient
-        self.w, self.h = self.h, self.w
-        self.base_building_observer:NotifyObservers(function(listener)
-            listener:OnOrientChanged(old_orient, orient, self.w, self.h)
-        end)
-    end
-end
+-- function Building:SetOrient(orient)
+--     if not self.can_change_head then return end
+--     assert(orient == Orient.X or orient == Orient.Y)
+--     if self.orient ~= orient then
+--         local old_orient = self.orient
+--         self.orient = orient
+--         self.w, self.h = self.h, self.w
+--         self.base_building_observer:NotifyObservers(function(listener)
+--             listener:OnOrientChanged(old_orient, orient, self.w, self.h)
+--         end)
+--     end
+-- end
 function Building:SetLogicPosition(x, y)
     self.x, self.y = x, y
     self.base_building_observer:NotifyObservers(function(listener)
@@ -147,7 +148,7 @@ function Building:IsNearByBuildingWithLength(building, len)
     local mid_x, mid_y = self:GetMidLogicPosition()
     local w, h = self:GetSize()
     local half_w, half_h = w/2, h/2
-    for k, v in pairs({
+    for _,v in pairs({
         {start_x, start_y},
         {start_x, end_y},
         {end_x, start_y},

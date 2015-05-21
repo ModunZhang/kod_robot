@@ -22,6 +22,22 @@ function cc.c3b( _r,_g,_b )
     end
     return setmetatable(c, c3b_m_)
 end
+local c4b_ = cc.c4b
+function cc.c4b(...)
+    local rgba = {...}
+    if #rgba == 0 then
+        return c4b_(0,0,0,0)
+    elseif #rgba == 1 then
+        return c4b_(rgba[1], rgba[1], rgba[1], rgba[1])
+    elseif #rgba == 2 then
+        return c4b_(rgba[1], rgba[2], rgba[2], rgba[2])
+    elseif #rgba == 3 then
+        return c4b_(rgba[1], rgba[2], rgba[3], rgba[3])
+    elseif #rgba >= 4 then
+        return c4b_(rgba[1], rgba[2], rgba[3], rgba[4])
+    end
+end
+cc.c4f = cc.c4b
 
 
 
@@ -230,13 +246,22 @@ function display.newScene(name)
     function scene:WaitForNet(delay)
         local child = self:getChildByTag(WAI_TAG)
         if not child then
-            UIKit:newGameUI("GameUIWatiForNetWork",delay):AddToScene(self, true):zorder(2001):setTag(WAI_TAG)
+            UIKit:newGameUI("GameUIWatiForNetWork",delay):AddToScene(self, true):zorder(4001):setTag(WAI_TAG)
         else
             child:DelayShow(delay)
         end
     end
     function scene:NoWaitForNet()
         self:removeChildByTag(WAI_TAG, true)
+    end
+
+    function scene:onEnterTransitionFinish()
+        printLog("Info", "Check MessageDialog :%s",self.__cname)
+        local message = UIKit:getMessageDialogWillShow()
+        if message then
+            message:AddToScene(self,true)
+            UIKit:clearMessageDialogWillShow()
+        end
     end
     return scene
 end

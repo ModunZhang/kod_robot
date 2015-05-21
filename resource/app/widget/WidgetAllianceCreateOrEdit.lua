@@ -46,12 +46,12 @@ function WidgetAllianceCreateOrEdit:onEnter()
     	end)
 		local gemIcon = display.newSprite("gem_icon_62x61.png")
 			:addTo(self)
-			:align(display.LEFT_BOTTOM,okButton:getPositionX() - 360,12)
+			:align(display.LEFT_BOTTOM,okButton:getPositionX() - 345,28)
 			:scale(0.5)
 		local gemLabel = UIKit:ttfLabel({
 			text = self:IsCreate() and config_intInit.createAllianceGem.value or config_intInit.editAllianceBasicInfoGem.value,
-			size = 16,
-			color = 0x615b44
+			size = 22,
+			color = 0x403c2f
 		})
 			:addTo(self)
 			:align(display.LEFT_CENTER, gemIcon:getPositionX()+gemIcon:getCascadeBoundingBox().width + 4,gemIcon:getPositionY() + gemIcon:getCascadeBoundingBox().height/2)
@@ -81,7 +81,7 @@ function WidgetAllianceCreateOrEdit:CreateAllianceButtonClicked()
 	if string.utf8len(data.name) < 3 or string.utf8len(data.name) > 20 or string.find(data.name,"%p") then
 		errMsg = _("联盟名称不合法") .. _("只允许字母、数字和空格，需要3~20个字符")
 	end 
-	if string.utf8len(data.tag) < 1 or string.utf8len(data.tag) > 3 or not string.match(data.tag,"^%w%w?%w?") then
+	if string.utf8len(data.tag) < 1 or string.utf8len(data.tag) > 3 or not string.match(data.tag,"^%w%w?%w?$") then
 		errMsg = _("联盟标签不合法") .. _("只允许字母、数字需要1~3个字符")
 	end
 	if self:IsCreate() then

@@ -54,10 +54,14 @@ function GameUIUpgradeBuilding:Find()
 end
 function GameUIUpgradeBuilding:PromiseOfFte()
     self.tabs:SelectTab("upgrade")
+    self.upgrade_layer.acc_layer.acc_button:setButtonEnabled(false)
+    self.upgrade_layer.OnBuildingUpgradingBegin = function() end
     self:GetFteLayer():SetTouchObject(self:Find())
+
 
     self:Find():removeEventListenersByEvent("CLICKED_EVENT")
     self:Find():onButtonClicked(function()
+        self.upgrade_layer.acc_layer.acc_button:setButtonEnabled(false)
         self:Find():setButtonEnabled(false)
         if self.building:IsHouse() then
             local tile = self.building:BelongCity():GetTileWhichBuildingBelongs(self.building)
@@ -68,6 +72,7 @@ function GameUIUpgradeBuilding:PromiseOfFte()
         end
 
         self:LeftButtonClicked()
+        self.upgrade_layer.acc_layer.acc_button:setButtonEnabled(false)
     end)
 
     local r = self:Find():getCascadeBoundingBox()
