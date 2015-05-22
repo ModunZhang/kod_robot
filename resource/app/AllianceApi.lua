@@ -25,7 +25,65 @@ function AllianceApi:getQuitAlliancePromise()
     if not Alliance_Manager:GetMyAlliance():IsDefault() and
         Alliance_Manager:GetMyAlliance():Status() ~= "prepare" and
         Alliance_Manager:GetMyAlliance():Status() ~= "fight" then
-        return NetManager:getQuitAlliancePromise()
+        if math.random(100) < 5 then
+            local members = Alliance_Manager:GetMyAlliance():GetAllMembers()
+            if LuaUtils:table_size(members) == 1 or not Alliance_Manager:GetMyAlliance():GetSelf():IsArchon() then
+                return NetManager:getQuitAlliancePromise()
+            end
+        end
+    end
+end
+-- 踢出或者改变成员职位
+function AllianceApi:AllianceMemberApi()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() then
+        local members = alliance:GetAllMembers()
+        local member_index = math.random(LuaUtils:table_size(members))
+        local count = 0
+        local member
+        local me = alliance:GetSelf()
+        while not member do
+            alliance:IteratorAllMembers(function ( id,v )
+                count = count + 1
+                if count == member_index then
+                    if v:Id() == me:Id() then
+                        member_index = member_index + 1
+                    else
+                        member = v
+                    end
+                end
+            end)
+        end
+        local excute_fun = math.random(10)
+        if excute_fun ~= 1 then
+            -- 职位改变
+            local up_or_down = math.random(2)
+            if up_or_down == 1 then
+                -- 降级
+                local auth,title_can = me:CanDemotionMemberLevel(member:Title())
+                local isLow = member:IsTitleLowest()
+                if auth and title_can and not isLow then
+                    print("职位降级",member:Name(),member:TitleDegrade())
+                    return NetManager:getEditAllianceMemberTitlePromise(member:Id(), member:TitleDegrade())
+                end
+            else
+                -- 晋级
+                local auth,title_can = me:CanUpgradeMemberLevel(member:TitleUpgrade())
+                local isHighest = member:IsTitleHighest()
+                if auth and title_can and not isHighest then
+                    print("职位晋级",member:Name(),member:TitleUpgrade())
+                    return NetManager:getEditAllianceMemberTitlePromise(member:Id(), member:TitleUpgrade())
+                end
+
+            end
+        else
+            -- 踢出
+            local auth,title_can = me:CanKickOutMember(member:Title())
+            if not title_can or not auth then
+                return
+            end
+            return NetManager:getAllianceMemberApiPromise(member:Id())
+        end
     end
 end
 -- 联盟捐赠
@@ -120,22 +178,64 @@ function AllianceApi:UpgradeAllianceVillage()
         end
     end
 end
--- 修改联盟地形
-function AllianceApi:EditTerrain()
+-- 修改联盟设置
+function AllianceApi:EditAllianceInfo()
     local alliance = Alliance_Manager:GetMyAlliance()
-    if not alliance:IsDefault() and alliance:GetSelf():CanEditAlliance() and alliance:Status() ~= "fight" then
-        local terrains = {
-            "grassLand",
-            "desert",
-            "iceField",
-        }
-        local current_terrain = alliance:Terrain()
-        local to_terrain = clone(current_terrain)
-        while to_terrain == current_terrain do
-            to_terrain = terrains[math.random(#terrains)]
+    local me = alliance:GetSelf()
+    if not alliance:IsDefault()  and alliance:Status() ~= "fight" and alliance:Status() ~= "prepare" then
+        local excute_fun = math.random(100)
+        if excute_fun <= 5 then
+            local need_honour =GameDatas.AllianceInitData.intInit.editAllianceTerrianHonour.value
+            if me:CanEditAlliance() and need_honour <= alliance:Honour() then
+                local terrains = {
+                    "grassLand",
+                    "desert",
+                    "iceField",
+                }
+                local current_terrain = alliance:Terrain()
+                local to_terrain = clone(current_terrain)
+                while to_terrain == current_terrain do
+                    to_terrain = terrains[math.random(#terrains)]
+                end
+                print("修改联盟地形:",current_terrain,"到",to_terrain)
+                return NetManager:getEditAllianceTerrianPromise(to_terrain)
+            end
+        elseif excute_fun <= 10 then
+            if me:CanEditAllianceJoinType() then
+                if alliance:JoinType() == "all" then
+                    print("修改联盟加入type到:audit")
+                    return NetManager:getEditAllianceJoinTypePromise("audit")
+                else
+                    print("修改联盟加入type到:all")
+                    return NetManager:getEditAllianceJoinTypePromise("all")
+                end
+            end
+        elseif excute_fun <= 15 then
+            if me:CanEditAllianceNotice() then
+                return NetManager:getEditAllianceNoticePromise("机器人联盟公告")
+            end
+        elseif excute_fun <= 20 then
+            if me:CanEditAllianceNotice() then
+                return NetManager:getEditAllianceDescriptionPromise("机器人联盟描述")
+            end
+        elseif excute_fun <= 25 and me:CanEditAllianceMemeberTitle() then
+            local titles = alliance:Titles()
+            local title_keys = {
+                "supervisor",
+                "quartermaster",
+                "elite",
+                "member",
+                "archon",
+                "general",
+            }
+            local change_title = title_keys[math.random(#title_keys)]
+            print("修改联盟职位名称",change_title)
+            return NetManager:getEditAllianceTitleNamePromise(change_title,"机器人"..change_title)
+        elseif excute_fun <= 30 then
+            return NetManager:getItemLogsPromise(alliance:Id())
+        elseif excute_fun <= 35 then
+            return NetManager:getNearedAllianceInfosPromise()
         end
-        print("修改联盟地形:",current_terrain,"到",to_terrain)
-        return NetManager:getEditAllianceTerrianPromise(to_terrain)
     end
 end
 -- 发忠诚值给联盟成员
@@ -255,7 +355,7 @@ function AllianceApi:HelpSpeedUp()
             if help_all then
                 return NetManager:getHelpAllAllianceMemberSpeedUpPromise()
             else
-                local event = can_help[#math.random(#can_help)]
+                local event = can_help[math.random(#can_help)]
                 return NetManager:getHelpAllianceMemberSpeedUpPromise(event:Id())
             end
         end
@@ -270,23 +370,39 @@ end
 -- 联盟方法组
 local function JoinAlliance()
     if Alliance_Manager:GetMyAlliance():IsDefault() then
-        NetManager:getFetchCanDirectJoinAlliancesPromise():done(function(response)
-            if not response.msg or not response.msg.allianceDatas then setRun() return end
-            if response.msg.allianceDatas then
-                local find_alliance = response.msg.allianceDatas[math.random(#response.msg.allianceDatas)]
-                if find_alliance.members == find_alliance.membersMax then
+        local page = 0
+        local joined = false
+        local function join()
+            if joined then
+                return
+            end
+            NetManager:getFetchCanDirectJoinAlliancesPromise(page):done(function(response)
+                if not response.msg or not response.msg.allianceDatas then
                     setRun()
                     return
                 end
-                local find_id = find_alliance.id
-                local p = AllianceApi:JoinAlliance(find_id)
-                if p then
-                    p:always(setRun)
-                else
-                    setRun()
+                if response.msg.allianceDatas then
+                    if #response.msg.allianceDatas == 0 then
+                        setRun()
+                        return
+                    end
+                    for i,find_alliance in ipairs(response.msg.allianceDatas) do
+                        if find_alliance.members < find_alliance.membersMax then
+                            local find_id = find_alliance.id
+                            local p = AllianceApi:JoinAlliance(find_id)
+                            if p then
+                                p:always(setRun)
+                                joined = true
+                                return
+                            end
+                        end
+                    end
+                    page = page + 10
+                    join()
                 end
-            end
-        end)
+            end)
+        end
+        join()
     else
         setRun()
     end
@@ -347,8 +463,8 @@ function UpgradeAllianceVillage()
         setRun()
     end
 end
-function EditTerrain()
-    local p = AllianceApi:EditTerrain()
+function EditAllianceInfo()
+    local p = AllianceApi:EditAllianceInfo()
     if p then
         p:always(setRun)
     else
@@ -363,6 +479,15 @@ function GiveLoyalty()
         setRun()
     end
 end
+function AllianceMemberApi()
+    local p = AllianceApi:AllianceMemberApi()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+
 return {
     setRun,
     JoinAlliance,
@@ -372,10 +497,36 @@ return {
     Contribute,
     UpgradeAllianceBuilding,
     UpgradeAllianceVillage,
-    EditTerrain,
+    EditAllianceInfo,
     GiveLoyalty,
--- getQuitAlliancePromise,
+    AllianceMemberApi,
+    getQuitAlliancePromise,
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

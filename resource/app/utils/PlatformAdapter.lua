@@ -91,7 +91,7 @@ function PlatformAdapter:mac()
         }
         print__(table.concat(t))
     end
-    print = function(...)end
+    -- print = function(...)end
 end
 
 

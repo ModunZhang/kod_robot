@@ -302,6 +302,85 @@ function DaliyApi:TradeGuild()
         end
     end
 end
+-- 日常奖励领取
+function DaliyApi:GetDaliyRewards()
+    local countInfo = User:GetCountInfo()
+    local real_index = countInfo.day60 % 30
+    for index = 1,30 do
+        if countInfo.day60 > countInfo.day60RewardsCount and real_index == index then
+            print("领取getDay60RewardPromise奖励",countInfo.day60,countInfo.day60RewardsCount,real_index , index)
+            return NetManager:getDay60RewardPromise()
+        end
+    end
+    -- 在线奖励
+    --flag 1.已领取 2.可以领取 3.还不能领取
+    local config_online = GameDatas.Activities.online
+    local on_line_time = DataUtils:getPlayerOnlineTimeMinutes()
+    local r = {}
+    for __,v in pairs(config_online) do
+        local flag = 3
+        if v.onLineMinutes <= on_line_time then
+            local is_get = false
+            for ___,todayOnLine in ipairs(countInfo.todayOnLineTimeRewards) do
+                if todayOnLine == v.timePoint then
+                    is_get = true
+                end
+            end
+            if is_get then
+                flag = 1
+            else
+                flag = 2
+            end
+        end
+        if flag == 2 then
+            print("领取在线奖励",v.timePoint)
+            return NetManager:getOnlineRewardPromise(v.timePoint)
+        end
+    end
+
+
+    -- 登陆14天奖励
+    -- flag 1.已领取 2.可领取 3.明天领取 0 未来的
+    local r = {}
+    local config_day14 = GameDatas.Activities.day14
+    for i,v in ipairs(config_day14) do
+        local config_rewards = string.split(v.rewards,",")
+        if #config_rewards == 1 then
+            local reward_type,item_key,count = unpack(string.split(v.rewards,":"))
+            local flag = 0
+            if v.day <= countInfo.day14RewardsCount then
+                flag = 1
+            elseif v.day == countInfo.day14 and countInfo.day14 > countInfo.day14RewardsCount then
+                flag = 2
+            elseif v.day == countInfo.day14 + 1  then
+                flag = 3
+            end
+            if flag == 2 then
+                print("领取day14奖励")
+                return NetManager:getDay14RewardPromise()
+            end
+        else
+            for __,one_reward in ipairs(config_rewards) do
+                local reward_type,item_key,count = unpack(string.split(one_reward,":"))
+                if reward_type == 'soldiers' then
+                    local flag = 0
+                    if v.day <= countInfo.day14RewardsCount then
+                        flag = 1
+                    elseif v.day == countInfo.day14 and countInfo.day14 > countInfo.day14RewardsCount then
+                        flag = 2
+                    elseif v.day == countInfo.day14 + 1  then
+                        flag = 3
+                    end
+                    if flag == 2 then
+                        print("领取day14奖励")
+                        return NetManager:getDay14RewardPromise()
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function setRun()
     app:setRun()
 end
@@ -338,6 +417,14 @@ local function TradeGuild()
         setRun()
     end
 end
+local function GetDaliyRewards()
+    local p = DaliyApi:GetDaliyRewards()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 
 return {
     setRun,
@@ -345,7 +432,13 @@ return {
     MilitaryTech,
     ToolShop,
     TradeGuild,
+    GetDaliyRewards,
 }
+
+
+
+
+
 
 
 

@@ -154,45 +154,45 @@ function OtherApi:MailApi()
             return NetManager:getSendPersonalMailPromise(memberId, "机器人邮件", "只是一封邮件" )
         end
     elseif excute_index == "get_inbox_mail"then
-        if #MailManager:GetMails() > 9 then
-            local fromIndex = #MailManager:GetMails()
-            return NetManager:getFetchMailsPromise(fromIndex)
-        end
+        local fromIndex = MailManager:GetMails() and #MailManager:GetMails() or 0
+        return NetManager:getFetchMailsPromise(fromIndex)
     elseif excute_index == "read_mail"then
-        local read_mails_id = {}
-        for i,mail in ipairs(MailManager:GetMails()) do
-            if not mail.isRead then
-                table.insert(read_mails_id, mail.id)
+        if MailManager:GetMails() then
+            local read_mails_id = {}
+            for i,mail in ipairs(MailManager:GetMails()) do
+                if not mail.isRead then
+                    table.insert(read_mails_id, mail.id)
+                end
+            end
+            if #read_mails_id > 0 then
+                return NetManager:getReadMailsPromise(read_mails_id)
             end
         end
-        if #read_mails_id > 0 then
-            return NetManager:getReadMailsPromise(read_mails_id)
-        end
     elseif excute_index == "save_mail"then
-        for i,mail in ipairs(MailManager:GetMails()) do
-            if not mail.isSaved then
-                return NetManager:getSaveMailPromise(mail.id)
+        if MailManager:GetMails() then
+            for i,mail in ipairs(MailManager:GetMails()) do
+                if not mail.isSaved then
+                    return NetManager:getSaveMailPromise(mail.id)
+                end
             end
         end
     elseif excute_index == "un_save_mail"then
-        for i,mail in ipairs(MailManager:GetMails()) do
-            if mail.isSaved then
-                return NetManager:getUnSaveMailPromise(mail.id)
+        if MailManager:GetMails() then
+            for i,mail in ipairs(MailManager:GetMails()) do
+                if mail.isSaved then
+                    return NetManager:getUnSaveMailPromise(mail.id)
+                end
             end
         end
     elseif excute_index == "get_saved_mail"then
-        if #MailManager:GetSavedMails() > 9 then
-            local fromIndex = #MailManager:GetSavedMails()
-            return NetManager:getFetchSavedMailsPromise(fromIndex)
-        end
+        local fromIndex = MailManager:GetSavedMails() and #MailManager:GetSavedMails() or 0
+        return NetManager:getFetchSavedMailsPromise(fromIndex)
     elseif excute_index == "get_send_mail"then
-        if #MailManager:GetSendMails() > 9 then
-            local fromIndex = #MailManager:GetSendMails()
-            return NetManager:FetchSendMailsFromServer(fromIndex)
-        end
+        local fromIndex = MailManager:GetSendMails() and #MailManager:GetSendMails() or 0
+        return NetManager:getFetchSendMailsPromise(fromIndex)
     elseif excute_index == "delete_mail"then
         local mails = MailManager:GetMails()
-        if #mails > 0 then
+        if mails and #mails > 0 then
             local delete_count = math.random(#mails)
             local ids = {}
             for i=1,delete_count do
@@ -201,30 +201,36 @@ function OtherApi:MailApi()
             return NetManager:getDeleteMailsPromise(ids)
         end
     elseif excute_index == "read_report"then
-        local read_reports_id = {}
-        for i,report in ipairs(MailManager:GetReports()) do
-            if not report:IsRead() then
-                table.insert(read_reports_id, report:Id())
+        if MailManager:GetReports() then
+            local read_reports_id = {}
+            for i,report in ipairs(MailManager:GetReports()) do
+                if not report:IsRead() then
+                    table.insert(read_reports_id, report:Id())
+                end
+            end
+            if #read_reports_id > 0 then
+                return NetManager:getReadReportsPromise(read_reports_id)
             end
         end
-        if #read_reports_id > 0 then
-            return NetManager:getReadReportsPromise(read_reports_id)
-        end
     elseif excute_index == "save_report"then
-        for i,report in ipairs(MailManager:GetReports()) do
-            if not report:IsSaved() then
-                return NetManager:getSaveReportPromise(report:Id())
+        if MailManager:GetReports() then
+            for i,report in ipairs(MailManager:GetReports()) do
+                if not report:IsSaved() then
+                    return NetManager:getSaveReportPromise(report:Id())
+                end
             end
         end
     elseif excute_index == "un_save_report"then
-        for i,report in ipairs(MailManager:GetReports()) do
-            if report:IsSaved() then
-                return NetManager:getUnSaveReportPromise(report:Id())
+        if MailManager:GetReports() then
+            for i,report in ipairs(MailManager:GetReports()) do
+                if report:IsSaved() then
+                    return NetManager:getUnSaveReportPromise(report:Id())
+                end
             end
         end
     elseif excute_index == "delete_report"then
         local reports = MailManager:GetReports()
-        if #reports > 0 then
+        if reports and #reports > 0 then
             local delete_count = math.random(#reports)
             local ids = {}
             for i=1,delete_count do
@@ -233,15 +239,11 @@ function OtherApi:MailApi()
             return NetManager:getDeleteReportsPromise(ids)
         end
     elseif excute_index == "get_report"then
-        if #MailManager:GetReports() > 9 then
-            local fromIndex = #MailManager:GetReports()
-            return NetManager:getReportsPromise(fromIndex)
-        end
+        local fromIndex = MailManager:GetReports() and #MailManager:GetReports() or 0
+        return NetManager:getReportsPromise(fromIndex)
     elseif excute_index == "get_saved_report"then
-        if #MailManager:GetSavedReports() > 9 then
-            local fromIndex = #MailManager:GetSavedReports()
-            return NetManager:getSavedReportsPromise(fromIndex)
-        end
+        local fromIndex = MailManager:GetSavedReports() and #MailManager:GetSavedReports() or 0
+        return NetManager:getSavedReportsPromise(fromIndex)
     end
 end
 
@@ -325,8 +327,15 @@ return {
     SwitchBuilding,
     SetPlayerIcon,
     MailApi,
-    Gacha,  
+    Gacha,
 }
+
+
+
+
+
+
+
 
 
 

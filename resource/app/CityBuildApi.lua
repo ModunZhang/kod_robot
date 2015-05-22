@@ -187,7 +187,7 @@ return {
     BuildRandomHouse,
     UnlockBuilding,
     Recommend,
-    -- SpeedUpBuildingEvents,
+    SpeedUpBuildingEvents,
 }
 
 
