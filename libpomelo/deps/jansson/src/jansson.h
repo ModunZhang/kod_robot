@@ -11,8 +11,9 @@
 #include <stdio.h>
 #include <stdlib.h>  /* for size_t */
 #include <stdarg.h>
+#include <assert.h>
 
-#include "jansson_config.h"
+#include <jansson_config.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +52,8 @@ typedef struct json_t {
     json_type type;
     size_t refcount;
 } json_t;
+
+#define IS_VALID_JSON(j) ((j->type >= JSON_OBJECT) && (j->type <= JSON_NULL) && (j->refcount > 0))
 
 #if JSON_INTEGER_IS_LONG_LONG
 #ifdef _WIN32
