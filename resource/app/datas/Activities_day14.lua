@@ -26,7 +26,7 @@ day14[6] = {
 }
 day14[7] = {
 	["day"] = 7,
-	["rewards"] = "soldiers:crossbowman:100"
+	["rewards"] = "soldiers:crossbowman:100,basicInfo:marchQueue:1"
 }
 day14[8] = {
 	["day"] = 8,
@@ -54,5 +54,5 @@ day14[13] = {
 }
 day14[14] = {
 	["day"] = 14,
-	["rewards"] = "basicInfo:marchQueue:1,soldiers:catapult:100"
+	["rewards"] = "soldiers:catapult:100"
 }

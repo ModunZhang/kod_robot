@@ -146,7 +146,7 @@ function WidgetAllianceTop:CreateBtnsPageItem()
         :addTo(content)
     -- 忠诚值
     display.newSprite("loyalty_128x128.png")
-        :align(display.CENTER, -40,loyalty_btn:getContentSize().height/2-4)
+        :align(display.CENTER, -40,loyalty_btn:getContentSize().height/2)
         :addTo(loyalty_btn)
         :scale(42/128)
     UIKit:ttfLabel(
@@ -159,7 +159,7 @@ function WidgetAllianceTop:CreateBtnsPageItem()
     local member = alliance:GetSelf()
     self.loyalty_label = UIKit:ttfLabel(
         {
-            text = GameUtils:formatNumber(member:Loyalty()),
+            text = GameUtils:formatNumber(User:Loyalty()),
             size = 18,
             color = 0xf5e8c4
         }):align(display.LEFT_CENTER, -15, loyalty_btn:getContentSize().height/2-10)

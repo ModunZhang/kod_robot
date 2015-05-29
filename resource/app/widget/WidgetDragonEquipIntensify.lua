@@ -22,7 +22,7 @@ function WidgetDragonEquipIntensify:ctor(delegate,equipmentName,current_count,ma
 	local icon_ = display.newSprite(icon)
 	icon_:addTo(icon_bg):setScale(0.6):pos(52,52)
 	display.newSprite("i_icon_20x20.png"):align(display.LEFT_BOTTOM, 5, 5):addTo(icon_bg)
-	local labelbg = display.newSprite("number_bg_102x30.png"):addTo(self):pos(0,-50)
+	local labelbg = display.newScale9Sprite("back_ground_166x84.png", 0,-50,cc.size(102,30),cc.rect(15,10,136,64)):addTo(self)
     local label = UIKit:ttfLabel({
     	size = 18,
     	color= 0x403c2f,

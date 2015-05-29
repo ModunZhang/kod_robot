@@ -1,5 +1,6 @@
 local UILib = import("..ui.UILib")
 local Sprite = import(".Sprite")
+local fire = import("..particles.fire")
 local SpriteConfig = import(".SpriteConfig")
 local CitySprite = class("CitySprite", Sprite)
 function CitySprite:ctor(city_layer, entity, is_my_alliance)
@@ -7,6 +8,8 @@ function CitySprite:ctor(city_layer, entity, is_my_alliance)
     self.is_my_alliance = is_my_alliance
     local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
     CitySprite.super.ctor(self, city_layer, entity, x, y)
+
+    self:CheckProtected()
 end
 function CitySprite:onExit()
     if self.info then
@@ -48,6 +51,8 @@ function CitySprite:RefreshSprite()
     }):addTo(self.banner):align(display.LEFT_CENTER, 60, 32)
     self:RefreshInfo()
 end
+
+local FIRE_TAG = 119
 function CitySprite:RefreshInfo()
     local entity = self:GetEntity()
     local info = entity:GetAllianceMemberInfo()
@@ -55,6 +60,19 @@ function CitySprite:RefreshInfo()
     self.banner:setTexture(banners[info:HelpedByTroopsCount()])
     self.level:setString(info:KeepLevel())
     self.name:setString(string.format("[%s]%s", entity:GetAlliance():Tag(), info:Name()))
+
+
+    self:CheckProtected()
+end
+function CitySprite:CheckProtected()
+    local is_protected = self:GetEntity():GetAllianceMemberInfo():IsProtected()
+    if is_protected then
+        if not self:getChildByTag(FIRE_TAG) then
+            fire():addTo(self, 2, FIRE_TAG):pos(0, -50)
+        end
+    else
+        self:removeChildByTag(FIRE_TAG)
+    end
 end
 
 

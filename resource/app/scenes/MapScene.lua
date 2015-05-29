@@ -257,12 +257,14 @@ function MapScene:OnSceneScale()
 end
 
 function MapScene:onEnterTransitionFinish()
-    printLog("Info", "Check MessageDialog :%s",self.__cname)
-    local message = UIKit:getMessageDialogWillShow()
-    if message then
-        message:AddToScene(self,true)
-        UIKit:clearMessageDialogWillShow()
-    end
+    -- printLog("Info", "Check MessageDialog :%s",self.__cname)
+    -- local message = UIKit:getMessageDialogWillShow()
+    -- if message then
+
+    --     print("add MessageDialog---->",self.__cname,message.AddToCurrentScene,tolua.type(message))
+    --     -- message:addTo(self,3001,1000)
+    --     -- UIKit:clearMessageDialogWillShow()
+    -- end
 end
 return MapScene
 

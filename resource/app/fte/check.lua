@@ -1,6 +1,6 @@
 return function(key)
     if key == "ALL" then
-        return DataManager:getUserData().basicInfo.power > 2000
+        return DataManager:getUserData().countInfo.isFTEFinished
     end
     local real_key = DataManager:getUserData()._id.."_"..key
     local has_key = cc.UserDefault:getInstance():getBoolForKey(real_key)

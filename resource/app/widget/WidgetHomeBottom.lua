@@ -11,6 +11,9 @@ local WidgetHomeBottom = class("WidgetHomeBottom", function()
 end)
 
 
+local ALLIANCE_TAG = 222
+
+
 function WidgetHomeBottom:MailUnreadChanged(...)
     self.mail_count:SetNumber(MailManager:GetUnReadMailsNum()+MailManager:GetUnReadReportsNum())
 end
@@ -54,6 +57,9 @@ function WidgetHomeBottom:ctor(city)
         elseif i == 3 then
             self.mail_count = WidgetNumberTips.new():addTo(self):pos(x+20, first_row+20)
             self.mail_count:setLocalZOrder(11)
+        elseif i == 4 then
+            self.alliance_btn = button
+            self.alliance_btn:setLocalZOrder(9)
         end
     end
 end
@@ -61,7 +67,7 @@ function WidgetHomeBottom:onEnter()
     local user = self.city:GetUser()
     MailManager:AddListenOnType(self,MailManager.LISTEN_TYPE.UNREAD_MAILS_CHANGED)
     user:AddListenOnType(self, user.LISTEN_TYPE.TASK)
-    
+
     self:OnTaskChanged()
     self:MailUnreadChanged()
 end
@@ -75,6 +81,7 @@ function WidgetHomeBottom:OnBottomButtonClicked(event)
     if not tag then return end
     if tag == 4 then -- tag 4 = alliance button
         UIKit:newGameUI('GameUIAlliance'):AddToCurrentScene(true)
+        self.alliance_btn:removeChildByTag(ALLIANCE_TAG)
     elseif tag == 3 then
         UIKit:newGameUI('GameUIMail',self.city):AddToCurrentScene(true)
     elseif tag == 2 then
@@ -87,7 +94,26 @@ function WidgetHomeBottom:OnBottomButtonClicked(event)
 end
 
 
+-- fte
+local WidgetFteArrow = import(".WidgetFteArrow")
+local WidgetFteMark = import(".WidgetFteMark")
+function WidgetHomeBottom:TipsOnAlliance()
+    -- WidgetFteMark.new()
+    --     :Size(100, 100)
+    --     :addTo(self.alliance_btn, 1, 111)
+    self.alliance_btn:removeChildByTag(ALLIANCE_TAG)
+
+    WidgetFteArrow.new(_("加入或创建联盟\n开启多人团战玩法"))
+        :TurnDown():align(display.BOTTOM_CENTER, 0, 50)
+        :addTo(self.alliance_btn, 1, ALLIANCE_TAG)
+
+    self:stopAllActions()
+    self:performWithDelay(function() self.alliance_btn:removeChildByTag(ALLIANCE_TAG) end, 5)
+end
+
+
 return WidgetHomeBottom
+
 
 
 

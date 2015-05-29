@@ -135,22 +135,22 @@ function MilitaryTechnology:IsAbleToUpgrade()
 
     local results = {}
     if City:GetSoldierManager():IsUpgradingMilitaryTech(self.building) then
-        table.insert(results, _("升级军事科技队列占用"))
+        table.insert(results, _("升级军事科技队列被占用"))
     end
     if current_coin<level_up_config.coin then
-        table.insert(results, _("银币不足").." ".._("需要补充")..(level_up_config.coin-current_coin))
+        table.insert(results, string.format( _("银币不足 需要补充 %d"), level_up_config.coin - current_coin ) )
     end
     if has_materials.trainingFigure<level_up_config.trainingFigure then
-        table.insert(results, Localize.sell_type.trainingFigure.._("不足").." ".._("需要补充")..(level_up_config.trainingFigure-has_materials.trainingFigure))
+        table.insert(results, string.format( _("木人桩 需要补充 %d"), level_up_config.trainingFigure - has_materials.trainingFigure ) )
     end
     if has_materials.bowTarget<level_up_config.bowTarget then
-        table.insert(results, Localize.sell_type.bowTarget.._("不足").." ".._("需要补充")..(level_up_config.bowTarget-has_materials.bowTarget))
+        table.insert(results, string.format( _("箭靶 需要补充 %d"), level_up_config.bowTarget - has_materials.bowTarget ) )
     end
     if has_materials.saddle<level_up_config.saddle then
-        table.insert(results, Localize.sell_type.saddle.._("不足").." ".._("需要补充")..(level_up_config.saddle-has_materials.saddle))
+        table.insert(results, string.format( _("马鞍 需要补充 %d"), level_up_config.saddle - has_materials.saddle ) )
     end
     if has_materials.ironPart<level_up_config.ironPart then
-        table.insert(results, Localize.sell_type.ironPart.._("不足").." ".._("需要补充")..(level_up_config.ironPart-has_materials.ironPart))
+        table.insert(results, string.format( _("精铁零件 需要补充 %d"), level_up_config.ironPart - has_materials.ironPart ) )
     end
 
     return results

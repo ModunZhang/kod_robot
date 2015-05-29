@@ -67,138 +67,170 @@ function AllianceFightApi:March()
             return NetManager:getUnlockPlayerSecondMarchQueuePromise()
         end
         print("行军事件",alliance:GetAllianceBelvedere():IsReachEventLimit())
-        if not alliance:GetAllianceBelvedere():IsReachEventLimit() then
-            local function __getSoldierConfig(soldier_type,level)
-                local normal = GameDatas.Soldiers.normal
-                local SPECIAL = GameDatas.Soldiers.special
-                local level = level or 1
-                return normal[soldier_type.."_"..level] or SPECIAL[soldier_type]
-            end
-            -- 首先检查是否有条件攻打，龙，兵
-            local dragonType
-            local dragonWidget = 0
-            local dragon
-            for k,d in pairs(dragon_manager:GetDragons()) do
-                if d:Status()=="free" and not d:IsDead() then
-                    if d:GetWeight() > dragonWidget then
-                        dragonWidget = d:GetWeight()
-                        dragonType = k
-                        dragon = d
-                    end
+        local function __getSoldierConfig(soldier_type,level)
+            local normal = GameDatas.Soldiers.normal
+            local SPECIAL = GameDatas.Soldiers.special
+            local level = level or 1
+            return normal[soldier_type.."_"..level] or SPECIAL[soldier_type]
+        end
+        -- 首先检查是否有条件攻打，龙，兵
+        local dragonType
+        local dragonWidget = 0
+        local dragon
+        for k,d in pairs(dragon_manager:GetDragons()) do
+            if d:Status()=="free" and not d:IsDead() then
+                if d:GetWeight() > dragonWidget then
+                    dragonWidget = d:GetWeight()
+                    dragonType = k
+                    dragon = d
                 end
             end
-            local fight_soldiers = {}
-            if dragon then
-                -- 带兵量判定
-                local leadCitizen = dragon:LeadCitizen()
-                local soldiers_citizen = 0
-                for k,v in pairs(City:GetSoldierManager():GetSoldierMap()) do
-                    if v > 0 then
-                        local count = math.random(v)
-                        soldiers_citizen = soldiers_citizen+count*__getSoldierConfig(k,City:GetSoldierManager():GetStarBySoldierType(k)).citizen
+        end
+        local fight_soldiers = {}
+        if dragon then
+            -- 带兵量判定
+            local leadCitizen = dragon:LeadCitizen()
+            local soldiers_citizen = 0
+            for k,v in pairs(City:GetSoldierManager():GetSoldierMap()) do
+                if v > 0 then
+                    local count = math.random(v)
+                    soldiers_citizen = soldiers_citizen+count*__getSoldierConfig(k,City:GetSoldierManager():GetStarBySoldierType(k)).citizen
 
-                        if leadCitizen >= soldiers_citizen then
-                            table.insert(fight_soldiers,{ name = k,count = math.random(v)})
-                        else
-                            break
-                        end
+                    if leadCitizen >= soldiers_citizen then
+                        table.insert(fight_soldiers,{ name = k, count = count})
+                    else
+                        break
                     end
                 end
             end
-            print("行军事件",#fight_soldiers,dragonType)
-            
+        end
+        print("行军事件",#fight_soldiers,dragonType)
 
-            -- 可选的各种行军事件
-            local march_types = {
-                "attackCity", -- 攻打城市
-                "strikeCity", -- 攻打城市
-                -- "village", -- 村落
-                -- "shrine", -- 圣地
-                -- "helpDefence", -- 协防
-                -- "retreatHelped", -- 撤防
-            }
-            local excute = march_types[math.random(#march_types)]
-            if excute == "attackCity" then
-                -- 攻打城市
-                if alliance:Status()=="fight" and #fight_soldiers > 0 and dragonType then
-                    local allMembers = enemy_alliance:GetAllMembers()
-                    local can_attack = {}
-                    for k,v in pairs(allMembers) do
-                        if not v:IsProtected() then
-                            table.insert(can_attack, v)
-                        end
-                    end
 
-                    if #can_attack > 0 then
-                        local attack_target = can_attack[math.random(#can_attack)]
-                        -- 只攻打盟主联盟
-                        local our_archon = alliance:GetAllianceArchon()
-                        if string.find(our_archon.Name(),"800_") then
-                            attack_target = enemy_alliance:GetAllianceArchon()
-                        end
-                        print("攻打敌方城市,敌方名字:",attack_target:Name())
-                        print("攻打敌方城市,派出龙:",dragonType)
-                        dump(fight_soldiers,"攻打敌方城市,派出士兵")
-                        return NetManager:getAttackPlayerCityPromise(dragonType, fight_soldiers, attack_target:Id())
-                    end
-                end
-            elseif excute == "strikeCity" then
-                if alliance:Status()=="fight" and dragonType then
-                    local allMembers = enemy_alliance:GetAllMembers()
-                    local can_attack = {}
-                    for k,v in pairs(allMembers) do
-                        if not v:IsProtected() then
-                            table.insert(can_attack, v)
-                        end
-                    end
-
-                    if #can_attack > 0 then
-                        local attack_target = can_attack[math.random(#can_attack)]
-                        print("突袭敌方城市,敌方名字:",attack_target:Name())
-                        print("突袭敌方城市,派出龙:",dragonType)
-                        return NetManager:getStrikePlayerCityPromise(dragonType,attack_target:Id())
-                    end
-                end
-            elseif excute == "village" then
-                -- TODO 村落
-                return
-            elseif excute == "shrine" then
-                -- TODO 圣地
-                return
-            elseif excute == "helpDefence" and #fight_soldiers > 0 and dragonType then
-                local allMembers = alliance:GetAllMembers()
-                local can_help_member = {}
+        -- 可选的各种行军事件
+        local march_types = {
+            "attackCity", -- 攻打城市
+            "strikeCity", -- 突袭城市
+            "village", -- 采集自己的村落
+            "retreatFromVillage", -- 从村落撤军
+            "enemyVillage", -- 采集敌方的村落
+            -- "shrine", -- 圣地
+            "helpDefence", -- 协防
+            "retreatHelped", -- 撤防
+        }
+        local excute = march_types[math.random(#march_types)]
+        if excute == "attackCity" and not alliance:GetAllianceBelvedere():IsReachEventLimit() then
+            -- 攻打城市
+            if alliance:Status()=="fight" and #fight_soldiers > 0 and dragonType then
+                local allMembers = enemy_alliance:GetAllMembers()
+                local can_attack = {}
                 for k,v in pairs(allMembers) do
-                    if not alliance:CheckHelpDefenceMarchEventsHaveTarget(v:Id()) and v:Id() ~= User:Id() then
-                        print("可协防玩家：",v:Name(),v:Id())
-                        table.insert(can_help_member, v)
+                    if not v:IsProtected() then
+                        table.insert(can_attack, v)
                     end
                 end
-                if #can_help_member < 1 then
-                    return
-                end
-                -- 随机一个玩家去协防
-                local player = can_help_member[math.random(#can_help_member)]
-                local playerId = player:Id()
 
-                if playerId then
-                    print("协防玩家城市:",player:Name())
-                    print("协防玩家城市,派出龙:",dragonType)
-                    dump(fight_soldiers,"协防玩家城市,派出士兵")
-                    return NetManager:getHelpAllianceMemberDefencePromise(dragonType, fight_soldiers, playerId)
+                if #can_attack > 0 then
+                    local attack_target = can_attack[math.random(#can_attack)]
+                    -- 只攻打盟主联盟
+                    local our_archon = alliance:GetAllianceArchon()
+                    if string.find(our_archon.Name(),"800_") then
+                        attack_target = enemy_alliance:GetAllianceArchon()
+                    end
+                    print("攻打敌方城市,敌方名字:",attack_target:Name())
+                    print("攻打敌方城市,派出龙:",dragonType)
+                    dump(fight_soldiers,"攻打敌方城市,派出士兵")
+                    return NetManager:getAttackPlayerCityPromise(dragonType, fight_soldiers, attack_target:Id())
                 end
-            elseif excute == "retreatHelped" then
-                local allMembers = alliance:GetAllMembers()
-                local can_retreat_member = {}
+            end
+        elseif excute == "strikeCity" and not alliance:GetAllianceBelvedere():IsReachEventLimit() then
+            if alliance:Status()=="fight" and dragonType then
+                local allMembers = enemy_alliance:GetAllMembers()
+                local can_attack = {}
                 for k,v in pairs(allMembers) do
-                    if City:IsHelpedToTroopsWithPlayerId(v:Id()) and v:Id() ~= User:Id() then
-                        table.insert(can_retreat_member, v)
+                    if not v:IsProtected() then
+                        table.insert(can_attack, v)
                     end
                 end
-                if #can_retreat_member > 0 then
-                    print("撤防！！！！！！！！！！！！")
-                    return NetManager:getRetreatFromHelpedAllianceMemberPromise(can_retreat_member[1]:Id())
+
+                if #can_attack > 0 then
+                    local attack_target = can_attack[math.random(#can_attack)]
+                    print("突袭敌方城市,敌方名字:",attack_target:Name())
+                    print("突袭敌方城市,派出龙:",dragonType)
+                    return NetManager:getStrikePlayerCityPromise(dragonType,attack_target:Id())
                 end
+            end
+        elseif excute == "village" and not alliance:GetAllianceBelvedere():IsReachEventLimit() then
+            if #fight_soldiers > 0 and dragonType then
+                local villages = alliance:GetAllianceVillageInfos()
+                local clone_villages = {}
+                for k,v in pairs(villages) do
+                    table.insert(clone_villages, v)
+                end
+                local attack_village = clone_villages[math.random(#clone_villages)]
+                print("占领自己村落:",attack_village.name)
+                print("占领自己村落,派出龙:",dragonType)
+                dump(fight_soldiers,"占领自己村落,派出士兵")
+                return NetManager:getAttackVillagePromise(dragonType,fight_soldiers,alliance:Id(),attack_village.id)
+            end
+        elseif excute == "retreatFromVillage" then
+            local villages = alliance:GetAllianceVillageInfos()
+            for k,v in pairs(villages) do
+                local villageEvent = alliance:FindVillageEventByVillageId(v.id)
+                if villageEvent and villageEvent:GetPlayerRole() == villageEvent.EVENT_PLAYER_ROLE.Me then --自己占领
+                    print("从村落撤军")
+                    return  NetManager:getRetreatFromVillagePromise(alliance:Id(),villageEvent:Id())
+                end
+            end
+        elseif excute == "enemyVillage" and not alliance:GetAllianceBelvedere():IsReachEventLimit() then
+            if alliance:Status()=="fight" and #fight_soldiers > 0 and dragonType then
+                local villages = enemy_alliance:GetAllianceVillageInfos()
+                local clone_villages = {}
+                for k,v in pairs(villages) do
+                    table.insert(clone_villages, v)
+                end
+                local attack_village = clone_villages[math.random(#clone_villages)]
+                print("占领敌方村落:",attack_village.name)
+                print("占领敌方村落,派出龙:",dragonType)
+                dump(fight_soldiers,"占领敌方村落,派出士兵")
+                return NetManager:getAttackVillagePromise(dragonType,fight_soldiers,enemy_alliance:Id(),attack_village.id)
+            end
+        elseif excute == "shrine" then
+            -- TODO 圣地
+            return
+        elseif excute == "helpDefence" and #fight_soldiers > 0 and dragonType and not alliance:GetAllianceBelvedere():IsReachEventLimit() then
+            local allMembers = alliance:GetAllMembers()
+            local can_help_member = {}
+            for k,v in pairs(allMembers) do
+                if not alliance:CheckHelpDefenceMarchEventsHaveTarget(v:Id()) and v:Id() ~= User:Id() then
+                    print("可协防玩家：",v:Name(),v:Id())
+                    table.insert(can_help_member, v)
+                end
+            end
+            if #can_help_member < 1 then
+                return
+            end
+            -- 随机一个玩家去协防
+            local player = can_help_member[math.random(#can_help_member)]
+            local playerId = player:Id()
+
+            if playerId then
+                print("协防玩家城市:",player:Name())
+                print("协防玩家城市,派出龙:",dragonType)
+                dump(fight_soldiers,"协防玩家城市,派出士兵")
+                return NetManager:getHelpAllianceMemberDefencePromise(dragonType, fight_soldiers, playerId)
+            end
+        elseif excute == "retreatHelped" then
+            local allMembers = alliance:GetAllMembers()
+            local can_retreat_member = {}
+            for k,v in pairs(allMembers) do
+                if City:IsHelpedToTroopsWithPlayerId(v:Id()) and v:Id() ~= User:Id() then
+                    table.insert(can_retreat_member, v)
+                end
+            end
+            if #can_retreat_member > 0 then
+                print("撤防！！！！！！！！！！！！")
+                return NetManager:getRetreatFromHelpedAllianceMemberPromise(can_retreat_member[1]:Id())
             end
         end
     end
@@ -208,12 +240,15 @@ function  AllianceFightApi:SpeedUpMarchEvent()
     -- 有正在行军的则加速
     local my_events = Alliance_Manager:GetMyAlliance():GetAllianceBelvedere():GetMyEvents()
     for k,march_event in pairs(my_events) do
-        if march_event:WithObject():GetTime() > 10 then
+        if march_event:WithObject().GetTime and march_event:WithObject():GetTime() > 10 then
             print("加速行军事件",march_event:WithObject():Id(),march_event:GetEventServerType(),march_event:WithObject():GetTime())
+            if march_event:GetEventServerType() == "村落采集事件" or march_event:GetEventServerType() == "圣地事件" then
+                return
+            end
             return NetManager:getBuyAndUseItemPromise("warSpeedupClass_2",{
                 ["warSpeedupClass_2"]={
                     eventType = march_event:GetEventServerType(),
-                    eventId=march_event:WithObject():Id()
+                    eventId = march_event:WithObject():Id()
                 }
             })
         end
@@ -276,6 +311,9 @@ return {
     March,
     SpeedUpMarchEvent,
 }
+
+
+
 
 
 

@@ -27,7 +27,7 @@ function WidgetChangeMap:ctor(map_type, location)
         :onButtonClicked(function(event)
             if map_type == WidgetChangeMap.MAP_TYPE.OUR_CITY then
                 if Alliance_Manager:GetMyAlliance():IsDefault() then
-                    UIKit:showMessageDialog(_("陛下"),_("未加入联盟!"))
+                    UIKit:showMessageDialog(_("主人"),_("加入联盟后开放此功能!"))
                     return
                 end
                 app:EnterMyAllianceScene(location)

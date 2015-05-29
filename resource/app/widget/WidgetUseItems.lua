@@ -154,7 +154,7 @@ function WidgetUseItems:OpenChangePlayerOrCityName(item)
     self:CreateItemBox(item,function ()
         local newName = string.trim(editbox:getText())
         if string.len(newName) == 0 then
-            UIKit:showMessageDialog(_("陛下"),_("请输入新的名称"))
+            UIKit:showMessageDialog(_("主人"),_("请输入新的名称"))
         else
             return true
         end
@@ -191,7 +191,7 @@ function WidgetUseItems:OpenBuffDialog( item )
         color = item_event and 0x007c23 or 0x403c2f,
     }):addTo(body):align(display.CENTER,size.width/2, size.height-50)
     if item_event then
-        buff_status_label:setString(_("已激活,剩余时间:")..GameUtils:formatTimeStyle1(item_event:GetTime()))
+        buff_status_label:setString(string.format( _("已激活,剩余时间:%s"), GameUtils:formatTimeStyle1(item_event:GetTime()) ))
     else
         buff_status_label:setString(_("未激活"))
     end
@@ -226,7 +226,7 @@ function WidgetUseItems:OpenBuffDialog( item )
         if item_event and item_event_new:Type() == item_event:Type() then
             local time = item_event_new:GetTime()
             if time >0 then
-                buff_status_label:setString(_("已激活,剩余时间:")..GameUtils:formatTimeStyle1(time))
+                buff_status_label:setString(string.format( _("已激活,剩余时间:%s"), GameUtils:formatTimeStyle1(time) ))
                 buff_status_label:setColor(UIKit:hex2c4b(0x007c23))
             else
                 buff_status_label:setString(_("未激活"))
@@ -296,7 +296,6 @@ function WidgetUseItems:OpenHeroBloodDialog( item )
     local size = body:getContentSize()
     local blood_bg = display.newScale9Sprite("back_ground_398x97.png",size.width/2,size.height-50,cc.size(556,58),cc.rect(10,10,378,77))
         :addTo(body)
-    -- local blood_icon = display.newSprite("buff_tool.png"):addTo(blood_bg):align(display.CENTER, 40, blood_bg:getContentSize().height/2):scale(0.2)
     local resource_manager = City:GetResourceManager()
     UIKit:ttfLabel({
         text = _("英雄之血"),
@@ -347,7 +346,6 @@ end
 
 function WidgetUseItems:OpenOneDragonItemExpDialog( item ,dragon)
     local same_items = ItemManager:GetSameTypeItems(item)
-    local increase_type = string.split(item:Name(),"_")[1]
     local dialog = UIKit:newWidgetUI("WidgetPopDialog",#same_items*130+200, _("增加龙的经验"),window.top-230)
     local body = dialog:GetBody()
     local size = body:getContentSize()
@@ -372,7 +370,7 @@ function WidgetUseItems:OpenOneDragonItemExpDialog( item ,dragon)
     }):align(display.RIGHT_CENTER,blood_bg:getContentSize().width-20,blood_bg:getContentSize().height/2)
         :addTo(blood_bg)
 
-    local exp_icon = display.newSprite("dragonskill_xp_51x63.png")
+    local exp_icon = display.newSprite("upgrade_experience_icon.png")
         :align(display.CENTER,dragon_value:getPositionX() - dragon_value:getContentSize().width - 20,blood_bg:getContentSize().height/2)
         :addTo(blood_bg)
         :scale(0.6)
@@ -414,11 +412,9 @@ function WidgetUseItems:OpenOneDragonItemExpDialog( item ,dragon)
     end)
 
     function dialog:OnBasicChanged()
-        if increase_type == "dragonExp" then
-            dragon_value:setString(dragon:Exp().."/"..dragon:GetMaxExp())
-            exp_icon:setPositionX(dragon_value:getPositionX() - dragon_value:getContentSize().width - 20)
-            dragon_level:setString("LV"..dragon:Level().."/"..dragon:GetMaxLevel())
-        end
+        dragon_value:setString(dragon:Exp().."/"..dragon:GetMaxExp())
+        exp_icon:setPositionX(dragon_value:getPositionX() - dragon_value:getContentSize().width - 20)
+        dragon_level:setString("LV"..dragon:Level().."/"..dragon:GetMaxLevel())
     end
     return dialog
 end
@@ -560,7 +556,7 @@ function WidgetUseItems:OpenIncreaseDragonExpOrHp( item )
         local dragon_frame = display.newSprite("alliance_item_flag_box_126X126.png")
 
 
-        local dragon_bg = display.newSprite("chat_hero_background.png")
+        local dragon_bg = display.newSprite("dragon_bg_114x114.png")
             :align(display.LEFT_CENTER, 7,dragon_frame:getContentSize().height/2)
             :addTo(dragon_frame)
         local dragon_img = display.newSprite(dragon:Type()..".png")
@@ -578,7 +574,7 @@ function WidgetUseItems:OpenIncreaseDragonExpOrHp( item )
             :addTo(box_bg,2)
 
         -- 经验 or hp
-        local text_1 = increase_type == "dragonHp" and _("生命值")..dragon:Hp().."/"..dragon:GetMaxHP() or _("经验值")..dragon:Exp().."/"..dragon:GetMaxExp()
+        local text_1 = increase_type == "dragonHp" and string.format( _("生命值 %d/%d"), dragon:Hp(), dragon:GetMaxHP() ) or string.format( _("经验值 %d/%d"), dragon:Exp(), dragon:GetMaxExp() )
         local dragon_vitality = UIKit:ttfLabel({
             text = text_1,
             size = 20,
@@ -734,7 +730,7 @@ function WidgetUseItems:OpenIncreaseDragonExpOrHp( item )
         if increase_type == "dragonHp" then
             for i,v in ipairs(dragon_boxes) do
                 local dragon = dragon_manager:GetDragon(v:GetDragonType())
-                v:setDragonVitality( _("生命值")..dragon:Hp().."/"..dragon:GetMaxHP())
+                v:setDragonVitality( string.format( _("生命值 %d/%d"), dragon:Hp(), dragon:GetMaxHP() ) )
             end
         end
     end
@@ -742,7 +738,7 @@ function WidgetUseItems:OpenIncreaseDragonExpOrHp( item )
         if increase_type == "dragonExp" then
             for i,v in ipairs(dragon_boxes) do
                 local dragon = dragon_manager:GetDragon(v:GetDragonType())
-                v:setDragonVitality(_("经验值")..dragon:Exp().."/"..dragon:GetMaxExp())
+                v:setDragonVitality( string.format( _("经验值 %d/%d"), dragon:Exp(), dragon:GetMaxExp() ) )
                 v:setDragonName( Localize.dragon[dragon:Type()] .."(LV "..dragon:Level()..")")
             end
         end
@@ -766,7 +762,7 @@ function WidgetUseItems:OpenChestDialog( item )
                     if ItemManager:CanOpenChest(use_item)  then
                         return true
                     else
-                        UIKit:showMessageDialog(_("陛下"),_("没有钥匙"))
+                        UIKit:showMessageDialog(_("主人"),_("没有钥匙"))
                     end
                 end,
                 function ()
@@ -823,12 +819,12 @@ function WidgetUseItems:OpenMoveTheCityDialog( item ,params)
     return dialog
 end
 function WidgetUseItems:OpenVipPointDialog(item)
-    return self:OpenNormalDialog(item,_("增加VIP点数"))
+    return self:OpenNormalDialog(item,_("增加VIP点数"),window.top-340)
 end
 
-function WidgetUseItems:OpenNormalDialog( item ,title)
+function WidgetUseItems:OpenNormalDialog( item ,title ,y)
     local same_items = ItemManager:GetSameTypeItems(item)
-    local dialog = UIKit:newWidgetUI("WidgetPopDialog",#same_items * 130 +100,title or item:GetLocalizeName(),window.top-230)
+    local dialog = UIKit:newWidgetUI("WidgetPopDialog",#same_items * 130 +100,title or item:GetLocalizeName(),y and y or window.top-230)
     local body = dialog:GetBody()
     local size = body:getContentSize()
 
@@ -874,7 +870,8 @@ function WidgetUseItems:OpenVipActive( item )
         color = vip_event:IsActived() and 0x007c23 or 0x403c2f,
     }):addTo(body):align(display.CENTER,size.width/2, size.height-35)
     if vip_event:IsActived() then
-        vip_status_label:setString(_("已激活,剩余时间:")..GameUtils:formatTimeStyle1(vip_event:GetTime()))
+        local left_time_str = GameUtils:formatTimeStyle1(vip_event:GetTime())
+        vip_status_label:setString( string.format( _("已激活,剩余时间:%s"), left_time_str ) )
     else
         vip_status_label:setString(_("未激活"))
     end
@@ -885,7 +882,8 @@ function WidgetUseItems:OpenVipActive( item )
     function dialog:OnVipEventTimer( vip_event_new )
         local time = vip_event_new:GetTime()
         if time >0 then
-            vip_status_label:setString(_("已激活,剩余时间:")..GameUtils:formatTimeStyle1(time))
+            local left_time_str = GameUtils:formatTimeStyle1(time)
+            vip_status_label:setString( string.format( _("已激活,剩余时间:%s"), left_time_str ) )
             vip_status_label:setColor(UIKit:hex2c4b(0x007c23))
         else
             vip_status_label:setString(_("未激活"))
@@ -957,7 +955,7 @@ function WidgetUseItems:OpenWarSpeedupDialog( item ,march_event)
     }):addTo(body):align(display.RIGHT_CENTER,gem_icon:getPositionX() - gem_icon:getContentSize().width * 0.6 - 10,size.height-50)
 
     local buff_status_label = UIKit:ttfLabel({
-        text = _("剩余时间:")..GameUtils:formatTimeStyle1(march_event:WithObject():GetTime()),
+        text = string.format( _("剩余时间: %s"), GameUtils:formatTimeStyle1(march_event:WithObject():GetTime()) ),
         size = 22,
         color = 0x007c23,
     }):addTo(body):align(display.LEFT_CENTER,30, size.height-50)
@@ -1000,7 +998,8 @@ function WidgetUseItems:OpenWarSpeedupDialog( item ,march_event)
     function dialog:OnAttackMarchEventTimerChanged( attackMarchEvent )
         if march_event:WithObject():Id() == attackMarchEvent:Id() and (attackMarchEvent:GetPlayerRole() == attackMarchEvent.MARCH_EVENT_PLAYER_ROLE.SENDER
             or attackMarchEvent:GetPlayerRole() == attackMarchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER) then
-            buff_status_label:setString(_("剩余时间:")..GameUtils:formatTimeStyle1(attackMarchEvent:GetTime()))
+            local left_time_str = GameUtils:formatTimeStyle1(attackMarchEvent:GetTime())
+            buff_status_label:setString(string.format(_("剩余时间:%s"), left_time_str))
         end
     end
 
@@ -1144,11 +1143,9 @@ function WidgetUseItems:OpenRetreatTroopDialog( item,event )
 end
 
 function WidgetUseItems:CreateItemBox(item,checkUseFunc,useItemFunc,buyAndUseFunc,which_bg)
-    local body_image = which_bg and "upgrade_resources_background_2.png" or "upgrade_resources_background_3.png"
-    local body = display.newScale9Sprite(body_image,0,0,cc.size(548,130),cc.rect(10,10,500,26))
+    local body_image = which_bg and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+    local body = display.newScale9Sprite(body_image,0,0,cc.size(548,130),cc.rect(10,10,528,20))
     body:setNodeEventEnabled(true)
-
-
 
     function body:onExit()
         ItemManager:RemoveListenerOnType(self,ItemManager.LISTEN_TYPE.ITEM_CHANGED)
@@ -1184,7 +1181,7 @@ function WidgetUseItems:CreateItemBox(item,checkUseFunc,useItemFunc,buyAndUseFun
             local item_name = item:Name()
             btn_call_back = function ()
                 if item:Price() > User:GetGemResource():GetValue() then
-                    UIKit:showMessageDialog(_("陛下"),_("金龙币不足"))
+                    UIKit:showMessageDialog(_("主人"),_("金龙币不足"))
                         :CreateOKButton(
                             {
                                 listener = function ()
@@ -1198,7 +1195,7 @@ function WidgetUseItems:CreateItemBox(item,checkUseFunc,useItemFunc,buyAndUseFun
                 end
             end
             if item:IsSell() then
-                local price_bg = display.newSprite("back_ground_118x36.png"):addTo(body):align(display.CENTER,470,94)
+                local price_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(118,36),cc.rect(15,10,136,64)):addTo(body):align(display.CENTER,470,94)
                 -- gem icon
                 local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(price_bg):align(display.CENTER, 20, price_bg:getContentSize().height/2):scale(0.6)
                 UIKit:ttfLabel({
@@ -1209,10 +1206,10 @@ function WidgetUseItems:CreateItemBox(item,checkUseFunc,useItemFunc,buyAndUseFun
                     :addTo(price_bg)
             end
         else
-            local num_bg = display.newSprite("back_ground_118x36.png"):addTo(body):align(display.CENTER,470,94)
+            local num_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(118,36),cc.rect(15,10,136,64)):addTo(body):align(display.CENTER,470,94)
 
             local own_label = UIKit:ttfLabel({
-                text = _("拥有")..":"..item:Count(),
+                text = string.format(_("拥有:%d"), item:Count()),
                 size = 20,
                 color = 0x403c2f,
             }):addTo(num_bg):align(display.CENTER,num_bg:getContentSize().width/2, num_bg:getContentSize().height/2)
@@ -1329,6 +1326,7 @@ end
 
 
 return WidgetUseItems
+
 
 
 

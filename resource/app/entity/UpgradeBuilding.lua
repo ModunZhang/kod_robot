@@ -407,7 +407,7 @@ function UpgradeBuilding:IsAbleToUpgrade(isUpgradeNow)
     local wood = city.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local iron = city.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local stone = city.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local citizen = city.resource_manager:GetPopulationResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
+    local citizen = city.resource_manager:GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
     local is_resource_enough = wood<config[self:GetNextLevel()].wood
         or stone<config[self:GetNextLevel()].stone
         or iron<config[self:GetNextLevel()].iron
@@ -448,7 +448,7 @@ function UpgradeBuilding:getUpgradeRequiredGems()
         wood = city.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()),
         iron = city.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()),
         stone = city.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()),
-        citizen = city.resource_manager:GetPopulationResource():GetNoneAllocatedByTime(app.timer:GetServerTime()),
+        citizen = city.resource_manager:GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime()),
     }
 
     local has_materials =city:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)

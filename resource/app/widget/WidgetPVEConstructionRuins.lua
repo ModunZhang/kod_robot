@@ -6,7 +6,7 @@ function WidgetPVEConstructionRuins:ctor(...)
     WidgetPVEConstructionRuins.super.ctor(self, ...)
 end
 function WidgetPVEConstructionRuins:GetTitle()
-    return string.format("%s %s%d", _("建筑废墟"), _("等级"), self:GetPVEMap():GetIndex())
+    return string.format(_("建筑废墟 等级%d"), self:GetPVEMap():GetIndex())
 end
 function WidgetPVEConstructionRuins:GetDesc()
     return self:GetObject():IsSearched()

@@ -23,34 +23,20 @@ local GameUINpc = import("..ui.GameUINpc")
 local UILib = import("..ui.UILib")
 local PVEScene = import(".PVEScene")
 local PVEFteScene = class("PVEFteScene", PVEScene)
-local DIRECTION_TAG = 911
-
 function PVEFteScene:ctor(...)
     PVEFteScene.super.ctor(self, ...)
 end
 function PVEFteScene:onExit()
     self.touch_judgment:destructor()
 end
-function PVEFteScene:CreateDirectionArrow()
-    if not self:getChildByTag(DIRECTION_TAG) then
-        return WidgetDirectionSelect.new():pos(display.cx, display.cy)
-            :addTo(self, 10, DIRECTION_TAG):EnableDirection():hide():scale(1.5)
-    end
-end
-function PVEFteScene:GetDirectionArrow()
-    if not self:getChildByTag(DIRECTION_TAG) then
-        return self:CreateDirectionArrow()
-    end
-    return self:getChildByTag(DIRECTION_TAG)
-end
-function PVEFteScene:DestroyDirectionArrow()
-    self:removeChildByTag(DIRECTION_TAG)
-end
 function PVEFteScene:OnTouchClicked(pre_x, pre_y, x, y)
+
+    if not self.move_data then return end
+
     -- 有动画就什么都不处理
-    if self.event_manager:TouchCounts() ~= 0 or 
-        self:GetSceneLayer():GetChar():getNumberOfRunningActions() > 0 then 
-        return 
+    if self.event_manager:TouchCounts() ~= 0 or
+        self:GetSceneLayer():GetChar():getNumberOfRunningActions() > 0 then
+        return
     end
 
     -- 获取当前点
@@ -87,6 +73,14 @@ function PVEFteScene:OnTouchClicked(pre_x, pre_y, x, y)
 
         self.user:UseStrength(1)
         self:GetSceneLayer():MoveCharTo(tx, ty)
+
+
+        self:GetDirectionArrow()
+            :EnableDirection(offset_x < 0, offset_x > 0, offset_y < 0, offset_y > 0)
+            :performWithDelay(function()
+                self:CheckDirection()
+            end, 0.5)
+
 
         app:GetAudioManager():PlayeEffectSoundWithKey(string.format("PVE_MOVE%d", self.move_step))
         self.move_step = self.move_step + 1
@@ -217,6 +211,7 @@ function PVEFteScene:RunFte()
                 end):next(function()
                 return self:PromiseOfIntroduce()
                 end):next(function()
+                self:DestoryMark()
                 return self:PromiseOfExit()
                 end):next(function()
                 return promise.new()
@@ -270,15 +265,19 @@ function PVEFteScene:PromiseOfFindNpc()
     end)
 end
 function PVEFteScene:PromiseOfIntroduce()
-    local r = self:GetHomePage().pve_back:getCascadeBoundingBox()
-    self:GetMark():Size(r.width, r.height):pos(r.x + r.width/2, r.y + r.height/2)
-
     self:GetFteLayer():Enable()
     return GameUINpc:PromiseOfSay(
-        {words = _("领主大人，探索会消耗体力值，但击败敌军可以获得资源和材料。。。"), npc = "man", rect = r}
+        {
+            words = _("领主大人，探索会消耗体力值，但击败敌军可以获得资源和材料…"),
+            npc = "man",
+            callback = function(npc_ui)
+                local r = self:GetHomePage().pve_back:getCascadeBoundingBox()
+                npc_ui.ui_map.background:FocusOnRect(r)
+                self:GetMark():Size(r.width, r.height):pos(r.x + r.width/2, r.y + r.height/2)
+            end
+        }
     ):next(function()
         self:GetFteLayer():Disable()
-        self:DestoryMark()
         return GameUINpc:PromiseOfLeave()
     end)
 end
@@ -313,6 +312,7 @@ function PVEFteScene:DestoryMark()
 end
 
 return PVEFteScene
+
 
 
 

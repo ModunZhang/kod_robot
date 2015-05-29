@@ -178,26 +178,30 @@ function GameUIMail:CreateMailControlBox()
 
                                         if self.inbox_layer:isVisible() then
                                             -- 批量删除结束后获取
-                                            if #self.manager:GetMails()<10 then
-                                                self.manager:FetchMailsFromServer(#self.manager:GetMails()):done(function ( response )
-                                                    self.inbox_listview:asyncLoadWithCurrentPosition_()
-                                                    self.is_deleting = false
-                                                    return response
-                                                end)
+                                            if #self.manager:GetMails() < 10 then
+                                                local response = self.manager:FetchMailsFromServer(#self.manager:GetMails())
+                                                if response then
+                                                    response:done(function ( response )
+                                                        self.inbox_listview:asyncLoadWithCurrentPosition_()
+                                                        self.is_deleting = false
+                                                        return response
+                                                    end)
+                                                end
                                             end
                                         end
                                         if self.saved_layer:isVisible() then
                                             -- 批量删除结束后获取
-                                            if #self.manager:GetSavedMails()<10 then
-                                                self.manager:FetchSavedMailsFromServer(#self.manager:GetSavedMails()):done(function ( response )
-                                                    self.save_mails_listview:asyncLoadWithCurrentPosition_()
-                                                    self.is_deleting = false
-                                                    return response
-                                                end)
+                                            if #self.manager:GetSavedMails() < 10 then
+                                                local response = self.manager:FetchSavedMailsFromServer(#self.manager:GetSavedMails())
+                                                if response then
+                                                    response:done(function ( response )
+                                                        self.save_mails_listview:asyncLoadWithCurrentPosition_()
+                                                        self.is_deleting = false
+                                                        return response
+                                                    end)
+                                                end
                                             end
                                         end
-
-
                                     end)
                                 elseif control_type == "report" then
                                     MailManager:DecreaseUnReadReportsNumByIds(ids)
@@ -207,21 +211,27 @@ function GameUIMail:CreateMailControlBox()
                                         if self.report_layer:isVisible() then
                                             -- 批量删除结束后获取
                                             if #self.manager:GetReports()<10 then
-                                                self.manager:FetchReportsFromServer(#self.manager:GetReports()):done(function ( response )
-                                                    self.report_listview:asyncLoadWithCurrentPosition_()
-                                                    self.is_deleting = false
-                                                    return response
-                                                end)
+                                                local response = self.manager:FetchReportsFromServer(#self.manager:GetReports())
+                                                if response then
+                                                    response:done(function ( response )
+                                                        self.report_listview:asyncLoadWithCurrentPosition_()
+                                                        self.is_deleting = false
+                                                        return response
+                                                    end)
+                                                end
                                             end
                                         end
                                         if self.saved_layer:isVisible() then
                                             -- 批量删除结束后获取
                                             if #self.manager:GetSavedReports()<10 then
-                                                self.manager:FetchReportsFromServer(#self.manager:GetSavedReports()):done(function ( response )
-                                                    self.saved_reports_listview:asyncLoadWithCurrentPosition_()
-                                                    self.is_deleting = false
-                                                    return response
-                                                end)
+                                                local response self.manager:FetchSavedReportsFromServer(#self.manager:GetSavedReports())
+                                                if response then
+                                                    response:done(function ( response )
+                                                        self.saved_reports_listview:asyncLoadWithCurrentPosition_()
+                                                        self.is_deleting = false
+                                                        return response
+                                                    end)
+                                                end
                                             end
                                         end
                                     end)
@@ -337,10 +347,13 @@ function GameUIMail:InitInbox(mails)
     self.inbox_listview:setRedundancyViewVal(200)
     self.inbox_listview:setDelegate(handler(self, self.DelegateInbox))
     if not mails then
-        self.manager:FetchMailsFromServer(0):done(function ( response )
-            self.inbox_listview:reload()
-            return response
-        end)
+        local promise = self.manager:FetchMailsFromServer(0)
+        if promise then
+            promise:done(function ( response )
+                self.inbox_listview:reload()
+                return response
+            end)
+        end
     end
     self.inbox_listview:reload()
 end
@@ -390,7 +403,7 @@ function GameUIMail:CreateInboxContent()
     local title_bg = display.newSprite("title_blue_482x30.png",item_width-482/2-2, item_height-24)
         :addTo(content,2)
     -- 不变的模板部分
-    local content_title_bg = display.newScale9Sprite("back_ground_516x60.png",item_width-4,10,cc.size(482,60),cc.rect(15,10,486,40))
+    local content_title_bg = display.newScale9Sprite("back_ground_166x84.png",item_width-4,10,cc.size(482,60),cc.rect(15,10,136,64))
         :align(display.RIGHT_BOTTOM)
         :addTo(content,2)
 
@@ -490,10 +503,13 @@ function GameUIMail:InitSaveMails(mails)
     self.save_mails_listview:setRedundancyViewVal(200)
     self.save_mails_listview:setDelegate(handler(self, self.DelegateSavedMails))
     if not self.manager:GetSavedMails() then
-        self.manager:FetchSavedMailsFromServer(0):done(function ( response )
-            self.save_mails_listview:reload()
-            return response
-        end)
+        local promise =self.manager:FetchSavedMailsFromServer(0)
+        if promise then
+            promise:done(function ( response )
+                self.save_mails_listview:reload()
+                return response
+            end)
+        end
     end
     self.save_mails_listview:reload()
 end
@@ -543,7 +559,7 @@ function GameUIMail:CreateSavedMailContent()
     local title_bg = display.newSprite("title_blue_482x30.png",item_width-482/2-2, item_height-24)
         :addTo(content,2)
     -- 不变的模板部分
-    local content_title_bg = display.newScale9Sprite("back_ground_516x60.png",item_width-4,10,cc.size(482,60),cc.rect(15,10,486,40))
+    local content_title_bg = display.newScale9Sprite("back_ground_166x84.png",item_width-4,10,cc.size(482,60),cc.rect(15,10,136,64))
         :align(display.RIGHT_BOTTOM)
         :addTo(content,2)
 
@@ -641,10 +657,13 @@ function GameUIMail:InitSendMails(mails)
     self.send_mail_listview:setRedundancyViewVal(200)
     self.send_mail_listview:setDelegate(handler(self, self.DelegateSendMails))
     if not mails then
-        self.manager:FetchSendMailsFromServer(0):done(function ( response )
-            self.send_mail_listview:reload()
-            return response
-        end)
+        local promise = self.manager:FetchSendMailsFromServer(0)
+        if promise then
+            promise:done(function ( response )
+                self.send_mail_listview:reload()
+                return response
+            end)
+        end
     end
     self.send_mail_listview:reload()
 end
@@ -692,7 +711,7 @@ function GameUIMail:CreateSendMailContent()
     local title_bg = display.newScale9Sprite("title_grey_482x30.png",item_width/2, item_height-24,cc.size(552,30),cc.rect(10,5,462,20))
         :addTo(content,2)
     -- 不变的模板部分
-    local content_title_bg = display.newScale9Sprite("back_ground_516x60.png",item_width-8,10,cc.size(552,60),cc.rect(15,10,486,40))
+    local content_title_bg = display.newScale9Sprite("back_ground_166x84.png",item_width-8,10,cc.size(552,60),cc.rect(15,10,136,64))
         :align(display.RIGHT_BOTTOM)
         :addTo(content,2)
 
@@ -843,12 +862,12 @@ function GameUIMail:SelectAllMailsOrReports(isSelect)
         end
         self.report_listview:asyncLoadWithCurrentPosition_()
     elseif self.saved_layer:isVisible() then
-        if self.save_mails_listview:isVisible() then
+        if self.save_mails_listview and self.save_mails_listview:isVisible() then
             for i,v in ipairs(self.manager:GetSavedMails()) do
                 self:SelectItems(v,isSelect)
             end
             self.save_mails_listview:asyncLoadWithCurrentPosition_()
-        elseif self.saved_reports_listview:isVisible() then
+        elseif self.saved_reports_listview and self.saved_reports_listview:isVisible() then
             for i,v in ipairs(self.manager:GetSavedReports()) do
                 self:SelectItems(v,isSelect)
             end
@@ -957,19 +976,23 @@ function GameUIMail:MailUnreadChanged(unreads)
     local mail_label = self.mail_unread_num_label
     local report_bg = self.report_unread_num_bg
     local report_label = self.report_unread_num_label
-    if unreads.mail and  unreads.mail>0 then
-        mail_bg:setVisible(true)
-        mail_label:setString(unreads.mail > 99 and "99+" or unreads.mail)
-    else
-        mail_bg:setVisible(false)
-        mail_label:setString("")
+    if unreads.mail then
+        if unreads.mail > 0  then
+            mail_bg:setVisible(true)
+            mail_label:setString(unreads.mail > 99 and "99+" or unreads.mail)
+        else
+            mail_bg:setVisible(false)
+            mail_label:setString("")
+        end
     end
-    if unreads.report and  unreads.report>0 then
-        report_bg:setVisible(true)
-        report_label:setString(unreads.report > 99 and "99+" or unreads.report)
-    else
-        report_bg:setVisible(false)
-        report_label:setString("")
+    if unreads.report then
+        if unreads.report > 0 then
+            report_bg:setVisible(true)
+            report_label:setString(unreads.report > 99 and "99+" or unreads.report)
+        else
+            report_bg:setVisible(false)
+            report_label:setString("")
+        end
     end
 end
 
@@ -1111,9 +1134,15 @@ function GameUIMail:ShowMailDetails(mail)
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }:addTo(content_bg):pos(10, 0)
     local content_item = content_listview:newItem()
+    local mail_content = mail.content
+    if mail.fromName == "__system" then
+        for k,v in pairs(Localize.mails) do
+            mail_content = string.gsub(mail_content, k, v)
+        end
+    end
     local content_label = UIKit:ttfLabel(
         {
-            text = mail.fromName == "__system" and _(mail.content) or mail.content,
+            text = mail_content,
             size = 20,
             dimensions = cc.size(550,0),
             color = 0x403c2f
@@ -1192,10 +1221,13 @@ function GameUIMail:InitReport()
     self.report_listview:setRedundancyViewVal(200)
     self.report_listview:setDelegate(handler(self, self.DelegateReport))
     if not self.manager:GetReports() then
-        self.manager:FetchReportsFromServer(0):done(function ( response )
-            self.report_listview:reload()
-            return response
-        end)
+        local promise = self.manager:FetchReportsFromServer(0)
+        if promise then
+            promise:done(function ( response )
+                self.report_listview:reload()
+                return response
+            end)
+        end
     end
     self.report_listview:reload()
 end
@@ -1280,7 +1312,7 @@ function GameUIMail:CreateReportContent()
             if report:IsWin() then
                 title_bg_image = "title_green_558x34.png"
             else
-                title_bg_image = "title_red_558x34.png"
+                title_bg_image = "title_red_556x34.png"
             end
         end
         local title_bg = display.newSprite(title_bg_image, item_width/2, 52+item_height/2):addTo(self)
@@ -1298,7 +1330,9 @@ function GameUIMail:CreateReportContent()
                 color = 0xffedae
             }):align(display.RIGHT_CENTER, 540, 17)
             :addTo(title_bg)
-        local report_content_bg = display.newSprite("back_ground_484X98.png", 35+item_width/2, -18+item_height/2):addTo(self)
+        local report_content_bg = WidgetUIBackGround.new({width = 484,height = 98},WidgetUIBackGround.STYLE_TYPE.STYLE_4)
+            :align(display.CENTER, 35+item_width/2, -18+item_height/2):addTo(self)
+
         local report_big_type = report:IsAttackOrStrike()
         if report_big_type == "strike" then
             display.newSprite("icon_strike_69x50.png"):align(display.LEFT_BOTTOM, 0, 0):addTo(report_content_bg):scale(0.8)
@@ -1320,7 +1354,7 @@ function GameUIMail:CreateReportContent()
             display.newSprite(UILib.resource[rewards.name], 190, 30):addTo(report_content_bg):scale(0.5)
             UIKit:ttfLabel(
                 {
-                    text = "+"..rewards.count,
+                    text = "+"..string.formatnumberthousands(rewards.count),
                     size = 20,
                     color = 0x403c2f
                 }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-20, 30)
@@ -1444,10 +1478,13 @@ function GameUIMail:InitSavedReports()
                 self.saved_reports_listview:setRedundancyViewVal(200)
                 self.saved_reports_listview:setDelegate(handler(self, self.DelegateSavedReport))
                 if not self.manager:GetSavedReports() then
-                    self.manager:FetchSavedReportsFromServer(0):done(function ( response )
-                        self.saved_reports_listview:reload()
-                        return response
-                    end)
+                    local promise = self.manager:FetchSavedReportsFromServer(0)
+                    if promise then
+                        promise:done(function ( response )
+                            self.saved_reports_listview:reload()
+                            return response
+                        end)
+                    end
                 end
                 self.saved_reports_listview:reload()
 
@@ -1538,7 +1575,7 @@ function GameUIMail:CreateSavedReportContent()
             if report:IsWin() then
                 title_bg_image = "title_green_558x34.png"
             else
-                title_bg_image = "title_red_558x34.png"
+                title_bg_image = "title_red_556x34.png"
             end
         end
         print("saved reports title image=",title_bg_image)
@@ -1557,7 +1594,8 @@ function GameUIMail:CreateSavedReportContent()
                 color = 0xffedae
             }):align(display.RIGHT_CENTER, 540, 17)
             :addTo(title_bg)
-        local report_content_bg = display.newSprite("back_ground_484X98.png", 35+item_width/2, -18+item_height/2):addTo(self)
+        local report_content_bg = WidgetUIBackGround.new({width = 484,height = 98},WidgetUIBackGround.STYLE_TYPE.STYLE_4)
+            :align(display.CENTER,35+item_width/2, -18+item_height/2):addTo(self)
         local report_big_type = report:IsAttackOrStrike()
         if report_big_type == "strike" then
             display.newSprite("icon_strike_69x50.png"):align(display.LEFT_BOTTOM, 0, 0):addTo(report_content_bg):scale(0.8)
@@ -1721,7 +1759,7 @@ function GameUIMail:OpenReplyMail(mail)
         }):align(display.LEFT_CENTER,10,18)
         :addTo(subject_input_box_image)
     -- 分割线
-    display.newScale9Sprite("dividing_line_584x1.png", r_size.width/2, r_size.height-160,cc.size(594,1)):addTo(reply_mail)
+    display.newScale9Sprite("dividing_line.png",r_size.width/2, r_size.height-160,cc.size(594,2),cc.rect(10,2,382,2)):addTo(reply_mail)
     -- 内容
     cc.ui.UILabel.new(
         {cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -1735,8 +1773,7 @@ function GameUIMail:OpenReplyMail(mail)
     -- 回复的邮件内容
     local lucid_bg = WidgetUIBackGround.new({width = 580,height=472},WidgetUIBackGround.STYLE_TYPE.STYLE_4):addTo(reply_mail)
     lucid_bg:pos((r_size.width-lucid_bg:getContentSize().width)/2, 82)
-    display.newScale9Sprite("dividing_line_584x1.png", lucid_bg:getContentSize().width/2, lucid_bg:getContentSize().height-288,cc.size(580,1)):addTo(lucid_bg)
-
+    display.newScale9Sprite("dividing_line.png",lucid_bg:getContentSize().width/2, lucid_bg:getContentSize().height-288,cc.size(580,2),cc.rect(10,2,382,2)):addTo(lucid_bg)
 
 
     local textView = ccui.UITextView:create(cc.size(578,278),display.newScale9Sprite("background_578X278.png"))
@@ -1891,8 +1928,8 @@ end
 
 
 function GameUIMail:GetMyName(report)
+    local data = report:GetData()
     if report:Type() == "strikeCity" or report:Type()== "cityBeStriked" then
-        local data = report:GetData()
         if data.attackPlayerData.id == DataManager:getUserData()._id then
             return data.attackPlayerData.name
         elseif data.helpDefencePlayerData and data.helpDefencePlayerData.id == DataManager:getUserData()._id then
@@ -1914,13 +1951,23 @@ function GameUIMail:GetMyName(report)
         elseif report:GetData().helpDefencePlayerData and report:GetData().helpDefencePlayerData.id == DataManager:getUserData()._id then
             return report:GetData().helpDefencePlayerData.name
         end
+    elseif report:Type() == "strikeVillage" then
+        return data.attackPlayerData.name
+    elseif report:Type() == "villageBeStriked" then
+        return data.defencePlayerData.name
+    elseif report:Type() == "attackVillage" then
+        if data.attackPlayerData.id == DataManager:getUserData()._id then
+            return data.attackPlayerData.name
+        elseif data.defencePlayerData and data.defencePlayerData.id == DataManager:getUserData()._id then
+            return data.defencePlayerData.name
+        end
     else
         return "xxxxx"
     end
 end
 function GameUIMail:GetMyAllianceTag(report)
+    local data = report:GetData()
     if report:Type() == "strikeCity" or report:Type()== "cityBeStriked" then
-        local data = report:GetData()
         if data.attackPlayerData.id == DataManager:getUserData()._id then
             return data.attackPlayerData.alliance.tag
         elseif data.helpDefencePlayerData and data.helpDefencePlayerData.id == DataManager:getUserData()._id then
@@ -1942,13 +1989,23 @@ function GameUIMail:GetMyAllianceTag(report)
         elseif report:GetData().helpDefencePlayerData and report:GetData().helpDefencePlayerData.id == DataManager:getUserData()._id then
             return report:GetData().helpDefencePlayerData.alliance.tag
         end
+    elseif report:Type() == "strikeVillage" then
+        return data.attackPlayerData.alliance.tag
+    elseif report:Type() == "villageBeStriked" then
+        return data.defencePlayerData.alliance.tag
+    elseif report:Type() == "attackVillage" then
+        if data.attackPlayerData.id == DataManager:getUserData()._id then
+            return data.attackPlayerData.alliance.tag
+        elseif data.defencePlayerData and data.defencePlayerData.id == DataManager:getUserData()._id then
+            return data.defencePlayerData.alliance.tag
+        end
     else
         return "xxxxx"
     end
 end
 function GameUIMail:GetEnemyName(report)
+    local data = report:GetData()
     if report:Type() == "strikeCity" or report:Type()== "cityBeStriked" then
-        local data = report:GetData()
         if data.attackPlayerData.id == DataManager:getUserData()._id then
             return (data.defencePlayerData and data.defencePlayerData.name) or (data.helpDefencePlayerData and data.helpDefencePlayerData.name)
         elseif data.helpDefencePlayerData and data.helpDefencePlayerData.id == DataManager:getUserData()._id then
@@ -1970,13 +2027,19 @@ function GameUIMail:GetEnemyName(report)
         then
             return report:GetData().attackPlayerData.name
         end
+    elseif report:Type() == "strikeVillage" then
+        return data.defencePlayerData.name
+    elseif report:Type() == "villageBeStriked" then
+        return data.attackPlayerData.name
+    elseif report:Type() == "attackVillage" then
+        return data.defencePlayerData.name
     else
         return "xxxxx"
     end
 end
 function GameUIMail:GetEnemyAllianceTag(report)
+    local data = report:GetData()
     if report:Type() == "strikeCity" or report:Type()== "cityBeStriked" then
-        local data = report:GetData()
         if data.attackPlayerData.id == DataManager:getUserData()._id then
             return data.strikeTarget.alliance.tag
         elseif data.helpDefencePlayerData and data.helpDefencePlayerData.id == DataManager:getUserData()._id then
@@ -1998,12 +2061,31 @@ function GameUIMail:GetEnemyAllianceTag(report)
         then
             return report:GetData().attackPlayerData.alliance.tag
         end
+    elseif report:Type() == "strikeVillage" then
+        return data.defencePlayerData.alliance.tag
+    elseif report:Type() == "villageBeStriked" then
+        return data.attackPlayerData.alliance.tag
+    elseif report:Type() == "attackVillage" then
+        return data.defencePlayerData.alliance.tag
     else
         return "xxxxx"
     end
 end
 
 return GameUIMail
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

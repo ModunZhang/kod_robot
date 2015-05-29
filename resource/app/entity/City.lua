@@ -53,7 +53,7 @@ City.RESOURCE_TYPE_TO_BUILDING_TYPE = {
     [ResourceManager.RESOURCE_TYPE.FOOD] = "farmer",
     [ResourceManager.RESOURCE_TYPE.IRON] = "miner",
     [ResourceManager.RESOURCE_TYPE.STONE] = "quarrier",
-    [ResourceManager.RESOURCE_TYPE.POPULATION] = "dwelling",
+    [ResourceManager.RESOURCE_TYPE.CITIZEN] = "dwelling",
 }
 local only_one_buildings_map = {
     keep            = true,

@@ -6,7 +6,7 @@ function WidgetPVEAncientRuins:ctor(...)
     WidgetPVEAncientRuins.super.ctor(self, ...)
 end
 function WidgetPVEAncientRuins:GetTitle()
-    return string.format("%s %s%d", _("上古遗迹"), _("等级"), self:GetPVEMap():GetIndex())
+    return string.format(_("上古遗迹 等级%d"), self:GetPVEMap():GetIndex())
 end
 function WidgetPVEAncientRuins:GetDesc()
     return self:GetObject():IsSearched()

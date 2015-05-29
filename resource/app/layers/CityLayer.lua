@@ -13,11 +13,14 @@ local SingleTreeSprite = import("..sprites.SingleTreeSprite")
 local BirdSprite = import("..sprites.BirdSprite")
 local CitizenSprite = import("..sprites.CitizenSprite")
 local SoldierSprite = import("..sprites.SoldierSprite")
+local BarracksSoldierSprite = import("..sprites.BarracksSoldierSprite")
 local HelpedTroopsSprite = import("..sprites.HelpedTroopsSprite")
 local SoldierManager = import("..entity.SoldierManager")
 local cocos_promise = import("..utils.cocos_promise")
+local Enum = import("..utils.Enum")
 local promise = import("..utils.promise")
 local Observer = import("..entity.Observer")
+local WidgetMaskFilter = import("..widget.WidgetMaskFilter")
 local MapLayer = import(".MapLayer")
 local CityLayer = class("CityLayer", MapLayer)
 
@@ -40,6 +43,8 @@ end})
 
 
 
+
+local BARRACKS_SOLDIER_TAG = 123456
 local floor = math.floor
 local min = math.min
 local random = math.random
@@ -185,21 +190,18 @@ function CityLayer:OnSoliderStarCountChanged(soldier_manager, soldier_star_chang
     self:UpdateSoldiersStar(soldier_manager, soldier_star_changed)
 end
 function CityLayer:OnSoliderCountChanged(soldier_manager, changed)
+    if self:IsBarracksMoving() then return end
     self:UpdateSoldiersVisibleWithSoldierManager(soldier_manager)
+end
+function CityLayer:IsBarracksMoving()
+    return self:GetCityNode():getChildByTag(BARRACKS_SOLDIER_TAG)
 end
 function CityLayer:OnHelpedTroopsChanged(city)
     self:UpdateHelpedByTroopsVisible(city:GetHelpedByTroops())
 end
 -----
-local SCENE_BACKGROUND = 1
-local BACK_NODE = 2
-local CITY_LAYER = 3
-local SKY_LAYER = 4
-local INFO_LAYER = 5
-local CITY_BACKGROUND = 1
-local ROAD_NODE = 2
-local BUILDING_NODE = 3
-local WEATHER_NODE = 4
+local SCENE_ZORDER = Enum("SCENE_BACKGROUND", "CITY_LAYER", "SKY_LAYER", "INFO_LAYER")
+local CITY_ZORDER = Enum("BUILDING_NODE")
 function CityLayer:ctor(city_scene)
     Observer.extend(self)
     CityLayer.super.ctor(self, city_scene, 0.6, 1.5)
@@ -236,11 +238,11 @@ function CityLayer:InitBackground()
     self:ReloadSceneBackground()
 end
 function CityLayer:InitCity()
-    self.city_layer = display.newLayer():addTo(self, CITY_LAYER):align(display.BOTTOM_LEFT, 47, 158 + 250)
-    self.sky_layer = display.newLayer():addTo(self, SKY_LAYER):align(display.BOTTOM_LEFT)
-    self.info_layer = display.newLayer():addTo(self, INFO_LAYER):align(display.BOTTOM_LEFT)
+    self.city_layer = display.newLayer():addTo(self, SCENE_ZORDER.CITY_LAYER):align(display.BOTTOM_LEFT, 47, 158 + 250)
+    self.sky_layer = display.newLayer():addTo(self, SCENE_ZORDER.SKY_LAYER):align(display.BOTTOM_LEFT)
+    self.info_layer = display.newLayer():addTo(self, SCENE_ZORDER.INFO_LAYER):align(display.BOTTOM_LEFT)
     self.position_node = cc.TMXTiledMap:create("tmxmaps/city_road2.tmx"):addTo(self.city_layer):hide()
-    self.city_node = display.newLayer():addTo(self.city_layer, BUILDING_NODE):align(display.BOTTOM_LEFT)
+    self.city_node = display.newLayer():addTo(self.city_layer, CITY_ZORDER.BUILDING_NODE):align(display.BOTTOM_LEFT)
     local origin_point = self:GetPositionIndex(0, 0)
     self.iso_map = IsoMapAnchorBottomLeft.new({
         tile_w = 51,
@@ -301,7 +303,7 @@ function CityLayer:ReloadSceneBackground()
     if self.background then
         self.background:removeFromParent()
     end
-    self.background = display.newNode():addTo(self, SCENE_BACKGROUND)
+    self.background = display.newNode():addTo(self, SCENE_ZORDER.SCENE_BACKGROUND)
     local terrain = self:Terrain()
     local left_1 = string.format("left_background_1_%s.jpg", terrain)
     local left_2 = string.format("left_background_2_%s.jpg", terrain)
@@ -328,10 +330,10 @@ function CityLayer:ReloadSceneBackground()
         local start = 0
         self:setFilter(filter.newFilter("CUSTOM", json.encode({
             frag = "shaders/flashAt.fs",
-            shaderName = "flash1",
+            shaderName = "flashAt",
             startTime = start,
             curTime = start,
-            lastTime = 0.5,
+            lastTime = time,
             rect = {0.815,0.543,0.21,0.26},
             srm = {1.0, 1.54, -45, 0.4},
         })))
@@ -421,7 +423,7 @@ function CityLayer:InitWithCity(city)
     -- 协防的部队
     local helpedByTroops = {}
     for i, v in ipairs({
-        {x = 15, y = 55},
+        {x = 25, y = 55},
         {x = 35, y = 55},
     }) do
         table.insert(helpedByTroops, HelpedTroopsSprite.new(self, i, v.x, v.y):addTo(city_node))
@@ -430,7 +432,7 @@ function CityLayer:InitWithCity(city)
 
     -- pve 入口
     self.pve_airship = self:CreateAirship(-9, 4):addTo(city_node)
-    self.fair_ground = self:CreateFairGround(60, 45):addTo(city_node)
+    self.fair_ground = self:CreateFairGround(60, 25):addTo(city_node)
 
 
     -- 更新其他需要动态生成的建筑
@@ -443,8 +445,16 @@ function CityLayer:InitWithCity(city)
     end)
     self:scheduleUpdate()
 
+    --
     for i = 1,1 do
         self:CreateBird(0, 0):scale(0.8):addTo(self.sky_layer)
+    end
+end
+function CityLayer:MoveBarracksSoldiers(...)
+    local soldiers = {...}
+    if #soldiers > 0 then
+        local star = City:GetSoldierManager():GetStarBySoldierType(soldiers[1])
+        self:CreateBarracksSoldier(soldiers[1], star):addTo(self:GetCityNode(), 0, BARRACKS_SOLDIER_TAG)
     end
 end
 ---
@@ -572,6 +582,9 @@ function CityLayer:UpdateTowersWithCity(city)
         v:DestorySelf()
     end
 end
+function CityLayer:RefreshMyCitySoldierCount()
+    self:UpdateSoldiersVisibleWithSoldierManager(City:GetSoldierManager())
+end
 function CityLayer:UpdateSoldiersVisibleWithSoldierManager(soldier_manager)
     local map = soldier_manager:GetSoldierMap()
     self:IteratorSoldiers(function(_, v)
@@ -615,6 +628,7 @@ function CityLayer:RefreshSoldiers(soldier_manager)
         {x = 2, y = 13, soldier_type = "ballista", scale = 0.8},
     }) do
         local star = soldier_manager:GetStarBySoldierType(v.soldier_type)
+        assert(star < 4)
         local soldier = self:CreateSoldier(v.soldier_type, star, v.x, v.y):addTo(self:GetCityNode())
         local x, y = soldier:getPosition()
         soldier:pos(x, y + 25):scale(v.scale)
@@ -639,7 +653,7 @@ function CityLayer:UpdateCitizen(city)
             count = count + 1
         end
     end)
-    for i = #self.citizens + 1, count do
+    for i = #self.citizens + 1, 1 do
         table.insert(self.citizens, self:CreateCitizen(city, 0, 0):addTo(self:GetCityNode()))
     end
 end
@@ -829,6 +843,9 @@ end
 function CityLayer:CreateCitizen(city, logic_x, logic_y)
     return CitizenSprite.new(self, city, logic_x, logic_y)
 end
+function CityLayer:CreateBarracksSoldier(soldier_type, star)
+    return BarracksSoldierSprite.new(self, soldier_type, star)
+end
 function CityLayer:CreateSoldier(soldier_type, star, logic_x, logic_y)
     return SoldierSprite.new(self, soldier_type, star, logic_x, logic_y)
 end
@@ -863,6 +880,8 @@ function CityLayer:ShowLevelUpNode()
 end
 
 return CityLayer
+
+
 
 
 

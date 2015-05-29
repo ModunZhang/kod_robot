@@ -57,7 +57,7 @@ property(Item,"isAdvancedItem",false)
 function Item:UpdateData(json_data)
     local name = json_data.name
     self:SetName(name)
-    self:SetCount(json_data.count)
+    self:SetCount(tonumber(json_data.count))
     local config = get_config(name)
     local category = get_category(name)
     self:SetCategory(category)

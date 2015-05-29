@@ -203,8 +203,8 @@ function GameUIMoonGate:InitWonderDetails()
         :addTo(info_bg)
     local honour_bg = display.newSprite("box_86x86.png"):align(display.CENTER,50,44)
         :addTo(info_bg)
-    display.newSprite("icon_honour_67x84.png"):align(display.CENTER,honour_bg:getContentSize().width/2,honour_bg:getContentSize().height/2)
-        :addTo(honour_bg)
+    display.newSprite("honour_128x128.png"):align(display.CENTER,honour_bg:getContentSize().width/2,honour_bg:getContentSize().height/2)
+        :addTo(honour_bg):scale(0.5)
     UIKit:ttfLabel({
         text = _("占领联盟"),
         size = 22,
@@ -281,8 +281,6 @@ function GameUIMoonGate:InitWonderDetails()
                 :align(display.LEFT_CENTER, 20,title_bg:getContentSize().height/2)
             local box = display.newSprite("box_136x136.png"):align(display.CENTER,80,item_height/2)
                 :addTo(content)
-            display.newSprite("i_icon_20x20.png"):align(display.CENTER,100,30)
-                :addTo(box)
             UIKit:ttfLabel({
                 text = Localize.wonder_title_buff[v],
                 size = 20,

@@ -71,8 +71,38 @@ function ShrinePlayFightReport:ctor(attackName,defenceName,attackDragonRoundData
 		v.star = v.soldierStar
 		v.count = v.soldierCount
 	end
+	self:formatOrderedAttackSoldiers()
 end
 
+function ShrinePlayFightReport:formatOrderedAttackSoldiers()
+	local result = {}
+	self.orderedAttackSoldiers = {}
+	for index,v in ipairs(self.fightAttackSoldierRoundData) do
+		if not result[v.soldierName] then
+			result[v.soldierName] = {name = v.soldierName,star = v.soldierStar,count = v.soldierCount or 0,index = index}
+		end
+	end
+	for ___,v in pairs(result) do
+		table.insert(self.orderedAttackSoldiers,v)
+	end
+	table.sort( self.orderedAttackSoldiers, function(a,b)
+		return a.index < b.index
+	end)
+
+	result = {}
+	self.orderedDefenceSoldierRoundData = {}
+	for index,v in ipairs(self.fightDefenceSoldierRoundData) do
+		if not result[v.soldierName] then
+			result[v.soldierName] = {name = v.soldierName,star = v.soldierStar,count = v.soldierCount or 0,index = index}
+		end
+	end
+	for ___,v in pairs(result) do
+		table.insert(self.orderedDefenceSoldierRoundData,v)
+	end
+	table.sort( self.orderedDefenceSoldierRoundData, function(a,b)
+		return a.index < b.index
+	end)
+end
 
 function ShrinePlayFightReport:GetFightAttackName()
   	return self.attackName
@@ -105,10 +135,10 @@ function ShrinePlayFightReport:GetFightDefenceWallRoundData()
     return {}
 end
 function ShrinePlayFightReport:GetOrderedAttackSoldiers()
-   return self.fightAttackSoldierRoundData or {}
+   return self.orderedAttackSoldiers or {}
 end
 function ShrinePlayFightReport:GetOrderedDefenceSoldiers()
-   return self.fightDefenceSoldierRoundData or {}
+   return self.orderedDefenceSoldierRoundData or {}
 end
 function ShrinePlayFightReport:GetReportResult()
 	return self.isWin

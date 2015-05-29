@@ -3,7 +3,6 @@ local promise = import("..utils.promise")
 local window = import("..utils.window")
 local BuildingRegister = import("..entity.BuildingRegister")
 local MaterialManager = import("..entity.MaterialManager")
-local WidgetBuyBuildingQueue = import("..widget.WidgetBuyBuildingQueue")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local SpriteConfig = import("..sprites.SpriteConfig")
@@ -54,7 +53,8 @@ function GameUIBuild:onExit()
     GameUIBuild.super.onExit(self)
 end
 function GameUIBuild:LoadBuildingQueue()
-    local back_ground = cc.ui.UIImage.new("back_ground_534x46.png"):align(display.CENTER, window.cx, window.top - 120)
+    local back_ground = display.newScale9Sprite("back_ground_166x84.png", 0,0,cc.size(534,46),cc.rect(15,10,136,64))
+        :align(display.CENTER, window.cx, window.top - 120)
     local check = cc.ui.UICheckBoxButton.new({on = "yes_40x40.png", off = "wow_40x40.png" })
         :addTo(back_ground)
         :align(display.CENTER, 30, back_ground:getContentSize().height/2)
@@ -79,7 +79,7 @@ function GameUIBuild:LoadBuildingQueue()
         -- :setButtonEnabled(false)
         :onButtonClicked(function ( event )
             if event.name == "CLICKED_EVENT" then
-                UIKit:newWidgetUI("WidgetBuyBuildingQueue"):AddToCurrentScene()
+                UIKit:newGameUI("GameUIActivityRewardNew",4):AddToCurrentScene(true)
             end
         end)
 
@@ -108,7 +108,7 @@ function GameUIBuild:OnUpgradingFinished(building)
     self:OnCityChanged()
 end
 function GameUIBuild:OnCityChanged()
-    local citizen = self.build_city:GetResourceManager():GetPopulationResource():GetValueLimit()
+    local citizen = self.build_city:GetResourceManager():GetCitizenResource():GetValueLimit()
     table.foreachi(self.base_resource_building_items or {}, function(i, v)
         local building_type = base_items[i].building_type
         local number = #self.build_city:GetDecoratorsByType(building_type)
@@ -143,7 +143,7 @@ function GameUIBuild:OnBuildOnItem(item)
     local wood = city.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local iron = city.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local stone = city.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local citizen = city.resource_manager:GetPopulationResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
+    local citizen = city.resource_manager:GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
     local is_resource_enough = wood<config[1].wood
         or stone<config[1].stone
         or iron<config[1].iron
@@ -236,7 +236,7 @@ function GameUIBuild:CreateItemWithListView(list_view)
 
 
     local left_x, right_x = 5, 150
-    local frame = display.newSprite("bg_134x134.png"):addTo(back_ground):pos((left_x + right_x) / 2, h/2)
+    local frame = display.newSprite("alliance_item_flag_box_126X126.png"):addTo(back_ground):pos((left_x + right_x) / 2, h/2):scale(134/126)
     local info_btn = WidgetPushButton.new(
         {normal = "info_26x26.png",pressed = "info_26x26.png"})
         :addTo(frame)
@@ -259,11 +259,6 @@ function GameUIBuild:CreateItemWithListView(list_view)
         :align(display.LEFT_CENTER, 30, size.height/2)
 
 
-    -- local btn_info = WidgetPushButton.new(
-    --     {normal = "info_26x26.png",pressed = "info_26x26.png"})
-    --     :addTo(back_ground)
-    --     :align(display.LEFT_BOTTOM, 10, 10)
-
     local condition_label = cc.ui.UILabel.new({
         text = _("已达到最大建筑数量"),
         size = 20,
@@ -274,7 +269,7 @@ function GameUIBuild:CreateItemWithListView(list_view)
         :align(display.LEFT_CENTER, 175, 80)
 
     local number_label = cc.ui.UILabel.new({
-        text = _("建筑数量").."5 / 5",
+        text = _("建筑数量 5/5"),
         size = 20,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_LEFT,
@@ -334,5 +329,8 @@ function GameUIBuild:CreateItemWithListView(list_view)
 end
 
 return GameUIBuild
+
+
+
 
 

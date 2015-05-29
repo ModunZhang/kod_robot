@@ -23,7 +23,7 @@ function GameUIShop:onEnter()
     content:setContentSize(cc.size(640, 0))
     local add_gem = 100000000
     local button = WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"}
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"}
         ,{scale9 = false}
     -- ,{
     --     disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
@@ -47,7 +47,7 @@ function GameUIShop:onEnter()
     -- })
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -68,7 +68,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -84,7 +84,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -100,7 +100,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -117,7 +117,7 @@ function GameUIShop:onEnter()
 
     -- print(Alliance_Manager:GetMyAlliance():JoinType())
     local join_btn = WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -151,7 +151,7 @@ function GameUIShop:onEnter()
     --     end
     -- end
     local join_btn = WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -167,7 +167,7 @@ function GameUIShop:onEnter()
             end)
         end)
     local join_btn = WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -185,7 +185,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -203,7 +203,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -221,7 +221,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -239,7 +239,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -255,7 +255,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -270,7 +270,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -287,7 +287,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -305,7 +305,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -322,7 +322,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -339,7 +339,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -364,7 +364,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -392,7 +392,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -420,7 +420,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -449,7 +449,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -466,7 +466,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -483,7 +483,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -500,7 +500,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -518,7 +518,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -537,7 +537,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -554,7 +554,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -572,7 +572,7 @@ function GameUIShop:onEnter()
             )
         end)
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -589,7 +589,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -608,7 +608,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -626,7 +626,7 @@ function GameUIShop:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -641,7 +641,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -699,7 +699,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -758,7 +758,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -811,7 +811,7 @@ function GameUIShop:onEnter()
             )
         end)
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -827,7 +827,7 @@ function GameUIShop:onEnter()
             )
         end)
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -842,7 +842,7 @@ function GameUIShop:onEnter()
             event.target:setButtonLabelString("音乐开关->" .. (app:GetAudioManager():GetBackgroundMusicState() and "on" or "off"))
         end)
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -857,7 +857,7 @@ function GameUIShop:onEnter()
             event.target:setButtonLabelString("音效开关->" .. (app:GetAudioManager():GetEffectSoundState() and "on" or "off"))
         end)
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -872,7 +872,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -896,7 +896,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -912,7 +912,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -927,7 +927,7 @@ function GameUIShop:onEnter()
             NetManager:getFindAllianceToFightPromose()
         end)
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -945,7 +945,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -964,7 +964,7 @@ function GameUIShop:onEnter()
         end)
 
     WidgetPushButton.new(
-        {normal = "green_btn_up_169x86.png", pressed = "green_btn_down_169x86.png"},
+        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,

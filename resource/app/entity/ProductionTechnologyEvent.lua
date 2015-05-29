@@ -46,12 +46,15 @@ end
 function ProductionTechnologyEvent:GetBuffLocalizedDesc()
 	return Localize.productiontechnology_buffer[self:Name()] or ""
 end
+function ProductionTechnologyEvent:GetBuffLocalizedDescComplete()
+	return Localize.productiontechnology_buffer_complete[self:Name()] or ""
+end
 function ProductionTechnologyEvent:Reset()
 	self:RemoveAllObserver()
 end
 function ProductionTechnologyEvent:GeneralLocalPush()
     if ext and ext.localpush then
-        local title = self:GetBuffLocalizedDesc().._("完成")
+        local title = self:GetBuffLocalizedDescComplete()
         app:GetPushManager():UpdateTechnologyPush(self:FinishTime(),title,self.id)
     end
 end

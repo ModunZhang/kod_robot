@@ -1,3 +1,4 @@
+local zz = import("..particles.zz")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local BarracksSprite = class("BarracksSprite", FunctionUpgradingSprite)
 
@@ -13,7 +14,7 @@ end
 
 
 
-local EMPTY_TAG = 114
+local EMPTY_TAG = 11400
 function BarracksSprite:ctor(city_layer, entity, city)
     BarracksSprite.super.ctor(self, city_layer, entity, city)
     entity:AddBarracksListener(self)
@@ -42,30 +43,10 @@ end
 function BarracksSprite:StopAni()
     self:GetAniArray()[1]:hide():getAnimation():stop()
 end
-
 function BarracksSprite:PlayEmptyAnimation()
     if not self:getChildByTag(EMPTY_TAG) then
         local x,y = self:GetSprite():getPosition()
-        local emitter = cc.ParticleSystemQuad:createWithTotalParticles(2)
-        :addTo(self,1,EMPTY_TAG):pos(x + 50,y + 50)
-        emitter:setDuration(-1)
-        emitter:setEmitterMode(0)
-        emitter:setPositionType(2)
-        emitter:setAngle(45)
-        emitter:setPosVar(cc.p(0,0))
-        emitter:setLife(3)
-        emitter:setLifeVar(0)
-        emitter:setStartSize(25)
-        emitter:setEndSize(35)
-        emitter:setGravity(cc.p(0,0))
-        emitter:setSpeed(25)
-        emitter:setSpeedVar(0)
-        emitter:setStartColor(cc.c4f(1))
-        emitter:setEndColor(cc.c4f(1,1,1,0))
-        emitter:setEmissionRate(1)
-        emitter:setBlendAdditive(false)
-        emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("z.png"))
-        emitter:updateWithNoTime()
+        zz():addTo(self,1,EMPTY_TAG):pos(x + 50,y + 50)
     end
 end
 

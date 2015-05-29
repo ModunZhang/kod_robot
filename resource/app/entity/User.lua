@@ -75,6 +75,7 @@ property(User, "serverName", "")
 property(User, "apnId", "")
 property(User, "gcId", "")
 property(User, "serverId", "")
+property(User, "serverLevel", "")
 property(User, "requestToAllianceEvents", {})
 property(User, "inviteToAllianceEvents", {})
 property(User, "allianceInfo", {
@@ -302,6 +303,7 @@ function User:OnPropertyChange(property_name, old_value, new_value)
 end
 function User:OnUserDataChanged(userData, current_time, deltaData)
     self:SetServerId(userData.serverId)
+    self:SetServerLevel(userData.serverLevel)
     self:SetGcId(userData.gcId)
     self:SetServerName(userData.logicServerId)
     self:SetApnId(userData.apnId)
@@ -588,11 +590,11 @@ function User:OnBasicInfoChanged(userData, deltaData)
     local is_delta_update = not is_fully_update and deltaData.basicInfo
     if is_fully_update or is_delta_update then
         local basicInfo = userData.basicInfo
-        self:SetTerrain(DataManager:getUserData().basicInfo.terrain)
+        self:SetTerrain(basicInfo.terrain)
         self:SetLevelExp(basicInfo.levelExp)
         self:SetLevel(self:GetPlayerLevelByExp(self:LevelExp()))
         self:SetPower(basicInfo.power)
-        self:SetName(DataManager:getUserData().basicInfo.name)
+        self:SetName(basicInfo.name)
         self:SetVipExp(basicInfo.vipExp)
         self:SetIcon(basicInfo.icon)
         self:SetMarchQueue(basicInfo.marchQueue)
@@ -657,7 +659,7 @@ function User:OnDailyQuestsChanged(userData, deltaData)
         local edit = {}
         local remove = {}
         if deltaData.dailyQuests.refreshTime then
-            self:SetDailyQuestsRefreshTime(userData.dailyQuests.refreshTime)
+            self:SetDailyQuestsRefreshTime(deltaData.dailyQuests.refreshTime)
             if deltaData.dailyQuests.quests then
                 self.dailyQuests = {}
                 for k,v in pairs(deltaData.dailyQuests.quests) do
@@ -767,7 +769,7 @@ function User:IsOnDailyQuestEvents()
 end
 function User:OnDailyQuestsRefresh()
     self:NotifyListeneOnType(User.LISTEN_TYPE.DALIY_QUEST_REFRESH, function(listener)
-        listener:OnDailyQuestsRefresh(self:GetDailyQuests())
+        listener:OnDailyQuestsRefresh()
     end)
 end
 function User:OnNewDailyQuests(changed_map)

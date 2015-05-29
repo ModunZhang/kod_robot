@@ -4,9 +4,11 @@ local Localize = import("..utils.Localize")
 local AllianceMap = class("AllianceMap", MultiObserver)
 -- local allianceBuildingType = GameDatas.AllianceInitData.buildingType
 local buildingName = GameDatas.AllianceInitData.buildingName
-
+local intInit = GameDatas.AllianceInitData.intInit
 AllianceMap.LISTEN_TYPE = Enum("BUILDING","BUILDING_INFO")
 
+local ceil = math.ceil
+local floor = math.floor
 
 -- {
 --     "id": "7kf2_RE13",
@@ -155,6 +157,7 @@ function AllianceMap:ctor(alliance)
     self.decoratorMapObjects = {}
 end
 function AllianceMap:Reset()
+    self:ClearAllListener()
     self.mapObjects = {}
     self.buildings = {}
     self.buildingMapObjects = {}
@@ -254,26 +257,48 @@ function AllianceMap:IteratorAllObjects(func)
     end
 end
 function AllianceMap:CanMoveBuilding(allianceBuilding, x, y)
+
     local building = clone(allianceBuilding)
-    building.location.x = x
-    building.location.y = y
-    for _,v in ipairs({building:GetGlobalRegion()}) do
-        if v < 0 and v >= 51 then
-            return false
+    local mx,my = building:GetMidLogicPosition()
+    local lx,ly = building:GetLogicPosition()
+    building.location.x = lx + x - mx
+    building.location.y = ly + y - my
+
+    -- 遍历周围的格子
+    local mx,my = building:GetMidLogicPosition()
+    local w,h = building:GetSize()
+    local squares = {}
+    for lx = ceil(mx - w/2), floor(mx + w/2) do
+        for ly = ceil(my - h/2), floor(my + h/2) do
+            table.insert(squares, {lx,ly,true})
         end
     end
-    --
-    local x1,y1 = allianceBuilding:GetLogicPosition()
-    for _,v in pairs(self.mapObjects) do
-        local x2,y2 = v:GetLogicPosition()
-        -- 不一样才能比较
-        if x1 ~= x2 or y1 ~= y2 then
-            if building:IsIntersect(v) then
-                return false
+
+    -- 去除不能用得格子
+    local ox,oy = allianceBuilding:GetLogicPosition()
+    local w,h = intInit.allianceRegionMapWidth.value, intInit.allianceRegionMapHeight.value
+    for _,v in ipairs(squares) do
+        local lx,ly = unpack(v)
+        if lx < 0 or lx >= w or ly < 0 or ly >= h then
+            v[3] = false
+        end
+        for _,mapObj in pairs(self.mapObjects) do
+            local x2,y2 = mapObj:GetLogicPosition()
+            if (ox ~= x2 or oy ~= y2) and mapObj:IsContainPoint(lx, ly) then
+                v[3] = false  
+                break
             end
         end
     end
-    return true
+
+    -- 返回结果
+    for i,v in ipairs(squares) do
+        if not v[3] then
+            return false, squares
+        end
+    end
+
+    return true, squares, building.location.x, building.location.y
 end
 function AllianceMap:GetAlliance()
     return self.alliance

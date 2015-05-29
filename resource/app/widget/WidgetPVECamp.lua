@@ -6,7 +6,7 @@ function WidgetPVECamp:ctor(...)
     WidgetPVECamp.super.ctor(self, ...)
 end
 function WidgetPVECamp:GetTitle()
-    return string.format("%s %s%d", _("野外营地"), _("等级"), self:GetPVEMap():GetIndex())
+    return string.format(_("野外营地等级%d"), self:GetPVEMap():GetIndex())
 end
 function WidgetPVECamp:GetDesc()
     if self:GetObject():IsSearched() then

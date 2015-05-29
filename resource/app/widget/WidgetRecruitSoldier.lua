@@ -259,7 +259,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
         self:AddButtons()
     else
         -- 招募时间限制
-        local time_bg = display.newSprite("back_ground_548X34.png")
+        local time_bg = display.newScale9Sprite("back_ground_166x84.png", 0,0,cc.size(548,34),cc.rect(15,10,136,64))
             :align(display.BOTTOM_CENTER, back_ground:getContentSize().width/2, 50)
             :addTo(back_ground)
         local ok,time = self:GetRecruitSpecialTime()
@@ -267,7 +267,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
         if ok then
             re_string = _("招募开启中")
         else
-            re_string = _("下一次开启招募:")..GameUtils:formatTimeStyle1(time-app.timer:GetServerTime())
+            re_string = string.format( _("下一次开启招募:%s"), GameUtils:formatTimeStyle1(time-app.timer:GetServerTime()) )
         end
         self.re_status = UIKit:ttfLabel({
             text = re_string,
@@ -284,7 +284,7 @@ function WidgetRecruitSoldier:AddButtons()
     local back_ground = self.back_ground
     local size = back_ground:getContentSize()
     local instant_button = WidgetPushButton.new(
-        {normal = "green_btn_up_250x65.png",pressed = "green_btn_down_250x65.png"}
+        {normal = "green_btn_up_250x66.png",pressed = "green_btn_down_250x66.png"}
         ,{}
         ,{
             disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
@@ -299,7 +299,7 @@ function WidgetRecruitSoldier:AddButtons()
         }))
         :onButtonClicked(function(event)
             if City:GetUser():GetGemResource():GetValue()< tonumber(self.gem_label:getString())then
-                UIKit:showMessageDialog(_("陛下"),_("您当前没有足够金龙币")):CreateOKButton(
+                UIKit:showMessageDialog(_("主人"),_("您当前没有足够金龙币")):CreateOKButton(
                     {
                         listener = function ()
                             UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
@@ -325,6 +325,13 @@ function WidgetRecruitSoldier:AddButtons()
             if type(self.instant_button_clicked) == "function" then
                 self:instant_button_clicked()
             end
+
+
+            if iskindof(display.getRunningScene(), "CityScene") then
+                display.getRunningScene():GetSceneLayer()
+                :MoveBarracksSoldiers(self.soldier_name)
+            end
+
             self:Close()
         end)
     self.instant_button = instant_button
@@ -345,7 +352,7 @@ function WidgetRecruitSoldier:AddButtons()
 
     -- 招募
     self.normal_button = WidgetPushButton.new(
-        {normal = "yellow_btn_up_185x65.png",pressed = "yellow_btn_down_185x65.png"}
+        {normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png"}
         ,{}
         ,{
             disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
@@ -500,9 +507,9 @@ function WidgetRecruitSoldier:OnResourceChanged(resource_manager)
         res_map.food = resource_manager:GetFoodResource():GetResourceValueByCurrentTime(server_time)
         res_map.iron = resource_manager:GetIronResource():GetResourceValueByCurrentTime(server_time)
         res_map.stone = resource_manager:GetStoneResource():GetResourceValueByCurrentTime(server_time)
-        res_map.citizen = resource_manager:GetPopulationResource():GetNoneAllocatedByTime(server_time)
+        res_map.citizen = resource_manager:GetCitizenResource():GetNoneAllocatedByTime(server_time)
     else
-        res_map.citizen = resource_manager:GetPopulationResource():GetNoneAllocatedByTime(server_time)
+        res_map.citizen = resource_manager:GetCitizenResource():GetNoneAllocatedByTime(server_time)
     end
     self.res_total_map = res_map
     self:CheckNeedResource(res_map, self.count)
@@ -669,52 +676,74 @@ function WidgetRecruitSoldier:PormiseOfOpen()
     return p
 end
 function WidgetRecruitSoldier:Find()
-    return self.normal_button
+    return self.instant_button
 end
 function WidgetRecruitSoldier:PormiseOfFte()
     local fte_layer = self:getParent():GetFteLayer()
     fte_layer:Enable():SetTouchObject(self:Find())
 
+
+    local p = promise.new()
     self:Find():removeEventListenersByEvent("CLICKED_EVENT")
     self:Find():onButtonClicked(function()
         self:Find():setButtonEnabled(false)
 
-        mockData.RecruitSoldier(self.soldier_name, self.count)
+        if iskindof(display.getRunningScene(), "CityScene") then
+            display.getRunningScene():GetSceneLayer()
+            :MoveBarracksSoldiers(self.soldier_name)
+        end
+        
+        mockData.InstantRecruitSoldier(self.soldier_name, self.count)
 
-        self:Close()
+        
+
+        self:getParent():LeftButtonClicked()
+
+        p:resolve()
     end)
 
-    local r = self:Find():getBoundingBox()
+    local r = self:Find():getCascadeBoundingBox()
     WidgetFteArrow.new(_("立即开始招募，招募士兵会消耗城民")):addTo(fte_layer)
-        :TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
+        :TurnLeft():align(display.LEFT_CENTER, r.x + r.width + 20, r.y + r.height/2 + 20)
 
-    return self.city:PromiseOfRecruitSoldier("swordsman"):next(function()
-        fte_layer:removeFromParent()
-    end)
+    return p
 end
 
+function WidgetRecruitSoldier:FindNormal()
+    return self.normal_button
+end
 function WidgetRecruitSoldier:PromiseOfFteSpecial()
     self:AddButtons()
     self:OnCountChanged(self.count)
     local fte_layer = self:getParent():GetFteLayer()
     fte_layer:Enable():SetTouchObject(self:Find())
 
+
+    local p = promise.new()
     self:Find():removeEventListenersByEvent("CLICKED_EVENT")
     self:Find():onButtonClicked(function()
         self:Find():setButtonEnabled(false)
 
-        mockData.RecruitSoldier(self.soldier_name, self.count)
+        if iskindof(display.getRunningScene(), "CityScene") then
+            display.getRunningScene():GetSceneLayer()
+            :MoveBarracksSoldiers(self.soldier_name)
+        end
 
-        self:Close()
+        
+        mockData.InstantRecruitSoldier(self.soldier_name, self.count)
+
+        
+
+        self:getParent():LeftButtonClicked()
+        
+        p:resolve()
     end)
 
-    local r = self:Find():getBoundingBox()
+    local r = self:Find():getCascadeBoundingBox()
     WidgetFteArrow.new(_("点击招募")):addTo(fte_layer)
-        :TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
+        :TurnLeft():align(display.LEFT_CENTER, r.x + r.width + 20, r.y + r.height/2 + 20)
 
-    return self.city:PromiseOfRecruitSoldier("skeletonWarrior"):next(function()
-        fte_layer:removeFromParent()
-    end)
+    return p
 end
 
 function WidgetRecruitSoldier:GetRecruitSpecialTime()
@@ -724,6 +753,7 @@ end
 
 
 return WidgetRecruitSoldier
+
 
 
 

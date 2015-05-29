@@ -68,7 +68,16 @@ function WidgetMilitaryTechnologyStatus:CreateUpgradingStatus()
     }):align(display.LEFT_CENTER, 30,80)
         :addTo(upgrading_node)
 
-    local upgrading_event = self.event
+    local upgrading_event
+    local soldier_manager = self.soldier_manager
+    if soldier_manager:IsUpgradingMilitaryTech(self.building_type) then
+        local military_tech_event = soldier_manager:GetLatestMilitaryTechEvents(self.building_type)
+        local soldier_star_event = soldier_manager:GetLatestSoldierStarEvents(self.building_type)
+        local tech_start_time = military_tech_event and military_tech_event:StartTime() or 0
+        local soldier_star_start_time = soldier_star_event and soldier_star_event:StartTime() or 0
+        upgrading_event = tech_start_time>soldier_star_start_time and military_tech_event or soldier_star_event
+        progress:SetProgressInfo(GameUtils:formatTimeStyle1(upgrading_event:GetTime()), upgrading_event:Percent(current_time))
+    end
     local is_free = upgrading_event and upgrading_event:LeftTime()<= DataUtils:getFreeSpeedUpLimitTime()
     local speed_up_btn = WidgetPushButton.new({normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"})
         :setButtonLabel(UIKit:ttfLabel({
@@ -172,6 +181,8 @@ function WidgetMilitaryTechnologyStatus:OnSoldierStarEventsChanged( soldier_mana
     self:RefreshTop()
 end
 return WidgetMilitaryTechnologyStatus
+
+
 
 
 

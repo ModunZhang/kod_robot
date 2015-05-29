@@ -7,9 +7,14 @@ function WidgetTimeBar:ctor(label_color, bg, bar, params)
     params.has_icon = params.has_icon == nil and true or false
     params.has_bg = params.has_bg == nil and true or false
     local bar_pos = params.bar_pos or {x = -4, y = 1}
-    local progress_bg = cc.ui.UIImage.new(bg or "progress_bar_364x40_1.png")
-        :addTo(self):align(display.LEFT_BOTTOM)
-    
+    local progress_bg
+    if bg == "back_ground_166x84.png" then
+        progress_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(138,34),cc.rect(15,10,136,64))
+    else
+        progress_bg = cc.ui.UIImage.new(bg or "progress_bar_364x40_1.png")
+    end
+
+    progress_bg:addTo(self):align(display.LEFT_BOTTOM)
     self.progress_label = cc.ui.UILabel.new({
         text = "",
         size = params.label_size or 18,
@@ -42,3 +47,4 @@ function WidgetTimeBar:align(anchorPoint, x, y)
 end
 
 return WidgetTimeBar
+

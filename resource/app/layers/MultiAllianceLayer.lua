@@ -6,16 +6,98 @@ local Observer = import("..entity.Observer")
 local AllianceView = import(".AllianceView")
 local MapLayer = import(".MapLayer")
 local MultiAllianceLayer = class("MultiAllianceLayer", MapLayer)
-local ZORDER = Enum("BACKGROUND", "BUILDING", "INFO", "LINE", "CORPS")
+local intInit = GameDatas.AllianceInitData.intInit
+local ZORDER = Enum("BACKGROUND", "BUILDING", "LINE", "CORPS", "INFO")
 local fmod = math.fmod
+local ceil = math.ceil
 local floor = math.floor
 local min = math.min
 local max = math.max
 local timer = app.timer
 local ipairs = ipairs
 local pairs = pairs
+local cc = cc
 local MINE,FRIEND,ENEMY,VILLAGE_TAG = 1,2,3,4
 MultiAllianceLayer.ARRANGE = Enum("H", "V")
+
+-- local soldier_config = {
+--     ----
+--     ["swordsman"] = {
+--         count = 4,
+--         {"bubing_1", -10, 45, 0.8},
+--         {"bubing_2", -20, 40, 0.8},
+--         {"bubing_3", -15, 35, 0.8},
+--     },
+--     ["ranger"] = {
+--         count = 4,
+--         {"gongjianshou_1", 0, 45, 0.8},
+--         {"gongjianshou_2", 0, 45, 0.8},
+--         {"gongjianshou_3", 0, 45, 0.8},
+--     },
+--     ["lancer"] = {
+--         count = 2,
+--         {"qibing_1", -10, 50, 0.8},
+--         {"qibing_2", -10, 50, 0.8},
+--         {"qibing_3", -10, 50, 0.8},
+--     },
+--     ["catapult"] = {
+--         count = 1,
+--         {  "toushiche", 0, 35, 1},
+--         {"toushiche_2", 0, 35, 1},
+--         {"toushiche_3", 0, 35, 1},
+--     },
+
+--     -----
+--     ["sentinel"] = {
+--         count = 4,
+--         {"shaobing_1", 0, 55, 0.8},
+--         {"shaobing_2", 0, 55, 0.8},
+--         {"shaobing_3", 0, 55, 0.8},
+--     },
+--     ["crossbowman"] = {
+--         count = 4,
+--         {"nugongshou_1", 0, 45, 0.8},
+--         {"nugongshou_2", 0, 50, 0.8},
+--         {"nugongshou_3", 15, 45, 0.8},
+--     },
+--     ["horseArcher"] = {
+--         count = 2,
+--         {"youqibing_1", -15, 55, 0.8},
+--         {"youqibing_2", -15, 55, 0.8},
+--         {"youqibing_3", -15, 55, 0.8},
+--     },
+--     ["ballista"] = {
+--         count = 1,
+--         {"nuche_1", 0, 30, 1},
+--         {"nuche_2", 0, 30, 1},
+--         {"nuche_3", 0, 30, 1},
+--     },
+--     ----
+--     ["skeletonWarrior"] = {
+--         count = 4,
+--         {"kulouyongshi", 0, 0, 0.8},
+--         {"kulouyongshi", 0, 0, 0.8},
+--         {"kulouyongshi", 0, 0, 0.8},
+--     },
+--     ["skeletonArcher"] = {
+--         count = 4,
+--         {"kulousheshou", 0, 0, 0.8},
+--         {"kulousheshou", 0, 0, 0.8},
+--         {"kulousheshou", 0, 0, 0.8},
+--     },
+--     ["deathKnight"] = {
+--         count = 2,
+--         {"siwangqishi", 0, 0, 0.8},
+--         {"siwangqishi", 0, 0, 0.8},
+--         {"siwangqishi", 0, 0, 0.8},
+--     },
+--     ["meatWagon"] = {
+--         count = 1,
+--         {"jiaorouche", 0, 30, 0.8},
+--         {"jiaorouche", 0, 30, 0.8},
+--         {"jiaorouche", 0, 30, 0.8},
+--     },
+-- }
 
 function MultiAllianceLayer:ctor(scene, arrange, ...)
     self.refresh_village_node = display.newNode():addTo(self)
@@ -43,8 +125,7 @@ function MultiAllianceLayer:ctor(scene, arrange, ...)
     self:RefreshAllVillageEvents()
 
 
-    -- local x, y = 13, 36
-    -- local len = 10
+    -- local len = 0
     -- local count = 1
     -- for i = x - len, x + len do
     --     self:CreateCorps(
@@ -53,10 +134,69 @@ function MultiAllianceLayer:ctor(scene, arrange, ...)
     --         {x = i, y = y + 10, index = 1},
     --         timer:GetServerTime(),
     --         timer:GetServerTime() + 100,
-    --         "redDragon"
+    --         "redDragon",
+    --         {},
+    --         ENEMY
     --     )
     --     count = count + 1
     -- end
+
+    -- local soldier = "ballista"
+    -- local star = 3
+    -- local x, y = 15, 15
+    -- self:CreateCorps(
+    --         1,
+    --         {x = x, y = y, index = 1},
+    --         {x = x, y = y + 10, index = 1},
+    --         timer:GetServerTime(),
+    --         timer:GetServerTime() + 100,
+    --         "redDragon",
+    --         {
+    --         {name = soldier, star = star}
+    --         },
+    --         ENEMY
+    --     )
+
+
+    -- self:CreateCorps(
+    --         2,
+    --         {x = x, y = y, index = 1},
+    --         {x = x + 10, y = y, index = 1},
+    --         timer:GetServerTime(),
+    --         timer:GetServerTime() + 100,
+    --         "greenDragon",
+    --         {
+    --         {name = soldier, star = star}
+    --         },
+    --         ENEMY
+    --     )
+
+
+    -- self:CreateCorps(
+    --         3,
+    --         {x = x, y = y, index = 1},
+    --         {x = x, y = y - 10, index = 1},
+    --         timer:GetServerTime(),
+    --         timer:GetServerTime() + 100,
+    --         "blueDragon",
+    --         {
+    --         {name = soldier, star = star}
+    --         },
+    --         ENEMY
+    --     )
+
+    -- self:CreateCorps(
+    --         4,
+    --         {x = x, y = y, index = 1},
+    --         {x = x - 10, y = y, index = 1},
+    --         timer:GetServerTime(),
+    --         timer:GetServerTime() + 100,
+    --         "redDragon",
+    --         {
+    --         {name = soldier, star = star}
+    --         },
+    --         ENEMY
+    --     )
 end
 function MultiAllianceLayer:Schedule()
     self.info_action:schedule(function()
@@ -140,15 +280,15 @@ function MultiAllianceLayer:InitAllianceView()
     end
     if MultiAllianceLayer.ARRANGE.H == self.arrange then
         alliance_view1 = AllianceView.new(self, self.alliances[1], 0):addTo(self)
-        alliance_view2 = AllianceView.new(self, self.alliances[2], 51):addTo(self)
+        alliance_view2 = AllianceView.new(self, self.alliances[2], intInit.allianceRegionMapWidth.value):addTo(self)
         -- local sx, sy = alliance_view1:GetLogicMap():ConvertToMapPosition(50.5, -3.5)
         -- local ex, ey = alliance_view1:GetLogicMap():ConvertToMapPosition(50.5, 51.5)
         -- display.newLine({{sx, sy}, {ex, ey}},
         --     {borderColor = cc.c4f(1.0, 0.0, 0.0, 1.0),
         --         borderWidth = 5}):addTo(self.building)
     else
-        alliance_view1 = AllianceView.new(self, self.alliances[1], 0, 104):addTo(self)
-        alliance_view2 = AllianceView.new(self, self.alliances[2], 0, 53):addTo(self)
+        alliance_view1 = AllianceView.new(self, self.alliances[1], 0, intInit.allianceRegionMapHeight.value * 2 + 2):addTo(self)
+        alliance_view2 = AllianceView.new(self, self.alliances[2], 0, intInit.allianceRegionMapHeight.value + 2):addTo(self)
         -- local sx, sy = alliance_view1:GetLogicMap():ConvertToMapPosition(-0.5, 51.5)
         -- local ex, ey = alliance_view1:GetLogicMap():ConvertToMapPosition(51.5, 51.5)
         -- display.newLine({{sx, sy}, {ex, ey}},
@@ -179,11 +319,11 @@ function MultiAllianceLayer:AddOrRemoveAllianceEvent(isAdd)
     end
 end
 function MultiAllianceLayer:OnVillageEventsDataChanged(changed_map)
-    for k,v in pairs(changed_map.added or {}) do
-        self:RefreshVillageEvent(v, true)
-    end
     for k,v in pairs(changed_map.removed or {}) do
         self:RefreshVillageEvent(v, false)
+    end
+    for k,v in pairs(changed_map.added or {}) do
+        self:RefreshVillageEvent(v, true)
     end
 end
 function MultiAllianceLayer:RefreshAllVillageEvents()
@@ -204,20 +344,24 @@ function MultiAllianceLayer:RefreshVillageEvent(village_event, is_add)
             local player_data = village_event:PlayerData()
             local aid = player_data.alliance.id
             local pid = player_data.id
+            local flag = obj:getChildByTag(VILLAGE_TAG)
             if is_add then
                 local ally = pid == self.mine_player_id and MINE or
                     (self.my_allinace_id == aid and FRIEND or ENEMY)
-                local flag = obj:getChildByTag(VILLAGE_TAG)
                 if flag then
+                    flag.rcount = flag.rcount + 1
                     flag:SetAlly(ally)
                 else
                     local x,y = obj:GetSpriteTopPosition()
                     self:CreateVillageFlag(ally)
                         :addTo(obj, 1, VILLAGE_TAG)
-                        :pos(x,y+50):scale(1.5)
+                        :pos(x,y+50):scale(1.5).rcount = 1
                 end
             else
-                obj:removeChildByTag(VILLAGE_TAG)
+                flag.rcount = flag.rcount - 1
+                if flag.rcount <= 0 then
+                    obj:removeChildByTag(VILLAGE_TAG)
+                end
             end
         end
     end
@@ -239,8 +383,8 @@ function MultiAllianceLayer:CreateVillageFlag(e)
         )
     function flag:SetAlly(e)
         local head,circle = unpack(flag_map[e])
-        self.flag:setTexture(head)
-        self.flag:getChildByTag(1):setTexture(circle)
+        self:setTexture(head)
+        self:getChildByTag(1):setTexture(circle)
     end
     return flag
 end
@@ -293,16 +437,17 @@ function MultiAllianceLayer:StartCorpsTimer()
                 local total_time = march_info.finish_time - march_info.start_time
                 local elapse_time = time - march_info.start_time
                 if elapse_time <= total_time then
-                    local cur_vec = cc.pAdd(cc.pMul(march_info.normal, march_info.speed * elapse_time), march_info.start_info.real)
+                    local len = march_info.speed * elapse_time
+                    local cur_vec = cc.pAdd(cc.pMul(march_info.normal, len), march_info.start_info.real)
                     corps:pos(cur_vec.x, cur_vec.y)
-                else
-                    self:DeleteCorpsById(id)
-                end
-                local line = self.lines_map[id]
-                if line then
+
+                    -- 更新线
+                    local line = self.lines_map[id]
                     local program = line:getFilter():getGLProgramState()
                     program:setUniformFloat("percent", fmod(time - floor(time), 1.0))
-                    program:setUniformFloat("elapse", line.is_enemy and elapse_time / total_time or 0)
+                    program:setUniformFloat("elapse", line.is_enemy and (cc.pGetLength(cc.pSub(cur_vec, march_info.origin_start)) / march_info.origin_length) or 0)
+                else
+                    self:DeleteCorpsById(id)
                 end
             end
         end
@@ -314,15 +459,15 @@ function MultiAllianceLayer:CreateAllianceCorps(alliance)
         table.foreachi(alliance:GetAttackMarchEvents(),function(_,event)
             self:CreateCorpsIf(event)
         end)
-        table.foreachi(alliance:GetAttackMarchReturnEvents(),function(_,event)
-            self:CreateCorpsIf(event)
-        end)
-        table.foreachi(alliance:GetStrikeMarchEvents(),function(_,event)
-            self:CreateCorpsIf(event)
-        end)
-        table.foreachi(alliance:GetStrikeMarchReturnEvents(),function(_,event)
-            self:CreateCorpsIf(event)
-        end)
+    table.foreachi(alliance:GetAttackMarchReturnEvents(),function(_,event)
+        self:CreateCorpsIf(event)
+    end)
+    table.foreachi(alliance:GetStrikeMarchEvents(),function(_,event)
+        self:CreateCorpsIf(event)
+    end)
+    table.foreachi(alliance:GetStrikeMarchReturnEvents(),function(_,event)
+        self:CreateCorpsIf(event)
+    end)
     else
         --敌方联盟
         local my_alliance_belvedere = self:GetMyAlliance():GetAllianceBelvedere()
@@ -399,10 +544,6 @@ function MultiAllianceLayer:ManagerCorpsFromChangedMap(changed_map,is_strkie,all
                         else
                             app:GetAudioManager():PlayeEffectSoundWithKey("ATTACK_PLAYER_ARRIVE")
                         end
-                    elseif player_role == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
-                        if marchEvent:IsReturnEvent() and not marchEvent:IsStrikeEvent() then -- return
-                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_BACK")
-                        end
                     end
                 end
                 self:DeleteCorpsById(marchEvent:Id())
@@ -459,9 +600,9 @@ function MultiAllianceLayer:CreateCorpsIf(marchEvent)
         else -- return
             if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER  then
                 ally = MINE
-            else
-                ally = FRIEND
-            end
+        else
+            ally = FRIEND
+        end
         end
     end
     self:CreateCorps(
@@ -475,21 +616,21 @@ function MultiAllianceLayer:CreateCorpsIf(marchEvent)
         ally
     )
 end
+local corps_scale = 1.2
 local dragon_dir_map = {
-    [0] = {"flying_45", -1}, -- x-,y+
-    {"flying_45", -1}, -- x-,y+
-    {"flying_-45", -1}, -- x-
+    [0] = {"flying_45", -corps_scale}, -- x-,y+
+    {"flying_45", -corps_scale}, -- x-,y+
+    {"flying_-45", -corps_scale}, -- x-
 
-    {"flying_-45", -1}, -- x-,y-
-    {"flying_-45", 1}, -- y+
-    {"flying_-45", 1}, -- x+,y+
+    {"flying_-45", -corps_scale}, -- x-,y-
+    {"flying_-45", corps_scale}, -- y+
+    {"flying_-45", corps_scale}, -- x+,y+
 
-    {"flying_45", 1}, -- x+
-    {"flying_45", 1}, -- x+,y-
-    {"flying_45", 1}, -- y-
+    {"flying_45", corps_scale}, -- x+
+    {"flying_45", corps_scale}, -- x+,y-
+    {"flying_45", corps_scale}, -- y-
 }
 local soldier_scale = 1
-local corps_scale = 1
 local soldier_dir_map = {
     [0] = {"move_45", - corps_scale, soldier_scale}, -- x-,y+
     {"move_45", - corps_scale, soldier_scale}, -- x-,y+
@@ -507,47 +648,47 @@ local soldier_config = {
     ----
     ["swordsman"] = {
         count = 4,
-        {"bubing_1", -10, 45, 0.8},
-        {"bubing_2", -20, 40, 0.8},
-        {"bubing_3", -15, 35, 0.8},
+        {"bubing_1", 0, 0, 0.8},
+        {"bubing_2", 0, 0, 0.8},
+        {"bubing_3", 0, 0, 0.8},
     },
     ["ranger"] = {
         count = 4,
-        {"gongjianshou_1", 0, 45, 0.8},
-        {"gongjianshou_2", 0, 45, 0.8},
-        {"gongjianshou_3", 0, 45, 0.8},
+        {"gongjianshou_1", 0, 0, 0.8},
+        {"gongjianshou_2", 0, 0, 0.8},
+        {"gongjianshou_3", 0, 0, 0.8},
     },
     ["lancer"] = {
         count = 2,
-        {"qibing_1", -10, 50, 0.8},
-        {"qibing_2", -10, 50, 0.8},
-        {"qibing_3", -10, 50, 0.8},
+        {"qibing_1", 20, 20, 0.8},
+        {"qibing_2", 20, 20, 0.8},
+        {"qibing_3", 20, 20, 0.8},
     },
     ["catapult"] = {
         count = 1,
-        {  "toushiche", 0, 35, 1},
-        {"toushiche_2", 0, 35, 1},
-        {"toushiche_3", 0, 35, 1},
+        {  "toushiche", 80, 20, 1},
+        {"toushiche_2", 50, 20, 1},
+        {"toushiche_3", 80, 20, 1},
     },
 
     -----
     ["sentinel"] = {
         count = 4,
-        {"shaobing_1", 0, 55, 0.8},
-        {"shaobing_2", 0, 55, 0.8},
-        {"shaobing_3", 0, 55, 0.8},
+        {"shaobing_1", 0, 0, 0.8},
+        {"shaobing_2", 0, 0, 0.8},
+        {"shaobing_3", 0, 0, 0.8},
     },
     ["crossbowman"] = {
         count = 4,
-        {"nugongshou_1", 0, 45, 0.8},
-        {"nugongshou_2", 0, 50, 0.8},
-        {"nugongshou_3", 15, 45, 0.8},
+        {"nugongshou_1", 0, 0, 0.8},
+        {"nugongshou_2", 0, 0, 0.8},
+        {"nugongshou_3", 20, 0, 0.8},
     },
     ["horseArcher"] = {
         count = 2,
-        {"youqibing_1", -15, 55, 0.8},
-        {"youqibing_2", -15, 55, 0.8},
-        {"youqibing_3", -15, 55, 0.8},
+        {"youqibing_1", 20, 20, 0.8},
+        {"youqibing_2", 20, 20, 0.8},
+        {"youqibing_3", 20, 20, 0.8},
     },
     ["ballista"] = {
         count = 1,
@@ -558,27 +699,27 @@ local soldier_config = {
     ----
     ["skeletonWarrior"] = {
         count = 4,
-        {"kulouyongshi", 0, 40, 0.8},
-        {"kulouyongshi", 0, 40, 0.8},
-        {"kulouyongshi", 0, 40, 0.8},
+        {"kulouyongshi", 0, 0, 0.8},
+        {"kulouyongshi", 0, 0, 0.8},
+        {"kulouyongshi", 0, 0, 0.8},
     },
     ["skeletonArcher"] = {
         count = 4,
-        {"kulousheshou", 25, 40, 0.8},
-        {"kulousheshou", 25, 40, 0.8},
-        {"kulousheshou", 25, 40, 0.8},
+        {"kulousheshou", 40, 0, 0.8},
+        {"kulousheshou", 40, 0, 0.8},
+        {"kulousheshou", 40, 0, 0.8},
     },
     ["deathKnight"] = {
         count = 2,
-        {"siwangqishi", -10, 50, 0.8},
-        {"siwangqishi", -10, 50, 0.8},
-        {"siwangqishi", -10, 50, 0.8},
+        {"siwangqishi", 20, 20, 0.8},
+        {"siwangqishi", 20, 20, 0.8},
+        {"siwangqishi", 20, 20, 0.8},
     },
     ["meatWagon"] = {
         count = 1,
-        {"jiaorouche", 0, 30, 0.8},
-        {"jiaorouche", 0, 30, 0.8},
-        {"jiaorouche", 0, 30, 0.8},
+        {"jiaorouche", 80, 10, 0.8},
+        {"jiaorouche", 80, 10, 0.8},
+        {"jiaorouche", 80, 10, 0.8},
     },
 }
 
@@ -600,12 +741,13 @@ local location_map = {
 }
 local function move_soldiers(corps, ani, dir_index, first_soldier)
     local config = soldier_config[first_soldier.name]
-    local ani_name,count = config[first_soldier.star or 1][1], config.count
-    local _,_,soldier_scale = unpack(soldier_dir_map[dir_index])
-    for i,v in ipairs(location_map[count]) do
+    local star = first_soldier.star or 1
+    local ani_name, ox, oy = unpack(config[star])
+    local _,_,s = unpack(soldier_dir_map[dir_index])
+    for i,v in ipairs(location_map[config.count]) do
         local x,y = unpack(v)
-        ccs.Armature:create(ani_name):addTo(corps):scale(soldier_scale)
-            :align(display.CENTER, x, y):getAnimation():play(ani)
+        ccs.Armature:create(ani_name):addTo(corps):scale(s)
+            :align(display.CENTER, x + ox, y + oy):getAnimation():play(ani)
     end
 end
 function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, finish_time, dragonType, soldiers, ally)
@@ -623,7 +765,7 @@ function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, fini
             ani,scalex = unpack(dragon_dir_map[index])
             local dragon_ani = UILib.dragon_animations[dragonType or "redDragon"][1]
             ccs.Armature:create(dragon_ani):addTo(corps)
-                :align(display.CENTER):getAnimation():play(ani)
+                :align(display.CENTER, -20, 0):getAnimation():play(ani)
         else
             ani,scalex = unpack(soldier_dir_map[index])
             move_soldiers(corps, ani, index, soldiers[1])
@@ -631,6 +773,7 @@ function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, fini
         corps:setScaleX(scalex)
         corps:setScaleY(math.abs(scalex))
         corps.march_info = march_info
+        corps:pos(march_info.start_info.real.x, march_info.start_info.real.y)
         self.corps_map[id] = corps
         self:CreateLine(id, march_info, ally)
     else
@@ -684,7 +827,7 @@ function MultiAllianceLayer:CreateLine(id, march_info, ally)
     sprite:setFilter(filter.newFilter("CUSTOM",
         json.encode({
             frag = "shaders/multi_tex.fs",
-            shaderName = "lineShader"..unit_count,
+            shaderName = "lineShader_"..id,
             unit_count = unit_count,
             unit_len = 1 / unit_count,
             percent = 0,
@@ -692,7 +835,7 @@ function MultiAllianceLayer:CreateLine(id, march_info, ally)
         })
     ))
     sprite:setScaleY(scale)
-    sprite.is_enemy = is_enemy
+    sprite.is_enemy = ally == ENEMY
     self.lines_map[id] = sprite
     return sprite
 end
@@ -703,8 +846,9 @@ function MultiAllianceLayer:GetMarchInfoWith(id, logic_start_point, logic_end_po
     local vector = cc.pSub(ept, spt)
     local degree = math.deg(cc.pGetAngle(vector, {x = 0, y = 1}))
     local length = cc.pGetLength(vector)
-    local scale = length / 22
     return {
+        origin_start = spt,
+        origin_length = length,
         start_info = {real = spt, logic = logic_start_point},
         end_info = {real = ept, logic = logic_end_point},
         degree = degree,
@@ -729,6 +873,7 @@ function MultiAllianceLayer:GetClickedObject(world_x, world_y)
     local logic_x, logic_y, alliance_view = self:GetAllianceCoordWithPoint(world_x, world_y)
     return alliance_view:GetClickedObject(world_x, world_y), self:GetMyAlliance():Id() == alliance_view:GetAlliance():Id()
 end
+local CLICK_EMPTY_TAG = 911
 function MultiAllianceLayer:PromiseOfFlashEmptyGround(building, is_my_alliance)
     local alliance_view
     for i,v in ipairs(self.alliance_views) do
@@ -741,22 +886,30 @@ function MultiAllianceLayer:PromiseOfFlashEmptyGround(building, is_my_alliance)
             break
         end
     end
+    self:RemoveClickNode()
+    local click_node = display.newSprite("click_empty.png"):addTo(self:GetBuildingNode(), 10000, CLICK_EMPTY_TAG)
+    local logic_map = alliance_view:GetLogicMap()
+    local lx,ly = building:GetEntity():GetLogicPosition()
     local p = promise.new()
-    if self.click_empty then
-        self.click_empty:removeFromParent()
-    end
-    local x,y = alliance_view:GetLogicMap():ConvertToMapPosition(building:GetEntity():GetLogicPosition())
-    self.click_empty = display.newSprite("click_empty.png"):addTo(self:GetBuildingNode()):pos(x,y)
-    self.click_empty:setOpacity(128)
-    transition.fadeTo(self.click_empty, {
-        opacity = 255, time = 0.5,
-        onComplete = function()
-            self.click_empty:removeFromParent()
-            self.click_empty = nil
-            p:resolve()
-        end
-    })
+    click_node:pos(logic_map:ConvertToMapPosition(lx,ly)):opacity(0)
+        :runAction(
+            transition.sequence{
+                cc.FadeTo:create(0.15, 255),
+                cc.FadeTo:create(0.15, 0),
+                cc.CallFunc:create(function()
+                    p:resolve()
+                    self:RemoveClickNode()
+                end)
+            }
+        )
     return p
+end
+function MultiAllianceLayer:AddClickNode()
+    self:RemoveClickNode()
+    return display.newNode():addTo(self:GetBuildingNode(), 10000, CLICK_EMPTY_TAG)
+end
+function MultiAllianceLayer:RemoveClickNode()
+    self:GetBuildingNode():removeChildByTag(CLICK_EMPTY_TAG)
 end
 
 ----- override
@@ -805,6 +958,13 @@ end
 
 
 return MultiAllianceLayer
+
+
+
+
+
+
+
 
 
 

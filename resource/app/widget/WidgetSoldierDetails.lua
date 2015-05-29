@@ -13,13 +13,6 @@ local window = import("..utils.window")
 
 local normal = GameDatas.Soldiers.normal
 local special = GameDatas.Soldiers.special
-local STAR_BG = {
-    "star1_118x132.png",
-    "star2_118x132.png",
-    "star3_118x132.png",
-    "star4_118x132.png",
-    "star5_118x132.png",
-}
 
 
 local WidgetSoldierDetails = class("WidgetSoldierDetails", WidgetPopDialog)
@@ -82,51 +75,10 @@ function WidgetSoldierDetails:InitSoldierDetails()
         color = UIKit:hex2c3b(0x5a5544)
     }):align(display.LEFT_CENTER,num_title_label:getPositionX()+num_title_label:getContentSize().width+10,bg_height-90):addTo(bg,2)
 
-    -- -- 调整解散士兵数量silder
-    -- if soldier_count>0 then
-    --     self:CreateDismissSoldierSilder()
-    -- end
     -- 士兵属性
     self:InitSoldierAttr()
 end
 
-function WidgetSoldierDetails:CreateDismissSoldierSilder()
-    -- bg
-    local bg = self.body
-
-    local bg_width,bg_height = bg:getContentSize().width,bg:getContentSize().height
-
-    -- -- icon
-    display.newSprite("res_citizen_88x82.png", bg_width/2-106, bg_height-126):addTo(bg)
-    local citizen_label = cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "0",
-        font = UIKit:getFontFilePath(),
-        size = 20,
-        color = UIKit:hex2c3b(0x403c2f)})
-        :align(display.CENTER, display.cx - 60, display.top - 324)
-        :addTo(self)
-
-    self.slider = WidgetSliderWithInput.new({max = City:GetSoldierManager():GetCountBySoldierType(self.soldier_type)})
-        :SetSliderSize(445, 24)
-        :addTo(bg)
-        :align(display.LEFT_CENTER, 30, bg_height - 220)
-        :OnSliderValueChanged(function(event)
-            citizen_label:setString(string.format("%d", math.floor(event.value)*self.s_config.citizen))
-        end)
-        :LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.RIGHT,0)
-
-    local dismiss_soldier_button = WidgetPushButton.new({normal = "resource_butter_red.png",pressed = "resource_butter_red_highlight.png"},{}
-        ,{
-            disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
-        })
-        :setButtonLabel(cc.ui.UILabel.new({UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,text = _("解散"), size = 24, color = display.COLOR_WHITE}))
-        :onButtonClicked(function(event)
-            print("解散士兵 =================")
-        end):align(display.CENTER, bg_width/2 + 205, bg_height-300):addTo(bg)
-        :setButtonEnabled(false)
-
-end
 
 function WidgetSoldierDetails:InitSoldierAttr()
     local sc = self.s_config

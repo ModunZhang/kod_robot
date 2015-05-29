@@ -229,7 +229,7 @@ function GameUIResource:CreateInfomation()
     local __,resource_title = self:GetTitleByType(self.building)
     self.secondLabel:setString(resource_title)
 
-    if ResourceManager.RESOURCE_TYPE.POPULATION ==  self.building:GetUpdateResourceType() then
+    if ResourceManager.RESOURCE_TYPE.CITIZEN ==  self.building:GetUpdateResourceType() then
         self.secondValueLabel:setString(string.format("-%d",self.building:GetProductionLimit()))
         self.firstLable:setString(_("银币产量"))
         self.firstValueLabel:setString(string.format("-%d/h",self.building:GetProductionPerHour()))
@@ -246,7 +246,7 @@ end
 
 
 function GameUIResource:GetListItem(index,title,val)
-    local bgImage = string.format("resource_item_bg%d.png",tonumber(index-1)%2)
+    local bgImage = string.format("back_ground_548x40_%d.png", tonumber(index-1) % 2 == 0 and 1 or 2)
     local item = self.listView:newItem()
     local bg = display.newSprite(bgImage)
     local titleLabel = cc.ui.UILabel.new({
@@ -287,7 +287,7 @@ function GameUIResource:GetDataSource()
     local __,__,title = self:GetTitleByType(self.building)
     table.insert(dataSource,{title,string.format("%d/h",resource:GetProductionPerHour())})
 
-    if self.building:GetUpdateResourceType() == ResourceManager.RESOURCE_TYPE.POPULATION then
+    if self.building:GetUpdateResourceType() == ResourceManager.RESOURCE_TYPE.CITIZEN then
         local coin_resource = self.city.resource_manager:GetCoinResource()
         local desc = string.format("%d/h",coin_resource:GetProductionPerHour())
         table.insert(dataSource,{_("当前产出银币"),desc})
@@ -325,7 +325,7 @@ function GameUIResource:GetTitleByType(building)
         return _("石匠小屋"),_("石料产量"),_("当前产出铁矿")
     elseif type == ResourceManager.RESOURCE_TYPE.FOOD then
         return _("农夫小屋"),_("粮食产量"),_("当前产出铁矿")
-    elseif type == ResourceManager.RESOURCE_TYPE.POPULATION then
+    elseif type == ResourceManager.RESOURCE_TYPE.CITIZEN then
         return _("住宅"),_("城民上限"),_("当前城民增长")
     else
         assert(false)

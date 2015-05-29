@@ -8,18 +8,46 @@ local UIListView = import(".UIListView")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local UILib = import(".UILib")
 local Enum = import("..utils.Enum")
-
+local DragonSprite = import("..sprites.DragonSprite")
+local Alliance_Manager = Alliance_Manager
 GameUIStrikePlayer.STRIKE_TYPE = Enum("CITY","VILLAGE")
 
-function GameUIStrikePlayer:ctor(params,strike_type)
+
+
+function GameUIStrikePlayer:ctor(strike_type,params)
 	GameUIStrikePlayer.super.ctor(self,City,_("准备突袭"))
 	self.dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
 	self.params = params
 	self.strike_type = strike_type or self.STRIKE_TYPE.CITY
+	self:RefreshDefaultDragon()
 end
 
 function GameUIStrikePlayer:GetDragonManager()
 	return self.dragon_manager
+end
+
+function GameUIStrikePlayer:RefreshDefaultDragon()
+	local dragons = self:GetDragonManager():GetDragons()
+	local power_dragon_type = self:GetDragonManager():GetCanFightPowerfulDragonType()
+	if power_dragon_type == "" then
+		power_dragon_type = self:GetDragonManager():GetPowerfulDragonType()
+	end
+	self.select_dragon_type = power_dragon_type
+end
+
+
+function GameUIStrikePlayer:GetDragon()
+	return self:GetDragonManager():GetDragon(self.select_dragon_type)
+end
+
+function GameUIStrikePlayer:ReloadDragon()
+	local dragon = self:GetDragon()
+	local x = 257
+	if dragon:Type() == 'redDragon' then
+		x = 307
+	end
+	self.dragon_sprite:setPositionX(x)
+	self.dragon_sprite:ReloadSpriteCauseTerrainChanged(dragon:GetTerrain())
 end
 
 function GameUIStrikePlayer:OnMoveInStage()
@@ -31,32 +59,55 @@ function GameUIStrikePlayer:CreateBetweenBgAndTitle()
 	self.content_node = display.newNode():addTo(self:GetView())
 end
 
+function GameUIStrikePlayer:GetMarchTime()
+	local from_alliance = Alliance_Manager:GetMyAlliance()
+	local mapObject = from_alliance:GetAllianceMap():FindMapObjectById(from_alliance:GetSelf():MapId())
+    local fromLocation = mapObject.location
+	local target_alliance
+	if self.params.targetIsMyAlliance then
+		target_alliance = from_alliance
+	else
+		target_alliance = Alliance_Manager:GetEnemyAlliance()
+	end
+	local toLocation = self.params.toLocation or cc.p(0,0)
+	local time = DataUtils:getPlayerDragonMarchTime(from_alliance,fromLocation,target_alliance,toLocation)
+	return GameUtils:formatTimeStyle1(time)
+end
+
 function GameUIStrikePlayer:BuildUI()
-	self.dragon_sprite = display.newSprite("red_dragon_big_612x260.png")
-		:align(display.CENTER_TOP,window.cx,window.top)
-		:addTo(self.content_node)
-	local black_layer = UIKit:shadowLayer():size(619,54):addTo(self.content_node):pos(window.left+10,window.top - 260)
+	local clipNode = display.newClippingRegionNode(cc.rect(0,0,614,390))
+    clipNode:addTo(self.content_node):pos(window.cx - 307,window.top - 390)
+    display.newSprite("dragon_animate_bg_624x606.png"):align(display.LEFT_BOTTOM,-5,0):addTo(clipNode)
+    display.newSprite("eyrie_584x547.png"):align(display.CENTER_BOTTOM,307, -230):addTo(clipNode)
+    local info_layer = UIKit:shadowLayer():size(619,40):addTo(self.content_node):pos(window.cx - 307,window.top - 390)
+    display.newSprite("line_624x58.png"):align(display.LEFT_TOP,0,20):addTo(info_layer)
 	UIKit:ttfLabel({
 		text = _("派出巨龙突袭可以侦查到敌方的城市信息"),
 		size = 20,
-		color = 0xffedae
-	}):align(display.CENTER, 310, 27):addTo(black_layer)
-	display.newSprite("black_line_624x4.png"):align(display.LEFT_BOTTOM,0,0):addTo(black_layer)
+		color = 0xffedae,
+	}):align(display.CENTER, 310, 20):addTo(info_layer)
+    local x,y = 257,200
+    if self:GetDragon():Type() == 'redDragon' then
+            x = 307
+            y = 200
+    end
+    self.dragon_sprite = DragonSprite.new(display.getRunningScene():GetSceneLayer(),self:GetDragon():GetTerrain()):addTo(clipNode):align(display.CENTER, x,y):scale(0.7)
 	self.list_view = UIListView.new ({
-        viewRect = cc.rect(black_layer:getPositionX()+30,window.bottom + 80,window.width-80,window.height - 340),
+        viewRect = cc.rect(window.left+40,window.bottom + 85,window.width-80,475),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
-        alignment = UIListView.ALIGNMENT_LEFT
+        alignment = UIListView.ALIGNMENT_LEFT,
     }):addTo(self.content_node)
-
-	WidgetPushButton.new({
+	local button = WidgetPushButton.new({
 		normal = "yellow_btn_up_186x66.png",
 		pressed = "yellow_btn_down_186x66.png"
 		})
 		:align(display.CENTER_BOTTOM,window.cx,window.bottom + 20)
 		:addTo(self.content_node)
 		:setButtonLabel("normal",UIKit:commonButtonLable({
-			text = _("突袭")
+			text = _("突袭"),
+			size = 18,
 		}))
+		:setButtonLabelOffset(0, 12)
 		:onButtonClicked(function()
 			local select_DragonType = self:GetSelectDragonType()
 			local dragon = self:GetDragonManager():GetDragon(select_DragonType)
@@ -81,18 +132,20 @@ function GameUIStrikePlayer:BuildUI()
 				self:OnStrikeButtonClicked()
 			end
 		end)
+	local time_bg = display.newSprite("alliance_title_gem_bg_154x20.png"):addTo(button):align(display.CENTER_BOTTOM,0,10)
+	local time_icon = display.newSprite("hourglass_30x38.png"):align(display.LEFT_CENTER, 10, 10):addTo(time_bg):scale(0.8)
+	UIKit:ttfLabel({
+		size = 18,
+		text = self:GetMarchTime(),
+	}):align(display.LEFT_CENTER, 10 + time_icon:getCascadeBoundingBox().width + 10, 10):addTo(time_bg)
     self:RefreshListView()
 end
 
 function GameUIStrikePlayer:RefreshListView()
 	local dragons = self:GetDragonManager():GetDragons()
-	local power_dragon_type = self:GetDragonManager():GetCanFightPowerfulDragonType()
-	if power_dragon_type == "" then
-		power_dragon_type = self:GetDragonManager():GetPowerfulDragonType()
-	end
  	for k,dragon in pairs(dragons) do
 		if dragon:Ishated() then
-			local item = self:GetItem(dragon,power_dragon_type)
+			local item = self:GetItem(dragon,self.select_dragon_type)
 			self.list_view:addItem(item)
 		end
 	end
@@ -105,9 +158,9 @@ function GameUIStrikePlayer:GetItem(dragon,power_dragon_type)
 	local box = display.newSprite("alliance_item_flag_box_126X126.png")
 		:align(display.LEFT_BOTTOM,0,0)
 		:addTo(content)
-	local head_bg = display.newSprite("chat_hero_background.png", 63, 63):addTo(box)
+	local head_bg = display.newSprite("dragon_bg_114x114.png", 63, 63):addTo(box)
 	display.newSprite(UILib.dragon_head[dragon:Type()], 56, 60):addTo(head_bg)
-	local content_box = display.newScale9Sprite("alliance_approval_box_450x126.png")
+	local content_box = display.newScale9Sprite("box_426X126.png")
 		:size(426,126)
 		:addTo(content)
 		:align(display.LEFT_BOTTOM,128,0)
@@ -153,11 +206,14 @@ function GameUIStrikePlayer:OnButtonClickInItem(dragon_type)
 	for _,item in ipairs(self.list_view:getItems()) do
 		item.button:setButtonEnabled(dragon_type~=item.dragon_type)
 	end	 
-	self.select_dragon_type = dragon_type
+	if dragon_type ~= self.select_dragon_type then
+		self.select_dragon_type = dragon_type
+		self:ReloadDragon()
+	end
 end
 
 function GameUIStrikePlayer:CheckDragonIsFree()
-	local dragon = self:GetDragonManager():GetDragon(self:GetSelectDragonType())
+	local dragon = self:GetDragon()
 
 	if not dragon:IsFree() and not dragon:IsDefenced() then
         UIKit:showMessageDialog(_("提示"),_("龙未处于空闲状态"))
@@ -181,7 +237,7 @@ end
 
 function GameUIStrikePlayer:SendDataToServer()
 	if self.strike_type == self.STRIKE_TYPE.CITY then
-		NetManager:getStrikePlayerCityPromise(self:GetSelectDragonType(),self.params):done(function()
+		NetManager:getStrikePlayerCityPromise(self:GetSelectDragonType(),self.params.memberId):done(function()
 			app:GetAudioManager():PlayeEffectSoundWithKey("DRAGON_STRIKE")
 			self:LeftButtonClicked()
 		end)

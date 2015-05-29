@@ -63,25 +63,25 @@ end
 -- end
 --------------------------------------------------------------------------------------------------
 
-local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
-local MultiObserver = import(".MultiObserver")
-local ChatManager = class("ChatManager",MultiObserver)
-local Enum = import("..utils.Enum")
-local PUSH_INTVAL = 2 -- 推送的时间间隔
-local SIZE_MUST_PUSH = 5 -- 如果队列中数量达到指定条数立即推送
-ChatManager.LISTEN_TYPE = Enum("TO_TOP","TO_REFRESH")
-ChatManager.CHANNNEL_TYPE = {GLOBAL = 1 ,ALLIANCE = 2}
-local BLOCK_LIST_KEY = "CHAT_BLOCK_LIST"
+local scheduler           = require(cc.PACKAGE_NAME .. ".scheduler")
+local MultiObserver       = import(".MultiObserver")
+local ChatManager         = class("ChatManager",MultiObserver)
+local Enum                = import("..utils.Enum")
+local PUSH_INTVAL         = 2 -- 推送的时间间隔
+local SIZE_MUST_PUSH      = 5 -- 如果队列中数量达到指定条数立即推送
+ChatManager.LISTEN_TYPE   = Enum("TO_TOP","TO_REFRESH")
+local BLOCK_LIST_KEY      = "CHAT_BLOCK_LIST"
 
 function ChatManager:ctor(gameDefault)
 	ChatManager.super.ctor(self)
-	self.gameDefault = gameDefault
-	self.emojiUtil = EmojiUtil.new()
-	self.global_channel = {}
-	self.alliance_channel = {}
-	self.push_buff_queue = {}
-	self.___handle___ = scheduler.scheduleGlobal(handler(self, self.__checkNotifyIf),PUSH_INTVAL)
-	self._blockedIdList_ = self:GetGameDefault():getBasicInfoValueForKey(BLOCK_LIST_KEY,{})
+	self.gameDefault           = gameDefault
+	self.emojiUtil             = EmojiUtil.new()
+	self.global_channel        = {}
+	self.alliance_channel      = {}
+	self.allianceFight_channel = {}
+	self.push_buff_queue       = {}
+	self.___handle___          = scheduler.scheduleGlobal(handler(self, self.__checkNotifyIf),PUSH_INTVAL)
+	self._blockedIdList_       = self:GetGameDefault():getBasicInfoValueForKey(BLOCK_LIST_KEY,{})
 end
 
 function ChatManager:GetEmojiUtil()
@@ -109,12 +109,16 @@ function ChatManager:__checkIsBlocked(msg)
 end
 
 function ChatManager:__getMessageWithChannel(channel)
-	if channel == self.CHANNNEL_TYPE.GLOBAL then
+	if channel == 'global' then
 		return self.global_channel
-	elseif channel == self.CHANNNEL_TYPE.ALLIANCE then
+	elseif channel == 'allianceFight' then
+		return self.allianceFight_channel
+	elseif channel == 'alliance' then
 		return self.alliance_channel
 	end
 end
+
+
 
 function ChatManager:insertNormalMessage_(msg)
 	if not msg.channel then return end
@@ -127,6 +131,11 @@ function ChatManager:insertNormalMessage_(msg)
 	elseif msg_type == 'alliance' then
 		if not self:__checkIsBlocked(msg) then
 			table.insert(self.alliance_channel,1,msg)
+			return true
+		end
+	elseif msg_type == 'alliancefight' then
+		if not self:__checkIsBlocked(msg) then
+			table.insert(self.allianceFight_channel,1,msg)
 			return true
 		end
 	end
@@ -157,15 +166,30 @@ function ChatManager:pushMsgToQueue_(msg)
 	end
 end
 
+function ChatManager:emptyAllianceChannel()
+	self.alliance_channel = {}
+	self.allianceFight_channel = {}
+	self:setChannelHaveInited('allianceFight',false)
+	self:setChannelHaveInited('alliance',false)
+end
 
 function ChatManager:emptyChannel_(channel)
 	if channel == 'global' then
 		self.global_channel = {}
+		self:setChannelHaveInited(channel,false)
+	elseif channel == 'allianceFight' then
+		self.allianceFight_channel = {}
+		self:setChannelHaveInited(channel,false)
 	elseif channel == 'alliance' then
 		self.alliance_channel = {}
+		self:setChannelHaveInited(channel,false)
 	else
 		self.global_channel = {}
 		self.alliance_channel = {}
+		self.allianceFight_channel = {}
+		self:setChannelHaveInited('global',false)
+		self:setChannelHaveInited('allianceFight',false)
+		self:setChannelHaveInited('alliance',false)
 	end
 end
 
@@ -174,26 +198,32 @@ function ChatManager:emptyPushQueue_()
 end
 
 -- api
-function ChatManager:HandleNetMessage(eventName,msg)
+function ChatManager:HandleNetMessage(eventName,msg,channel)
 	if eventName == 'onChat' then
 		if self:insertNormalMessage_(msg) then
 			self:pushMsgToQueue_(msg)
 		end
 	elseif eventName == 'onAllChat' then
 		self:emptyPushQueue_()
-		self:emptyChannel_()
+		self:emptyChannel_(channel)
 		for _,v in ipairs(msg) do
 			self:insertNormalMessage_(v)
 		end
+		self:setChannelHaveInited(channel,true)
 		self:callEventsChangedListeners_(self.LISTEN_TYPE.TO_REFRESH,{})
 	end
 end
 
 function ChatManager:FetchChannelMessage(channel)
-	local messages = self:__getMessageWithChannel(channel)
-	return LuaUtils:table_filteri(messages,function(_,v)
-		return not self:__checkIsBlocked(v)
-	end)
+	if not self:isChannelInited(channel) then
+		self:FetchAllChatMessageFromServer(channel)
+		return {}
+	else
+		local messages = self:__getMessageWithChannel(channel)
+		return LuaUtils:table_filteri(messages,function(_,v)
+			return not self:__checkIsBlocked(v)
+		end)
+	end
 end
 
 function ChatManager:__formatLastMessage(chat)
@@ -209,12 +239,16 @@ function ChatManager:__formatLastMessage(chat)
 end
 
 function ChatManager:FetchLastChannelMessage()
-	local messages_1 = self:__getMessageWithChannel(self.CHANNNEL_TYPE.GLOBAL)
-	local messages_2 = self:__getMessageWithChannel(self.CHANNNEL_TYPE.ALLIANCE)
+	local messages_1 = self:__getMessageWithChannel('global')
+	local messages_2 = self:__getMessageWithChannel('alliance')
+	local messages_3 = self:__getMessageWithChannel('allianceFight')
 	messages_1 =  LuaUtils:table_filteri(messages_1,function(_,v)
 		return not self:__checkIsBlocked(v)
 	end)
 	messages_2 =  LuaUtils:table_filteri(messages_2,function(_,v)
+		return not self:__checkIsBlocked(v)
+	end)	
+	messages_3 =  LuaUtils:table_filteri(messages_3,function(_,v)
 		return not self:__checkIsBlocked(v)
 	end)
 	return 
@@ -222,20 +256,46 @@ function ChatManager:FetchLastChannelMessage()
 		self:__formatLastMessage(messages_1[1]),
 		self:__formatLastMessage(messages_1[2]),
 		self:__formatLastMessage(messages_2[1]),
-		self:__formatLastMessage(messages_2[2])
+		self:__formatLastMessage(messages_2[2]),	
+		self:__formatLastMessage(messages_3[1]),
+		self:__formatLastMessage(messages_3[2]),
 	}
 end
 
-function ChatManager:FetchAllChatMessageFromServer()
-	self:emptyChannel_()
-	NetManager:getFetchChatPromise():done(function(messages)
-		-- self:HandleNetMessage('onAllChat',messages)
+function ChatManager:FetchChatWhenReLogined()
+	self:FetchAllChatMessageFromServer('global')
+	local alliance = Alliance_Manager:GetMyAlliance()
+	if not alliance:IsDefault() then
+		self:FetchAllChatMessageFromServer('alliance')
+		local status = alliance:Status()
+        if status ~= 'prepare' and status ~= 'fight' then
+        	self:emptyChannel_('allianceFight')
+        else
+        	self:FetchAllChatMessageFromServer('allianceFight')
+        end
+	end
+end
+
+function ChatManager:FetchAllChatMessageFromServer(channel)
+	self:emptyChannel_(channel)
+	NetManager:getFetchChatPromise(channel):done(function(response)
+		self:HandleNetMessage('onAllChat',response.msg.chats,channel)
 	end)
 end
 
+function ChatManager:isChannelInited(channel)
+	return self[string.format("inited_channel_%s",channel)]
+end
+
+function ChatManager:setChannelHaveInited(channel,trueOrFalse)
+	if type(trueOrFalse) ~= 'boolean' then
+		trueOrFalse = true
+	end
+	self[string.format("inited_channel_%s",channel)] = trueOrFalse
+end
+
 function ChatManager:SendChat(channel,msg,cb)
-	local channel_in_server = channel == self.CHANNNEL_TYPE.GLOBAL and 'global' or 'alliance'
-	NetManager:getSendChatPromise(channel_in_server,msg):done(function()
+	NetManager:getSendChatPromise(channel,msg):done(function()
 		self:__checkNotifyIf()
 		if cb then cb() end
 	end)

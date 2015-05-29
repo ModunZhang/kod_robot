@@ -127,23 +127,25 @@ end
 
 -- ui入场动画
 function GameUIBase:UIAnimationMoveIn()
-    self:opacity(0)
-    transition.fadeIn(self,{
-        time = 0.15,
-        onComplete = function()
-            self:OnMoveInStage()
-        end
-    })
+    -- self:opacity(0)
+    -- transition.fadeIn(self,{
+    --     time = 0.15,
+    --     onComplete = function()
+    --         self:OnMoveInStage()
+    --     end
+    -- })
+    self:OnMoveInStage()
 end
 
 -- ui 出场动画
 function GameUIBase:UIAnimationMoveOut()
-   transition.fadeOut(self,{
-        time = 0.15,
-        onComplete = function()
-            self:OnMoveOutStage()
-        end
-    })
+   -- transition.fadeOut(self,{
+   --      time = 0.15,
+   --      onComplete = function()
+   --          self:OnMoveOutStage()
+   --      end
+   --  })
+    self:OnMoveOutStage()
 end
 
 -- Private Methods

@@ -44,7 +44,7 @@ function GameUIWriteMail:ctor(send_type,contacts)
         font = UIKit:getFontFilePath(),
     })
     local editbox_subject = self.editbox_subject
-    editbox_subject:setPlaceHolder(_("最多可输入140字符"))
+    editbox_subject:setPlaceHolder(string.format(_("最多可输入%d字符"),140))
     editbox_subject:setMaxLength(137)
     editbox_subject:setFont(UIKit:getEditBoxFont(),22)
     editbox_subject:setFontColor(cc.c3b(0,0,0))
@@ -53,7 +53,7 @@ function GameUIWriteMail:ctor(send_type,contacts)
     editbox_subject:align(display.LEFT_TOP,150, r_size.height-100):addTo(write_mail)
 
     -- 分割线
-    display.newScale9Sprite("dividing_line_584x1.png", r_size.width/2, r_size.height-160,cc.size(594,1)):addTo(write_mail)
+    display.newScale9Sprite("dividing_line.png",r_size.width/2, r_size.height-160,cc.size(594,2),cc.rect(10,2,382,2)):addTo(write_mail)
     -- 内容
     cc.ui.UILabel.new(
         {cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -65,7 +65,7 @@ function GameUIWriteMail:ctor(send_type,contacts)
         }):align(display.LEFT_CENTER,58,r_size.height-180)
         :addTo(write_mail)
     -- 回复的邮件内容
-    self.textView = ccui.UITextView:create(cc.size(580,472),display.newScale9Sprite("background_580X472.png"))
+    self.textView = ccui.UITextView:create(cc.size(580,472),display.newScale9Sprite("background_88x42.png"))
     local textView = self.textView
     textView:addTo(write_mail):align(display.CENTER_BOTTOM,r_size.width/2,76)
     textView:setReturnType(cc.KEYBOARD_RETURNTYPE_DEFAULT)
@@ -84,7 +84,7 @@ function GameUIWriteMail:ctor(send_type,contacts)
 
     send_label:enableShadow()
     self.send_button = WidgetPushButton.new(
-        {normal = "yellow_btn_up_149x47.png", pressed = "yellow_btn_down_149x47.png"},
+        {normal = "yellow_btn_up_148x58.png", pressed = "yellow_btn_down_148x58.png"},
         {scale9 = false}
     ):setButtonLabel(send_label)
         :addTo(write_mail):align(display.CENTER, write_mail:getContentSize().width-120, 40)
@@ -98,15 +98,15 @@ function GameUIWriteMail:ctor(send_type,contacts)
 end
 function GameUIWriteMail:SendMail(addressee,title,content)
     if not title or string.trim(title)=="" then
-        UIKit:showMessageDialog(_("陛下"),_("请填写邮件主题"))
+        UIKit:showMessageDialog(_("主人"),_("请填写邮件主题"))
         return
     elseif not content or string.trim(content)=="" then
-        UIKit:showMessageDialog(_("陛下"),_("请填写邮件内容"))
+        UIKit:showMessageDialog(_("主人"),_("请填写邮件内容"))
         return
     end
     if self.send_type == PERSONAL_MAIL then
         if not addressee or string.trim(addressee)=="" then
-            UIKit:showMessageDialog(_("陛下"),_("请填写正确的收件人ID"))
+            UIKit:showMessageDialog(_("主人"),_("请填写正确的收件人ID"))
             return
         end
         NetManager:getSendPersonalMailPromise(addressee, title, content,self.contacts):done(function(result)

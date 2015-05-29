@@ -142,12 +142,12 @@ local DRAGON_MATERIAL_PIC_MAP = {
 local SOLDIER_METARIAL = {
     ["heroBones"] = "heroBones_128x128.png",
     ["magicBox"] = "magicBox_128x128.png",
-    ["holyBook"] = "insight_icon_45x45.png",
-    ["brightAlloy"] = "insight_icon_45x45.png",
+    ["holyBook"] = "magicBox_128x128.png",
+    ["brightAlloy"] = "magicBox_128x128.png",
     ["soulStone"] = "soulStone_128x128.png",
     ["deathHand"] = "deathHand_128x128.png",
-    ["confessionHood"] = "insight_icon_45x45.png",
-    ["brightRing"] = "insight_icon_45x45.png",
+    ["confessionHood"] = "magicBox_128x128.png",
+    ["brightRing"] = "magicBox_128x128.png",
 }
 local EQUIPMENT = {
     ["redCrown_s1"] = "redCrown_s1_128x128.png",
@@ -202,13 +202,7 @@ local EQUIPMENT = {
     ["greenArmguard_s3"] = "greenArmguard_s3_128x128.png",
     ["greenArmguard_s4"] = "greenArmguard_s4_128x128.png",
 }
-local STAR_BG = {
-    "star1_118x132.png",
-    "star2_118x132.png",
-    "star3_118x132.png",
-    "star4_118x132.png",
-    "star5_118x132.png",
-}
+
 local EFFECT_ANIMATION_FILES = {
     ranger = {
         "animations/swordsman_effect/Swordsman_effects.ExportJson",
@@ -494,8 +488,6 @@ local DECORATOR_IMAGE = {
         decorate_tree_2 =  "tree_2_grassLand.png",
         decorate_tree_3 =  "tree_3_grassLand.png",
         decorate_tree_4 =  "tree_4_grassLand.png",
-        stone_mountain  = "grass_stone_mountain_80x58.png",
-        farmland        = "grass_farmland_80x55.png"
     },
     iceField = {
         decorate_lake_1 = "lake_1_iceField.png",
@@ -506,8 +498,6 @@ local DECORATOR_IMAGE = {
         decorate_tree_2 =  "tree_2_iceField.png",
         decorate_tree_3 =  "tree_3_iceField.png",
         decorate_tree_4 =  "tree_4_iceField.png",
-        stone_mountain  = "ice_stone_mountain_80x58.png",
-        farmland        = "ice_farmland_80x55.png"
     },
     desert = {
         decorate_lake_1 = "lake_1_desert.png",
@@ -518,14 +508,12 @@ local DECORATOR_IMAGE = {
         decorate_tree_2 =  "tree_2_desert.png",
         decorate_tree_3 =  "tree_3_desert.png",
         decorate_tree_4 =  "tree_4_desert.png",
-        stone_mountain  = "desert_stone_mountain_80x58.png",
-        farmland        = "desert_farmland_80x55.png"
     },
 }
 local DRAGON_HEAD = {
     blueDragon = "Dragon_blue_113x128.png",
-    redDragon = "Dragon_red_113x128.png",
-    greenDragon = "Dragon_green_113x128.png"
+    redDragon = "redDragon.png",
+    greenDragon = "greenDragon.png"
 }
 local BUFF = {
     masterOfDefender = "masterOfDefender_128x128.png",
@@ -1057,9 +1045,24 @@ local CITY_TERRAIN_ICON = {
     grassLand = "city_terrain_grassLand_142x142.png",
     iceField = "city_terrain_iceField_142x142.png",
 }
+
+local ALLIANCE_LANGUAGE_FRAME = {
+    all = "all.png",
+    en  = "en.png",
+    fr  = "fr.png",
+    cn  = "cn.png",
+    tw  = "tw.png",
+    de  = "de.png",
+    ko  = "ko.png",
+    ja  = "ja.png",
+    ru  = "ru.png",
+    es  = "es.png",
+    pt  = "pt.png",
+    it  = "it.png",
+}
+
 return {
     resource = RESOURCE,
-    soldier_bg = STAR_BG,
     soldier_effect = SOLDIER_EFFECT_ANIMATIONS,
     effect_animation_files = EFFECT_ANIMATION_FILES,
     soldier_animation_files = SOLDIER_ANIMATION_FILES,
@@ -1104,6 +1107,7 @@ return {
     activity_image_config = ACTIVITY_IMAGE_CONFIG,
     server_level_image = server_level_image,
     city_terrain_icon = CITY_TERRAIN_ICON,
+    alliance_language_frame = ALLIANCE_LANGUAGE_FRAME,
 }
 
 

@@ -130,7 +130,7 @@ function WidgetManufacture:Manufacture()
         NetManager:getFetchMaterialsPromise(self.toolShop:GetBuildingEvent():Id()):done(function()
             local desc_t = {}
             for i,v in ipairs(content) do
-                table.insert(desc_t, string.format("%sx%d", Localize.materials[v.type], v.count)) 
+                table.insert(desc_t, string.format("%sx%d", Localize.materials[v.type], v.count))
             end
             GameGlobalUI:showTips(_("获取建筑材料"), table.concat(desc_t, ", "))
         end)
@@ -180,7 +180,7 @@ function WidgetManufacture:Manufacture()
         NetManager:getFetchMaterialsPromise(self.toolShop:GetTechnologyEvent():Id()):done(function()
             local desc_t = {}
             for i,v in ipairs(content) do
-                table.insert(desc_t, string.format("%sx%d", Localize.materials[v.type], v.count)) 
+                table.insert(desc_t, string.format("%sx%d", Localize.materials[v.type], v.count))
             end
             GameGlobalUI:showTips(_("获取科技材料"), table.concat(desc_t, ", "))
         end)
@@ -240,11 +240,11 @@ function WidgetManufacture:CreateMaterialItemWithListView(list_view, title, mate
         local describe = MATERIALS_MAP[type][2]
         local index = MATERIALS_MAP[type][3]
 
-        local back_ground = cc.ui.UIImage.new("box_120x154.png")
+        local back_ground = WidgetUIBackGround.new({width = 120,height = 154},WidgetUIBackGround.STYLE_TYPE.STYLE_4)
             :align(display.CENTER, origin_x + gap_x * (index - 1), origin_y)
 
         local pos = back_ground:getAnchorPointInPoints()
-        
+
         local icon_bg = cc.ui.UIImage.new("box_118x118.png")
             :align(display.CENTER, pos.x, pos.y+18)
             :addTo(back_ground)
@@ -253,7 +253,7 @@ function WidgetManufacture:CreateMaterialItemWithListView(list_view, title, mate
             :align(display.CENTER, icon_bg:getContentSize().width/2,icon_bg:getContentSize().height/2)
             :scale(100/128)
 
-        local num_bg = cc.ui.UIImage.new("back_ground_118x36.png")
+        local num_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(118,36),cc.rect(15,10,136,64))
             :addTo(back_ground):align(display.CENTER,pos.x, 20)
 
         local store_label = UIKit:ttfLabel({
@@ -356,7 +356,7 @@ function WidgetManufacture:CreateMaterialItemWithListView(list_view, title, mate
             local stone_cur = resource_manager:GetStoneResource():GetResourceValueByCurrentTime(time)
             local iron_cur = resource_manager:GetIronResource():GetResourceValueByCurrentTime(time)
             local number, wood, stone, iron, time = toolShop:GetNeedByCategory(category)
-            describe:setString(_("随机制造")..string.format("%d", number).._("个材料"))
+            describe:setString( string.format(_("随机制造%d个材料"), number) )
             self:SetNeedNumber({wood_cur, wood}, {stone_cur, stone}, {iron_cur, iron}, time)
             return self
         end
@@ -396,7 +396,7 @@ function WidgetManufacture:CreateMaterialItemWithListView(list_view, title, mate
             :addTo(material, 2):align(display.CENTER, 351 + 120, height)
 
         function material:SetNumber(number)
-            describe:setString(_("制造材料")..string.format(" %d ", number).._("完成!"))
+            describe:setString(string.format( _("制造材料x%d 完成!"), number ) )
             return self
         end
         function material:SetClicked(func)
@@ -440,13 +440,14 @@ function WidgetManufacture:CreateMaterialItemWithListView(list_view, title, mate
             local percent = elapse_time * 100.0 / total_time
 
             self:GetProgressBox():show()
-                :SetDescribe(string.format("%s X%d", _("制造材料"), number))
+                :SetDescribe(string.format(_("制造材料 x%d"), number))
                 :SetProgressInfo(GameUtils:formatTimeStyle1(event:LeftTime(server_time)), percent)
 
             self:GetMaterial():hide()
             self:GetNeedBox():hide()
         elseif event:IsStored(server_time) then
             self:SetGetMaterials(event:Content())
+            printLog("sss","%s",".."..event:TotalCount())
             self:GetMaterial():show():SetNumber(event:TotalCount())
 
             self:GetProgressBox():hide()
@@ -492,6 +493,7 @@ end
 
 
 return WidgetManufacture
+
 
 
 

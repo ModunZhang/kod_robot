@@ -22,24 +22,8 @@ function VillageSprite:onExit()
 end
 function VillageSprite:GetSpriteFile()
     local village_info = self:VillageInfo()
-    if not village_info  then
-        local village_name = self:GetEntity():GetName()
-        if village_name == 'woodVillage' then
-            local decorate_tree = UILib.decorator_image[self:GetMapLayer():Terrain()].decorate_tree_1
-            return decorate_tree
-        elseif village_name == 'ironVillage' then
-            return "iron_ruins_276x200.png",120/276
-        elseif village_name == 'stoneVillage' then
-            local stone_mountain = UILib.decorator_image[self:GetMapLayer():Terrain()].stone_mountain
-            return stone_mountain
-        elseif village_name == 'foodVillage' then
-            local farmland = UILib.decorator_image[self:GetMapLayer():Terrain()].farmland
-            return farmland
-        end
-    else
-        local build_png = SpriteConfig[village_info.name]:GetConfigByLevel(village_info.level).png
-	    return build_png
-    end
+    local build_png = SpriteConfig[village_info.name]:GetConfigByLevel(village_info.level).png
+	return build_png
 end
 function VillageSprite:GetSpriteOffset()
 	return self:GetLogicMap():ConvertToLocalPosition(0, 0)
@@ -72,8 +56,8 @@ function VillageSprite:RefreshSprite()
 end
 function VillageSprite:RefreshInfo()
     local info = self:VillageInfo()
-    -- self.level:setString(info.level)
-    -- self.name:setString(Localize.village_name[self:GetEntity():GetName()])
+    self.level:setString(info.level)
+    self.name:setString(Localize.village_name[self:GetEntity():GetName()])
 end
 
 

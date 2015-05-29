@@ -7,7 +7,7 @@ local WidgetPushButton = import(".WidgetPushButton")
 local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetPopDialog = import(".WidgetPopDialog")
 local WidgetAllianceHelper = import(".WidgetAllianceHelper")
-local WidgetDropList = import("..widget.WidgetDropList")
+local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local WidgetRankingList = class("WidgetRankingList", WidgetPopDialog)
 
 local ui_helper = WidgetAllianceHelper.new()
@@ -63,7 +63,7 @@ function WidgetRankingList:OnMoveInStage()
     local body = self:GetBody()
     local size = body:getContentSize()
 
-    local bg = display.newSprite("background_548x52.png"):addTo(body)
+    local bg = display.newScale9Sprite("back_ground_166x84.png", 0,0,cc.size(548,52),cc.rect(15,10,136,64)):addTo(body)
         :align(display.TOP_CENTER, size.width / 2, size.height - 110)
 
     self.my_ranking = UIKit:ttfLabel({
@@ -86,7 +86,7 @@ function WidgetRankingList:OnMoveInStage()
     self.listview:setRedundancyViewVal(self.listview:getViewRect().height + 76 * 2)
     self.listview:setDelegate(handler(self, self.sourceDelegate))
 
-    self.drop_list = WidgetDropList.new(
+    self.drop_list = WidgetRoundTabButtons.new(
         {
             {tag = "power",label = _("战斗力排行榜"),default = true},
             {tag = "kill",label = _("击杀排行榜")},
@@ -136,7 +136,7 @@ function WidgetRankingList:LoadMore()
     if not self.drop_list then return end
     if self.is_loading or #self.current_rank.datas >= 100 then return end
     self.is_loading = true
-    local tag = self.drop_list:GetSelectdTag()
+    local tag = self.drop_list:GetSelectedButtonTag()
     if self.type_ == "player" then
         local cur_datas = self.rank_map[tag].datas
         NetManager:getPlayerRankPromise(tag, #cur_datas):done(function(response)
@@ -157,11 +157,11 @@ function WidgetRankingList:ReloadRank(rank)
     if rank.myData.rank == json.null then
         self.my_ranking:setString(_("暂无排名"))
     else
-        local str 
+        local str
         if self.type_ == "player" then
-            str = self.drop_list:GetSelectdTag() == "power" and _("我的战斗力排行") or _("我的击杀排行")
+            str = self.drop_list:GetSelectedButtonTag() == "power" and _("我的战斗力排行") or _("我的击杀排行")
         else
-            str = self.drop_list:GetSelectdTag() == "power" and _("我的联盟战斗力排行") or _("我的联盟击杀排行")
+            str = self.drop_list:GetSelectedButtonTag() == "power" and _("我的联盟战斗力排行") or _("我的联盟击杀排行")
         end
         self.my_ranking:setString(string.format("%s : %d", str, rank.myData.rank))
     end
@@ -210,14 +210,25 @@ local crown_map = {
     "crown_silver_46x40.png",
     "crown_brass_46x40.png",
 }
+local NORMAL_COLOR = UIKit:hex2c3b(0x403c2f)
+local MINE_COLOR = UIKit:hex2c3b(0xffedae)
 function WidgetRankingList:CreatePlayerContentByIndex(idx)
     local item = display.newSprite("background2_548x76.png")
     local size = item:getContentSize()
     item.bg2 = display.newSprite("background1_548x76.png"):addTo(item)
         :pos(size.width/2, size.height/2)
+    item.bg3 = display.newSprite("background3_548x76.png"):addTo(item)
+        :pos(size.width/2, size.height/2)
     display.newSprite("background_57x57.png"):addTo(item):pos(120, 40)
     local player_head_icon = UIKit:GetPlayerIconOnly():addTo(item,1):pos(120, 40):scale(0.5)
-    display.newSprite("dragon_strength_27x31.png"):addTo(item):pos(400, 40)
+
+
+    local tag = self.drop_list:GetSelectedButtonTag()        
+    local png = tag == "power" and "dragon_strength_27x31.png" or "fight_62x70.png"
+    local s = tag == "power" and 1 or 0.5
+    display.newSprite(png):addTo(item):pos(400, 40):scale(s)
+    
+
     item.player_icon = player_head_icon
     item.rank = UIKit:ttfLabel({
         text = "",
@@ -245,8 +256,17 @@ function WidgetRankingList:CreatePlayerContentByIndex(idx)
         item.player_icon:setTexture(UIKit:GetPlayerIconImage(data.icon))
         return self
     end
+    local ranklist = self
     function item:SetIndex(index)
-        self.bg2:setVisible(index % 2 == 0)
+        local is_mine = ranklist.current_rank.myData.rank == index
+        self.bg2:setVisible(index % 2 == 0 and not is_mine)
+        self.bg3:setVisible(is_mine)
+
+        local c = is_mine and MINE_COLOR or NORMAL_COLOR
+        self.rank:setColor(c)
+        self.name:setColor(c)
+        self.value:setColor(c)
+
         if index <= 3 then
             self.rank:hide()
             self.crown:setTexture(crown_map[index])
@@ -266,9 +286,13 @@ function WidgetRankingList:CreateAllianceContentByIndex(idx)
     item.bg2 = display.newSprite("background1_548x76.png"):addTo(item)
         :pos(size.width/2, size.height/2)
 
+    item.bg3 = display.newSprite("background3_548x76.png"):addTo(item)
+        :pos(size.width/2, size.height/2)
 
-
-    display.newSprite("dragon_strength_27x31.png"):addTo(item):pos(400, 40)
+    local tag = self.drop_list:GetSelectedButtonTag()        
+    local png = tag == "power" and "dragon_strength_27x31.png" or "fight_62x70.png"
+    local s = tag == "power" and 1 or 0.5
+    display.newSprite(png):addTo(item):pos(400, 40):scale(s)
 
     item.rank = UIKit:ttfLabel({
         text = "",
@@ -307,8 +331,18 @@ function WidgetRankingList:CreateAllianceContentByIndex(idx)
             :addTo(self):align(display.CENTER, 80, 5):scale(0.5)
         return self
     end
+    local ranklist = self
     function item:SetIndex(index)
-        self.bg2:setVisible(index % 2 == 0)
+        local is_mine = ranklist.current_rank.myData.rank == index
+        self.bg2:setVisible(index % 2 == 0 and not is_mine)
+        self.bg3:setVisible(is_mine)
+
+        local c = is_mine and MINE_COLOR or NORMAL_COLOR
+        self.rank:setColor(c)
+        self.name:setColor(c)
+        self.tag:setColor(c)
+        self.value:setColor(c)
+
         if index <= 3 then
             self.rank:hide()
             self.crown:setTexture(crown_map[index])
@@ -325,6 +359,7 @@ end
 
 
 return WidgetRankingList
+
 
 
 

@@ -44,7 +44,7 @@ function DataUtils:buyResource(need, has)
         if config and required > 0 then
             local currentBuy = 0
             if key == "citizen" then
-                local freeCitizenLimit = City:GetResourceManager():GetPopulationResource():GetValueLimit()
+                local freeCitizenLimit = City:GetResourceManager():GetCitizenResource():GetValueLimit()
                 while required > 0 do
                     local requiredPercent = required / freeCitizenLimit
                     for i=#config,1,-1 do
@@ -489,6 +489,7 @@ end
 --联盟名称随机
 local config_clientinitgame = GameDatas.ClientInitGame
 function DataUtils:__getRandomAllianceNameAndTag()
+    -- math.randomseed(User:GetCountInfo().registerTime or os.time())
     local __categore = math.random(1,5)
     local name = ""
     local tag = ""

@@ -168,21 +168,29 @@ end
 function UICheckBoxButton:onTouch_(event)
     local name, x, y = event.name, event.x, event.y
     if name == "began" then
+        self.touchBeganX = x
+        self.touchBeganY = y
         if not self:checkTouchInSprite_(x, y) then return false end
         self.fsm_:doEvent("press")
         self:dispatchEvent({name = UIButton.PRESSED_EVENT, x = x, y = y, touchInTarget = true})
         return true
     end
 
-    local touchInTarget = self:checkTouchInSprite_(x, y)
+    local touchInTarget = self:checkTouchInSprite_(x, y) and self:checkTouchInSprite_(self.touchBeganX, self.touchBeganY)
     if name == "moved" then
-        if touchInTarget and self.fsm_:canDoEvent("press") then
-            self.fsm_:doEvent("press")
-            self:dispatchEvent({name = UIButton.PRESSED_EVENT, x = x, y = y, touchInTarget = true})
-        elseif not touchInTarget and self.fsm_:canDoEvent("release") then
+        if touchInTarget then
+            self:dispatchEvent({name = MOVE_EVENT, x = x, y = y, touchInTarget = true})
+        elseif  not touchInTarget and self.fsm_:canDoEvent("release") then
             self.fsm_:doEvent("release")
             self:dispatchEvent({name = UIButton.RELEASE_EVENT, x = x, y = y, touchInTarget = false})
         end
+        -- if touchInTarget and self.fsm_:canDoEvent("press") then
+        --     self.fsm_:doEvent("press")
+        --     self:dispatchEvent({name = UIButton.PRESSED_EVENT, x = x, y = y, touchInTarget = true})
+        -- elseif not touchInTarget and self.fsm_:canDoEvent("release") then
+        --     self.fsm_:doEvent("release")
+        --     self:dispatchEvent({name = UIButton.RELEASE_EVENT, x = x, y = y, touchInTarget = false})
+        -- end
     else
         if self.fsm_:canDoEvent("release") then
             self.fsm_:doEvent("release")

@@ -74,24 +74,24 @@ function GameUISettingAccount:CreateGameCenterPanel()
 		:setButtonLabel("normal", UIKit:commonButtonLable({
 			text = _("切换账号")
 		}))
-		:onButtonClicked(function()
-			self:ChangeAccountForceButtonClicked()
+	self.gamecenter_force_change_button:onButtonClicked(function()
+			self:ChangeAccountForceButtonClicked(self.gamecenter_force_change_button)
 		end)
 	self.gamecenter_change_account_button = WidgetPushButton.new({
-			normal = "yellow_btn_up_185x65.png",
-			pressed="yellow_btn_down_185x65.png"
+			normal = "yellow_btn_up_186x66.png",
+			pressed="yellow_btn_down_186x66.png"
 		})
 		:align(display.BOTTOM_CENTER, 276, 10)
 		:addTo(self.gamecenter_panel)
 		:setButtonLabel("normal", UIKit:commonButtonLable({
 			text = _("切换账号")
 		}))
-		:onButtonClicked(function()
-			self:CreateOrChangeAccountButtonClicked()
+	self.gamecenter_change_account_button:onButtonClicked(function()
+			self:CreateOrChangeAccountButtonClicked(self.gamecenter_change_account_button)
 		end)
 	self.gamecenter_login_button = WidgetPushButton.new({
-			normal = "yellow_btn_up_185x65.png",
-			pressed="yellow_btn_down_185x65.png"
+			normal = "yellow_btn_up_186x66.png",
+			pressed="yellow_btn_down_186x66.png"
 		})
 		:align(display.BOTTOM_CENTER, 276, 10)
 		:addTo(self.gamecenter_panel)
@@ -156,6 +156,7 @@ function GameUISettingAccount:RefreshUI()
 					self.gamecenter_force_change_button:hide()
 					self.gamecenter_change_account_button:setButtonLabelString("normal",_("切换账号"))
 					self.gamecenter_change_account_button:show()
+					self.gamecenter_change_account_button.tips = _("当前GameCenter下存在其他游戏账号，点击切换按钮，会立即登录另一个GameCenter游戏账号")
 					self.gamecenter_login_button:hide()
 				end
 			else -- 创建新账号
@@ -164,6 +165,7 @@ function GameUISettingAccount:RefreshUI()
 				self.gamecenter_force_change_button:hide()
 				self.gamecenter_tips_label:setColor(UIKit:hex2c3b(0x7e0000))
 				self.gamecenter_change_account_button:setButtonLabelString("normal",_("创建新账号"))
+				self.gamecenter_change_account_button.tips = _("当前GameCenter下没有绑定的账号，你可以在此创建一个全新的游戏账号。点击下方的按钮后，会登出当前账号，使用新的GameCenter账号进行游戏")
 				self.gamecenter_change_account_button:show()
 				self.gamecenter_login_button:hide()
 			end
@@ -188,6 +190,7 @@ function GameUISettingAccount:RefreshUI()
 				self.gamecenter_tips_label:setString(_("注意:如果当前账号状态是未绑定，切换Game Center的其他账号会导致当前账号的丢失，并无法找回，请慎重操作。"))
 				self.gamecenter_tips_label:setColor(UIKit:hex2c3b(0x7e0000))
 				self.gamecenter_force_change_button:show()
+				self.gamecenter_force_change_button.tips = _("注意:如果当前账号状态是未绑定，切换Game Center的其他账号会导致当前账号的丢失，并无法找回，请慎重操作。")
 				self.gamecenter_change_account_button:hide()
 				self.gamecenter_login_button:hide()
 
@@ -203,7 +206,6 @@ function GameUISettingAccount:RefreshUI()
 			self.gamecenter_bind_state_label:setString(_("当前状态:未知"))
 			self.gamecenter_tips_label:setString(_("请在ios设置中登录你的GameCenter账号，或点击下面的按钮进行绑定"))
 			self.gamecenter_tips_label:setColor(UIKit:hex2c3b(0x7e0000))
-			--color change TODO:
 			self.gamecenter_force_change_button:hide()
 			self.gamecenter_change_account_button:hide()
 			self.gamecenter_login_button:show()
@@ -211,18 +213,35 @@ function GameUISettingAccount:RefreshUI()
 	end
 end
 
-function GameUISettingAccount:ChangeAccountForceButtonClicked()
-	local __,gcId = ext.gamecenter.getPlayerNameAndId() 
-	NetManager:getForceSwitchGcIdPromise(gcId)
+function GameUISettingAccount:ChangeAccountForceButtonClicked(button)
+	if button.tips then
+		UIKit:showMessageDialog(_("提示"), button.tips, function()
+			local __,gcId = ext.gamecenter.getPlayerNameAndId() 
+			NetManager:getForceSwitchGcIdPromise(gcId)
+		end,function()end)
+	else
+		local __,gcId = ext.gamecenter.getPlayerNameAndId() 
+		NetManager:getForceSwitchGcIdPromise(gcId)
+	end
 end
 
-function GameUISettingAccount:CreateOrChangeAccountButtonClicked()
-	local __,gcId = ext.gamecenter.getPlayerNameAndId() 
-	NetManager:getSwitchGcIdPromise(gcId)
+function GameUISettingAccount:CreateOrChangeAccountButtonClicked(button)
+	if button.tips then
+		UIKit:showMessageDialog(_("提示"), button.tips, function()
+			local __,gcId = ext.gamecenter.getPlayerNameAndId() 
+			NetManager:getSwitchGcIdPromise(gcId)
+		end,function()end)
+	else
+		local __,gcId = ext.gamecenter.getPlayerNameAndId() 
+		NetManager:getSwitchGcIdPromise(gcId)
+	end
+	
 end
 
 function GameUISettingAccount:GameCenterButtonClicked()
-	ext.gamecenter.authenticate(true)
+	UIKit:showMessageDialog(_("提示"), _("确定绑定GameCenter账号?"), function()
+		ext.gamecenter.authenticate(true)
+	end, function()end)
 end
 
 return GameUISettingAccount

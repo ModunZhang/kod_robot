@@ -127,7 +127,7 @@ function WidgetCitizen:ctor(city)
 
         local res_info_bg = cc.ui.UIImage.new("res_info_bg_392x106.png"):addTo(self):pos(window.left + 215, cur_pos)
 
-        cc.ui.UIImage.new("dividing_line_352x2.png"):addTo(res_info_bg):pos(0, 53)
+        display.newScale9Sprite("dividing_line.png",4,53,cc.size(350,2),cc.rect(10,2,382,2)):addTo(res_info_bg):align(display.LEFT_CENTER)
 
         cc.ui.UILabel.new({
             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -176,13 +176,13 @@ function WidgetCitizen:ctor(city)
 
         if i == CITIZEN then
             local add_btn = cc.ui.UIPushButton.new(
-                {normal = "add_btn_up_30x88.png",pressed = "add_btn_down_30x88.png"})
+                {normal = "button_wareHouseUI_normal.png",pressed = "button_wareHouseUI_pressed.png"})
                 :addTo(res_info_bg):pos(375, 53)
                 :onButtonClicked(function(event)
                     WidgetUseItems.new():Create({item_type = WidgetUseItems.USE_TYPE.BUFF,item_name="citizenBonus_1"})
                         :AddToCurrentScene()
-                end)
-            cc.ui.UIImage.new("add_18x19.png"):addTo(add_btn):align(display.CENTER, 0, 0)
+                end):scale(30/49)
+            cc.ui.UIImage.new("+.png"):addTo(add_btn):align(display.CENTER, 0, 0)
         end
 
         self.citizen_number[i] = {production, productionPerHour}
@@ -193,12 +193,12 @@ function WidgetCitizen:UpdateData()
     local city = self.city
     citizen_array = {}
     local resource_manager = city:GetResourceManager()
-    citizen_array[CITIZEN] = resource_manager:GetPopulationResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
+    citizen_array[CITIZEN] = resource_manager:GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
     citizen_array[FOOD] = city:GetCitizenByType("farmer")
     citizen_array[WOOD] = city:GetCitizenByType("woodcutter")
     citizen_array[IRON] = city:GetCitizenByType("miner")
     citizen_array[STONE] = city:GetCitizenByType("quarrier")
-    self:SetMaxCitizen(resource_manager:GetPopulationResource():GetTotalLimit())
+    self:SetMaxCitizen(resource_manager:GetCitizenResource():GetTotalLimit())
     self:OnCitizenChanged(citizen_array)
 end
 function WidgetCitizen:OnCitizenChanged(citizen_array)
@@ -223,11 +223,11 @@ function WidgetCitizen:OnCitizenChanged(citizen_array)
         local production = string.format("%d", citizen_array[k])
         local productionPerHour
         if k == CITIZEN then
-            local population = resource_manager:GetPopulationResource()
+            local population = resource_manager:GetCitizenResource()
             productionPerHour = population:GetProductionPerHour()
             production = string.format("%d/%d", production, population:GetValueLimit())
         elseif k == FOOD then
-            productionPerHour = resource_manager:GetFoodResource():GetProductionPerHour()
+            productionPerHour = resource_manager:GetFoodProductionPerHour()
         elseif k == WOOD then
             productionPerHour = resource_manager:GetWoodResource():GetProductionPerHour()
         elseif k == IRON then

@@ -43,7 +43,7 @@ function WidgetBuffBox:ctor(params)
     buff_active:runAction(cc.RepeatForever:create(seq_1))
     self.buff_active = buff_active
     -- 信息框
-    local info_bg = display.newSprite("back_ground_130x30.png")
+    local info_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(130,30),cc.rect(15,10,136,64))
         :align(display.CENTER, width/2, 15)
         :addTo(self)
     self.info_label = UIKit:ttfLabel(

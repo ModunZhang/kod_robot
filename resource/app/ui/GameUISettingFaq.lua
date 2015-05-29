@@ -34,7 +34,7 @@ function GameUISettingFaq:BuildUI()
     end
     local editbox = cc.ui.UIInput.new({
         UIInputType = 1,
-        image = "chat_Input_box.png",
+        image = "input_box.png",
         size = cc.size(548,57),
         listener = onEdit,
     })
@@ -105,7 +105,7 @@ function GameUISettingFaq:GetItem(data)
         size = 20,
         color= 0x403c2f
     }):align(display.LEFT_CENTER,22,36):addTo(box)
-    display.newSprite("activity_next_32x37.png"):align(display.RIGHT_CENTER, 524, 36):addTo(box)
+    display.newSprite("next_32x38.png"):align(display.RIGHT_CENTER, 524, 36):addTo(box)
     item:addContent(content)
     item:setItemSize(562,84)
     return item

@@ -13,6 +13,8 @@ local GameUISquare = UIKit:createUIClass("GameUISquare", "GameUIWithCommonHeader
 
 function GameUISquare:ctor(city)
     GameUISquare.super.ctor(self,city, _("广场"))
+
+    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_RECRUIT")
 end
 function GameUISquare:OnMoveInStage()
     GameUISquare.super.OnMoveInStage(self)

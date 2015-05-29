@@ -67,8 +67,7 @@ function GameUIStorePackage:CreateItemLogo()
 end
 
 function GameUIStorePackage:CreateListView()
-	local list_bg = display.newScale9Sprite("box_bg_546x214.png")
-		:size(546,402)
+	local list_bg = display.newScale9Sprite("background_568x120.png", 0,0,cc.size(546,402),cc.rect(15,10,538,100))
 		:addTo(self:GetBody())
 		:align(display.BOTTOM_CENTER, 304, 118)
 	self.info_list = UIListView.new({
@@ -90,7 +89,7 @@ end
 
 function GameUIStorePackage:GetItem(index,reward)
 	local item = self.info_list:newItem()
-	local content = display.newScale9Sprite(string.format("resource_item_bg%d.png",index % 2)):size(524,48)
+	local content = display.newScale9Sprite(string.format("back_ground_548x40_%d.png", index % 2 == 0 and 1 or 2)):size(524,48)
 	local bg = display.newSprite("box_118x118.png"):align(display.LEFT_CENTER, 14, 24):addTo(content)
 	local icon = display.newSprite(UILib.item[reward.key]):align(display.CENTER, 59, 58):addTo(bg)
 	icon:scale(100/math.max(icon:getContentSize().width,icon:getContentSize().height))

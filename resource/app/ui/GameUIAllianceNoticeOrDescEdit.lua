@@ -31,18 +31,24 @@ function GameUIAllianceNoticeOrDescEdit:OnMoveInStage()
 	}):align(display.CENTER,300,26):addTo(titleBar)
 	
 
-	local textView = ccui.UITextView:create(cc.size(555,238),display.newScale9Sprite("alliance_edit_bg_555x238.png"))
+	local textView = ccui.UITextView:create(cc.size(555,238),display.newScale9Sprite("background_88x42.png"))
     textView:addTo(bg_node):align(display.CENTER_TOP,bg_node:getContentSize().width/2, titleBar:getPositionY() - 10)
     textView:setReturnType(cc.KEYBOARD_RETURNTYPE_DEFAULT)    
     textView:setFont(UIKit:getEditBoxFont(), 24)
     textView:setPlaceHolder(_("最多输入600个字符"))
     textView:setMaxLength(600)
     textView:setFontColor(UIKit:hex2c3b(0x000000))
+
+    local text = ""
     if self.isNotice_ then
-    	textView:setText(Alliance_Manager:GetMyAlliance():Notice() or "")
+    	text = Alliance_Manager:GetMyAlliance():Notice()
     else
-    	textView:setText(Alliance_Manager:GetMyAlliance():Describe() or "")
+    	text = Alliance_Manager:GetMyAlliance():Describe()
     end
+    if text == json.null or string.len(text) == 0 then
+    	text = ""
+    end
+	textView:setText(text)
     self.textView = textView
 
 
@@ -80,11 +86,13 @@ function GameUIAllianceNoticeOrDescEdit:onOkButtonClicked()
 		NetManager:getEditAllianceNoticePromise(content)
         	:done(function()
         		self:LeftButtonClicked()
+        		GameGlobalUI:showTips(_("提示"),_("修改联盟公告成功"))
         	end)
 	else
 		NetManager:getEditAllianceDescriptionPromise(content)
 			:done(function()
         		self:LeftButtonClicked()
+        		GameGlobalUI:showTips(_("提示"),_("修改联盟描述成功"))
         	end)
 	end
 end

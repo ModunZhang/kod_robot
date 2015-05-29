@@ -7,7 +7,7 @@ local Sprite = class("Sprite", function(...)
     return Observer.extend(display.newNode(), ...)
 end)
 
-local modf = math.modf
+local fmod = math.fmod
 local SPRITE = 0
 function Sprite:GetWorldPosition()
     return self:getParent():convertToWorldSpace(cc.p(self:GetCenterPosition()))
@@ -160,8 +160,7 @@ function Sprite:ResetFlashStatus()
 end
 function Sprite:BeginFlash(lastTime)
     self.time = 0
-    local _,fract = modf(self.time, lastTime) 
-    local ratio = fract / lastTime
+    local ratio = fmod(self.time, lastTime)  / lastTime
     self:GetSprite():setFilter(filter.newFilter("CUSTOM", json.encode({
         frag = "shaders/flash.fs",
         shaderName = "flash",
@@ -172,8 +171,7 @@ function Sprite:BeginFlash(lastTime)
         if self.time > lastTime then
             self:ResetFlashStatus()
         else
-            local _,fract = modf(self.time, lastTime) 
-            self:GetSprite():getFilter():getGLProgramState():setUniformFloat("ratio", fract / lastTime)
+            self:GetSprite():getFilter():getGLProgramState():setUniformFloat("ratio", fmod(self.time, lastTime) / lastTime)
         end
     end)
     self:GetSprite():scheduleUpdate()

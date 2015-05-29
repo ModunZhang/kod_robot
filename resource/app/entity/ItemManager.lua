@@ -184,7 +184,7 @@ function ItemManager:GetAllResourceTypes()
         ironBonus = {RESOURCE_TYPE.IRON,RESOURCE_BUFF_TYPE.PRODUCT},
         foodBonus = {RESOURCE_TYPE.FOOD,RESOURCE_BUFF_TYPE.PRODUCT},
         coinBonus = {RESOURCE_TYPE.COIN,RESOURCE_BUFF_TYPE.PRODUCT},
-        citizenBonus = {RESOURCE_TYPE.POPULATION,RESOURCE_BUFF_TYPE.PRODUCT},
+        citizenBonus = {RESOURCE_TYPE.CITIZEN,RESOURCE_BUFF_TYPE.PRODUCT},
     }
     return buff_map
 end

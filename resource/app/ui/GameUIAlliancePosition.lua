@@ -89,7 +89,7 @@ function GameUIAlliancePosition:ctor()
     }):align(display.CENTER, 100, 140):addTo(body)
     local editbox_x = cc.ui.UIInput.new({
         UIInputType = 1,
-        image = "input_box_174X40.png",
+        image = "input_box.png",
         size = cc.size(174,40),
         font = UIKit:getFontFilePath(),
         listener = edit
@@ -110,7 +110,7 @@ function GameUIAlliancePosition:ctor()
     }):align(display.CENTER, 320, 140):addTo(body)
     local editbox_y = cc.ui.UIInput.new({
         UIInputType = 1,
-        image = "input_box_174X40.png",
+        image = "input_box.png",
         size = cc.size(174,40),
         font = UIKit:getEditBoxFont(),
         listener = edit

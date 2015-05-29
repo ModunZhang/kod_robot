@@ -103,7 +103,7 @@ function BelvedereEntity:GetEventPrefix()
 	elseif self:GetType() == self.ENTITY_TYPE.STRIKE_RETURN then
 		return string.format(_("返回中 (%s)"),self:GetDestinationLocation())
 	elseif self:GetType() == self.ENTITY_TYPE.SHIRNE then
-		return string.format(_("圣地战中 %s(%s)"),self:WithObject():Stage():GetDescStageName(),self:GetDestinationLocation())
+		return string.format(_("正在参加圣地战 %s(%s)"),self:WithObject():Stage():GetDescStageName(),self:GetDestinationLocation())
 	end
 end
 
@@ -153,8 +153,11 @@ function BelvedereEntity:GetDestinationLocation()
 	elseif self:GetType() == self.ENTITY_TYPE.HELPTO then
 		return self:WithObject().beHelpedPlayerData.location.x .. "," .. self:WithObject().beHelpedPlayerData.location.y
 	elseif self:GetType() == self.ENTITY_TYPE.SHIRNE then
-		local location =  self:FindShrinePlayerTroops().location
-		return location.x .. "," .. location.y
+		-- local location =  self:FindShrinePlayerTroops().location
+		-- return location.x .. "," .. location.y
+		local map_obj = Alliance_Manager:GetMyAlliance():GetAllianceShrine():GetShireObjectFromMap()
+		local x,y = map_obj:GetLogicPosition()
+		return string.format("%d,%d",x,y)
 	end
 end
 
@@ -170,8 +173,9 @@ function BelvedereEntity:GetDestinationLocationNotString()
 	elseif self:GetType() == self.ENTITY_TYPE.HELPTO then
 		return self:WithObject().beHelpedPlayerData.location
 	elseif self:GetType() == self.ENTITY_TYPE.SHIRNE then
-		local location =  self:FindShrinePlayerTroops().location
-		return location
+		local map_obj = Alliance_Manager:GetMyAlliance():GetAllianceShrine():GetShireObjectFromMap()
+		local x,y = map_obj:GetLogicPosition()
+		return {x = x,y = y}
 	end
 end
 

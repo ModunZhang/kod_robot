@@ -121,7 +121,7 @@ function WidgetSoldierInBattle:ctor(filename, options)
     :scale(frame_scale)
 
     if options.side == "blue" then
-        cc.ui.UIImage.new("title_blue_166x30.png")
+        display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(166,30), cc.rect(10,10,410,10))
             :addTo(self):align(display.LEFT_CENTER, 110, 105)
     elseif options.side == "red" then
         cc.ui.UIImage.new("title_red_166x30.png")

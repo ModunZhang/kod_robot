@@ -22,10 +22,10 @@ function MaterialDepotUpgradeBuilding:GetMaxDragonMaterial()
     local level = self:GetLevel()
     return level == 0 and 0 or config_function[level].maxDragonMaterial
 end
-function MaterialDepotUpgradeBuilding:GetMaxDragonEquipment()
-    local level = self:GetLevel()
-    return level == 0 and 0 or config_function[level].maxDragonEquipment
-end
+-- function MaterialDepotUpgradeBuilding:GetMaxDragonEquipment()
+--     local level = self:GetLevel()
+--     return level == 0 and 0 or config_function[level].maxDragonEquipment
+-- end
 return MaterialDepotUpgradeBuilding
 
 

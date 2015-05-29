@@ -34,10 +34,14 @@ function UIKit:CheckOpenUI(ui, isopen)
     local callbacks = self.open_ui_callbacks
     if #callbacks > 0 then
         if isopen then
-            ui.__type  = UIKit.UITYPE.BACKGROUND
-            ui:GetFteLayer()
+            local ui_name,callback = unpack(callbacks[1])
+            if ui_name == ui.__cname then
+                ui.__type = UIKit.UITYPE.BACKGROUND
+                ui:GetFteLayer()
+            end
         else
-            if callbacks[1](ui) then
+            local ui_name,callback = unpack(callbacks[1])
+            if callback(ui) then
                 table.remove(callbacks, 1)
             end
         end
@@ -49,12 +53,12 @@ function UIKit:PromiseOfOpen(ui_name)
     end
     self.open_ui_callbacks = {}
     local p = promise.new()
-    table.insert(self.open_ui_callbacks, function(ui)
+    table.insert(self.open_ui_callbacks, {ui_name, function(ui)
         if ui_name == ui.__cname then
             p:resolve(ui)
             return true
         end
-    end)
+    end})
     return p
 end
 function UIKit:CheckCloseUI(ui_name)
@@ -175,19 +179,21 @@ end
 function UIKit:getRegistry()
     return self.Registry
 end
-
+--[[
+不会关闭的界面:答题界面  联盟结算界面 网络相关的信息弹出框 联盟对战相关的弹出框
+--]]
 function UIKit:closeAllUI(force)
     if force then
         self.open_ui_callbacks = {}
         self.close_ui_callbacks = {}
     end
     for name,v in pairs(self:getRegistry().objects_) do
-        if v.__isBase and v.__type ~= self.UITYPE.BACKGROUND and v.__cname ~= 'GameUISelenaQuestion' then
+        if v.__isBase and v.__type ~= self.UITYPE.BACKGROUND and v.__cname ~= 'GameUISelenaQuestion'  and v.__cname ~= 'GameUIWarSummary' then
             v:LeftButtonClicked()
         end
     end
     for __,v in pairs(self.messageDialogs) do
-        if v:GetUserData() ~= '__key__dialog' then
+        if v:GetUserData() ~= '__key__dialog' and '__alliance_war_tips__' ~= v:GetUserData() then
             v:LeftButtonClicked()
         end
     end
@@ -365,10 +371,9 @@ function UIKit:CreateEventTitle(...)
     return node
 end
 
--- TODO: 玩家头像
 function UIKit:GetPlayerCommonIcon(key,isOnline)
     isOnline = type(isOnline) ~= 'boolean' and true or isOnline
-    local heroBg = isOnline and display.newSprite("chat_hero_background.png") or self:getDiscolorrationSprite("chat_hero_background.png")
+    local heroBg = isOnline and display.newSprite("dragon_bg_114x114.png") or self:getDiscolorrationSprite("dragon_bg_114x114.png")
     self:GetPlayerIconOnly(key,isOnline):addTo(heroBg)
         :align(display.CENTER,56,65)
     return heroBg
@@ -387,47 +392,24 @@ function UIKit:GetPlayerIconOnly(key,isOnline)
 end
 --TODO:将这个函数替换成CreateBoxPanel9来实现
 function UIKit:CreateBoxPanel(height)
-    local node = display.newNode()
-    local bottom = display.newSprite("alliance_box_bottom_552x12.png")
-        :addTo(node)
-        :align(display.LEFT_BOTTOM,0,0)
-    local top =  display.newSprite("alliance_box_top_552x12.png")
-    local middleHeight = height - bottom:getContentSize().height - top:getContentSize().height
-    local next_y = bottom:getContentSize().height
-    while middleHeight > 0 do
-        local middle = display.newSprite("alliance_box_middle_552x1.png")
-            :addTo(node)
-            :align(display.LEFT_BOTTOM,0, next_y)
-        middleHeight = middleHeight - middle:getContentSize().height
-        next_y = next_y + middle:getContentSize().height
-    end
-    top:addTo(node)
-        :align(display.LEFT_BOTTOM,0,next_y)
+    local node = self:CreateBoxPanel9({height = height})
     return node
-
 end
 
 function UIKit:CreateBoxPanel9(params)
-    local common_bg = display.newScale9Sprite("gray_box_574x102.png")
-    common_bg:setCapInsets(cc.rect(8,8,556,78))
+    local common_bg = WidgetUIBackGround.new({width = params.width and params.width or 552,height = params.height},WidgetUIBackGround.STYLE_TYPE.STYLE_3)
     common_bg:setAnchorPoint(cc.p(0,0))
-    common_bg:size(params.width and params.width or 552,params.height)
     return common_bg
 end
 
 
 function UIKit:CreateBoxWithoutContent(params)
-    if not params then
-        return display.newSprite("mission_box_558x66.png")
-    else
-        local sp = display.newScale9Sprite("mission_box_558x66.png")
-        sp:size(params.width or 558,params.height or 66)
-    end
+    local params = params or {}
+    return WidgetUIBackGround.new({width = params.width or 558,height = params.height or 66},WidgetUIBackGround.STYLE_TYPE.STYLE_4)
 end
 function UIKit:CreateBoxPanelWithBorder(params)
-    local node = display.newScale9Sprite("panel_556x120.png")
+    local node = WidgetUIBackGround.new({width = params.width or 556,height = params.height or 120},WidgetUIBackGround.STYLE_TYPE.STYLE_5)
     node:setAnchorPoint(cc.p(0,0))
-    node:size(params.width or 556,params.height or 120)
     return node
 end
 
@@ -441,20 +423,11 @@ end
 
 function UIKit:commonTitleBox(height)
     local node = display.newNode()
-    local bottom = display.newSprite("title_box_bottom_540x18.png")
-        :addTo(node)
-        :align(display.LEFT_BOTTOM,4,0)
-    local top =  display.newSprite("title_box_top_548x58.png")
-    local middleHeight = height - bottom:getContentSize().height - top:getContentSize().height
-    local next_y = bottom:getContentSize().height
-    while middleHeight > 0 do
-        local middle = display.newSprite("title_box_middle_540x1.png")
-            :addTo(node)
-            :align(display.LEFT_BOTTOM,4, next_y)
-        middleHeight = middleHeight - middle:getContentSize().height
-        next_y = next_y + middle:getContentSize().height
-    end
-    top:addTo(node):align(display.LEFT_BOTTOM,0,next_y)
+
+    local list_bg = display.newScale9Sprite("back_ground_540x64.png", 4, 0,cc.size(540, height - 50),cc.rect(10,10,520,44))
+        :align(display.LEFT_BOTTOM):addTo(node)
+    local title_bg = display.newSprite("alliance_evnets_title_548x50.png"):align(display.LEFT_BOTTOM, 0, height - 50):addTo(node)
+
     return node
 end
 
@@ -472,7 +445,6 @@ function UIKit:commonButtonWithBG(options)
         "red",
         "purple",
     }
-    -- display.newScale9Sprite("btn_bg_148x58.png",nil,nil,cc.size(options.w, options.h))
     local btn_bg = cc.ui.UIImage.new("btn_bg_148x58.png", {scale9 = true,
         capInsets = cc.rect(0, 0, 144 , 54)
     }):align(display.CENTER):setLayoutSize(options.w, options.h)
@@ -644,7 +616,7 @@ function UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_
         dialog:DisableAutoClose()
     end
     self:__addMessageDialogToCurrentScene(dialog)
-    dialog:zorder(3001)
+    dialog:zorder(4001)
     return dialog
 end
 
@@ -665,7 +637,7 @@ function UIKit:showMessageDialogWithParams(params)
     local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback,user_data):SetTitle(title):SetPopMessage(content):zorder(zorder)
 
     dialog:CreateOKButton({listener = ok_callback,btn_name = ok_string})
-    if cancel_callback then
+    if params.cancel_callback then
         dialog:CreateCancelButton({listener = cancel_callback,btn_name = _("取消")})
     end
     dialog:VisibleXButton(visible_x_button)
@@ -707,19 +679,31 @@ function UIKit:__addMessageDialogToCurrentScene(dialog)
 end
 
 function UIKit:getMessageDialogWillShow()
-    printLog("info", "getMessageDialogWillShow--->%s",self.willShowMessage_ or "nil")
+    -- printLog("info", "getMessageDialogWillShow--->%s",self.willShowMessage_ or "nil")
     return self.willShowMessage_
 end
 function UIKit:clearMessageDialogWillShow()
+    if self.willShowMessage_ then
+        local func = tolua.getcfunction(self.willShowMessage_, "release")
+        if func then
+            func(self)
+        end
+    end
     self.willShowMessage_ = nil
 end
 --如果是__key__dialog强制替换
 function UIKit:addMessageDialogWillShow(messageDialog)
+    local func = tolua.getcfunction(messageDialog, "retain")
+    if func then
+        func(self)
+    end
     if self.willShowMessage_ then
+        print("addMessageDialogWillShow----->1",tolua.type(messageDialog))
         if messageDialog:GetUserData() == '__key__dialog' then
             self.willShowMessage_ = messageDialog
         end
     else
+        print("addMessageDialogWillShow----->2",tolua.type(messageDialog),messageDialog.__cname,type(messageDialog.AddToScene))
         self.willShowMessage_ = messageDialog
     end
 end
@@ -875,6 +859,7 @@ function UIKit:GetItemImage(reward_type,item_key)
         end
     end
 end
+
 
 
 

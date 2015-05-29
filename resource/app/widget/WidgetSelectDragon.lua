@@ -2,6 +2,7 @@ local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetPushButton = import(".WidgetPushButton")
 local WidgetPopDialog = import(".WidgetPopDialog")
 local Localize = import("..utils.Localize")
+local UILib = import("..ui.UILib")
 
 local WidgetSelectDragon = class("WidgetSelectDragon", WidgetPopDialog)
 
@@ -16,10 +17,10 @@ function WidgetSelectDragon:ctor(params)
         local dragon_frame = display.newSprite("alliance_item_flag_box_126X126.png")
 
 
-        local dragon_bg = display.newSprite("chat_hero_background.png")
+        local dragon_bg = display.newSprite("dragon_bg_114x114.png")
             :align(display.LEFT_CENTER, 7,dragon_frame:getContentSize().height/2)
             :addTo(dragon_frame)
-        local dragon_img = display.newSprite(dragon:Type()..".png")
+        local dragon_img = display.newSprite(UILib.dragon_head[dragon:Type()])
             :align(display.CENTER, dragon_bg:getContentSize().width/2, dragon_bg:getContentSize().height/2+5)
             :addTo(dragon_bg)
         local box_bg = display.newSprite("box_426X126.png")
@@ -107,7 +108,7 @@ function WidgetSelectDragon:ctor(params)
 
 
     if #params.btns == 1 then
-        WidgetPushButton.new({normal = "yellow_btn_up_185x65.png",pressed = "yellow_btn_down_185x65.png"})
+        WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png"})
             :setButtonLabel(UIKit:ttfLabel({
                 text = params.btns[1].btn_label,
                 size = 24,
@@ -126,7 +127,7 @@ function WidgetSelectDragon:ctor(params)
                 end
             end):align(display.CENTER,rb_size.width/2,50):addTo(body)
     elseif #params.btns == 2 then
-        WidgetPushButton.new({normal = "yellow_button_146x42.png",pressed = "yellow_button_highlight_146x42.png"})
+        WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
             :setButtonLabel(UIKit:ttfLabel({
                 text = params.btns[1].btn_label,
                 size = 24,
@@ -145,7 +146,7 @@ function WidgetSelectDragon:ctor(params)
                 end
             end):align(display.CENTER,rb_size.width/2+150,50):addTo(body)
 
-        WidgetPushButton.new({normal = "red_button_146x42.png",pressed = "red_button_highlight_146x42.png"})
+        WidgetPushButton.new({normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"})
             :setButtonLabel(UIKit:ttfLabel({
                 text = params.btns[2].btn_label,
                 size = 24,

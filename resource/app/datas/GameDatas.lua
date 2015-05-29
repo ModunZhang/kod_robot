@@ -20,6 +20,8 @@ GameDatas.ClientInitGame = {
 	["alliance_name_adj"] = {},
 	["alliance_name_noun"] = {},
 	["alliance_name_fixed"] = {},
+	["pve_level"] = {},
+	["pve_wanted"] = {},
 }
 require("app.datas.ClientInitGame_ruins")
 require("app.datas.ClientInitGame_locations")
@@ -40,6 +42,8 @@ require("app.datas.ClientInitGame_alliance_name_single_name")
 require("app.datas.ClientInitGame_alliance_name_adj")
 require("app.datas.ClientInitGame_alliance_name_noun")
 require("app.datas.ClientInitGame_alliance_name_fixed")
+require("app.datas.ClientInitGame_pve_level")
+require("app.datas.ClientInitGame_pve_wanted")
 
 GameDatas.Activities = {
 	["day60"] = {},

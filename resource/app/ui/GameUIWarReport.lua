@@ -187,8 +187,8 @@ function GameUIWarReport:CreateBootyPart()
         local booty_item_bg_color_flag = true
         local added_booty_item_count = 0
         for k,booty_parms in pairs(self:GetBooty()) do
-            local booty_item_bg_image = booty_item_bg_color_flag and "upgrade_resources_background_3.png" or "upgrade_resources_background_2.png"
-            local booty_item_bg = display.newSprite(booty_item_bg_image)
+            local booty_item_bg_image = booty_item_bg_color_flag and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+            local booty_item_bg = display.newScale9Sprite(booty_item_bg_image):size(520,46)
                 :align(display.TOP_CENTER, booty_list_bg_size.width/2, booty_list_bg_size.height-item_height*added_booty_item_count-6)
                 :addTo(booty_list_bg,2)
             local booty_icon = display.newSprite(booty_parms.icon, 30, 23):addTo(booty_item_bg)
@@ -199,7 +199,7 @@ function GameUIWarReport:CreateBootyPart()
                 color = 0x403c2f
             }):align(display.LEFT_CENTER,80,23):addTo(booty_item_bg)
             UIKit:ttfLabel({
-                text = booty_parms.value,
+                text = string.formatnumberthousands(booty_parms.value),
                 size = 22,
                 color = booty_parms.value>0 and 0x288400 or 0x7e0000
             }):align(display.RIGHT_CENTER,booty_list_bg_size.width-30,23):addTo(booty_item_bg)
@@ -340,8 +340,6 @@ function GameUIWarReport:CreateArmyItem(title,troop,dragon,enemy_troop,round_dat
 
     local t_bg = display.newScale9Sprite(isSelf and "back_ground_blue_254x42.png" or "back_ground_red_254x42.png", 0, 0,cc.size(256,34),cc.rect(10,10,234,22))
         :align(display.CENTER_TOP,w/2, h):addTo(army_item)
-    -- local t_bg = display.newSprite("report_title_252X30.png"):align(display.CENTER_TOP, w/2, h-3)
-    --     :addTo(army_item)
     UIKit:ttfLabel({
         text = title ,
         size = 20,
@@ -349,7 +347,7 @@ function GameUIWarReport:CreateArmyItem(title,troop,dragon,enemy_troop,round_dat
     }):align(display.CENTER,t_bg:getContentSize().width/2, 17):addTo(t_bg)
 
     local function createInfoItem(params)
-        local item  = tolua.type(params.bg_image) == "string" and display.newSprite(params.bg_image) or params.bg_image
+        local item  = tolua.type(params.bg_image) == "string" and display.newScale9Sprite(params.bg_image,0,0,cc.size(254,28),cc.rect(10,10,528,20)) or params.bg_image
         local title = UIKit:ttfLabel({
             text = params.title ,
             size = params.size or 18,
@@ -390,22 +388,22 @@ function GameUIWarReport:CreateArmyItem(title,troop,dragon,enemy_troop,round_dat
 
         army_info = {
             {
-                bg_image = "back_ground_254x28_1.png",
+                bg_image = "back_ground_548x40_1.png",
                 title = _("部队"),
                 value = troopTotal,
             },
             {
-                bg_image = "back_ground_254x28_2.png",
+                bg_image = "back_ground_548x40_2.png",
                 title = _("存活"),
                 value = troopTotal-totalDamaged,
             },
             {
-                bg_image = "back_ground_254x28_1.png",
+                bg_image = "back_ground_548x40_1.png",
                 title = _("伤兵"),
                 value = totalWounded,
             },
             {
-                bg_image = "back_ground_254x28_2.png",
+                bg_image = "back_ground_548x40_2.png",
                 title = _("被消灭"),
                 value = totalDamaged - totalWounded,
                 color = 0x7e0000,
@@ -417,17 +415,17 @@ function GameUIWarReport:CreateArmyItem(title,troop,dragon,enemy_troop,round_dat
                 size = 20
             },
             {
-                bg_image = "back_ground_254x28_2.png",
+                bg_image = "back_ground_548x40_2.png",
                 title = _("Level"),
                 value = dragon.level,
             },
             {
-                bg_image = "back_ground_254x28_1.png",
+                bg_image = "back_ground_548x40_1.png",
                 title = _("XP"),
                 value = "+"..dragon.expAdd,
             },
             {
-                bg_image = "back_ground_254x28_2.png",
+                bg_image = "back_ground_548x40_2.png",
                 title = _("HP"),
                 value = dragon.hp.."/-"..dragon.hpDecreased,
             },
@@ -435,7 +433,7 @@ function GameUIWarReport:CreateArmyItem(title,troop,dragon,enemy_troop,round_dat
     else
         army_info = {
             {
-                bg_image = "back_ground_254x28_1.png",
+                bg_image = "back_ground_548x40_1.png",
                 title = _("无部队"),
             }
         }
@@ -609,14 +607,14 @@ function GameUIWarReport:CreateWallPart()
     -- 背景框
     local bg = self:CreateSmallBackGround({width=550,height=98})
 
-    local heroBg = display.newSprite("chat_hero_background.png"):align(display.CENTER,50,49):addTo(bg)
+    local heroBg = display.newSprite("dragon_bg_114x114.png"):align(display.CENTER,50,49):addTo(bg)
     heroBg:setScale(0.8)
     display.newSprite("icon_wall_83x103.png"):addTo(heroBg):align(display.LEFT_CENTER,22,50)
 
 
 
-    display.newScale9Sprite("back_ground_254x28_1.png",100, 73,cc.size(448,48),cc.rect(10,10,234,8)):addTo(bg):align(display.LEFT_CENTER)
-    display.newScale9Sprite("back_ground_254x28_2.png",100, 25,cc.size(448,48),cc.rect(10,10,234,8)):addTo(bg):align(display.LEFT_CENTER)
+    display.newScale9Sprite("back_ground_548x40_1.png",100, 73,cc.size(448,48),cc.rect(10,10,528,20)):addTo(bg):align(display.LEFT_CENTER)
+    display.newScale9Sprite("back_ground_548x40_2.png",100, 25,cc.size(448,48),cc.rect(10,10,528,20)):addTo(bg):align(display.LEFT_CENTER)
 
     UIKit:ttfLabel({
         text = _("城墙生命值") ,
@@ -655,16 +653,6 @@ end
 -- 创建 宽度为258的 UI框
 function GameUIWarReport:CreateSmallBackGround(params)
     local r_bg = display.newScale9Sprite("back_ground_258x90.png",0,0,cc.size(params.width or 258,params.height),cc.rect(10,10,238,70))
-    -- title bg
-    if title then
-        local t_bg = display.newSprite("report_title_252X30.png"):align(display.CENTER_TOP, 129, height-3):addTo(r_bg,2)
-        UIKit:ttfLabel({
-            text = title ,
-            size = 20,
-            color = 0xffedae
-        }):align(display.CENTER,t_bg:getContentSize().width/2, 15):addTo(t_bg)
-    end
-
     return r_bg
 end
 

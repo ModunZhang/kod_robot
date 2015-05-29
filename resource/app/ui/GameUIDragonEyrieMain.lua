@@ -212,7 +212,11 @@ function GameUIDragonEyrieMain:RefreshUI()
             self.dragon_hp_label:setString(dragon:Hp() .. "/" .. dragon:GetMaxHP())
             self.progress_hated:setPercentage(dragon:Hp()/dragon:GetMaxHP()*100)
             self.state_label:setString(Localize.dragon_status[dragon:Status()])
-            self.state_label:setColor(dragon:IsDefenced() and UIKit:hex2c3b(0x7e0000) or UIKit:hex2c3b(0x07862b))
+            if dragon:IsDefenced() or dragon:IsFree() then
+                self.state_label:setColor(UIKit:hex2c3b(0x07862b))
+            else
+                self.state_label:setColor(UIKit:hex2c3b(0x7e0000))
+            end
             self.death_speed_button:hide()
             self.progress_content_death:hide()
         end
@@ -300,7 +304,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
             size = 20,
             align = cc.TEXT_ALIGNMENT_CENTER,
         }):align(display.CENTER_BOTTOM, 145, 20):addTo(info_bg)
-        local expIcon = display.newSprite("dragonskill_xp_51x63.png")
+        local expIcon = display.newSprite("upgrade_experience_icon.png")
             :addTo(info_bg)
             :scale(0.7)
             :align(display.BOTTOM_RIGHT, self.draong_info_xp_label:getPositionX() - self.draong_info_xp_label:getContentSize().width/2 - 10,10)
@@ -547,7 +551,7 @@ function GameUIDragonEyrieMain:CreateDragonScrollNode()
         local dragon_armature = DragonSprite.new(display.getRunningScene():GetSceneLayer(),dragon:GetTerrain())
             :addTo(v)
             :pos(240,440)
-            :hide()
+            :hide():scale(0.9)
         v.armature = dragon_armature
         dragon_armature:GetSprite():getAnimation():stop()
         if dragon:Ishated() then

@@ -225,8 +225,8 @@ function GameUISelenaQuestion:GetWelcomeLayer(welcome_ui_type)
 		lineHeight = 36,
 	}):align(display.LEFT_TOP, 22, 280):addTo(layer)
 	local button = WidgetPushButton.new({
-		normal = "yellow_btn_up_185x65.png",
-		pressed = "yellow_btn_down_185x65.png"
+		normal = "yellow_btn_up_186x66.png",
+		pressed = "yellow_btn_down_186x66.png"
 		})
 		:addTo(layer)
 		:pos(304,50)

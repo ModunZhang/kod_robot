@@ -105,13 +105,13 @@ function WidgetPlayerNode:GetMedalItemNode(basic_data)
 	local content = self:GetBoxNodeWithTitle(_("勋章")):addTo(node):align(display.LEFT_BOTTOM,(self:GetSize().width - 556)/2,0)
 	local x,y,margin = 15,5,145
 	for i=1,4 do
-		local button = WidgetPushButton.new({normal = "player_medel_bg_92x108.png"})
+		local button = WidgetPushButton.new({normal = "box_buff_1.png"})
 			:align(display.LEFT_BOTTOM, x + (i -1) * margin, 5):addTo(content)
 			:onButtonClicked(function()
 				if self:CallDelegate_(DELEGATE_METHODS.PlayerCanClickedButton,{"Medal",i}) then 
 					self:CallDelegate_(DELEGATE_METHODS.OnMedalButtonClicked,{i})
 				end
-			end)
+			end):scale(108/160)
 		if data_source[i] then
 			display.newSprite(data_source[i], 46, 54):addTo(button)
 		end
@@ -134,7 +134,7 @@ function WidgetPlayerNode:GetBasicInfoItemNode(basic_data)
 		:addTo(node,-1)
 	UIKit:GetPlayerIconOnly(data_source.playerIcon):addTo(icon_bg):pos(60,70):scale(0.8)
 	if self:CallDelegate_(DELEGATE_METHODS.PlayerCanClickedButton,{"PlayerIcon"}) then
-		display.newSprite("draong_eq_i_25x25.png"):align(display.LEFT_BOTTOM, icon_bg:getPositionX()+8, icon_bg:getPositionY()+14):addTo(node)
+		display.newSprite("goods_26x26.png"):align(display.LEFT_BOTTOM, icon_bg:getPositionX()+8, icon_bg:getPositionY()+14):addTo(node)
 		WidgetPushTransparentButton.new(cc.rect(0,0,120,175))
         :align(display.LEFT_BOTTOM,0,0)
         :addTo(vip_bg)
@@ -233,7 +233,7 @@ function WidgetPlayerNode:BuildDataItemNode(data_list_data)
 	local data_list_data = data_list_data or self:CallDelegate_(DELEGATE_METHODS.DataSource,{"DataInfoData"})
 	local item = self:GetListView():newItem()
 	if #data_list_data == 0 then return end
-	local box_height = #data_list_data * 48 + 64
+	local box_height = #data_list_data * 48 + 66
 	local node = display.newNode():size(self:GetSize().width,box_height)
 	local data_panel = UIKit:commonTitleBox(box_height):addTo(node):pos((self:GetSize().width - 540)/2,0) --width:540
 	UIKit:ttfLabel({
@@ -243,8 +243,8 @@ function WidgetPlayerNode:BuildDataItemNode(data_list_data)
 	}):align(display.CENTER_TOP,270,box_height - 12):addTo(data_panel)
 	local x,y = 14,10
 	for i,v in ipairs(data_list_data) do
-		local image_name = string.format("box_bg_item_520x48_%d.png",i % 2)
-		local bg = display.newSprite(image_name):align(display.LEFT_BOTTOM, x, y + (i - 1) * 48):addTo(data_panel)
+		local image_name = string.format("back_ground_548x40_%d.png",i % 2 == 0 and 1 or 2)
+		local bg = display.newScale9Sprite(image_name):align(display.LEFT_BOTTOM, x, y + (i - 1) * 48):addTo(data_panel):size(520,48)
 		UIKit:ttfLabel({
 			text = data_list_data[i][1],
 			color= 0x615b44,

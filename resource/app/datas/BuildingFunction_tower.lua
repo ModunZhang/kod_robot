@@ -11,7 +11,7 @@ tower[1] = {
 }
 tower[2] = {
 	["level"] = 2,
-	["power"] = 50,
+	["power"] = 30,
 	["infantry"] = 12,
 	["archer"] = 12,
 	["cavalry"] = 12,
@@ -20,7 +20,7 @@ tower[2] = {
 }
 tower[3] = {
 	["level"] = 3,
-	["power"] = 75,
+	["power"] = 35,
 	["infantry"] = 13,
 	["archer"] = 13,
 	["cavalry"] = 13,
@@ -29,7 +29,7 @@ tower[3] = {
 }
 tower[4] = {
 	["level"] = 4,
-	["power"] = 100,
+	["power"] = 40,
 	["infantry"] = 14,
 	["archer"] = 14,
 	["cavalry"] = 14,
@@ -38,7 +38,7 @@ tower[4] = {
 }
 tower[5] = {
 	["level"] = 5,
-	["power"] = 125,
+	["power"] = 50,
 	["infantry"] = 15,
 	["archer"] = 15,
 	["cavalry"] = 15,
@@ -47,7 +47,7 @@ tower[5] = {
 }
 tower[6] = {
 	["level"] = 6,
-	["power"] = 150,
+	["power"] = 60,
 	["infantry"] = 16,
 	["archer"] = 16,
 	["cavalry"] = 16,
@@ -56,7 +56,7 @@ tower[6] = {
 }
 tower[7] = {
 	["level"] = 7,
-	["power"] = 175,
+	["power"] = 80,
 	["infantry"] = 17,
 	["archer"] = 17,
 	["cavalry"] = 17,
@@ -65,7 +65,7 @@ tower[7] = {
 }
 tower[8] = {
 	["level"] = 8,
-	["power"] = 200,
+	["power"] = 130,
 	["infantry"] = 18,
 	["archer"] = 18,
 	["cavalry"] = 18,
@@ -74,7 +74,7 @@ tower[8] = {
 }
 tower[9] = {
 	["level"] = 9,
-	["power"] = 225,
+	["power"] = 270,
 	["infantry"] = 19,
 	["archer"] = 19,
 	["cavalry"] = 19,
@@ -83,7 +83,7 @@ tower[9] = {
 }
 tower[10] = {
 	["level"] = 10,
-	["power"] = 250,
+	["power"] = 400,
 	["infantry"] = 20,
 	["archer"] = 20,
 	["cavalry"] = 20,
@@ -92,7 +92,7 @@ tower[10] = {
 }
 tower[11] = {
 	["level"] = 11,
-	["power"] = 375,
+	["power"] = 550,
 	["infantry"] = 21,
 	["archer"] = 21,
 	["cavalry"] = 21,
@@ -101,7 +101,7 @@ tower[11] = {
 }
 tower[12] = {
 	["level"] = 12,
-	["power"] = 500,
+	["power"] = 690,
 	["infantry"] = 22,
 	["archer"] = 22,
 	["cavalry"] = 22,
@@ -110,7 +110,7 @@ tower[12] = {
 }
 tower[13] = {
 	["level"] = 13,
-	["power"] = 750,
+	["power"] = 900,
 	["infantry"] = 23,
 	["archer"] = 23,
 	["cavalry"] = 23,
@@ -119,7 +119,7 @@ tower[13] = {
 }
 tower[14] = {
 	["level"] = 14,
-	["power"] = 1000,
+	["power"] = 1810,
 	["infantry"] = 24,
 	["archer"] = 24,
 	["cavalry"] = 24,
@@ -128,7 +128,7 @@ tower[14] = {
 }
 tower[15] = {
 	["level"] = 15,
-	["power"] = 1500,
+	["power"] = 2820,
 	["infantry"] = 25,
 	["archer"] = 25,
 	["cavalry"] = 25,
@@ -137,7 +137,7 @@ tower[15] = {
 }
 tower[16] = {
 	["level"] = 16,
-	["power"] = 2000,
+	["power"] = 3900,
 	["infantry"] = 26,
 	["archer"] = 26,
 	["cavalry"] = 26,
@@ -146,7 +146,7 @@ tower[16] = {
 }
 tower[17] = {
 	["level"] = 17,
-	["power"] = 2500,
+	["power"] = 5690,
 	["infantry"] = 27,
 	["archer"] = 27,
 	["cavalry"] = 27,
@@ -155,7 +155,7 @@ tower[17] = {
 }
 tower[18] = {
 	["level"] = 18,
-	["power"] = 3000,
+	["power"] = 7000,
 	["infantry"] = 28,
 	["archer"] = 28,
 	["cavalry"] = 28,
@@ -164,7 +164,7 @@ tower[18] = {
 }
 tower[19] = {
 	["level"] = 19,
-	["power"] = 3500,
+	["power"] = 8550,
 	["infantry"] = 29,
 	["archer"] = 29,
 	["cavalry"] = 29,
@@ -173,7 +173,7 @@ tower[19] = {
 }
 tower[20] = {
 	["level"] = 20,
-	["power"] = 4000,
+	["power"] = 10030,
 	["infantry"] = 30,
 	["archer"] = 30,
 	["cavalry"] = 30,
@@ -182,7 +182,7 @@ tower[20] = {
 }
 tower[21] = {
 	["level"] = 21,
-	["power"] = 4500,
+	["power"] = 13620,
 	["infantry"] = 31,
 	["archer"] = 31,
 	["cavalry"] = 31,
@@ -191,7 +191,7 @@ tower[21] = {
 }
 tower[22] = {
 	["level"] = 22,
-	["power"] = 6750,
+	["power"] = 15610,
 	["infantry"] = 32,
 	["archer"] = 32,
 	["cavalry"] = 32,
@@ -200,7 +200,7 @@ tower[22] = {
 }
 tower[23] = {
 	["level"] = 23,
-	["power"] = 9000,
+	["power"] = 18010,
 	["infantry"] = 33,
 	["archer"] = 33,
 	["cavalry"] = 33,
@@ -209,7 +209,7 @@ tower[23] = {
 }
 tower[24] = {
 	["level"] = 24,
-	["power"] = 11250,
+	["power"] = 20270,
 	["infantry"] = 34,
 	["archer"] = 34,
 	["cavalry"] = 34,
@@ -218,7 +218,7 @@ tower[24] = {
 }
 tower[25] = {
 	["level"] = 25,
-	["power"] = 15000,
+	["power"] = 27680,
 	["infantry"] = 35,
 	["archer"] = 35,
 	["cavalry"] = 35,
@@ -227,7 +227,7 @@ tower[25] = {
 }
 tower[26] = {
 	["level"] = 26,
-	["power"] = 22500,
+	["power"] = 30900,
 	["infantry"] = 36,
 	["archer"] = 36,
 	["cavalry"] = 36,
@@ -236,7 +236,7 @@ tower[26] = {
 }
 tower[27] = {
 	["level"] = 27,
-	["power"] = 30000,
+	["power"] = 34760,
 	["infantry"] = 37,
 	["archer"] = 37,
 	["cavalry"] = 37,
@@ -245,7 +245,7 @@ tower[27] = {
 }
 tower[28] = {
 	["level"] = 28,
-	["power"] = 40000,
+	["power"] = 38410,
 	["infantry"] = 38,
 	["archer"] = 38,
 	["cavalry"] = 38,
@@ -254,7 +254,7 @@ tower[28] = {
 }
 tower[29] = {
 	["level"] = 29,
-	["power"] = 50000,
+	["power"] = 54660,
 	["infantry"] = 39,
 	["archer"] = 39,
 	["cavalry"] = 39,
@@ -263,7 +263,7 @@ tower[29] = {
 }
 tower[30] = {
 	["level"] = 30,
-	["power"] = 60000,
+	["power"] = 63090,
 	["infantry"] = 40,
 	["archer"] = 40,
 	["cavalry"] = 40,
@@ -272,7 +272,7 @@ tower[30] = {
 }
 tower[31] = {
 	["level"] = 31,
-	["power"] = 70000,
+	["power"] = 72870,
 	["infantry"] = 41,
 	["archer"] = 41,
 	["cavalry"] = 41,
@@ -281,7 +281,7 @@ tower[31] = {
 }
 tower[32] = {
 	["level"] = 32,
-	["power"] = 80000,
+	["power"] = 82670,
 	["infantry"] = 42,
 	["archer"] = 42,
 	["cavalry"] = 42,
@@ -290,7 +290,7 @@ tower[32] = {
 }
 tower[33] = {
 	["level"] = 33,
-	["power"] = 90000,
+	["power"] = 113160,
 	["infantry"] = 43,
 	["archer"] = 43,
 	["cavalry"] = 43,
@@ -299,7 +299,7 @@ tower[33] = {
 }
 tower[34] = {
 	["level"] = 34,
-	["power"] = 100000,
+	["power"] = 127150,
 	["infantry"] = 44,
 	["archer"] = 44,
 	["cavalry"] = 44,
@@ -308,7 +308,7 @@ tower[34] = {
 }
 tower[35] = {
 	["level"] = 35,
-	["power"] = 110000,
+	["power"] = 143220,
 	["infantry"] = 45,
 	["archer"] = 45,
 	["cavalry"] = 45,
@@ -317,7 +317,7 @@ tower[35] = {
 }
 tower[36] = {
 	["level"] = 36,
-	["power"] = 125000,
+	["power"] = 159400,
 	["infantry"] = 46,
 	["archer"] = 46,
 	["cavalry"] = 46,
@@ -326,7 +326,7 @@ tower[36] = {
 }
 tower[37] = {
 	["level"] = 37,
-	["power"] = 140000,
+	["power"] = 214360,
 	["infantry"] = 47,
 	["archer"] = 47,
 	["cavalry"] = 47,
@@ -335,7 +335,7 @@ tower[37] = {
 }
 tower[38] = {
 	["level"] = 38,
-	["power"] = 155000,
+	["power"] = 237130,
 	["infantry"] = 48,
 	["archer"] = 48,
 	["cavalry"] = 48,
@@ -344,7 +344,7 @@ tower[38] = {
 }
 tower[39] = {
 	["level"] = 39,
-	["power"] = 170000,
+	["power"] = 262890,
 	["infantry"] = 49,
 	["archer"] = 49,
 	["cavalry"] = 49,
@@ -353,7 +353,7 @@ tower[39] = {
 }
 tower[40] = {
 	["level"] = 40,
-	["power"] = 225000,
+	["power"] = 289160,
 	["infantry"] = 50,
 	["archer"] = 50,
 	["cavalry"] = 50,

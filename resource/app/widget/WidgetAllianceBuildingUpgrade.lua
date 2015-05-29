@@ -29,7 +29,7 @@ end
 -- Node Event
 function WidgetAllianceBuildingUpgrade:onEnter()
     -- building level
-    local level_bg = display.newSprite("upgrade_level_bg.png", display.cx+80, display.top-125):addTo(self)
+    local level_bg = display.newScale9Sprite("title_blue_430x30.png",display.cx+80, display.top-125, cc.size(390,30), cc.rect(10,10,410,10)):addTo(self)
     self.builging_level = UIKit:ttfLabel({
         font = UIKit:getFontFilePath(),
         size = 26,
@@ -38,10 +38,9 @@ function WidgetAllianceBuildingUpgrade:onEnter()
     }):align(display.LEFT_CENTER, 20, level_bg:getContentSize().height/2)
         :addTo(level_bg)
     -- 建筑功能介绍
-    -- 建筑图片 放置区域左右边框
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.CENTER, display.cx-250, display.top-175)
-        :addTo(self):setFlippedX(true)
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.CENTER, display.cx-145, display.top-175)
+    display.newSprite("alliance_item_flag_box_126X126.png")
+        :align(display.LEFT_CENTER, display.cx-268, display.top-175)
+        :scale(136/126)
         :addTo(self)
 
     self.building_info_btn = WidgetPushButton.new({normal = UIKit:getImageByBuildingType( self.building.name ,1),
@@ -71,7 +70,7 @@ function WidgetAllianceBuildingUpgrade:onEnter()
             listener = function ()
                 local err = self:IsAbleToUpgrade()
                 if err then
-                    UIKit:showMessageDialog(_("陛下"),ERR_MESSAGE[err])
+                    UIKit:showMessageDialog(_("主人"),ERR_MESSAGE[err])
                 else
                     NetManager:getUpgradeAllianceBuildingPromise(self.building.name)
                 end
@@ -131,11 +130,11 @@ function WidgetAllianceBuildingUpgrade:InitNextLevelEfficiency()
     self:SetUpgradeEfficiency()
 end
 function WidgetAllianceBuildingUpgrade:SetBuildingLevel()
-    self.builging_level:setString(_("等级").." ".. self.building.level)
+    self.builging_level:setString( string.format( _("等级 %d"), self.building.level ) )
     if #self.building_config == self.building.level then
         self.next_level:setString(_("等级已满"))
     else
-        self.next_level:setString(_("等级") .. " ".. self.building.level+1)
+        self.next_level:setString( string.format( _("等级 %d"), self.building.level+1 ) )
     end
 end
 
@@ -157,7 +156,7 @@ function WidgetAllianceBuildingUpgrade:SetUpgradeEfficiency()
         elseif building.name == "orderHall" then
             efficiency = _("各类型的村落个数+1")
         else
-            efficiency = "本地化缺失" .. building.name
+            efficiency = string.format( "本地化缺失%s", building.name )
         end
     end
 
@@ -184,7 +183,7 @@ function WidgetAllianceBuildingUpgrade:InitRequirement()
             isVisible = true,
             isSatisfy = alliance:GetSelf():CanUpgradeAllianceBuilding() ,
             icon="alliance_item_leader_39x39.png",
-            description= _("职位大于等于")..Localize.alliance_title.quartermaster},
+            description= string.format( _("职位大于等于%s"), Localize.alliance_title.quartermaster )},
     }
     if not self.requirement_listview then
         self.requirement_listview = WidgetRequirementListview.new({

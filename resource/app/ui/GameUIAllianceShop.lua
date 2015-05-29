@@ -132,7 +132,7 @@ function GameUIAllianceShop:HonourAndLoyalty()
     display.newSprite("honour_128x128.png"):addTo(bg):align(display.LEFT_CENTER, -10, bg:getContentSize().height/2):scale(0.3)
     -- 荣耀值
     local honour_label = UIKit:ttfLabel({
-        text = string.formatnumberthousands(self.alliance:Honour()),
+        text = GameUtils:formatNumber(self.alliance:Honour()),
         size = 20,
         color = 0x615b44
     }):addTo(bg):align(display.CENTER, bg:getContentSize().width/2 , bg:getContentSize().height/2)
@@ -148,7 +148,7 @@ function GameUIAllianceShop:HonourAndLoyalty()
     }):addTo(node):align(display.RIGHT_CENTER, bg:getPositionX() - bg:getContentSize().width - 20 , 17)
     -- 荣耀值
     local loyalty_label = UIKit:ttfLabel({
-        text = string.formatnumberthousands(User:Loyalty()),
+        text = GameUtils:formatNumber(User:Loyalty()),
         size = 20,
         color = 0x615b44
     }):addTo(bg):align(display.CENTER, bg:getContentSize().width/2 , bg:getContentSize().height/2)
@@ -181,7 +181,7 @@ function GameUIAllianceShop:InitGoodsPart()
     -- 普通道具
     -- title
     local title_item = __createListItem(list_width,50)
-    local title_bg = display.newSprite("title_blue_558x34.png")
+    local title_bg = display.newSprite("title_blue_554x34.png")
     UIKit:ttfLabel({
         text = _("普通道具"),
         size = 22,
@@ -288,7 +288,7 @@ function GameUIAllianceShop:CreateGoodsBox(goods)
         end
     end
 
-    local num_bg = display.newSprite("back_ground_118x36.png"):align(display.BOTTOM_CENTER, 0, -76)
+    local num_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(118,36),cc.rect(15,10,136,64)):align(display.BOTTOM_CENTER, 0, -76)
         :addTo(box_button)
     display.newSprite("loyalty_128x128.png"):align(display.CENTER, 24, num_bg:getContentSize().height/2-2):addTo(num_bg):scale(34/128)
     UIKit:ttfLabel({
@@ -324,7 +324,7 @@ function GameUIAllianceShop:CreateStockGoodsBox(goods)
         shadow = true
     }):align(display.CENTER, own_bg:getContentSize().width/2, own_bg:getContentSize().height/2+8):addTo(own_bg)
 
-    local num_bg = display.newSprite("back_ground_118x36.png"):align(display.BOTTOM_CENTER, 0, -76)
+    local num_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(118,36),cc.rect(15,10,136,64)):align(display.BOTTOM_CENTER, 0, -76)
         :addTo(box_button)
     display.newSprite("honour_128x128.png"):align(display.CENTER, 24, num_bg:getContentSize().height/2-2):addTo(num_bg):scale(34/128)
     UIKit:ttfLabel({
@@ -534,7 +534,7 @@ function GameUIAllianceShop:OnAllianceInfoChanged()
     self.honourAndLoyalty:SetLoyalty(User:Loyalty())
 end
 function GameUIAllianceShop:OnAllianceBasicChanged(alliance,changed_map)
-    if changed_map.honour then
+    if changed_map.honour and self.honourAndLoyalty then
         self.honourAndLoyalty:SetHonour(alliance:Honour())
     end
 end

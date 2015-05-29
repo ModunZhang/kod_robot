@@ -117,7 +117,7 @@ local map_resource = {
     ironSmelting = {RESOURCE_TYPE.IRON,RESOURCE_BUFF_TYPE.PRODUCT},
     cropResearch = {RESOURCE_TYPE.FOOD,RESOURCE_BUFF_TYPE.PRODUCT},
     fastFix = {RESOURCE_TYPE.WALLHP,RESOURCE_BUFF_TYPE.PRODUCT},
-    beerSupply = {RESOURCE_TYPE.POPULATION,RESOURCE_BUFF_TYPE.LIMIT},
+    beerSupply = {RESOURCE_TYPE.CITIZEN,RESOURCE_BUFF_TYPE.LIMIT},
 }
 function ProductionTechnology:GetResourceBuffData()
     if map_resource[self:Name()] then

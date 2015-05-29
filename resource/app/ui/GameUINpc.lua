@@ -73,7 +73,6 @@ local function mark_key_word(s, e, key_word, keyword_map)
 end
 function GameUINpc:ctor(...)
     GameUINpc.super.ctor(self)
-    self.touch_action_node = display.newNode():addTo(self)
     self.btn = cc.ui.UIPushButton.new({normal = "+_red.png",pressed = "+_red.png"}, nil, {})
         :setButtonSize(display.width,display.height):align(display.LEFT_BOTTOM)
         :addTo(self):setOpacity(0)
@@ -129,9 +128,7 @@ function GameUINpc:OnMoveInStage()
     GameUINpc.super.OnMoveInStage(self)
     self:setLocalZOrder(3001)
     self.ui_map = self:BuildUI()
-    if self.is_should_start then
-        self:StartDialog()
-    end
+    self:StartDialog()
     self:RefreshNpc(self:CurrentDialog())
     self.btn:onButtonClicked(function()
         self:OnClick()
@@ -170,7 +167,6 @@ function GameUINpc:ShowWords(dialog, ani)
         self.label:removeFromParent()
         self.label = nil
     end
-    self.ui_map.background:FocusOnRect(dialog.rect)
     if self.npc_brow ~= dialog.brow then
         self.npc_brow = dialog.brow
         if self.npc_brow then
@@ -186,10 +182,6 @@ function GameUINpc:ShowWords(dialog, ani)
     self:hide_letter(self.label)
     self:show_letter(self.label, ani == nil and true or ani)
 end
-function GameUINpc:ResetClick()
-    self.touch_action_node:stopAllActions()
-    self.touch_action_node:performWithDelay(function()end, 0.1)
-end
 function GameUINpc:RefreshNpc(dialog)
     if dialog.npc == "man" then
         self.ui_map.man:show()
@@ -200,7 +192,6 @@ function GameUINpc:RefreshNpc(dialog)
     end
 end
 function GameUINpc:Reset()
-    self:ResetClick()
     self.dialog = {}
     self.dialog_index = 1
     self.dialog_index_callbacks = {}
@@ -226,10 +217,8 @@ end
 function GameUINpc:OnDialogClicked(index)
     local callbacks = self.dialog_clicked_callbacks[index]
     if callbacks and #callbacks > 0 then
-        callbacks[1]()
-        table.remove(callbacks, 1)
+        table.remove(callbacks, 1)()
     end
-    self:ResetClick()
 end
 function GameUINpc:PromiseOfDialogEndWithClicked(index)
     local p = promise.new()
@@ -241,12 +230,13 @@ function GameUINpc:PromiseOfDialogEndWithClicked(index)
     return p
 end
 function GameUINpc:OnDialogEnded(index)
+    if type(self.dialog[index].callback) == "function" then
+        self.dialog[index].callback(self)
+    end
     local callbacks = self.dialog_index_callbacks[index]
     if callbacks and #callbacks > 0 then
-        callbacks[1]()
-        table.remove(callbacks, 1)
+        table.remove(callbacks, 1)()
     end
-    self:ResetClick()
 end
 function GameUINpc:PromiseOfDialogEnded(index)
     local p = promise.new()
@@ -266,7 +256,6 @@ function GameUINpc:PromiseOfSay(...)
         instance:StartDialog()
     else
         instance = UIKit:newGameUI('GameUINpc', ...):AddToCurrentScene(true)
-        instance.is_should_start = true
     end
     return instance:PromiseOfDialogEndWithClicked(#{...})
 end

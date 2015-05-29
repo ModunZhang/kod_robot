@@ -43,10 +43,9 @@ function WidgetPVEDialog:Refresh()
     local size = self:GetBody():getContentSize()
     local w,h = size.width, size.height
     local dialog = self.dialog
-    -- 建筑图片 放置区域左右边框
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.LEFT_CENTER, 50, h*0.5 + 20)
-        :addTo(dialog):flipX(true)
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.RIGHT_CENTER, 50 + 133, h*0.5 + 20)
+    display.newSprite("alliance_item_flag_box_126X126.png")
+        :align(display.LEFT_CENTER, 50, h*0.5 + 20)
+        :scale(136/126)
         :addTo(dialog)
     local type_,image,s = self:GetIcon()
     if type_ == "image" then
@@ -56,7 +55,8 @@ function WidgetPVEDialog:Refresh()
     end
 
     --
-    local level_bg = display.newSprite("back_ground_138x34.png")
+    --
+    local level_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(138,34),cc.rect(15,10,136,64))
         :addTo(dialog):pos(50 + 133 * 0.5, h*0.5 - 80)
     local size = level_bg:getContentSize()
     UIKit:ttfLabel({
@@ -64,6 +64,23 @@ function WidgetPVEDialog:Refresh()
         size = 20,
         color = 0x514d3e,
     }):addTo(level_bg):align(display.CENTER, size.width/2 , size.height/2)
+
+    level_bg:setVisible(not self:GetObject():IsAttackAble())
+
+
+    if self:GetObject():IsAttackAble() then
+        local flag = display.newNode():addTo(dialog):pos(50 + 133 * 0.5, h*0.5 - 80)
+        flag:setVisible(self:GetObject():Total() > 0)
+
+        local sx,ex = -40,40
+        local searched_png = "pve_icon_searched.png"
+        local un_searched_png = "pve_icon_floor.png"
+        for i = 1, self:GetObject():Total() do
+            display.newSprite(self:GetObject():Searched() >= i and searched_png or un_searched_png)
+                :addTo(flag):pos((ex - sx) / (self:GetObject():Total() - 1) * (i - 1) + sx, 0)
+        end
+    end
+
 
     --
     UIKit:ttfLabel({
@@ -113,7 +130,7 @@ function WidgetPVEDialog:GetBrief()
         return _("未探索")
     elseif self:GetObject():IsSearched() then
         return _("已探索")
-    else 
+    else
         return string.format(_("剩余层数:%d"),self:GetObject():Left())
     end
 end
@@ -201,6 +218,7 @@ function WidgetPVEDialog:Fight()
                 self:GetObject():GetMap():Terrain(), self:GetTitle()
             )
 
+
             if report:IsAttackWin() then
                 local rollback = self:Search()
                 local rewards
@@ -218,6 +236,9 @@ function WidgetPVEDialog:Fight()
                             GameGlobalUI:showTips(_("获得奖励"), rewards)
                         end
                     end):AddToCurrentScene(true)
+
+                    self:CheckPveTask(report)
+
                 end):fail(function()
                     rollback()
                 end)
@@ -227,14 +248,32 @@ function WidgetPVEDialog:Fight()
                     self.user:EncodePveDataAndResetFightRewardsData()
                 ):done(function()
                     UIKit:newGameUI("GameUIReplayNew", report):AddToCurrentScene(true)
+
+                    self:CheckPveTask(report)
+
                 end)
             end
         end):AddToCurrentScene(true)
 end
 
+function WidgetPVEDialog:CheckPveTask(report)
+    local target,ok = self.user:GetPVEDatabase():GetTarget()
+    if ok and target.target > target.count then
+        for i,v in ipairs(report:GetDefenceKDA().soldiers) do
+            if v.name == target.name then
+                self.user:GetPVEDatabase():IncKillCount(v.damagedCount)
+                break
+            end
+        end
+    end
+    self:getParent():GetHomePage().event_tab:PromiseOfSwitch()
+end
+
 
 
 return WidgetPVEDialog
+
+
 
 
 

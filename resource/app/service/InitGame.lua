@@ -17,6 +17,8 @@ return function(userData)
     ItemManager = ItemManager_.new()
     Alliance_Manager = AllianceManager_.new()
     if GLOBAL_FTE then
+        DataManager:getFteData().basicInfo.name = userData.basicInfo.name
+        DataManager:getFteData().basicInfo.terrain = userData.basicInfo.terrain
         User = User_.new(initData._id)
         City = City_.new(User):InitWithJsonData(initData)
         DataManager:setFteUserDeltaData()
@@ -31,11 +33,6 @@ return function(userData)
     timer:AddListener(ItemManager)
     timer:AddListener(Alliance_Manager)
     timer:Start()
-
-
-    if not GLOBAL_FTE then
-        app:GetChatManager():FetchAllChatMessageFromServer()
-    end
 
     if ext.gamecenter.isGameCenterEnabled() and not ext.gamecenter.isAuthenticated() then
          ext.gamecenter.authenticate(false)

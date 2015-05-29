@@ -33,7 +33,8 @@ function GameUIAllianceCityEnter:GetLevelLabelText()
 end
 
 function GameUIAllianceCityEnter:GetProcessLabelText()
-    return self:GetMember():WallHp() .. "/" .. config_wall[self:GetMember():WallLevel()].wallHp
+    -- return self:GetMember():WallHp() .. "/" .. config_wall[self:GetMember():WallLevel()].wallHp
+    return ""
 end
 function GameUIAllianceCityEnter:GetCurrentAlliance()
     return self.isMyAlliance and self:GetMyAlliance() or self:GetEnemyAlliance()
@@ -41,7 +42,16 @@ end
 
 function GameUIAllianceCityEnter:onEnter()
     GameUIAllianceCityEnter.super.onEnter(self)
+    self:GetProgressTimer():setPercentage(0)
     Alliance_Manager:GetMyAlliance():AddListenOnType(self,Alliance.LISTEN_TYPE.BASIC)
+    NetManager:getPlayerWallInfoPromise(self:GetMember():Id()):done(function(response)
+        if response.msg.wallInfo then
+            local current_wall_hp = response.msg.wallInfo.wallHp
+            local maxWallHp = config_wall[response.msg.wallInfo.wallLevel].wallHp
+            self:GetProgressTimer():setPercentage(current_wall_hp/maxWallHp*100)
+            self:GetProcessLabel():setString(string.format("%d/%d",current_wall_hp,maxWallHp))
+        end
+    end)
 end
 function GameUIAllianceCityEnter:onExit()
     Alliance_Manager:GetMyAlliance():RemoveListenerOnType(self,Alliance.LISTEN_TYPE.BASIC)
@@ -53,14 +63,6 @@ function GameUIAllianceCityEnter:OnAllianceBasicChanged( alliance,changed_map )
         self:GetEnterButtonByIndex(2):setButtonEnabled(changed_map.status.new == "fight")
     end
 end
--- function GameUIAllianceCityEnter:GetPlayerByLocation( x,y )
---     for _,member in pairs(self:GetCurrentAlliance():GetAllMembers()) do
---         print(member.location.x,member.location.y)
---         if member.location.x == x and y == member.location.y then
---             return member
---         end
---     end
--- end
 
 function GameUIAllianceCityEnter:GetBuildingInfoOriginalY()
     return self.process_bar_bg:getPositionY()-self.process_bar_bg:getContentSize().height-40
@@ -69,7 +71,6 @@ function GameUIAllianceCityEnter:FixedUI()
     self:GetDescLabel():hide()
     self:GetHonourIcon():hide()
     self:GetHonourLabel():hide()
-    self:GetProgressTimer():setPercentage(self:GetMember():WallHp()/config_wall[self:GetMember():WallLevel()].wallHp * 100)
 end
 
 function GameUIAllianceCityEnter:GetEnemyAlliance()
@@ -213,7 +214,7 @@ function GameUIAllianceCityEnter:GetEnterButtons()
             UIKit:showMessageDialog(_("提示"),_("玩家处于保护状态,不能进攻或突袭"), function()end)
             return
         end
-        UIKit:newGameUI("GameUIStrikePlayer",member:Id()):AddToCurrentScene(true)
+        UIKit:newGameUI("GameUIStrikePlayer",1,{memberId = member:Id(),targetIsMyAlliance = false,toLocation = self:GetLogicPosition()}):AddToCurrentScene(true)
         self:LeftButtonClicked()
     end)
     strike_button:setButtonEnabled(my_allaince:Status() == "fight")

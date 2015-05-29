@@ -60,6 +60,7 @@ function WidgetAutoOrderAwardButton:OnTimer(dt)
 			self:SetTimeInfo(diff_time)
 		else
 			self:CheckState()
+			self:SetTimeInfo(diff_time)
 		end
 	end
 end

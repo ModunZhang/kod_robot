@@ -25,7 +25,8 @@ function WidgetDropItem:onEnter()
     local button = cc.ui.UIPushButton.new({normal = "drop_down_box_button_normal_52x44.png",pressed = "drop_down_box_button_light_52x44.png"})
         :align(display.RIGHT_BOTTOM, 554,7):addTo(header)
         :onButtonClicked(handler(self, self.OnBoxButtonClicked))
-    self.arrow = display.newSprite("drop_down_box_icon_3128.png"):addTo(button):pos(-26,22)
+    self.arrow = display.newSprite("shrine_page_control_26x34.png"):addTo(button):pos(-26,22)
+    self.arrow:setRotation(90)
     self.title_label = UIKit:ttfLabel({
         text = self.params.title,
         size = 20,
@@ -96,7 +97,8 @@ function WidgetDropItem:CreateRewardsPanel(task)
         size = 20,
         color = 0x403c2f,
     }):align(display.CENTER, 572/2, size.height - 100):addTo(content)
-    display.newSprite("line_550x2.png"):align(display.CENTER, 572/2, base_under_line):addTo(content)
+
+    display.newScale9Sprite("dividing_line.png",0,0,cc.size(550,2),cc.rect(10,2,382,2)):align(display.CENTER, 572/2, base_under_line):addTo(content)
 
     local base_y = base_under_line
     local gap_y = 20
@@ -114,7 +116,7 @@ function WidgetDropItem:CreateRewardsPanel(task)
             color = 0x403c2f,
         }):align(display.CENTER, 572/2 + 220, cur_y):addTo(content)
         if i ~= #task:GetRewards() then
-            display.newSprite("line_550x2.png"):align(display.CENTER, 572/2, cur_y - under_y):addTo(content)
+            display.newScale9Sprite("dividing_line.png",0,0,cc.size(550,2),cc.rect(10,2,382,2)):align(display.CENTER, 572/2, cur_y - under_y):addTo(content)
         end
         base_y = cur_y - under_y
     end
@@ -131,6 +133,7 @@ function WidgetDropItem:align(anchorPoint, x, y)
 end
 
 return WidgetDropItem
+
 
 
 

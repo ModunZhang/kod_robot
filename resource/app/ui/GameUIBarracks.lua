@@ -140,7 +140,7 @@ function GameUIBarracks:CreateSpecialSoldierUI()
     local titles ={
         {
             title = _("亡灵部队"),
-            title_img = "title_red_554x34.png",
+            title_img = "title_red_556x34.png",
         },
     -- {
     --     title = _("精灵部队"),
@@ -262,7 +262,7 @@ function GameUIBarracks:CreateSpecialItemWithListView( list_view, soldiers ,titl
 
     -- 招募时间限制
 
-    local time_bg = display.newSprite("back_ground_548X34.png")
+    local time_bg = display.newScale9Sprite("back_ground_166x84.png", 0,0,cc.size(548,34),cc.rect(15,10,136,64))
         :align(display.BOTTOM_CENTER, row_item:getContentSize().width/2, 10)
         :addTo(row_item)
     local re_time = DataUtils:GetNextRecruitTime()

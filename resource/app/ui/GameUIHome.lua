@@ -16,18 +16,20 @@ local ResourceManager = import("..entity.ResourceManager")
 local GrowUpTaskManager = import("..entity.GrowUpTaskManager")
 local GameUIHome = UIKit:createUIClass('GameUIHome')
 local WidgetAutoOrderAwardButton = import("..widget.WidgetAutoOrderAwardButton")
+local Alliance_Manager = Alliance_Manager
 
 local app = app
 local timer = app.timer
 local WOOD          = ResourceManager.RESOURCE_TYPE.WOOD
 local FOOD          = ResourceManager.RESOURCE_TYPE.FOOD
 local IRON          = ResourceManager.RESOURCE_TYPE.IRON
-local STONE         = ResourceManager.RESOURCE_TYPE.STONE
-local POPULATION    = ResourceManager.RESOURCE_TYPE.POPULATION
 local COIN          = ResourceManager.RESOURCE_TYPE.COIN
+local STONE         = ResourceManager.RESOURCE_TYPE.STONE
+local CITIZEN       = ResourceManager.RESOURCE_TYPE.CITIZEN
 
 local red_color = UIKit:hex2c4b(0xff3c00)
 local normal_color = UIKit:hex2c4b(0xf3f0b6)
+
 function GameUIHome:OnResourceChanged(resource_manager)
     local server_time = timer:GetServerTime()
     local allresources = resource_manager:GetAllResources()
@@ -35,7 +37,7 @@ function GameUIHome:OnResourceChanged(resource_manager)
     local food_resource = allresources[FOOD]
     local iron_resource = allresources[IRON]
     local stone_resource = allresources[STONE]
-    local citizen_resource = allresources[POPULATION]
+    local citizen_resource = allresources[CITIZEN]
     local coin_resource = allresources[COIN]
     local wood_number = wood_resource:GetResourceValueByCurrentTime(server_time)
     local food_number = food_resource:GetResourceValueByCurrentTime(server_time)
@@ -89,25 +91,30 @@ function GameUIHome:RefreshHelpButtonVisible()
         self.top_order_group:RefreshOrder()
     end
 end
+
 function GameUIHome:DisplayOn()
     self.visible_count = self.visible_count + 1
-    -- self:setVisible(self.visible_count > 0)
     self:FadeToSelf(self.visible_count > 0)
 end
 function GameUIHome:DisplayOff()
     self.visible_count = self.visible_count - 1
-    -- self:setVisible(self.visible_count > 0)
     self:FadeToSelf(self.visible_count > 0)
 end
 function GameUIHome:FadeToSelf(isFullDisplay)
-    self:setCascadeOpacityEnabled(true)
-    local opacity = isFullDisplay == true and 255 or 0
-    local p = isFullDisplay and 0 or 0
-    transition.fadeTo(self, {opacity = opacity, time = 0.2,
-        onComplete = function()
-            self:pos(p, p)
-        end
-    })
+    self:stopAllActions()
+    if isFullDisplay then
+        self:show()
+        transition.fadeIn(self, {
+            time = 0.2,
+        })
+    else
+        transition.fadeOut(self, {
+            time = 0.2,
+            onComplete = function()
+                self:hide()
+            end,
+        })
+    end
 end
 
 function GameUIHome:ctor(city)
@@ -118,17 +125,15 @@ function GameUIHome:onEnter()
     self.visible_count = 1
     local city = self.city
     -- 上背景
-    self:CreateTop()
+    self.top = self:CreateTop()
     self.bottom = self:CreateBottom()
-
-    WidgetChangeMap.new(WidgetChangeMap.MAP_TYPE.OUR_CITY):addTo(self)
 
     local ratio = self.bottom:getScale()
     self.event_tab = WidgetEventTabButtons.new(self.city, ratio)
     local rect1 = self.chat:getCascadeBoundingBox()
     local x, y = rect1.x, rect1.y + rect1.height - 2
+    self.event_tab:addTo(self,0):pos(x, y)
 
-    self.event_tab:addTo(self):pos(x, y)
     self:AddOrRemoveListener(true)
     self:OnResourceChanged(city:GetResourceManager())
     self:RefreshData()
@@ -141,34 +146,40 @@ end
 function GameUIHome:AddOrRemoveListener(isAdd)
     local city = self.city
     local user = self.city:GetUser()
+    local my_allaince = Alliance_Manager:GetMyAlliance()
+    local alliance_belvedere = my_allaince:GetAllianceBelvedere()
     if isAdd then
         city:AddListenOnType(self, city.LISTEN_TYPE.UPGRADE_BUILDING)
         city:AddListenOnType(self, city.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
         city:GetResourceManager():AddObserver(self)
         city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
         city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
-        Alliance_Manager:GetMyAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.BASIC)
-        Alliance_Manager:GetMyAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.HELP_EVENTS)
-        Alliance_Manager:GetMyAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.ALL_HELP_EVENTS)
+        my_allaince:AddListenOnType(self, Alliance.LISTEN_TYPE.BASIC)
+        my_allaince:AddListenOnType(self, Alliance.LISTEN_TYPE.HELP_EVENTS)
+        my_allaince:AddListenOnType(self, Alliance.LISTEN_TYPE.ALL_HELP_EVENTS)
         user:AddListenOnType(self, user.LISTEN_TYPE.BASIC)
         user:AddListenOnType(self, user.LISTEN_TYPE.TASK)
         user:AddListenOnType(self, user.LISTEN_TYPE.VIP_EVENT_ACTIVE)
         user:AddListenOnType(self, user.LISTEN_TYPE.VIP_EVENT_OVER)
         user:AddListenOnType(self, user.LISTEN_TYPE.COUNT_INFO)
+        alliance_belvedere:AddListenOnType(self, alliance_belvedere.LISTEN_TYPE.OnMarchDataChanged)
+        alliance_belvedere:AddListenOnType(self, alliance_belvedere.LISTEN_TYPE.OnCommingDataChanged)
     else
-        city:RemoveListenerOnType(self, self.city.LISTEN_TYPE.UPGRADE_BUILDING)
+        city:RemoveListenerOnType(self,city.LISTEN_TYPE.UPGRADE_BUILDING)
         city:RemoveListenerOnType(self,city.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
         city:GetResourceManager():RemoveObserver(self)
         city:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
         city:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
-        Alliance_Manager:GetMyAlliance():RemoveListenerOnType(self, Alliance.LISTEN_TYPE.BASIC)
-        Alliance_Manager:GetMyAlliance():RemoveListenerOnType(self, Alliance.LISTEN_TYPE.HELP_EVENTS)
-        Alliance_Manager:GetMyAlliance():RemoveListenerOnType(self, Alliance.LISTEN_TYPE.ALL_HELP_EVENTS)
+        my_allaince:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.BASIC)
+        my_allaince:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.HELP_EVENTS)
+        my_allaince:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.ALL_HELP_EVENTS)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.BASIC)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.TASK)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.VIP_EVENT_ACTIVE)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.VIP_EVENT_OVER)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.COUNT_INFO)
+        alliance_belvedere:RemoveListenerOnType(self, alliance_belvedere.LISTEN_TYPE.OnMarchDataChanged)
+        alliance_belvedere:RemoveListenerOnType(self, alliance_belvedere.LISTEN_TYPE.OnCommingDataChanged)
     end
 end
 function GameUIHome:OnAllianceBasicChanged(fromEntity,changed_map)
@@ -237,7 +248,7 @@ function GameUIHome:CreateTop()
     }):addTo(name_bg):align(display.LEFT_CENTER, 14, name_bg:getContentSize().height/2 + 3)
 
     -- 玩家战斗值图片
-    display.newSprite("power_16x19.png"):addTo(top_bg):pos(ox + 20, 65)
+    display.newSprite("dragon_strength_27x31.png"):addTo(top_bg):pos(ox + 20, 65):scale(16/27)
 
     -- 玩家战斗值文字
     UIKit:ttfLabel({
@@ -255,6 +266,13 @@ function GameUIHome:CreateTop()
         shadow = true
     }):addTo(top_bg):align(display.LEFT_CENTER, ox + 14, 42)
 
+    self.shadow_power_label = UIKit:ttfLabel({
+        text = "",
+        size = 20,
+        color = 0xf3f0b6,
+        shadow = true
+    }):addTo(top_bg):align(display.LEFT_CENTER, ox + 14, 42):hide()
+
     -- 资源按钮
     local button = cc.ui.UIPushButton.new(
         {normal = "player_btn_up_314x86.png", pressed = "player_btn_down_314x86.png"},
@@ -266,23 +284,24 @@ function GameUIHome:CreateTop()
     end):addTo(top_bg):align(display.LEFT_CENTER, top_bg:getContentSize().width/2+2, top_bg:getContentSize().height/2+10)
 
     -- 资源图片和文字
+    self.res_icon_map = {}
     local first_row = 18
     local first_col = 18
     local label_padding = 15
     local padding_width = 100
     local padding_height = 35
     for i, v in ipairs({
-        {"res_wood_82x73.png", "wood_label"},
-        {"res_stone_88x82.png", "stone_label"},
-        {"res_citizen_88x82.png", "citizen_label"},
-        {"res_food_91x74.png", "food_label"},
-        {"res_iron_91x63.png", "iron_label"},
-        {"res_coin_81x68.png", "coin_label"},
+        {"res_wood_82x73.png", "wood_label", "wood"},
+        {"res_stone_88x82.png", "stone_label", "stone"},
+        {"res_citizen_88x82.png", "citizen_label", "citizen"},
+        {"res_food_91x74.png", "food_label", "food"},
+        {"res_iron_91x63.png", "iron_label", "iron"},
+        {"res_coin_81x68.png", "coin_label", "coin"},
     }) do
         local row = i > 3 and 1 or 0
         local col = (i - 1) % 3
         local x, y = first_col + col * padding_width, first_row - (row * padding_height)
-        display.newSprite(v[1]):addTo(button):pos(x, y):scale(0.3)
+        self.res_icon_map[v[3]] = display.newSprite(v[1]):addTo(button):pos(x, y):scale(0.3)
 
         self[v[2]] = UIKit:ttfLabel({text = "",
             size = 18,
@@ -292,13 +311,13 @@ function GameUIHome:CreateTop()
     end
 
     -- 玩家信息背景
-    local player_bg = display.newSprite("player_bg_110x106.png")
+    local player_bg = display.newSprite("player_info_bg_120x120.png")
         :align(display.LEFT_BOTTOM, display.width>640 and 58 or 60, 10)
-        :addTo(top_bg, 2):setCascadeOpacityEnabled(true)
+        :addTo(top_bg, 2):scale(106/120):setCascadeOpacityEnabled(true)
     self.player_icon = UIKit:GetPlayerIconOnly(User:Icon())
-        :addTo(player_bg):pos(55, 64):scale(0.72)
+        :addTo(player_bg):pos(60, 68):scale(0.78)
     self.exp = display.newProgressTimer("player_exp_bar_110x106.png",
-        display.PROGRESS_TIMER_RADIAL):addTo(player_bg):pos(55, 53)
+        display.PROGRESS_TIMER_RADIAL):addTo(player_bg):pos(60, 58):scale(1.15)
     self.exp:setRotationSkewY(180)
     self:RefreshExp()
 
@@ -390,16 +409,6 @@ function GameUIHome:CreateTop()
     --在线活动
     local activity_button = WidgetAutoOrderAwardButton.new(self)
 
-
-
-    -- function activity_button:CheckVisible()
-    --     return true
-    -- end
-
-    -- function activity_button:GetElementSize()
-    --     return activity_button:getCascadeBoundingBox().size
-    -- end
-
     left_order:AddElement(activity_button)
     left_order:RefreshOrder()
     local order = WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM,20):addTo(self):pos(display.right-50, display.top-200)
@@ -448,15 +457,72 @@ function GameUIHome:CreateTop()
     order:RefreshOrder()
     self.top_order_group = order
     self.left_order_group = left_order
+
+    --联盟提示按钮
+    self.join_alliance_tips_button = cc.ui.UIPushButton.new({normal = 'alliance_join_tips_79x83.png'}):pos(display.left+40, display.top-600):addTo(self)
+        :onButtonClicked(function()
+            UIKit:newGameUI("GameUIAllianceJoinTips"):AddToCurrentScene(true)
+        end)
+    self.join_alliance_tips_button:setVisible(not User:GetCountInfo().firstJoinAllianceRewardGeted)
+    --瞭望塔事件按钮
+    local alliance_belvedere_button = cc.ui.UIPushButton.new({normal = 'fight_62x70.png'}):pos(display.right-50, display.top-600):addTo(self)
+    alliance_belvedere_button.alliance_belvedere_events_count = WidgetNumberTips.new():addTo(alliance_belvedere_button):pos(20,-20)
+    self.alliance_belvedere_button = alliance_belvedere_button
+    alliance_belvedere_button:onButtonClicked(function()
+        local default_tab = 'march'
+        local alliance = Alliance_Manager:GetMyAlliance()
+        local alliance_belvedere = alliance:GetAllianceBelvedere()
+        local hasMarch,__ = alliance_belvedere:HasMyEvents()
+        if not hasMarch then
+            local hasComming,__ = alliance_belvedere:HasOtherEvents()
+            if hasComming then
+                default_tab = 'comming'
+            end
+        end
+        UIKit:newGameUI('GameUIWathTowerRegion',self.city,default_tab):AddToCurrentScene(true)
+    end)
+    local alliance = Alliance_Manager:GetMyAlliance()
+    local alliance_belvedere = alliance:GetAllianceBelvedere()
+    local hasEvent,count = alliance_belvedere:HasEvents()
+    alliance_belvedere_button.alliance_belvedere_events_count:SetNumber(count)
+    if hasEvent then
+        alliance_belvedere_button:show()
+    else
+        alliance_belvedere_button:hide()
+    end
+
     return top_bg
 end
 
+function GameUIHome:OnMarchDataChanged()
+    self:RefreshAllianceBelvedereButton()
+end
+function GameUIHome:OnCommingDataChanged()
+    self:RefreshAllianceBelvedereButton()
+end
+
+function GameUIHome:RefreshAllianceBelvedereButton()
+    if not self.alliance_belvedere_button then return end
+    local alliance = Alliance_Manager:GetMyAlliance()
+    local alliance_belvedere = alliance:GetAllianceBelvedere()
+    local hasEvent,count = alliance_belvedere:HasEvents()
+    if hasEvent then
+        self.alliance_belvedere_button.alliance_belvedere_events_count:SetNumber(count)
+        self.alliance_belvedere_button:show()
+    else
+        self.alliance_belvedere_button:hide()
+    end
+end
+
 function GameUIHome:CreateBottom()
-    local bottom_bg = WidgetHomeBottom.new(self.city):addTo(self)
+    local bottom_bg = WidgetHomeBottom.new(self.city):addTo(self, 1)
         :align(display.BOTTOM_CENTER, display.cx, display.bottom)
 
     self.chat = WidgetChat.new():addTo(bottom_bg)
         :align(display.CENTER, bottom_bg:getContentSize().width/2, bottom_bg:getContentSize().height-11)
+
+    self.change_map = WidgetChangeMap.new(WidgetChangeMap.MAP_TYPE.OUR_CITY):addTo(self, 1)
+
     return bottom_bg
 end
 function GameUIHome:OnVipEventActive( vip_event )
@@ -483,6 +549,104 @@ function GameUIHome:RefreshVIP()
         level_img:setFilter(filters)
     end
 end
+local POWER_ANI_TAG = 1001
+function GameUIHome:ShowPowerAni(wp, old_power)
+    local pnt = self.top
+    self.power_label:hide()
+    self.shadow_power_label:show():setString(string.formatnumberthousands(old_power))
+
+    pnt:removeChildByTag(POWER_ANI_TAG)
+    local tp = pnt:convertToNodeSpace(self.power_label:convertToWorldSpace(cc.p(0,0)))
+    local lp = pnt:convertToNodeSpace(wp)
+    local time, delay_time = 1, 0.25
+    local emitter = cc.ParticleFlower:createWithTotalParticles(200)
+        :addTo(pnt, 100, POWER_ANI_TAG):pos(lp.x, lp.y)
+    emitter:setDuration(time + delay_time)
+    emitter:setLife(1)
+    emitter:setLifeVar(1)
+    emitter:setStartColor(cc.c4f(1.0,0.84,0.48,1.0))
+    emitter:setStartColorVar(cc.c4f(0.0))
+    emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("stars.png"))
+    emitter:runAction(transition.sequence{
+        cc.MoveTo:create(time, cc.p(tp.x, tp.y)),
+        cc.CallFunc:create(function()
+            self:ScaleIcon(self.power_label:show())
+            self.shadow_power_label:hide()
+        end),
+        cc.DelayTime:create(delay_time),
+    })
+end
+local RES_ICON_TAG = {
+    food = 1010,
+    wood = 1011,
+    iron = 1012,
+    coin = 1013,
+    stone = 1014,
+    citizen = 1015,
+}
+local icon_map = {
+    food = "res_food_91x74.png",
+    wood = "res_wood_82x73.png",
+    iron = "res_iron_91x63.png",
+    coin = "res_coin_81x68.png",
+    stone = "res_stone_88x82.png",
+    citizen = "res_citizen_88x82.png",
+}
+function GameUIHome:ShowResourceAni(resource, wp)
+    local pnt = self.top
+    pnt:removeChildByTag(RES_ICON_TAG[resource])
+
+    local s1 = self.res_icon_map[resource]:getContentSize()
+    local tp = pnt:convertToNodeSpace(self.res_icon_map[resource]:convertToWorldSpace(cc.p(s1.width/2,s1.height/2)))
+    local lp = pnt:convertToNodeSpace(wp)
+
+    local x,y,tx,ty = lp.x,lp.y,tp.x, tp.y
+    local icon = display.newSprite(icon_map[resource])
+        :addTo(pnt):pos(x,y):scale(0.8)
+
+    local size = icon:getContentSize()
+    local emitter = cc.ParticleFlower:createWithTotalParticles(200)
+        :addTo(icon):pos(size.width/2, size.height/2)
+
+    local time = 1
+    emitter:setPosVar(cc.p(10,10))
+    emitter:setDuration(time)
+    emitter:setCascadeOpacityEnabled(true)
+    emitter:setLife(1)
+    emitter:setLifeVar(1)
+    emitter:setStartColor(cc.c4f(1.0))
+    emitter:setStartColorVar(cc.c4f(0.0))
+    emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("stars.png"))
+
+
+    local bezier2 ={
+        cc.p(x,y),
+        cc.p((x + tx) * 0.5 + math.random(200) - 100, (y + ty) * 0.5),
+        cc.p(tx, ty)
+    }
+    icon:runAction(
+        cc.Spawn:create({
+            cc.ScaleTo:create(time, 0.3),
+            transition.sequence{
+                cc.BezierTo:create(time, bezier2),
+                cc.CallFunc:create(function()
+                    icon:opacity(0)
+                    self:ScaleIcon(self.res_icon_map[resource], 0.3, 0.5)
+                end),
+                cc.DelayTime:create(1),
+                cc.RemoveSelf:create(),
+            }
+        })
+    )
+end
+function GameUIHome:ScaleIcon(ccnode, s, ds)
+    local s = s or 1
+    local ds = ds or 0.1
+    ccnode:runAction(transition.sequence{
+        cc.ScaleTo:create(0.2, s * (1 + ds)),
+        cc.ScaleTo:create(0.2, s),
+    })
+end
 
 -- fte
 local mockData = import("..fte.mockData")
@@ -507,9 +671,10 @@ function GameUIHome:PromiseOfFteWaitFinish()
             self.event_tab:EventChangeOn("build", true)
         end
         self:GetFteLayer()
-        return self.city:PromiseOfFinishUpgradingByLevel(nil, nil):next(function()
-            self:GetFteLayer():removeFromParent()
-        end)
+        return self.city:PromiseOfFinishUpgradingByLevel(nil, nil)
+            :next(function()self:GetFteLayer():Reset()end)
+            :next(cocos_promise.delay(1))
+            :next(function()self:GetFteLayer():removeFromParent()end)
     end
     return cocos_promise.defer()
 end
@@ -537,12 +702,16 @@ function GameUIHome:PromiseOfFteFreeSpeedUp()
 
             local r = self:Find():getCascadeBoundingBox()
             WidgetFteArrow.new(_("5分钟以下免费加速")):addTo(self:GetFteLayer())
-            :TurnDown(true):align(display.RIGHT_BOTTOM, r.x + r.width/2 + 30, r.y + 50)
+                :TurnDown(true):align(display.RIGHT_BOTTOM, r.x + r.width/2 + 30, r.y + 50)
         end)
 
-        return self.city:PromiseOfFinishUpgradingByLevel(nil, nil):next(function()
-            self:GetFteLayer():removeFromParent()
-        end)
+        return self.city:PromiseOfFinishUpgradingByLevel(nil, nil)
+            :next(function()
+                self:GetFteLayer():removeFromParent()
+                self:GetFteLayer()
+            end)
+            :next(cocos_promise.delay(1))
+            :next(function()self:GetFteLayer():removeFromParent()end)
     end
     return cocos_promise.defer()
 end
@@ -577,9 +746,13 @@ function GameUIHome:PromiseOfFteInstantSpeedUp()
 
         end)
 
-        return self.city:PromiseOfFinishUpgradingByLevel():next(function()
-            self:GetFteLayer():removeFromParent()
-        end)
+        return self.city:PromiseOfFinishUpgradingByLevel()
+            :next(function()
+                self:GetFteLayer():removeFromParent()
+                self:GetFteLayer()
+            end)
+            :next(cocos_promise.delay(1))
+            :next(function()self:GetFteLayer():removeFromParent()end)
     end
     return cocos_promise.defer()
 end
@@ -607,12 +780,31 @@ function GameUIHome:PromiseOfActivePromise()
         return ui:PromiseOfFte()
     end)
 end
-
 function GameUIHome:OnCountInfoChanged()
+    self.join_alliance_tips_button:setVisible(not User:GetCountInfo().firstJoinAllianceRewardGeted)
     self.left_order_group:RefreshOrder()
 end
+function GameUIHome:PromiseOfFteAlliance()
+    self.bottom:TipsOnAlliance()
+end
+function GameUIHome:PromiseOfFteAllianceMap()
+    local btn = self.change_map.btn
+    btn:removeChildByTag(102)
+
+    WidgetFteArrow.new(_("进入联盟地图\n体验更多玩法")):addTo(btn, 10, 102)
+        :TurnDown(false):align(display.LEFT_BOTTOM, 20, 55)
+
+    btn:stopAllActions()
+    btn:performWithDelay(function() btn:removeChildByTag(102) end, 10)
+end
+
 
 return GameUIHome
+
+
+
+
+
 
 
 

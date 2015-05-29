@@ -2,7 +2,6 @@
 -- Author: Kenny Dai
 -- Date: 2015-01-23 09:34:06
 --
-local WidgetDropList = import("..widget.WidgetDropList")
 local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
@@ -186,9 +185,7 @@ function GameUIItems:CreateShopContentByIndex( idx )
         dimensions = cc.size(380,0)
     }):align(display.LEFT_CENTER, 19 , 38)
         :addTo(desc_bg)
-    -- local icon_bg = display.newSprite("box_120x154.png"):addTo(content):align(display.CENTER, 70, item_height/2)
     local item_bg = display.newSprite("box_118x118.png"):addTo(content):align(display.TOP_CENTER,  70, item_height-10)
-    -- local item_icon_color_bg = display.newSprite("box_item_100x100.png"):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
     local parent = self
     function content:SetOwnCount( new_item )
         own_num:setString(_("拥有")..":"..string.formatnumberthousands(new_item:Count()))
@@ -216,7 +213,7 @@ function GameUIItems:CreateShopContentByIndex( idx )
         if self.button then
             self:removeChild(self.button, true)
         end
-        self.button = cc.ui.UIPushButton.new({normal = "green_btn_up_148x70.png",pressed = "green_btn_down_148x70.png"})
+        self.button = cc.ui.UIPushButton.new({normal = "green_btn_up_148x76.png",pressed = "green_btn_down_148x76.png"})
             :setButtonLabel(UIKit:ttfLabel({
                 text = _("购买"),
                 size = 20,
@@ -408,10 +405,10 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
     }):align(display.LEFT_TOP, 152 , item_height-60)
         :addTo(content)
 
-    local icon_bg = display.newSprite("box_120x154.png"):addTo(content):align(display.CENTER, 70, item_height/2)
-    local num_bg = display.newSprite("back_ground_118x36.png"):addTo(icon_bg):align(display.CENTER, icon_bg:getContentSize().width/2, 20)
+    local icon_bg = WidgetUIBackGround.new({width = 120,height = 154},WidgetUIBackGround.STYLE_TYPE.STYLE_4)
+        :addTo(content):align(display.CENTER, 70, item_height/2)
+    local num_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(118,36),cc.rect(15,10,136,64)):addTo(icon_bg):align(display.CENTER, icon_bg:getContentSize().width/2, 20)
     local item_bg = display.newSprite("box_118x118.png"):addTo(icon_bg):align(display.CENTER, icon_bg:getContentSize().width/2, icon_bg:getContentSize().height-60)
-    -- local item_icon_color_bg = display.newSprite("box_item_100x100.png"):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
 
 
     local own_num = UIKit:ttfLabel({
@@ -478,17 +475,17 @@ function GameUIItems:UseItemFunc( items )
             -- 需要对应的钥匙
             if name == "chest_2" then
                 if ItemManager:GetItemByName("chestKey_2"):Count() < 1 then
-                    UIKit:showMessageDialog(_("陛下"),_("开启铜宝箱需要铜钥匙"))
+                    UIKit:showMessageDialog(_("主人"),_("开启铜宝箱需要铜钥匙"))
                     return
                 end
             elseif name == "chest_3" then
                 if ItemManager:GetItemByName("chestKey_3"):Count() < 1 then
-                    UIKit:showMessageDialog(_("陛下"),_("开启银宝箱需要银钥匙"))
+                    UIKit:showMessageDialog(_("主人"),_("开启银宝箱需要银钥匙"))
                     return
                 end
             elseif name == "chest_4" then
                 if ItemManager:GetItemByName("chestKey_4"):Count() < 1 then
-                    UIKit:showMessageDialog(_("陛下"),_("开启金宝箱需要金钥匙"))
+                    UIKit:showMessageDialog(_("主人"),_("开启金宝箱需要金钥匙"))
                     return
                 end
             end
@@ -553,6 +550,7 @@ function GameUIItems:OnItemsChanged( changed_map )
     end
 end
 return GameUIItems
+
 
 
 

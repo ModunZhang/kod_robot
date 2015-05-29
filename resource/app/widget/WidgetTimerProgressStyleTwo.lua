@@ -1,5 +1,6 @@
 local WidgetWithBlueTitle = import(".WidgetWithBlueTitle")
 local WidgetProgress = import(".WidgetProgress")
+local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetTimerProgress = import(".WidgetTimerProgress")
 local WidgetPushButton = import(".WidgetPushButton")
 
@@ -8,7 +9,8 @@ local WidgetTimerProgressStyleTwo = class("WidgetTimerProgressStyleTwo", WidgetT
 function WidgetTimerProgressStyleTwo:ctor(height,title)
     local height = height == nil and 272 or height
     local back_ground_351x96 =WidgetWithBlueTitle.new(height,title)
-    local describe_bg = display.newSprite("back_ground_556x56.png"):addTo(back_ground_351x96):pos(304,160)
+    local describe_bg = WidgetUIBackGround.new({width = 556,height = 56},WidgetUIBackGround.STYLE_TYPE.STYLE_5)
+        :addTo(back_ground_351x96):align(display.CENTER,304,160)
     self.describe = cc.ui.UILabel.new({
         size = 22,
         font = UIKit:getFontFilePath(),

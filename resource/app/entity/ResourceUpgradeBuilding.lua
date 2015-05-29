@@ -52,7 +52,7 @@ end
 function ResourceUpgradeBuilding:IsAbleToUpgrade(isUpgradeNow)
     -- 升级是否使空闲城民小于0
     local resource_manager = City:GetResourceManager()
-    local free_citizen_limit = resource_manager:GetPopulationResource():GetValueLimit()
+    local free_citizen_limit = resource_manager:GetCitizenResource():GetValueLimit()
     local current_citizen = self:GetCitizen()
     local next_level_citizen = self:GetNextLevelLevelCitizen()
     if (next_level_citizen-current_citizen)>free_citizen_limit then

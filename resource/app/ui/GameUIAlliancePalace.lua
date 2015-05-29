@@ -1,6 +1,5 @@
 local window = import("..utils.window")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
-local WidgetUIBackGround2 = import("..widget.WidgetUIBackGround2")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetAllianceBuildingUpgrade = import("..widget.WidgetAllianceBuildingUpgrade")
 local GameUIAlliancePalace = UIKit:createUIClass('GameUIAlliancePalace', "GameUIAllianceBuilding")

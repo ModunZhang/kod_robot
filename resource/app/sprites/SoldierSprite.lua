@@ -26,9 +26,9 @@ local soldier_config = {
     },
     ["catapult"] = {
         count = 1,
-        {  "toushiche", 0, 35, 1},
-        {"toushiche_2", 0, 35, 1},
-        {"toushiche_3", 0, 35, 1},
+        {  "toushiche", 60, 25, 1},
+        {"toushiche_2", 60, 25, 1},
+        {"toushiche_3", 60, 25, 1},
     },
 
     -----
@@ -77,9 +77,9 @@ local soldier_config = {
     },
     ["meatWagon"] = {
         count = 1,
-        {"jiaorouche", 0, 30, 0.8},
-        {"jiaorouche", 0, 30, 0.8},
-        {"jiaorouche", 0, 30, 0.8},
+        {"jiaorouche", 60, 20, 0.8},
+        {"jiaorouche", 60, 20, 0.8},
+        {"jiaorouche", 60, 20, 0.8},
     },
 }
 local position_map = {

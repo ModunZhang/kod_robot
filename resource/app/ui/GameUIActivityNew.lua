@@ -79,7 +79,7 @@ function GameUIActivityNew:CreateTabIf_activity()
 	if not self.activity_list_view then
 		local list = UIListView.new({
 	        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
-	        viewRect = cc.rect((window.width - 612)/2,window.bottom_top + 20,612,785),
+	        viewRect = cc.rect(window.left+(window.width - 612)/2,window.bottom_top + 20,612,785),
 	    }):addTo(self:GetView())
 	    list:onTouch(handler(self, self.OnActivityListViewTouch))
 	    self.activity_list_view = list
@@ -183,7 +183,7 @@ function GameUIActivityNew:GetActivityItem(item_type)
 	if item_type ~= self.ITEMS_TYPE.EVERY_DAY_LOGIN then
 		display.newSprite("activity_layer_blue_586x114.png"):align(display.RIGHT_CENTER, size.width,size.height/2+2):addTo(content)
 	end
-	display.newSprite("activity_next_32x37.png"):align(display.LEFT_CENTER, 566, 80):addTo(bg)
+	display.newSprite("next_32x38.png"):align(display.LEFT_CENTER, 566, 80):addTo(bg)
 
 	if item_type == self.ITEMS_TYPE.EVERY_DAY_LOGIN then
 		local title_label = UIKit:ttfLabel({
@@ -223,7 +223,7 @@ function GameUIActivityNew:GetActivityItem(item_type)
 		}):align(display.LEFT_BOTTOM,298,90):addTo(bg)
 
 		local day_label = UIKit:ttfLabel({
-			text = string.format(_("%d/%d"),countInfo.day14,#config_day14),
+			text = string.format("%d/%d",countInfo.day14,#config_day14),
 			size = 20,
 			color= 0xa2ff00,
 			shadow= true,

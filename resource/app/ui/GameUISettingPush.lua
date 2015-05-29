@@ -2,7 +2,7 @@
 -- Author: Danny He
 -- Date: 2015-02-24 08:49:25
 --
-local GameUISettingPush = UIKit:createUIClass("GameUISettingPush")
+local GameUISettingPush = UIKit:createUIClass("GameUISettingPush","UIAutoClose")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local window = import("..utils.window")
 local UICheckBoxButton = import(".UICheckBoxButton")
@@ -18,8 +18,8 @@ function GameUISettingPush:onEnter()
 end
 
 function GameUISettingPush:BuildUI()
-	local shadowLayer = UIKit:shadowLayer():addTo(self)
-	local bg = WidgetUIBackGround.new({height=762}):addTo(shadowLayer)
+	local bg = WidgetUIBackGround.new({height=762})
+    self:addTouchAbleChild(bg)
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
 	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})

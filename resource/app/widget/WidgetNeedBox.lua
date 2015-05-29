@@ -1,3 +1,4 @@
+local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetNeedBox = class("WidgetNeedBox", function(...)
     return display.newNode(...)
 end)
@@ -29,7 +30,7 @@ function WidgetNeedBox:ctor()
     local col1_x, col2_x, col3_x, col4_x = 35, 160, 285, 410
     local row_y, label_relate_x, label_relate_y = 28, 32, 12
 
-    local back_ground_556x56 = cc.ui.UIImage.new("back_ground_556x56.png"):addTo(self)
+    local back_ground_556x56 = WidgetUIBackGround.new({width = 556,height = 56},WidgetUIBackGround.STYLE_TYPE.STYLE_5):addTo(self)
 
     cc.ui.UIImage.new("res_wood_82x73.png")
         :addTo(back_ground_556x56)

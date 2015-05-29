@@ -12,7 +12,7 @@ function WidgetFteMark:ctor()
     self.origin_size = self:getContentSize()
 end
 function WidgetFteMark:Size(w, h)
-    w = math.max(w, self.origin_size.width)
+    -- w = math.max(w, self.origin_size.width)
     h = math.max(h, self.origin_size.height)
     return self:size(w, h)
 end

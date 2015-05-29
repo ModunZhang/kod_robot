@@ -930,3 +930,23 @@ errors["playerDataAlreadyInited"] = {
 	["code"] = 686,
 	["message"] = "玩家数据已经初始化"
 }
+errors["deviceLocked"] = {
+	["key"] = "deviceLocked",
+	["code"] = 687,
+	["message"] = "设备禁止登陆"
+}
+errors["playerLocked"] = {
+	["key"] = "playerLocked",
+	["code"] = 688,
+	["message"] = "玩家禁止登录"
+}
+errors["firstJoinAllianceRewardAlreadyGeted"] = {
+	["key"] = "firstJoinAllianceRewardAlreadyGeted",
+	["code"] = 689,
+	["message"] = "首次加入联盟奖励已经领取"
+}
+errors["fteAlreadyFinished"] = {
+	["key"] = "fteAlreadyFinished",
+	["code"] = 690,
+	["message"] = "新手引导已经完成"
+}

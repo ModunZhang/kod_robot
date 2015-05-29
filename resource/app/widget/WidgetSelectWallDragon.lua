@@ -17,7 +17,7 @@ function WidgetSelectWallDragon:ctor(params)
         local dragon_frame = display.newSprite("alliance_item_flag_box_126X126.png")
 
 
-        local dragon_bg = display.newSprite("chat_hero_background.png")
+        local dragon_bg = display.newSprite("dragon_bg_114x114.png")
             :align(display.LEFT_CENTER, 7,dragon_frame:getContentSize().height/2)
             :addTo(dragon_frame)
         local dragon_img = display.newSprite(dragon:Type()..".png")

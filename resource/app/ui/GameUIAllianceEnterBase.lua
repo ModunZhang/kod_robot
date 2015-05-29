@@ -107,7 +107,7 @@ function GameUIAllianceEnterBase:GetBuildingImage()
 end
 
 function GameUIAllianceEnterBase:GetBuildImageInfomation(sprite)
-    return 110/480,97,self:GetUIHeight() - 90 
+    return 110/480,97,self:GetUIHeight() - 90
 end
 
 function GameUIAllianceEnterBase:IsShowBuildingBox()
@@ -117,11 +117,7 @@ end
 function GameUIAllianceEnterBase:InitBuildingImage()
     local body = self:GetBody()
     if self:IsShowBuildingBox() then
-        -- 建筑图片 放置区域左右边框
-        cc.ui.UIImage.new("building_frame_36x136.png"):align(display.LEFT_CENTER, 30,self:GetUIHeight()-90)
-            :addTo(body):flipX(true)
-        cc.ui.UIImage.new("building_frame_36x136.png"):align(display.RIGHT_CENTER, 163, self:GetUIHeight()-90)
-            :addTo(body)
+        display.newSprite("alliance_item_flag_box_126X126.png"):addTo(body):align(display.LEFT_CENTER, 30,self:GetUIHeight()-90):scale(136/126)
     end
     local sprite = self:GetBuildImageSprite()
     if not sprite then
@@ -135,7 +131,8 @@ function GameUIAllianceEnterBase:InitBuildingImage()
         sprite:setAnchorPoint(cc.p(0.5,0.5)):addTo(body):pos(x,y)
         sprite:setScale(scale)
     end
-    local level_bg = display.newSprite("back_ground_138x34.png"):addTo(body):pos(96, self:GetUIHeight()-180)
+    local level_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(138,34),cc.rect(15,10,136,64))
+        :addTo(body):pos(96, self:GetUIHeight()-180)
     local label = UIKit:ttfLabel({
         text = self:GetLevelLabelText(),
         size = 20,
@@ -195,10 +192,10 @@ function GameUIAllianceEnterBase:InitBuildingDese()
         dimensions = cc.size(400,0)
     }):align(display.LEFT_TOP, 180, self:GetUIHeight()-20):addTo(body)
 
-    self.process_bar_bg = display.newSprite("Progress_bar_1.png"):align(display.LEFT_TOP, 180, self:GetUIHeight()-30):addTo(body)
-    self.progressTimer = UIKit:commonProgressTimer("progress_bar_366x34.png"):addTo(self.process_bar_bg):align(display.LEFT_BOTTOM,0,0):scale(386/366)
+    self.process_bar_bg = display.newSprite("process_bg_394x40.png"):align(display.LEFT_TOP, 186, self:GetUIHeight()-30):addTo(body)
+    self.progressTimer = UIKit:commonProgressTimer("process_color_394x40.png"):addTo(self.process_bar_bg):align(display.LEFT_BOTTOM,0,0)
     self.progressTimer:setPercentage(100)
-    self.process_icon_bg =   display.newSprite("back_ground_43x43.png"):addTo(self.process_bar_bg):pos(10,18)
+    self.process_icon_bg =   display.newSprite("back_ground_43x43.png"):addTo(self.process_bar_bg):pos(10,20)
     local icon,scale = self:GetProcessIcon()
     self.process_icon =  display.newSprite(icon):addTo(self.process_icon_bg):pos(21,21):scale(scale)
     self.process_label = UIKit:ttfLabel({
@@ -206,7 +203,7 @@ function GameUIAllianceEnterBase:InitBuildingDese()
         color = 0xfff3c7,
         shadow = true,
         text = self:GetProcessLabelText()
-    }):align(display.LEFT_CENTER,self.process_icon_bg:getPositionX() + 40,self.process_icon_bg:getPositionY()):addTo(self.process_bar_bg)
+    }):align(display.LEFT_CENTER,self.process_icon_bg:getPositionX() + 40,20):addTo(self.process_bar_bg)
 end
 
 function GameUIAllianceEnterBase:GetProgressTimer()
@@ -295,7 +292,7 @@ function GameUIAllianceEnterBase:GetEnterButtonByIndex( idx )
     return self.EnterButtonNodes[idx]
 end
 function GameUIAllianceEnterBase:GetEnterButtons()
-    if self:IsMyAlliance() then 
+    if self:IsMyAlliance() then
         local move_city_button = self:BuildOneButton("icon_move_player_city.png",_("迁移城市")):onButtonClicked(function()
             if self:GetMyAlliance():Status() == 'fight' then
                 UIKit:showMessageDialog(nil, _("战争期不能移动"),function()end)
@@ -337,7 +334,7 @@ function GameUIAllianceEnterBase:GetDescLabel()
 end
 
 function GameUIAllianceEnterBase:GetProcessIcon()
-    return "wall_36x41.png",1
+    return  "icon_wall_83x103.png",0.4
 end
 
 function GameUIAllianceEnterBase:GetProcessLabelText()
@@ -349,4 +346,5 @@ function GameUIAllianceEnterBase:GetBuildingDesc()
 end
 
 return GameUIAllianceEnterBase
+
 

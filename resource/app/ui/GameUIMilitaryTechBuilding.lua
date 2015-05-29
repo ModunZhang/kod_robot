@@ -88,7 +88,8 @@ function GameUIMilitaryTechBuilding:InitTech()
     self.teac_list = WidgetMilitaryTechnology.new(self.building):addTo(self.tech_layer):align(display.BOTTOM_CENTER, window.cx, window.bottom_top+20)
 
     -- 科技点数
-    local tech_point_bg = display.newSprite("back_ground_548x52.png"):addTo(self.tech_layer):align(display.CENTER, window.cx, window.top-244)
+    local tech_point_bg = display.newScale9Sprite("back_ground_166x84.png", 0,0,cc.size(548,52),cc.rect(15,10,136,64))
+    :addTo(self.tech_layer):align(display.CENTER, window.cx, window.top-244)
     display.newSprite("bottom_icon_package_77x67.png"):addTo(tech_point_bg):align(display.CENTER,30,tech_point_bg:getContentSize().height/2):scale(0.5)
     UIKit:ttfLabel({
         text = building_map_tech[self.building:GetType()],

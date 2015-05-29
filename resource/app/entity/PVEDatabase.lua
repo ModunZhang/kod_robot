@@ -87,8 +87,70 @@ function PVEDatabase:ResetAllMapsListener()
     end
 end
 
+--------
+local pve_wanted = GameDatas.ClientInitGame.pve_wanted
+function PVEDatabase:GetTarget()
+    local name_key, count_key, target_key, coin_key = self:GetPveTaskKeys()
+    local user_default = cc.UserDefault:getInstance()
+    local name = user_default:getStringForKey(name_key)
+    return {
+        name = name,
+        count = user_default:getIntegerForKey(count_key),
+        target = user_default:getIntegerForKey(target_key),
+        coin = user_default:getIntegerForKey(coin_key),
+    }, #name > 0
+end
+function PVEDatabase:NewTarget(name, count)
+    local old,ok = self:GetTarget()
+    local wanted = pve_wanted[self.user:GetCurrentPVEMap():GetIndex()]
+    local soldierName, count, coin = "swordsman", 100, 2500
+    
+    local soldiers = {}
+    for k,v in pairs(wanted) do
+        if k == "coin" then
+            coin = v
+        elseif k ~= "floor" then
+            if not ok or (ok and k ~= old.name) then
+                table.insert(soldiers, {name = k, count = v})
+            end
+        end
+    end
+    local wanted_soldier = soldiers[math.random(#soldiers)]
+
+
+    local name_key, count_key, target_key, coin_key = self:GetPveTaskKeys()
+    local user_default = cc.UserDefault:getInstance()
+    user_default:setStringForKey(name_key, wanted_soldier.name)
+    user_default:setIntegerForKey(count_key, 0)
+    user_default:setIntegerForKey(target_key, wanted_soldier.count)
+    user_default:setIntegerForKey(coin_key, coin)
+    user_default:flush()
+end
+function PVEDatabase:IncKillCount(count)
+    local name_key, count_key, target_key = self:GetPveTaskKeys()
+    local user_default = cc.UserDefault:getInstance()
+    if #user_default:getStringForKey(name_key) > 0 then
+        local kill_count = user_default:getIntegerForKey(count_key)
+        local kill_target = user_default:getIntegerForKey(target_key)
+        kill_count = kill_count + count > kill_target and kill_target or (kill_count + count)
+        user_default:setIntegerForKey(count_key, kill_count)
+        user_default:flush()
+    end
+end
+function PVEDatabase:GetPveTaskKeys()
+    local id = DataManager:getUserData()._id
+    return id.."_pve_task",
+        id.."_pve_task_count",
+        id.."_pve_task_target_count",
+        id.."_pve_task_coin"
+end
+
 
 return PVEDatabase
+
+
+
+
 
 
 

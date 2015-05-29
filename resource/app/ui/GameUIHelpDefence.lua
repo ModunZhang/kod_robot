@@ -283,7 +283,7 @@ function GameUIHelpDefence:DragonPart()
         :align(display.LEFT_CENTER, window.left+47,window.top-425)
         :addTo(self:GetView())
 
-    local dragon_bg = display.newSprite("chat_hero_background.png")
+    local dragon_bg = display.newSprite("dragon_bg_114x114.png")
         :align(display.LEFT_CENTER, 7,dragon_frame:getContentSize().height/2)
         :addTo(dragon_frame)
     local dragon_img = cc.ui.UIImage.new(dragon.type..".png")

@@ -42,8 +42,18 @@ function PVEScene:onEnter()
     self:GetSceneLayer():GotoMapPositionInMiddle(point.x, point.y)
     self:GetSceneLayer():ZoomTo(0.8)
     self:GetSceneLayer():MoveCharTo(self.user:GetPVEDatabase():GetCharPosition())
-    app:GetAudioManager():PlayGameMusic("PVEScene")
+    app:GetAudioManager():PlayGameMusic("PVEScene",true)
     self.user:GetPVEDatabase():SetLocationHandle(self)
+end
+function PVEScene:onEnterTransitionFinish()
+    local userdefault = cc.UserDefault:getInstance()
+    local pve_key = DataManager:getUserData()._id.."_first_in_pve"
+    if not userdefault:getBoolForKey(pve_key) then
+        userdefault:setBoolForKey(pve_key, true)
+        userdefault:flush()
+
+        UIKit:newGameUI("GameUITips", "pve", _("玩法介绍"), true):AddToScene(self, true)
+    end
 end
 function PVEScene:onExit()
     PVEScene.super.onExit(self)
@@ -61,6 +71,21 @@ function PVEScene:onExit()
         end)
     end
 end
+function PVEScene:CreateDirectionArrow()
+    if not self:getChildByTag(DIRECTION_TAG) then
+        return WidgetDirectionSelect.new():pos(display.cx, display.cy)
+            :addTo(self, 10, DIRECTION_TAG):EnableDirection():hide():scale(1.5)
+    end
+end
+function PVEScene:GetDirectionArrow()
+    if not self:getChildByTag(DIRECTION_TAG) then
+        return self:CreateDirectionArrow()
+    end
+    return self:getChildByTag(DIRECTION_TAG)
+end
+function PVEScene:DestroyDirectionArrow()
+    self:removeChildByTag(DIRECTION_TAG)
+end
 function PVEScene:LoadAnimation()
     UILib.loadSolidersAnimation()
     UILib.loadPveAnimation()
@@ -77,21 +102,6 @@ end
 function PVEScene:GetHomePage()
     return self.home_page
 end
-function PVEScene:CreateDirectionArrow()
-    if not self:getChildByTag(DIRECTION_TAG) then
-        return WidgetDirectionSelect.new():pos(display.cx, display.cy)
-            :addTo(self, 10, DIRECTION_TAG):EnableDirection():hide():scale(1.5)
-    end
-end
-function PVEScene:GetDirectionArrow()
-    if not self:getChildByTag(DIRECTION_TAG) then
-        return self:CreateDirectionArrow()
-    end
-    return self:getChildByTag(DIRECTION_TAG)
-end
-function PVEScene:DestroyDirectionArrow()
-    self:removeChildByTag(DIRECTION_TAG)
-end
 function PVEScene:OnLocationChanged(is_pos_changed, is_switch_floor)
     local location = DataManager:getUserData().pve.location
     if is_switch_floor then
@@ -101,6 +111,41 @@ function PVEScene:OnLocationChanged(is_pos_changed, is_switch_floor)
         self:GetSceneLayer():MoveCharTo(location.x, location.y)
     end
     assert(false)
+end
+function PVEScene:PormiseOfCheckObject(x, y, type)
+    local object = self.user:GetCurrentPVEMap():GetObjectByCoord(x, y)
+    if not object or not object:Type() then
+        self.user:GetCurrentPVEMap():ModifyObject(x, y, 0, type)
+        self.user:ResetPveData()
+        return NetManager:getSetPveDataPromise(
+            self.user:EncodePveDataAndResetFightRewardsData()
+        ):fail(function()
+            -- 失败回滚
+            local location = DataManager:getUserData().pve.location
+            self.user:GetPVEDatabase():SetCharPosition(location.x, location.y, location.z)
+            self:GetSceneLayer():MoveCharTo(self.user:GetPVEDatabase():GetCharPosition())
+        end)
+    else
+        return cocos_promise.defer()
+    end
+end
+function PVEScene:OnTwoTouch()
+
+end
+function PVEScene:GetCurrentPos()
+    local logic_map = self:GetSceneLayer():GetLogicMap()
+    local char_x,char_y = self:GetSceneLayer():GetChar():getPosition()
+    return logic_map:ConvertToLogicPosition(char_x, char_y)
+end
+function PVEScene:GetClickedPos(x, y)
+    local logic_map = self:GetSceneLayer():GetLogicMap()
+    local point = self:GetSceneLayer():GetSceneNode():convertToNodeSpace(cc.p(x, y))
+    return logic_map:ConvertToLogicPosition(point.x, point.y)
+end
+function PVEScene:GetCenterPos()
+    local logic_map = self:GetSceneLayer():GetLogicMap()
+    local point = self:GetSceneLayer():GetSceneNode():convertToNodeSpace(cc.p(display.cx, display.cy))
+    return logic_map:ConvertToLogicPosition(point.x, point.y)
 end
 function PVEScene:OnTouchClicked(pre_x, pre_y, x, y)
     -- 有动画就什么都不处理
@@ -128,6 +173,13 @@ function PVEScene:OnTouchClicked(pre_x, pre_y, x, y)
     local offset_x = is_offset_x and (new_x - old_x) / math.abs(new_x - old_x) or 0
     local offset_y = is_offset_x and 0 or (new_y - old_y) / math.abs(new_y - old_y)
     local tx, ty = old_x + offset_x, old_y + offset_y
+
+
+
+    self:GetDirectionArrow()
+        :ShowDirection(offset_x < 0, offset_x > 0, offset_y < 0, offset_y > 0)
+        :show():runAction(transition.sequence{cc.FadeIn:create(0.25), cc.FadeOut:create(0.25)})
+
 
     if self:GetSceneLayer():CanMove(tx, ty) and
         self.user:HasAnyStength() then
@@ -230,11 +282,13 @@ function PVEScene:CheckTrap()
                         {dragon = enemy.dragon, soldiers = enemy.soldiers},
                         trap_obj:GetMap():Terrain(), _("散兵游勇")
                     )
+
                     if report:IsAttackWin() then
                         self.user:SetPveData(report:GetAttackKDA(), enemy.rewards)
                     else
                         self.user:SetPveData(report:GetAttackKDA())
                     end
+
                     NetManager:getSetPveDataPromise(
                         self.user:EncodePveDataAndResetFightRewardsData()
                     ):done(function()
@@ -243,53 +297,32 @@ function PVEScene:CheckTrap()
                                 GameGlobalUI:showTips(_("获得奖励"), enemy.rewards)
                             end
                         end):AddToCurrentScene(true)
+
+                        self:CheckPveTask(report)
+
                     end)
                 end):AddToCurrentScene(true)
         end)
         self.user:GetPVEDatabase():ResetNextEnemyCounter()
     end
 end
-function PVEScene:PormiseOfCheckObject(x, y, type)
-    local object = self.user:GetCurrentPVEMap():GetObjectByCoord(x, y)
-    if not object or not object:Type() then
-        self.user:GetCurrentPVEMap():ModifyObject(x, y, 0, type)
-        self.user:ResetPveData()
-        return NetManager:getSetPveDataPromise(
-            self.user:EncodePveDataAndResetFightRewardsData()
-        ):fail(function()
-            -- 失败回滚
-            local location = DataManager:getUserData().pve.location
-            self.user:GetPVEDatabase():SetCharPosition(location.x, location.y, location.z)
-            self:GetSceneLayer():MoveCharTo(self.user:GetPVEDatabase():GetCharPosition())
-        end)
-    else
-        return cocos_promise.defer()
+function PVEScene:CheckPveTask(report)
+    local target,ok = self.user:GetPVEDatabase():GetTarget()
+    if ok and target.target > target.count then
+        for i,v in ipairs(report:GetDefenceKDA().soldiers) do
+            if v.name == target.name then
+                self.user:GetPVEDatabase():IncKillCount(v.damagedCount)
+                break
+            end
+        end
     end
+    self:GetHomePage().event_tab:PromiseOfSwitch()
 end
-function PVEScene:OnTwoTouch()
-
-end
-function PVEScene:GetCurrentPos()
-    local logic_map = self:GetSceneLayer():GetLogicMap()
-    local char_x,char_y = self:GetSceneLayer():GetChar():getPosition()
-    return logic_map:ConvertToLogicPosition(char_x, char_y)
-end
-function PVEScene:GetClickedPos(x, y)
-    local logic_map = self:GetSceneLayer():GetLogicMap()
-    local point = self:GetSceneLayer():GetSceneNode():convertToNodeSpace(cc.p(x, y))
-    return logic_map:ConvertToLogicPosition(point.x, point.y)
-end
-function PVEScene:GetCenterPos()
-    local logic_map = self:GetSceneLayer():GetLogicMap()
-    local point = self:GetSceneLayer():GetSceneNode():convertToNodeSpace(cc.p(display.cx, display.cy))
-    return logic_map:ConvertToLogicPosition(point.x, point.y)
-end
-
-
 
 
 
 return PVEScene
+
 
 
 

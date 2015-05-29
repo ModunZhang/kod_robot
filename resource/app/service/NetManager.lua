@@ -166,6 +166,7 @@ local function get_response_delete_report_msg(response)
                 clone_response.msg.playerData = {}
                 table.insert(clone_response.msg.playerData, v)
                 local edit = decodeInUserDataFromDeltaData(user_data, clone_response.msg.playerData)
+                LuaUtils:outputTable("删除战报 edit", edit)
                 DataManager:setUserData(user_data, edit)
             end
         end
@@ -340,18 +341,17 @@ end
 
 local base_event_map = {
     disconnect = function(success, response)
-        print("server----->disconnect---->")
+        printLog("Server Status","disconnect")
         if NetManager.m_netService:isConnected() then
-            UIKit:showKeyMessageDialog(_("错误"), _("服务器连接断开,请检测你的网络环境后重试!"), function()
+            UIKit:showKeyMessageDialog(_("错误"), _("与服务器的链接中断，请检查你的网络环境后重试!"), function()
                 app:retryConnectServer()
             end)
         end
     end,
     timeout = function(success, response)
-        print("server----->timeout---->")
     end,
     onKick = function(success, response)
-        print("server----->onKick---->")
+        printLog("Server Status","onKick")
         NetManager:disconnect()
         UIKit:showKeyMessageDialog(_("提示"), _("服务器连接断开!"), function()
             app:restart(false)
@@ -371,14 +371,14 @@ local logic_event_map = {
             -- 在客户端没有 mails 或者 reports key时，收到邮件或者战报需要增加未读字段数值
             if not user_data.reports then
                 for i,v in ipairs(response) do
-                    if string.find(v[1],"reports") then
+                    if v[1] and string.find(v[1],"reports") then
                         MailManager:IncreaseUnReadReportNum(1)
                     end
                 end
             end
             if not user_data.mails then
                 for i,v in ipairs(response) do
-                    if string.find(v[1],"mails") then
+                    if v[1] and string.find(v[1],"mails") then
                         MailManager:IncreaseUnReadMailsNum(1)
                     end
                 end
@@ -391,12 +391,6 @@ local logic_event_map = {
         if not NetManager.m_was_inited_game then return end
         if success then
             app:GetChatManager():HandleNetMessage("onChat", response)
-        end
-    end,
-    onAllChat = function(success, response)
-        if not NetManager.m_was_inited_game then return end
-        if success then
-            app:GetChatManager():HandleNetMessage("onAllChat", response)
         end
     end,
     -- alliance
@@ -438,7 +432,15 @@ local logic_event_map = {
             local edit = decodeInUserDataFromDeltaData(user_alliance_data, response.allianceData)
             DataManager:setUserAllianceData(user_alliance_data, edit)
         end
-    end
+    end,
+    onNotice = function(success, response)
+        if success then
+            local running_scene = display.getRunningScene().__cname
+            if running_scene ~= "MainScene" and running_scene ~= "LogoScene" then
+                GameGlobalUI:showNotice(response.type,response.content)
+            end
+        end
+    end,
 }
 ---
 function NetManager:InitEventsMap(...)
@@ -1075,8 +1077,8 @@ function NetManager:getSendChatPromise(channel,text)
     }, "发送聊天信息失败!")
 end
 --获取所有聊天信息
-function NetManager:getFetchChatPromise()
-    return get_none_blocking_request_promise("chat.chatHandler.getAll",nil, "获取聊天信息失败!")
+function NetManager:getFetchChatPromise(channel)
+    return get_none_blocking_request_promise("chat.chatHandler.getAll",{channel = channel}, "获取聊天信息失败!")
 end
 -- 获取所有请求加入联盟的申请
 function NetManager:getJoinRequestEventsPromise(allianceId)
@@ -1150,7 +1152,7 @@ end
 function NetManager:getUpgradeAllianceBuildingPromise(buildingName)
     return get_blocking_request_promise("logic.allianceHandler.upgradeAllianceBuilding", {
         buildingName = buildingName
-    }, "升级联盟建筑失败!"):done(get_player_response_msg)
+    }, "升级联盟建筑失败!"):done(get_player_response_msg):done(get_alliance_response_msg)
 end
 -- 升级联盟村落
 function NetManager:getUpgradeAllianceVillagePromise(villageType)
@@ -1581,6 +1583,13 @@ function NetManager:getIapGiftPromise(giftId)
     },"获取联盟其他玩家赠送的礼品!"):done(get_player_response_msg)
 end
 
+
+-- 完成fte
+function NetManager:getFinishFTE()
+    return get_blocking_request_promise("logic.playerHandler.finishFTE", nil,"完成fte失败!"):done(get_player_response_msg)
+end
+
+
 --获取服务器列表
 function NetManager:getServersPromise()
     return get_blocking_request_promise("logic.playerHandler.getServers",nil,"获取服务器列表失败!")
@@ -1594,6 +1603,14 @@ end
 -- 购买联盟盟主职位
 function NetManager:getBuyAllianceArchon()
     return get_blocking_request_promise("logic.allianceHandler.buyAllianceArchon"):done(get_player_response_msg)
+end
+--领取首次加入联盟奖励
+function NetManager:getFirstJoinAllianceRewardPromise()
+    return get_blocking_request_promise("logic.playerHandler.getFirstJoinAllianceReward",nil,"领取首次加入联盟奖励失败!"):done(get_player_response_msg)
+end
+--获取玩家城墙血量
+function NetManager:getPlayerWallInfoPromise(memberId)
+    return get_blocking_request_promise("logic.playerHandler.getPlayerWallInfo",{memberId = memberId},"领取首次加入联盟奖励失败!")
 end
 ----------------------------------------------------------------------------------------------------------------
 function NetManager:getUpdateFileList(cb)

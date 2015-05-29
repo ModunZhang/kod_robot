@@ -9,7 +9,7 @@ local GameUIAllianceLoyalty = class("GameUIAllianceLoyalty", WidgetPopDialog)
 function GameUIAllianceLoyalty:ctor()
     GameUIAllianceLoyalty.super.ctor(self,340,_("忠诚值"),window.top-200)
 
-    local go_shop_btn = WidgetPushButton.new({normal = "yellow_btn_up_185x65.png",pressed = "yellow_btn_down_185x65.png"})
+    local go_shop_btn = WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png"})
         :align(display.CENTER,self.body:getContentSize().width/2,60)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then

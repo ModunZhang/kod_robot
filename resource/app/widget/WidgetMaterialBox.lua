@@ -22,11 +22,11 @@ function WidgetMaterialBox:ctor(material_type,material_name,cb,is_has_i_icon)
     local material = cc.ui.UIImage.new(self:GetMaterialImage(material_type,material_name)):addTo(icon_bg)
         :align(display.CENTER, icon_bg:getContentSize().width/2, icon_bg:getContentSize().height/2):scale(100/128)
     if is_has_i_icon then
-        cc.ui.UIImage.new("draong_eq_i_25x25.png"):addTo(icon_bg,2)
+        cc.ui.UIImage.new("goods_26x26.png"):addTo(icon_bg,2)
             :align(display.BOTTOM_LEFT, 4, 4)
     end
 
-    self.number_bg = cc.ui.UIImage.new("back_ground_118x36.png"):addTo(material_bg)
+    self.number_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(118,36),cc.rect(15,10,136,64)):addTo(material_bg)
         :align(display.BOTTOM_CENTER, rect.width/2, 4)
         :hide()
     local number_bg = self.number_bg 

@@ -20,11 +20,9 @@ local GameUIAllianceHome = UIKit:createUIClass('GameUIAllianceHome')
 local buildingName = GameDatas.AllianceInitData.buildingName
 local Alliance_Manager = Alliance_Manager
 local cc = cc
-function GameUIAllianceHome:ctor(alliance, multialliancelayer)
-    GameUIAllianceHome.super.ctor(self)
-    self.alliance = alliance
-    self.multialliancelayer = multialliancelayer
-end
+
+
+
 function GameUIAllianceHome:DisplayOn()
     self.visible_count = self.visible_count + 1
     self:FadeToSelf(self.visible_count > 0)
@@ -33,21 +31,32 @@ function GameUIAllianceHome:DisplayOff()
     self.visible_count = self.visible_count - 1
     self:FadeToSelf(self.visible_count > 0)
 end
+function GameUIAllianceHome:FadeToSelf(isFullDisplay)
+    self:stopAllActions()
+    if isFullDisplay then
+        self:show()
+        transition.fadeIn(self, {
+            time = 0.2,
+        })
+    else
+        transition.fadeOut(self, {
+            time = 0.2,
+            onComplete = function()
+                self:hide()
+            end,
+        })
+    end
+end
 function GameUIAllianceHome:IsDisplayOn()
     return self.visible_count > 0
 end
-function GameUIAllianceHome:FadeToSelf(isFullDisplay)
-    self:setCascadeOpacityEnabled(true)
-    local opacity = isFullDisplay == true and 255 or 0
-    local p = isFullDisplay and 0 or 99999999
-    transition.fadeTo(self, {opacity = opacity, time = 0.2,
-        onComplete = function()
-            self:pos(p, p)
-        end
-    })
+
+
+function GameUIAllianceHome:ctor(alliance, multialliancelayer)
+    GameUIAllianceHome.super.ctor(self)
+    self.alliance = alliance
+    self.multialliancelayer = multialliancelayer
 end
-
-
 function GameUIAllianceHome:onEnter()
     GameUIAllianceHome.super.onEnter(self)
     -- 获取历史记录
@@ -89,6 +98,7 @@ function GameUIAllianceHome:AddOrRemoveListener(isAdd)
         city:AddListenOnType(self,city.LISTEN_TYPE.HELPED_TO_TROOPS)
         city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
         city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
+        User:AddListenOnType(self, User.LISTEN_TYPE.ALLIANCE_INFO)
         local alliance_belvedere = self.alliance:GetAllianceBelvedere()
         alliance_belvedere:AddListenOnType(self, alliance_belvedere.LISTEN_TYPE.OnMarchDataChanged)
         alliance_belvedere:AddListenOnType(self, alliance_belvedere.LISTEN_TYPE.OnCommingDataChanged)
@@ -105,6 +115,7 @@ function GameUIAllianceHome:AddOrRemoveListener(isAdd)
         city:RemoveListenerOnType(self,city.LISTEN_TYPE.HELPED_TO_TROOPS)
         city:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
         city:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+        User:RemoveListenerOnType(self, User.LISTEN_TYPE.ALLIANCE_INFO)
         local alliance_belvedere = self.alliance:GetAllianceBelvedere()
         alliance_belvedere:RemoveListenerOnType(self, alliance_belvedere.LISTEN_TYPE.OnMarchDataChanged)
         alliance_belvedere:RemoveListenerOnType(self, alliance_belvedere.LISTEN_TYPE.OnCommingDataChanged)
@@ -145,8 +156,11 @@ function GameUIAllianceHome:Schedule()
         if alliance:IsDefault() then return end
         local lx,ly,view = self.multialliancelayer:GetAllianceCoordWithPoint(display.cx, display.cy)
         local layer = view:GetLayer()
-        local x,y = alliance_map:FindMapObjectById(myself:MapId()):GetMidLogicPosition()
-        self:UpdateMyAllianceBuildingArrows(screen_rect, alliance, layer)
+        -- local x,y = alliance_map:FindMapObjectById(myself:MapId()):GetMidLogicPosition()
+        -- self:UpdateMyAllianceBuildingArrows(screen_rect, alliance, layer)
+        if not Alliance_Manager:GetMyAlliance():IsDefault() then
+            self:UpdateFriendArrows(screen_rect, Alliance_Manager:GetMyAlliance(), layer, lx, ly)
+        end
         if Alliance_Manager:HaveEnemyAlliance() then
             self:UpdateEnemyArrows(screen_rect, Alliance_Manager:GetEnemyAlliance(), layer, lx, ly)
         end
@@ -159,12 +173,15 @@ function GameUIAllianceHome:InitArrow()
     self.screen_rect = cc.rect(0, rect1.height, display.width, rect2.y - rect1.height)
 
     -- my alliance building
-    self.alliance_building_arrows = {}
-    for i = 1, 5 do
-        self.alliance_building_arrows[i] = display.newSprite("arrow_blue-hd.png")
-            :addTo(self, -2):align(display.TOP_CENTER):hide()
-    end
-    self.allince_arrow_index = 1
+    -- self.alliance_building_arrows = {}
+    -- for i = 1, 5 do
+    --     self.alliance_building_arrows[i] = display.newSprite("arrow_blue-hd.png")
+    --         :addTo(self, -2):align(display.TOP_CENTER):hide()
+    -- end
+    -- self.allince_arrow_index = 1
+    -- friends
+    self.friends_arrows = {}
+    self.friends_arrow_index = 1
     -- enemys
     self.enemy_arrows = {}
     self.enemy_arrow_index = 1
@@ -323,7 +340,7 @@ function GameUIAllianceHome:CreateTop()
     self_flag:align(display.CENTER, self_name_bg:getContentSize().width-100, -30):addTo(self_name_bg)
     self.self_flag = self_flag
     -- 敌方联盟名字
-    local enemy_name_bg = display.newSprite("title_red_292X32.png")
+    local enemy_name_bg =  display.newSprite("title_red_292X32.png")
         :align(display.RIGHT_CENTER, 147,-26)
         :addTo(top_enemy_bg)
     local enemy_name_label = UIKit:ttfLabel(
@@ -366,7 +383,7 @@ function GameUIAllianceHome:CreateTop()
     -- 己方战力
     local self_power_bg = display.newSprite("power_background_146x26.png")
         :align(display.LEFT_CENTER, -107, -65):addTo(top_self_bg)
-    local our_num_icon = cc.ui.UIImage.new("power_24x29.png"):align(display.CENTER, -107, -65):addTo(top_self_bg)
+    local our_num_icon = cc.ui.UIImage.new("dragon_strength_27x31.png"):align(display.CENTER, -107, -65):addTo(top_self_bg)
     local self_power_label = UIKit:ttfLabel(
         {
             text = string.formatnumberthousands(alliance:Power()),
@@ -377,7 +394,7 @@ function GameUIAllianceHome:CreateTop()
     -- 敌方战力
     local enemy_power_bg = display.newSprite("power_background_146x26.png")
         :align(display.LEFT_CENTER, -20, -65):addTo(top_enemy_bg)
-    local enemy_num_icon = cc.ui.UIImage.new("power_24x29.png")
+    local enemy_num_icon = cc.ui.UIImage.new("dragon_strength_27x31.png")
         :align(display.CENTER, 0, enemy_power_bg:getContentSize().height/2)
         :addTo(enemy_power_bg)
     local enemy_power_label = UIKit:ttfLabel(
@@ -440,7 +457,7 @@ function GameUIAllianceHome:CreateTop()
             self:SetEnemyPowerOrKill(enemy_reprot_data_kill)
         else
             if status~="peace" then
-                enemy_num_icon:setTexture("power_24x29.png")
+                enemy_num_icon:setTexture("dragon_strength_27x31.png")
                 self:SetEnemyPowerOrKill(enemyAlliance:Power())
                 enemy_num_icon:scale(1.0)
             else
@@ -448,7 +465,7 @@ function GameUIAllianceHome:CreateTop()
                 enemy_num_icon:scale(0.4)
                 self:SetEnemyPowerOrKill(alliance:GetFightRequestPlayerNum())
             end
-            our_num_icon:setTexture("power_24x29.png")
+            our_num_icon:setTexture("dragon_strength_27x31.png")
             self:SetOurPowerOrKill(alliance:Power())
         end
     end
@@ -518,24 +535,13 @@ function GameUIAllianceHome:OnAllianceBasicChanged(alliance,changed_map)
     end
 end
 function GameUIAllianceHome:OnMemberChanged(alliance)
-    local self_member = alliance:GetMemeberById(DataManager:getUserData()._id)
-    self.page_top:SetLoyalty(GameUtils:formatNumber(self_member.loyalty))
+-- local self_member = alliance:GetMemeberById(DataManager:getUserData()._id)
+-- self.page_top:SetLoyalty(GameUtils:formatNumber(self_member.loyalty))
 end
--- function GameUIAllianceHome:OnAllianceCountInfoChanged(alliance,countInfo)
---     self.count = 0
---     local status = self.alliance:Status()
---     if status=="fight" or status=="protect" then
---         print("self.count",self.count)
---         LuaUtils:outputTable("GameUIAllianceHome:OnAllianceCountInfoChanged==countInfo", countInfo)
---         self.count = self.count + 1
---         if countInfo.kill then
---             self.top:SetOurPowerOrKill(countInfo.kill)
---         end
---         if countInfo.beKilled then
---             self.top:SetEnemyPowerOrKill(countInfo.beKilled)
---         end
---     end
--- end
+function GameUIAllianceHome:OnAllianceInfoChanged()
+    self.page_top:SetLoyalty(GameUtils:formatNumber(User:Loyalty()))
+end
+
 local deg = math.deg
 local ceil = math.ceil
 local point = cc.p
@@ -566,17 +572,6 @@ function GameUIAllianceHome:UpdateCoordinate(logic_x, logic_y, alliance_view)
     self.page_top:SetCoordinateTitle(is_mine)
     self.page_top:SetCoordinate(coordinate_str)
 end
-function GameUIAllianceHome:UpdateAllArrows(logic_x, logic_y, alliance_view)
-    local layer = alliance_view:GetLayer()
-    local screen_rect = self.screen_rect
-    local alliance = self.alliance
-    local x,y = alliance:GetAllianceMap():FindMapObjectById(alliance:GetSelf():MapId()):GetMidLogicPosition()
-    self:UpdateMyCityArrows(screen_rect, alliance, layer, x,y)
-    self:UpdateMyAllianceBuildingArrows(screen_rect, alliance, layer)
-    if Alliance_Manager:HaveEnemyAlliance() then
-        self:UpdateEnemyArrows(screen_rect, Alliance_Manager:GetEnemyAlliance(), layer, logic_x, logic_y)
-    end
-end
 function GameUIAllianceHome:UpdateMyCityArrows(screen_rect, alliance, layer, x, y)
     local map_point = layer:ConvertLogicPositionToMapPosition(x, y, alliance:Id())
     local world_point = layer:convertToWorldSpace(map_point)
@@ -595,46 +590,82 @@ function GameUIAllianceHome:UpdateMyCityArrows(screen_rect, alliance, layer, x, 
         self.arrow:hide()
     end
 end
-function GameUIAllianceHome:UpdateMyAllianceBuildingArrows(screen_rect, alliance, layer)
-    local id = alliance:Id()
-    local count = 1
-    alliance:GetAllianceMap():IteratorAllianceBuildings(function(_, v)
-        if count == self.allince_arrow_index then
-            local arrow = self:GetMyAllianceArrow(count)
-            local x,y = v:GetMidLogicPosition()
-            local map_point = layer:ConvertLogicPositionToMapPosition(x, y, id)
-            local world_point = layer:convertToWorldSpace(map_point)
-            if not rectContainsPoint(screen_rect, world_point) then
-                local p,degree = self:GetIntersectPoint(screen_rect, MID_POINT, world_point)
-                if p and degree then
-                    arrow:show():pos(p.x, p.y):rotation(degree + 180)
-                end
-            else
-                arrow:hide()
-            end
-            return true
+-- function GameUIAllianceHome:UpdateMyAllianceBuildingArrows(screen_rect, alliance, layer)
+--     local id = alliance:Id()
+--     local count = 1
+--     alliance:GetAllianceMap():IteratorAllianceBuildings(function(_, v)
+--         if count == self.allince_arrow_index then
+--             local arrow = self:GetMyAllianceArrow(count)
+--             local x,y = v:GetMidLogicPosition()
+--             local map_point = layer:ConvertLogicPositionToMapPosition(x, y, id)
+--             local world_point = layer:convertToWorldSpace(map_point)
+--             if not rectContainsPoint(screen_rect, world_point) then
+--                 local p,degree = self:GetIntersectPoint(screen_rect, MID_POINT, world_point)
+--                 if p and degree then
+--                     arrow:show():pos(p.x, p.y):rotation(degree + 180)
+--                 end
+--             else
+--                 arrow:hide()
+--             end
+--             return true
+--         end
+--         count = count + 1
+--     end)
+--     self.allince_arrow_index = self.allince_arrow_index + 1
+--     if self.allince_arrow_index > 5 then
+--         self.allince_arrow_index = 1
+--     end
+-- end
+-- function GameUIAllianceHome:GetMyAllianceArrow(count)
+--     return self.alliance_building_arrows[count]
+-- end
+local min = math.min
+local MAX_ARROW_COUNT = 5
+function GameUIAllianceHome:UpdateFriendArrows(screen_rect, alliance, layer, logic_x, logic_y)
+    local count = self:UpdateAllianceArrow(screen_rect, alliance, layer, logic_x, logic_y, self.friends_arrow_index, function(index)
+        if not self.friends_arrows[index] then
+            self.friends_arrows[index] = display.newSprite("arrow_blue-hd.png")
+                :addTo(self, -2):align(display.TOP_CENTER):hide()
         end
-        count = count + 1
+        return self.friends_arrows[index]
     end)
-    self.allince_arrow_index = self.allince_arrow_index + 1
-    if self.allince_arrow_index > 5 then
-        self.allince_arrow_index = 1
+    local friends_arrows = self.friends_arrows
+    for i = count, #friends_arrows do
+        friends_arrows[i]:hide()
+    end
+    self.friends_arrow_index = self.friends_arrow_index + 1
+    if self.friends_arrow_index > min(count, MAX_ARROW_COUNT) then
+        self.friends_arrow_index = 1
     end
 end
-function GameUIAllianceHome:GetMyAllianceArrow(count)
-    return self.alliance_building_arrows[count]
+function GameUIAllianceHome:UpdateEnemyArrows(screen_rect, alliance, layer, logic_x, logic_y)
+    local count = self:UpdateAllianceArrow(screen_rect, alliance, layer, logic_x, logic_y, self.enemy_arrow_index, function(index)
+        if not self.enemy_arrows[index] then
+            self.enemy_arrows[index] = display.newSprite("arrow_red-hd.png")
+                :addTo(self, -2):align(display.TOP_CENTER):hide()
+        end
+        return self.enemy_arrows[index]
+    end)
+    local enemy_arrows = self.enemy_arrows
+    for i = count, #enemy_arrows do
+        enemy_arrows[i]:hide()
+    end
+    self.enemy_arrow_index = self.enemy_arrow_index + 1
+    if self.enemy_arrow_index > min(count, MAX_ARROW_COUNT) then
+        self.enemy_arrow_index = 1
+    end
 end
-local min = math.min
-function GameUIAllianceHome:UpdateEnemyArrows(screen_rect, enemy_alliance, layer, logic_x, logic_y)
-    local id = enemy_alliance:Id()
+--
+function GameUIAllianceHome:UpdateAllianceArrow(screen_rect, alliance, layer, logic_x, logic_y, cur_index, func)
+    local id = alliance:Id()
     local count = 1
-    enemy_alliance:GetAllianceMap():IteratorCities(function(_, v)
-        if count > 10 then return true end
-        if count == self.enemy_arrow_index then
+    alliance:GetAllianceMap():IteratorCities(function(_, v)
+        if count > MAX_ARROW_COUNT then return true end
+        if count == cur_index then
             local x,y = v:GetMidLogicPosition()
             local dx, dy = (logic_x - x), (logic_y - y)
             if dx^2 + dy^2 > 1 then
-                local arrow = self:GetEnemyArrow(count)
+                local arrow = func(count)
                 local map_point = layer:ConvertLogicPositionToMapPosition(x, y, id)
                 local world_point = layer:convertToWorldSpace(map_point)
                 if not rectContainsPoint(screen_rect, world_point) then
@@ -649,22 +680,9 @@ function GameUIAllianceHome:UpdateEnemyArrows(screen_rect, enemy_alliance, layer
         end
         count = count + 1
     end)
-    local enemy_arrows = self.enemy_arrows
-    for i = count, #enemy_arrows do
-        enemy_arrows[i]:hide()
-    end
-    self.enemy_arrow_index = self.enemy_arrow_index + 1
-    if self.enemy_arrow_index > min(count, 10) then
-        self.enemy_arrow_index = 1
-    end
+    return count
 end
-function GameUIAllianceHome:GetEnemyArrow(count)
-    if not self.enemy_arrows[count] then
-        self.enemy_arrows[count] = display.newSprite("arrow_red-hd.png")
-            :addTo(self, -2):align(display.TOP_CENTER):hide()
-    end
-    return self.enemy_arrows[count]
-end
+--
 function GameUIAllianceHome:GetIntersectPoint(screen_rect, point1, point2, normal)
     local points = self:GetPointsWithScreenRect(screen_rect)
     for i = 1, #points do
@@ -739,6 +757,9 @@ function GameUIAllianceHome:GetAlliancePeriod()
 end
 
 return GameUIAllianceHome
+
+
+
 
 
 

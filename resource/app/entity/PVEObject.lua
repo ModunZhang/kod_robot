@@ -166,6 +166,9 @@ function PVEObject:DecodeToRewards(raw, func)
     end)
     return setmetatable(r, m)
 end
+function PVEObject:IsAttackAble()
+    return normal_map[self.type] or elite_map[self.type]
+end
 function PVEObject:IsUnSearched()
     return self:Searched() == 0
 end

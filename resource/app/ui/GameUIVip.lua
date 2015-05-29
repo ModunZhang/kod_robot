@@ -619,78 +619,7 @@ function GameUIVip:CreateBackGroundWithTitle(title_string)
     return body,layer
 end
 
-function GameUIVip:CreateVIPItem(params)
-    local body = display.newColorLayer(cc.c4b(0,0,0,0))
-    body:setContentSize(cc.size(580,138))
-    local prop_bg = display.newSprite("box_136x138.png"):align(display.LEFT_BOTTOM, 0,0):addTo(body)
-    local prop_icon = display.newSprite("vip_tool_icon.png")
-        :align(display.CENTER, prop_bg:getContentSize().width/2,prop_bg:getContentSize().height/2)
-        :addTo(prop_bg)
-    local num_bg = display.newSprite("vip_bg_2.png")
-        :align(display.BOTTOM_CENTER, prop_bg:getContentSize().width/2,6)
-        :addTo(prop_bg)
-    local num_label = cc.ui.UILabel.new(
-        {
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-            text = params.value,
-            font = UIKit:getFontFilePath(),
-            size = 20,
-            color = UIKit:hex2c3b(0xffedae)
-        })
-        :addTo(num_bg)
-    if params.gem then
-        local gem_icon = display.newSprite("gem_icon_62x61.png"):align(display.RIGHT_CENTER, 42,num_bg:getContentSize().height/2):addTo(num_bg):scale(0.5)
-        num_label:align(display.LEFT_CENTER, 45, num_bg:getContentSize().height/2)
-    else
-        num_label:align(display.CENTER, num_bg:getContentSize().width/2, num_bg:getContentSize().height/2)
-    end
 
-    local des_bg = display.newSprite("vip_bg_3.png"):align(display.LEFT_BOTTOM, 126,6):addTo(body)
-
-    local eff_label_1 = cc.ui.UILabel.new(
-        {
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-            text = params.first_label,
-            font = UIKit:getFontFilePath(),
-            size = 24,
-            color = UIKit:hex2c3b(0x514d3e)
-        }):align(display.LEFT_CENTER,140, 100)
-        :addTo(body)
-    local eff_label_2 = cc.ui.UILabel.new(
-        {
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-            text = params.second_label,
-            font = UIKit:getFontFilePath(),
-            size = 20,
-            color = UIKit:hex2c3b(0x615b44)
-        }):align(display.LEFT_CENTER,140, 60)
-        :addTo(body)
-    local button_label_str,normal_img,pressed_img
-    if params.btn_type == BUY_AND_USE then
-        button_label_str,normal_img,pressed_img = _("购买使用"),"green_btn_up_142x39.png","green_btn_down_142x39.png"
-    else
-        button_label_str,normal_img,pressed_img = _("使用"),"yellow_btn_up_149x47.png","yellow_btn_down_149x47.png"
-    end
-    local button_label = cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = button_label_str,
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)})
-    button_label:enableShadow()
-    local button = WidgetPushButton.new(
-        {normal = normal_img, pressed = pressed_img},
-        {scale9 = false}
-    ):setButtonLabel(button_label)
-        :addTo(body):align(display.CENTER, 500,30)
-        :onButtonClicked(function(event)
-            if event.name == "CLICKED_EVENT" then
-                params.listener()
-            end
-        end)
-
-    return body
-end
 function GameUIVip:GetVIPInfoByLevel(level)
     local info ={}
 

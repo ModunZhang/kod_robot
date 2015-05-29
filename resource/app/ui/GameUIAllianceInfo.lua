@@ -105,7 +105,7 @@ function GameUIAllianceInfo:BuildUI()
         {tag = "Members",label = _("成员列表"),default = self.default_tab == "Members"},
     }, function(tag)
         self:OnTabButtonClicked(tag)
-    end,2):align(display.BOTTOM_CENTER,304,10):addTo(self:GetBody()):zorder(200)
+    end,1):align(display.BOTTOM_CENTER,304,10):addTo(self:GetBody()):zorder(200)
 end
 
 function GameUIAllianceInfo:OnTabButtonClicked( tag )
@@ -298,7 +298,7 @@ function GameUIAllianceInfo:LoadContact()
         size = cc.size(446,40),
         font = UIKit:getFontFilePath(),
     })
-    editbox_subject:setPlaceHolder(_("最多可输入140字符"))
+    editbox_subject:setPlaceHolder(string.format(_("最多可输入%d字符"),140))
     editbox_subject:setMaxLength(140)
     editbox_subject:setFont(UIKit:getEditBoxFont(),22)
     editbox_subject:setFontColor(cc.c3b(0,0,0))
@@ -307,7 +307,8 @@ function GameUIAllianceInfo:LoadContact()
     editbox_subject:align(display.LEFT_CENTER,subject_title:getPositionX() + 10,subject_title:getPositionY()):addTo(layer)
 
     -- 分割线
-    local line =display.newScale9Sprite("dividing_line_584x1.png", l_size.width/2, subject_title:getPositionY() - 35,cc.size(594,1)):addTo(layer)
+    local line = display.newScale9Sprite("dividing_line.png",l_size.width/2, subject_title:getPositionY() - 35,cc.size(594,2),cc.rect(10,2,382,2)):addTo(layer)
+
     -- 内容
     UIKit:ttfLabel(
         {
@@ -317,7 +318,7 @@ function GameUIAllianceInfo:LoadContact()
         }):align(display.LEFT_CENTER,30,line:getPositionY() - 20)
         :addTo(layer)
     -- 回复的邮件内容
-    local textView = ccui.UITextView:create(cc.size(558,352),display.newScale9Sprite("background_580X472.png"))
+    local textView = ccui.UITextView:create(cc.size(558,352),display.newScale9Sprite("background_88x42.png"))
     textView:addTo(layer):align(display.CENTER_TOP,l_size.width/2,line:getPositionY() - 40)
     textView:setReturnType(cc.KEYBOARD_RETURNTYPE_DEFAULT)
     textView:setFont(UIKit:getEditBoxFont(), 24)
@@ -347,18 +348,18 @@ function GameUIAllianceInfo:LoadContact()
 end
 function GameUIAllianceInfo:SendMail(addressee,title,content)
     if not title or string.trim(title)=="" then
-        UIKit:showMessageDialog(_("陛下"),_("请填写邮件主题"))
+        UIKit:showMessageDialog(_("主人"),_("请填写邮件主题"))
         return
     elseif not content or string.trim(content)=="" then
-        UIKit:showMessageDialog(_("陛下"),_("请填写邮件内容"))
+        UIKit:showMessageDialog(_("主人"),_("请填写邮件内容"))
         return
     end
     if not addressee or string.trim(addressee)=="" then
-        UIKit:showMessageDialog(_("陛下"),_("请填写正确的收件人ID"))
+        UIKit:showMessageDialog(_("主人"),_("请填写正确的收件人ID"))
         return
     end
     if User:Id() == addressee then
-        UIKit:showMessageDialog(_("陛下"),_("不能给自己发送邮件"))
+        UIKit:showMessageDialog(_("主人"),_("不能给自己发送邮件"))
         return
     end
     NetManager:getSendPersonalMailPromise(addressee, title, content,self.contacts):done(function(result)
@@ -391,7 +392,7 @@ function GameUIAllianceInfo:LoadMembers()
     WidgetPushTransparentButton.new(cc.rect(0,0,560,134)):addTo(layer):align(display.LEFT_TOP,22,664):onButtonClicked(function()
         UIKit:newGameUI("GameUIAllianceMemberInfo",false,archon_data.id):AddToCurrentScene(true)
     end)
-    local title_bar =  display.newScale9Sprite("alliance_event_type_darkblue_222x30.png",0,0, cc.size(428,30), cc.rect(7,7,190,16))
+    local title_bar =  display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(428,30), cc.rect(10,10,410,10))
         :addTo(layer)
         :align(display.LEFT_TOP, 154, 664)
     local title_label = UIKit:ttfLabel({
@@ -400,9 +401,10 @@ function GameUIAllianceInfo:LoadMembers()
         color= 0xffedae,
         align = cc.TEXT_ALIGNMENT_LEFT,
     }):addTo(title_bar):align(display.LEFT_CENTER,5, 15)
-    local line_2 = display.newScale9Sprite("dividing_line_594x2.png"):addTo(layer)
+    local line_2 = display.newScale9Sprite("dividing_line.png",0,0,cc.size(428,2),cc.rect(10,2,382,2))
+        :addTo(layer)
         :align(display.LEFT_BOTTOM,title_bar:getPositionX(),536)
-        :size(428,2)
+
     local powerIcon = display.newSprite("dragon_strength_27x31.png")
         :align(display.LEFT_BOTTOM,line_2:getPositionX() + 5,line_2:getPositionY()+5)
         :addTo(layer)
@@ -424,10 +426,10 @@ function GameUIAllianceInfo:LoadMembers()
         color = 0x403c2f,
         align = cc.TEXT_ALIGNMENT_RIGHT,
     }):addTo(layer):align(display.BOTTOM_RIGHT,line_2:getPositionX() + 428,line_2:getPositionY() + 5)
-
-    local line_1 = display.newScale9Sprite("dividing_line_594x2.png"):addTo(layer)
+    local line_1 = display.newScale9Sprite("dividing_line.png",0,0,cc.size(428,2),cc.rect(10,2,382,2))
+        :addTo(layer)
         :align(display.LEFT_BOTTOM,title_bar:getPositionX(),572)
-        :size(428,2)
+
     local display_title,imageName = self:GetAllianceTitleAndLevelPng("archon")
     local title_icon = display.newSprite(imageName)
         :align(display.LEFT_BOTTOM, line_1:getPositionX(), line_1:getPositionY() + 5)
@@ -462,7 +464,7 @@ end
 
 function GameUIAllianceInfo:GetMemberItemContent()
     local node = display.newNode():size(560,78)
-    local content_title = display.newSprite("title_blue_558x34.png"):align(display.LEFT_BOTTOM, 0, 0):addTo(node)
+    local content_title = display.newSprite("title_blue_554x34.png"):align(display.LEFT_BOTTOM, 0, 0):addTo(node)
     node.content_title = content_title
     local title_label= UIKit:ttfLabel({
         text = "title",
@@ -474,7 +476,8 @@ function GameUIAllianceInfo:GetMemberItemContent()
         local num_sp = display.newSprite(v):addTo(content_title):align(display.RIGHT_CENTER,258,17)
         content_title[key] = num_sp
     end
-    local content_memeber = display.newSprite("mission_box_558x66.png"):align(display.LEFT_BOTTOM,0, 6):addTo(node)
+    local content_memeber = WidgetUIBackGround.new({width = 558,height = 66},WidgetUIBackGround.STYLE_TYPE.STYLE_4)
+        :align(display.LEFT_BOTTOM,0, 6):addTo(node)
     node.content_memeber = content_memeber
 
     local empty_label = UIKit:ttfLabel({
@@ -520,7 +523,7 @@ end
 
 function GameUIAllianceInfo:GetPlayerIconSprite()
 
-    local bg = display.newSprite("chat_hero_background.png", nil, nil, {class=cc.FilteredSpriteWithOne})
+    local bg = display.newSprite("dragon_bg_114x114.png", nil, nil, {class=cc.FilteredSpriteWithOne})
     local icon = display.newSprite(UIKit:GetPlayerIconImage(1), nil, nil, {class=cc.FilteredSpriteWithOne}):addTo(bg):align(display.CENTER,56,65)
     bg.icon = icon
     return bg
@@ -620,6 +623,7 @@ function GameUIAllianceInfo:listviewListener(event)
     end
 end
 return GameUIAllianceInfo
+
 
 
 

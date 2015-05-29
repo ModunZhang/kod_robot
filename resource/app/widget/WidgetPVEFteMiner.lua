@@ -82,7 +82,11 @@ function WidgetPVEFteMiner:PormiseOfFte()
     local r = self.btns[1]:getCascadeBoundingBox()
     self:GetFteLayer():SetTouchObject(self.btns[1])
 
-    WidgetFteArrow.new(_("点击进攻")):addTo(self:GetFteLayer())
+
+    local cur = self:GetObject():Searched() + 1
+    local str = string.format(_("点击进攻第%d层"), cur)
+
+    WidgetFteArrow.new(str):addTo(self:GetFteLayer())
         :TurnUp():align(display.TOP_CENTER, r.x + r.width/2, r.y - 10)
 
     return UIKit:PromiseOfOpen("GameUIPVEFteSendTroop")

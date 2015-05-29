@@ -26,57 +26,29 @@ function MyCityScene:onEnter()
     self:GetCity():AddListenOnType(self, City.LISTEN_TYPE.UPGRADE_BUILDING)
     self:GetCity():GetUser():AddListenOnType(self, User.LISTEN_TYPE.BASIC)
     self:GetCity():GetSoldierManager():AddListenOnType(self, SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
+    self:GetCity():GetFirstBuildingByType("barracks"):AddBarracksListener(self)
+
 
 
     local alliance = Alliance_Manager:GetMyAlliance()
     local alliance_map = alliance:GetAllianceMap()
-    local allianceShirine = alliance:GetAllianceShrine()
-    alliance_map:AddListenOnType(allianceShirine, alliance_map.LISTEN_TYPE.BUILDING_INFO)
+    alliance:AddListenOnType(self, alliance.LISTEN_TYPE.OPERATION)
 
 
-    -- local emitter = cc.ParticleRain:createWithTotalParticles(200)
-    -- :addTo(self:GetScreenLayer()):pos(display.cx-80, display.height)
-    -- emitter:setLife(7)
-    -- emitter:setStartSize(10)
-    -- emitter:setStartSizeVar(10)
-    -- emitter:setRadialAccel(10)
-    -- emitter:setRadialAccelVar(50)
-    -- emitter:setRotationIsDir(true)
-    -- emitter:setStartSpinVar(1000)
-    -- emitter:setEndSpinVar(1000)
-    -- emitter:setStartColor(cc.c4f(1,1,1,0.8))
-    -- emitter:setStartColorVar(cc.c4f(0,0,0,0.2))
-    -- emitter:setEndColor(cc.c4f(1,1,1,0))
-    -- emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
-    -- emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("snow.png"))
-
---
-    -- local emitter = cc.ParticleRain:createWithTotalParticles(50)
-    -- :addTo(self)
-    -- :pos(display.cx + 80, display.height)
-    -- emitter:setPosVar(cc.p(display.cx,0))
-    -- emitter:setGravity(cc.p(-10,-10))
-    -- emitter:setStartSize(30)
-    -- emitter:setStartSizeVar(30)
-    -- emitter:setEndSize(30)
-    -- emitter:setEndSizeVar(30)
-    -- emitter:setLife(0.5)
-    -- emitter:setSpeed(1800)
-    -- emitter:setSpeedVar(100)
-    -- emitter:setAngle(-100)
-    -- emitter:setAngleVar(0)
-    -- emitter:setRadialAccel(100)
-    -- emitter:setRadialAccelVar(0)
-    -- emitter:setTangentialAccel(0)
-    -- emitter:setTangentialAccelVar(0)
-    -- emitter:setRotationIsDir(false)
-    -- emitter:setStartSpin(10)
-    -- emitter:setEndSpin(10)
-    -- emitter:setStartColor(cc.c4f(1,1,1,0.9))
-    -- emitter:setStartColorVar(cc.c4f(0,0,0,0.1))
-    -- emitter:setEndColor(cc.c4f(1,1,1,0.5))
-    -- emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
-    -- emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("rain.png"))
+    self.firstJoinAllianceRewardGeted = DataManager:getUserData().countInfo.firstJoinAllianceRewardGeted
+    -- cc.ui.UIPushButton.new({normal = "lock_btn.png",pressed = "lock_btn.png"})
+    -- :addTo(self, 1000000):align(display.RIGHT_TOP, display.width, display.height)
+    -- :onButtonClicked(function(event)
+    --     event.target:setButtonEnabled(false)
+    --     app:ReloadGame()
+    -- end):setOpacity(0)
+    -- UIKit:ttfLabel({
+    --     text = _("reload"),
+    --     size = 30,
+    --     color = 0xffedae,
+    --     align = cc.TEXT_ALIGNMENT_CENTER,
+    -- }):addTo(self, 1000000)
+    -- :align(display.RIGHT_TOP, display.width, display.height)
 end
 function MyCityScene:onExit()
     MyCityScene.super.onExit(self)
@@ -84,15 +56,26 @@ end
 function MyCityScene:EnterEditMode()
     self:GetTopLayer():hide()
     self:GetHomePage():DisplayOff()
+    local label = UIKit:ttfLabel(
+        {
+            text = _("选择一个空地,将小屋移动到这里"),
+            size = 22,
+            color = 0xffedae,
+        })
+    self.move_house_tip = display.newScale9Sprite("fte_label_background.png",display.cx,display.top-100,cc.size(label:getContentSize().width+60,label:getContentSize().height+20),cc.rect(20,20,330,28))
+        :addTo(self)
+    label:align(display.CENTER, self.move_house_tip:getContentSize().width/2, self.move_house_tip:getContentSize().height/2):addTo(self.move_house_tip)
     MyCityScene.super.EnterEditMode(self)
 end
 function MyCityScene:LeaveEditMode()
     self:GetTopLayer():show()
     self:GetHomePage():DisplayOn()
+    self.move_house_tip:removeFromParent(true)
     MyCityScene.super.LeaveEditMode(self)
     self:GetSceneUILayer():removeChildByTag(WidgetMoveHouse.ADD_TAG, true)
 end
 function MyCityScene:CreateSceneUILayer()
+    local scene_node = self
     local city = self.city
     local scene_layer = self:GetSceneLayer()
     local scene_ui_layer = display.newLayer()
@@ -131,17 +114,33 @@ function MyCityScene:CreateSceneUILayer()
     function scene_ui_layer:Schedule()
         display.newNode():addTo(self):schedule(function()
             if scene_layer:getScale() < (scene_layer:GetScaleRange()) * 1.3 then
-                if self.is_show == nil or  self.is_show == true then
+                if self.is_show == nil or self.is_show == true then
                     scene_layer:HideLevelUpNode()
+                    scene_node:GetTopLayer():stopAllActions()
+                    transition.fadeTo(scene_node:GetTopLayer(), {
+                        opacity = 0,
+                        time = 0.5,
+                        onComplete = function()
+                            scene_node:GetTopLayer():hide()
+                        end,
+                    })
                     self.is_show = false
                 end
             else
-                if self.is_show == nil or  self.is_show == false then
+                if self.is_show == nil or self.is_show == false then
                     scene_layer:ShowLevelUpNode()
+                    scene_node:GetTopLayer():stopAllActions()
+                    transition.fadeTo(scene_node:GetTopLayer(), {
+                        opacity = 255,
+                        time = 0.5,
+                        onComplete = function()
+                            scene_node:GetTopLayer():show()
+                        end,
+                    })
                     self.is_show = true
                 end
             end
-        end, 0.5)
+        end, 1)
         display.newNode():addTo(self):schedule(function()
             -- local building = self.building__
             -- if self.indicator and building then
@@ -175,6 +174,20 @@ function MyCityScene:NewLockButtonFromBuildingSprite(building_sprite)
         :onButtonClicked(function()
             if self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint(self.city) > 0 then
                 UIKit:newGameUI("GameUIUnlockBuilding", self.city, building_sprite:GetEntity()):AddToCurrentScene(true)
+            else
+                UIKit:showMessageDialog(_("提示"), _("升级城堡解锁此建筑"))
+                    :CreateOKButton(
+                        {
+                            listener = function()
+                                local building_sprite = self:GetSceneLayer():FindBuildingSpriteByBuilding(self.city:GetFirstBuildingByType("keep"), self.city)
+                                local x,y = self.city:GetFirstBuildingByType("keep"):GetMidLogicPosition()
+                                self:GotoLogicPoint(x,y,40):next(function()
+                                    self:AddIndicateForBuilding(building_sprite)
+                                end)
+                            end,
+                            btn_name= _("前往")
+                        }
+                    )
             end
         end)
     button.sprite = building_sprite
@@ -189,9 +202,45 @@ end
 function MyCityScene:GetHomePage()
     return self.home_page
 end
+function MyCityScene:OnOperation(alliance, op)
+    if op == "join" and
+        Alliance_Manager:HasBeenJoinedAlliance() and
+        not self.firstJoinAllianceRewardGeted
+    then
+        self:GetHomePage():PromiseOfFteAllianceMap()
+    end
+end
 function MyCityScene:onEnterTransitionFinish()
     MyCityScene.super.onEnterTransitionFinish(self)
+    if ext.registereForRemoteNotifications then
+        ext.registereForRemoteNotifications()
+    end
     app:sendApnIdIf()
+
+    if Alliance_Manager:HasBeenJoinedAlliance() then
+        return
+    end
+    local userdefault = cc.UserDefault:getInstance()
+    local city_key = DataManager:getUserData()._id.."_first_in_city_scene"
+    if not userdefault:getBoolForKey(city_key) and
+        Alliance_Manager:GetMyAlliance():IsDefault() then
+
+        userdefault:setBoolForKey(city_key, true)
+        userdefault:flush()
+
+        app:lockInput(true)
+        cocos_promise.defer(function()app:lockInput(false);end)
+            :next(function()
+                return GameUINpc:PromiseOfSay(
+                    {words = _("领主大人，这个世界上的觉醒者并不只有你一人。介入他们或者创建联盟邀请他们加入，会让我们发展得更顺利")}
+                )
+            end):next(function()
+            self:GetHomePage():PromiseOfFteAlliance()
+            return GameUINpc:PromiseOfLeave()
+            end)
+    else
+        self:GetHomePage():PromiseOfFteAlliance()
+    end
 end
 function MyCityScene:CreateHomePage()
     if UIKit:GetUIInstance("GameUIHome") then
@@ -228,14 +277,17 @@ function MyCityScene:OnUserBasicChanged(user, changed)
     if changed.terrain then
         self:ChangeTerrain(changed.terrain.new)
     end
+    if changed.power then
+        self:GetHomePage():ShowPowerAni(cc.p(display.cx, display.cy), changed.power.old)
+    end
 end
 function MyCityScene:OnUpgradingBegin()
     app:GetAudioManager():PlayeEffectSoundWithKey("UI_BUILDING_UPGRADE_START")
     self:GetSceneLayer():CheckCanUpgrade()
-    local can_unlock = self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint(self.city) > 0
-    self:IteratorLockButtons(function(v)
-        v:setVisible(can_unlock)
-    end)
+    -- local can_unlock = self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint(self.city) > 0
+    -- self:IteratorLockButtons(function(v)
+    --     -- v:setVisible(can_unlock)
+    -- end)
 end
 function MyCityScene:OnUpgrading()
 
@@ -247,28 +299,38 @@ function MyCityScene:OnUpgradingFinished(building)
     self:GetSceneLayer():CheckCanUpgrade()
     app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
 
-    local can_unlock = self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint(self.city) > 0
-    self:IteratorLockButtons(function(v)
-        v:setVisible(can_unlock)
-    end)
+    -- local can_unlock = self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint(self.city) > 0
+    -- self:IteratorLockButtons(function(v)
+    --     v:setVisible(can_unlock)
+    -- end)
+end
+
+function MyCityScene:OnBeginRecruit()
+end
+function MyCityScene:OnRecruiting()
+end
+function MyCityScene:OnEndRecruit(barracks, event, soldier_type)
+    local star = self:GetCity():GetSoldierManager():GetStarBySoldierType(soldier_type)
+    self:GetSceneLayer():MoveBarracksSoldiers(soldier_type)
 end
 function MyCityScene:OnTilesChanged(tiles)
     self:GetTopLayer():removeAllChildren()
-    local can_unlock = self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint(self.city) > 0
+    -- local can_unlock = self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint(self.city) > 0
     local city = self:GetCity()
     table.foreach(tiles, function(_, tile)
         local tile_entity = tile:GetEntity()
         if (city:IsTileCanbeUnlockAt(tile_entity.x, tile_entity.y)) then
             local building = city:GetBuildingByLocationId(tile_entity.location_id)
             if building and not building:IsUpgrading() then
-                self:NewLockButtonFromBuildingSprite(tile):setVisible(can_unlock)
+                self:NewLockButtonFromBuildingSprite(tile)
+                -- :setVisible(can_unlock)
             end
         end
     end)
     print("#self:GetTopLayer():getChildren()", #self:GetTopLayer():getChildren())
 end
 function MyCityScene:OnTouchClicked(pre_x, pre_y, x, y)
-    if self.event_manager:TouchCounts() ~= 0 or 
+    if self.event_manager:TouchCounts() ~= 0 or
         self.util_node:getNumberOfRunningActions() > 0 then return end
 
     local building = self:GetSceneLayer():GetClickedObject(x, y)
@@ -346,7 +408,7 @@ function MyCityScene:OpenUI(building, default_tab)
             local _,_,index = self.city:GetUser():GetPVEDatabase():GetCharPosition()
             app:EnterPVEScene(index)
         else
-            UIKit:showMessageDialog(_("陛下"),_("必须有一条空闲的龙，才能进入pve"))
+            UIKit:showMessageDialog(_("主人"),_("需要一条空闲状态的魔龙才能探险"))
         end
         app:GetAudioManager():PlayeEffectSoundWithKey("AIRSHIP")
     elseif type_ == "FairGround" then
@@ -359,6 +421,20 @@ function MyCityScene:OpenUI(building, default_tab)
 end
 
 return MyCityScene
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

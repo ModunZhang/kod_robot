@@ -72,7 +72,7 @@ function GameUIDragonEquipment:onEnter()
         {tag = "info",label = _("信息")},
     }, function(tag)
        self:OnTabButtonClicked(tag)
-    end,2):align(display.BOTTOM_CENTER,304,10):addTo(backgroundImage)
+    end,1):align(display.BOTTOM_CENTER,304,10):addTo(backgroundImage)
 
     self.tab_buttons:SetTabButtonWillSelectListener(function(tag)
         if "intensify" == tag then
@@ -104,7 +104,7 @@ function GameUIDragonEquipment:TabButtonEvent_info()
         local mainEquipment = self:GetEquipmentItem()
           :addTo(node):align(display.LEFT_TOP,15,self.titleBar:getPositionY() - 10)
         self.info_mainEquipment = mainEquipment
-        local name_bar = display.newScale9Sprite("alliance_event_type_darkblue_222x30.png",0,0, cc.size(468,30), cc.rect(7,7,190,16))  
+        local name_bar = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(468,30), cc.rect(10,10,410,10))  
           :addTo(node):align(display.LEFT_TOP,mainEquipment:getPositionX() + mainEquipment:getContentSize().width + 5,mainEquipment:getPositionY() - 2)
         UIKit:ttfLabel({
             text = Localize.equip[self:GetEquipment():GetCanLoadConfig().name],
@@ -180,7 +180,7 @@ function GameUIDragonEquipment:TabButtonEvent_intensify()
         local mainEquipment = self:GetEquipmentItem()
           :addTo(node):align(display.LEFT_TOP,15,self.titleBar:getPositionY() - 10)
         self.intensify_mainEquipment = mainEquipment
-        local name_bar = display.newScale9Sprite("alliance_event_type_darkblue_222x30.png",0,0, cc.size(468,30), cc.rect(7,7,190,16))  
+        local name_bar = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(468,30), cc.rect(10,10,410,10))  
           :addTo(node):align(display.LEFT_TOP,mainEquipment:getPositionX() + mainEquipment:getContentSize().width + 5,mainEquipment:getPositionY() - 2)
         UIKit:ttfLabel({
             text = Localize.equip[self:GetEquipment():GetCanLoadConfig().name],
@@ -254,7 +254,7 @@ end
 
 --type 为活力 力量 buffer 1 2 3
 function GameUIDragonEquipment:GetListItem(index,title,value)
-	local bg = display.newScale9Sprite(string.format("resource_item_bg%d.png",index%2)):size(LISTVIEW_WIDTH,40)
+	local bg = display.newScale9Sprite(string.format("back_ground_548x40_%d.png", index % 2 == 0 and 1 or 2)):size(LISTVIEW_WIDTH,40)
     UIKit:ttfLabel({
         text = title,
         size = 20,
@@ -518,7 +518,7 @@ end
 
 function GameUIDragonEquipment:GetIntensifyListItem(index,title,value)
   local item = self.intensify_list:newItem()
-  local bg = display.newScale9Sprite(string.format("resource_item_bg%d.png",index%2)):size(LISTVIEW_WIDTH ,40)
+  local bg = display.newScale9Sprite(string.format("back_ground_548x40_%d.png", index % 2 == 0 and 1 or 2)):size(LISTVIEW_WIDTH ,40)
   UIKit:ttfLabel({
       text = title,
       size = 20,

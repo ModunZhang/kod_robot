@@ -242,7 +242,7 @@ local soldierCount_meta = {}
 soldierCount_meta.__index = soldierCount_meta
 function soldierCount_meta:Title()
     local config = self:Config()
-    return string.format(_("招募%s个%s"), config.count, Localize.soldier_name[config.name])
+    return string.format(_("招募%s个%s"), string.formatnumberthousands(config.count), Localize.soldier_name[config.name])
 end
 function soldierCount_meta:Desc()
     return Localize.soldier_name[self:Config().name]
@@ -262,10 +262,10 @@ end
 local pveCount_meta = {}
 pveCount_meta.__index = pveCount_meta
 function pveCount_meta:Title()
-    return string.format(_("探索步数达到%d"), self:Config().count)
+    return string.format(_("探索步数达到%s"), string.formatnumberthousands(self:Config().count))
 end
 function pveCount_meta:Desc()
-    return string.format(_("探索步数达到%d描述"), self:Config().count)
+    return string.format(_("探索步数达到%s描述"), string.formatnumberthousands(self:Config().count))
 end
 function pveCount_meta:GetRewards()
     return get_rewards(self:Config())
@@ -282,10 +282,10 @@ end
 local attackWin_meta = {}
 attackWin_meta.__index = attackWin_meta
 function attackWin_meta:Title()
-    return string.format(_("攻击玩家获胜%d次"), self:Config().count)
+    return string.format(_("攻击玩家获胜%s次"), string.formatnumberthousands(self:Config().count))
 end
 function attackWin_meta:Desc()
-    return string.format(_("攻击玩家获胜%d次描述"), self:Config().count)
+    return string.format(_("攻击玩家获胜%s次描述"), string.formatnumberthousands(self:Config().count))
 end
 function attackWin_meta:GetRewards()
     return get_rewards(self:Config())
@@ -302,10 +302,10 @@ end
 local strikeWin_meta = {}
 strikeWin_meta.__index = strikeWin_meta
 function strikeWin_meta:Title()
-    return string.format(_("突袭玩家获胜%d次"), self:Config().count)
+    return string.format(_("突袭玩家获胜%s次"), string.formatnumberthousands(self:Config().count))
 end
 function strikeWin_meta:Desc()
-    return string.format(_("突袭玩家获胜%d次描述"), self:Config().count)
+    return string.format(_("突袭玩家获胜%s次描述"), string.formatnumberthousands(self:Config().count))
 end
 function strikeWin_meta:GetRewards()
     return get_rewards(self:Config())
@@ -323,10 +323,10 @@ end
 local playerKill_meta = {}
 playerKill_meta.__index = playerKill_meta
 function playerKill_meta:Title()
-    return string.format(_("击杀积分达到%d"), self:Config().kill)
+    return string.format(_("击杀积分达到%s"), string.formatnumberthousands(self:Config().kill))
 end
 function playerKill_meta:Desc()
-    return string.format(_("击杀积分达到%d描述"), self:Config().kill)
+    return string.format(_("击杀积分达到%s描述"), string.formatnumberthousands(self:Config().kill))
 end
 function playerKill_meta:GetRewards()
     return get_rewards(self:Config())
@@ -343,10 +343,10 @@ end
 local playerPower_meta = {}
 playerPower_meta.__index = playerPower_meta
 function playerPower_meta:Title()
-    return string.format(_("power值到达%d"), self:Config().power)
+    return string.format(_("power值到达%s"), string.formatnumberthousands(self:Config().power))
 end
 function playerPower_meta:Desc()
-    return string.format(_("power值到达%d描述"), self:Config().power)
+    return string.format(_("power值到达%s描述"), string.formatnumberthousands(self:Config().power))
 end
 function playerPower_meta:GetRewards()
     return get_rewards(self:Config())

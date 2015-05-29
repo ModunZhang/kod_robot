@@ -1,3 +1,4 @@
+local ResourceManager = import("..entity.ResourceManager")
 local SpriteConfig = import(".SpriteConfig")
 local UILib = import("..ui.UILib")
 local Sprite = import(".Sprite")
@@ -24,6 +25,15 @@ function UpgradingSprite:OnBuildingUpgradingBegin(building, time)
     -- animation
     self:StartBuildingAnimation()
 end
+
+local res_map = {
+    [ResourceManager.RESOURCE_TYPE.WOOD] = "wood",
+    [ResourceManager.RESOURCE_TYPE.FOOD] = "food",
+    [ResourceManager.RESOURCE_TYPE.IRON] = "iron",
+    [ResourceManager.RESOURCE_TYPE.COIN] = "coin",
+    [ResourceManager.RESOURCE_TYPE.STONE] = "stone",
+    [ResourceManager.RESOURCE_TYPE.CITIZEN] = "citizen",
+}
 function UpgradingSprite:OnBuildingUpgradeFinished(building)
     if self.label then
         self.label:setString(building:GetType().." "..building:GetLevel())
@@ -36,6 +46,15 @@ function UpgradingSprite:OnBuildingUpgradeFinished(building)
 
     -- animation
     self:StopBuildingAnimation()
+
+    local running_scene = display.getRunningScene()
+    if iskindof(running_scene, "MyCityScene") and building:IsHouse() then
+        local _,tp = self:GetWorldPosition()
+        running_scene:GetHomePage():ShowResourceAni(res_map[building:GetUpdateResourceType()], tp)
+        if building:GetType() == "dwelling" then
+            running_scene:GetHomePage():ShowResourceAni("coin", tp)
+        end
+    end
 end
 function UpgradingSprite:OnBuildingUpgrading(building, time)
     if self.label then
@@ -165,13 +184,13 @@ function UpgradingSprite:GetCurrentConfig()
         return nil
     end
 end
-function UpgradingSprite:GetBeforeConfig()
-    if self.config then
-        return self.config:GetConfigByLevel(self:GetEntity():GetRealEntity():GetBeforeLevel())
-    else
-        return nil
-    end
-end
+-- function UpgradingSprite:GetBeforeConfig()
+--     if self.config then
+--         return self.config:GetConfigByLevel(self:GetEntity():GetRealEntity():GetBeforeLevel())
+--     else
+--         return nil
+--     end
+-- end
 function UpgradingSprite:GetLogicZorder()
     if self:GetEntity():GetType() == "keep" then
         return 1
@@ -189,11 +208,9 @@ function UpgradingSprite:CreateLevelNode()
     self.level_bg:setCascadeOpacityEnabled(true)
     self.can_level_up = cc.ui.UIImage.new("can_level_up.png"):addTo(self.level_bg):show()
     self.can_not_level_up = cc.ui.UIImage.new("can_not_level_up.png"):addTo(self.level_bg):pos(0,-10):hide()
-    self.text_field = cc.ui.UILabel.new({
+    self.text_field = UIKit:ttfLabel({
         size = 16,
-        font = UIKit:getFontFilePath(),
-        align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0xfff1cc)
+        color = 0xfff1cc,
     }):addTo(self.level_bg):align(display.CENTER, 10, 18)
     self.text_field:setSkewY(-30)
 end
@@ -206,6 +223,8 @@ function UpgradingSprite:HideLevelUpNode()
     self.level_bg:fadeTo(0.5, 0)
 end
 return UpgradingSprite
+
+
 
 
 

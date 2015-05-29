@@ -1,3 +1,4 @@
+local promise = import("..utils.promise")
 local window = import("..utils.window")
 local UILib = import("..ui.UILib")
 local Sprite = import("..sprites.Sprite")
@@ -7,6 +8,11 @@ local MapScene = import(".MapScene")
 local AllianceScene = class("AllianceScene", MapScene)
 local Alliance = import("..entity.Alliance")
 local GameUIAllianceHome = import("..ui.GameUIAllianceHome")
+
+local ceil = math.ceil
+local floor = math.floor
+
+
 function AllianceScene:ctor(location)
     self.location = location
     self.util_node = display.newNode():addTo(self)
@@ -21,12 +27,12 @@ function AllianceScene:onEnter()
     self:GetAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.BASIC)
     self:GetAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.OPERATION)
     local alliance_map = self:GetAlliance():GetAllianceMap()
-    local allianceShirine = self:GetAlliance():GetAllianceShrine()
-    alliance_map:AddListenOnType(allianceShirine,alliance_map.LISTEN_TYPE.BUILDING_INFO)
 
-    if not app:GetGameDefautlt():getBasicInfoValueForKey("SHOW_REGION_TIPS") then
+    local alliance_key = DataManager:getUserData()._id.."_SHOW_REGION_TIPS"
+    if not app:GetGameDefautlt():getBasicInfoValueForKey(alliance_key) then
+        app:GetGameDefautlt():getBasicInfoValueForKey(alliance_key,true)
+
         UIKit:newGameUI("GameUITips","region"):AddToScene(self, true)
-        app:GetGameDefautlt():getBasicInfoValueForKey("SHOW_REGION_TIPS",true)
     end
     if self.location then
         self:GotoPosition(self.location.x, self.location.y)
@@ -55,6 +61,7 @@ function AllianceScene:EnterEditMode()
 end
 function AllianceScene:LeaveEditMode()
     self:GetHomePage():DisplayOn()
+    self.alliance_obj_to_move = nil
 end
 function AllianceScene:IsEditMode()
     return not self:GetHomePage():IsDisplayOn()
@@ -83,10 +90,10 @@ function AllianceScene:GotoLogicPosition(x, y)
 end
 function AllianceScene:OnTouchClicked(pre_x, pre_y, x, y)
     if self.event_manager:TouchCounts() ~= 0 or
-        self.util_node:getNumberOfRunningActions() > 0 then 
-        return 
+        self.util_node:getNumberOfRunningActions() > 0 then
+        return
     end
-    
+
     local building = self:GetSceneLayer():GetClickedObject(x, y)
     if building then
         app:lockInput(true)
@@ -100,13 +107,52 @@ function AllianceScene:OnTouchClicked(pre_x, pre_y, x, y)
                 self:OpenUI(building)
             end)
         else
-            self:GetSceneLayer():PromiseOfFlashEmptyGround(building, true):next(function()
-                self:OpenUI(building)
-            end)
+            if self.alliance_obj_to_move then
+                local x,y = building:GetEntity():GetLogicPosition()
+                local mapObj = self.alliance_obj_to_move.obj
+
+                local can_move,squares,out_x,out_y = self:GetAlliance()
+                    :GetAllianceMap()
+                    :CanMoveBuilding(mapObj, x, y)
+
+                self:PromiseOfShowPlaceInfo(squares, x, y):next(function()
+                    if can_move then
+                        self:CheckCanMoveAllianceObject(x, y, out_x, out_y)
+                    end
+                end)
+            else
+                self:GetSceneLayer():PromiseOfFlashEmptyGround(building, true):next(function()
+                    self:OpenUI(building)
+                end)
+            end
         end
     elseif self:IsEditMode() then
         self:LeaveEditMode()
     end
+end
+function AllianceScene:PromiseOfShowPlaceInfo(squares, lx, ly)
+    local alliance_view = self:GetSceneLayer().alliance_views[1]
+    local logic_map = alliance_view:GetLogicMap()
+    local click_node = self:GetSceneLayer():AddClickNode()
+    for i,v in ipairs(squares) do
+        local x,y,is_not_red = unpack(v)
+        display.newSprite("click_empty.png"):addTo(click_node)
+            :pos(logic_map:ConvertToLocalPosition(lx - x, ly - y))
+            :scale(0.96):setColor(is_not_red and display.COLOR_BLUE or display.COLOR_RED)
+    end
+    local p = promise.new()
+    click_node:pos(logic_map:ConvertToMapPosition(lx,ly)):opacity(0)
+        :runAction(
+            transition.sequence{
+                cc.FadeTo:create(0.3, 255),
+                cc.FadeTo:create(0.3, 0),
+                cc.CallFunc:create(function()
+                    p:resolve()
+                    self:GetSceneLayer():RemoveClickNode()
+                end)
+            }
+        )
+    return p
 end
 function AllianceScene:OpenUI(building)
     if building:GetEntity():GetType() ~= "building" then
@@ -117,7 +163,9 @@ function AllianceScene:OpenUI(building)
 end
 function AllianceScene:OnAllianceBasicChanged(alliance,changed_map)
     if changed_map.terrain then
-        app:EnterMyAllianceScene()
+        UIKit:showMessageDialog(nil,_("联盟地形已经改变"),function()
+            app:EnterMyAllianceScene()
+        end,nil,false,nil)
     end
 end
 function AllianceScene:ChangeTerrain()
@@ -125,7 +173,7 @@ function AllianceScene:ChangeTerrain()
 end
 function AllianceScene:OnOperation(alliance,operation_type)
     if operation_type == "quit" then
-        UIKit:showMessageDialog(_("提示"),_("您已经退出联盟"), function()
+        UIKit:showMessageDialog(_("提示"),_("你已经退出联盟"), function()
             app:EnterMyCityScene()
         end,nil,false)
     end
@@ -192,23 +240,22 @@ function AllianceScene:LoadEditModeWithAllianceObj(alliance_obj)
     self:EnterEditMode()
 end
 
-function AllianceScene:CheckCanMoveAllianceObject(x,y)
+function AllianceScene:CheckCanMoveAllianceObject(x, y, out_x, out_y)
     if self.alliance_obj_to_move then
         UIKit:showMessageDialog(nil
             ,string.format(
-                _("可以移动%s到%s将消耗荣耀值%s,确认移动?")
+                _("你可以移动%s到%s将消耗荣耀值%s,确认要移动吗?")
                 ,self.alliance_obj_to_move.name
                 ,"(" .. x .."," .. y .. ")"
                 ,self.alliance_obj_to_move.honour
             )
             ,function()
                 if self:GetAlliance():GetAllianceMap():CanMoveBuilding(self.alliance_obj_to_move.obj,x,y) then
-                    NetManager:getMoveAllianceBuildingPromise(self.alliance_obj_to_move.obj:Id(), x, y):always(function()
-                        self.alliance_obj_to_move = nil
+                    NetManager:getMoveAllianceBuildingPromise(self.alliance_obj_to_move.obj:Id(), out_x, out_y):always(function()
                         self:LeaveEditMode()
                     end)
                 else
-                    UIKit:showMessageDialog(nil, _("不能移动到目标点位"),function()end)
+                    UIKit:showMessageDialog(nil, _("无法移动到目标位置"),function()end)
                 end
             end
             ,nil
@@ -224,6 +271,9 @@ function AllianceScene:ReEnterScene()
     app:enterScene("AllianceScene")
 end
 return AllianceScene
+
+
+
 
 
 

@@ -36,9 +36,9 @@ function GameUIUnlockBuilding:Init()
     -- bg
     local bg = self.body
     -- 建筑功能介绍
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.CENTER, display.cx-250, display.top-265)
-        :addTo(self):setFlippedX(true)
-    cc.ui.UIImage.new("building_frame_36x136.png"):align(display.CENTER, display.cx-145, display.top-265)
+    display.newSprite("alliance_item_flag_box_126X126.png")
+        :align(display.LEFT_CENTER, display.cx-268, display.top-265)
+        :scale(136/126)
         :addTo(self)
 
     local build_png = SpriteConfig[self.building:GetType()]:GetConfigByLevel(1).png
@@ -178,7 +178,7 @@ function GameUIUnlockBuilding:SetUpgradeRequirementListview()
     local wood = City.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local iron = City.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local stone = City.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local population = City.resource_manager:GetPopulationResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local population = City.resource_manager:GetCitizenResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local building = self.building
 
     local has_materials =City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)
@@ -224,7 +224,7 @@ function GameUIUnlockBuilding:SetUpgradeRequirementListview()
         },
 
         {
-            resource_type = _("建筑蓝图"),
+            resource_type = _("工程图纸"),
             isVisible = self.building:GetLevelUpBlueprints()>0,
             isSatisfy = has_materials.blueprints>=self.building:GetLevelUpBlueprints() ,
             icon="blueprints_128x128.png",

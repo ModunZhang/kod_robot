@@ -1,6 +1,7 @@
 local WidgetWithBlueTitle = import("..widget.WidgetWithBlueTitle")
 local UIListView = import('.UIListView')
 local WidgetPushButton = import("..widget.WidgetPushButton")
+local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetSoldierBox = import("..widget.WidgetSoldierBox")
 local WidgetTimerProgressStyleTwo = import("..widget.WidgetTimerProgressStyleTwo")
 local WidgetTreatSoldier = import("..widget.WidgetTreatSoldier")
@@ -146,7 +147,8 @@ function GameUIHospital:CreateHealAllSoldierItem()
         [COIN]  = {total_coin,"res_coin_81x68.png"},
     }
     -- 资源背景框
-    local resource_bg = display.newSprite("back_ground_556x56.png"):addTo(self.treate_all_soldiers_item):pos(self.treate_all_soldiers_item:getContentSize().width/2,180)
+    local resource_bg = WidgetUIBackGround.new({width = 556,height = 56},WidgetUIBackGround.STYLE_TYPE.STYLE_5)
+        :addTo(self.treate_all_soldiers_item):align(display.CENTER,self.treate_all_soldiers_item:getContentSize().width/2,180)
     for k,v in pairs(resource_icons) do
         self.heal_resource_item_table[k] = createResourceItem(v[2],v[1]):addTo(self.treate_all_soldiers_item):pos(bg_size.width/2-40, 165)
     end
@@ -422,10 +424,23 @@ end
 function GameUIHospital:CreateSpeedUpHeal()
     self.timer = WidgetTimerProgressStyleTwo.new(nil, _("治愈伤兵")):addTo(self.heal_layer)
         :align(display.CENTER, window.cx, window.top-740)
-        :hide()
         :OnButtonClicked(function(event)
             UIKit:newGameUI("GameUITreatSoldierSpeedUp", self.building):AddToCurrentScene(true)
         end)
+    local treat_event = self.building:GetTreatEvent()
+    if treat_event:IsTreating() then
+        self.timer:show()
+        local treat_count = 0
+        local soldiers = treat_event:GetTreatInfo()
+        for k,v in pairs(soldiers) do
+            treat_count = treat_count + v.count
+        end
+        self:SetTreatingSoldierNum(treat_count)
+        self.timer:SetProgressInfo(GameUtils:formatTimeStyle1(treat_event:LeftTime(app.timer:GetServerTime())),treat_event:Percent(app.timer:GetServerTime()))
+    else
+        self.timer:hide()
+    end
+
 end
 --设置正在治愈的伤兵数量label
 function GameUIHospital:SetTreatingSoldierNum( treat_soldier_num )
@@ -500,6 +515,8 @@ function GameUIHospital:OnSoliderStarCountChanged(soldier_manager,star_changed_m
     end
 end
 return GameUIHospital
+
+
 
 
 

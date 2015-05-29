@@ -15,7 +15,7 @@ function WidgetSoldierBox:ctor(soldier_png, cb)
 
     local rect = self.soldier_bg:getCascadeBoundingBox()
 
-    local number_bg = cc.ui.UIImage.new("back_ground_118x36.png"):addTo(self.soldier_bg)
+    local number_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(118,36),cc.rect(15,10,136,64)):addTo(self.soldier_bg)
         :align(display.CENTER, 0, - rect.height / 2 +28)
 
     local size = number_bg:getContentSize()
@@ -47,7 +47,11 @@ function WidgetSoldierBox:SetSoldier(soldier_type, star)
     return self
 end
 function WidgetSoldierBox:SetNumber(number)
-    self.number:setString(string.formatnumberthousands(number))
+    if type(number) == 'string' then
+        self.number:setString(number)
+    elseif type(number) == 'number' then
+        self.number:setString(string.formatnumberthousands(number))
+    end
     return self
 end
 function WidgetSoldierBox:Enable(b)

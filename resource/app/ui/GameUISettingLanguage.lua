@@ -2,7 +2,7 @@
 -- Author: Danny He
 -- Date: 2015-02-10 11:27:19
 --
-local GameUISettingLanguage = UIKit:createUIClass("GameUISettingLanguage")
+local GameUISettingLanguage = UIKit:createUIClass("GameUISettingLanguage","UIAutoClose")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local window = import("..utils.window")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
@@ -14,8 +14,8 @@ function GameUISettingLanguage:onEnter()
 end
 
 function GameUISettingLanguage:BuildUI()
-	local shadowLayer = UIKit:shadowLayer():addTo(self)
-	local bg = WidgetUIBackGround.new({height=762}):addTo(shadowLayer)
+	local bg = WidgetUIBackGround.new({height=762})
+	self:addTouchAbleChild(bg)
 	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
 	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
 	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
@@ -32,8 +32,8 @@ function GameUISettingLanguage:BuildUI()
 	}):addTo(titleBar):align(display.CENTER,300,28)
 	local code = app:GetGameLanguage()
 	local languages = {
-		{image = 'flag_en_83x83.png',code = 'en_US'},
-		{image = 'flag_zh_83x83.png',code = 'zh_Hans'},
+		{image = 'flag_zh_83x83.png',code = 'zh_CN'},
+		{image = 'flag_zh_Hant_83x83.png',code = 'zh_TW'},
 	}
 	local x,y = 20,732
 	for i,v in ipairs(languages) do

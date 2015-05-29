@@ -35,8 +35,6 @@ function WidgetBackGroundTabButtons:ctor(buttons, listener)
         table.insert(tabs, widget)
     end
     self.tabs = tabs
-    -- cc.ui.UIImage.new("decorator_21x62.png"):addTo(node):align(display.LEFT_CENTER, -width/2, 0)
-    -- cc.ui.UIImage.new("decorator_21x62.png"):addTo(node):align(display.RIGHT_CENTER, width/2, 0):flipX(true)
 
     if default then
         self:PushButton(default)

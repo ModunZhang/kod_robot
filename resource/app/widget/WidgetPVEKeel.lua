@@ -6,7 +6,7 @@ function WidgetPVEKeel:ctor(...)
     WidgetPVEKeel.super.ctor(self, ...)
 end
 function WidgetPVEKeel:GetTitle()
-    return string.format("%s %s%d", _("龙骨"), _("等级"), self:GetPVEMap():GetIndex())
+    return string.format(_("龙骨 等级%d"), self:GetPVEMap():GetIndex())
 end
 function WidgetPVEKeel:GetDesc()
     return self:GetObject():IsSearched()

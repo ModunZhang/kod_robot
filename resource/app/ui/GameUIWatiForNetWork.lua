@@ -1,5 +1,5 @@
 local GameUIWatiForNetWork = UIKit:createUIClass("GameUIWatiForNetWork")
-local modf = math.modf
+local fmod = math.fmod
 function GameUIWatiForNetWork:ctor(delay)
     GameUIWatiForNetWork.super.ctor(self)
     self.delay = delay and checkint(delay) or 1
@@ -40,8 +40,9 @@ function GameUIWatiForNetWork:onEnter()
 
     self.loading = display.newNode():addTo(self)
 
-    math.randomseed(os.time())
-    local bg,circle,icon = unpack(loading_map[math.random(#loading_map)])
+    local seed = math.floor(app.timer:GetServerTime() * 1000)
+    local index = seed % 3 + 1
+    local bg,circle,icon = unpack(loading_map[index])
     display.newSprite(bg):addTo(self.loading)
     :pos(display.cx, display.cy):scale(0.8)
     
@@ -53,16 +54,14 @@ function GameUIWatiForNetWork:onEnter()
         {class=cc.FilteredSpriteWithOne}):addTo(self.loading):scale(0.8)
 
     local time, flashTime = 0, 1
-    local _,ratio = (modf(time, flashTime) / flashTime)
     icon:setFilter(filter.newFilter("CUSTOM", json.encode({
         frag = "shaders/flash.fs",
         shaderName = "flash1",
-        ratio = ratio,
+        ratio = fmod(time, flashTime) / flashTime,
     })))
     icon:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
         time = time + dt
-        local _,ratio = modf(time, flashTime)
-        icon:getFilter():getGLProgramState():setUniformFloat("ratio", ratio / flashTime)
+        icon:getFilter():getGLProgramState():setUniformFloat("ratio", fmod(time, flashTime) / flashTime)
     end)
     icon:scheduleUpdate()
 

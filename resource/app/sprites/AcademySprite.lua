@@ -1,3 +1,4 @@
+local zz = import("..particles.zz")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local AcademySprite = class("AcademySprite", FunctionUpgradingSprite)
 
@@ -8,6 +9,10 @@ function AcademySprite:OnProductionTechnologyEventDataChanged(changed_map)
         app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
     end
 end
+
+
+
+local EMPTY_TAG = 11400
 function AcademySprite:ctor(city_layer, entity, city)
     AcademySprite.super.ctor(self, city_layer, entity, city)
     city:AddListenOnType(self, city.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
@@ -21,8 +26,10 @@ function AcademySprite:DoAni()
     if self:GetEntity():IsUnlocked() then
         if self:GetEntity():BelongCity():HaveProductionTechEvent() then
             self:PlayAni()
+            self:removeChildByTag(EMPTY_TAG)
         else
             self:StopAni()
+            self:PlayEmptyAnimation()
         end
     end
 end
@@ -36,6 +43,12 @@ function AcademySprite:StopAni()
     self:GetAniArray()[1]:hide():getAnimation():stop()
 end
 
+function AcademySprite:PlayEmptyAnimation()
+    if not self:getChildByTag(EMPTY_TAG) then
+        local x,y = self:GetSprite():getPosition()
+        zz():addTo(self,1,EMPTY_TAG):pos(x + 50,y + 50)
+    end
+end
 
 return AcademySprite
 

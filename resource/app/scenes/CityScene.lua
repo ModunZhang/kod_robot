@@ -19,6 +19,7 @@ function CityScene:onEnter()
     self:PlayBackgroundMusic()
     self:GotoLogicPointInstant(6, 4)
     self:GetSceneLayer():ZoomTo(1)
+    self:PlayEffectIf()
 
     --  cc.ui.UIPushButton.new({normal = "lock_btn.png",pressed = "lock_btn.png"})
     -- :addTo(self, 1000000):pos(display.cx, display.cy + 300)
@@ -59,13 +60,14 @@ function CityScene:GotoLogicPoint(x, y, speed)
     return self:GetSceneLayer():PromiseOfMove(point.x, point.y, speed)
 end
 function CityScene:PlayBackgroundMusic()
-    app:GetAudioManager():PlayGameMusic()
+    app:GetAudioManager():PlayGameMusic('MyCityScene')
     -- self:performWithDelay(function()
     --     self:PlayBackgroundMusic()
     -- end, 113 + 30)
 end
 function CityScene:ChangeTerrain()
     self:GetSceneLayer():ChangeTerrain()
+    self:PlayEffectIf()
 end
 function CityScene:EnterEditMode()
     self:GetSceneLayer():EnterEditMode()
@@ -151,7 +153,59 @@ function CityScene:onEnterTransitionFinish()
     CityScene.super.onEnterTransitionFinish(self)
 end
 
+
+local EFFECT_TAG = 12321
+function CityScene:PlayEffectIf()
+    if math.floor(app.timer:GetServerTime()) % 2 == 1 then return end
+    self:GetScreenLayer():removeAllChildren()
+    local terrain = self:GetCity():GetUser():Terrain()
+    if terrain == "iceField" then
+        local emitter = cc.ParticleRain:createWithTotalParticles(200)
+            :addTo(self:GetScreenLayer(), 1, EFFECT_TAG):pos(display.cx-80, display.height)
+        emitter:setLife(7)
+        emitter:setStartSize(10)
+        emitter:setStartSizeVar(10)
+        emitter:setRadialAccel(10)
+        emitter:setRadialAccelVar(50)
+        emitter:setRotationIsDir(true)
+        emitter:setStartSpinVar(1000)
+        emitter:setEndSpinVar(1000)
+        emitter:setStartColor(cc.c4f(1,1,1,0.8))
+        emitter:setStartColorVar(cc.c4f(0,0,0,0.2))
+        emitter:setEndColor(cc.c4f(1,1,1,0))
+        emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
+        emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("snow.png"))
+    elseif terrain == "grassLand" then
+        local emitter = cc.ParticleRain:createWithTotalParticles(50)
+            :addTo(self:GetScreenLayer(), 1, EFFECT_TAG):pos(display.cx + 80, display.height)
+        emitter:setPosVar(cc.p(display.cx,0))
+        emitter:setGravity(cc.p(-10,-10))
+        emitter:setStartSize(30)
+        emitter:setStartSizeVar(30)
+        emitter:setEndSize(30)
+        emitter:setEndSizeVar(30)
+        emitter:setLife(0.5)
+        emitter:setSpeed(1800)
+        emitter:setSpeedVar(100)
+        emitter:setAngle(-100)
+        emitter:setAngleVar(0)
+        emitter:setRadialAccel(100)
+        emitter:setRadialAccelVar(0)
+        emitter:setTangentialAccel(0)
+        emitter:setTangentialAccelVar(0)
+        emitter:setRotationIsDir(false)
+        emitter:setStartSpin(10)
+        emitter:setEndSpin(10)
+        emitter:setStartColor(cc.c4f(1,1,1,0.9))
+        emitter:setStartColorVar(cc.c4f(0,0,0,0.1))
+        emitter:setEndColor(cc.c4f(1,1,1,0.5))
+        emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
+        emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("rain.png"))
+    end
+end
+
 return CityScene
+
 
 
 

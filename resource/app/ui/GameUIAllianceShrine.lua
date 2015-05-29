@@ -328,7 +328,7 @@ function GameUIAllianceShrine:GetStageListItem(index,stage_obj)
 		text = stage_obj:GetStageDesc(),
 		size = 18,
 		color=  desc_color,
-		dimensions = cc.size(530,74) 
+		dimensions = cc.size(400,74) 
 	}):align(display.LEFT_TOP, 10, 82):addTo(logo_bg)
 	local stage_star = stage_obj:Star()
 	local x,y = 14,15
@@ -400,7 +400,6 @@ end
 
 function GameUIAllianceShrine:OnResearchButtonClick(stage_obj,sender)
 	UIKit:newGameUI("GameUIAllianceShrineDetail",stage_obj,self:GetAllianceShrine(),true):AddToCurrentScene(true)
-	if sender then sender:hide() end
 end
 
 --战斗事件
@@ -418,9 +417,9 @@ function GameUIAllianceShrine:TabEvent_fight_event()
 end
 
 function GameUIAllianceShrine:BuildFightItemBox(event)
-	local box = display.newScale9Sprite("box_bg_546x214.png", 0,0, cc.size(380,102), cc.rect(10,13,521,189))
-	local player_strengh_bg = display.newScale9Sprite("box_bg_item_520x48_1.png"):size(356,39):addTo(box):align(display.LEFT_BOTTOM, 12,12)
-	local player_count_bg = display.newScale9Sprite("box_bg_item_520x48_0.png")
+	local box = display.newScale9Sprite("background_568x120.png", 0,0,cc.size(380,102),cc.rect(15,10,538,100))
+	local player_strengh_bg = display.newScale9Sprite("back_ground_548x40_1.png"):size(356,39):addTo(box):align(display.LEFT_BOTTOM, 12,12)
+	local player_count_bg = display.newScale9Sprite("back_ground_548x40_2.png")
 			:size(356,39):addTo(box)
 			:align(display.LEFT_BOTTOM, 12,player_strengh_bg:getPositionY()+39)
 	display.newSprite("res_citizen_88x82.png"):scale(0.35):align(display.LEFT_CENTER,5,19):addTo(player_count_bg)
@@ -450,9 +449,9 @@ end
 
 function GameUIAllianceShrine:GetFight_List_Item(event)
 	local bg = WidgetUIBackGround.new({width = 568,height = 172},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
-	local title_bg =  display.newSprite("title_blue_558x34.png"):align(display.TOP_CENTER, 284, 168):addTo(bg)
+	local title_bg =  display.newSprite("title_blue_554x34.png"):align(display.TOP_CENTER, 284, 168):addTo(bg)
 	UIKit:ttfLabel({
-		text =  event:Stage():GetStageDesc(),
+		text =  event:Stage():GetDescStageName(),
 		size = 22,
 		color = 0xffedae,
 	}):align(display.LEFT_CENTER, 10, 17):addTo(title_bg)
@@ -489,6 +488,7 @@ function GameUIAllianceShrine:GetFight_List_Item(event)
 end
 
 function GameUIAllianceShrine:RefreshFightListView()
+
 	self.fight_list:removeAllItems()
 	for i,event in ipairs(self:GetAllianceShrine():GetShrineEvents()) do	
 		local item = self.fight_list:newItem()
@@ -553,9 +553,9 @@ function GameUIAllianceShrine:RefreshEventsListView()
 end
 
 function GameUIAllianceShrine:BuildReportItemBox(report)
-	local box = display.newScale9Sprite("box_bg_546x214.png", 0,0, cc.size(380,102), cc.rect(10,13,521,189))
-	local player_strengh_bg = display.newScale9Sprite("box_bg_item_520x48_1.png"):size(356,39):addTo(box):align(display.LEFT_BOTTOM, 12,12)
-	local player_count_bg = display.newScale9Sprite("box_bg_item_520x48_0.png")
+	local box = display.newScale9Sprite("background_568x120.png", 0,0,cc.size(380,102),cc.rect(15,10,538,100))
+	local player_strengh_bg = display.newScale9Sprite("back_ground_548x40_1.png"):size(356,39):addTo(box):align(display.LEFT_BOTTOM, 12,12)
+	local player_count_bg = display.newScale9Sprite("back_ground_548x40_2.png")
 			:size(356,39):addTo(box)
 			:align(display.LEFT_BOTTOM, 12,player_strengh_bg:getPositionY()+39)
 	display.newSprite("res_citizen_88x82.png"):scale(0.35):align(display.LEFT_CENTER,5,19):addTo(player_count_bg)
@@ -604,7 +604,7 @@ function GameUIAllianceShrine:fillReportItemContent(content,report,idx)
 	box.power_label:setString(report.playerAvgPower)
 	content.date_label:setString(os.date("%Y-%m-%d",report:Time()))
 	content.time_label:setString(os.date("%H:%M:%S",report:Time()))
-	content.title_label:setString(report:Stage():GetStageDesc())
+	content.title_label:setString(report:Stage():GetDescStageName())
 	if content.button then
 		content.button:removeSelf()
 	end
@@ -626,7 +626,7 @@ end
 function GameUIAllianceShrine:GetReportsItem(report)
 	local bg = WidgetUIBackGround.new({width = 568,height = 172},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
 	local title_bg_0 = display.newSprite("title_green_558x34.png"):align(display.TOP_CENTER, 284, 168):addTo(bg)
-	local title_bg_1 = display.newSprite("title_red_558x34.png"):align(display.TOP_CENTER, 284, 168):addTo(bg)
+	local title_bg_1 = display.newSprite("title_red_556x34.png"):align(display.TOP_CENTER, 284, 168):addTo(bg)
 	local title_label = UIKit:ttfLabel({
 		text =  "",--,
 		size = 22,

@@ -14,6 +14,7 @@ function GameUIWarSummary:ctor()
     GameUIWarSummary.super.ctor(self,605,_("战斗结算"))
 end
 function GameUIWarSummary:onEnter()
+    app:GetAudioManager():PlayeEffectSoundWithKey('BATTLE_DRAGON')
     GameUIWarSummary.super.onEnter(self)
     self:DisableCloseBtn()
     self:DisableAutoClose()
@@ -107,9 +108,9 @@ function GameUIWarSummary:onEnter()
         local function createItem(info,meetFlag)
             local content
             if meetFlag then
-                content = display.newSprite("upgrade_resources_background_3.png")
+                content = display.newScale9Sprite("back_ground_548x40_1.png"):size(520,46)
             else
-                content = display.newSprite("upgrade_resources_background_2.png")
+                content = display.newScale9Sprite("back_ground_548x40_2.png"):size(520,46)
             end
             UIKit:ttfLabel({
                 text = info[1],
@@ -136,7 +137,7 @@ function GameUIWarSummary:onEnter()
             {string.formatnumberthousands(ourAlliance.strikeSuccessCount),_("突袭成功"),string.formatnumberthousands(enemyAlliance.strikeSuccessCount)},
             {string.formatnumberthousands(ourAlliance.attackCount),_("进攻次数"),string.formatnumberthousands(enemyAlliance.attackCount)},
             {string.formatnumberthousands(ourAlliance.attackSuccessCount),_("进攻成功"),string.formatnumberthousands(enemyAlliance.attackSuccessCount)},
-            {killMax.allianceId == alliance:Id() and killMax.playerName or _("无"),_("头号杀手"),killMax.allianceId ~= alliance:Id() and killMax.playerName or _("无")},
+            {killMax.allianceId == alliance:Id() and killMax.playerName ~= json.null and killMax.playerName or _("无"),_("头号杀手"),killMax.allianceId ~= alliance:Id() and killMax.playerName  ~= json.null and killMax.playerName or _("无")},
             {string.formatnumberthousands(ourAlliance.honour),_("荣耀值奖励"),string.formatnumberthousands(enemyAlliance.honour)},
         }
         local b_flag = true
@@ -153,13 +154,18 @@ function GameUIWarSummary:onEnter()
             {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"}
         ):addTo(content):align(display.CENTER,w/2,45)
             :setButtonLabel(UIKit:ttfLabel({
-                text = _("离开战场"),
+                text = _("确定"),
                 size = 24,
                 color = 0xffedae,
                 shadow= true
             })):onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                app:EnterMyAllianceScene()
+                local scene_name = display.getRunningScene().__cname
+                if scene_name == 'AllianceBattleScene' or scene_name == 'AllianceScene' then
+                    app:EnterMyAllianceScene()
+                elseif scene_name == 'MyCityScene' then
+                    self:LeftButtonClicked()
+                end
             end
             end)
         return response

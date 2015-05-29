@@ -4,30 +4,60 @@ local UILib = import("..ui.UILib")
 local Localize_item = import("..utils.Localize_item")
 local window = import("..utils.window")
 local GameUIPVEHome = UIKit:createUIClass('GameUIPVEHome')
+local WidgetPVEGetRewards = import("..widget.WidgetPVEGetRewards")
 local WidgetHomeBottom = import("..widget.WidgetHomeBottom")
 local WidgetUseItems = import("..widget.WidgetUseItems")
 local ChatManager = import("..entity.ChatManager")
 local WidgetChat = import("..widget.WidgetChat")
+local WidgetPVEEvent = import("..widget.WidgetPVEEvent")
+local pve_level = GameDatas.ClientInitGame.pve_level
 local timer = app.timer
 
 
 function GameUIPVEHome:DisplayOn()
-
+    self.visible_count = self.visible_count + 1
+    self:FadeToSelf(self.visible_count > 0)
 end
 function GameUIPVEHome:DisplayOff()
-
+    self.visible_count = self.visible_count - 1
+    self:FadeToSelf(self.visible_count > 0)
 end
+function GameUIPVEHome:FadeToSelf(isFullDisplay)
+    self:stopAllActions()
+    if isFullDisplay then
+        self:show()
+        transition.fadeIn(self, {
+            time = 0.2,
+        })
+    else
+        transition.fadeOut(self, {
+            time = 0.2,
+            onComplete = function()
+                self:hide()
+            end,
+        })
+    end
+end
+
+
 function GameUIPVEHome:ctor(user, scene)
     self.user = user
     self.layer = scene:GetSceneLayer()
     GameUIPVEHome.super.ctor(self, {type = UIKit.UITYPE.BACKGROUND})
 end
 function GameUIPVEHome:onEnter()
+    self.visible_count = 1
     self:CreateTop()
-    self:CreateBottom()
+    self.bottom = self:CreateBottom()
+
+    local ratio = self.bottom:getScale()
+    self.event_tab = WidgetPVEEvent.new(self.user, ratio)
+    local rect1 = self.chat:getCascadeBoundingBox()
+    local x, y = rect1.x, rect1.y + rect1.height - 2
+    self.event_tab:addTo(self):pos(x, y)
+
     self:OnExploreChanged(self.layer)
     self:OnResourceChanged(self.user)
-
     self:AddOrRemoveListener(true)
 end
 function GameUIPVEHome:onExit()
@@ -50,7 +80,7 @@ function GameUIPVEHome:OnResourceChanged(user)
     self.gem_label:setString(string.formatnumberthousands(user:GetGemResource():GetValue()))
 end
 function GameUIPVEHome:OnExploreChanged(pve_layer)
-    self.exploring:setString(string.format("探索度 %.2f%%", pve_layer:ExploreDegree() * 100))
+    self.exploring:setString(string.format(_("探索度 %.2f%%"), pve_layer:ExploreDegree() * 100))
 end
 function GameUIPVEHome:CreateTop()
     local top_bg = display.newSprite("head_bg.png")
@@ -122,21 +152,21 @@ function GameUIPVEHome:CreateTop()
         color = 0xffedae,
     }):addTo(pve_back):align(display.CENTER, size.width / 2, 25)
 
-    local box = cc.ui.UIPushButton.new(
+    local reward_btn = cc.ui.UIPushButton.new(
         {normal = "back_ground_box.png", pressed = "back_ground_box.png"}
         ,{})
         :addTo(top_bg, 1):align(display.CENTER, 80, 55):scale(0.8)
         :onButtonClicked(function(event)
-            if self.layer:ExploreDegree() >= 1.0 then
-                self.box:hide()
-                self:GetRewards()
-            end
+            local reward = pve_level[self.layer:CurrentPVEMap():GetIndex()]
+            WidgetPVEGetRewards.new({gemClass = self:GetRewardItemName(), count = reward.count}, self.layer:ExploreDegree() * 100):AddToCurrentScene(true)
         end)
-    self.box_bg = box
-    self.box = ccs.Armature:create("lanse"):addTo(box)
-        :align(display.CENTER, - 20, 10):scale(0.25)
 
-    self:SetBoxStatus(not self.layer:CurrentPVEMap():IsRewarded())
+    self.reward = display.newSprite(UILib.item[self:GetRewardItemName()],nil,nil,{class=cc.FilteredSpriteWithOne})
+        :addTo(reward_btn):scale(0.6)
+    self:RefreshRewards()
+
+
+
 
     UIKit:ttfLabel({
         text = string.format("%d. %s", self.layer:CurrentPVEMap():GetIndex(), self.layer:CurrentPVEMap():Name()),
@@ -153,49 +183,68 @@ end
 function GameUIPVEHome:CreateBottom()
     local bottom_bg = WidgetHomeBottom.new(City):addTo(self)
         :align(display.BOTTOM_CENTER, display.cx, display.bottom)
-    WidgetChat.new():addTo(bottom_bg)
+
+    self.chat = WidgetChat.new():addTo(bottom_bg)
         :align(display.CENTER, bottom_bg:getContentSize().width/2, bottom_bg:getContentSize().height-11)
+
     self.change_map = WidgetChangeMap.new(WidgetChangeMap.MAP_TYPE.PVE):addTo(self)
+
+    return bottom_bg
 end
 
-function GameUIPVEHome:SetBoxStatus(can_get)
-    self.box:show()
-    self.box_bg:setButtonEnabled(can_get)
-    if can_get then
-        self.box:getAnimation():stop()
+-- function GameUIPVEHome:SetBoxStatus(can_get)
+--     self.box:show()
+--     self.box_bg:setButtonEnabled(can_get)
+--     if can_get then
+--         self.box:getAnimation():stop()
+--     else
+--         self.box:getAnimation():playWithIndex(0)
+--         self.box:getAnimation():gotoAndPause(85)
+--     end
+-- end
+function GameUIPVEHome:GetRewards()
+-- local index = self.layer:CurrentPVEMap():GetIndex()
+-- local rewards = GameDatas.PlayerInitData.pveLevel[index]
+-- local _1,name = unpack(string.split(rewards.itemName, ":"))
+-- self.user:ResetPveData()
+-- self.user:SetPveData(nil, {
+--     {
+--         type = "items",
+--         name = name,
+--         count = rewards.count,
+--     },
+-- }, nil)
+-- local data = self.user:EncodePveDataAndResetFightRewardsData()
+-- data.pveData.rewardedFloor = index
+-- NetManager:getSetPveDataPromise(data):done(function()
+--     local wp = self.box:getParent():convertToWorldSpace(cc.p(self.box:getPosition()))
+--     UIKit:newGameUI("GameUIPveGetRewards", wp.x, wp.y):AddToCurrentScene(true)
+--         :AddClickOutFunc(function(ui)
+--             ui:LeftButtonClicked()
+--             self:SetBoxStatus(not self.layer:CurrentPVEMap():IsRewarded())
+--             GameGlobalUI:showTips(_("获得奖励"), Localize_item.item_name[name].."x"..rewards.count)
+--         end)
+-- end)
+end
+function GameUIPVEHome:RefreshRewards()
+    self.reward:setTexture(UILib.item[self:GetRewardItemName()])
+    if self.layer:CurrentPVEMap():IsRewarded() then
+        self.reward:setFilter(filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1}))
     else
-        self.box:getAnimation():playWithIndex(0)
-        self.box:getAnimation():gotoAndPause(85)
+        self.reward:clearFilter()
     end
 end
-function GameUIPVEHome:GetRewards()
-    local index = self.layer:CurrentPVEMap():GetIndex()
-    local rewards = GameDatas.PlayerInitData.pveLevel[index]
-    local _1,name = unpack(string.split(rewards.itemName, ":"))
-    self.user:ResetPveData()
-    self.user:SetPveData(nil, {
-        {
-            type = "items",
-            name = name,
-            count = rewards.count,
-        },
-    }, nil)
-    local data = self.user:EncodePveDataAndResetFightRewardsData()
-    data.pveData.rewardedFloor = index
-    NetManager:getSetPveDataPromise(data):done(function()
-        local wp = self.box:getParent():convertToWorldSpace(cc.p(self.box:getPosition()))
-        UIKit:newGameUI("GameUIPveGetRewards", wp.x, wp.y):AddToCurrentScene(true)
-            :AddClickOutFunc(function(ui)
-                ui:LeftButtonClicked()
-                self:SetBoxStatus(not self.layer:CurrentPVEMap():IsRewarded())
-                GameGlobalUI:showTips(_("获得奖励"), Localize_item.item_name[name].."x"..rewards.count)
-            end)
-    end)
+function GameUIPVEHome:GetRewardItemName()
+    local reward = pve_level[self.layer:CurrentPVEMap():GetIndex()]
+    local _,itemName = unpack(string.split(reward.itemName, ":"))
+    return itemName
 end
 
 
 
 return GameUIPVEHome
+
+
 
 
 

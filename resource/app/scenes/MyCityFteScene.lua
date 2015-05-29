@@ -14,6 +14,8 @@ local NotifyItem = import("..entity.NotifyItem")
 local MyCityScene = import(".MyCityScene")
 local MyCityFteScene = class("MyCityFteScene", MyCityScene)
 
+
+local is_send = false
 function MyCityFteScene:ctor(...)
     MyCityFteScene.super.ctor(self, ...)
     self.clicked_callbacks = {}
@@ -21,14 +23,14 @@ end
 function MyCityFteScene:onEnterTransitionFinish()
     self:RunFte()
 end
+local ARROW_TAG = 11901
 function MyCityFteScene:PromiseOfClickBuilding(x, y, for_build, msg, arrow_param)
     self:BeginClickFte()
     self:GetSceneLayer()
         :FindBuildingBy(x, y)
         :next(function(building)
-            local mid,top = building:GetWorldPosition()
+            local __,top = building:GetWorldPosition()
             local info_layer = self:GetSceneLayer():GetInfoLayer()
-            local middle_point = info_layer:convertToNodeSpace(mid)
             local top_point = info_layer:convertToNodeSpace(top)
 
             local str
@@ -42,27 +44,53 @@ function MyCityFteScene:PromiseOfClickBuilding(x, y, for_build, msg, arrow_param
 
             info_layer:removeAllChildren()
             local arrow = WidgetFteArrow.new(msg or str)
-                :addTo(info_layer, 1, 119):TurnDown():pos(top_point.x, top_point.y + 50)
+                :addTo(info_layer, 1, ARROW_TAG):TurnDown():pos(top_point.x, top_point.y + 50)
             if arrow_param then
                 if arrow_param.direction == "up" then
-                    arrow:TurnUp():pos(top_point.x + 0, top_point.y - 300)
+                    arrow:TurnUp()
                 end
+                arrow:pos(top_point.x + (arrow_param.x or 0), top_point.y + (arrow_param.y or -300))
             end
 
 
             local mx, my = building:GetEntity():GetMidLogicPosition()
             self:GotoLogicPoint(mx, my, 5)
-            :next(function()
-                local rect
-                if info_layer:getChildByTag(119) then
-                    local rect1 = info_layer:getChildByTag(119):getCascadeBoundingBox()
-                    local rect2 = building:getCascadeBoundingBox()
-                    rect = cc.rectUnion(rect1, rect2)
-                else
-                    rect = building:getCascadeBoundingBox()
-                end
-                self:GetFteLayer():FocusOnRect(rect)
-            end)
+                :next(function()
+                    info_layer:removeAllChildren()
+
+                    local __,top = building:GetWorldPosition()
+                    local tp = self:GetFteLayer():convertToNodeSpace(top)
+                    local arrow = WidgetFteArrow.new(msg or str)
+                        :addTo(self:GetFteLayer(), 1, ARROW_TAG)
+                        :TurnDown():pos(tp.x, tp.y + 50)
+                    if arrow_param then
+                        if arrow_param.direction == "up" then
+                            arrow:TurnUp()
+                        end
+                        arrow:pos(tp.x + (arrow_param.x or 0), tp.y + (arrow_param.y or -300))
+                    end
+                    local rect = building:GetSprite():getBoundingBox()
+                    local x,y,x1,y1 = rect.x,rect.y,rect.x + rect.width,rect.y + rect.height
+                    if building:GetEntity():GetType() == "keep" then
+                        x1 = x1 - 50
+                    elseif building:GetEntity():GetType() == "barracks" then
+                        x1 = x1 - 40
+                    elseif building:GetEntity():GetType() == "hospital" then
+                        x1 = x1 - 60
+                    elseif building:GetEntity():GetType() == "academy" then
+                        x1 = x1 - 20
+                    elseif building:GetEntity():GetType() == "materialDepot" then
+                        x1 = x1 - 20
+                    elseif building:GetEntity():GetType() == "airship" then
+                        y = y + 80
+                        x = x - 50
+                    end
+
+                    local lp = building:GetSprite():getParent():convertToWorldSpace(cc.p(x,y))
+                    local rp = building:GetSprite():getParent():convertToWorldSpace(cc.p(x1,y1))
+
+                    self:GetFteLayer():FocusOnRect(cc.rect(lp.x, lp.y, rp.x - lp.x, rp.y - lp.y))
+                end)
 
         end)
 
@@ -78,12 +106,14 @@ function MyCityFteScene:PromiseOfClickBuilding(x, y, for_build, msg, arrow_param
 end
 function MyCityFteScene:BeginClickFte()
     self.clicked_callbacks = {}
+    self:GetFteLayer():removeChildByTag(ARROW_TAG, true)
     self:GetFteLayer():FocusOnRect()
     self:GetFteLayer():Enable()
     self:GetSceneLayer():GetInfoLayer():removeAllChildren()
 end
 function MyCityFteScene:EndClickFte()
     self.clicked_callbacks = {}
+    self:GetFteLayer():removeChildByTag(ARROW_TAG, true)
     self:GetFteLayer():FocusOnRect()
     self:GetFteLayer():Disable()
     self:GetSceneLayer():GetInfoLayer():removeAllChildren()
@@ -101,8 +131,8 @@ function MyCityFteScene:CheckClickPromise(building, func)
 end
 function MyCityFteScene:OnTouchClicked(pre_x, pre_y, x, y)
     if self.event_manager:TouchCounts() ~= 0 or
-        self.util_node:getNumberOfRunningActions() > 0 then 
-        return 
+        self.util_node:getNumberOfRunningActions() > 0 then
+        return
     end
 
     local building = self:GetSceneLayer():GetClickedObject(x, y)
@@ -168,6 +198,7 @@ function MyCityFteScene:OpenUI(building, default_tab)
     local type_ = entity:GetType()
     local uiarrays = ui_map[type_]
     if type_ == "ruins" and not self:IsEditMode() then
+        if #UIKit.open_ui_callbacks == 0 then return end
         UIKit:newGameUI(uiarrays[1], city, entity, uiarrays[2], uiarrays[3]):AddToScene(self, true)
     elseif type_ == "airship" then
         local dragon_manger = city:GetDragonEyrie():GetDragonManager()
@@ -176,7 +207,7 @@ function MyCityFteScene:OpenUI(building, default_tab)
             local _,_,index = self.city:GetUser():GetPVEDatabase():GetCharPosition()
             app:EnterPVEFteScene(1)
         else
-            UIKit:showMessageDialog(_("陛下"),_("必须有一条空闲的龙，才能进入pve"))
+            UIKit:showMessageDialog(_("主人"),_("需要一条空闲状态的魔龙才能探险"))
         end
         app:GetAudioManager():PlayeEffectSoundWithKey("AIRSHIP")
     elseif type_ == "FairGround" then
@@ -184,6 +215,7 @@ function MyCityFteScene:OpenUI(building, default_tab)
     elseif type_ == "square" then
         UIKit:newGameUI("GameUISquare", self.city):AddToScene(self, true)
     else
+        if #UIKit.open_ui_callbacks == 0 then return end
         UIKit:newGameUI(uiarrays[1], city, entity, default_tab or uiarrays[2], uiarrays[3]):AddToScene(self, true)
     end
 end
@@ -207,12 +239,9 @@ function MyCityFteScene:RunFte()
     end):next(function()
         if not check("BuildHouseAt_3_3") then
             self:GetFteLayer():UnlockAll()
-            return self:PromiseOfBuildFirstHouse(18, 12, "dwelling")
-        end
-    end):next(function()
-        if not check("FinishBuildHouseAt_3_1") then
-            self:GetFteLayer():UnlockAll()
-            return self:GetHomePage():PromiseOfFteWaitFinish()
+            return self:PromiseOfBuildFirstHouse(18, 12, "dwelling"):next(function()
+                return self:GetHomePage():PromiseOfFteWaitFinish()
+            end)
         end
     end):next(function()
         if not check("UpgradeBuildingTo_keep_2") then
@@ -235,19 +264,16 @@ function MyCityFteScene:RunFte()
             return self:GetHomePage():PromiseOfFteInstantSpeedUp()
         end
     end):next(function()
-        if not check("RecruitSoldier_swordsman") then
+        if not check("InstantRecruitSoldier_swordsman") then
             self:GetFteLayer():UnlockAll()
             return self:PromiseOfRecruitSoldier("swordsman")
         end
     end):next(function()
         if not check("BuildHouseAt_5_3") then
             self:GetFteLayer():UnlockAll()
-            return self:PromiseOfBuildHouse(8, 22, "farmer")
-        end
-    end):next(function()
-        if not check("FinishBuildHouseAt_5_1") then
-            self:GetFteLayer():UnlockAll()
-            return self:GetHomePage():PromiseOfFteWaitFinish()
+            return self:PromiseOfBuildHouse(8, 22, "farmer"):next(function()
+                return self:GetHomePage():PromiseOfFteWaitFinish()
+            end)
         end
     end):next(function()
         if not check("FightWithNpc1") then
@@ -255,10 +281,23 @@ function MyCityFteScene:RunFte()
             return self:PromiseOfExplorePve()
         end
     end):next(function()
-        if not check("UpgradeBuildingTo_keep_3") then
-            self:GetFteLayer():UnlockAll()
-            return self:PromiseOfUpgradeKeepForHospital()
-        end
+
+            cc.ui.UIPushButton.new({normal = "skip.png",pressed = "skip.png"})
+                :addTo(self, 1000000):align(display.RIGHT_TOP, display.width, display.height)
+                :onButtonClicked(function(event)
+                    event.target:setButtonEnabled(false)
+
+                    UIKit:showMessageDialog(_("提示"),_("是否跳过新手引导？"),function()
+                        self:Skip()
+                    end, function()
+                        event.target:setButtonEnabled(true)
+                    end, false)
+                end)
+
+            if not check("UpgradeBuildingTo_keep_3") then
+                self:GetFteLayer():UnlockAll()
+                return self:PromiseOfUpgradeKeepForHospital()
+            end
     end):next(function()
         if not check("FinishUpgradingBuilding_keep_3") then
             self:GetFteLayer():UnlockAll()
@@ -282,12 +321,9 @@ function MyCityFteScene:RunFte()
     end):next(function()
         if not check("BuildHouseAt_6_3") then
             self:GetFteLayer():UnlockAll()
-            return self:PromiseOfBuildWoodcutter()
-        end
-    end):next(function()
-        if not check("FinishBuildHouseAt_6_3") then
-            self:GetFteLayer():UnlockAll()
-            return self:GetHomePage():PromiseOfFteWaitFinish()
+            return self:PromiseOfBuildWoodcutter():next(function()
+                return self:GetHomePage():PromiseOfFteWaitFinish()
+            end)
         end
     end):next(function()
         if not check("UpgradeBuildingTo_keep_4") then
@@ -340,19 +376,16 @@ function MyCityFteScene:RunFte()
             return self:PromiseOfCheckMaterials()
         end
     end):next(function()
-        if not check("RecruitSoldier_skeletonWarrior") then
+        if not check("InstantRecruitSoldier_skeletonWarrior") then
             self:GetFteLayer():UnlockAll()
             return self:PromiseOfRecruitSpecial()
         end
     end):next(function()
         if not check("BuildHouseAt_7_3") then
             self:GetFteLayer():UnlockAll()
-            return self:PromiseOfBuildQuarrier()
-        end
-    end):next(function()
-        if not check("FinishBuildHouseAt_7_3") then
-            self:GetFteLayer():UnlockAll()
-            return self:GetHomePage():PromiseOfFteWaitFinish()
+            return self:PromiseOfBuildQuarrier():next(function()
+                return self:GetHomePage():PromiseOfFteWaitFinish()
+            end)
         end
     end):next(function()
         if not check("BuildHouseAt_8_3") then
@@ -360,6 +393,10 @@ function MyCityFteScene:RunFte()
             return self:PromiseOfBuildHouse(28, 12, "miner", _("建造矿工小屋"))
         end
     end):next(function()
+        if not is_send then
+            NetManager:getFinishFTE()
+            is_send = true
+        end
         self:GetFteLayer():UnlockAll()
         return self:PromiseOfFteEnd()
     end)
@@ -397,7 +434,7 @@ function MyCityFteScene:PromiseOfBuildHouse(x, y, house_type, msg)
 end
 function MyCityFteScene:PromiseOfFirstUpgradeKeep()
     return GameUINpc:PromiseOfSay(
-        {words = _("非常好，现在我们来升级城堡！城堡等级越高，可以解锁更多建筑。。。")}
+        {words = _("非常好，现在我们来升级城堡！城堡等级越高，可以解锁更多建筑…")}
     ):next(function()
         return GameUINpc:PromiseOfLeave()
     end):next(function()
@@ -410,8 +447,8 @@ function MyCityFteScene:PromiseOfUnlockBuilding(building_type)
     local tutorial = TutorialLayer.new():addTo(self, 2001)
     return cocos_promise.defer(function()
         WidgetFteArrow.new(string.format(_("点击解锁%s"), Localize.building_name[building_type]))
-        :TurnUp():align(display.TOP_CENTER, 0, -50)
-        :addTo(self:GetLockButtonsByBuildingType(building_type), 1, 123)
+            :TurnUp():align(display.TOP_CENTER, 0, -50)
+            :addTo(self:GetLockButtonsByBuildingType(building_type), 1, 123)
 
         return self:GotoLogicPoint(x, y, 5):next(function()
             tutorial:SetTouchObject(self:GetLockButtonsByBuildingType(building_type))
@@ -437,6 +474,19 @@ function MyCityFteScene:PromiseOfRecruitSoldier()
         return UIKit:PromiseOfOpen("GameUIFteBarracks")
     end):next(function(ui)
         return ui:PromiseOfFte()
+    end):next(function()
+        local tutorial = TutorialLayer.new():addTo(self, 2001)
+        return self:GotoLogicPoint(9, 15, 0.5):next(function()
+            local p = promise.new()
+            self:schedule(function()
+                if not self:GetSceneLayer():IsBarracksMoving() then
+                    self:stopAllActions()
+                    tutorial:removeFromParent()
+                    p:resolve()
+                end
+            end, 1)
+            return p
+        end)
     end)
 end
 function MyCityFteScene:PromiseOfExplorePve()
@@ -451,13 +501,17 @@ function MyCityFteScene:PromiseOfExplorePve()
         )
     end):next(function()
         return GameUINpc:PromiseOfSay(
-            {words = _("领主大人，光靠城市基本的资源产出，无法满足我们的发展需求。。。"), npc = "man"},
+            {words = _("领主大人，光靠城市基本的资源产出，无法满足我们的发展需求…"), npc = "man"},
             {words = _("我倒是知道一个地方，有些危险，但有着丰富的物资，也许我们尝试着探索。。。"), npc = "man"}
         )
     end):next(function()
         return GameUINpc:PromiseOfLeave()
     end):next(function()
-        return self:PromiseOfClickBuilding(-9, 4, nil, _("点击飞艇进入探险地图"))
+        return self:PromiseOfClickBuilding(-9, 4, nil, _("点击飞艇进入探险地图"), {
+            direction = "up",
+            x = -25,
+            y = -230,
+        })
     end):next(function()
         return promise.new()
     end)
@@ -517,37 +571,40 @@ function MyCityFteScene:PromiseOfBuildWoodcutter()
     end)
 end
 function MyCityFteScene:PromiseOfHeal()
-    return self:PromiseOfClickBuilding(16, 29)
-    :next(function()
-        return UIKit:PromiseOfOpen("GameUIFteHospital")
-    end):next(function(ui)
+    return self:PromiseOfClickBuilding(16, 29, nil, nil, {
+        x = -30,
+        y = 50,
+    })
+        :next(function()
+            return UIKit:PromiseOfOpen("GameUIFteHospital")
+        end):next(function(ui)
         return ui:PromiseOfFte()
-    end)
+        end)
 end
 function MyCityFteScene:PromiseOfResearch()
     return self:PromiseOfClickBuilding(26, 29)
-    :next(function()
-        return UIKit:PromiseOfOpen("GameUIFteAcademy")
-    end):next(function(ui)
+        :next(function()
+            return UIKit:PromiseOfOpen("GameUIFteAcademy")
+        end):next(function(ui)
         return ui:PromiseOfFte()
-    end)
+        end)
 end
 function MyCityFteScene:PromiseOfCheckMaterials()
     return self:PromiseOfClickBuilding(26, 19)
-    :next(function()
-        return UIKit:PromiseOfOpen("GameUIFteMaterialDepot")
-    end):next(function(ui)
+        :next(function()
+            return UIKit:PromiseOfOpen("GameUIFteMaterialDepot")
+        end):next(function(ui)
         return ui:PromiseOfFte()
-    end)
+        end)
 end
 function MyCityFteScene:PromiseOfRecruitSpecial()
     ui_map.barracks[2] = "specialRecruit"
     return self:PromiseOfClickBuilding(6, 29)
-    :next(function()
-        return UIKit:PromiseOfOpen("GameUIFteBarracks")
-    end):next(function(ui)
+        :next(function()
+            return UIKit:PromiseOfOpen("GameUIFteBarracks")
+        end):next(function(ui)
         return ui:PromiseOfFteSpecial()
-    end)
+        end)
 end
 function MyCityFteScene:PromiseOfBuildQuarrier()
     return GameUINpc:PromiseOfSay(
@@ -560,27 +617,40 @@ function MyCityFteScene:PromiseOfBuildQuarrier()
 end
 local FTE_MARK_TAG = 120
 function MyCityFteScene:PromiseOfFteEnd()
-    local r = self:GetHomePage().quest_bar_bg:getCascadeBoundingBox()
-    WidgetFteMark.new():addTo(self, 4000, FTE_MARK_TAG):Size(r.width, r.height)
-        :pos(r.x + r.width/2, r.y + r.height/2)
-
     GameUINpc:PromiseOfSay(
-        {words = _("看来大人你已经能够顺利接管这座城市了。。。如果不知道该干什么可以点击左上角的推荐任务"), rect = r}
+        {
+            words = _("看来大人你已经能够顺利接管这座城市了。。。如果不知道该干什么可以点击左上角的推荐任务"),
+            callback = function(npc_ui)
+                local r = self:GetHomePage().quest_bar_bg:getCascadeBoundingBox()
+                npc_ui.ui_map.background:FocusOnRect(r)
+                WidgetFteMark.new():addTo(self, 4000, FTE_MARK_TAG)
+                    :Size(r.width, r.height):pos(r.x + r.width/2, r.y + r.height/2)
+            end
+        }
     ):next(function()
-        self:removeChildByTag(FTE_MARK_TAG)
-        if ext.registereForRemoteNotifications then
-            ext.registereForRemoteNotifications()
-        end
-        app:GetPushManager():CancelAll()
-        UIKit:closeAllUI(true)
-        app:EnterUserMode()
-        app:EnterMyCityScene()
+        self:EnterMyCity()
     end)
+end
+function MyCityFteScene:Skip()
+    mockData.Skip()
+    self:EnterMyCity()
+end
+function MyCityFteScene:EnterMyCity()
+    if not is_send then
+        NetManager:getFinishFTE()
+    end
+    app:GetPushManager():CancelAll()
+    UIKit:closeAllUI(true)
+    app:EnterUserMode()
+    app:EnterMyCityScene()
 end
 
 
 
 return MyCityFteScene
+
+
+
 
 
 

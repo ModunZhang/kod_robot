@@ -100,7 +100,7 @@ function GameUIPVESendTroop:OnMoveInStage()
     end):align(display.LEFT_CENTER,window.left+50,window.top-910):addTo(self:GetView())
     self.max_btn = max_btn
 
-    self.march_btn = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+    self.march_btn = WidgetPushButton.new({normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"})
         :setButtonLabel(UIKit:ttfLabel({
             text = _("进攻"),
             size = 24,
@@ -111,23 +111,23 @@ function GameUIPVESendTroop:OnMoveInStage()
             if event.name == "CLICKED_EVENT" then
                 assert(tolua.type(self.march_callback)=="function")
                 if not self.dragon then
-                    UIKit:showMessageDialog(_("陛下"),_("快去孵化一只巨龙吧"))
+                    UIKit:showMessageDialog(_("主人"),_("快去孵化一只巨龙吧"))
                     return
                 end
                 local dragonType = self.dragon:Type()
                 local soldiers = self:GetSelectSoldier()
                 if not self.dragon:IsFree() and not self.dragon:IsDefenced() then
-                    UIKit:showMessageDialog(_("陛下"),_("龙未处于空闲状态"))
+                    UIKit:showMessageDialog(_("主人"),_("龙未处于空闲状态"))
                     return
                 elseif self.dragon:Hp()<1 then
-                    UIKit:showMessageDialog(_("陛下"),_("选择的龙已经死亡"))
+                    UIKit:showMessageDialog(_("主人"),_("选择的龙已经死亡"))
                     return
                 elseif #soldiers == 0 then
-                    UIKit:showMessageDialog(_("陛下"),_("请选择要派遣的部队"))
+                    UIKit:showMessageDialog(_("主人"),_("请选择要派遣的部队"))
                     return
                 end
                 if self.dragon:IsHpLow() then
-                    UIKit:showMessageDialog(_("陛下"),_("您的龙的HP低于20%,有很大几率阵亡,确定要派出吗?"))
+                    UIKit:showMessageDialog(_("主人"),_("您的龙的HP低于20%,有很大几率阵亡,确定要派出吗?"))
                         :CreateOKButton(
                             {
                                 listener =  function ()
@@ -174,7 +174,7 @@ function GameUIPVESendTroop:SelectDragonPart()
         :align(display.LEFT_CENTER, window.left+47,window.top-415)
         :addTo(self:GetView())
 
-    local dragon_bg = display.newSprite("chat_hero_background.png")
+    local dragon_bg = display.newSprite("dragon_bg_114x114.png")
         :align(display.LEFT_CENTER, 7,dragon_frame:getContentSize().height/2)
         :addTo(dragon_frame)
     self.dragon_img = cc.ui.UIImage.new(dragon:Type()..".png")
@@ -185,7 +185,7 @@ function GameUIPVESendTroop:SelectDragonPart()
         :addTo(dragon_frame)
     -- 龙，等级
     self.dragon_name = UIKit:ttfLabel({
-        text = _(dragon:Type()).."（LV ".. dragon:Level()..")",
+        text = Localize.dragon[dragon:Type()].."（LV ".. dragon:Level()..")",
         size = 22,
         color = 0x514d3e,
     }):align(display.LEFT_CENTER,20,80)

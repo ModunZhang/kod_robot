@@ -3,7 +3,6 @@ local Localize = import("..utils.Localize")
 local MaterialManager = import("..entity.MaterialManager")
 local WidgetPushButton = import(".WidgetPushButton")
 local WidgetUIBackGround = import(".WidgetUIBackGround")
-local WidgetUIBackGround2 = import(".WidgetUIBackGround2")
 local WidgetPopDialog = import(".WidgetPopDialog")
 local UILib = import("..ui.UILib")
 
@@ -23,7 +22,9 @@ local DRAGON_BG = {
 
 -- local EQUIP_LOCALIZE = Localize.equip_material
 local EQUIP_LOCALIZE = Localize.equip
+local EQUIP_MAKE = Localize.equip_make
 local DRAGON_LOCALIZE = Localize.dragon
+local DRAGON_ONLY = Localize.dragon_only
 local BODY_LOCALIZE = Localize.body
 function WidgetMakeEquip:ctor(equip_type, black_smith, city)
     WidgetMakeEquip.super.ctor(self,862,_("制造装备"),display.top-80)
@@ -73,7 +74,7 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
         :align(display.CENTER, pos.x, pos.y):scale(0.62)
 
     -- 装备的数量背景
-    local back_ground_97x20 = cc.ui.UIImage.new("back_ground_138x34.png"):addTo(star_bg, 2)
+    local back_ground_97x20 = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(138,34),cc.rect(15,10,136,64)):addTo(star_bg, 2)
         :align(display.CENTER, pos.x, pos.y - 10 - 128/2+6):scale(0.7)
 
     -- 装备数量label
@@ -104,7 +105,7 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
 
     -- used for dragon
     cc.ui.UILabel.new({
-        text = string.format("%s%s%s", _("仅供"), DRAGON_LOCALIZE[equip_config.usedFor], _("装备")),
+        text = DRAGON_ONLY[equip_config.usedFor],
         size = 18,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
@@ -126,8 +127,8 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
 
     -- 立即建造
     local size = back_ground:getContentSize()
-    local instant_button = cc.ui.UIPushButton.new({normal = "green_btn_up_250x65.png",
-        pressed = "green_btn_down_250x65.png"}):addTo(back_ground)
+    local instant_button = cc.ui.UIPushButton.new({normal = "green_btn_up_250x66.png",
+        pressed = "green_btn_down_250x66.png"}):addTo(back_ground)
         :align(display.CENTER, 150, 100)
         :setButtonLabel(UIKit:ttfLabel({
             text = _("立即制造"),
@@ -159,8 +160,8 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
 
     local size = back_ground:getContentSize()
     local button = WidgetPushButton.new({
-        normal = "yellow_btn_up_185x65.png",
-        pressed = "yellow_btn_down_185x65.png"
+        normal = "yellow_btn_up_186x66.png",
+        pressed = "yellow_btn_down_186x66.png"
     }
     ,{}
     ,{
@@ -177,7 +178,7 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
         :onButtonClicked(function(event)
             if self:IsAbleToMakeEqui(false) then
                 NetManager:getMakeDragonEquipmentPromise(equip_type):done(function (response)
-                    GameGlobalUI:showTips(_("提示"),string.format(_("已在制造%s"),EQUIP_LOCALIZE[equip_type]))
+                    GameGlobalUI:showTips(_("提示"), EQUIP_MAKE[equip_type])
                     return response
                 end)
 
@@ -342,11 +343,9 @@ end
 function WidgetMakeEquip:UpdateEquipCounts()
     local material_manager = self.city:GetMaterialManager()
     local cur = material_manager:GetMaterialsByType(MaterialManager.MATERIAL_TYPE.EQUIPMENT)[self.equip_type]
-    local max = self.city:GetFirstBuildingByType("materialDepot"):GetMaxDragonEquipment()
-    local label = string.format("%d/%d", cur, max)
-    if label ~= self.number:getString() then
-        self.number:setString(label)
-    end
+    -- local max = self.city:GetFirstBuildingByType("materialDepot"):GetMaxDragonEquipment()
+    local label = string.format("%d", cur, max)
+    self.number:setString(label)
 end
 -- 更新材料数量
 function WidgetMakeEquip:UpdateMaterials()
@@ -368,7 +367,7 @@ end
 function WidgetMakeEquip:UpdateBuildLabel(queue)
     local is_enough = queue == 0
     -- self.normal_build_btn:setButtonEnabled(is_enough)
-    local label = string.format("%s %d/%d", _("制造队列"), 1,queue)
+    local label = string.format(_("制造队列 %d/%d"), 1 - queue,1)
     if label ~= self.build_label:getString() then
         self.build_label:setString(label)
     end
@@ -379,7 +378,7 @@ end
 function WidgetMakeEquip:UpdateCoin(coin)
     local equip_config = self.equip_config
     local need_coin = equip_config.coin
-    local label = string.format("%s %s/%s", _("需要银币"),  GameUtils:formatNumber(coin),GameUtils:formatNumber(need_coin))
+    local label = string.format( _("需要银币 %s/%s"),  GameUtils:formatNumber(coin),GameUtils:formatNumber(need_coin))
     if self.coin_label:getString() ~= label then
         self.coin_label:setString(label)
     end
@@ -459,13 +458,14 @@ function WidgetMakeEquip:IsAbleToMakeEqui(isFinishNow)
             local making_event = self.black_smith:GetMakeEquipmentEvent()
             local time_gem = DataUtils:getGemByTimeInterval(making_event:LeftTime(app.timer:GetServerTime()))
             need_gems = need_gems + time_gem
-            table.insert(not_suitble, _("完成当前制造队列,需要")..time_gem)
+            table.insert(not_suitble, string.format( _("完成当前制造队列,需要%d"), time_gem ) )
         end
         -- 检查银币
         local current_coin = city:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
         if equip_config.coin>current_coin then
             local coin_gem = DataUtils:buyResource({coin = equip_config.coin}, {coin =current_coin })
-            table.insert(not_suitble, _("银币不足,需要")..coin_gem)
+
+            table.insert(not_suitble, string.format( _("银币不足,需要%d"), coin_gem ) )
             need_gems = need_gems + coin_gem
         end
 
@@ -485,4 +485,5 @@ function WidgetMakeEquip:IsAbleToMakeEqui(isFinishNow)
 end
 
 return WidgetMakeEquip
+
 

@@ -57,7 +57,7 @@ function AllianceShrineStage:formatTroops(str)
 		local troops = string.split(suntroops,"_")
 		local troop_type,star = troops[1],troops[2]
 		local count =  checknumber(troops[3])
-		local count_str = math.ceil(count*0.8) .. "~" .. math.ceil(count*1.2)
+		local count_str = math.ceil(count*0.9)*self:SuggestPlayer() .. "~" .. math.ceil(count*1.1)*self:SuggestPlayer()
 		table.insert(r,{type = troop_type,count = count_str,star = tonumber(star)})
 	end
 	property(self,"troops",r)

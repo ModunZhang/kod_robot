@@ -203,8 +203,8 @@ function AllianceApi:EditAllianceInfo()
         elseif excute_fun <= 10 then
             if me:CanEditAllianceJoinType() then
                 if alliance:JoinType() == "all" then
-                    print("修改联盟加入type到:audit")
-                    return NetManager:getEditAllianceJoinTypePromise("audit")
+                    -- print("修改联盟加入type到:audit")
+                    -- return NetManager:getEditAllianceJoinTypePromise("audit")
                 else
                     print("修改联盟加入type到:all")
                     return NetManager:getEditAllianceJoinTypePromise("all")

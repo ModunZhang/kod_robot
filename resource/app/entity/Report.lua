@@ -369,9 +369,9 @@ function Report:GetReportTitle()
         end
     elseif report_type == "villageBeStriked" then
         if data.level>1 then
-            return _("防守突袭村落成功")
-        else
             return _("防守突袭村落失败")
+        else
+            return _("防守突袭村落成功")
         end
     elseif report_type=="attackCity" then
         local result = self:GetReportResult()

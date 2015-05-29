@@ -116,8 +116,8 @@ function GameUIMission:CreateUIIf_achievement()
         size = 24,
         color= 0x403c2f
     }):align(display.LEFT_BOTTOM, 34, 28):addTo(recommend_contet_bg)
-    display.newSprite("mission_header_line_620x56.png")
-        :align(display.CENTER_TOP, 308, 14)
+    display.newSprite("line_624x58.png")
+        :align(display.CENTER_TOP, 308, 16)
         :addTo(header_bg)
     local list,list_node = UIKit:commonListView({
         viewRect = cc.rect(0, 0,558,584),
@@ -201,7 +201,7 @@ function GameUIMission:GetAchievementListItem(isFinished,data)
         color= 0x403c2f
     }):align(display.LEFT_CENTER, 5, 33):addTo(content)
     if not isFinished then
-        display.newSprite("activity_next_32x37.png"):align(display.RIGHT_CENTER, 548, 33):addTo(content)
+        display.newSprite("next_32x38.png"):align(display.RIGHT_CENTER, 548, 33):addTo(content)
     else
         content.button = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
             :align(display.RIGHT_CENTER, 552, 33)
@@ -221,7 +221,7 @@ end
 
 function GameUIMission:GetGetAchievementListHeaderItem(isFinished)
     local item = self.achievement_list:newItem()
-    local content = display.newSprite(isFinished and "title_green_558x34.png" or "title_blue_558x34.png")
+    local content = display.newSprite(isFinished and "title_green_558x34.png" or "title_blue_554x34.png")
     UIKit:ttfLabel({
         text = isFinished and _("已完成任务") or _("成就任务"),
         size = 22,
@@ -369,7 +369,7 @@ function GameUIMission:GetDailyItem(data)
     local icon_bg = display.newSprite("technology_bg_116x116.png", 67, 67):addTo(flag_box)
     local offset = cc.p(0,6)
     display.newSprite(data.image, 58 + offset.x, 58 + offset.y):addTo(icon_bg)
-    local header = display.newScale9Sprite("alliance_event_type_darkblue_222x30.png",0,0, cc.size(412,30), cc.rect(7,7,190,16))
+    local header = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(412,30), cc.rect(10,10,410,10))
         :align(display.LEFT_BOTTOM, 146, 112)
         :addTo(content)
     UIKit:ttfLabel({
@@ -402,7 +402,7 @@ function GameUIMission:GetDailyItem(data)
         progress:setPercentage(100 * data.percent)
     end
 
-    display.newSprite("activity_next_32x37.png"):align(display.LEFT_CENTER, 530, 77):addTo(content)
+    display.newSprite("next_32x38.png"):align(display.LEFT_CENTER, 530, 77):addTo(content)
 
 
     item:addContent(content)

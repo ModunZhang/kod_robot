@@ -225,7 +225,7 @@ function GameUITradeGuild:CreateSellItemForListView(listView,goods)
     item:addContent(content)
     listView:addItem(item)
     -- 商品icon
-    local icon_bg = display.newSprite("back_ground_58x54.png")
+    local icon_bg =  display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(58,54),cc.rect(15,10,136,64))
         :align(display.LEFT_CENTER, 6, content:getContentSize().height/2)
         :addTo(content)
     local icon_image = display.newSprite(self:GetGoodsIcon(listView,goods.itemData.name))
@@ -290,7 +290,7 @@ function GameUITradeGuild:CreateSellItemForListView(listView,goods)
                     end)
                 end
                 if City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())<goods.itemData.price*goods.itemData.count then
-                    UIKit:showMessageDialog(_("陛下"),_("银币不足,是否使用金龙币补充"))
+                    UIKit:showMessageDialog(_("主人"),_("银币不足,是否使用金龙币补充"))
                         :CreateOKButton({
                             listener = function ()
                                 buy_func()
@@ -407,9 +407,6 @@ function GameUITradeGuild:CreateOptions(params)
             :align(display.CENTER,0,0)
             :addTo(checkBoxButton):scale(0.8)
         group:addButton(checkBoxButton)
-        -- local num_bg = display.newSprite("number_bg_98x26.png")
-        --     :align(display.BOTTOM_CENTER, 0, -checkBoxButton:getCascadeBoundingBox().size.height/2+10)
-        --     :addTo(checkBoxButton)
         local num_bg = UIKit:shadowLayer()
         num_bg:setContentSize(cc.size(104,26))
         num_bg:addTo(checkBoxButton):pos(-50,-checkBoxButton:getCascadeBoundingBox().size.height/2+15)
@@ -459,8 +456,9 @@ function GameUITradeGuild:LoadMyGoodsPage()
         :align(display.BOTTOM_LEFT, -car_btn:getCascadeBoundingBox().size.width/2+6, -car_btn:getCascadeBoundingBox().size.height/2+6)
 
     --title bg
-    local title_bg = display.newSprite("title_blue_408x30.png"):addTo(layer)
+    local title_bg = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(408,30), cc.rect(10,10,410,10))
         :align(display.CENTER, window.cx +70 , window.top- 108)
+        :addTo(layer)
     --title label
     UIKit:ttfLabel(
         {
@@ -543,8 +541,9 @@ function GameUITradeGuild:CreateSellItem(list,index)
             :addTo(goods_bg)
         goods_icon:scale(84/math.max(goods_icon:getContentSize().width,goods_icon:getContentSize().height))
         -- 商品数量背景框
-        local goods_num_bg = display.newSprite("number_bg_98x26.png")
-            :align(display.BOTTOM_CENTER, goods_bg:getContentSize().width/2, 13)
+        local goods_num_bg = UIKit:shadowLayer()
+        goods_num_bg:setContentSize(cc.size(102,26))
+        goods_num_bg:align(display.BOTTOM_CENTER, 8, 8)
             :addTo(goods_bg)
         UIKit:ttfLabel(
             {
@@ -692,7 +691,7 @@ function GameUITradeGuild:OpenDollyIntro()
         :addTo(body)
     -- 确定
     WidgetPushButton.new(
-        {normal = "yellow_btn_up_185x65.png",pressed = "yellow_btn_down_185x65.png"}
+        {normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png"}
     ):addTo(body)
         :align(display.CENTER, w/2,50)
         :setButtonLabel(UIKit:ttfLabel({
@@ -1115,6 +1114,7 @@ function GameUITradeGuild:GetMaterialIndexByName(material_type)
     return build_temp[material_type] or teach_temp[material_type]
 end
 return GameUITradeGuild
+
 
 
 

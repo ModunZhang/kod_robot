@@ -44,7 +44,7 @@ function WidgetPromoteSoliderList:CreateItem(soldier_type,star)
     local content = WidgetUIBackGround.new({width = item_width,height = item_height},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
     item:addContent(content)
 
-    local title_bg = display.newSprite("title_blue_558x34.png")
+    local title_bg = display.newSprite("title_blue_554x34.png")
         :addTo(content)
         :pos(item_width/2,item_height-25)
     local temp = UIKit:ttfLabel({

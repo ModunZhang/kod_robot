@@ -133,12 +133,8 @@ function GameUITownHall:CreateQuestItem(quest,index)
 
     local body = WidgetUIBackGround.new({width=item_width,height=item_height},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
     local b_size = body:getContentSize()
-    local title_bg = display.newSprite("title_blue_558x34.png"):addTo(body):align(display.CENTER,b_size.width/2 , b_size.height-24)
-    -- local quest_name = UIKit:ttfLabel({
-    --     text = Localize.daily_quests_name[quest.index],
-    --     size = 22,
-    --     color = 0xffedae,
-    -- }):align(display.LEFT_CENTER, 15, title_bg:getContentSize().height/2):addTo(title_bg)
+    local title_bg = display.newSprite("title_blue_554x34.png"):addTo(body):align(display.CENTER,b_size.width/2 , b_size.height-24)
+
     local star_bar = StarBar.new({
         max = 5,
         bg = "Stars_bar_bg.png",
@@ -149,16 +145,15 @@ function GameUITownHall:CreateQuestItem(quest,index)
     }):addTo(title_bg):align(display.LEFT_CENTER,10, title_bg:getContentSize().height/2)
 
     -- 任务icon
-    local icon_bg = display.newSprite("box_100x100.png"):addTo(body):pos(55,120)
+    local icon_bg = display.newSprite("box_136x136.png"):addTo(body):pos(58,120):scale(110/136)
     display.newSprite(UILib.daily_quests_icon[quest.index])
         :addTo(icon_bg):pos(icon_bg:getContentSize().width/2,icon_bg:getContentSize().height/2)
-        :scale(0.55)
+        :scale(0.77)
 
     local status_label = UIKit:ttfLabel({
-        text = "111",
         size = 20,
         color = 0x403c2f,
-    }):align(display.LEFT_CENTER,icon_bg:getPositionX()+ icon_bg:getContentSize().width -20, icon_bg:getPositionY()+20):addTo(body)
+    }):align(display.LEFT_CENTER,icon_bg:getPositionX()+ icon_bg:getContentSize().width - 50 , icon_bg:getPositionY()+20):addTo(body)
     local add_star_btn = WidgetPushButton.new(
         {normal = "add_btn_up_50x50.png", pressed = "add_btn_down_50x50.png"},
         {scale9 = false}
@@ -181,7 +176,7 @@ function GameUITownHall:CreateQuestItem(quest,index)
         :addTo(title_bg)
 
     local glass_icon = display.newSprite("hourglass_30x38.png")
-        :align(display.RIGHT_CENTER,icon_bg:getPositionX()+ icon_bg:getContentSize().width, icon_bg:getPositionY()-20)
+        :align(display.RIGHT_CENTER,icon_bg:getPositionX()+ icon_bg:getContentSize().width - 40, icon_bg:getPositionY()-20)
         :addTo(body)
         :scale(0.8)
 
@@ -189,19 +184,19 @@ function GameUITownHall:CreateQuestItem(quest,index)
         text = "222",
         size = 20,
         color = 0x403c2f,
-    }):align(display.LEFT_CENTER,icon_bg:getPositionX()+ icon_bg:getContentSize().width, icon_bg:getPositionY()-20):addTo(body)
+    }):align(display.LEFT_CENTER,icon_bg:getPositionX()+ icon_bg:getContentSize().width - 40, icon_bg:getPositionY()-20):addTo(body)
 
     local progress = WidgetProgress.new(UIKit:hex2c3b(0xffedae), "progress_bar_272x40_1.png", "progress_bar_272x40_2.png", {
         icon_bg = "back_ground_43x43.png",
         icon = "hourglass_30x38.png",
         bar_pos = {x = 0,y = 0}
-    }):addTo(body):align(display.LEFT_CENTER, icon_bg:getPositionX()+ icon_bg:getContentSize().width-25, icon_bg:getPositionY()-20)
+    }):addTo(body):align(display.LEFT_CENTER, icon_bg:getPositionX()+ icon_bg:getContentSize().width-60, icon_bg:getPositionY()-20)
 
     local control_btn = WidgetPushButton.new()
         :align(display.RIGHT_CENTER,item_width-10,108)
         :addTo(body)
 
-    local reward_bg = display.newSprite("back_ground_548x52.png"):pos(item_width/2,34):addTo(body)
+    local reward_bg = display.newScale9Sprite("back_ground_166x84.png", item_width/2,34,cc.size(548,52),cc.rect(15,10,136,64)):addTo(body)
 
     local TownHallUI = self
     function item:SetStar(quest)
@@ -233,7 +228,7 @@ function GameUITownHall:CreateQuestItem(quest,index)
                     NetManager:getDailyQeustRewardPromise(quest.id):done(function ()
                         local re_desc = ""
                         for i,v in ipairs(total_rewards) do
-                            re_desc = re_desc .. Localize.fight_reward[v.resource_type].."X"..v.count.." "
+                            re_desc = re_desc .. Localize.fight_reward[v.resource_type].."X".. string.formatnumberthousands(v.count) .." "
                         end
                         GameGlobalUI:showTips(_("每日任务完成"),_("获得")..re_desc)
 
@@ -269,11 +264,11 @@ function GameUITownHall:CreateQuestItem(quest,index)
                 })
             ):onButtonClicked(function(event)
                 if TownHallUI.isFinishedQuest then
-                    UIKit:showMessageDialog(_("陛下"),_("请先领取已经完成的任务的奖励"))
+                    UIKit:showMessageDialog(_("主人"),_("请先领取已经完成的任务的奖励"))
                     return
                 end
                 if TownHallUI.started_quest_item then
-                    UIKit:showMessageDialog(_("陛下"),_("已经有一个任务正在进行中"))
+                    UIKit:showMessageDialog(_("主人"),_("已经有一个任务正在进行中"))
                     return
                 end
                 NetManager:getStartDailyQuestPromise(quest.id)
@@ -409,7 +404,7 @@ end
 
 function GameUITownHall:OnTimer(current_time)
     if self.refresh_time then
-        if User:GetNextDailyQuestsRefreshTime()-current_time<=0 then
+        if (User:GetNextDailyQuestsRefreshTime()-current_time) <= 0 then
             self:ResetQuest()
         else
             self.refresh_time:setString(GameUtils:formatTimeStyle1(User:GetNextDailyQuestsRefreshTime()-current_time))

@@ -79,8 +79,8 @@ function WidgetMailContacts:CreateContactsContent()
         if self.bg then
             self.bg:removeFromParent(true)
         end
-        local body_image = idx%2==0 and "upgrade_resources_background_2.png" or "upgrade_resources_background_3.png"
-        self.bg = display.newScale9Sprite(body_image,item_width/2,item_height/2,cc.size(item_width,item_height),cc.rect(10,10,500,26)):addTo(self)
+        local body_image = idx%2==0 and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+        self.bg = display.newScale9Sprite(body_image,item_width/2,item_height/2,cc.size(item_width,item_height),cc.rect(10,10,528,20)):addTo(self)
 
         alliance_tag:setString(contacts.allianceTag and contacts.allianceTag~="" and "["..contacts.allianceTag.."]" or "")
         if not contacts.allianceTag then

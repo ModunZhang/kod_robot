@@ -6,7 +6,7 @@ function WidgetPVECrashedAirship:ctor(...)
     WidgetPVECrashedAirship.super.ctor(self, ...)
 end
 function WidgetPVECrashedAirship:GetTitle()
-    return string.format("%s %s%d", _("坠毁的飞艇"), _("等级"), self:GetPVEMap():GetIndex())
+    return string.format(_("坠毁的飞艇 等级%d"), self:GetPVEMap():GetIndex())
 end
 function WidgetPVECrashedAirship:GetDesc()
     if self:GetObject():IsSearched() then

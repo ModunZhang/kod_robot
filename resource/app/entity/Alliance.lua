@@ -15,6 +15,8 @@ local Alliance = class("Alliance", MultiObserver)
 local VillageEvent = import(".VillageEvent")
 local AllianceBelvedere = import(".AllianceBelvedere")
 local config_palace = GameDatas.AllianceBuilding.palace
+local pushManager_ = app:GetPushManager()
+local audioManager_ = app:GetAudioManager()
 --注意:突袭用的MarchAttackEvent 所以使用OnAttackMarchEventTimerChanged
 Alliance.LISTEN_TYPE = Enum(
     "OPERATION",
@@ -60,6 +62,8 @@ property(Alliance, "maxMembers", 0)
 property(Alliance, "describe", "")
 property(Alliance, "notice", "")
 property(Alliance, "archon", "")
+-- 成员信息
+property(Alliance, "members", {})
 property(Alliance, "memberCount", 0)
 property(Alliance, "status", "")
 property(Alliance, "statusStartTime", 0)
@@ -73,22 +77,20 @@ property(Alliance, "villages", {})
 property(Alliance, "villageLevels", {})
 property(Alliance, "allianceFight", {})
 property(Alliance, "allianceFightReports", nil)
+--行军事件
+property(Alliance, "attackMarchEvents", {})
+property(Alliance, "attackMarchReturnEvents", {})
+property(Alliance, "strikeMarchEvents", {})
+property(Alliance, "strikeMarchReturnEvents", {})
+-- 村落事件
+property(Alliance, "villageEvents", {})
 function Alliance:ctor()
     Alliance.super.ctor(self)
     self.flag = Flag:RandomFlag()
-    self.members = {}
-    self.help_events = {}
     self.alliance_map = AllianceMap.new(self)
     self.alliance_shrine = AllianceShrine.new(self)
-    --行军事件
-    self.attackMarchEvents = {}
-    self.attackMarchReturnEvents = {}
-    self.strikeMarchEvents = {}
-    self.strikeMarchReturnEvents = {}
-    --村落采集
-    self.villageEvents = {}
-    self.alliance_belvedere = AllianceBelvedere.new(self)
-    -- self:SetNeedUpdateEnemyAlliance(false)
+    self.alliance_belvedere = AllianceBelvedere.new(self) -- 村落采集
+    self.help_events = {}
     -- 联盟道具管理
     self.items_manager = AllianceItemsManager.new()
 end
@@ -452,8 +454,9 @@ function Alliance:OnAllianceDataChanged(alliance_data,refresh_time,deltaData)
         self:SetTitleNames(alliance_data.titles)
     end
     self:UpdateMaxMemberCount(alliance_data)
-    self:OnAllianceBasicInfoChangedFirst(alliance_data,deltaData)
+    self:OnAllianceFightChanged(alliance_data, deltaData)
     self:OnAllianceFightReportsChanged(alliance_data, deltaData)
+    self:OnAllianceBasicInfoChangedFirst(alliance_data,deltaData)
 
     self:OnAllianceMemberDataChanged(alliance_data,deltaData)
 
@@ -465,7 +468,6 @@ function Alliance:OnAllianceDataChanged(alliance_data,refresh_time,deltaData)
 
     self:OnAllianceCountInfoChanged(alliance_data, deltaData)
 
-    self:OnAllianceFightChanged(alliance_data, deltaData)
 
     self:OnAllianceFightRequestsChanged(alliance_data, deltaData)
 
@@ -718,6 +720,7 @@ function Alliance:OnAttackMarchEventsDataChanged(alliance_data,deltaData,refresh
             attackMarchEvent:UpdateData(v,refresh_time)
             self.attackMarchEvents[attackMarchEvent:Id()] = attackMarchEvent
             attackMarchEvent:AddObserver(self)
+            self:updateWatchTowerLocalPushIf(attackMarchEvent)
         end
         self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnMarchEventRefreshed,"OnAttackMarchEventsDataChanged")
     end
@@ -730,12 +733,14 @@ function Alliance:OnAttackMarchEventsDataChanged(alliance_data,deltaData,refresh
                 attackMarchEvent:UpdateData(event_data,refresh_time)
                 self.attackMarchEvents[attackMarchEvent:Id()] = attackMarchEvent
                 attackMarchEvent:AddObserver(self)
+                self:updateWatchTowerLocalPushIf(attackMarchEvent)
                 return attackMarchEvent
             end
             ,function(event_data)
                 if self.attackMarchEvents[event_data.id] then
                     local attackMarchEvent = self.attackMarchEvents[event_data.id]
                     attackMarchEvent:UpdateData(event_data,refresh_time)
+                    self:updateWatchTowerLocalPushIf(attackMarchEvent)
                     return attackMarchEvent
                 end
             end
@@ -746,6 +751,7 @@ function Alliance:OnAttackMarchEventsDataChanged(alliance_data,deltaData,refresh
                     self.attackMarchEvents[event_data.id] = nil
                     attackMarchEvent = MarchAttackEvent.new()
                     attackMarchEvent:UpdateData(event_data,refresh_time)
+                    self:cancelLocalMarchEventPushIf(attackMarchEvent)
                     return attackMarchEvent
                 end
             end
@@ -802,6 +808,7 @@ function Alliance:OnAttackMarchReturnEventsDataChanged(alliance_data,deltaData,r
                     self.attackMarchReturnEvents[event_data.id] = nil
                     attackMarchReturnEvent = MarchAttackReturnEvent.new()
                     attackMarchReturnEvent:UpdateData(event_data,refresh_time)
+                    self:cancelLocalMarchEventPushIf(attackMarchReturnEvent)
                     return attackMarchReturnEvent
                 end
             end
@@ -922,6 +929,7 @@ function Alliance:OnStrikeMarchEventsDataChanged(alliance_data,deltaData,refresh
             strikeMarchEvent:UpdateData(v,refresh_time)
             self.strikeMarchEvents[strikeMarchEvent:Id()] = strikeMarchEvent
             strikeMarchEvent:AddObserver(self)
+            self:updateWatchTowerLocalPushIf(strikeMarchEvent)
         end
         self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnMarchEventRefreshed,"OnStrikeMarchEventDataChanged")
     end
@@ -933,12 +941,14 @@ function Alliance:OnStrikeMarchEventsDataChanged(alliance_data,deltaData,refresh
                 strikeMarchEvent:UpdateData(event_data,refresh_time)
                 self.strikeMarchEvents[strikeMarchEvent:Id()] = strikeMarchEvent
                 strikeMarchEvent:AddObserver(self)
+                self:updateWatchTowerLocalPushIf(strikeMarchEvent)
                 return strikeMarchEvent
             end
             ,function(event_data)
                 if self.strikeMarchEvents[event_data.id] then
                     local strikeMarchEvent = self.strikeMarchEvents[event_data.id]
                     strikeMarchEvent:UpdateData(event_data,refresh_time)
+                    self:updateWatchTowerLocalPushIf(strikeMarchEvent)
                     return strikeMarchEvent
                 end
             end
@@ -949,6 +959,7 @@ function Alliance:OnStrikeMarchEventsDataChanged(alliance_data,deltaData,refresh
                     self.strikeMarchEvents[event_data.id] = nil
                     strikeMarchEvent = MarchAttackEvent.new(true)
                     strikeMarchEvent:UpdateData(event_data,refresh_time)
+                    self:cancelLocalMarchEventPushIf(strikeMarchEvent)
                     return strikeMarchEvent
                 end
             end
@@ -1004,6 +1015,7 @@ function Alliance:OnStrikeMarchReturnEventsDataChanged(alliance_data,deltaData,r
                     self.strikeMarchReturnEvents[event_data.id] = nil
                     strikeMarchReturnEvent = MarchAttackReturnEvent.new(true)
                     strikeMarchReturnEvent:UpdateData(event_data,refresh_time)
+                    self:cancelLocalMarchEventPushIf(strikeMarchReturnEvent)
                     return strikeMarchReturnEvent
                 end
             end
@@ -1240,6 +1252,30 @@ function Alliance:IsMyAlliance()
     return self.isMyAlliance
 end
 
+function Alliance:updateWatchTowerLocalPushIf(marchEvent)
+    if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
+        if not marchEvent:IsReturnEvent() then 
+            local marchType = marchEvent:MarchType() 
+            local msg = marchEvent:IsStrikeEvent() and _("你的城市正被敌军突袭") or _("你的城市正被敌军攻击")
+            local warningTime = self:GetAllianceBelvedere():GetWarningTime()
+            if marchType == 'city' then
+                pushManager_:UpdateWatchTowerPush(marchEvent:ArriveTime() - warningTime,msg,marchEvent:Id())
+            end
+        end
+    end
+end
+--因为这里添加了音效效果 so 所有的事件删除都要调用此方法
+function Alliance:cancelLocalMarchEventPushIf(marchEvent)
+    if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
+        if marchEvent:IsReturnEvent() then 
+            if not marchEvent:IsStrikeEvent() then --我的一般进攻部队返回城市
+                audioManager_:PlayeEffectSoundWithKey("TROOP_BACK")
+            end
+        else
+            pushManager_:CancelWatchTowerPush(marchEvent:Id())
+        end
+    end
+end
 return Alliance
 
 

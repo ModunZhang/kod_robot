@@ -1,5 +1,4 @@
 local window = import("..utils.window")
-local WidgetDropList = import("..widget.WidgetDropList")
 local WidgetMaterials = import("..widget.WidgetMaterials")
 local WidgetCitizen = import("..widget.WidgetCitizen")
 local UIListView = import(".UIListView")

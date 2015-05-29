@@ -65,12 +65,11 @@ function GameUIWall:CreateMilitaryUIIf()
 		:onButtonClicked(function()
 			self:OnSelectDragonButtonClicked()
 	end)
-	local list_bg = display.newScale9Sprite("box_bg_546x214.png")
+	local list_bg = display.newScale9Sprite("background_568x120.png", 0,0,cc.size(568,100),cc.rect(15,10,538,100))
 			:addTo(top_bg)
 			:align(display.LEFT_BOTTOM,22,80)
-			:size(568, 100)
 	self.info_list = UIListView.new({
-			bgColor = UIKit:hex2c4b(0x7a000000),
+			-- bgColor = UIKit:hex2c4b(0x7a000000),
 	        viewRect = cc.rect(11,10, 546, 80),
 	        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
 		}):addTo(list_bg)
@@ -242,7 +241,7 @@ function GameUIWall:OnDragonHpItemUseButtonClicked()
 end
 
 function GameUIWall:GetTipsBoxWithTipsContent(content)
-	local tips_bg = display.newSprite("box_panel_556x106.png")
+	local tips_bg = WidgetUIBackGround.new({width = 556,height = 106},WidgetUIBackGround.STYLE_TYPE.STYLE_5)
 	local y = 100
 	for _,v in ipairs(content) do
 		local tips_label = UIKit:ttfLabel({text = v,size = 18,color = 0x403c2f})
@@ -274,7 +273,7 @@ end
 
 function GameUIWall:GetListItem(index,data)
 	local item = self.info_list:newItem()
-	local imageName = string.format("box_bg_item_520x48_%d.png",index%2)
+	local imageName = string.format("back_ground_548x40_%d.png",index%2==0 and 1 or 2)
 	local content = display.newScale9Sprite(imageName):size(546,42)
 	UIKit:ttfLabel({
 		text = data.title,

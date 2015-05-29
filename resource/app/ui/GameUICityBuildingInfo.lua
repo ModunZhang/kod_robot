@@ -366,9 +366,9 @@ function GameUICityBuildingInfo:CreateContent(content,index,color,image)
         table.insert(temp_labels, label)
     end
     max_height = max_height + 20
-    local bg_image = image or (index and index == self.building_level and "back_ground_520x48.png") or (index%2 == 1 and "upgrade_resources_background_2.png" or "upgrade_resources_background_3.png")
+    local bg_image = image or (index and index == self.building_level and "back_ground_520x48.png") or (index%2 == 1 and "back_ground_548x40_1.png" or "back_ground_548x40_2.png")
 
-    local content = display.newScale9Sprite(bg_image,0,0,cc.size(520,max_height),cc.rect(10,10,500,26))
+    local content = display.newScale9Sprite(bg_image):size(520,max_height)
     for i,v in ipairs(temp_labels) do
         v:addTo(content)
         v:setPositionY(max_height/2)

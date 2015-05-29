@@ -12,8 +12,8 @@ function WidgetPVESelectStage:ctor(user)
     self.user = user
     self.pve_database = user:GetPVEDatabase()
     WidgetPVESelectStage.super.ctor(self, 674, _("选择关卡"), display.cy + 350)
-    local back = display.newSprite("back_ground_select.png"):addTo(self:GetBody())
-    :pos(self:GetBody():getContentSize().width/2, 674/2)
+    local back =display.newScale9Sprite("background_568x120.png", 0,0,cc.size(568,612),cc.rect(15,10,538,100)):addTo(self:GetBody())
+        :pos(self:GetBody():getContentSize().width/2, 674/2)
     local list_view = UIListView.new({
         -- bgColor = UIKit:hex2c4b(0x7a100000),
         viewRect = cc.rect(0, 0, 549, 589),
@@ -30,7 +30,7 @@ end
 
 function WidgetPVESelectStage:CreateItemWithListView(list_view, level)
     local item = list_view:newItem()
-    local back_ground = display.newSprite(level % 2 == 0 and "pve_select_2.png" or "pve_select_1.png")
+    local back_ground = display.newScale9Sprite(level % 2 == 0 and "back_ground_548x40_1.png" or "back_ground_548x40_2.png",0,0,cc.size(547,97),cc.rect(10,10,528,20))
     local size = back_ground:getContentSize()
     local w = size.width
     local h = size.height
@@ -87,6 +87,7 @@ end
 
 
 return WidgetPVESelectStage
+
 
 
 

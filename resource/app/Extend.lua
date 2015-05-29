@@ -1,7 +1,31 @@
 print("加载玩家自定义函数!")
-
 NOT_HANDLE = function(...) print("net message not handel, please check !") end
+local texture_data_file = device.platform == 'ios' and ".texture_data_iOS" or ".texture_data"
+local plist_texture_data     = import(texture_data_file)
+local sharedSpriteFrameCache = cc.SpriteFrameCache:getInstance()
 
+local c = cc
+local Sprite = c.Sprite
+local old_setTexture = Sprite.setTexture
+function Sprite:setTexture(arg)
+    if type(arg) == 'string' then
+        local found_data_in_plist = plist_texture_data[arg]
+        if found_data_in_plist then
+            local frame = sharedSpriteFrameCache:getSpriteFrame(arg)
+            if not frame then
+                local plistName = string.sub(found_data_in_plist,1,string.find(found_data_in_plist,"%.") - 1)
+                plistName = string.format("%s.plist",plistName)
+                printInfo("setTexture:load plist texture:%s",found_data_in_plist)
+                display.addSpriteFrames(plistName,found_data_in_plist)
+            end
+            self:setSpriteFrame(arg)
+        else
+            old_setTexture(self,arg)  
+        end
+    else
+       old_setTexture(self,arg)  
+    end
+end
 
 local c3b_m_ = {
     __add = function(a,b)
@@ -256,16 +280,16 @@ function display.newScene(name)
     end
 
     function scene:onEnterTransitionFinish()
-        printLog("Info", "Check MessageDialog :%s",self.__cname)
-        local message = UIKit:getMessageDialogWillShow()
-        if message then
-            message:AddToScene(self,true)
-            UIKit:clearMessageDialogWillShow()
-        end
+        -- local message = UIKit:getMessageDialogWillShow()
+        -- printLog("Info", "Check MessageDialog :%s %s",self.__cname,tolua.type(message))
+        -- if message then
+        --     print("add MessageDialog---->",self.__cname)
+        --     message:AddToScene(self,true)
+        --     UIKit:clearMessageDialogWillShow()
+        -- end
     end
     return scene
 end
-
 
 display.__newLayer = display.newLayer
 
@@ -282,7 +306,20 @@ function display.newNode()
 end
 display.__newSprite = display.newSprite
 function display.newSprite(...)
-    local sp = display.__newSprite(...)
+    local args = {...}
+    local name = args[1]
+    local found_data_in_plist = plist_texture_data[name]
+    if found_data_in_plist then
+        local frame = sharedSpriteFrameCache:getSpriteFrame(name)
+        if not frame then
+            local plistName = string.sub(found_data_in_plist,1,string.find(found_data_in_plist,"%.") - 1)
+            plistName = string.format("%s.plist",plistName)
+            display.addSpriteFrames(plistName,found_data_in_plist)
+        end
+        printInfo("newSprite: %s load plist texture:%s",name,found_data_in_plist)
+        args[1] = string.format("#%s",name)
+    end
+    local sp = display.__newSprite(unpack(args))
     sp:setCascadeOpacityEnabled(true)
     return sp
 end

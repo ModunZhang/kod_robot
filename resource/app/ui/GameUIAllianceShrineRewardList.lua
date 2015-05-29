@@ -31,8 +31,8 @@ function GameUIAllianceShrineRewardList:BuildUI()
 	self.rewards_listView = list
 	list_node:addTo(background):align(display.CENTER_BOTTOM, background:getContentSize().width/2, 118)
 	WidgetPushButton.new({
-		normal = "yellow_btn_up_185x65.png",
-		pressed = "yellow_btn_down_185x65.png"
+		normal = "yellow_btn_up_186x66.png",
+		pressed = "yellow_btn_down_186x66.png"
 	}):align(display.CENTER_BOTTOM,background:getContentSize().width/2,30):addTo(background)
 	:setButtonLabel("normal",UIKit:commonButtonLable({
 		text = _("确定")
@@ -45,7 +45,7 @@ end
 
 function GameUIAllianceShrineRewardList:GetListItem(index,data) 
 	local item = self.rewards_listView:newItem()
-	local content = display.newScale9Sprite(string.format("resource_item_bg%d.png",index % 2)):size(547,94)
+	local content = display.newScale9Sprite(string.format("back_ground_548x40_%d.png", index % 2 == 0 and 1 or 2)):size(547,94)
 	
 	
 	local iconImage = "goldKill_icon_76x84.png"

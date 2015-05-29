@@ -92,7 +92,7 @@ local house_type = {
 function CityBuildApi:BuildHouseByType(type_)
     if City:GetLeftBuildingCountsByType(type_) > 0 then
         local need_citizen = BuildingRegister[type_].new({building_type = type_, level = 1, finishTime = 0}):GetCitizen()
-        local citizen = City:GetResourceManager():GetPopulationResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
+        local citizen = City:GetResourceManager():GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
         if need_citizen <= citizen then
             for i,v in ipairs(City:GetRuinsNotBeenOccupied()) do
                 local tile = City:GetTileWhichBuildingBelongs(v)

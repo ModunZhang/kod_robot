@@ -38,8 +38,8 @@ function WidgetSelectPlayerHeadIcon:AddIconOption(icon_key,icon)
     local item =list:newItem()
     local item_width,item_height = 548, 116
     item:setItemSize(item_width,item_height)
-    local body_image = list.which_bg and "upgrade_resources_background_2.png" or "upgrade_resources_background_3.png"
-    local content = display.newScale9Sprite(body_image,0,0,cc.size(item_width,item_height),cc.rect(10,10,500,26))
+    local body_image = list.which_bg and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+    local content = display.newScale9Sprite(body_image,0,0,cc.size(item_width,item_height),cc.rect(10,10,528,20))
     list.which_bg = not list.which_bg
 
     UIKit:GetPlayerCommonIcon(icon_key):addTo(content)

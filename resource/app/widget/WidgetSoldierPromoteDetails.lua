@@ -212,7 +212,7 @@ function WidgetSoldierPromoteDetails:onEnter()
 
 
     WidgetPushButton.new(
-        {normal = "yellow_btn_up_185x65.png",pressed = "yellow_btn_down_185x65.png"})
+        {normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png"})
         :addTo(body)
         :align(display.CENTER, size.width/2 , 50)
         :setButtonLabel(UIKit:ttfLabel({

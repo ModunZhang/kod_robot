@@ -97,12 +97,12 @@ end
 function GameUIUpgradeTechnology:GetNextLevelPower()
     if self:CheckIsMeUpgrade() and not self:CheckMeIsReachLimitLevel() then
         if self:GetProductionTechnology():GetNextLevelPower() > 0 then
-            return  self:GetProductionTechnology():GetNextLevelPower() 
+            return  self:GetProductionTechnology():GetNextLevelPower()
         else
             return 0
         end
     end
-    return self:GetProductionTechnology():GetNextLevelPower() 
+    return self:GetProductionTechnology():GetNextLevelPower()
 end
 
 function GameUIUpgradeTechnology:RefreshUI()
@@ -183,7 +183,7 @@ function GameUIUpgradeTechnology:BuildUI()
     local box = display.newSprite("alliance_item_flag_box_126X126.png"):align(display.LEFT_TOP, 20, title_bar:getPositionY() - 20):addTo(bg_node)
     self.tech_bg = self:GetTechIcon():pos(63,63):addTo(box):scale(0.95)
 
-    local title = display.newScale9Sprite("alliance_event_type_darkblue_222x30.png",0,0, cc.size(438,30), cc.rect(7,7,190,16))
+    local title = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(438,30), cc.rect(10,10,410,10))
         :align(display.LEFT_TOP,box:getPositionX()+box:getContentSize().width + 10, box:getPositionY())
         :addTo(bg_node)
     self.lv_label = UIKit:ttfLabel({
@@ -191,10 +191,10 @@ function GameUIUpgradeTechnology:BuildUI()
         size = 22,
         color= 0xffedae
     }):align(display.LEFT_CENTER, 10, 15):addTo(title)
-    local line_2 = display.newScale9Sprite("dividing_line_594x2.png"):size(422,1)
+    local line_2 = display.newScale9Sprite("dividing_line.png",0,0,cc.size(422,2),cc.rect(10,2,382,2))
         :align(display.LEFT_BOTTOM,box:getPositionX()+box:getContentSize().width + 10, box:getPositionY()-box:getContentSize().height)
         :addTo(bg_node)
-    local line_1 = display.newScale9Sprite("dividing_line_594x2.png"):size(422,1)
+    local line_1 =  display.newScale9Sprite("dividing_line.png",0,0,cc.size(422,2),cc.rect(10,2,382,2))
         :align(display.LEFT_BOTTOM,line_2:getPositionX(), line_2:getPositionY() + 40)
         :addTo(bg_node)
     self.line_1 = line_1
@@ -229,7 +229,7 @@ function GameUIUpgradeTechnology:BuildUI()
     }):addTo(bg_node):align(display.LEFT_BOTTOM,line_2:getPositionX()+6, line_2:getPositionY() + 5)
 
     local next_power_val_label = UIKit:ttfLabel({
-        text = "123", 
+        text = "123",
         size = 22,
         color= 0x403c2f,
         align = cc.TEXT_ALIGNMENT_RIGHT,
@@ -351,7 +351,7 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
                 canNotBuy = true,
             })
     end
-     table.insert(requirements,
+    table.insert(requirements,
         {
             resource_type = _("学院等级"),
             isVisible = true,
@@ -370,10 +370,10 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
         })
     table.insert(requirements,
         {
-            resource_type = _("建筑蓝图"),
+            resource_type = _("工程图纸"),
             isVisible = cost.blueprints>0,
             isSatisfy = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["blueprints"]>=cost.blueprints,
-            icon="blueprints_112x112.png",
+            icon="blueprints_128x128.png",
             description= City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["blueprints"] .."/"..  cost.blueprints
         })
     table.insert(requirements,
@@ -381,7 +381,7 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             resource_type = _("建造工具"),
             isVisible = cost.tools>0,
             isSatisfy = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["tools"]>=cost.tools,
-            icon="tools_112x112.png",
+            icon="tools_128x128.png",
             description= City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["tools"] .."/".. cost.tools
         })
     table.insert(requirements,
@@ -389,7 +389,7 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             resource_type = _("砖石瓦片"),
             isVisible = cost.tiles>0,
             isSatisfy = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["tiles"]>=cost.tiles,
-            icon="tiles_112x112.png",
+            icon="tiles_128x128.png",
             description= City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["tiles"] .. "/" .. cost.tiles
         })
     table.insert(requirements,
@@ -397,10 +397,10 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             resource_type = _("滑轮组"),
             isVisible = cost.pulley>0,
             isSatisfy = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["pulley"]>=cost.pulley,
-            icon="pulley_112x112.png",
+            icon="pulley_128x128.png",
             description = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)["pulley"] .. "/" .. cost.pulley
-        })  
-   
+        })
+
     -- table.sort( requirements, function(a,b)
     --     return not a.isSatisfy and b.isSatisfy
     -- end)
@@ -527,22 +527,22 @@ function GameUIUpgradeTechnology:RefreshButtonState()
 end
 
 function GameUIUpgradeTechnology:CheckUpgradeButtonState()
-    if not self:CheckMeIsOpened() 
-        or not self:CheckMeDependTechIsUnlock() 
-        or self:CheckIsMeUpgrade() 
+    if not self:CheckMeIsOpened()
+        or not self:CheckMeDependTechIsUnlock()
+        or self:CheckIsMeUpgrade()
         or not self:CheckAcademyLevel()
-        then
+    then
         return false
     end
     return true
 end
 
 function GameUIUpgradeTechnology:CheckUpgradeNowButtonState()
-    if not self:CheckMeIsOpened() 
-        or not self:CheckMeDependTechIsUnlock() 
-        or self:CheckIsMeUpgrade() 
+    if not self:CheckMeIsOpened()
+        or not self:CheckMeDependTechIsUnlock()
+        or self:CheckIsMeUpgrade()
         or not self:CheckAcademyLevel()
-        then
+    then
         return false
     end
     return true
@@ -590,6 +590,7 @@ function GameUIUpgradeTechnology:CheckMeIsReachLimitLevel()
 end
 
 return GameUIUpgradeTechnology
+
 
 
 

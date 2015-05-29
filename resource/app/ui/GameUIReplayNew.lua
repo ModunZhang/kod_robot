@@ -7,8 +7,8 @@ local BattleObject = import(".BattleObject")
 local Wall = import(".Wall")
 local Corps = import(".Corps")
 local UILib = import(".UILib")
-local WidgetSoldierInBattle = import("..widget.WidgetSoldierInBattle")
 local WidgetSoldier = import("..widget.WidgetSoldier")
+local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local UIListView = import("..ui.UIListView")
 local Enum = import("..utils.Enum")
 local GameUIReplayNew = UIKit:createUIClass('GameUIReplayNew')
@@ -56,7 +56,7 @@ local function decode_battle_from_report(report)
         attacker.soldierName = attacker.soldierName or "wall"
         defender.soldierName = defender.soldierName or "wall"
         local defeatAll
-        if attacker.soldierName ~= "wall" and defender.soldierName ~= "wall" then
+        if attacker.soldierName ~= "wall" and defender.soldierName ~= "wall" and #attacks ~= i then
             defeatAll = (((attacker.morale - attacker.moraleDecreased) <= 20
                 or (attacker.soldierCount - attacker.soldierDamagedCount) <= 0) or not attacker.isWin)
                 and (((defender.morale - defender.moraleDecreased) <= 20
@@ -223,12 +223,14 @@ local function newDragon(replay_ui, dragon_type, level)
         text = level,
         size = 20,
         color = 0xffedae,
+        shadow = true,
     }):align(display.CENTER, -65, 180):addTo(node)
 
     node.name = UIKit:ttfLabel({
         text = Localize.dragon[dragon_type],
         size = 20,
         color = 0xffedae,
+        shadow = true,
     }):align(display.CENTER, 80, 180):addTo(node)
 
     node.progress = display.newProgressTimer("progress_bar_dragon_hp.png", display.PROGRESS_TIMER_BAR)
@@ -238,18 +240,21 @@ local function newDragon(replay_ui, dragon_type, level)
     -- node.progress:setPercentage(80)
 
     node.hp = UIKit:ttfLabel({
-        size = 12,
+        size = 15,
         color = 0xffedae,
+        shadow = true,
     }):align(display.CENTER, 45, 145):addTo(node):hide()
 
     node.result = UIKit:ttfLabel({
         size = 20,
-        color = 0x00be36
+        color = 0x00be36,
+        shadow = true,
     }):align(display.CENTER, 120, -55):addTo(node,1):hide()
 
     node.buff = UIKit:ttfLabel({
         size = 20,
-        color = 0x00be36
+        color = 0x00be36,
+        shadow = true,
     }):align(display.CENTER, 65, -55):addTo(node,1):hide()
 
     local ani_name, left_x, right_x, scale, Y = unpack(dragon_ani_map[dragon_type])
@@ -396,20 +401,22 @@ local function newSoldierInBattle(list_view, is_left)
     local name = UIKit:ttfLabel({
         color = 0xffedae,
         size = 20,
+        shadow = true,
     }):addTo(title):align(display.CENTER, s1.width/2, 13)
 
     local soldier = WidgetSoldier.new("ranger", 1, false):addTo(content):pos(50, 50):scale(88/128)
-
-    display.newSprite("back_ground_178x90.png"):addTo(content):pos(190, 50)
+    display.newScale9Sprite("back_ground_166x84.png",190 , 50,cc.size(178,90),cc.rect(15,10,136,64)):addTo(content)
 
     local type_ = UIKit:ttfLabel({
         color = 0x403c2f,
         size = 20,
+    -- shadow = true,
     }):addTo(content):align(display.LEFT_CENTER, s1.width/2 - 25, 75)
 
     local status = UIKit:ttfLabel({
         color = 0x007c23,
         size = 22,
+    -- shadow = true,
     }):addTo(content):align(display.LEFT_CENTER, s1.width/2 - 25, 35)
 
 
@@ -834,8 +841,7 @@ function GameUIReplayNew:ctor(report, callback)
     self.round = 1
 end
 function GameUIReplayNew:OnMoveInStage()
-    GameUIReplayNew.super.OnMoveInStage(self)
-    app:GetAudioManager():PlayGameMusic("AllianceBattleScene")
+    app:GetAudioManager():PlayGameMusic("AllianceBattleScene",true,true)
     self.ui_map = self:BuildUI()
     self.ui_map.battle_background1:setTexture(string.format("back_ground_%s.png", self.report:GetAttackTargetTerrain()))
     self.ui_map.attackName:setString(self.report:GetFightAttackName())
@@ -865,7 +871,7 @@ function GameUIReplayNew:OnMoveInStage()
         elseif self.ui_map.speedup.speed == 4 then
             self.ui_map.speedup.speed = nil
             self.ui_map.speedup:setButtonLabelString(_("x1"))
-            self:SpeedUp(1)
+            self:SpeedUp()
         end
     end)
     self.ui_map.close:onButtonClicked(function()
@@ -875,6 +881,8 @@ function GameUIReplayNew:OnMoveInStage()
         self:ShowResult()
     end)
     self:Replay()
+
+    GameUIReplayNew.super.OnMoveInStage(self)
 end
 function GameUIReplayNew:onExit()
     GameUIReplayNew.super.onExit(self)
@@ -926,6 +934,7 @@ function GameUIReplayNew:ShowResult()
     self:Stop()
     self.ui_map.speedup:setButtonLabelString(_("回放"))
     self.ui_map.pass:hide()
+    self.ui_map.close:show()
 end
 function GameUIReplayNew:ShowStrongOrWeak()
     local vs = GameUtils:GetVSFromSoldierName(self:TopSoldierLeft().name, self:TopSoldierRight().name)
@@ -1121,6 +1130,7 @@ function GameUIReplayNew:PromiseOfPlayDamage(count, x, y)
         text = "-"..count,
         size = 30,
         color = 0xff0000,
+        shadow = true,
     }):addTo(self.ui_map.damage_node)
         :align(display.CENTER, x, y):runAction(speed)
     return p
@@ -1270,8 +1280,9 @@ function GameUIReplayNew:IsAllDefeated(soldiers)
     end
     return true
 end
+local DEFAULT_SPEED = 1.5
 function GameUIReplayNew:SpeedUp(speed)
-    self.speed = speed or 1
+    self.speed = speed or DEFAULT_SPEED
     local a = self.timer_node:getActionByTag(SPEED_TAG)
     if a then
         a:setSpeed(self.speed)
@@ -1310,10 +1321,10 @@ function GameUIReplayNew:SpeedUp(speed)
     self.ui_map.soldier_morale_defence:RefreshSpeed()
 end
 function GameUIReplayNew:Speed()
-    return self.speed or 1
+    return self.speed or DEFAULT_SPEED
 end
 function GameUIReplayNew:Reset()
-    self:SpeedUp(1)
+    self:SpeedUp()
     if self.result then
         self.result:removeFromParent()
         self.result = nil
@@ -1331,6 +1342,7 @@ function GameUIReplayNew:Reset()
     self.ui_map.speedup.speed = nil
     self.ui_map.speedup:setButtonLabelString(_("x1"))
     self.ui_map.pass:show()
+    self.ui_map.close:hide()
 
     self.ui_map.soldier_inbattle_attack:hide()
     self.ui_map.soldier_count_attack:hide()
@@ -1467,23 +1479,27 @@ function GameUIReplayNew:BuildUI()
     ui_map.attackName = UIKit:ttfLabel({
         color = 0xffedae,
         size = 22,
+        shadow = true,
     }):addTo(top):align(display.CENTER, 150, 445)
 
     ui_map.defenceName = UIKit:ttfLabel({
         color = 0xffedae,
         size = 22,
+        shadow = true,
     }):addTo(top):align(display.CENTER, top_size.width - 150, 445)
 
     UIKit:ttfLabel({
         text = _("进攻方"),
         color = 0xffedae,
         size = 22,
+        shadow = true,
     }):addTo(top):align(display.CENTER, 150, 405)
 
     UIKit:ttfLabel({
         text = _("防守方"),
         color = 0xffedae,
         size = 22,
+        shadow = true,
     }):addTo(top):align(display.CENTER, top_size.width - 150, 405)
 
     display.newSprite("soldier_count_icon.png"):addTo(top):pos(120, 70)
@@ -1509,6 +1525,7 @@ function GameUIReplayNew:BuildUI()
         local text = UIKit:ttfLabel({
             color = 0xffedae,
             size = 18,
+            shadow = true,
         }):addTo(node):align(display.CENTER)
         function node:align(anchorPoint, x, y)
             progress:align(anchorPoint)
@@ -1566,7 +1583,8 @@ function GameUIReplayNew:BuildUI()
     ui_map.soldier_morale_defence = newProgress("soldier_bar_morale.png", self):addTo(top)
         :align(display.CENTER, top_size.width - 209, 37):FlipX(true)
 
-    local bottom = display.newSprite("back_ground_replay.png"):addTo(self, 0)
+    local bottom = WidgetUIBackGround.new({width = 608,height = 520},WidgetUIBackGround.STYLE_TYPE.STYLE_1)
+        :addTo(self, 0)
         :align(display.BOTTOM_CENTER, window.cx, window.bottom)
 
     local s1 = bottom:getContentSize()
@@ -1598,36 +1616,55 @@ function GameUIReplayNew:BuildUI()
     ui_map.speedup = cc.ui.UIPushButton.new(
         {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"},
         {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = _("加速"),
-        size = 24,
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(bottom):align(display.CENTER, 110, 50)
+    ):setButtonLabel(
+        UIKit:ttfLabel({
+            text = _("加速"),
+            color = 0xfff3c7,
+            size = 24,
+            shadow = true,
+        })
+    ):addTo(bottom):align(display.CENTER, 110, 50)
 
     ui_map.close = cc.ui.UIPushButton.new(
         {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},
         {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = _("关闭"),
-        size = 24,
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(bottom):align(display.CENTER, s1.width - 110, 50)
+    ):setButtonLabel(
+        UIKit:ttfLabel({
+            text = _("关闭"),
+            color = 0xfff3c7,
+            size = 24,
+            shadow = true,
+        })
+    ):addTo(bottom):align(display.CENTER, s1.width - 110, 50)
 
     ui_map.pass = cc.ui.UIPushButton.new(
-        {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"},
+        {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},
         {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = _("跳过"),
-        size = 24,
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(bottom):align(display.CENTER, s1.width - 110, 50)
+    ):setButtonLabel(
+        UIKit:ttfLabel({
+            text = _("跳过"),
+            color = 0xfff3c7,
+            size = 24,
+            shadow = true,
+        })
+    ):addTo(bottom):align(display.CENTER, s1.width - 110, 50)
     return ui_map
 end
 
+
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
+function GameUIReplayNew:DoFte()
+    local r = self.ui_map.close:getCascadeBoundingBox()
+    WidgetFteArrow.new(_("点击关闭")):addTo(self.ui_map.close)
+    :TurnDown():align(display.CENTER_BOTTOM, 0, r.height - 20)
+end
+
 return GameUIReplayNew
+
+
+
+
+
 
 
 

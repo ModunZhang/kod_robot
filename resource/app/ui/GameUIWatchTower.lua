@@ -138,7 +138,7 @@ end
 function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
     local item = self.listView:newItem()
     local bg = WidgetUIBackGround.new({width = 568,height = 204},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
-    local title_bg  = display.newSprite("title_blue_558x34.png")
+    local title_bg  = display.newSprite("title_blue_554x34.png")
         :align(display.TOP_CENTER,284, 198)
         :addTo(bg)
     if entity then
@@ -359,7 +359,7 @@ end
 function GameUIWatchTower:GetOtherEventItem(entity)
     local item = self.listView:newItem()
     local bg = WidgetUIBackGround.new({width = 568,height = 204},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
-    local title_image = entity:WithObject():MarchType() == 'helpDefence' and 'title_green_558x34.png' or 'title_red_558x34.png'
+    local title_image = entity:WithObject():MarchType() == 'helpDefence' and 'title_green_558x34.png' or 'title_red_556x34.png'
     local title_bg  = display.newSprite(title_image)
         :align(display.TOP_CENTER,284, 198)
         :addTo(bg)

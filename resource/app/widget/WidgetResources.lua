@@ -68,7 +68,7 @@ function WidgetResources:RefreshSpecifyResource(resource,item,maxvalue,occupy_ci
         -- item.tax.title:setString(title_value)
         -- local tax_time = townHall:IsInImposing() and GameUtils:formatTimeStyle1(townHall:GetTaxEvent():LeftTime(app.timer:GetServerTime())) or ""
         -- item.tax.value:setString(tax_time)
-        -- item.free_citizen.value:setString(self.city:GetResourceManager():GetPopulationResource():GetNoneAllocatedByTime(app.timer:GetServerTime()))
+        -- item.free_citizen.value:setString(self.city:GetResourceManager():GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime()))
     end
 end
 function WidgetResources:CreateResourceListView()
@@ -121,7 +121,7 @@ function WidgetResources:InitAllResources()
             resource_icon="res_coin_81x68.png",
             resource_current_value=GameUtils:formatNumber(crm:GetCoinResource():GetResourceValueByCurrentTime(current_time)),
             total_income=GameUtils:formatNumber(crm:GetCoinResource():GetProductionPerHour()).."/h",
-            occupy_citizen=GameUtils:formatNumber(self.city:GetResourceManager():GetPopulationResource():GetNoneAllocatedByTime(current_time)),
+            occupy_citizen=GameUtils:formatNumber(self.city:GetResourceManager():GetCitizenResource():GetNoneAllocatedByTime(current_time)),
             type = "coin"
         },
     }
@@ -147,7 +147,7 @@ function WidgetResources:AddResourceItem(parms)
     local content = WidgetUIBackGround.new({width = 568,height = 156},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
     local c_size = content:getContentSize()
     -- resource icon bg
-    local icon_bg = display.newSprite("box_134x134.png",80,c_size.height/2):addTo(content)
+    local icon_bg = display.newSprite("alliance_item_flag_box_126X126.png",80,c_size.height/2):addTo(content):scale(134/126)
     local icon_bg_1 = display.newSprite("box_118x118.png",icon_bg:getContentSize().width/2,icon_bg:getContentSize().height/2):addTo(icon_bg)
 
     -- resou icon

@@ -136,7 +136,7 @@ siege_cavalry[14] = {
 	["trainingFigure"] = 0,
 	["bowTarget"] = 0,
 	["saddle"] = 0,
-	["ironPart"] = 1200,
+	["ironPart"] = 1120,
 	["buildTime"] = 390000,
 	["power"] = 76420
 }
@@ -146,7 +146,7 @@ siege_cavalry[15] = {
 	["trainingFigure"] = 0,
 	["bowTarget"] = 0,
 	["saddle"] = 0,
-	["ironPart"] = 1500,
+	["ironPart"] = 1280,
 	["buildTime"] = 432000,
 	["power"] = 108000
 }

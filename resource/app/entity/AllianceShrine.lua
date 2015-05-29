@@ -32,14 +32,6 @@ function AllianceShrine:ctor(alliance)
 	self:loadStages()
 end
 
-function AllianceShrine:OnBuildingInfoChange(building)
-	if building.name == 'shrine' and self.perception then
-		local shire_building = config_shrine[building.level]
-        self.perception:SetProductionPerHour(app.timer:GetServerTime(),shire_building.pRecoveryPerHour)
-        self.perception:SetValueLimit(shire_building.perception)
-	end
-end
-
 function AllianceShrine:GetAlliance()
 	return self.alliance
 end
@@ -73,8 +65,6 @@ function AllianceShrine:Reset()
 	self.shrineReports = {}
 	self.maxCountOfStage = nil
 	self.perception = nil
-	local alliance_map = self:GetAlliance():GetAllianceMap()
-	alliance_map:RemoveListenerOnType(self,alliance_map.LISTEN_TYPE.BUILDING_INFO)
 end
 
 function AllianceShrine:OnPropertyChange(property_name, old_value, value)
@@ -147,8 +137,6 @@ function AllianceShrine:InitOrUpdatePerception(alliance_data)
 	if not self.perception then
 		local resource_refresh_time = alliance_data.basicInfo.perceptionRefreshTime / 1000.0
 		self.perception = AutomaticUpdateResource.new()
-		self.perception:UpdateResource(resource_refresh_time,alliance_data.basicInfo.perception)
-		
 		local building
 		for i,v in ipairs(alliance_data.buildings) do
 			if v.name == "shrine" then
@@ -159,10 +147,23 @@ function AllianceShrine:InitOrUpdatePerception(alliance_data)
 		local shire_building = config_shrine[building.level]
         self.perception:SetProductionPerHour(resource_refresh_time,shire_building.pRecoveryPerHour)
         self.perception:SetValueLimit(shire_building.perception)
+		self.perception:UpdateResource(resource_refresh_time,alliance_data.basicInfo.perception)
     else
     	if alliance_data.basicInfo and alliance_data.basicInfo.perception then
     		local resource_refresh_time = alliance_data.basicInfo.perceptionRefreshTime / 1000.0
-    		self.perception:UpdateResource(resource_refresh_time,alliance_data.basicInfo.perception)
+    		local building
+			for i,v in ipairs(alliance_data.buildings) do
+				if v.name == "shrine" then
+					building = v
+					break
+				end
+			end
+			if building then
+				local shire_building = config_shrine[building.level]
+		        self.perception:SetProductionPerHour(resource_refresh_time,shire_building.pRecoveryPerHour)
+		        self.perception:SetValueLimit(shire_building.perception)
+		    end
+			self.perception:UpdateResource(resource_refresh_time,alliance_data.basicInfo.perception)
     	end
 	end
 end
@@ -339,7 +340,14 @@ function AllianceShrine:DecodeObjectsFromJsonAlliance(alliance_data,deltaData,re
 end
 
 function AllianceShrine:GetShireObjectFromMap()
-	return self:GetAlliance():GetAllianceMap():FindAllianceBuildingInfoByName("shrine")
+	local object
+	self:GetAlliance():GetAllianceMap():IteratorAllianceBuildings(function(__,map_obj)
+		if map_obj.name == 'shrine' then
+			object = map_obj
+			return true
+		end
+	end)
+	return object
 end
 
 function AllianceShrine:GetPlayerLocation(playerId)

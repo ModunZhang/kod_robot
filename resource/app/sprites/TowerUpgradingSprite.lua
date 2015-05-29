@@ -16,7 +16,7 @@ local offset_map = {
         [Orient.UP] = {0, -7},
         [Orient.NONE] = {0, 71},
         right_end = {-9, 36},
-        left_end = {-44, 73}
+        left_end = {-74, 91}
     },
     [2] = {
         [Orient.X] = {16, 75},
@@ -29,7 +29,7 @@ local offset_map = {
         [Orient.UP] = {0, -7},
         [Orient.NONE] = {0, 71},
         right_end = {-17, 31},
-        left_end = {-44, 73}
+        left_end = {-54, 80}
     },
     [3] = {
         [Orient.X] = {14, 75},
@@ -42,7 +42,7 @@ local offset_map = {
         [Orient.UP] = {0, -7},
         [Orient.NONE] = {-2, 63},
         right_end = {-3, 25},
-        left_end = {-47, 66}
+        left_end = {-57, 70}
     },
 }
 ---- 功能

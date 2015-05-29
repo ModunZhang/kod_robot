@@ -10,7 +10,7 @@ local SoldierManager = import("..entity.SoldierManager")
 local Localize = import("..utils.Localize")
 
 local function create_line_item(icon,text_1,text_2,text_3)
-    local line = display.newSprite("dividing_line_384x2.png")
+    local line = display.newScale9Sprite("dividing_line.png",0,0,cc.size(384,2),cc.rect(10,2,382,2))
     local icon = display.newSprite(icon):addTo(line,2):align(display.LEFT_BOTTOM, 0, 2)
     icon:scale(32/icon:getContentSize().width)
     local text1 = UIKit:ttfLabel({
@@ -20,6 +20,9 @@ local function create_line_item(icon,text_1,text_2,text_3)
     }):align(display.LEFT_BOTTOM, 40 , 2)
         :addTo(line)
     local green_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.BOTTOM_CENTER, 320 , 6):addTo(line)
+    if text_2 == "" then
+        green_icon:hide()
+    end
     local text2 = UIKit:ttfLabel({
         text = text_2,
         size = 22,
@@ -34,8 +37,13 @@ local function create_line_item(icon,text_1,text_2,text_3)
         :addTo(line)
 
     function line:SetText(text_2,text_3)
-        text2:setString(text_2)
         text3:setString(text_3)
+        if text_2 then
+            text2:setString(text_2)
+        else
+            text2:setString("")
+            green_icon:hide()
+        end
     end
 
     return line
@@ -101,15 +109,18 @@ function WidgetMilitaryTechnology:CreateItem(tech)
 
     local soldiers = string.split(tech:Name(), "_")
     local soldier_category = Localize.soldier_category
-    local line1 = create_line_item("battle_33x33.png",tech:GetTechLocalize(),(tech:GetAtkEff()*100).."%",(tech:GetNextLevlAtkEff()*100).."%"):addTo(content):align(display.LEFT_CENTER, 10, 60)
-    local line2 = create_line_item("bottom_icon_package_77x67.png",tech:GetTechCategory(),tech:GetTechPoint(),tech:GetNextLevlTechPoint()):addTo(content):align(display.LEFT_CENTER, 10, 20)
+    local line1 = create_line_item("battle_33x33.png",tech:GetTechLocalize(),tech:IsMaxLevel() and "" or (tech:GetAtkEff()*100).."%",(tech:GetNextLevlAtkEff()*100).."%"):addTo(content):align(display.LEFT_CENTER, 10, 60)
+    local line2 = create_line_item("bottom_icon_package_77x67.png",tech:GetTechCategory(),tech:IsMaxLevel() and "" or tech:GetTechPoint(),tech:GetNextLevlTechPoint()):addTo(content):align(display.LEFT_CENTER, 10, 20)
 
     function item:LevelUpRefresh(tech)
         tech_level:setString(string.format("Lv%d",tech:Level()))
-        line1:SetText((tech:GetAtkEff()*100).."%",(tech:GetNextLevlAtkEff()*100).."%")
-        line2:SetText(tech:GetTechPoint(),tech:GetNextLevlTechPoint())
         if tech:IsMaxLevel() then
             upgrade_btn:hide()
+            line1:SetText(nil,(tech:GetAtkEff()*100).."%")
+            line2:SetText(nil,tech:GetNextLevlTechPoint())
+        else
+            line1:SetText((tech:GetAtkEff()*100).."%",(tech:GetNextLevlAtkEff()*100).."%")
+            line2:SetText(tech:GetTechPoint(),tech:GetNextLevlTechPoint())
         end
     end
     function item:GetTech()
@@ -152,6 +163,7 @@ function WidgetMilitaryTechnology:VisibleUpgradeButton()
     end
 end
 return WidgetMilitaryTechnology
+
 
 
 

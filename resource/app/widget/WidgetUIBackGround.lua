@@ -31,7 +31,7 @@ function WidgetUIBackGround:ctor(params,style)
             :addTo(self)
         return
     elseif style == WidgetUIBackGround.STYLE_TYPE.STYLE_4 then
-        display.newScale9Sprite("back_ground_484X98.png",0 , 0,cc.size(width,height),cc.rect(15,10,454,78))
+        display.newScale9Sprite("box_62X98.png",0 , 0,cc.size(width,height),cc.rect(15,10,32,78))
             :align(display.LEFT_BOTTOM)
             :addTo(self)
         return

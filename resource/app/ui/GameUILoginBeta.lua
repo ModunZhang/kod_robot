@@ -436,7 +436,7 @@ end
 local check = import("..fte.check")
 local mockData = import("..fte.mockData")
 function GameUILoginBeta:checkFte()
-    if check("BuildHouseAt_8_3") then
+    if check("ALL") then
         app:EnterUserMode()
         return
     end
@@ -456,8 +456,6 @@ function GameUILoginBeta:checkFte()
     end
     if check("BuildHouseAt_3_3") then
         mockData.BuildHouseAt(3,3,"dwelling")
-    end
-    if check("FinishBuildHouseAt_3_1") then
         mockData.FinishBuildHouseAt(3,1)
     end
     if check("UpgradeBuildingTo_keep_2") then
@@ -472,14 +470,11 @@ function GameUILoginBeta:checkFte()
     if check("FinishUpgradingBuilding_barracks_1") then
         mockData.FinishUpgradingBuilding("barracks",1)
     end
-    if check("RecruitSoldier_swordsman") then
-        mockData.RecruitSoldier("swordsman", 10)
-        mockData.FinishRecruitSoldier()
+    if check("InstantRecruitSoldier_swordsman") then
+        mockData.InstantRecruitSoldier("swordsman", 10)
     end
     if check("BuildHouseAt_5_3") then
         mockData.BuildHouseAt(5,3,"farmer")
-    end
-    if check("FinishBuildHouseAt_5_1") then
         mockData.FinishBuildHouseAt(5,1)
     end
     if check("GetSoldier") then
@@ -505,8 +500,6 @@ function GameUILoginBeta:checkFte()
     end
     if check("BuildHouseAt_6_3") then
         mockData.BuildHouseAt(6,3,"woodcutter")
-    end
-    if check("FinishBuildHouseAt_6_3") then
         mockData.FinishBuildHouseAt(6,1)
     end
     if check("UpgradeBuildingTo_keep_4") then
@@ -542,14 +535,12 @@ function GameUILoginBeta:checkFte()
     if check("FightWithNpc3") then
         mockData.FightWithNpc(3)
     end
-    if check("RecruitSoldier_skeletonWarrior") then
+    if check("InstantRecruitSoldier_skeletonWarrior") then
         mockData.RecruitSoldier("skeletonWarrior", 1)
         mockData.FinishRecruitSoldier()
     end
     if check("BuildHouseAt_7_3") then
         mockData.BuildHouseAt(7,3,"quarrier")
-    end
-    if check("FinishBuildHouseAt_7_3") then
         mockData.FinishBuildHouseAt(7,1)
     end
     if check("BuildHouseAt_8_3") then

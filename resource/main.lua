@@ -77,7 +77,8 @@ UIKit = {
     end,
     createUIClass = function ()
         return {}
-    end
+    end,
+    showKeyMessageDialog = function() return {} end,
 }
 device = { getOpenUDID = function() return GlobalDeviceId end,
     platform = "mac" }

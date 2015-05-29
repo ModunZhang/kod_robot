@@ -50,7 +50,7 @@ function AllianceView:ctor(layer, alliance, logic_base_x, logic_base_y)
     self.objects = {}
     self.village_map = {}
     logic_base_x = logic_base_x or 0
-    logic_base_y = logic_base_y or 53
+    logic_base_y = logic_base_y or intInit.allianceRegionMapHeight.value + 2
     self.normal_map = NormalMapAnchorBottomLeftReverseY.new{
         tile_w = TILE_WIDTH,
         tile_h = TILE_WIDTH,
@@ -86,10 +86,10 @@ function AllianceView:RandomSeed()
 end
 local terrain_map = {
     grassLand = {
-        "012.png",
-        "013.png",
-        "014.png",
-        "015.png",
+        "unlock_tile_surface_3_grassLand.png",
+        "unlock_tile_surface_4_grassLand.png",
+        "unlock_tile_surface_5_grassLand.png",
+        "unlock_tile_surface_6_grassLand.png",
     },
     desert = {
         "005.png",
@@ -98,10 +98,10 @@ local terrain_map = {
         "008.png",
     },
     iceField = {
-        "024.png",
-        "025.png",
-        "026.png",
-        "027.png",
+        "unlock_tile_surface_4_iceField.png",
+        "unlock_tile_surface_5_iceField.png",
+        "unlock_tile_surface_6_iceField.png",
+        "unlock_tile_surface_7_iceField.png",
     }
 }
 local Alliance_Manager = Alliance_Manager
@@ -109,12 +109,12 @@ function AllianceView:InitAlliance()
     self.is_my_alliance = Alliance_Manager:GetMyAlliance():Id() == self.alliance:Id()
     local background = self:GetLayer():GetBackGround()
     local array = terrain_map[self:Terrain()]
+    math.randomseed(12345)
     if #array > 0 then
         local sx,sy,ex,ey = self.normal_map:GetRegion()
-        local size = self:getContentSize()
         local random = math.random
-        local span = 200
-        for i = 1, 300 do
+        local span = 0
+        for i = 1, 100 do
             local x = random(sx + span, ex - span)
             local y = random(sy + span, ey - span)
             display.newSprite(array[random(#array)]):addTo(background, 1000):pos(x, y)

@@ -25,7 +25,7 @@ function GameUIStrikeReport:GetReportLevel()
         "A",
         "S",
     }
-    return (report:Type() == "cityBeStriked" and _("敌方") or "")..string.format(report_level,level_map[level])
+    return  level == 0 and (string.format(_("由于诡计之雾的效果,%s没有获得任何情报"),report:Type() == "cityBeStriked" and  _("敌方") or "")) or (report:Type() == "cityBeStriked" and _("敌方") or "")..string.format(report_level,level_map[level])
 end
 function GameUIStrikeReport:GetBattleCityName()
     local battleAt = self.report:GetBattleAt()
@@ -89,7 +89,7 @@ function GameUIStrikeReport:onEnter()
     shadow_layer:align(display.CENTER, 0, 0)
         :addTo(strike_result_image)
 
-    local strike_result_label = cc.ui.UILabel.new(
+    cc.ui.UILabel.new(
         {
             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
             text = self:GetReportLevel(),
@@ -98,7 +98,7 @@ function GameUIStrikeReport:onEnter()
             color = UIKit:hex2c3b(0xffedae)
         }):align(display.CENTER, strike_result_image:getContentSize().width/2, 15)
         :addTo(strike_result_image)
-    local strike_result_label = cc.ui.UILabel.new(
+    cc.ui.UILabel.new(
         {
             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
             text = self:GetBattleCityName(),
@@ -107,23 +107,30 @@ function GameUIStrikeReport:onEnter()
             color = UIKit:hex2c3b(0x615b44)
         }):align(display.LEFT_CENTER, 20, rb_size.height-170)
         :addTo(report_body)
-    local strike_result_label = cc.ui.UILabel.new(
+    cc.ui.UILabel.new(
         {
             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
             text = GameUtils:formatTimeStyle2(math.floor(report:CreateTime()/1000)),
             font = UIKit:getFontFilePath(),
             size = 18,
             color = UIKit:hex2c3b(0x615b44)
-        }):align(display.LEFT_CENTER, 20, rb_size.height-200)
+        }):align(display.RIGHT_CENTER, rb_size.width-20, rb_size.height-170)
         :addTo(report_body)
     -- 突袭战报详细内容展示
     self.details_view = UIListView.new{
         viewRect = cc.rect(0, 70, 588, 505),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }:addTo(report_body):pos(10, 5)
-
+    local terrain = report:GetStrikeTarget().terrain
+    local war_result_label = UIKit:ttfLabel(
+        {
+            text = string.format(_("战斗地形:%s(派出%s获得额外力量)"),Localize.terrain[terrain],terrain=="grassLand" and _("绿龙") or terrain=="desert" and _("红龙") or terrain=="iceField" and _("蓝龙")),
+            size = 18,
+            color = 0x615b44
+        }):align(display.LEFT_CENTER, 20, rb_size.height-195)
+        :addTo(report_body)
     -- 战利品部分
-    self:CreateBootyPart()
+    -- self:CreateBootyPart()
     -- 战斗统计部分
     self:CreateWarStatisticsPart()
     if (report:Type() == "strikeCity" or report:Type() == "strikeVillage") and report:GetStrikeLevel()>1 then
@@ -199,8 +206,8 @@ function GameUIStrikeReport:CreateBootyPart()
         local booty_item_bg_color_flag = true
         local added_booty_item_count = 0
         for k,booty_parms in pairs(self:GetBooty()) do
-            local booty_item_bg_image = booty_item_bg_color_flag and "upgrade_resources_background_3.png" or "upgrade_resources_background_2.png"
-            local booty_item_bg = display.newSprite(booty_item_bg_image)
+            local booty_item_bg_image = booty_item_bg_color_flag and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+            local booty_item_bg = display.newScale9Sprite(booty_item_bg_image):size(520,46)
                 :align(display.TOP_CENTER, booty_list_bg_size.width/2, booty_list_bg_size.height-item_height*added_booty_item_count-6)
                 :addTo(booty_list_bg,2)
             local booty_icon = display.newSprite(booty_parms.icon, 30, 23):addTo(booty_item_bg)
@@ -215,7 +222,7 @@ function GameUIStrikeReport:CreateBootyPart()
             local color = (self.report:Type() == "strikeCity" or self.report:Type() == "strikeVillage") and 0x288400 or 0x770000
             cc.ui.UILabel.new({
                 UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-                text = ((self.report:Type() == "strikeCity" or self.report:Type() == "strikeVillage") and "" or "-")..booty_parms.value,
+                text = ((self.report:Type() == "strikeCity" or self.report:Type() == "strikeVillage") and "" or "-")..string.formatnumberthousands(booty_parms.value),
                 font = UIKit:getFontFilePath(),
                 size = 22,
                 color = UIKit:hex2c3b(color)
@@ -352,7 +359,7 @@ function GameUIStrikeReport:CreateArmyItem(dragon,isSelf)
     local army_item = self:CreateSmallBackGround({height=h,title=Localize.dragon[dragon.type],isSelf=isSelf})
 
     local function createInfoItem(params)
-        local item  = display.newSprite(params.bg_image)
+        local item  = display.newScale9Sprite(params.bg_image,0,0,cc.size(254,28),cc.rect(10,10,528,20))
         local title = UIKit:ttfLabel({
             text = params.title ,
             size = 18,
@@ -375,13 +382,13 @@ function GameUIStrikeReport:CreateArmyItem(dragon,isSelf)
 
     local army_info = {
         {
-            bg_image = "back_ground_254x28_2.png",
+            bg_image = "back_ground_548x40_1.png",
             title = "Level",
             value = dragon.level,
         },
 
         {
-            bg_image = "back_ground_254x28_1.png",
+            bg_image = "back_ground_548x40_2.png",
             title = "HP",
             value = dragon.hp.."/-"..dragon.hpDecreased,
         },
@@ -450,8 +457,8 @@ function GameUIStrikeReport:CreateEnemyResource()
     local added_r_item_count = 0
 
     for k,r_parms in pairs(unpack_resources) do
-        local r_item_bg_image = r_item_bg_color_flag and "back_ground_546X36_1.png" or "back_ground_546X36_2.png"
-        local r_item_bg = display.newSprite(r_item_bg_image)
+        local r_item_bg_image = r_item_bg_color_flag and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+        local r_item_bg = display.newScale9Sprite(r_item_bg_image,0,0,cc.size(546,36),cc.rect(10,10,528,20))
             :align(display.TOP_CENTER, group_width/2, r_list_height-r_tip_height*added_r_item_count)
             :addTo(group)
         local r_icon = display.newSprite(r_parms.icon, 30, 18):addTo(r_item_bg)
@@ -515,8 +522,8 @@ function GameUIStrikeReport:CreateEnemyTechnology()
     local added_r_item_count = 0
     for i = #militaryTechs,1,-1 do
         local r_parms = militaryTechs[i]
-        local r_item_bg_image = r_item_bg_color_flag and "back_ground_546X36_1.png" or "back_ground_546X36_2.png"
-        local r_item_bg = display.newSprite(r_item_bg_image)
+        local r_item_bg_image = r_item_bg_color_flag and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+        local r_item_bg = display.newScale9Sprite(r_item_bg_image,0,0,cc.size(546,36),cc.rect(10,10,528,20))
             :align(display.TOP_CENTER, group_width/2, r_list_height-r_tip_height*added_r_item_count+4)
             :addTo(group)
         local soldiers = string.split(r_parms.name, "_")
@@ -592,8 +599,8 @@ function GameUIStrikeReport:CreateDragonSkills()
         local r_item_bg_color_flag = true
         local added_r_item_count = 0
         for k,r_parms in pairs(skills) do
-            local r_item_bg_image = r_item_bg_color_flag and "back_ground_546X36_1.png" or "back_ground_546X36_2.png"
-            local r_item_bg = display.newSprite(r_item_bg_image)
+            local r_item_bg_image = r_item_bg_color_flag and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+            local r_item_bg = display.newScale9Sprite(r_item_bg_image,0,0,cc.size(546,36),cc.rect(10,10,528,20))
                 :align(display.TOP_CENTER, group_width/2, r_list_height-r_tip_height*added_r_item_count)
                 :addTo(group)
             cc.ui.UILabel.new({
@@ -643,8 +650,8 @@ function GameUIStrikeReport:CreateGarrison()
         local r_item_bg_color_flag = true
         local added_r_item_count = 0
         for k,r_parms in pairs(soldiers) do
-            local r_item_bg_image = r_item_bg_color_flag and "back_ground_546X36_1.png" or "back_ground_546X36_2.png"
-            local r_item_bg = display.newSprite(r_item_bg_image)
+            local r_item_bg_image = r_item_bg_color_flag and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+            local r_item_bg = display.newScale9Sprite(r_item_bg_image,0,0,cc.size(546,36),cc.rect(10,10,528,20))
                 :align(display.TOP_CENTER, group_width/2, r_list_height-r_tip_height*added_r_item_count)
                 :addTo(group)
             cc.ui.UILabel.new({
@@ -706,8 +713,8 @@ function GameUIStrikeReport:CreateDragonEquipments()
         local r_item_bg_color_flag = true
         local added_r_item_count = 0
         for k,r_parms in pairs(equipments) do
-            local r_item_bg_image = r_item_bg_color_flag and "back_ground_546X36_1.png" or "back_ground_546X36_2.png"
-            local r_item_bg = display.newSprite(r_item_bg_image)
+            local r_item_bg_image = r_item_bg_color_flag and "back_ground_548x40_1.png" or "back_ground_548x40_2.png"
+            local r_item_bg = display.newScale9Sprite(r_item_bg_image,0,0,cc.size(546,36),cc.rect(10,10,528,20))
                 :align(display.TOP_CENTER, group_width/2, r_list_height-r_tip_height*added_r_item_count)
                 :addTo(group)
             cc.ui.UILabel.new({
@@ -801,6 +808,8 @@ function GameUIStrikeReport:GetProbableNum(num)
 end
 
 return GameUIStrikeReport
+
+
 
 
 

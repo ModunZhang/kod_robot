@@ -13,7 +13,7 @@ function GameUIAllianceDecorateEnter:GetUIHeight()
 end
 
 function GameUIAllianceDecorateEnter:GetHonourLabelText()
-    return buildingName[self:GetBuilding():GetName()].moveNeedHonour
+    return GameUtils:formatNumber(buildingName[self:GetBuilding():GetName()].moveNeedHonour)
 end
 
 function GameUIAllianceDecorateEnter:FixedUI()
@@ -49,6 +49,11 @@ function GameUIAllianceDecorateEnter:GetBuildingDesc()
 	return _("可拆除,需要职位在将军以上的玩家,并且花费一定的荣誉值")
 end
 
+function GameUIAllianceDecorateEnter:GetLocation()
+    local building = self:GetBuilding()
+    local x,y = building:GetMidLogicPosition()
+    return string.format("%d,%d",x,y)
+end
 
 function GameUIAllianceDecorateEnter:GetBuildingInfo()
 	local location = {

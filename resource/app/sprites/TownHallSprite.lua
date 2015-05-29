@@ -1,3 +1,4 @@
+local zz = import("..particles.zz")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local TownHallSprite = class("TownHallSprite", FunctionUpgradingSprite)
 
@@ -11,6 +12,11 @@ function TownHallSprite:OnNewDailyQuestsEvent(changed_map)
     end
     self:DoAni()
 end
+
+
+
+
+local EMPTY_TAG = 11400
 function TownHallSprite:ctor(city_layer, entity, city)
     TownHallSprite.super.ctor(self, city_layer, entity, city)
     city:GetUser():AddListenOnType(self, city:GetUser().LISTEN_TYPE.NEW_DALIY_QUEST_EVENT)
@@ -24,8 +30,10 @@ function TownHallSprite:DoAni()
     if self:GetEntity():IsUnlocked() then
         if self:GetEntity():BelongCity():GetUser():IsOnDailyQuestEvents() then
             self:PlayAni()
+            self:removeChildByTag(EMPTY_TAG)
         else
             self:StopAni()
+            self:PlayEmptyAnimation()
         end
     end
 end
@@ -38,7 +46,12 @@ end
 function TownHallSprite:StopAni()
     self:GetAniArray()[1]:hide():getAnimation():stop()
 end
-
+function TownHallSprite:PlayEmptyAnimation()
+    if not self:getChildByTag(EMPTY_TAG) then
+        local x,y = self:GetSprite():getPosition()
+        zz():addTo(self,1,EMPTY_TAG):pos(x + 50,y + 50)
+    end
+end
 
 return TownHallSprite
 

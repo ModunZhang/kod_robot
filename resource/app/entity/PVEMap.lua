@@ -67,12 +67,12 @@ end
 function PVEMap:Name()
     return Localize_pve.stage_name[self.index]
 end
-function PVEMap:Desc()
-    return Localize_pve.stage_desc[self.index]
-end
-function PVEMap:CompleteText()
-    return Localize_pve.stage_complete[self.index]
-end
+-- function PVEMap:Desc()
+--     return Localize_pve.stage_desc[self.index]
+-- end
+-- function PVEMap:CompleteText()
+--     return Localize_pve.stage_complete[self.index]
+-- end
 function PVEMap:GetFileName()
     return string.format("tmxmaps/pve_%d_info.tmx", self.index)
 end

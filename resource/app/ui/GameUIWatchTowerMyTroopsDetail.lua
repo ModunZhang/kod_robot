@@ -56,8 +56,7 @@ function GameUIWatchTowerMyTroopsDetail:onEnter()
 	}):align(display.CENTER,title_bar:getContentSize().width/2, title_bar:getContentSize().height/2)
 		:addTo(title_bar)
 
-	local listBg = display.newScale9Sprite("alliance_title_list_572x436.png")
-		:size(568,648)
+	local listBg = display.newScale9Sprite("background_568x120.png", 0,0,cc.size(568,648),cc.rect(15,10,538,100))
 		:align(display.CENTER_BOTTOM, self.backgroundImage:getContentSize().width/2, 30)
 		:addTo(self.backgroundImage)
 
@@ -195,7 +194,7 @@ end
 function GameUIWatchTowerMyTroopsDetail:GetSubItem(ITEM_TYPE,index,item_data)
 	local height = ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO and 38 or 36
 	local width  = ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO and 420 or 546
-	local item = display.newScale9Sprite(string.format("resource_item_bg%d.png",(index - 1) % 2)):size(width,height)
+	local item = display.newScale9Sprite(string.format("back_ground_548x40_%d.png", (index - 1) % 2 == 0 and 1 or 2)):size(width,height)
 	local title_label = UIKit:ttfLabel({
 		text = item_data[1],
 		size = 20,

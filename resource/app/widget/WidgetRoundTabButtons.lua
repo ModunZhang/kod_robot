@@ -9,17 +9,11 @@ local WidgetRoundTabButtons = class("WidgetRoundTabButtons", function()
 end)
 
 WidgetRoundTabButtons.STYLES = {
-    WHITE = 1,
-    BROWN = 2,
+    BROWN = 1,
 }
 
 local STYLE_IMAGES = 
 {
-    {
-        { on = "tab_btn_up_106x58.png", off = "tab_btn_down_106x58.png",},
-        { on = "tab_btn_up_110x58.png", off = "tab_btn_down_110x58.png",},
-        { on = "tab_btn_up_106x58_1.png", off = "tab_btn_down_106x58_1.png",}
-    },
     {
         { on = "tab_btn_up_106x58.png", off = "tab_btn_down_brown_106x58.png",},
         { on = "tab_btn_up_110x58.png", off = "tab_btn_down_brown_110x58.png",},
@@ -29,17 +23,13 @@ local STYLE_IMAGES =
 
 local STYLE_LABEL_PARAMS = {
     {
-        enable = 0x403c2f,
-        unable = 0x00c0ff
-    },
-    {
         enable = 0xffedae,
         unable = 0x00c0ff
     }
 }
 
-function WidgetRoundTabButtons:ctor(buttons, listener,style)
-    style = style or self.STYLES.WHITE 
+function WidgetRoundTabButtons:ctor(buttons, listener, style)
+    local style = style or self.STYLES.BROWN 
     self.style = style
     self.callbacks = {}
     self.tabListener = listener

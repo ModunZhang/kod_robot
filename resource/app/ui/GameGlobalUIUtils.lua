@@ -6,12 +6,18 @@ import('app.utils.Minheap')
 local Localize = import("..utils.Localize")
 local GameGlobalUIUtils = class('GameGlobalUIUtils')
 local GameUICommonTips = import(".GameUICommonTips")
+local GameUISystemNotice = import(".GameUISystemNotice")
 
 function GameGlobalUIUtils:ctor()
 	self.tipsHeap = Minheap.new(function(a,b)
 		return a.time < b.time
 	end)
 	self.increase_index = 0
+
+	self.noticeHeap = Minheap.new(function(a,b)
+		return a.time < b.time
+	end)
+	self.increase_notic_index = 0
 end
 
 function GameGlobalUIUtils:showTips(title,content)
@@ -31,10 +37,35 @@ function GameGlobalUIUtils:showTips(title,content)
 	end
 end
 
+function GameGlobalUIUtils:showNotice(notice_type,notice_content)
+	-- local instance = cc.Director:getInstance():getRunningScene():getChildByTag(1030)
+	-- if not instance then
+	-- 	self.notice = GameUISystemNotice.new(self,notice_type,notice_content)
+	-- 	assert(self.notice)
+	-- 	cc.Director:getInstance():getRunningScene():addChild(self.notice, 1000001, 1030)
+	-- end
+	-- if self.notice:IsOpen() then
+	-- 	self.increase_notic_index = self.increase_notic_index + 1
+	-- 	self.noticeHeap:push({type = notice_type,content = notice_content,time = self.increase_notic_index})
+	-- else
+	-- 	self.increase_notic_index = 0
+	-- 	self.notice:showNotice(notice_type,notice_content)
+	-- end
+	
+end
+
 function GameGlobalUIUtils:onTipsMoveOut(tipsUI)
 	if not self.tipsHeap:empty() then
 		local message = self.tipsHeap:pop()
 		tipsUI:showTips(message.title,message.content)
+		return true
+	end
+	return false
+end
+function GameGlobalUIUtils:onNoticeMoveOut(noticeUI)
+	if not self.noticeHeap:empty() then
+		local message = self.noticeHeap:pop()
+		noticeUI:showNotice(message.type,message.content)
 		return true
 	end
 	return false

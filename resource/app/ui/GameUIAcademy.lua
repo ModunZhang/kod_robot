@@ -29,6 +29,7 @@ local GameUIAcademy = UIKit:createUIClass("GameUIAcademy","GameUIUpgradeBuilding
 local window = import("..utils.window")
 local UIScrollView = import(".UIScrollView")
 local WidgetPushButton = import("..widget.WidgetPushButton")
+local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 
 
 function GameUIAcademy:GetTechsData()
@@ -161,7 +162,7 @@ function GameUIAcademy:CreateBetweenBgAndTitle()
 end
 
 function GameUIAcademy:BuildTipsUI(technology_node,y)
-	local tips_bg = display.newSprite("box_panel_556x106.png")
+	local tips_bg = WidgetUIBackGround.new({width = 556,height = 106},WidgetUIBackGround.STYLE_TYPE.STYLE_5)
 		:addTo(technology_node):align(display.LEFT_TOP,40,y)
 	local no_event_label_1 = UIKit:ttfLabel({
 		text = _("研发队列空闲"),

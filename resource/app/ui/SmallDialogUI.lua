@@ -14,7 +14,7 @@ function SmallDialogUI:ctor(parms)
     self.center_part = cc.ui.UIImage.new("centerDialog_100x144.png"):align(display.CENTER, 0, 0):addTo(self.dialog)
     self.left_part = cc.ui.UIImage.new("broadsideDialog_104x144.png"):align(display.RIGHT_CENTER, -50, 0):addTo(self.dialog)
     self.right_part = cc.ui.UIImage.new("broadsideDialog_104x144.png"):align(display.LEFT_CENTER, 50, 0):addTo(self.dialog)
-    self.dialogDividing = display.newScale9Sprite("dialogDividing_390x5.png", 0, -10, cc.size(292,5)):addTo(self.dialog)
+    self.dialogDividing = display.newScale9Sprite("dividing_line.png",0,-10,cc.size(290,2),cc.rect(10,2,382,2)):addTo(self.dialog)
     self.right_part:setFlippedX(true)
     -- tips 两条
     self.tips1 = cc.ui.UILabel.new({

@@ -42,7 +42,6 @@ end
 ---------------------------
 --Observer Methods
 function WidgetMarchEvents:OnHelpToTroopsChanged(changed_map)
-    dump(changed_map)
     self:PromiseOfSwitch()
 end
 
@@ -53,16 +52,18 @@ end
 function WidgetMarchEvents:OnFightEventTimerChanged(fightEvent)
     local item = self.items_map[fightEvent:Id()]
     if item then
-        local desc =  string.format(" %s %s", item.prefix,GameUtils:formatTimeStyle1(fightEvent:GetTime()))
-        item.desc:setString(desc)
+        -- local desc =  string.format(" %s %s", item.prefix,GameUtils:formatTimeStyle1(fightEvent:GetTime()))
+        -- item.desc:setString(desc)
+        item.time:setString(GameUtils:formatTimeStyle1(fightEvent:GetTime()))
     end
 end
 
 function WidgetMarchEvents:OnAttackMarchEventTimerChanged(attackMarchEvent)
     local item = self.items_map[attackMarchEvent:Id()]
     if item then
-        local desc =  string.format(" %s %s", item.prefix,GameUtils:formatTimeStyle1(attackMarchEvent:GetTime()))
-        item.desc:setString(desc)
+        -- local desc =  string.format(" %s %s", item.prefix,GameUtils:formatTimeStyle1(attackMarchEvent:GetTime()))
+        -- item.desc:setString(desc)
+        item.time:setString(GameUtils:formatTimeStyle1(attackMarchEvent:GetTime()))
         item.progress:setPercentage(attackMarchEvent:GetPercent())
     end
 end
@@ -70,8 +71,9 @@ end
 function WidgetMarchEvents:OnVillageEventTimer(villageEvent)
     local item = self.items_map[villageEvent:Id()]
     if item then
-        local desc =  string.format(" %s %d%% %s", item.prefix,villageEvent:CollectPercent(),GameUtils:formatTimeStyle1(villageEvent:GetTime()))
+        local desc =  string.format(" %s %d%%", item.prefix,villageEvent:CollectPercent())
         item.desc:setString(desc)
+        item.time:setString(GameUtils:formatTimeStyle1(villageEvent:GetTime()))
         item.progress:setPercentage(villageEvent:CollectPercent())
     end
 end
@@ -293,11 +295,17 @@ function WidgetMarchEvents:CreateReturnItem(entity)
     end):addTo(node):align(display.LEFT_CENTER, 4, half_height)
     node.prefix = entity:GetEventPrefix()
     node.desc = UIKit:ttfLabel({
-        text = string.format("%s %s",node.prefix,GameUtils:formatTimeStyle1(event:GetTime())),
+        text = node.prefix,
         size = 16,
         color = 0xd1ca95,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
 
+    node.time = UIKit:ttfLabel({
+        text = GameUtils:formatTimeStyle1(event:GetTime()),
+        size = 16,
+        color = 0xd1ca95,
+        align = cc.TEXT_ALIGNMENT_RIGHT,
+    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 170, half_height)
     node.speed_btn = WidgetPushButton.new({
         normal = "march_speedup_btn_up.png",
         pressed = "march_speedup_btn_down.png",
@@ -317,7 +325,7 @@ function WidgetMarchEvents:CreateReturnItem(entity)
         normal = "yellow_btn_up_75x39.png",
         pressed = "yellow_btn_down_75x39.png",
         disabled= "disable_75x39.png",
-    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6 - 78, half_height)
+    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 84, half_height)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("部队"),
             size = 18,
@@ -344,10 +352,18 @@ function WidgetMarchEvents:CreateAttackItem(entity)
     end):addTo(node):align(display.LEFT_CENTER, 4, half_height)
     node.prefix = entity:GetEventPrefix()
     node.desc = UIKit:ttfLabel({
-        text = string.format("%s %s",node.prefix,GameUtils:formatTimeStyle1(event:GetTime())),
+        text = node.prefix,
         size = 16,
         color = 0xd1ca95,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
+
+    node.time = UIKit:ttfLabel({
+        text = GameUtils:formatTimeStyle1(event:GetTime()),
+        size = 16,
+        color = 0xd1ca95,
+        align = cc.TEXT_ALIGNMENT_RIGHT,
+    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 170, half_height)
+
     node.speed_btn = WidgetPushButton.new({
         normal = "march_speedup_btn_up.png",
         pressed = "march_speedup_btn_down.png",
@@ -367,7 +383,7 @@ function WidgetMarchEvents:CreateAttackItem(entity)
         normal = "march_return_btn_up.png",
         pressed = "march_return_btn_down.png",
         disabled= "disable_75x39.png",
-    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6 - 78, half_height)
+    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 84, half_height)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("撤退"),
             size = 18,
@@ -394,21 +410,33 @@ function WidgetMarchEvents:CreateDefenceItem(entity)
     end):addTo(node):align(display.LEFT_CENTER, 4, half_height)
     local display_text = ""
     node.prefix = entity:GetEventPrefix()
+    local time_str = ""
     if type_str == 'COLLECT' then
         node.progress:setPercentage(event:CollectPercent())
-        display_text = string.format(" %s %d%% %s", node.prefix,event:CollectPercent(),GameUtils:formatTimeStyle1(event:GetTime()))
+        display_text = string.format(" %s %d%%", node.prefix,event:CollectPercent())
+        time_str = GameUtils:formatTimeStyle1(event:GetTime())
     elseif type_str == 'SHIRNE' then
        node.progress:setPercentage(100)
-       display_text = string.format(" %s %s", node.prefix,GameUtils:formatTimeStyle1(event:GetTime()))
+       display_text = node.prefix
+       time_str = ""
     elseif type_str == 'HELPTO' then
         node.progress:setPercentage(100)
        display_text = node.prefix
+       time_str = ""
     end
     node.desc = UIKit:ttfLabel({
         text = display_text,
         size = 16,
         color = 0xd1ca95,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
+
+    node.time = UIKit:ttfLabel({
+        text = time_str,
+        size = 16,
+        color = 0xd1ca95,
+        align = cc.TEXT_ALIGNMENT_RIGHT,
+    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 170, half_height)
+
     node.speed_btn = WidgetPushButton.new({
         normal = "march_return_btn_up.png",
         pressed = "march_return_btn_down.png",
@@ -428,7 +456,7 @@ function WidgetMarchEvents:CreateDefenceItem(entity)
         normal = "yellow_btn_up_75x39.png",
         pressed = "yellow_btn_down_75x39.png",
         disabled= "disable_75x39.png",
-    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 6 - 78, half_height)
+    }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 84, half_height)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("部队"),
             size = 18,

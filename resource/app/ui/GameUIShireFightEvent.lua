@@ -159,7 +159,7 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
 
     local icon = display.newSprite("alliance_item_flag_box_126X126.png"):align(display.LEFT_TOP, 12, 141):addTo(content)
     display.newSprite("technology_bg_116x116.png", 63, 63):addTo(icon)
-    local title_name = arrived and "title_red_558x34.png" or "title_blue_558x34.png"
+    local title_name = arrived and "title_red_556x34.png" or "title_blue_554x34.png"
     local title_bar = display.newSprite(title_name):align(display.CENTER_TOP, 284, 184):addTo(content)
     display.newSprite("alliacne_search_29x33.png"):align(display.RIGHT_CENTER, 540,17):addTo(title_bar):scale(0.8)
     WidgetPushTransparentButton.new(cc.rect(0,0,558,34)):addTo(title_bar):align(display.LEFT_BOTTOM,0, 0):onButtonClicked(function()
@@ -210,7 +210,7 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
     if not arrived then
         self.event_bind_to_label[obj:Id()] = time_label
     end
-    local line_2 = display.newScale9Sprite("dividing_line_594x2.png"):size(400,2)
+    local line_2 = display.newScale9Sprite("dividing_line.png",0,0,cc.size(400,2),cc.rect(10,2,382,2))
         :align(display.LEFT_BOTTOM, icon:getPositionX()+icon:getContentSize().width+10,70)
         :addTo(content)
 
@@ -231,8 +231,7 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
         size = 20,
         color = 0x403c2f
     }):align(display.RIGHT_BOTTOM,line_2:getPositionX()+line_2:getContentSize().width,power_title_label:getPositionY()):addTo(content)
-
-    local line_1 = display.newScale9Sprite("dividing_line_594x2.png"):size(400,2)
+    local line_1 = display.newScale9Sprite("dividing_line.png",0,0,cc.size(400,2),cc.rect(10,2,382,2))
         :align(display.LEFT_BOTTOM,line_2:getPositionX(),line_2:getPositionY()+40):addTo(content)
 
     local dragon_title_label =  UIKit:ttfLabel({
@@ -293,4 +292,5 @@ function GameUIShireFightEvent:InfomationButtonClicked()
 end
 
 return GameUIShireFightEvent
+
 

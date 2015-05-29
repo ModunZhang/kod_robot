@@ -157,10 +157,10 @@ return {
         confessionHood = 0,
         brightRing = 0,
         brightAlloy = 0,
-        magicBox = 1,
-        deathHand = 1,
-        soulStone = 1,
-        heroBones = 1
+        magicBox = 0,
+        deathHand = 0,
+        soulStone = 0,
+        heroBones = 0
     },
     dragonEquipments = {
         blueChest_s2 = 0,

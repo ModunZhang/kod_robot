@@ -2,32 +2,28 @@
 -- Author: dannyhe
 -- Date: 2014-08-21 20:49:46
 --
--- 适配相应平台的Lua接口
+--[[
+    --适配相应平台的Lua接口文件
+
+    --UITextView
+        iOS模拟器和真机支持ccui.UITextView 
+        函数名和参数同EditBox 构造函数不同
+        player/android 暂不支持
+        
+        local textView = ccui.UITextView:create(cc.size(549,379),display.newScale9Sprite(""))
+        textView:addTo(self):center()
+        textView:setReturnType(cc.KEYBOARD_RETURNTYPE_SEND)    
+        textView:setFont(UIKit:getFontFilePath(), 24)
+        textView:registerScriptTextViewHandler(function(event,textView)
+
+        end)
+]]--
 local PlatformAdapter = {}
 
 function PlatformAdapter:android()
     device.getOpenUDID = ext.getOpenUDID
-    --openudid
-    -- if ext.getOpenUDID then
-    --     device.getOpenUDID = function ()
-    --         return ext.getOpenUDID()
-    --     end
-    -- end
 end
 
---[[
-    模拟器和真机支持ccui.UITextView 
-    函数名和参数同EditBox 构造函数不同
-    player/android 不支持
-    
-    local textView = ccui.UITextView:create(cc.size(549,379),display.newScale9Sprite(""))
-    textView:addTo(self):center()
-    textView:setReturnType(cc.KEYBOARD_RETURNTYPE_SEND)    
-    textView:setFont(UIKit:getFontFilePath(), 24)
-    textView:registerScriptTextViewHandler(function(event,textView)
-
- end)
-]]--
 
 function PlatformAdapter:ios()
     device.getOpenUDID = ext.getOpenUDID
@@ -62,7 +58,7 @@ function PlatformAdapter:mac()
     fileutils:addSearchPath("dev/res/fonts/")
     fileutils:addSearchPath("dev/res/images/")
     fileutils:addSearchPath("dev/res/fonts/")
-    fileutils:addSearchPath("dev/res/images/_Compressed/")
+    fileutils:addSearchPath("dev/res/images/_Compressed_mac/")
     fileutils:addSearchPath("dev/res/images/_CanCompress/")
     ext.getDeviceToken = function ()end
     ext.market_sdk = {}
@@ -81,43 +77,15 @@ function PlatformAdapter:mac()
         filePath = string.gsub(filePath,"animations/","animations_mac/")
         return filePath
     end
-    local print__ = print 
-    printLog = function(tag, fmt, ...)
-        local t = {
-            "[",
-            string.upper(tostring(tag)),
-            "] ",
-            string.format(tostring(fmt), ...)
-        }
-        print__(table.concat(t))
-    end
-    -- print = function(...)end
 end
 
 
 function PlatformAdapter:common()
-    --CCTableView
-    cc.TABLEVIEW_FILL_TOPDOWN = 0
-    cc.TABLEVIEW_FILL_BOTTOMUP = 1
-
-    cc.SCROLLVIEW_SCRIPT_SCROLL = 0
-    cc.SCROLLVIEW_SCRIPT_ZOOM   = 1
-    cc.TABLECELL_TOUCHED        = 2
-    cc.TABLECELL_HIGH_LIGHT     = 3
-    cc.TABLECELL_UNHIGH_LIGHT   = 4
-    cc.TABLECELL_WILL_RECYCLE   = 5
-    cc.TABLECELL_SIZE_FOR_INDEX = 6
-    cc.TABLECELL_SIZE_AT_INDEX  = 7
-    cc.NUMBER_OF_CELLS_IN_TABLEVIEW = 8
-    cc.SCROLLVIEW_BOUND_TOP = 9
-    cc.SCROLLVIEW_BOUND_BOTTOM = 10
-
-    cc.SCROLLVIEW_DIRECTION_NONE = -1
-    cc.SCROLLVIEW_DIRECTION_HORIZONTAL = 0
-    cc.SCROLLVIEW_DIRECTION_VERTICAL = 1
-    cc.SCROLLVIEW_DIRECTION_BOTH  = 2
-    --打开文件搜索路径
+    --打开文件搜索路径日志
     -- cc.FileUtils:getInstance():setPopupNotify(true)
+    --拓展输入框键盘的类型
+    cc.EDITBOX_INPUT_MODE_ASCII_CAPABLE = 7
+    --修改Quick函数
     local printError__ = printError
     printError = function(...)
         printError__(...)
@@ -128,7 +96,7 @@ function PlatformAdapter:common()
     end
     self:gameCenter()
 end
-
+-- 适配GameCenter Lua接口
 function PlatformAdapter:gameCenter()
     if not ext.gamecenter then
         local ep_func = function(...)end

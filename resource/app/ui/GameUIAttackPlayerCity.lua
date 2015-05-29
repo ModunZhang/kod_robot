@@ -50,7 +50,7 @@ function GameUIAttackPlayerCity:BuildUI()
    		self:LeftButtonClicked()
    	end)
    	local box = display.newSprite("alliance_item_flag_box_126X126.png"):align(display.LEFT_TOP,30,titleBar:getPositionY()-10):addTo(bg_node):scale(0.7)
-   	local head_bg = display.newSprite("chat_hero_background.png", 63, 63):addTo(box)
+   	local head_bg = display.newSprite("dragon_bg_114x114.png", 63, 63):addTo(box)
 	display.newSprite(UILib.dragon_head[self:GetMyTroop().dragon.type], 56, 60):addTo(head_bg)
 
 	local line_2 = display.newScale9Sprite("dividing_line.png")
@@ -98,8 +98,8 @@ function GameUIAttackPlayerCity:BuildUI()
 	self.pre_tip:align(display.RIGHT_CENTER, box:getPositionX()+10,self.next_tip:getPositionY())
 	self.pre_tip:addTo(self.bg_node)
 	local button = WidgetPushButton.new({
-		normal = "yellow_btn_up_185x65.png",
-		pressed = "yellow_btn_down_185x65.png",
+		normal = "yellow_btn_up_186x66.png",
+		pressed = "yellow_btn_down_186x66.png",
 	}):align(display.RIGHT_TOP, right_top_x, left_bottom_y - 20):addTo(bg_node)
 	:setButtonLabel("normal", UIKit:commonButtonLable({text = _("进攻"),}))
 	:onButtonClicked(handler(self, self.OnAttackButtonClicked))

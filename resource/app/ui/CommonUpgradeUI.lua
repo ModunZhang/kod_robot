@@ -87,7 +87,7 @@ end
 
 function CommonUpgradeUI:InitCommonPart()
     -- building level
-    local level_bg = display.newSprite("upgrade_level_bg.png", display.cx+80, display.top-125):addTo(self)
+    local level_bg = display.newScale9Sprite("title_blue_430x30.png",display.cx+80, display.top-125, cc.size(390,30), cc.rect(10,10,410,10)):addTo(self)
     self.builging_level = UIKit:ttfLabel({
         font = UIKit:getFontFilePath(),
         size = 26,
@@ -96,9 +96,6 @@ function CommonUpgradeUI:InitCommonPart()
     }):align(display.LEFT_CENTER, 20, level_bg:getContentSize().height/2)
         :addTo(level_bg)
     -- 建筑功能介绍
-    -- 建筑图片 放置区域左右边框
-    -- cc.ui.UIImage.new("building_frame_36x136.png"):align(display.CENTER, display.cx-250, display.top-175)
-    --     :addTo(self):setFlippedX(true)
     WidgetPushButton.new({normal = "alliance_item_flag_box_126X126.png"})
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
@@ -106,7 +103,7 @@ function CommonUpgradeUI:InitCommonPart()
             end
         end):align(display.CENTER, display.cx-200, display.top-175)
         :addTo(self):scale(136/126)
-   
+
     self:ReloadBuildingImage()
     self:InitBuildingIntroduces()
     self:InitNextLevelEfficiency()
@@ -205,7 +202,8 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
             efficiency = efficiency .. string.format("%s+%d,",bd.vitalityRecoveryPerHour,additon)
         end
     elseif self.building:GetType()=="watchTower" then
-        efficiency = string.format("%s,",bd["watchTower_"..self.building:GetLevel()])
+        local warning = GameDatas.ClientInitGame.watchTower
+        efficiency = string.format("%s,",string.format(bd["watchTower_"..self.building:GetLevel()],warning[self.building:GetLevel()].waringMinute))
     elseif self.building:GetType()=="warehouse" then
         local additon = building:GetResourceNextLevelValueLimit()-building:GetResourceValueLimit()
         if additon>0 then
@@ -501,7 +499,7 @@ function CommonUpgradeUI:SetUpgradeRequirementListview()
     local wood = city.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local iron = city.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
     local stone = city.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local population = city.resource_manager:GetPopulationResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
+    local population = city.resource_manager:GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
 
     local materials = city:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)
     local building = self.building
@@ -553,7 +551,7 @@ function CommonUpgradeUI:SetUpgradeRequirementListview()
         },
 
         {
-            resource_type = _("建筑蓝图"),
+            resource_type = _("工程图纸"),
             isVisible = building:GetLevelUpBlueprints()>0,
             isSatisfy = materials["blueprints"]>=building:GetLevelUpBlueprints() ,
             icon="blueprints_128x128.png",
@@ -836,3 +834,6 @@ function CommonUpgradeUI:PopNotSatisfyDialog(listener,can_not_update_type)
 end
 
 return CommonUpgradeUI
+
+
+

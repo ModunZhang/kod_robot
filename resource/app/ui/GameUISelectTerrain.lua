@@ -34,10 +34,12 @@ function GameUISelectTerrain:OnMoveInStage()
     self.ui_map.select:onButtonClicked(function(event)
         self.ui_map.select:setButtonEnabled(false)
         if DataManager:getUserData().basicInfo.terrain ~= "__NONE__" then
+            DataManager:getFteData().basicInfo.terrain = DataManager:getUserData().basicInfo.terrain
             DataManager:setFteUserDeltaData()
             self.select_promise:resolve()
         else
             NetManager:initPlayerData(self.terrainType):done(function()
+                DataManager:getFteData().basicInfo.terrain = DataManager:getUserData().basicInfo.terrain
                 DataManager:setFteUserDeltaData()
                 self.select_promise:resolve()
             end):fail(function()
@@ -134,9 +136,9 @@ function GameUISelectTerrain:BuildUI()
     local s3 = list_bg:getContentSize()
     local title_bg = display.newSprite("alliance_evnets_title_548x50.png")
         :addTo(list_bg):pos(s3.width/2, s3.height + 25)
-    local bar1 = display.newSprite("upgrade_resources_background_3.png"):addTo(list_bg):pos(s3.width/2, s3.height-30)
-    local bar2 = display.newSprite("upgrade_resources_background_2.png"):addTo(list_bg):pos(s3.width/2, s3.height-30 - 46 * 1)
-    local bar3 = display.newSprite("upgrade_resources_background_3.png"):addTo(list_bg):pos(s3.width/2, s3.height-30 - 46 * 2)
+    local bar1 = display.newScale9Sprite("back_ground_548x40_1.png"):addTo(list_bg):pos(s3.width/2, s3.height-30):size(520,46)
+    local bar2 = display.newScale9Sprite("back_ground_548x40_2.png"):addTo(list_bg):pos(s3.width/2, s3.height-30 - 46 * 1):size(520,46)
+    local bar3 = display.newScale9Sprite("back_ground_548x40_1.png"):addTo(list_bg):pos(s3.width/2, s3.height-30 - 46 * 2):size(520,46)
 
     local s4 = title_bg:getContentSize()
     ui_map.title = UIKit:ttfLabel({size = 22,color = 0xffedae})

@@ -15,7 +15,7 @@ local SoldierManager = import("..entity.SoldierManager")
 local WidgetUpgradeMilitaryTech = class("WidgetUpgradeMilitaryTech", WidgetPopDialog)
 
 local function create_line_item(icon,text_1,text_2)
-    local line = display.newSprite("dividing_line_546x2.png")
+    local line = display.newScale9Sprite("dividing_line.png",0,0,cc.size(546,2),cc.rect(10,2,382,2))
     local icon = display.newSprite(icon):addTo(line,2):align(display.LEFT_BOTTOM, 0, 0)
     icon:scale(40/icon:getContentSize().width)
     local text1 = UIKit:ttfLabel({
@@ -61,13 +61,13 @@ end
 function WidgetUpgradeMilitaryTech:CurrentInfo()
     local body = self.body
     local size = body:getContentSize()
-    local bg = display.newScale9Sprite("back_ground_548x52.png", 0, 0,cc.size(548,46),cc.rect(10,10,528,26))
+    local bg = display.newScale9Sprite("back_ground_166x84.png", 0,0,cc.size(548,46),cc.rect(15,10,136,64))
         :align(display.CENTER, size.width/2, size.height-50)
         :addTo(body)
 
     local tech = self.tech
     self.upgrade_tip = UIKit:ttfLabel({
-        text = tech:GetTechLocalize().." (".._("升级到").." Lv"..(tech:Level()+1)..")",
+        text = tech:GetTechLocalize()..string.format( _(" (升级到 Lv%d)"), tech:Level()+1 ),
         size = 22,
         color = 0x403c2f,
     }):align(display.CENTER, bg:getContentSize().width/2 , bg:getContentSize().height/2)
@@ -91,7 +91,7 @@ function WidgetUpgradeMilitaryTech:UpgradeButtons()
                 end
 
                 if self.tech:IsAbleToUpgradeNow() then
-                    UIKit:showMessageDialog(_("陛下"),_("金龙币不足"))
+                    UIKit:showMessageDialog(_("主人"),_("金龙币不足"))
                         :CreateOKButton({
                             listener =  function ()
                                 UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
@@ -172,7 +172,8 @@ function WidgetUpgradeMilitaryTech:UpgradeRequirement()
             isVisible = City:GetSoldierManager():GetUpgradingMilitaryTechNum(self.tech:Building())>0,
             isSatisfy = not  City:GetSoldierManager():IsUpgradingMilitaryTech(self.tech:Building()),
             icon="hammer_33x40.png",
-            description= _("升级队列已满")..":"..(1-City:GetSoldierManager():GetUpgradingMilitaryTechNum(self.tech:Building())).."/1"
+
+            description= string.format( _("升级队列已满:%d/1"), (1-City:GetSoldierManager():GetUpgradingMilitaryTechNum(self.tech:Building())) ),
         },
         {
             resource_type = Localize.fight_reward.coin,
@@ -234,10 +235,10 @@ function WidgetUpgradeMilitaryTech:PopNotSatisfyDialog(upgrade_listener,results)
     end
     local need_gems = self.tech:GetUpgradeGems()
     local current_gem = User:GetGemResource():GetValue()
-    UIKit:showMessageDialog(_("陛下"),message)
+    UIKit:showMessageDialog(_("主人"),message)
         :CreateOKButton({
             listener =  current_gem < need_gems and function ()
-                UIKit:showMessageDialog(_("陛下"),_("金龙币不足"))
+                UIKit:showMessageDialog(_("主人"),_("金龙币不足"))
                     :CreateOKButton({
                         listener =  function ()
                             UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
@@ -259,7 +260,8 @@ function WidgetUpgradeMilitaryTech:OnMilitaryTechsDataChanged(city,changed_map)
             self.tech = v
             self.upgrade_time:setString(GameUtils:formatTimeStyle1(v:GetUpgradeTime()))
             self.upgrade_now_need_gems_label:setString(v:GetInstantUpgradeGems())
-            self.upgrade_tip:setString(v:GetTechLocalize().." (".._("升级到").." Lv"..(v:Level()+1)..")")
+
+            self.upgrade_tip:setString(v:GetTechLocalize()..string.format( _(" (升级到 Lv%d)"), (v:Level()+1) ))
             self.line1:SetText("+"..(v:GetAtkEff()*100).."%")
             self.line2:SetText("+"..v:GetTechPoint())
             self:UpgradeRequirement()

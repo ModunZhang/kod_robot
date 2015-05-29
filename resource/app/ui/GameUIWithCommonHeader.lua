@@ -7,6 +7,9 @@ function GameUIWithCommonHeader:ctor(city, title)
     GameUIWithCommonHeader.super.ctor(self,{type = UIKit.UITYPE.WIDGET})
     self.title = title
     self.city = city
+
+
+    self:BlurRenderScene()
 end
 
 function GameUIWithCommonHeader:onEnter()
@@ -67,6 +70,7 @@ function GameUIWithCommonHeader:DisableAutoClose()
     return self
 end
 function GameUIWithCommonHeader:onExit()
+    self:ResetRenderSceneState()
     if self.__gem_label then
         self.city:GetResourceManager():RemoveObserver(self)
     end
@@ -100,8 +104,6 @@ end
 
 function GameUIWithCommonHeader:UIAnimationMoveIn()
     self:GetView():pos(0,display.top + 200)
-    -- self:GetTitleBar():opacity(0)
-    self:BlurRenderScene()
     transition.fadeIn(self:GetTitleBar(),{
         time = 0.05,
         onComplete = function()
@@ -118,7 +120,6 @@ function GameUIWithCommonHeader:UIAnimationMoveIn()
 end
 
 function GameUIWithCommonHeader:UIAnimationMoveOut()
-    self:ResetRenderSceneState()
     transition.moveTo(self:GetView(),{
         x = 0,
         y = display.top + 200,

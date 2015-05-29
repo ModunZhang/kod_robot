@@ -188,10 +188,12 @@ function LocalPushManager:SwitchWatchTowerPush(isOn)
 end
 
 function LocalPushManager:UpdateWatchTowerPush(finishTime,msg,identity)
+	printLog("local push","UpdateWatchTowerPush-->%s", msg)
 	self:AddLocalPush("LOCAL_PUSH_KEY_WATCH_TOWER",finishTime,msg,identity)
 end
 
 function LocalPushManager:CancelWatchTowerPush(identity)
+	printLog("local push","CancelWatchTowerPush-->%s", identity)
 	self:CancelNotificationByKeyAndIdentity("LOCAL_PUSH_KEY_WATCH_TOWER",identity)
 end
 return LocalPushManager
