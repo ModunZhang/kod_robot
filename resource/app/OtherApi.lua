@@ -307,10 +307,14 @@ function OtherApi:Chat()
 
     local alliance = Alliance_Manager:GetMyAlliance()
     local channel
-    if alliance:Status() == "fight" then
-        channel = channels[math.random(3)]
+    if not alliance:IsDefault() then
+        if alliance:Status() == "fight" then
+            channel = channels[math.random(3)]
+        else
+            channel = channels[math.random(2)]
+        end
     else
-        channel = channels[math.random(2)]
+        channel = channels[math.random(1)]
     end
     return NetManager:getSendChatPromise(channel,"你们这群渣渣！！！！")
 end
@@ -387,15 +391,16 @@ end
 
 return {
     setRun,
-    SetCityTerrain,
-    SwitchBuilding,
-    SetPlayerIcon,
-    MailApi,
-    Gacha,
-    GetRank,
-    VIP,
+    -- SetCityTerrain,
+    -- SwitchBuilding,
+    -- SetPlayerIcon,
+    -- MailApi,
+    -- Gacha,
+    -- GetRank,
+    -- VIP,
     Chat,
 }
+
 
 
 
