@@ -281,7 +281,9 @@ local function RecruitSoldier(type_, count)
 end
 
 local function InstantRecruitSoldier(name, count)
+    local config = special[name] or normal[name.."_1"]
     mock{
+        {"basicInfo.power", DataManager:getFteData().basicInfo.power + config.power * count},
         {string.format("soldiers.%s", name), count},
     }
 
@@ -343,10 +345,10 @@ local function FightWithNpc(floor)
 
     if floor > 2 then
         mock{
-            {"soldierMaterials.magicBox", 1},
-            {"soldierMaterials.deathHand", 1},
-            {"soldierMaterials.soulStone", 1},
-            {"soldierMaterials.heroBones", 1},
+            {"soldierMaterials.magicBox", 2},
+            {"soldierMaterials.deathHand", 2},
+            {"soldierMaterials.soulStone", 2},
+            {"soldierMaterials.heroBones", 2},
         }
     end
 

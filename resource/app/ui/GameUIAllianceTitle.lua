@@ -127,12 +127,25 @@ function GameUIAllianceTitle:BuildUI()
 	self:RefreshListView(member_level)
 end
 
+function GameUIAllianceTitle:CheckArchonLastLoginTimeGraterThen7Days()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    local alliance_archon =  alliance:GetAllianceArchon()
+    if alliance_archon:LastLoginTime()/1000 - app.timer:GetServerTime() > 7 * 24 * 60 *60 then
+        return true
+    else
+        return false
+    end
+end
+
 function GameUIAllianceTitle:OnBuyAllianceArchonButtonClicked()
     if config_intInit.buyArchonGem.value > User:GetGemResource():GetValue() then
         UIKit:showMessageDialog(nil, _("金龙币不足"), function()
         end)
     elseif Alliance_Manager:GetMyAlliance():GetSelf():IsArchon() then
         UIKit:showMessageDialog(nil, _("你已经是盟主"), function()
+        end)
+    elseif not self:CheckArchonLastLoginTimeGraterThen7Days() then
+         UIKit:showMessageDialog(nil, _("盟主连续离线7天才能购买盟主职位"), function()
         end)
     else
         NetManager:getBuyAllianceArchon():done(function(response)

@@ -42,6 +42,13 @@ local elite_map = {
     [PVEDefine.CRASHED_AIRSHIP] = true,
 }
 
+local reward_map = {
+    [PVEDefine.WOODCUTTER] = "resources,wood,1000",
+    [PVEDefine.QUARRIER] = "resources,stone,1000",
+    [PVEDefine.MINER] = "resources,iron,1000",
+    [PVEDefine.FARMER] = "resources,food,1000",
+}
+
 function PVEObject:ctor(x, y, searched, type, map)
     self.x = x
     self.y = y
@@ -71,7 +78,7 @@ function PVEObject:GetEnemyByIndex(index)
     return self:DecodeToEnemy(self:GetEnemyInfo(index))
 end
 function PVEObject:GetEnemyInfo(index)
-    local unique = self.type == PVEDefine.TRAP and random(#pve_normal) or self.x * self.y * (index + self.type)
+    local unique = self.type == PVEDefine.TRAP and random(#pve_normal) or (self.x * (self.y * 100) + (index + self.type))
     if normal_map[self.type] then
         return pve_normal[unique % #pve_normal + 1]
     elseif elite_map[self.type] then
@@ -95,6 +102,7 @@ function PVEObject:DecodeToEnemy(raw_data)
     level = tonumber(level)
     local strength, vitality = dragonLevel[level].strength, dragonLevel[level].vitality
     local soldiers_raw = string.split(raw_data.soldiers, ";")
+    local rewards_raw = reward_map[self.type] or raw_data.rewards
     return {
         dragon = {
             level = level,
@@ -115,7 +123,7 @@ function PVEObject:DecodeToEnemy(raw_data)
                 count = is_not_boss and pve_func.soldiers.countFunc(self:Floor(), count) or count,
             }
         end),
-        rewards = self:DecodeToRewards(raw_data.rewards, pve_func.rewards.countFunc),
+        rewards = self:DecodeToRewards(rewards_raw, pve_func.rewards.countFunc),
     }
 end
 local m = getmetatable(NotifyItem)

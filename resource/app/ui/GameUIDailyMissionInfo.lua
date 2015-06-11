@@ -181,8 +181,8 @@ function GameUIDailyMissionInfo:GetItem(index,item_data,isFinish)
                 :onButtonClicked(function()
                     if item_data.func then
                         if item_data.func() then
-                            self:CloseUIIf("GameUIDailyMissionInfo")
                             self:CloseUIIf("GameUIMission")
+                            self:CloseUIIf("GameUIDailyMissionInfo")
                         end
                     end
                 end)
@@ -249,7 +249,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
                         GameGlobalUI:showTips(_("错误"),_("你还未建造工具作坊"))
                         return false
                     end
-                    UIKit:newGameUI("GameUIToolShop", City,building):AddToCurrentScene(true)
+                    UIKit:newGameUI("GameUIToolShop", City,building,"manufacture"):AddToCurrentScene(true)
                     return false
                 end
             }
@@ -373,7 +373,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
                 func = function()
                     local blackSmith = City:GetFirstBuildingByType("blackSmith")
                     if blackSmith:IsUnlocked() then
-                        UIKit:newGameUI("GameUIBlackSmith",City,blackSmith):AddToCurrentScene(true)
+                        UIKit:newGameUI("GameUIBlackSmith",City,blackSmith,"redDragon"):AddToCurrentScene(true)
                         return false
                     else
                         GameGlobalUI:showTips(_("错误"),_("你还未建造铁匠铺"))

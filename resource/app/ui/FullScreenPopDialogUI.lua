@@ -89,8 +89,9 @@ function FullScreenPopDialogUI:CreateOKButton(params)
     end
     local params = params or {}
     local listener,btn_name = params.listener,params.btn_name
+    local btn_images = params.btn_images
     local name = btn_name or _("确定")
-    local ok_button = cc.ui.UIPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+    local ok_button = cc.ui.UIPushButton.new(btn_images or {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
         :setButtonLabel(UIKit:ttfLabel({text =name, size = 24, color = 0xffedae,shadow=true}))
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then

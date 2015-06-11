@@ -9,7 +9,10 @@ function FriendCityScene:ctor(user, city, location)
 end
 function FriendCityScene:onEnter()
     FriendCityScene.super.onEnter(self)
-    UIKit:newGameUI('GameUICityInfo', self.user, self.location):AddToScene(self):setTouchSwallowEnabled(false)
+    self.home = UIKit:newGameUI('GameUICityInfo', self.user, self.location):AddToScene(self):setTouchSwallowEnabled(false)
+end
+function FriendCityScene:GetHomePage()
+    return self.home
 end
 
 function FriendCityScene:OnTouchClicked(pre_x, pre_y, x, y)

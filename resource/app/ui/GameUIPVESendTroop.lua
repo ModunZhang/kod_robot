@@ -126,22 +126,9 @@ function GameUIPVESendTroop:OnMoveInStage()
                     UIKit:showMessageDialog(_("主人"),_("请选择要派遣的部队"))
                     return
                 end
-                if self.dragon:IsHpLow() then
-                    UIKit:showMessageDialog(_("主人"),_("您的龙的HP低于20%,有很大几率阵亡,确定要派出吗?"))
-                        :CreateOKButton(
-                            {
-                                listener =  function ()
-                                    self.march_callback(dragonType,soldiers)
-                                    -- 确认派兵后关闭界面
-                                    self:LeftButtonClicked()
-                                end
-                            }
-                        )
-                else
-                    self.march_callback(dragonType,soldiers)
-                    -- 确认派兵后关闭界面
-                    self:LeftButtonClicked()
-                end
+                self.march_callback(dragonType,soldiers)
+                -- 确认派兵后关闭界面
+                self:LeftButtonClicked()
             end
 
         end):align(display.RIGHT_CENTER,window.right-50,window.top-910):addTo(self:GetView())
@@ -177,7 +164,7 @@ function GameUIPVESendTroop:SelectDragonPart()
     local dragon_bg = display.newSprite("dragon_bg_114x114.png")
         :align(display.LEFT_CENTER, 7,dragon_frame:getContentSize().height/2)
         :addTo(dragon_frame)
-    self.dragon_img = cc.ui.UIImage.new(dragon:Type()..".png")
+    self.dragon_img = cc.ui.UIImage.new(UILib.dragon_head[dragon:Type()])
         :align(display.CENTER, dragon_bg:getContentSize().width/2, dragon_bg:getContentSize().height/2+5)
         :addTo(dragon_bg)
     local box_bg = display.newSprite("box_426X126.png")
@@ -213,7 +200,7 @@ function GameUIPVESendTroop:SelectDragonPart()
 
 end
 function GameUIPVESendTroop:RefreashDragon(dragon)
-    self.dragon_img:setTexture(dragon:Type()..".png")
+    self.dragon_img:setTexture(UILib.dragon_head[dragon:Type()])
     self.dragon_name:setString(_(dragon:Type()).."（LV "..dragon:Level().."）")
     self.dragon_vitality:setString(_("生命值")..dragon:Hp().."/"..dragon:GetMaxHP())
     self.dragon = dragon
@@ -480,21 +467,21 @@ function GameUIPVESendTroop:CreateTroopsShow()
     function TroopsShow:SetPower(power)
         local info_bg =self.info_bg
         local power_item = createInfoItem(_("战斗力"),string.formatnumberthousands(power))
-            :align(display.CENTER,50,26)
+            :align(display.LEFT_CENTER,50,26)
             :addTo(info_bg)
         return self
     end
     function TroopsShow:SetCitizen(citizen)
         local info_bg =self.info_bg
         local citizen_item = createInfoItem(_("部队容量"),citizen.."/"..parent.dragon:LeadCitizen())
-        citizen_item:align(display.CENTER,320-citizen_item:getContentSize().width/2,26)
+        citizen_item:align(display.CENTER,320,26)
             :addTo(info_bg)
         return self
     end
     function TroopsShow:SetWeight(weight)
         local info_bg =self.info_bg
         local weight_item = createInfoItem(_("负重"),string.formatnumberthousands(weight))
-        weight_item:align(display.CENTER,630-weight_item:getContentSize().width-40,26)
+        weight_item:align(display.RIGHT_CENTER,590,26)
             :addTo(info_bg)
         return self
     end
@@ -671,13 +658,14 @@ function GameUIPVESendTroop:PromiseOfAttack()
     self:GetFteLayer():SetTouchObject(self.march_btn)
 
     WidgetFteArrow.new(_("点击进攻")):addTo(self:GetFteLayer()):TurnRight()
-    :align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
+        :align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
 
     return UIKit:PromiseOfOpen("GameUIReplayNew")
 end
 
 
 return GameUIPVESendTroop
+
 
 
 

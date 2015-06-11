@@ -116,7 +116,7 @@ function GameUISelenaQuestion:GetMsgAndButtonTitleByWelcomeType(welcome_ui_type)
 		return _("大人，我准备了一些小小测试，如果你每日能连续答对10道题，我会奖赏你哦！"),_("开始吧")
 	elseif welcome_ui_type == self.WELCOME_UI_TYPE.SUCCESS then 
 		self.npc_animation:getAnimation():play("shy", -1, 0)
-		return _("大人，恭喜你已经答对所有问题！你可以在每日任务中领取我为你准备的一份小礼物哦！"),_("再来一局")
+		return _("大人，恭喜你已经答对所有问题！你可以在每日任务中领取我为你准备的一份小礼物哦！"),_("确定")
 	elseif welcome_ui_type == self.WELCOME_UI_TYPE.FAILED then 
 		return string.format(_("回答错误！大人，你本次答题一共回答正确%s道问题，请你继续努力哦！"),self:GetRightQuestionCount()),_("再来一局")
 	end
@@ -160,7 +160,7 @@ function GameUISelenaQuestion:GetListItem(index,question)
 	local item = self.question_layer_list:newItem()
 	local label = UIKit:ttfLabel({
 		text = question,
-		size = 22,
+		size = 18,
 		color= 0x403c2f,
 		dimensions = cc.size(494,0),
 	})
@@ -206,12 +206,15 @@ end
 function GameUISelenaQuestion:GetWelcomeLayer(welcome_ui_type)
 	welcome_ui_type = welcome_ui_type or self.WELCOME_UI_TYPE.WELCOME
 	local msg,button_title = self:GetMsgAndButtonTitleByWelcomeType(welcome_ui_type)
+	local isFinished = welcome_ui_type == self.WELCOME_UI_TYPE.SUCCESS
 	self._question_index = -1
 	if self.welcome_layer then
 		self.welcome_layer.setInfo(msg,button_title)
+		self.welcome_layer.isFinished = isFinished
 		return self.welcome_layer
 	end
 	local layer = display.newLayer():size(608,322)
+	layer.isFinished = isFinished
 	UIKit:ttfLabel({
 		text = _("塞琳娜:"),
 		size = 24,
@@ -235,7 +238,7 @@ function GameUISelenaQuestion:GetWelcomeLayer(welcome_ui_type)
 		}))
 		:onButtonClicked(function ()
 			self.npc_animation:getAnimation():play("Animation1", 0, 0)
-			self:OnStarButtonClicked()
+			self:OnStarButtonClicked(layer.isFinished)
 		end)
 	layer.setInfo = function(msg,button_title)
 		msg_label:setString(msg)
@@ -292,10 +295,14 @@ function GameUISelenaQuestion:OnAnswerButtonClicked(index,button)
 	end
 end
 
-function GameUISelenaQuestion:OnStarButtonClicked()
-	self:LoadQuestionFromConfig()
-	self:GetQuestionLayer(self:GetCurrentQuestion()):show()
-	self.welcome_layer:hide()
+function GameUISelenaQuestion:OnStarButtonClicked(isFinished)
+	if isFinished then
+		self:LeftButtonClicked()
+	else
+		self:LoadQuestionFromConfig()
+		self:GetQuestionLayer(self:GetCurrentQuestion()):show()
+		self.welcome_layer:hide()
+	end
 end
 
 function GameUISelenaQuestion:GetCurrentQuestion()

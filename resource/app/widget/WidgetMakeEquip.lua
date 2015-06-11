@@ -368,9 +368,7 @@ function WidgetMakeEquip:UpdateBuildLabel(queue)
     local is_enough = queue == 0
     -- self.normal_build_btn:setButtonEnabled(is_enough)
     local label = string.format(_("制造队列 %d/%d"), 1 - queue,1)
-    if label ~= self.build_label:getString() then
-        self.build_label:setString(label)
-    end
+    self.build_label:setString(label)
     self.build_label:setColor(is_enough and UIKit:hex2c3b(0x403c2f) or display.COLOR_RED)
     self.build_check_box:setButtonSelected(is_enough)
 end
@@ -379,9 +377,7 @@ function WidgetMakeEquip:UpdateCoin(coin)
     local equip_config = self.equip_config
     local need_coin = equip_config.coin
     local label = string.format( _("需要银币 %s/%s"),  GameUtils:formatNumber(coin),GameUtils:formatNumber(need_coin))
-    if self.coin_label:getString() ~= label then
-        self.coin_label:setString(label)
-    end
+    self.coin_label:setString(label)
     local is_enough = coin >= need_coin
     self.coin_label:setColor(is_enough and UIKit:hex2c3b(0x403c2f) or display.COLOR_RED)
     self.coin_check_box:setButtonSelected(is_enough)
@@ -390,9 +386,7 @@ end
 function WidgetMakeEquip:UpdateGemLabel()
     local equip_config = self.equip_config
     local gem_label = string.format("%d", DataUtils:buyResource({coin = equip_config.coin}, {}) + DataUtils:getGemByTimeInterval(equip_config.makeTime))
-    if self.gem_label:getString() ~= gem_label then
-        self.gem_label:setString(gem_label)
-    end
+    self.gem_label:setString(gem_label)
 end
 -- 更新buff加成
 function WidgetMakeEquip:UpdateBuffTime()
@@ -436,7 +430,7 @@ function WidgetMakeEquip:IsAbleToMakeEqui(isFinishNow)
         if not is_material_enough then
             break
         end
-        material_manager:IteratorDragonMaterialsByType(function (m_name,m_count)
+        material_manager:IteratorDragonMaterials(function (m_name,m_count)
             if m_name == v[1] then
                 if tonumber(v[2]) > m_count then
                     UIKit:showMessageDialog(_("提示"),_("材料不足"),function()end)

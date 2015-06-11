@@ -13,11 +13,17 @@ local User = import("..entity.User")
 local NotifyItem = import("..entity.NotifyItem")
 local CityScene = import(".CityScene")
 local MyCityScene = class("MyCityScene", CityScene)
+local GameUIActivityRewardNew = import("..ui.GameUIActivityRewardNew")
 local ipairs = ipairs
 
-function MyCityScene:ctor(...)
+function MyCityScene:ctor(city,isFromLogin)
     self.util_node = display.newNode():addTo(self)
-    MyCityScene.super.ctor(self, ...)
+    MyCityScene.super.ctor(self,city)
+    if type(isFromLogin) == 'boolean' then
+        self.isFromLogin = isFromLogin
+    else
+        self.isFromLogin = false
+    end
 end
 function MyCityScene:onEnter()
     MyCityScene.super.onEnter(self)
@@ -113,12 +119,12 @@ function MyCityScene:CreateSceneUILayer()
     -- end
     function scene_ui_layer:Schedule()
         display.newNode():addTo(self):schedule(function()
+            -- 检查缩放比
             if scene_layer:getScale() < (scene_layer:GetScaleRange()) * 1.3 then
                 if self.is_show == nil or self.is_show == true then
                     scene_layer:HideLevelUpNode()
                     scene_node:GetTopLayer():stopAllActions()
-                    transition.fadeTo(scene_node:GetTopLayer(), {
-                        opacity = 0,
+                    transition.fadeOut(scene_node:GetTopLayer(), {
                         time = 0.5,
                         onComplete = function()
                             scene_node:GetTopLayer():hide()
@@ -130,17 +136,14 @@ function MyCityScene:CreateSceneUILayer()
                 if self.is_show == nil or self.is_show == false then
                     scene_layer:ShowLevelUpNode()
                     scene_node:GetTopLayer():stopAllActions()
-                    transition.fadeTo(scene_node:GetTopLayer(), {
-                        opacity = 255,
+                    scene_node:GetTopLayer():show()
+                    transition.fadeIn(scene_node:GetTopLayer(), {
                         time = 0.5,
-                        onComplete = function()
-                            scene_node:GetTopLayer():show()
-                        end,
                     })
                     self.is_show = true
                 end
             end
-        end, 1)
+        end, 0.5)
         display.newNode():addTo(self):schedule(function()
             -- local building = self.building__
             -- if self.indicator and building then
@@ -214,9 +217,16 @@ function MyCityScene:onEnterTransitionFinish()
     MyCityScene.super.onEnterTransitionFinish(self)
     if ext.registereForRemoteNotifications then
         ext.registereForRemoteNotifications()
-    end
+    end 
+    app:sendPlayerLanguageCodeIf()
     app:sendApnIdIf()
-
+    if self.isFromLogin then
+        local isFinished_fte = DataManager:getUserData().countInfo.isFTEFinished
+        local not_buy_any_gems = DataManager:getUserData().countInfo.iapCount == 0 
+        if isFinished_fte and not_buy_any_gems then
+            UIKit:newGameUI("GameUIActivityRewardNew",GameUIActivityRewardNew.REWARD_TYPE.FIRST_IN_PURGURE):AddToScene(self, true)
+        end
+    end
     if Alliance_Manager:HasBeenJoinedAlliance() then
         return
     end
@@ -369,12 +379,12 @@ local ui_map = setmetatable({
     hunterHall     = {"GameUIMilitaryTechBuilding",           "tech",         },
     stable         = {"GameUIMilitaryTechBuilding",           "tech",         },
     workshop       = {"GameUIMilitaryTechBuilding",           "tech",         },
-    dwelling       = {"GameUIDwelling"            ,        "citizen",         },
+    dwelling       = {"GameUIDwelling"            ,        "upgrade",         },
     farmer         = {"GameUIResource"            ,},
     woodcutter     = {"GameUIResource"            ,},
     quarrier       = {"GameUIResource"            ,},
     miner          = {"GameUIResource"            ,},
-    wall           = {"GameUIWall"                ,       "military",         },
+    wall           = {"GameUIWall"                ,       "upgrade",         },
     tower          = {"GameUITower"               ,},
     airship        = {},
     FairGround     = {},
@@ -421,6 +431,7 @@ function MyCityScene:OpenUI(building, default_tab)
 end
 
 return MyCityScene
+
 
 
 

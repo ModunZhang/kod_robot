@@ -5,7 +5,6 @@
 local GameUILoginBeta = UIKit:createUIClass('GameUILoginBeta','GameUISplashBeta')
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local LOCAL_RESOURCES_PERCENT = 60
-local Localize = import("..utils.Localize")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 
 function GameUILoginBeta:ctor()
@@ -16,25 +15,33 @@ function GameUILoginBeta:ctor()
     self.m_totalSize = 0
     self.m_currentSize = 0
     self.local_resources = {
-		{image = "animations/dragon_animation_0.pvr.ccz",list = "animations/dragon_animation_0.plist"},
-		{image = "animations/dragon_animation_1.pvr.ccz",list = "animations/dragon_animation_1.plist"},
-		{image = "animations/dragon_animation_2.pvr.ccz",list = "animations/dragon_animation_2.plist"},
-		{image = "animations/dragon_animation_3.pvr.ccz",list = "animations/dragon_animation_3.plist"},
-		{image = "animations/dragon_animation_4.pvr.ccz",list = "animations/dragon_animation_4.plist"},
-		{image = "animations/dragon_animation_5.pvr.ccz",list = "animations/dragon_animation_5.plist"},
-		{image = "animations/dragon_animation_6.pvr.ccz",list = "animations/dragon_animation_6.plist"},
-		{image = "animations/soldiers_animation_0.pvr.ccz",list = "animations/soldiers_animation_0.plist"},
-		{image = "animations/soldiers_animation_1.pvr.ccz",list = "animations/soldiers_animation_1.plist"},
-		{image = "animations/soldiers_animation_2.pvr.ccz",list = "animations/soldiers_animation_2.plist"},
-		{image = "animations/soldiers_animation_3.pvr.ccz",list = "animations/soldiers_animation_3.plist"},
-		{image = "animations/ui_animation_0.pvr.ccz",list = "animations/ui_animation_0.plist"},
-        {image = "animations/ui_animation_1.pvr.ccz",list = "animations/ui_animation_1.plist"},
-        {image = "animations/heihua_animation_0.pvr.ccz",list = "animations/heihua_animation_0.plist"},
-        {image = "animations/heihua_animation_1.pvr.ccz",list = "animations/heihua_animation_1.plist"},
-        {image = "animations/heihua_animation_2.pvr.ccz",list = "animations/heihua_animation_2.plist"},
-        {image = "animations/region_animation_0.pvr.ccz",list = "animations/region_animation_0.plist"},
 		{image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
-		{image = "emoji.png",list = "emoji.plist"},
+        {image = "animations/dragon_animation_0.pvr.ccz",list = "animations/dragon_animation_0.plist"},
+        {image = "animations/dragon_animation_1.pvr.ccz",list = "animations/dragon_animation_1.plist"},
+        {image = "animations/dragon_animation_2.pvr.ccz",list = "animations/dragon_animation_2.plist"},
+        {image = "animations/dragon_animation_3.pvr.ccz",list = "animations/dragon_animation_3.plist"},
+        {image = "animations/dragon_animation_4.pvr.ccz",list = "animations/dragon_animation_4.plist"},
+        {image = "animations/dragon_animation_5.pvr.ccz",list = "animations/dragon_animation_5.plist"},
+        {image = "animations/dragon_animation_6.pvr.ccz",list = "animations/dragon_animation_6.plist"},
+        {image = "animations/soldiers_animation_0.pvr.ccz",list = "animations/soldiers_animation_0.plist"},
+        {image = "animations/soldiers_animation_1.pvr.ccz",list = "animations/soldiers_animation_1.plist"},
+        {image = "animations/soldiers_animation_2.pvr.ccz",list = "animations/soldiers_animation_2.plist"},
+        {image = "animations/soldiers_animation_3.pvr.ccz",list = "animations/soldiers_animation_3.plist"},
+        {image = "animations/ui_animation_0.pvr.ccz",list = "animations/ui_animation_0.plist"},
+        {image = "animations/ui_animation_1.pvr.ccz",list = "animations/ui_animation_1.plist"},
+        {image = "animations/ui_animation_2.pvr.ccz",list = "animations/ui_animation_2.plist"},
+        {image = "ui_png_bg.pvr.ccz",list = "ui_png_bg.plist"},
+        {image = "ui_png_button.pvr.ccz",list = "ui_png_button.plist"},
+        {image = "ui_png.pvr.ccz",list = "ui_png.plist"},
+        {image = "ui_pvr_0.pvr.ccz",list = "ui_pvr_0.plist"},
+        {image = "ui_pvr_1.pvr.ccz",list = "ui_pvr_1.plist"},
+		-- {image = "emoji.png",list = "emoji.plist"},
+
+        
+        -- {image = "animations/heihua_animation_0.pvr.ccz",list = "animations/heihua_animation_0.plist"},
+        -- {image = "animations/heihua_animation_1.pvr.ccz",list = "animations/heihua_animation_1.plist"},
+        -- {image = "animations/heihua_animation_2.pvr.ccz",list = "animations/heihua_animation_2.plist"},
+        -- {image = "animations/region_animation_0.pvr.ccz",list = "animations/region_animation_0.plist"},
 	}
 	self.local_resources_percent_per = LOCAL_RESOURCES_PERCENT / #self.local_resources
 end
@@ -83,11 +90,23 @@ function GameUILoginBeta:createProgressBar()
 end
 
 function GameUILoginBeta:createTips()
+    local LOGIN_TIPS = {
+        _("提示：预留一定的空闲城民，兵营将他们训练成士兵"),
+        _("登录提示帮助2"),
+        _("登录提示帮助3"),
+        _("登录提示帮助4"),
+        _("登录提示帮助5"),
+        _("登录提示帮助6"),
+        _("登录提示帮助7"),
+        _("登录提示帮助8"),
+        _("登录提示帮助9"),
+        _("登录提示帮助10"),
+    }
     math.randomseed(tostring(os.time()):reverse():sub(1, 6))
-    local random = math.random(1,#Localize.login_tips)
+    local random = math.random(1,#LOGIN_TIPS)
     local label = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = Localize.login_tips[random],
+        text = LOGIN_TIPS[random],
         font = UIKit:getFontFilePath(),
         size = 18,
         align = cc.TEXT_ALIGNMENT_CENTER,
@@ -140,6 +159,7 @@ function GameUILoginBeta:showVersion()
     if  CONFIG_IS_DEBUG or device.platform == 'mac' then
         local __debugVer = require("debug_version")
         self.verLabel:setString(string.format(_("版本%s(%s)"), ext.getAppVersion(), __debugVer))
+        app.client_tag = __debugVer
     else
         local jsonPath = cc.FileUtils:getInstance():fullPathForFilename("fileList.json")
         local file = io.open(jsonPath)
@@ -149,6 +169,7 @@ function GameUILoginBeta:showVersion()
         local tag = json.decode(jsonString).tag
         local version = string.format(_("版本%s(%s)"), ext.getAppVersion(), tag)
         self.verLabel:setString(version)
+        app.client_tag = tag
     end
 end
 
@@ -281,7 +302,7 @@ function GameUILoginBeta:login()
                 if GLOBAL_FTE then
                     app:EnterMyCityFteScene()
                 else
-                    app:EnterMyCityScene()
+                    app:EnterMyCityScene(true)
                 end
             end
         end, 0.3)
@@ -359,6 +380,7 @@ function GameUILoginBeta:getUpdateFileList()
             else
                 device.openURL(CONFIG_APP_URL[device.platform])
             end
+            self:loadServerJson()
         end)
         return
     end
@@ -376,6 +398,7 @@ function GameUILoginBeta:getUpdateFileList()
         for _, v in ipairs(updateFileList) do
             self.m_totalSize = self.m_totalSize + v.size
         end
+        dump(updateFileList,"updateFileList------>")
         self:downloadFiles(updateFileList)
     else
     	self:setProgressPercent(100)

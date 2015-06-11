@@ -114,7 +114,7 @@ function GameUIGacha:CreateGachaPool(layer)
         text = string.formatnumberthousands(city:GetResourceManager():GetCasinoTokenResource():GetValue()),
         size = 18,
         color = 0xffd200,
-    }):addTo(draw_thing_bg):align(display.CENTER,170,118)
+    }):addTo(draw_thing_bg):align(display.LEFT_CENTER,140,118)
 
     local gacha_boxes = {}
     if isSenior then
@@ -257,6 +257,14 @@ function GameUIGacha:CreateGachaPool(layer)
                             self.continuous_draw_items = nil
                             -- 恢复ui退出home_button
                             main:GetHomeButton():setButtonEnabled(true)
+
+                            -- 弹出评价
+                            if main.appraise then
+                                UIKit:showEvaluateDialog(function ()
+                                    app:GetGameDefautlt():setStringForKey("APPRAISE:"..User:Id(),"Evaluated")
+                                end)
+                            end
+                            main.appraise = false
                         end
                         award:setLocalZOrder(1)
                     end})
@@ -278,10 +286,12 @@ function GameUIGacha:CreateGachaPool(layer)
         main:GetHomeButton():setButtonEnabled(false)
         self.award =self.award or {} -- 抽到物品的图标和名字node,开启下次抽奖需移除
         local item_name = item[1]
-        print("item_name==",item_name)
-        dump(item,"StartLotteryDraw")
         self.current_gacha_item_count = item[2]
         self.current_gacha_item_name = item_name
+        -- 是否弹出评价
+        if app:GetGameDefautlt():getStringForKey("APPRAISE:"..User:Id()) ~= "Evaluated" and string.find(item_name,"gemClass") then
+            main.appraise = true
+        end
         layer:EnAbleButton(false)
         local terminal_point
         for i,item in ipairs(items) do
@@ -378,8 +388,8 @@ function GameUIGacha:GetLightLine(isSenior)
     local srpite_frame_2 = cc.SpriteFrame:create(img_2,cc.rect(0,0,w,h))
     local light_line = display.newSprite(img_1)
 
-    cc.SpriteFrameCache:getInstance():addSpriteFrame(srpite_frame_1,img_1)
-    cc.SpriteFrameCache:getInstance():addSpriteFrame(srpite_frame_2,img_2)
+    -- cc.SpriteFrameCache:getInstance():addSpriteFrame(srpite_frame_1,img_1)
+    -- cc.SpriteFrameCache:getInstance():addSpriteFrame(srpite_frame_2,img_2)
     local frames = display.newFrames(patten, 1, 2)
     local animation = display.newAnimation(frames, 0.2)
     light_line:playAnimationForever(animation)
@@ -404,7 +414,7 @@ function GameUIGacha:InitOrdinary()
     local line_1 = self:GetLightLine(false):align(display.TOP_CENTER, window.left+32, window.top-200):addTo(layer)
     local line_2 = self:GetLightLine(false):align(display.TOP_CENTER, window.right-31, window.top-200):addTo(layer)
 
-    local button = WidgetPushButton.new({normal = "green_btn_up_252x78.png",pressed = "green_btn_down_252x78.png"}
+    local button = WidgetPushButton.new({}
         ,{}
         ,{
             disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
@@ -443,22 +453,26 @@ function GameUIGacha:InitOrdinary()
                 end
             end
         end)
-        :align(display.CENTER, window.cx+5, window.bottom+150)
-        :addTo(layer)
+        
     -- 是否有免费抽奖次数
     if User:GetOddFreeNormalGachaCount()>0 then
         button:setButtonLabel(UIKit:commonButtonLable({
             text = _("免费抽奖"),
-            size = 24
+            size = 22
         }))
             :setButtonLabelOffset(0,0)
 
-        local btn_images = {normal = "green_btn_up_252x77.png",
-            pressed = "green_btn_down_252x77.png"
+        local btn_images = {normal = "purple_btn_up_252x78.png",
+            pressed = "purple_btn_down_252x78.png"
         }
         button:setButtonImage(cc.ui.UIPushButton.NORMAL, btn_images["normal"], true)
         button:setButtonImage(cc.ui.UIPushButton.PRESSED, btn_images["pressed"], true)
     else
+        local btn_images = {normal = "yellow_btn_up_252x78.png",
+            pressed = "yellow_btn_down_252x78.png"
+        }
+        button:setButtonImage(cc.ui.UIPushButton.NORMAL, btn_images["normal"], true)
+        button:setButtonImage(cc.ui.UIPushButton.PRESSED, btn_images["pressed"], true)
         button:setButtonLabel(UIKit:commonButtonLable({
             text = _("开始抽奖")
         }))
@@ -472,7 +486,8 @@ function GameUIGacha:InitOrdinary()
             color = 0xffd200,
         }):addTo(button,1,112):align(display.CENTER,0,-12)
     end
-
+    button:align(display.CENTER, window.cx+5, window.bottom+150)
+        :addTo(layer)
     self.normal_gacha_button = button
     function layer:EnAbleButton(enabled)
         button:setButtonEnabled(enabled)
@@ -571,12 +586,11 @@ function GameUIGacha:OnCountInfoChanged()
         local button = self.normal_gacha_button
         button:setButtonLabel(UIKit:commonButtonLable({
             text = _("免费抽奖"),
-            size = 24
+            size = 22
         })):setButtonLabelOffset(0,0)
 
-        local btn_images = {normal = "green_btn_up_252x77.png",
-            pressed = "green_btn_down_252x77.png",
-            disabled = "grey_btn_252x77.png",
+        local btn_images = {normal = "purple_btn_up_252x78.png",
+            pressed = "purple_btn_down_252x78.png",
         }
         button:setButtonImage(cc.ui.UIPushButton.NORMAL, btn_images["normal"], true)
         button:setButtonImage(cc.ui.UIPushButton.PRESSED, btn_images["pressed"], true)
@@ -585,11 +599,11 @@ function GameUIGacha:OnCountInfoChanged()
         local button = self.normal_gacha_button
         button:setButtonLabel(UIKit:commonButtonLable({
             text = _("开始抽奖"),
-            size = 20
+            size = 22
         })):setButtonLabelOffset(0,20)
 
-        local btn_images = {normal = "green_btn_up_252x78.png",
-            pressed = "green_btn_down_252x78.png",
+        local btn_images = {normal = "yellow_btn_up_252x78.png",
+            pressed = "yellow_btn_down_252x78.png",
             disabled = "grey_btn_252x78.png",
         }
         button:setButtonImage(cc.ui.UIPushButton.NORMAL, btn_images["normal"], true)

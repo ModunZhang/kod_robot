@@ -19,6 +19,7 @@ local Localize_item = import("..utils.Localize_item")
 local Localize = import("..utils.Localize")
 local UILib = import(".UILib")
 local Localize_item = import("..utils.Localize_item")
+local fire_wall = import("..particles.fire_wall")
 
 local height_config = {
     EVERY_DAY_LOGIN = 762,
@@ -73,8 +74,8 @@ end
 function GameUIActivityRewardNew:RefreshUI()
     if self:GetRewardType() == self.REWARD_TYPE.EVERY_DAY_LOGIN then
         local countInfo = User:GetCountInfo()
-        local flag = countInfo.day60 % 30
-        local geted = countInfo.day60RewardsCount % 30 -- <= geted
+        local flag = countInfo.day60 % 30 == 0 and 30 or countInfo.day60 % 30
+        local geted = countInfo.day60RewardsCount % 30 == 0 and 30 or countInfo.day60RewardsCount % 30 -- <= geted
         for i,button in ipairs(self.rewards_buttons) do
             if i > flag then -- other day
                 button.check_bg:hide()
@@ -181,6 +182,7 @@ function GameUIActivityRewardNew:GetDay60Reward()
     if self:GetPageOfDay60() == 2 then
         config_data = LuaUtils:table_slice(config_day60,30,60)
     else
+        print("GetDay60Reward---->1")
         config_data =  LuaUtils:table_slice(config_day60,1,30)
     end
     local final_data = LuaUtils:table_map(config_data,function(k,v)
@@ -193,8 +195,9 @@ end
 function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
     self.rewards_buttons = {}
     local rewards = self:GetDay60Reward()
-    local flag = User:GetCountInfo().day60 % 30
-    local geted = User:GetCountInfo().day60RewardsCount % 30 -- <= geted
+    local flag = User:GetCountInfo().day60 % 30 == 0 and 30 or User:GetCountInfo().day60 % 30
+    local geted = User:GetCountInfo().day60RewardsCount % 30 == 0 and 30 or User:GetCountInfo().day60RewardsCount % 30  -- <= geted
+    local auto_get_reward = 0
     UIKit:ttfLabel({
         text = _("领取30日奖励后，刷新奖励列表"),
         size = 20,
@@ -215,7 +218,7 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
             :scale(110/118)
         UIKit:addTipsToNode(button,Localize_item.item_name[rewards[i].reward],self)
         table.insert(self.rewards_buttons,button)
-        local enable = display.newSprite(UILib.item[rewards[i].reward], 55, -54, {class=cc.FilteredSpriteWithOne}):addTo(button)
+        local enable = display.newSprite(UILib.item[rewards[i].reward], 59, -59, {class=cc.FilteredSpriteWithOne}):addTo(button)
         local size = enable:getContentSize()
         enable:scale(90/math.max(size.width,size.height))
         local check_bg = display.newSprite("activity_check_bg_55x51.png"):align(display.RIGHT_BOTTOM,105,-105):addTo(button,2):scale(34/55)
@@ -226,10 +229,12 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
             check_bg:hide()
             enable:clearFilter()
         else
+
             if flag == i then
-                if flag > geted then -- can
+                if flag > geted or (geted == 30 and flag == 1) then -- can
                     check_bg:hide()
                     enable:clearFilter()
+                    auto_get_reward = i
                 else
                     check_bg:show()
                     if not enable:getFilter() then
@@ -255,13 +260,16 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
             y = y - 108
         end
     end
+    if auto_get_reward ~= 0 then
+        self:On_EVERY_DAY_LOGIN_GetReward(auto_get_reward,rewards[auto_get_reward])
+    end
 end
 
 
 function GameUIActivityRewardNew:On_EVERY_DAY_LOGIN_GetReward(index,reward)
     local countInfo = User:GetCountInfo()
-    local real_index = countInfo.day60 % 30
-    if countInfo.day60 > countInfo.day60RewardsCount and real_index == index then
+    local real_index = countInfo.day60 % 30 == 0 and 30 or countInfo.day60 % 30
+    if (countInfo.day60 > countInfo.day60RewardsCount and real_index == index) or (countInfo.day60RewardsCount > countInfo.day60 and real_index == index) then
         NetManager:getDay60RewardPromise():done(function()
             GameGlobalUI:showTips(_("提示"),string.format(_("恭喜您获得 %s x %d"),Localize_item.item_name[reward.reward],reward.count))
             app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
@@ -345,7 +353,7 @@ function GameUIActivityRewardNew:GetContinutyListItem(reward_type,item_key,time_
         height= 116
     })
     local item_bg = display.newSprite("box_118x118.png"):align(display.LEFT_CENTER, 5, 58):addTo(content):scale(110/118)
-    local sp = display.newSprite(UIKit:GetItemImage(reward_type,item_key), 55,54, {class=cc.FilteredSpriteWithOne}):addTo(item_bg)
+    local sp = display.newSprite(UIKit:GetItemImage(reward_type,item_key), 59,59, {class=cc.FilteredSpriteWithOne}):addTo(item_bg)
     local size = sp:getContentSize()
     sp:scale(90/math.max(size.width,size.height))
     local check_bg = display.newSprite("activity_check_bg_55x51.png"):align(display.RIGHT_BOTTOM,110,0):addTo(item_bg):scale(34/55)
@@ -477,10 +485,10 @@ function GameUIActivityRewardNew:GetRewardName(reward_type,reward_key)
 end
 -----------------------
 function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
-    local bar = display.newSprite("activity_first_purgure_587x176.jpg"):align(display.TOP_CENTER, 304,self.height - 15):addTo(self.bg)
+    local bar = display.newSprite("activity_first_purgure_588x176.jpg"):align(display.TOP_CENTER, 304,self.height - 15):addTo(self.bg)
     local bg = display.newSprite("selenaquestion_bg_580x536.png"):addTo(self.bg):align(display.TOP_CENTER, 304, self.height - 15 - 176):scale(587/580)
     display.newSprite("Npc.png"):align(display.RIGHT_BOTTOM, 315, -10):addTo(self.bg):scale(552/423)
-    local reward_bg = display.newScale9Sprite("activity_day_bg_104x34.png",0,0,cc.size(290,560),cc.rect(10,10,84,14)):align(display.LEFT_BOTTOM, 260, 14):addTo(bg)
+    local reward_bg = display.newScale9Sprite("activity_day_bg_104x34.png",0,0,cc.size(290,510),cc.rect(10,10,84,14)):align(display.LEFT_BOTTOM, 260, 14):addTo(bg)
     local countInfo = User:GetCountInfo()
     local rewards = self:GetFirstPurgureRewards()
     local x,y = 20,500
@@ -488,13 +496,13 @@ function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
         :setButtonLabel("normal", UIKit:commonButtonLable({
             text = _("领取")
         }))
-        :addTo(reward_bg)
+        :addTo(reward_bg,1)
         :pos(145,58)
-    self.go_store_button = WidgetPushButton.new({normal = 'green_btn_up_186x66.png',pressed = 'green_btn_down_186x66.png'})
+    self.go_store_button = WidgetPushButton.new({normal = 'yellow_btn_up_186x66.png',pressed = 'yellow_btn_down_186x66.png'})
         :setButtonLabel("normal", UIKit:commonButtonLable({
             text = _("前往充值")
         }))
-        :addTo(reward_bg)
+        :addTo(reward_bg,1)
         :pos(145,58)
         :onButtonClicked(function()
             UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
@@ -505,7 +513,7 @@ function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
             local reward_type,reward_name,count = unpack(reward)
             table.insert(tips_list, Localize_item.item_name[reward_name] .. " x" .. count)
             local item_bg = display.newSprite("box_118x118.png"):align(display.LEFT_TOP, x, y):addTo(reward_bg):scale(110/118)
-            local sp = display.newSprite(UIKit:GetItemImage(reward_type,reward_name),55,54):addTo(item_bg)
+            local sp = display.newSprite(UIKit:GetItemImage(reward_type,reward_name),59,59):addTo(item_bg)
             local size = sp:getContentSize()
             sp:scale(90/math.max(size.width,size.height))
             UIKit:addTipsToNode(sp,Localize_item.item_name[reward_name] .. " x" .. count,self)
@@ -519,6 +527,10 @@ function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
     local tips_str = table.concat(tips_list, ",")
     self.purgure_get_button:onButtonClicked(function()
         NetManager:getFirstIAPRewardsPromise():done(function()
+            if iskindof(display.getRunningScene(), "MyCityScene") then
+                display.getRunningScene():GetHomePage().event_tab:RefreshBuildQueueByType("build")
+            end
+
             GameGlobalUI:showTips(_("提示"),tips_str)
             app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
             self:LeftButtonClicked()
@@ -687,7 +699,7 @@ function GameUIActivityRewardNew:GetRewardLevelUpItem(index,title,rewards,flag)
         local reward_type,reward_name,count = unpack(v)
         table.insert(reward_list, Localize_item.item_name[reward_name] .. " x" .. count)
         local item_bg = display.newSprite("box_118x118.png"):align(display.LEFT_CENTER, x, 52):addTo(content):scale(94/118)
-        local sp = display.newSprite(UIKit:GetItemImage(reward_type,reward_name),55,54):addTo(item_bg)
+        local sp = display.newSprite(UIKit:GetItemImage(reward_type,reward_name),59,59):addTo(item_bg)
         local size = sp:getContentSize()
         sp:scale(90/math.max(size.width,size.height))
         UIKit:addTipsToNode(sp,Localize_item.item_name[reward_name] .. " x" .. count,self)
@@ -764,7 +776,7 @@ function GameUIActivityRewardNew:GetOnLineItem(reward_type,item_key,time_str,rew
     })
     local item_bg = display.newSprite("box_118x118.png"):align(display.LEFT_CENTER, 5, 58):addTo(content):scale(110/118)
     local image = UIKit:GetItemImage(reward_type,item_key)
-    local sp = display.newSprite(image, 55,54, {class=cc.FilteredSpriteWithOne}):addTo(item_bg)
+    local sp = display.newSprite(image, 59,59, {class=cc.FilteredSpriteWithOne}):addTo(item_bg)
     local size = sp:getContentSize()
     sp:scale(90/math.max(size.width,size.height))
     UIKit:addTipsToNode(sp,rewards,self)

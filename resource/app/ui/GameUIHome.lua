@@ -1,6 +1,7 @@
 local cocos_promise = import("..utils.cocos_promise")
 local promise = import("..utils.promise")
 local window = import("..utils.window")
+local WidgetLight = import("..widget.WidgetLight")
 local WidgetChat = import("..widget.WidgetChat")
 local WidgetNumberTips = import("..widget.WidgetNumberTips")
 local WidgetHomeBottom = import("..widget.WidgetHomeBottom")
@@ -16,7 +17,12 @@ local ResourceManager = import("..entity.ResourceManager")
 local GrowUpTaskManager = import("..entity.GrowUpTaskManager")
 local GameUIHome = UIKit:createUIClass('GameUIHome')
 local WidgetAutoOrderAwardButton = import("..widget.WidgetAutoOrderAwardButton")
-local Alliance_Manager = Alliance_Manager
+local WidgetAutoOrderGachaButton = import("..widget.WidgetAutoOrderGachaButton")
+local WidgetAutoOrderBuffButton = import("..widget.WidgetAutoOrderBuffButton")
+local light_gem = import("..particles.light_gem")
+local fire_var = import("app.particles.fire_var")
+
+
 
 local app = app
 local timer = app.timer
@@ -157,11 +163,14 @@ function GameUIHome:AddOrRemoveListener(isAdd)
         my_allaince:AddListenOnType(self, Alliance.LISTEN_TYPE.BASIC)
         my_allaince:AddListenOnType(self, Alliance.LISTEN_TYPE.HELP_EVENTS)
         my_allaince:AddListenOnType(self, Alliance.LISTEN_TYPE.ALL_HELP_EVENTS)
+        my_allaince:AddListenOnType(self, Alliance.LISTEN_TYPE.OPERATION)
         user:AddListenOnType(self, user.LISTEN_TYPE.BASIC)
         user:AddListenOnType(self, user.LISTEN_TYPE.TASK)
         user:AddListenOnType(self, user.LISTEN_TYPE.VIP_EVENT_ACTIVE)
         user:AddListenOnType(self, user.LISTEN_TYPE.VIP_EVENT_OVER)
         user:AddListenOnType(self, user.LISTEN_TYPE.COUNT_INFO)
+        user:AddListenOnType(self, user.LISTEN_TYPE.IAP_GIFTS_REFRESH)
+        user:AddListenOnType(self, user.LISTEN_TYPE.IAP_GIFTS_CHANGE)
         alliance_belvedere:AddListenOnType(self, alliance_belvedere.LISTEN_TYPE.OnMarchDataChanged)
         alliance_belvedere:AddListenOnType(self, alliance_belvedere.LISTEN_TYPE.OnCommingDataChanged)
     else
@@ -173,11 +182,14 @@ function GameUIHome:AddOrRemoveListener(isAdd)
         my_allaince:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.BASIC)
         my_allaince:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.HELP_EVENTS)
         my_allaince:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.ALL_HELP_EVENTS)
+        my_allaince:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.OPERATION)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.BASIC)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.TASK)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.VIP_EVENT_ACTIVE)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.VIP_EVENT_OVER)
         user:RemoveListenerOnType(self, user.LISTEN_TYPE.COUNT_INFO)
+        user:RemoveListenerOnType(self, user.LISTEN_TYPE.IAP_GIFTS_REFRESH)
+        user:RemoveListenerOnType(self, user.LISTEN_TYPE.IAP_GIFTS_CHANGE)
         alliance_belvedere:RemoveListenerOnType(self, alliance_belvedere.LISTEN_TYPE.OnMarchDataChanged)
         alliance_belvedere:RemoveListenerOnType(self, alliance_belvedere.LISTEN_TYPE.OnCommingDataChanged)
     end
@@ -252,7 +264,7 @@ function GameUIHome:CreateTop()
 
     -- 玩家战斗值文字
     UIKit:ttfLabel({
-        text = _("战斗值："),
+        text = _("战斗力："),
         size = 14,
         color = 0x9a946b,
         shadow = true
@@ -348,13 +360,16 @@ function GameUIHome:CreateTop()
 
 
     -- 金龙币按钮
+
     local button = cc.ui.UIPushButton.new(
         {normal = "gem_btn_up_196x68.png", pressed = "gem_btn_down_196x68.png"},
         {scale9 = false}
     ):onButtonClicked(function(event)
         UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
     end):addTo(top_bg):pos(top_bg:getContentSize().width - 155, -16)
-    display.newSprite("gem_icon_62x61.png"):addTo(button):pos(60, 3)
+    local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(button):pos(60, 3)
+    light_gem():addTo(gem_icon, 1022):pos(62/2, 61/2)
+
     self.gem_label = UIKit:ttfLabel({
         size = 20,
         color = 0xffd200,
@@ -388,12 +403,13 @@ function GameUIHome:CreateTop()
         color = UIKit:hex2c3b(0xfffeb3)})
         :addTo(quest_bar_bg):align(display.LEFT_CENTER, -120, 0)
 
-    local left_order =  WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM,20):addTo(self):pos(display.left+40, display.top-200)
+    local left_order =  WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM,50):addTo(self):pos(display.left+40, display.top-200)
     -- 活动按钮
     local button = cc.ui.UIPushButton.new(
         {normal = "tips_66x64.png", pressed = "tips_66x64.png"},
         {scale9 = false}
     )
+    WidgetLight.new():addTo(button, -1001):scale(0.6)
     button:onButtonClicked(function(event)
         if event.name == "CLICKED_EVENT" then
             UIKit:newGameUI("GameUIActivityNew",self.city):AddToCurrentScene(true)
@@ -403,29 +419,21 @@ function GameUIHome:CreateTop()
         return true
     end
     function button:GetElementSize()
-        return button:getCascadeBoundingBox().size
+        return {width = 66,height = 64}
     end
     left_order:AddElement(button)
+    button.tips_button_count = WidgetNumberTips.new():addTo(button):pos(20,-20)
+    button.tips_button_count:SetNumber(LuaUtils:table_size(User:GetIapGifts()))
+    self.tips_button = button
     --在线活动
     local activity_button = WidgetAutoOrderAwardButton.new(self)
-
     left_order:AddElement(activity_button)
     left_order:RefreshOrder()
-    local order = WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM,20):addTo(self):pos(display.right-50, display.top-200)
+
+
+    local order = WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM,50):addTo(self):pos(display.right-50, display.top-200)
     -- BUFF按钮
-    local buff_button = cc.ui.UIPushButton.new(
-        {normal = "buff_68x68.png", pressed = "buff_68x68.png"}
-    ):onButtonClicked(function(event)
-        if event.name == "CLICKED_EVENT" then
-            UIKit:newGameUI("GameUIBuff",self.city):AddToCurrentScene(true)
-        end
-    end)
-    function buff_button:CheckVisible()
-        return true
-    end
-    function buff_button:GetElementSize()
-        return buff_button:getCascadeBoundingBox().size
-    end
+    local buff_button = WidgetAutoOrderBuffButton.new(self)
     order:AddElement(buff_button)
 
     -- 协助加速按钮
@@ -454,9 +462,15 @@ function GameUIHome:CreateTop()
     end
     order:AddElement(help_button)
 
+    -- gacha button
+    local gacha_button = WidgetAutoOrderGachaButton.new(self)
+    order:AddElement(gacha_button)
+
     order:RefreshOrder()
     self.top_order_group = order
     self.left_order_group = left_order
+
+
 
     --联盟提示按钮
     self.join_alliance_tips_button = cc.ui.UIPushButton.new({normal = 'alliance_join_tips_79x83.png'}):pos(display.left+40, display.top-600):addTo(self)
@@ -464,6 +478,9 @@ function GameUIHome:CreateTop()
             UIKit:newGameUI("GameUIAllianceJoinTips"):AddToCurrentScene(true)
         end)
     self.join_alliance_tips_button:setVisible(not User:GetCountInfo().firstJoinAllianceRewardGeted)
+    if self.join_alliance_tips_button:isVisible() then
+        fire_var():addTo(self.join_alliance_tips_button, -1000, 321)
+    end
     --瞭望塔事件按钮
     local alliance_belvedere_button = cc.ui.UIPushButton.new({normal = 'fight_62x70.png'}):pos(display.right-50, display.top-600):addTo(self)
     alliance_belvedere_button.alliance_belvedere_events_count = WidgetNumberTips.new():addTo(alliance_belvedere_button):pos(20,-20)
@@ -492,6 +509,26 @@ function GameUIHome:CreateTop()
     end
 
     return top_bg
+end
+
+function GameUIHome:CheckFinishAllActivity()
+
+end
+
+function GameUIHome:CheckAllianceRewardCount()
+    if not self.tips_button then return end
+    local count = LuaUtils:table_size(User:GetIapGifts())
+    print("CheckAllianceRewardCount----->",count)
+    self.tips_button.tips_button_count:SetNumber(count)
+end
+
+
+function GameUIHome:OnIapGiftsRefresh()
+    self:CheckAllianceRewardCount()
+end
+
+function GameUIHome:OnIapGiftsChanged(changed_map)
+    self:CheckAllianceRewardCount()
 end
 
 function GameUIHome:OnMarchDataChanged()
@@ -526,10 +563,17 @@ function GameUIHome:CreateBottom()
     return bottom_bg
 end
 function GameUIHome:OnVipEventActive( vip_event )
+    self.top_order_group:RefreshOrder()
     self:RefreshVIP()
 end
 function GameUIHome:OnVipEventOver( vip_event )
+    self.top_order_group:RefreshOrder()
     self:RefreshVIP()
+end
+function GameUIHome:OnOperation(alliance,operation_type)
+    if operation_type == "quit" then
+        self.top_order_group:RefreshOrder()
+    end
 end
 function GameUIHome:RefreshExp()
     local current_level = User:GetPlayerLevelByExp(User:LevelExp())
@@ -542,7 +586,7 @@ function GameUIHome:RefreshVIP()
     vip_btn:setButtonImage(cc.ui.UIPushButton.PRESSED, vip_btn_img, true)
     local vip_level = self.vip_level
     vip_level:removeAllChildren()
-    local level_img = display.newSprite(string.format("VIP_%d_46x32.png", User:GetVipLevel()),0,0,{class=cc.FilteredSpriteWithOne}):addTo(vip_level)
+    local level_img = display.newSprite(string.format("VIP_%d_46x32.png", User:GetVipLevel()),5,0,{class=cc.FilteredSpriteWithOne}):addTo(vip_level)
     if not User:IsVIPActived() then
         local my_filter = filter
         local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
@@ -592,13 +636,13 @@ local icon_map = {
     stone = "res_stone_88x82.png",
     citizen = "res_citizen_88x82.png",
 }
-function GameUIHome:ShowResourceAni(resource, wp)
+function GameUIHome:ShowResourceAni(resource)
     local pnt = self.top
     pnt:removeChildByTag(RES_ICON_TAG[resource])
 
     local s1 = self.res_icon_map[resource]:getContentSize()
     local tp = pnt:convertToNodeSpace(self.res_icon_map[resource]:convertToWorldSpace(cc.p(s1.width/2,s1.height/2)))
-    local lp = pnt:convertToNodeSpace(wp)
+    local lp = pnt:convertToNodeSpace(cc.p(display.cx, display.cy))
 
     local x,y,tx,ty = lp.x,lp.y,tp.x, tp.y
     local icon = display.newSprite(icon_map[resource])
@@ -782,7 +826,12 @@ function GameUIHome:PromiseOfActivePromise()
 end
 function GameUIHome:OnCountInfoChanged()
     self.join_alliance_tips_button:setVisible(not User:GetCountInfo().firstJoinAllianceRewardGeted)
+    if self.join_alliance_tips_button:getChildByTag(321) and
+        User:GetCountInfo().firstJoinAllianceRewardGeted then
+        self.join_alliance_tips_button:removeChildByTag(321)
+    end
     self.left_order_group:RefreshOrder()
+    self.top_order_group:RefreshOrder()
 end
 function GameUIHome:PromiseOfFteAlliance()
     self.bottom:TipsOnAlliance()
@@ -800,6 +849,7 @@ end
 
 
 return GameUIHome
+
 
 
 

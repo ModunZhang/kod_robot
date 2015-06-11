@@ -419,9 +419,12 @@ function Dragon:GetWeight()
 	end
 end
 
-function Dragon:TotalStrength()
+
+local intInit = GameDatas.PlayerInitData.intInit
+function Dragon:TotalStrength(terrain)
 	local strength = self:Strength()
-	local buff = self:__getDragonStrengthBuff()
+	local terrainBuff = self:GetTerrain() == terrain and (intInit.dragonStrengthTerrainAddPercent.value / 100) or 0
+	local buff = self:__getDragonStrengthBuff() + terrainBuff
 	strength = strength + math.floor(strength * buff)
 	for __,equipment in pairs(self:Equipments()) do
 		if equipment:IsLoaded() then

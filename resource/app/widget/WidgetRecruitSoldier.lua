@@ -28,7 +28,7 @@ local soldier_vs = GameDatas.ClientInitGame.soldier_vs
 local function return_vs_soldiers_map(soldier_name)
     local strong_vs = {}
     local weak_vs = {}
-    for k, v in pairs(soldier_vs[GameUtils:GetSoldierTypeByName(soldier_name)]) do
+    for k, v in pairs(soldier_vs[DataUtils:GetSoldierTypeByName(soldier_name)]) do
         if v == "strong" then
             table.insert(strong_vs, k)
         elseif v == "weak" then
@@ -267,7 +267,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
         if ok then
             re_string = _("招募开启中")
         else
-            re_string = string.format( _("下一次开启招募:%s"), GameUtils:formatTimeStyle1(time-app.timer:GetServerTime()) )
+            re_string = string.format( _("下一次开启招募:%s"), GameUtils:formatTimeStyle1(time))
         end
         self.re_status = UIKit:ttfLabel({
             text = re_string,
@@ -283,12 +283,7 @@ end
 function WidgetRecruitSoldier:AddButtons()
     local back_ground = self.back_ground
     local size = back_ground:getContentSize()
-    local instant_button = WidgetPushButton.new(
-        {normal = "green_btn_up_250x66.png",pressed = "green_btn_down_250x66.png"}
-        ,{}
-        ,{
-            disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
-        })
+    local instant_button = cc.ui.UIPushButton.new({normal = "green_btn_up_250x66.png",pressed = "green_btn_down_250x66.png"})
         :addTo(back_ground, 2)
         :align(display.CENTER, 160, 110)
         :setButtonLabel(UIKit:ttfLabel({
@@ -315,6 +310,7 @@ function WidgetRecruitSoldier:AddButtons()
                 local not_enough_material = self:CheckMaterials(self.count)
                 if not_enough_material then
                     UIKit:showMessageDialog(_("招募材料不足"),_("您当前没有足够材料"))
+                    return
                 else
                     NetManager:getInstantRecruitSpecialSoldierPromise(self.soldier_name, self.count)
                 end
@@ -460,7 +456,7 @@ function WidgetRecruitSoldier:OnTimer(current_time)
         if ok then
             self.re_status:setString(_("招募开启中"))
         else
-            self.re_status:setString(_("下一次开启招募:")..GameUtils:formatTimeStyle1(time-current_time))
+            self.re_status:setString(_("下一次开启招募:")..GameUtils:formatTimeStyle1(time))
         end
     end
 end
@@ -690,7 +686,7 @@ function WidgetRecruitSoldier:PormiseOfFte()
 
         if iskindof(display.getRunningScene(), "CityScene") then
             display.getRunningScene():GetSceneLayer()
-            :MoveBarracksSoldiers(self.soldier_name)
+            :MoveBarracksSoldiers(self.soldier_name, true)
         end
         
         mockData.InstantRecruitSoldier(self.soldier_name, self.count)
@@ -726,7 +722,7 @@ function WidgetRecruitSoldier:PromiseOfFteSpecial()
 
         if iskindof(display.getRunningScene(), "CityScene") then
             display.getRunningScene():GetSceneLayer()
-            :MoveBarracksSoldiers(self.soldier_name)
+            :MoveBarracksSoldiers(self.soldier_name, true)
         end
 
         

@@ -115,7 +115,7 @@ function GameUIWall:CreateMilitaryUIIf()
     	shadow = true,
    	}):align(display.LEFT_CENTER, iconbg:getPositionX()+iconbg:getContentSize().width+10,20):addTo(progressTimer_bg)
  	self.dragon_hp_recovery_label = UIKit:ttfLabel({
- 		 text = self:GetDragonHPRecoveryStr(),
+ 		 text = self:GetDragonHPRecoveryStr(dragon),
  		 color = 0xfff3c7,
  		 shadow = true,
  		 size = 22,
@@ -227,9 +227,10 @@ function GameUIWall:GetDefenceDragonBuffDesc()
 	return string.format(_("选择%s会获得战斗力加成"),Localize.dragon[User:GetBestDragon()])
 end
 
-function GameUIWall:GetDragonHPRecoveryStr()
+function GameUIWall:GetDragonHPRecoveryStr(dragon)
+	if not dragon then return 0 end
 	local dragonEyrie = City:GetDragonEyrie()
-	return "+" .. dragonEyrie:GetHPRecoveryPerHour() .. "/h"
+	return "+" .. dragonEyrie:GetTotalHPRecoveryPerHour(dragon:Type()) .. "/h"
 end
 
 function GameUIWall:OnDragonHpItemUseButtonClicked()
@@ -357,6 +358,7 @@ function GameUIWall:RefreshUIAfterSelectDragon(dragon)
 		self.tips_label:hide()
 		self.progressTimer_bg:show()
 		self.hp_label:setString(dragon:Hp() .. "/" .. dragon:GetMaxHP())
+		self.dragon_hp_recovery_label:setString(self:GetDragonHPRecoveryStr(dragon))
 		self.hp_label:show()
 		self.dragon_hp_progress:setPercentage(dragon:Hp()/dragon:GetMaxHP()*100)
 		self.dragon_head:setTexture(UILib.dragon_head[dragon:Type()])

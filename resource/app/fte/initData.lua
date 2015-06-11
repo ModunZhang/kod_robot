@@ -337,6 +337,7 @@ return {
         todayLoyaltyGet = 0,
         todayOnLineTime = 0,
         isFirstIAPRewardsGeted = false,
+        firstJoinAllianceRewardGeted = true,
         vipLoginDaysCount = 1,
         todayFreeNormalGachaCount = 0,
         levelupRewards = { },
@@ -346,7 +347,7 @@ return {
         day14 = 1,
         day60RewardsCount = 0,
         lastLoginTime = 1431067838640,
-        registerTime = 1431067835010
+        registerTime = 1431067835010,
     },
     buildings = {
         location_19 = {
@@ -796,7 +797,7 @@ return {
         stone = 25000,
         coin = 50000,
         iron = 25000,
-        gem = 2000,
+        gem = 1000,
         citizen = 100,
         refreshTime = 1431067835010
     },

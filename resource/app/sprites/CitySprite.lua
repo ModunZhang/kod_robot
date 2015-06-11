@@ -1,15 +1,19 @@
 local UILib = import("..ui.UILib")
 local Sprite = import(".Sprite")
 local fire = import("..particles.fire")
+local smoke_city = import("..particles.smoke_city")
 local SpriteConfig = import(".SpriteConfig")
 local CitySprite = class("CitySprite", Sprite)
+
+
+local timer = app.timer
 function CitySprite:ctor(city_layer, entity, is_my_alliance)
     self:setNodeEventEnabled(true)
     self.is_my_alliance = is_my_alliance
     local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
     CitySprite.super.ctor(self, city_layer, entity, x, y)
 
-    self:CheckProtected()
+    self:CheckStatus()
 end
 function CitySprite:onExit()
     if self.info then
@@ -17,28 +21,36 @@ function CitySprite:onExit()
     end
 end
 function CitySprite:GetSpriteFile()
+    return self:GetConfig().png
+end
+function CitySprite:GetConfig()
     local config
     if self.is_my_alliance then
         config = SpriteConfig["my_keep"]
     else
         config = SpriteConfig["other_keep"]
     end
-    return config:GetConfigByLevel(self:GetEntity():GetAllianceMemberInfo():KeepLevel()).png
+    return config:GetConfigByLevel(self:GetEntity():GetAllianceMemberInfo():KeepLevel())
 end
 function CitySprite:GetSpriteOffset()
     return self:GetLogicMap():ConvertToLocalPosition(0, 0)
 end
 function CitySprite:RefreshSprite()
     CitySprite.super.RefreshSprite(self)
+    self.sprite:setAnchorPoint(self:GetConfig().offset.anchorPoint)
+
+
     if self.info then
         self.info:removeFromParent()
         self.info = nil
     end
 
-    local map_layer = self:GetMapLayer()
     local lx,ly = self:GetEntity():GetLogicPosition()
+    local map_layer = self:GetMapLayer()
+    local logic_map = map_layer:GetLogicMap()
     local x,y = map_layer:GetLogicMap():ConvertToMapPosition(lx,ly)
-    self.info = display.newNode():addTo(map_layer:GetInfoNode()):pos(x, y - 50):scale(0.8):zorder(x * y)
+    local w,h = logic_map:GetSize()
+    self.info = display.newNode():addTo(map_layer:GetInfoNode()):pos(x, y - 50):scale(0.8):zorder(x * lx + ly)
 
     self.banner = display.newSprite("city_banner.png"):addTo(self.info):align(display.CENTER_TOP)
     self.level = UIKit:ttfLabel({
@@ -52,7 +64,8 @@ function CitySprite:RefreshSprite()
     self:RefreshInfo()
 end
 
-local FIRE_TAG = 119
+local FIRE_TAG = 11900
+local SMOKE_TAG = 12000
 function CitySprite:RefreshInfo()
     local entity = self:GetEntity()
     local info = entity:GetAllianceMemberInfo()
@@ -61,17 +74,33 @@ function CitySprite:RefreshInfo()
     self.level:setString(info:KeepLevel())
     self.name:setString(string.format("[%s]%s", entity:GetAlliance():Tag(), info:Name()))
 
-
-    self:CheckProtected()
+    self:CheckStatus()
 end
-function CitySprite:CheckProtected()
-    local is_protected = self:GetEntity():GetAllianceMemberInfo():IsProtected()
-    if is_protected then
+function CitySprite:CheckStatus()
+    local memberInfo = self:GetEntity():GetAllianceMemberInfo()
+    if memberInfo:IsProtected() then
+        if self:getChildByTag(SMOKE_TAG) then
+            self:removeChildByTag(SMOKE_TAG)
+        end
         if not self:getChildByTag(FIRE_TAG) then
-            fire():addTo(self, 2, FIRE_TAG):pos(0, -50)
+            local x,y = self:GetSpriteOffset()
+            fire():addTo(self, 2, FIRE_TAG):pos(x + 20, y)
         end
     else
-        self:removeChildByTag(FIRE_TAG)
+        if self:getChildByTag(FIRE_TAG) then
+            self:removeChildByTag(FIRE_TAG)
+        end
+
+        local is_smoke = (timer:GetServerTime() - memberInfo:LastBeAttackedTime()) < 10 * 60
+        if is_smoke then
+            if not self:getChildByTag(SMOKE_TAG) then
+                smoke_city():addTo(self, 2, SMOKE_TAG):pos(self:GetSpriteOffset())
+            end
+        else
+            if self:getChildByTag(SMOKE_TAG) then
+                self:removeChildByTag(SMOKE_TAG)
+            end
+        end
     end
 end
 

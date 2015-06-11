@@ -73,7 +73,7 @@ function TreeSprite:CreateSprite()
         end
     until true
     if not ppsprite then
-        ppsprite = display.newSprite("1.png"):hide()
+        ppsprite = display.newSprite("vip_1.png"):hide()
     end
     return ppsprite
 end

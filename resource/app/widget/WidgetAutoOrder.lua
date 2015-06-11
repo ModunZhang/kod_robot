@@ -31,18 +31,21 @@ function WidgetAutoOrder:RefreshOrder()
         if v:CheckVisible() then
             if self.order_type == WidgetAutoOrder.ORIENTATION.BOTTOM_TO_TOP then
             	v:setPositionY(gap)
-                gap = gap + v:GetElementSize().height + self.default_gap
+                gap = gap + v:GetElementSize().height/2 + self.default_gap
             elseif self.order_type == WidgetAutoOrder.ORIENTATION.TOP_TO_BOTTOM then
             	v:setPositionY(gap)
-                gap = gap - v:GetElementSize().height - self.default_gap
+                gap = gap - v:GetElementSize().height/2 - self.default_gap
             elseif self.order_type == WidgetAutoOrder.ORIENTATION.LEFT_TO_RIGHT then
             	v:setPositionX(gap)
-                gap = gap + v:GetElementSize().width + self.default_gap
+                gap = gap + v:GetElementSize().width/2 + self.default_gap
             elseif self.order_type == WidgetAutoOrder.ORIENTATION.RIGHT_TO_LEFT then
             	v:setPositionX(gap)
-                gap = gap - v:GetElementSize().width - self.default_gap
+                gap = gap - v:GetElementSize().width/2 - self.default_gap
             end
             v:show()
+            if v.refrshCallback then
+                v:refrshCallback()
+            end
         else
             v:hide()
         end

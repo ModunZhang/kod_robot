@@ -17,7 +17,7 @@ end
 
 function LogoScene:onEnter()
     self.layer = cc.LayerColor:create(cc.c4b(255,255,255,255)):addTo(self)
-    self.sprite = display.newSprite("batcat_logo_368x390.png", display.cx, display.cy):addTo(self.layer)
+    self.sprite = display.newSprite("batcat_logo_368x507.png", display.cx, display.cy):addTo(self.layer)
     self:performWithDelay(function() self:beginAnimate() end,0.5)
 end
 
@@ -46,7 +46,7 @@ end
 
 
 function LogoScene:onExit()
-    cc.Director:getInstance():getTextureCache():removeTextureForKey("batcat_logo_368x390.png")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("batcat_logo_368x507.png")
 end
 
 return LogoScene

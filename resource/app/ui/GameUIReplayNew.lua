@@ -56,7 +56,7 @@ local function decode_battle_from_report(report)
         attacker.soldierName = attacker.soldierName or "wall"
         defender.soldierName = defender.soldierName or "wall"
         local defeatAll
-        if attacker.soldierName ~= "wall" and defender.soldierName ~= "wall" and #attacks ~= i then
+        if attacker.soldierName ~= "wall" and defender.soldierName ~= "wall" --[[and #attacks ~= i]] then
             defeatAll = (((attacker.morale - attacker.moraleDecreased) <= 20
                 or (attacker.soldierCount - attacker.soldierDamagedCount) <= 0) or not attacker.isWin)
                 and (((defender.morale - defender.moraleDecreased) <= 20
@@ -841,7 +841,7 @@ function GameUIReplayNew:ctor(report, callback)
     self.round = 1
 end
 function GameUIReplayNew:OnMoveInStage()
-    app:GetAudioManager():PlayGameMusic("AllianceBattleScene",true,true)
+    app:GetAudioManager():PlayGameMusicOnSceneEnter("AllianceBattleScene",true)
     self.ui_map = self:BuildUI()
     self.ui_map.battle_background1:setTexture(string.format("back_ground_%s.png", self.report:GetAttackTargetTerrain()))
     self.ui_map.attackName:setString(self.report:GetFightAttackName())
@@ -889,7 +889,7 @@ function GameUIReplayNew:onExit()
     if type(self.callback) == "function" then
         self.callback()
     end
-    app:GetAudioManager():PlayGameMusic()
+    app:GetAudioManager():PlayGameMusicAutoCheckScene()
 end
 function GameUIReplayNew:GetOrderedAttackSoldiers()
     return self.report:GetOrderedAttackSoldiers()
@@ -937,7 +937,7 @@ function GameUIReplayNew:ShowResult()
     self.ui_map.close:show()
 end
 function GameUIReplayNew:ShowStrongOrWeak()
-    local vs = GameUtils:GetVSFromSoldierName(self:TopSoldierLeft().name, self:TopSoldierRight().name)
+    local vs = DataUtils:GetVSFromSoldierName(self:TopSoldierLeft().name, self:TopSoldierRight().name)
     if vs == "strong" then
         self.ui_map.arrow_green:show():flipX(false)
     elseif vs == "weak" then

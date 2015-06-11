@@ -273,7 +273,29 @@ function OtherApi:Items()
         end
     end
 end
-
+-- 获取排行榜
+function OtherApi:GetRank()
+    local random = math.random(4)
+    print("获取排行榜信息",random)
+    if random == 1 then
+        return NetManager:getPlayerRankPromise("power")
+    elseif random == 2 then
+        return NetManager:getAllianceRankPromise("power")
+    elseif random == 3 then
+        return NetManager:getPlayerRankPromise("kill")
+    elseif random == 4 then
+        return NetManager:getAllianceRankPromise("kill")
+    end
+end
+-- vip
+function OtherApi:VIP()
+   if User:IsVIPActived() then
+       -- 增加vip点数
+       return  NetManager:getBuyAndUseItemPromise("vipPoint_"..math.random(3,4),{})
+   else
+       return  NetManager:getBuyAndUseItemPromise("vipActive_"..math.random(3,5),{})
+   end
+end
 local function setRun()
     app:setRun()
 end
@@ -320,7 +342,22 @@ local function MailApi()
         setRun()
     end
 end
-
+local function GetRank()
+    local p = OtherApi:GetRank()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function VIP()
+    local p = OtherApi:VIP()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 return {
     setRun,
     SetCityTerrain,
@@ -328,7 +365,10 @@ return {
     SetPlayerIcon,
     MailApi,
     Gacha,
+    GetRank,
+    VIP,
 }
+
 
 
 

@@ -10,6 +10,8 @@ local WidgetPushButton = import("..widget.WidgetPushButton")
 local Localize = import("..utils.Localize")
 local UILib = import(".UILib")
 local Localize_item = import("..utils.Localize_item")
+local light_gem = import("..particles.light_gem")
+
 
 function GameUIStore:ctor()
 	GameUIStore.super.ctor(self,City,_("获得金龙币"))
@@ -104,6 +106,8 @@ end
 
 function GameUIStore:GetItemLogo(data)
 	local logo = display.newSprite(data.config.logo)
+	-- 金龙币上的粒子特效
+	light_gem():addTo(logo, 1022):pos(data.config.light_position.x , data.config.light_position.y):scale(1.2)
 	local logo_box = display.newSprite("store_logo_box_592x141.png",296,69):addTo(logo):zorder(5)
 	local bg = display.newSprite(data.config.desc)
 	if data.config.npc then
@@ -198,8 +202,22 @@ function GameUIStore:AddRewardsForItem(content,data)
 	end
 end
 
+function GameUIStore:CreateShopButton(on_clicked)
+    local gem_button = cc.ui.UIImage.new("gem_btn_up.png"):align(display.RIGHT_TOP, 670, 86)
+    local gem_icon = cc.ui.UIImage.new("gem_icon_62x61.png")
+        :addTo(gem_button)
+        :pos(106,0)
 
-function GameUIStore:RightButtonClicked()
+    light_gem():addTo(gem_icon, 1022):pos(62/2, 61/2)
+
+    local gem_label = UIKit:ttfLabel({
+        text = ""..string.formatnumberthousands(City:GetUser():GetGemResource():GetValue()),
+        size = 20,
+        color = 0xffd200,
+        shadow = true
+    }):addTo(gem_button):align(display.CENTER,64,32)
+
+    return gem_button,gem_label
 end
 
 return GameUIStore

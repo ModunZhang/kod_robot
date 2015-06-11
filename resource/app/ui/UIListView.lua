@@ -84,6 +84,7 @@ function UIListView:ctor(params)
     self.direction = params.direction or UIScrollView.DIRECTION_VERTICAL
     self.alignment = params.alignment or UIListView.ALIGNMENT_VCENTER
     self.bAsyncLoad = params.async or false
+    self.iscleanup = params.iscleanup == nil and true or params.iscleanup
     self.container = display.newNode()
     -- self.padding_ = params.padding or {left = 0, right = 0, top = 0, bottom = 0}
 
@@ -109,6 +110,7 @@ function UIListView:ctor(params)
     else
         self.needTips = true
     end
+     self.isTipsStringShow = false
 end
 
 function UIListView:onCleanup()
@@ -970,6 +972,10 @@ function UIListView:asyncLoadWithCurrentPosition_()
         current_min_index = math.min(current_min_index,v.idx_)
         current_max_index = math.max(current_max_index,v.idx_)
     end
+    if self:IsTipsStringShow() then
+        self:reload()
+        return
+    end
     for i = current_min_index, current_max_index do
         if i > count then
             self:unloadOneItem_(i)
@@ -1141,7 +1147,7 @@ function UIListView:unloadOneItem_(idx)
     table.remove(self.items_, unloadIdx)
     self:addFreeItem_(item)
     -- item:removeFromParentAndCleanup(false)
-    self.container:removeChild(item)
+    self.container:removeChild(item, iscleanup)
 
     self:callAsyncLoadDelegate_(self, UIListView.UNLOAD_CELL_TAG, idx)
 end
@@ -1390,15 +1396,22 @@ function UIListView:isItemFullyInViewRect(pos)
     return self:rectWholeInRect(self.viewRect_,bound)
 end
 
+function UIListView:IsTipsStringShow()
+    return self.isTipsStringShow
+end
+
 function UIListView:callAsyncLoadDelegate_(...)
     if self.tipsString then
         local args = {...}
         if self.delegate_[UIListView.DELEGATE](self, UIListView.COUNT_TAG) > 0 then
+            self.isTipsStringShow = false
             return self.delegate_[UIListView.DELEGATE](unpack(args))
         else
+            self.isTipsStringShow = true
             return self:self_sourceDelegate(unpack(args))
         end
     else
+        self.isTipsStringShow = false
         return self.delegate_[UIListView.DELEGATE](unpack(args))
     end
 end

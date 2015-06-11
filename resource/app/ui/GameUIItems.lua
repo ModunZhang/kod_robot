@@ -492,27 +492,32 @@ function GameUIItems:UseItemFunc( items )
             clone_items = clone(ItemManager:GetItems())
         end
         NetManager:getUseItemPromise(items:Name(),{}):done(function (response)
+            local message = ""
+            local awards = {}
             if string.find(name,"dragonChest") then
-                local message = ""
                 for i,v in ipairs(response.msg.playerData) do
                     if string.find(v[1],"dragonMaterials") then
                         local m_name = string.split(v[1], ".")[2]
-                        message = message .. Localize.equip_material[m_name].."x"..(v[2]-clone_dragon_materials[m_name]).." "
+                        local m_count = v[2]-clone_dragon_materials[m_name]
+                        message = message .. Localize.equip_material[m_name].."x"..m_count.." "
+                        table.insert(awards, {name = m_name, count = m_count})
                     end
                 end
-                GameGlobalUI:showTips(_("获得"),message)
+                -- GameGlobalUI:showTips(_("获得"),message)
             elseif string.find(name,"chest") then
-                local message = ""
                 LuaUtils:outputTable("name", response)
                 for i,v in ipairs(response.msg.playerData) do
                     if tolua.type(v[2]) == "table" then
-                        message = message .. Localize_item.item_name[v[2].name].."x"..(v[2].count - clone_items[v[2].name]:Count()).." "
+                        local m_name = v[2].name
+                        local m_count = v[2].count - clone_items[v[2].name]:Count()
+                        message = message .. Localize_item.item_name[m_name].."x"..m_count.." "
+                        table.insert(awards, {name = m_name, count = m_count})
                     end
                 end
-                GameGlobalUI:showTips(_("获得"),message)
+                -- GameGlobalUI:showTips(_("获得"),message)
             end
-
-            UIKit:PlayUseItemAni(items)
+            -- 提示统一动画播放之后提示
+            UIKit:PlayUseItemAni(items,awards,message)
         end)
     else
         local dialog = WidgetUseItems.new():Create({

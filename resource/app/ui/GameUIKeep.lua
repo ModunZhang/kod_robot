@@ -9,7 +9,7 @@ local SpriteConfig = import("..sprites.SpriteConfig")
 local window = import('..utils.window')
 local intInit = GameDatas.PlayerInitData.intInit
 local GameUIKeep = UIKit:createUIClass('GameUIKeep',"GameUIUpgradeBuilding")
-
+local sharedSpriteFrameCache = cc.SpriteFrameCache:getInstance()
 local building_config_map = {
     ["keep"] = {scale = 0.25, offset = {x = 75, y = 74}},
     ["watchTower"] = {scale = 0.4, offset = {x = 80, y = 70}},
@@ -214,10 +214,10 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
             else
                 content:addWidget(display.newSprite("back_ground_568X142.png"))
             end
-            local title_bg = display.newScale9Sprite("title_blue_430x30.png",70,46, cc.size(412,30), cc.rect(10,10,410,10))
+            local title_bg = display.newScale9Sprite("title_blue_430x30.png",70,46, cc.size(412,30), cc.rect(10,10,410,10)):addTo(content)
             -- building name
             UIKit:ttfLabel({
-                text = _(Localize.building_name[unlock_building:GetType()]),
+                text = Localize.building_name[unlock_building:GetType()],
                 size = 22,
                 color = 0xffedae}):align(display.CENTER_LEFT, 14, title_bg:getContentSize().height/2)
                 :addTo(title_bg)
@@ -234,7 +234,7 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
             -- building introduce
             local building_tip = UIKit:ttfLabel({
                 text = building_introduces[unlock_building:GetType()],
-                size = 20,
+                size = 18,
                 aglin = ui.TEXT_ALIGN_LEFT,
                 valign = ui.TEXT_VALIGN_CENTER,
                 dimensions = cc.size(374, 0),
@@ -256,7 +256,10 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
             local p = building_image:getAnchorPointInPoints()
             local building_image_1
             for _,v in ipairs(config:GetStaticImagesByLevel()) do
-                building_image_1 = display.newSprite(v,p.x, p.y,{class=cc.FilteredSpriteWithOne}):addTo(building_image)
+                local frame = sharedSpriteFrameCache:getSpriteFrame(v)
+                if frame then
+                    building_image_1 = display.newSprite("#"..v,p.x, p.y,{class=cc.FilteredSpriteWithOne}):addTo(building_image)
+                end
             end
             if not isUnlocked then
                 local my_filter = filter
@@ -345,7 +348,7 @@ function GameUIKeep:CreateChangeTerrainWindow()
                     _("红龙"),
                 },
             }
-            self.terrain_eff_label:setString(string.format(_("%s地形能提升50%% %s的活力回复速度"),t_name[event.selected][1],t_name[event.selected][2]))
+            self.terrain_eff_label:setString(string.format(_("%s地形能提升%d%% %s的生命回复速度和额外的力量"),t_name[event.selected][1],intInit.dragonStrengthTerrainAddPercent.value,t_name[event.selected][2]))
 
         end)
         :align(display.CENTER, 80 , 50)
@@ -395,7 +398,7 @@ function GameUIKeep:CreateChangeTerrainWindow()
     local label_2 = cc.ui.UILabel.new(
         {
             UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-            text = _("提供兵种招募，升级增加每次招募的最大数量"),
+            text = _("花费金龙币改变城市的地形，每种地形对应增益一种巨龙"),
             font = UIKit:getFontFilePath(),
             size = 20,
             dimensions = cc.size(260,100),
@@ -459,20 +462,21 @@ function GameUIKeep:CreateChangeTerrainWindow()
         end)
 end
 function GameUIKeep:PlayCloudAnimation()
-    local armature = ccs.Armature:create("Cloud_Animation"):addTo(display.getRunningScene(),5000):pos(display.cx, display.cy)
-    cc.LayerColor:create(UIKit:hex2c4b(0x00ffffff)):addTo(display.getRunningScene(),5000):runAction(
-        transition.sequence{
-            cc.CallFunc:create(function() armature:getAnimation():play("Animation1", -1, 0) end),
-            cc.FadeIn:create(0.75),
-            cc.DelayTime:create(0.5),
-            cc.CallFunc:create(function() armature:getAnimation():play("Animation4", -1, 0) end),
-            cc.CallFunc:create(function() self:LeftButtonClicked() end),
-            cc.FadeOut:create(0.75),
-            cc.CallFunc:create(function()
-                armature:removeFromParent()
-            end),
-        }
-    )
+    app:EnterMyCityScene()
+    -- local armature = ccs.Armature:create("Cloud_Animation"):addTo(display.getRunningScene(),5000):pos(display.cx, display.cy)
+    -- cc.LayerColor:create(UIKit:hex2c4b(0x00ffffff)):addTo(display.getRunningScene(),5000):runAction(
+    --     transition.sequence{
+    --         cc.CallFunc:create(function() armature:getAnimation():play("Animation1", -1, 0) end),
+    --         cc.FadeIn:create(0.75),
+    --         cc.DelayTime:create(0.5),
+    --         cc.CallFunc:create(function() armature:getAnimation():play("Animation4", -1, 0) end),
+    --         cc.CallFunc:create(function() self:LeftButtonClicked() end),
+    --         cc.FadeOut:create(0.75),
+    --         cc.CallFunc:create(function()
+    --             armature:removeFromParent()
+    --         end),
+    --     }
+    -- )
 end
 function GameUIKeep:CreateBackGroundWithTitle(title_string)
     local leyer = display.newColorLayer(cc.c4b(0,0,0,127))

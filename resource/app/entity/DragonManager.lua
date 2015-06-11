@@ -146,6 +146,10 @@ function DragonManager:OnUserDataChanged(user_data, current_time, deltaData,hp_r
     self:RefreshDragonDeathEvents(user_data,deltaData)
 end
 
+function DragonManager:HaveDragonHateEvent()
+    return not LuaUtils:table_empty(self.dragon_events)
+end
+
 function DragonManager:GetDragonEventByDragonType(dragon_type)
     return self.dragon_events[dragon_type]
 end
@@ -347,11 +351,16 @@ function DragonManager:checkHPRecoveryIf_(dragon,resource_refresh_time,hp_recove
     if dragon:Ishated() and dragon:IsDead() and self:GetHPResource(dragon:Type())  then
         self:RemoveHPResource(dragon:Type())
     end
+    local tmp_resource = self:GetHPResource(dragon:Type())
+    if resource_refresh_time and tmp_resource then
+        tmp_resource:UpdateResource(resource_refresh_time,dragon:Hp())
+    end
     --判断是否可以执行血量恢复 如果队列中没有这条龙会添加
     if dragon:Ishated() and not dragon:IsDead() and dragon:Status() ~= 'march' then
         local hp_resource = self:AddHPResource(dragon:Type())
         hp_resource:UpdateResource(resource_refresh_time,dragon:Hp())
-        hp_resource:SetProductionPerHour(resource_refresh_time,hp_recovery_perHour)
+        local val_of_hp_recovery_perHour = hp_recovery_perHour[dragon:Type()]
+        hp_resource:SetProductionPerHour(resource_refresh_time,val_of_hp_recovery_perHour)
         hp_resource:SetValueLimit(dragon:GetMaxHP())
     end
 end

@@ -134,7 +134,6 @@ function SoldierManager:GetTotalUpkeep()
 end
 function SoldierManager:GetTreatResource(soldiers)
     local treatCoin = 0
-    dump(soldiers)
     for k, v in pairs(soldiers) do
         local config = self:GetSoldierConfig(v.name)
         if config then

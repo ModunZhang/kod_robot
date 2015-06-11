@@ -80,8 +80,7 @@ function GameUITradeGuild:OnMoveInStage()
             self:LoadMyGoodsPage()
         end
     end):pos(window.cx, window.bottom + 34)
-    self:RefreshSoldMark()
-
+    self.tab_buttons:SetButtonTipNumber("myGoods",self.trade_manager:GetSoldDealsCount())
     self.building:AddUpgradeListener(self)
     self.trade_manager:AddListenOnType(self, TradeManager.LISTEN_TYPE.DEAL_CHANGED)
     self.trade_manager:AddListenOnType(self, TradeManager.LISTEN_TYPE.MY_DEAL_REFRESH)
@@ -95,19 +94,7 @@ function GameUITradeGuild:onExit()
     self.city:GetMaterialManager():RemoveObserver(self)
     GameUITradeGuild.super.onExit(self)
 end
-function GameUITradeGuild:RefreshSoldMark()
-    if self.trade_manager:IsSomeDealsSold() then
-        if not self.is_some_sold then
-            self.is_some_sold = display.newSprite("back_ground_32x33.png"):addTo(self.tab_buttons)
-                :pos(280,40)
-        end
-    else
-        if self.is_some_sold then
-            self.is_some_sold:removeFromParent(true)
-            self.is_some_sold = nil
-        end
-    end
-end
+
 function GameUITradeGuild:LoadBuyPage()
     local layer = self.buy_layer
     self.resource_drop_list =  WidgetRoundTabButtons.new(
@@ -130,26 +117,32 @@ function GameUITradeGuild:LoadBuyPage()
 
             if self.resource_layer then
                 self.resource_layer:setVisible(tag == 'resource')
-                if self.resource_options:getSelectedIndex() then
-                    self:RefreshSellListView(RESOURCE_TYPE,self.resource_options:getSelectedIndex())
-                else
-                    self.resource_options:getButtonAtIndex(1):setButtonSelected(true)
+                if tag == 'resource' then
+                    if self.resource_options:getSelectedIndex() then
+                        self:RefreshSellListView(RESOURCE_TYPE,self.resource_options:getSelectedIndex())
+                    else
+                        self.resource_options:getButtonAtIndex(1):setButtonSelected(true)
+                    end
                 end
             end
             if self.build_material_layer then
                 self.build_material_layer:setVisible(tag == 'build_material')
-                if self.build_material_options:getSelectedIndex() then
-                    self:RefreshSellListView(BUILD_MATERIAL_TYPE,self.build_material_options:getSelectedIndex())
-                else
-                    self.build_material_options:getButtonAtIndex(1):setButtonSelected(true)
+                if tag == 'build_material' then
+                    if self.build_material_options:getSelectedIndex() then
+                        self:RefreshSellListView(BUILD_MATERIAL_TYPE,self.build_material_options:getSelectedIndex())
+                    else
+                        self.build_material_options:getButtonAtIndex(1):setButtonSelected(true)
+                    end
                 end
             end
             if self.martial_material_layer then
                 self.martial_material_layer:setVisible(tag == 'martial_material')
-                if self.martial_material_options:getSelectedIndex() then
-                    self:RefreshSellListView(BUILD_MATERIAL_TYPE,self.martial_material_options:getSelectedIndex())
-                else
-                    self.martial_material_options:getButtonAtIndex(1):setButtonSelected(true)
+                if tag == 'martial_material' then
+                    if self.martial_material_options:getSelectedIndex() then
+                        self:RefreshSellListView(BUILD_MATERIAL_TYPE,self.martial_material_options:getSelectedIndex())
+                    else
+                        self.martial_material_options:getButtonAtIndex(1):setButtonSelected(true)
+                    end
                 end
             end
         end
@@ -421,9 +414,7 @@ function GameUITradeGuild:CreateOptions(params)
         -- 封装一下各个选项，以便之后刷新选项最新数值
         function checkBoxButton:SetValue(num)
             local new_value = GameUtils:formatNumber(num)
-            if new_value ~= num_value:getString() then
-                num_value:setString(new_value)
-            end
+            num_value:setString(new_value)
         end
     end
     group:setButtonsLayoutMargin(0, 4, 0, 0)
@@ -539,7 +530,7 @@ function GameUITradeGuild:CreateSellItem(list,index)
         local goods_icon = display.newSprite(UILib.resource[goods.goods_type] or UILib.materials[goods.goods_type])
             :align(display.CENTER, goods_bg:getContentSize().width/2, goods_bg:getContentSize().height/2)
             :addTo(goods_bg)
-        goods_icon:scale(84/math.max(goods_icon:getContentSize().width,goods_icon:getContentSize().height))
+        goods_icon:scale(100/math.max(goods_icon:getContentSize().width,goods_icon:getContentSize().height))
         -- 商品数量背景框
         local goods_num_bg = UIKit:shadowLayer()
         goods_num_bg:setContentSize(cc.size(102,26))
@@ -1057,11 +1048,11 @@ end
 function GameUITradeGuild:OnBuildingUpgrading()
 end
 function GameUITradeGuild:OnDealChanged(changed_map)
-    self:RefreshSoldMark()
+    self.tab_buttons:SetButtonTipNumber("myGoods",self.trade_manager:GetSoldDealsCount())
     self:LoadMyGoodsList()
 end
 function GameUITradeGuild:OnMyDealsRefresh(changed_map)
-    self:RefreshSoldMark()
+    self.tab_buttons:SetButtonTipNumber("myGoods",self.trade_manager:GetSoldDealsCount())
 end
 function GameUITradeGuild:OnResourceChanged(resource_manager)
     GameUITradeGuild.super.OnResourceChanged(self,resource_manager)
@@ -1114,6 +1105,7 @@ function GameUITradeGuild:GetMaterialIndexByName(material_type)
     return build_temp[material_type] or teach_temp[material_type]
 end
 return GameUITradeGuild
+
 
 
 

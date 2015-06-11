@@ -69,7 +69,7 @@ function WidgetSoldierDetails:InitSoldierDetails()
     local soldier_count = self.soldier_count
     self.total_soldier = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = soldier_count,
+        text = string.formatnumberthousands(soldier_count),
         font = UIKit:getFontFilePath(),
         size = 22,
         color = UIKit:hex2c3b(0x5a5544)

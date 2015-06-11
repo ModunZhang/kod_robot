@@ -195,26 +195,38 @@ function GameUIAllianceCityEnter:GetEnterButtons()
             buttons = {help_button,enter_button,mail_button,info_button}
         end
     else -- 敌方玩家
+        local isProtected = self:CheckMeIsProtectedWarinng()
         local attack_button = self:BuildOneButton("attack_58x56.png",_("进攻")):onButtonClicked(function()
-            UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers)
-                if member:IsProtected() then
-                    UIKit:showMessageDialog(_("提示"),_("玩家处于保护状态,不能进攻或突袭"), function()end)
-                    return
+            UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                if isProtected then
+                    UIKit:showMessageDialog(_("提示"),_("进攻玩家城市将失去保护状态，确定继续派兵?"),function()
+                        NetManager:getAttackPlayerCityPromise(dragonType, soldiers, member:Id()):done(function()
+                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                            gameuialliancesendtroops:LeftButtonClicked()
+                        end)
+                    end)
+                else
+                    if member:IsProtected() then
+                        UIKit:showMessageDialog(_("提示"),_("目标城市已被击溃并进入保护期，可能无法发生战斗，你是否继续派兵?"), function()
+                            NetManager:getAttackPlayerCityPromise(dragonType, soldiers, member:Id()):done(function()
+                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                                gameuialliancesendtroops:LeftButtonClicked()
+                            end)
+                        end,function()end)
+                    else
+                        NetManager:getAttackPlayerCityPromise(dragonType, soldiers, member:Id()):done(function()
+                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                            gameuialliancesendtroops:LeftButtonClicked()
+                        end)
+                    end
                 end
-                NetManager:getAttackPlayerCityPromise(dragonType, soldiers, member:Id()):done(function()
-                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                end)
-            end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition()}):AddToCurrentScene(true)
+            end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
             self:LeftButtonClicked()
         end)
     local my_allaince = Alliance_Manager:GetMyAlliance()
     attack_button:setButtonEnabled(my_allaince:Status() == "fight")
     local strike_button = self:BuildOneButton("strike_66x62.png",_("突袭")):onButtonClicked(function()
-        if member:IsProtected() then
-            UIKit:showMessageDialog(_("提示"),_("玩家处于保护状态,不能进攻或突袭"), function()end)
-            return
-        end
-        UIKit:newGameUI("GameUIStrikePlayer",1,{memberId = member:Id(),targetIsMyAlliance = false,toLocation = self:GetLogicPosition()}):AddToCurrentScene(true)
+        UIKit:newGameUI("GameUIStrikePlayer",1,{memberId = member:Id(),targetIsMyAlliance = false,toLocation = self:GetLogicPosition(),targetIsProtected = member:IsProtected()}):AddToCurrentScene(true)
         self:LeftButtonClicked()
     end)
     strike_button:setButtonEnabled(my_allaince:Status() == "fight")

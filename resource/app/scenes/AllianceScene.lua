@@ -19,11 +19,10 @@ function AllianceScene:ctor(location)
     AllianceScene.super.ctor(self)
 end
 function AllianceScene:onEnter()
-    self:LoadAnimation()
     AllianceScene.super.onEnter(self)
     self:CreateAllianceUI()
-    app:GetAudioManager():PlayGameMusic()
-    self:GetSceneLayer():ZoomTo(0.8)
+    app:GetAudioManager():PlayGameMusicOnSceneEnter("AllianceScene",false)
+    self:GetSceneLayer():ZoomTo(0.82)
     self:GetAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.BASIC)
     self:GetAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.OPERATION)
     local alliance_map = self:GetAlliance():GetAllianceMap()
@@ -32,7 +31,7 @@ function AllianceScene:onEnter()
     if not app:GetGameDefautlt():getBasicInfoValueForKey(alliance_key) then
         app:GetGameDefautlt():getBasicInfoValueForKey(alliance_key,true)
 
-        UIKit:newGameUI("GameUITips","region"):AddToScene(self, true)
+        UIKit:newGameUI("GameUITips","region",_("玩法介绍"), true):AddToScene(self, true)
     end
     if self.location then
         self:GotoPosition(self.location.x, self.location.y)
@@ -42,10 +41,26 @@ function AllianceScene:onEnter()
     else
         self:GotoCurrentPosition()
     end
+
+
+    -- cc.ui.UIPushButton.new({normal = "lock_btn.png",pressed = "lock_btn.png"})
+    -- :addTo(self, 1000000):align(display.RIGHT_TOP, display.width, display.height)
+    -- :onButtonClicked(function(event)
+    --     app:onEnterBackground()
+    -- end)
+
+    -- cc.ui.UIPushButton.new({normal = "lock_btn.png",pressed = "lock_btn.png"})
+    -- :addTo(self, 1000000):align(display.RIGHT_TOP, display.width, display.height - 100)
+    -- :onButtonClicked(function(event)
+    --     app:onEnterForeground()
+    -- end)
 end
-function AllianceScene:LoadAnimation()
-    UILib.loadSolidersAnimation()
-    UILib.loadDragonAnimation()
+function AllianceScene:GetPreloadImages()
+    return {
+        {image = "animations/region_animation_0.pvr.ccz",list = "animations/region_animation_0.plist"},
+        {image = "region_png.pvr.ccz",list = "region_png.plist"},
+        {image = "region_pvr.pvr.ccz",list = "region_pvr.plist"},
+    }
 end
 function AllianceScene:GotoCurrentPosition()
     local mapObject = self:GetAlliance():GetAllianceMap():FindMapObjectById(self:GetAlliance():GetSelf():MapId())
@@ -267,9 +282,6 @@ function AllianceScene:CheckCanMoveAllianceObject(x, y, out_x, out_y)
     end
 end
 
-function AllianceScene:ReEnterScene()
-    app:enterScene("AllianceScene")
-end
 return AllianceScene
 
 

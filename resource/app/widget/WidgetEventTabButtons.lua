@@ -374,12 +374,14 @@ function WidgetEventTabButtons:CreateProgressItem()
         text = "Building",
         size = 18,
         color = 0xd1ca95,
+        shadow = true,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
 
     node.time = UIKit:ttfLabel({
         text = "Time",
         size = 18,
         color = 0xd1ca95,
+        shadow = true,
     }):addTo(node):align(display.RIGHT_CENTER, 470, half_height)
 
     node.speed_btn = WidgetPushButton.new({normal = "green_btn_up_154x39.png",
@@ -439,6 +441,7 @@ function WidgetEventTabButtons:CreateOpenItem()
         size = 18,
         font = UIKit:getFontFilePath(),
         color = 0xd1ca95,
+        shadow = true,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
 
     node.button = WidgetPushButton.new({
@@ -666,9 +669,10 @@ function WidgetEventTabButtons:IsAbleToFreeSpeedup(building)
 end
 function WidgetEventTabButtons:UpgradeBuildingHelpOrSpeedup(building)
     local eventType = building:EventType()
-    if self:IsAbleToFreeSpeedup(building) and 
-        building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) then
-        NetManager:getFreeSpeedUpPromise(eventType,building:UniqueUpgradingKey())
+    if self:IsAbleToFreeSpeedup(building) then
+        if building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 2 then
+            NetManager:getFreeSpeedUpPromise(eventType,building:UniqueUpgradingKey())
+        end
     else
         if not Alliance_Manager:GetMyAlliance():IsDefault() then
             -- 是否已经申请过联盟加速
@@ -765,7 +769,7 @@ function WidgetEventTabButtons:LoadBuildingEvents()
 end
 function WidgetEventTabButtons:LoadSoldierEvents()
     self:InsertItem(self:CreateBottom():OnOpenClicked(function(event)
-        UIKit:newGameUI('GameUIBarracks', self.city, self.barracks):AddToCurrentScene(true)
+        UIKit:newGameUI('GameUIBarracks', self.city, self.barracks, "recruit"):AddToCurrentScene(true)
     end):SetLabel(_("查看现有的士兵")))
     local event = self.barracks:GetRecruitEvent()
     if event:IsRecruting() then
@@ -1008,7 +1012,7 @@ function WidgetEventTabButtons:ProductionTechnologyEventUpgradeOrSpeedup(event)
 end
 
 function WidgetEventTabButtons:GetProductionTechnologyEventProgressInfo(event)
-    return _("研发") .. event:Entity():GetLocalizedName() .. " " .. GameUtils:formatTimeStyle1(event:GetTime()),event:GetPercent()
+    return _("研发") .. event:Entity():GetLocalizedName() ,event:GetPercent(),GameUtils:formatTimeStyle1(event:GetTime())
 end
 
 function WidgetEventTabButtons:PromiseOfPopUp()

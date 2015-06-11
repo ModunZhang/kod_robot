@@ -29,6 +29,14 @@ local offset_map = {
 function WallUpgradingSprite:ctor(city_layer, entity, level)
     self.level = level
     WallUpgradingSprite.super.ctor(self, city_layer, entity)
+
+    if entity:IsGate() then
+        ccs.Armature:create("shaobing_3"):addTo(self)
+        :pos(-170, 0):getAnimation():play("idle_45")
+
+        ccs.Armature:create("shaobing_3"):addTo(self)
+        :pos(-80, -50):getAnimation():play("idle_45")
+    end
 end
 function WallUpgradingSprite:GetSpriteFile()
     local entity = self:GetEntity()

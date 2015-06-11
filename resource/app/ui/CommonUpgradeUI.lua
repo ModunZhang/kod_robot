@@ -103,7 +103,7 @@ function CommonUpgradeUI:InitCommonPart()
             end
         end):align(display.CENTER, display.cx-200, display.top-175)
         :addTo(self):scale(136/126)
-
+    display.newSprite("info_26x26.png"):addTo(self,2):align(display.LEFT_BOTTOM, display.cx-264, display.top-240)
     self:ReloadBuildingImage()
     self:InitBuildingIntroduces()
     self:InitNextLevelEfficiency()
@@ -116,7 +116,7 @@ function CommonUpgradeUI:ReloadBuildingImage()
     local config = SpriteConfig[self.building:GetType()]:GetConfigByLevel(self.building:GetLevel())
     local configs = SpriteConfig[self.building:GetType()]:GetAnimationConfigsByLevel(self.building:GetLevel())
     self.building_image = display.newSprite(config.png, 0, 0)
-        :addTo(self):pos(display.cx-196, display.top-158)
+        :addTo(self):pos(display.cx-196, display.top-164)
     local p = self.building_image:getAnchorPointInPoints()
     for _,v in ipairs(configs) do
         if v.deco_type == "image" then
@@ -141,7 +141,20 @@ end
 function CommonUpgradeUI:SetBuildingLevel()
     self.builging_level:setString(_("等级 ")..self.building:GetLevel())
     if self.building:GetNextLevel() == self.building:GetLevel() then
-        self.next_level:setString(_("等级已满 "))
+        self.next_level:getParent():setVisible(false)
+        local bg = display.newSprite("back_ground_608x350.png"):align(display.CENTER_BOTTOM, window.cx, window.bottom_top + 10):addTo(self)
+        -- npc image
+        display.newSprite("Npc.png"):align(display.LEFT_BOTTOM, -50, -14):addTo(bg)
+        -- 对话框 bg
+        local tip_bg = display.newSprite("back_ground_342x228.png", 406,210):addTo(bg)
+        -- 称谓label
+        cc.ui.UILabel.new({
+            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+            text = _("当前建筑已达最大等级"),
+            font = UIKit:getFontFilePath(),
+            size = 24,
+            color = UIKit:hex2c3b(0x403c2f)
+        }):align(display.LEFT_TOP,14,210):addTo(tip_bg)
     else
         self.next_level:setString(_("等级 ")..self.building:GetNextLevel())
     end
@@ -171,6 +184,7 @@ function CommonUpgradeUI:InitNextLevelEfficiency()
     }):align(display.CENTER,bg_size.width/2,bg_size.height/2):addTo(bg)
 
     local efficiency_bg = display.newSprite("back_ground_398x97.png", window.cx+74, window.top-310):addTo(self)
+
     local efficiency_bg_size = efficiency_bg:getContentSize()
     self.efficiency = UIKit:ttfLabel({
         size = 20,
@@ -280,6 +294,10 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
         if house_add>0 then
             efficiency = string.format("%s+%d," ,bd.townHall_dwelling,house_add)
         end
+        local award_add = (building:GetNextLevelEfficiency() - building:GetEfficiency()) * 100
+        if award_add > 0 then
+            efficiency = efficiency .. string.format("%s+%d%%," ,_("提升任务奖励"),award_add)
+        end
     elseif self.building:GetType()=="dwelling" then
         local addtion = building:GetNextLevelCitizen()-building:GetProductionLimit()
         if addtion>0 then
@@ -340,14 +358,29 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
         if next_recovery - recovery > 0 then
             efficiency = efficiency .. string.format(_("资源小车回复速度+%d/小时,"),(next_recovery - recovery))
         end
-    elseif self.building:GetType()=="trainingGround"
-        or self.building:GetType()=="stable"
-        or self.building:GetType()=="hunterHall"
-        or self.building:GetType()=="workshop" then
+    elseif self.building:GetType()=="trainingGround" then
         local eff = self.building:GetEfficiency()
         local next_eff = self.building:GetNextLevelEfficiency()
         if next_eff - eff > 0 then
-            efficiency = string.format(_("科技升级速度+%d%%,"),(next_eff - eff) * 100)
+            efficiency = string.format(_("步兵招募速度+%d%%,"),(next_eff - eff) * 100)
+        end
+    elseif self.building:GetType()=="stable" then
+        local eff = self.building:GetEfficiency()
+        local next_eff = self.building:GetNextLevelEfficiency()
+        if next_eff - eff > 0 then
+            efficiency = string.format(_("骑兵招募速度+%d%%,"),(next_eff - eff) * 100)
+        end
+    elseif self.building:GetType()=="hunterHall" then
+        local eff = self.building:GetEfficiency()
+        local next_eff = self.building:GetNextLevelEfficiency()
+        if next_eff - eff > 0 then
+            efficiency = string.format(_("弓手招募速度+%d%%,"),(next_eff - eff) * 100)
+        end
+    elseif self.building:GetType()=="workshop" then
+        local eff = self.building:GetEfficiency()
+        local next_eff = self.building:GetNextLevelEfficiency()
+        if next_eff - eff > 0 then
+            efficiency = string.format(_("攻城系招募速度+%d%%,"),(next_eff - eff) * 100)
         end
     else
         assert(false,"本地化丢失")
@@ -355,6 +388,9 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
     -- 增加power,每个建筑都有的属性
     efficiency = efficiency ..string.format("%s+%d",bd.power,building:GetNextLevelPower()-building:GetPower())
     self.efficiency:setString(efficiency)
+    if self.building:GetNextLevel() == self.building:GetLevel() then
+        self.efficiency:getParent():setVisible(false)
+    end
 end
 
 function CommonUpgradeUI:InitUpgradePart()
@@ -645,7 +681,7 @@ function CommonUpgradeUI:InitAccelerationPart()
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
         font = UIKit:getFontFilePath(),
         size = 20,
-        dimensions = cc.size(530, 80),
+        dimensions = cc.size(530, 0),
         color = UIKit:hex2c3b(0x403c2f)
     }):align(display.LEFT_CENTER, display.cx - 270, display.top - 540)
         :addTo(self.acc_layer)
@@ -733,7 +769,7 @@ function CommonUpgradeUI:PopNotSatisfyDialog(listener,can_not_update_type)
             dialog:CreateOKButton(
                 {
                     listener = function()
-                        UIKit:newGameUI('GameUIShop', City):AddToCurrentScene(true)
+                        UIKit:newGameUI('GameUIStore'):AddToCurrentScene(true)
                         self:getParent():getParent():LeftButtonClicked()
                     end
                 }
@@ -834,6 +870,9 @@ function CommonUpgradeUI:PopNotSatisfyDialog(listener,can_not_update_type)
 end
 
 return CommonUpgradeUI
+
+
+
 
 
 

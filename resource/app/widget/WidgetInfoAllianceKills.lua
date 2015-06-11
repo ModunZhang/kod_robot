@@ -29,10 +29,10 @@ function WidgetInfoAllianceKills:CreateInfoItem(info_message)
             text = string.formatnumberthousands(member.kill),
             size = 22,
             color = 0x403c2f,
-        }):align(display.RIGHT_CENTER,520,20)
+        }):align(display.LEFT_CENTER,430,20)
             :addTo(content)
         display.newSprite("battle_33x33.png")
-            :align(display.RIGHT_CENTER,510-t:getContentSize().width,20)
+            :align(display.RIGHT_CENTER,420,20)
             :addTo(content)
 
         meetFlag =  not meetFlag

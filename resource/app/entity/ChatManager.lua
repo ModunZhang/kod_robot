@@ -42,7 +42,7 @@ function EmojiUtil:ConvertEmojiToRichText(chatmsg,func_handler_dest)
 		if count == 0 or string.len(string.trim(result)) == 0 then
 			dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"}', v)
 		else
-			dest[i] = string.format('{\"type\":\"image\", \"value\":\"%s\"}',string.format('#%s.png', string.upper(result)))
+			dest[i] = string.format('{\"type\":\"image\", \"value\":\"%s\"}',string.format('%s.png', string.upper(result)))
 		end
 	end
 	if func_handler_dest and type(func_handler_dest) == 'function' then

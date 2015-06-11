@@ -34,6 +34,7 @@ function HelpEvent:OnPropertyChange()
 end
 
 function HelpEvent:UpdateData(json_data)
+    local json_data = clone(json_data)
     self:SetId(json_data.id)
     local playerData = json_data.playerData
     self.playerData:SetId(playerData.id)

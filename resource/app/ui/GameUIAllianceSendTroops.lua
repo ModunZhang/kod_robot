@@ -172,7 +172,7 @@ function GameUIAllianceSendTroops:OnMoveInStage()
     end):align(display.LEFT_CENTER,window.left+50,window.top-910):addTo(self:GetView())
     self.max_btn = max_btn
 
-    local march_btn = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"},nil,nil)
+    local march_btn = WidgetPushButton.new({normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},nil,nil)
         :setButtonLabel(UIKit:ttfLabel({
             text = _("行军"),
             size = 24,
@@ -216,42 +216,42 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                     end
                     return
                 end
-                if self.dragon:IsHpLow() then
-                    UIKit:showMessageDialog(_("行军"),_("您的龙的HP低于20%,有很大几率阵亡,确定要派出吗?"))
-                        :CreateOKButton(
-                            {
-                                listener =  function ()
-                                    if self.dragon:IsDefenced() then
-                                        NetManager:getCancelDefenceDragonPromise():done(function()
-                                            -- self.march_callback(dragonType,soldiers)
-                                            -- -- 确认派兵后关闭界面
-                                            -- self:LeftButtonClicked()
-                                            self:CallFuncMarch_Callback(dragonType,soldiers)
-                                        end)
-                                    else
-                                        -- self.march_callback(dragonType,soldiers)
-                                        -- -- 确认派兵后关闭界面
-                                        -- self:LeftButtonClicked()
-                                        self:CallFuncMarch_Callback(dragonType,soldiers)
-                                    end
-                                end
-                            }
-                        )
-                else
-                    if self.dragon:IsDefenced() then
-                        NetManager:getCancelDefenceDragonPromise():done(function()
-                            -- self.march_callback(dragonType,soldiers)
-                            -- -- 确认派兵后关闭界面
-                            -- self:LeftButtonClicked()
-                            self:CallFuncMarch_Callback(dragonType,soldiers)
-                        end)
-                    else
+                -- if self.dragon:IsHpLow() then
+                --     UIKit:showMessageDialog(_("行军"),_("您的龙的HP低于20%,有很大几率阵亡,确定要派出吗?"))
+                --         :CreateOKButton(
+                --             {
+                --                 listener =  function ()
+                --                     if self.dragon:IsDefenced() then
+                --                         NetManager:getCancelDefenceDragonPromise():done(function()
+                --                             -- self.march_callback(dragonType,soldiers)
+                --                             -- -- 确认派兵后关闭界面
+                --                             -- self:LeftButtonClicked()
+                --                             self:CallFuncMarch_Callback(dragonType,soldiers)
+                --                         end)
+                --                     else
+                --                         -- self.march_callback(dragonType,soldiers)
+                --                         -- -- 确认派兵后关闭界面
+                --                         -- self:LeftButtonClicked()
+                --                         self:CallFuncMarch_Callback(dragonType,soldiers)
+                --                     end
+                --                 end
+                --             }
+                --         )
+                -- else
+                if self.dragon:IsDefenced() then
+                    NetManager:getCancelDefenceDragonPromise():done(function()
                         -- self.march_callback(dragonType,soldiers)
-                        -- 确认派兵后关闭界面
+                        -- -- 确认派兵后关闭界面
                         -- self:LeftButtonClicked()
                         self:CallFuncMarch_Callback(dragonType,soldiers)
-                    end
+                    end)
+                else
+                    -- self.march_callback(dragonType,soldiers)
+                    -- 确认派兵后关闭界面
+                    -- self:LeftButtonClicked()
+                    self:CallFuncMarch_Callback(dragonType,soldiers)
                 end
+                -- end
             end
 
         end):align(display.RIGHT_CENTER,window.right-50,window.top-910):addTo(self:GetView())
@@ -613,12 +613,12 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
             local num_1 = tonumber(split_str[1])
             local num_2 = tonumber(split_str[2])
             local value_label_1 = UIKit:ttfLabel({
-                text = num_1,
+                text = string.formatnumberthousands(num_1),
                 size = 18,
                 color = num_1 > num_2 and 0x7e0000 or 0xffedae,
             })
             local value_label_2 = UIKit:ttfLabel({
-                text = "/"..num_2,
+                text = "/"..string.formatnumberthousands(num_2),
                 size = 18,
                 color = 0xffedae,
             })
@@ -630,7 +630,7 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
             info:setContentSize(total_width, 45)
         else
             local value_label = UIKit:ttfLabel({
-                text = value,
+                text = string.formatnumberthousands(value),
                 size = 18,
                 color = 0xffedae,
             })
@@ -683,7 +683,7 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
         return rc
     end
     function TroopShow:SetPower(power)
-        local power_item = createInfoItem(_("战斗力"),string.formatnumberthousands(power))
+        local power_item = createInfoItem(_("战斗力"),power)
             :align(display.CENTER,30,0)
             :addTo(info_bg)
         return self
@@ -699,7 +699,7 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
         return self.exceed_lead
     end
     function TroopShow:SetWeight(weight)
-        local weight_item = createInfoItem(_("负重"),string.formatnumberthousands(weight))
+        local weight_item = createInfoItem(_("负重"),weight)
         weight_item:align(display.CENTER,620-weight_item:getContentSize().width-30,0)
             :addTo(info_bg)
         return self
@@ -713,7 +713,7 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
         display.newSprite("dragon_strength_27x31.png"):pos(10,label:getContentSize().height/2)
             :addTo(label)
         UIKit:ttfLabel({
-            text = soldier_power,
+            text = string.formatnumberthousands(soldier_power),
             size = 18,
             color = 0xffedae,
         }):align(display.CENTER,label:getContentSize().width/2,label:getContentSize().height/2)
@@ -789,6 +789,8 @@ function GameUIAllianceSendTroops:onExit()
 end
 
 return GameUIAllianceSendTroops
+
+
 
 
 

@@ -52,12 +52,13 @@ function WidgetTab:ctor(param, width, height)
         end
     end)
 end
+local max = math.max
 function WidgetTab:SetOrResetProgress(time, percent)
     if time and percent then
         if self.left_time > time then
             self.left_time = time
             self.label:show():setString(GameUtils:formatTimeStyle1(time))
-            self.progress:show():setPercentage(percent)
+            self.progress:show():setPercentage( (percent/100) * (100 - 10) + 10)
             self.tab_png:scale(0.8):setPositionX(self.width/5)
         end
     else

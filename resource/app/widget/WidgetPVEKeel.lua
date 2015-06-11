@@ -18,6 +18,17 @@ function WidgetPVEKeel:SetUpButtons()
         { { label = _("离开"), icon = "pve_icon_leave.png", } } or
         {
             {
+                label = _("生命"), 
+                icon = "pve_icon_life.png",
+                callback = function()
+                    local rollback = self:Search()
+                    self:GetRewardsFromServer(2):fail(function()
+                        rollback()
+                    end)
+                    self:removeFromParent()
+                end
+            },
+            {
                 label = _("知识"), 
                 icon = "pve_icon_knowledge.png",
                 callback = function()
@@ -28,17 +39,6 @@ function WidgetPVEKeel:SetUpButtons()
                     self:removeFromParent()
                 end
             },
-            {
-                label = _("生命"), 
-                icon = "pve_icon_life.png",
-                callback = function()
-                    local rollback = self:Search()
-                    self:GetRewardsFromServer(2):fail(function()
-                        rollback()
-                    end)
-                    self:removeFromParent()
-                end
-            }
         }
 end
 

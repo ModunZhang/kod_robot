@@ -102,7 +102,7 @@ function User:ctor(p)
         [STRENGTH] = AutomaticUpdateResource.new(),
     }
     self:GetGemResource():SetValueLimit(math.huge) -- 会有人充值这么多的金龙币吗？
-    self:GetStrengthResource():SetValueLimit(100)
+    self:GetStrengthResource():SetValueLimit(intInit.staminaMax.value)
 
     self.staminaUsed = 0
     self.gemUsed = nil
@@ -209,7 +209,7 @@ function User:EncodePveDataAndResetFightRewardsData()
         },
         fightData = fightData,
         rewards = rewards,
-        -- rewardedFloor = nil,
+    -- rewardedFloor = nil,
     }
 end
 function User:ResetAllListeners()
@@ -329,6 +329,7 @@ function User:OnUserDataChanged(userData, current_time, deltaData)
     self:OnVipEventDataChange(userData, deltaData)
     -- 日常任务
     self:OnDailyTasksChanged(userData.dailyTasks)
+
     return self
 end
 
@@ -447,7 +448,7 @@ end
 -- 获取当天剩余普通免费gacha次数
 function User:GetOddFreeNormalGachaCount()
     local vip_add = self:GetVipEvent():IsActived() and self:GetVIPNormalGachaAdd() or 0
-    return intInit.freeNormalGachaCountPerDay.value + vip_add - self.countInfo.todayFreeNormalGachaCount
+    return intInit.freeNormalGachaCountPerDay.value + vip_add - self:GetCountInfo().todayFreeNormalGachaCount
 end
 function User:GetVipEvent()
     return self.vip_event
@@ -521,7 +522,17 @@ function User:OnVipEventDataChange(userData, deltaData)
         if userData.vipEvents then
             if not LuaUtils:table_empty(userData.vipEvents) then
                 self.vip_event:UpdateData(userData.vipEvents[1])
+            else
+                self.vip_event:Reset()
+                self:NotifyListeneOnType(User.LISTEN_TYPE.VIP_EVENT_OVER, function(listener)
+                    listener:OnVipEventOver(self.vip_event)
+                end)
             end
+        else
+            self.vip_event:Reset()
+            self:NotifyListeneOnType(User.LISTEN_TYPE.VIP_EVENT_OVER, function(listener)
+                listener:OnVipEventOver(self.vip_event)
+            end)
         end
         self:NotifyListeneOnType(User.LISTEN_TYPE.VIP_EVENT, function(listener)
             listener:OnVipEventTimer(self.vip_event)
@@ -579,9 +590,10 @@ function User:OnResourcesChangedByTime(userData, current_time, deltaData)
     local is_delta_update = not is_fully_update and deltaData.resources and deltaData.resources.stamina
     local resources = userData.resources
     if is_fully_update or is_delta_update then
+        local refreshTime = userData.resources.refreshTime / 1000
         local strength = self:GetStrengthResource()
-        strength:UpdateResource(current_time, resources.stamina)
-        strength:SetProductionPerHour(current_time, 4)
+        strength:UpdateResource(refreshTime, resources.stamina)
+        strength:SetProductionPerHour(refreshTime, intInit.staminaRecoverPerHour.value)
     end
     self:GetGemResource():SetValue(resources.gem)
 end
@@ -612,7 +624,7 @@ function User:OnAllianceInfoChanged( userData, deltaData )
     local is_fully_update = deltaData == nil
     local is_delta_update = not is_fully_update and deltaData.allianceInfo
     if is_fully_update then
-       self.allianceInfo = clone(userData.allianceInfo)
+        self.allianceInfo = clone(userData.allianceInfo)
     end
     if is_delta_update then
         for i,v in pairs(deltaData.allianceInfo) do
@@ -627,7 +639,7 @@ function User:OnAllianceDonateChanged( userData, deltaData )
     local is_fully_update = deltaData == nil
     local is_delta_update = not is_fully_update and deltaData.allianceDonate
     if is_fully_update then
-       self.allianceDonate = clone(userData.allianceDonate)
+        self.allianceDonate = clone(userData.allianceDonate)
     end
     if is_delta_update then
         for i,v in pairs(deltaData.allianceDonate) do
@@ -813,6 +825,9 @@ function User:GetBestDragon()
 end
 
 return User
+
+
+
 
 
 

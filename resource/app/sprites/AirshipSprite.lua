@@ -47,7 +47,7 @@ function AirshipSprite:CreateSprite()
     return sprite
 end
 function AirshipSprite:GetSpriteOffset()
-    return 50, 50
+    return 35, 35
 end
 function AirshipSprite:GetMidLogicPosition()
     return self:GetLogicMap():ConvertToLogicPosition(self:getPosition())

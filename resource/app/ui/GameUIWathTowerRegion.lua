@@ -237,7 +237,12 @@ function GameUIWathTowerRegion:GetMyEventItemWithIndex(index,isOpen,entity)
                 )
                 :align(display.RIGHT_BOTTOM,555,10)
                 :onButtonClicked(function(event)
-                    self:LeftButtonClicked()
+                    local current_scene = display.getRunningScene().__cname
+                    if current_scene == 'AllianceScene' or current_scene == 'AllianceBattleScene' then
+                        self:LeftButtonClicked()
+                    else
+                        app:EnterMyAllianceScene()
+                    end
                 end)
                 :addTo(bg)
             UIKit:ttfLabel({
@@ -302,7 +307,7 @@ function GameUIWathTowerRegion:GetMyEventItemWithIndex(index,isOpen,entity)
                 local progress_timer = UIKit:commonProgressTimer("process_color_village_collect_326x40.png"):align(display.LEFT_CENTER, 0, 20):addTo(process_bg)
                 progress_timer:setPercentage(entity:WithObject():CollectPercent())
                 local process_label = UIKit:ttfLabel({
-                    text =  math.floor(entity:WithObject():CollectCount()) .. "/" .. entity:WithObject():VillageData().collectTotal,
+                    text = string.format("%s/%s",string.formatnumberthousands(math.floor(entity:WithObject():CollectCount())),string.formatnumberthousands(entity:WithObject():VillageData().collectTotal)),
                     size = 20,
                     color= 0xfff3c7,
                     shadow= true
@@ -529,7 +534,8 @@ function GameUIWathTowerRegion:OnVillageEventTimer(villageEvent)
         self.village_process[villageEvent:Id()]:setPercentage(villageEvent:CollectPercent())
     end
     if self.village_labels[villageEvent:Id()] then
-        self.village_labels[villageEvent:Id()]:setString(math.floor(villageEvent:CollectCount()) .. "/" .. villageEvent:VillageData().collectTotal)
+        local str = string.format("%s/%s",string.formatnumberthousands(math.floor(villageEvent:CollectCount())),string.formatnumberthousands(villageEvent:VillageData().collectTotal))
+        self.village_labels[villageEvent:Id()]:setString(str)
     end
 end
 

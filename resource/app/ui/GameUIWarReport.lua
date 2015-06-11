@@ -97,20 +97,23 @@ function GameUIWarReport:onEnter()
     self.details_view:reload()
 
     -- 回放按钮
-    local replay_label = UIKit:ttfLabel({
-        text = _("回放"),
-        size = 20,
-        color = 0xfff3c7})
+    local r_data = report:GetData()
+    if r_data.fightWithHelpDefencePlayerReports or r_data.fightWithDefencePlayerReports then
+        local replay_label = UIKit:ttfLabel({
+            text = _("回放"),
+            size = 20,
+            color = 0xfff3c7})
 
-    replay_label:enableShadow()
-    WidgetPushButton.new(
-        {normal = "yellow_btn_up_148x58.png", pressed = "yellow_btn_down_148x58.png"},
-        {scale9 = false}
-    ):setButtonLabel(replay_label)
-        :addTo(report_body):align(display.CENTER, report_body:getContentSize().width-100, rb_size.height-186)
-        :onButtonClicked(function(event)
-            UIKit:newGameUI("GameUIReplayNew",clone(report)):AddToCurrentScene(true)
-        end)
+        replay_label:enableShadow()
+        WidgetPushButton.new(
+            {normal = "yellow_btn_up_148x58.png", pressed = "yellow_btn_down_148x58.png"},
+            {scale9 = false}
+        ):setButtonLabel(replay_label)
+            :addTo(report_body):align(display.CENTER, report_body:getContentSize().width-100, rb_size.height-186)
+            :onButtonClicked(function(event)
+                UIKit:newGameUI("GameUIReplayNew",clone(report)):AddToCurrentScene(true)
+            end)
+    end
 
     -- 删除按钮
     local delete_label = UIKit:ttfLabel({
@@ -416,7 +419,7 @@ function GameUIWarReport:CreateArmyItem(title,troop,dragon,enemy_troop,round_dat
             },
             {
                 bg_image = "back_ground_548x40_2.png",
-                title = _("Level"),
+                title = _("等级"),
                 value = dragon.level,
             },
             {
@@ -484,7 +487,7 @@ function GameUIWarReport:CreateBelligerentsItem(player,isSelf)
         :addTo(player_item)
 
     UIKit:ttfLabel({
-        text =  player.type and _("Level").." "..player.level or "["..player.alliance.tag.."]",
+        text =  player.type and string.format(_("等级%d"),player.level) or "["..player.alliance.tag.."]",
         size = 22,
         color = 0xffedae
     }):align(display.CENTER,170,  height-75)
@@ -532,7 +535,6 @@ function GameUIWarReport:CreateSoldierInfo(soldiers)
     local bg = self:CreateSmallBackGround({width=554,height=172})
 
     local content = WidgetClickPageView.new({bg=bg})
-
     for i=1,#soldiers,4 do
 
         local page_item = content:newItem()
@@ -643,10 +645,12 @@ function GameUIWarReport:CreateWallPart()
 
     item:addContent(bg)
     self.details_view:addItem(item)
-    if self.report:IsAttackCamp() then
-        self:OurLose(wall_data.soldiers)
-    else
-        self:KillEnemy(wall_data.soldiers)
+    if #wall_data.soldiers > 0 then
+        if self.report:IsAttackCamp() then
+            self:OurLose(wall_data.soldiers)
+        else
+            self:KillEnemy(wall_data.soldiers)
+        end
     end
 end
 
@@ -686,6 +690,8 @@ function GameUIWarReport:GetRewards()
     return  self.report:GetMyRewards()
 end
 return GameUIWarReport
+
+
 
 
 

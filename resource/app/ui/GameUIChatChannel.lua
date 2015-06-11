@@ -193,12 +193,24 @@ function GameUIChatChannel:CreateTabButtons()
     },
     function(tag)
         self._channelType = tag
-       
+        self:ShowTipsIf()
         self:RefreshListView()
     end):addTo(self:GetView()):pos(window.cx, window.bottom + 34)
 end
 
-
+function GameUIChatChannel:ShowTipsIf()
+    local my_alliance = Alliance_Manager:GetMyAlliance()
+    if my_alliance:IsDefault() then
+        if self._channelType == 'alliance' then
+            UIKit:showMessageDialog(_("提示"),_("加入联盟后开放此功能!"),function()end)
+        end
+    elseif self._channelType == 'allianceFight' then
+        local status = my_alliance:Status()
+        if status ~= 'prepare' and status ~= 'fight' then
+            UIKit:showMessageDialog(_("提示"),_("联盟未处于战争状态，不能使用此聊天频道!"),function()end)
+        end
+    end
+end
 
 function GameUIChatChannel:GetChatIcon(icon)
     local bg = display.newSprite("dragon_bg_114x114.png"):scale(66/114)
@@ -325,13 +337,13 @@ function GameUIChatChannel:RefreshListView()
     if self._channelType ~= 'global' then
         local my_alliance = Alliance_Manager:GetMyAlliance()
         if my_alliance:IsDefault() then
-            UIKit:showMessageDialog(_("提示"),_("加入联盟后开放此功能!"),function()end)
+            -- UIKit:showMessageDialog(_("提示"),_("加入联盟后开放此功能!"),function()end)
             self.dataSource_ = {}
         elseif self._channelType == 'allianceFight' then
             local status = my_alliance:Status()
             if status ~= 'prepare' and status ~= 'fight' then
-                UIKit:showMessageDialog(_("提示"),_("联盟未处于战争状态，不能使用此聊天频道!"),function()end)
                 self.dataSource_ = {}
+                -- UIKit:showMessageDialog(_("提示"),_("联盟未处于战争状态，不能使用此聊天频道!"),function()end)
             else
                 self.dataSource_ = clone(self:FetchCurrentChannelMessages())
             end
@@ -393,8 +405,13 @@ function GameUIChatChannel:HandleCellUIData(mainContent,chat,update_time)
     local vipLabel = currentContent.vip_label
     local name_title = chat.allianceTag == "" and chat.name or string.format("[ %s ] %s",chat.allianceTag,chat.name)
     titleLabel:setString(name_title)
-    vipLabel:setString('VIP ' .. DataUtils:getPlayerVIPLevel(chat.vip))
-    vipLabel:setPositionX(titleLabel:getPositionX() + titleLabel:getContentSize().width + 15)
+    if chat.vipActive then
+        vipLabel:setString('VIP ' .. DataUtils:getPlayerVIPLevel(chat.vip))
+        vipLabel:setPositionX(titleLabel:getPositionX() + titleLabel:getContentSize().width + 15)
+        vipLabel:show()
+    else
+        vipLabel:hide()
+    end
     if update_time or not chat.timeStr then
         chat.timeStr = NetService:formatTimeAsTimeAgoStyleByServerTime(chat.time)
     end
@@ -596,7 +613,8 @@ function GameUIChatChannel:CreatePlayerMenu(event,chat)
         elseif msg == 'out' then
             local tag = data.tag
             if tag ~= 'blockChat' then
-                if #self:GetDataSource() - 7 <= 0 or listView:getItemWithLogicIndex(#self:GetDataSource() - 7) then
+                local __,offset_y = listView:getSlideDistance()
+                if offset_y  < 0 then
                     listView:scrollAuto()
                 else
                     if distance > 0 then

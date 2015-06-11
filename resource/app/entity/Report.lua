@@ -380,6 +380,8 @@ function Report:GetReportTitle()
                 return result and _("进攻协防部队成功") or _("进攻协防部队失败")
             elseif data.fightWithDefencePlayerReports then
                 return result and _("进攻城市成功") or _("进攻城市失败")
+            else
+                return _("进攻城市成功")
             end
         elseif data.defencePlayerData and data.defencePlayerData.id == self.player_id then
             return result and _("防守城市成功") or _("防守城市失败")
@@ -457,53 +459,9 @@ function Report:IsWin()
             return false
         end
     elseif report_type=="attackCity" then
-        if data.attackPlayerData.id == self.player_id then
-            if data.fightWithHelpDefencePlayerReports then
-                local round = data.fightWithHelpDefencePlayerReports.attackPlayerSoldierRoundDatas
-                if not round then
-                    return true
-                end
-                return round[#round].isWin
-            elseif data.fightWithDefencePlayerReports then
-                local round = data.fightWithDefencePlayerReports.attackPlayerSoldierRoundDatas
-                if not round then
-                    return true
-                end
-                return round[#round].isWin
-            end
-        elseif data.defencePlayerData and data.defencePlayerData.id == self.player_id then
-            local round = data.fightWithDefencePlayerReports.defencePlayerSoldierRoundDatas
-            if not round then
-                return false
-            end
-            return round[#round].isWin
-        elseif data.helpDefencePlayerData and
-            data.helpDefencePlayerData.id == self.player_id then
-            local round = data.fightWithHelpDefencePlayerReports.defencePlayerSoldierRoundDatas
-            return round[#round].isWin
-        end
+        return self:GetReportResult()
     elseif report_type=="attackVillage" then
-        if data.attackPlayerData.id == self.player_id then
-            if data.fightWithDefencePlayerReports then
-                local round = data.fightWithDefencePlayerReports.attackPlayerSoldierRoundDatas
-                if not round then
-                    return true
-                end
-                return round[#round].isWin
-            elseif data.fightWithDefenceVillageReports then
-                local round = data.fightWithDefenceVillageReports.attackPlayerSoldierRoundDatas
-                if not round then
-                    return true
-                end
-                return round[#round].isWin
-            end
-        elseif data.defencePlayerData and data.defencePlayerData.id == self.player_id then
-            local round = data.fightWithDefencePlayerReports.defencePlayerSoldierRoundDatas
-            if not round then
-                return false
-            end
-            return round[#round].isWin
-        end
+        return self:GetReportResult()
     elseif report_type=="collectResource" then
         return true
     end
@@ -546,7 +504,7 @@ function Report:GetFightDefenceSoldierRoundData()
 end
 function Report:IsFightWall()
     local data = self:GetFightReports()
-    return data.attackPlayerWallRoundDatas
+    return  data.attackPlayerWallRoundDatas and #data.attackPlayerWallRoundDatas > 0
 end
 function Report:GetFightAttackWallRoundData()
     local data = self:GetFightReports()
@@ -642,6 +600,10 @@ function Report:GetReportResult()
             return my_round[#my_round].isWin
         end
     elseif data.defencePlayerData and data.defencePlayerData.id == self.player_id then
+        -- 完全没有战斗数据,表示防守玩家城墙血量为零，且没有驻防
+        if not data.fightWithDefencePlayerReports then
+            return false
+        end
         -- 打到城墙，直接算输
         local wall_round = data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas
         if wall_round then

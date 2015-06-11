@@ -152,7 +152,7 @@ local building_details_map = {
     ["orderHall"] = {
         {90,			130,		300},
         {_("等级"), _("战斗力"),_("村落定期生成数量")},
-        {"level",  	"power"    ,"woodVillageCount" },
+        {"level",  	"power"    ,"villageCount" },
     },
     ["palace"] = {
         {90,			130,		300},
@@ -167,7 +167,7 @@ local building_details_map = {
     ["shrine"] = {
         {90,		100,		200,			130},
         {_("等级"), _("战斗力"),_("感知力上限"),_("感知力恢复每小时")},
-        {_("level"), _("power"),_("perception"),_("pRecoveryPerHour")},
+        {"level","power","perception","pRecoveryPerHour"},
     },
 }
 
@@ -177,6 +177,14 @@ function GameUICityBuildingInfo:ctor(building)
     if building.__cname and string.find(building.__cname,"UpgradeBuilding") then
         building_name = building:GetType()
         config = building:GetFunctionConfig()[building_name]
+        building_level = building:GetLevel()
+    elseif building.__cname == "GateEntity" then
+        building_name = building:GetType()
+        config = building:GetConfig()
+        building_level = building:GetLevel()
+    elseif building.__cname == "TowerEntity" then
+        building_name = building:GetType()
+        config = building:GetConfig()
         building_level = building:GetLevel()
     else
         building_name = building.name

@@ -12,27 +12,27 @@ intInit["buyArchonGem"] = {
 }
 intInit["editAllianceBasicInfoGem"] = {
 	["type"] = "editAllianceBasicInfoGem",
-	["value"] = 50,
+	["value"] = 200,
 	["desc"] = "编辑联盟基础信息所需宝石"
 }
 intInit["editAllianceTerrianHonour"] = {
 	["type"] = "editAllianceTerrianHonour",
-	["value"] = 50,
+	["value"] = 5000,
 	["desc"] = "编辑联盟地形所需荣耀值"
 }
 intInit["activeShrineStageEventMinutes"] = {
 	["type"] = "activeShrineStageEventMinutes",
-	["value"] = 5,
+	["value"] = 30,
 	["desc"] = "圣地战激活后持续时间"
 }
 intInit["allianceFightPrepareMinutes"] = {
 	["type"] = "allianceFightPrepareMinutes",
-	["value"] = 1,
+	["value"] = 20,
 	["desc"] = "联盟战准备期时间"
 }
 intInit["allianceFightTotalFightMinutes"] = {
 	["type"] = "allianceFightTotalFightMinutes",
-	["value"] = 5,
+	["value"] = 60,
 	["desc"] = "联盟战战争期时间"
 }
 intInit["allianceHelpDefenceTroopsMaxCount"] = {
@@ -42,7 +42,7 @@ intInit["allianceHelpDefenceTroopsMaxCount"] = {
 }
 intInit["allianceRevengeMaxMinutes"] = {
 	["type"] = "allianceRevengeMaxMinutes",
-	["value"] = 5,
+	["value"] = 1440,
 	["desc"] = "复仇最大时间"
 }
 intInit["allianceRegionMapWidth"] = {
@@ -62,17 +62,17 @@ intInit["citizenPerLeadership"] = {
 }
 intInit["dragonStrikeHpDecreasedPercent"] = {
 	["type"] = "dragonStrikeHpDecreasedPercent",
-	["value"] = 10,
+	["value"] = 5,
 	["desc"] = "龙突袭每次减少的血量百分比"
 }
 intInit["allianceFightFaiedProtectMinutes"] = {
 	["type"] = "allianceFightFaiedProtectMinutes",
-	["value"] = 1,
+	["value"] = 180,
 	["desc"] = "联盟战失败保护期时间"
 }
 intInit["allianceFightSuccessProtectMinutes"] = {
 	["type"] = "allianceFightSuccessProtectMinutes",
-	["value"] = 1,
+	["value"] = 180,
 	["desc"] = "联盟战成功保护期时间"
 }
 intInit["KilledCitizenPerDragonExp"] = {
@@ -92,6 +92,6 @@ intInit["KilledCitizenPerWallHp"] = {
 }
 intInit["villageRefreshMinutes"] = {
 	["type"] = "villageRefreshMinutes",
-	["value"] = 10,
+	["value"] = 240,
 	["desc"] = "村落采空后多少分钟后刷新"
 }

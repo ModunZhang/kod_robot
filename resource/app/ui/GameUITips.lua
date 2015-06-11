@@ -104,7 +104,7 @@ function GameUITips:Tips()
         {title = _("3.升级主城堡"),image = 'keep_1.png',text = _("升级城堡能够提升建筑的等级上限，解锁更多的地块和新的建筑"),scale = 0.25},
         {title = _("4.招募部队"),image = 'barracks.png',text = _("在兵营招募部队，招募出的部队会持续消耗粮食，请务必保证自己的粮食产量充足"),scale = 0.45},
         {title = _("5.飞艇探索"),image = 'airship.png',text = _("使用飞艇，带领部队探索外域，获得资源还能增长巨龙等级，提升带兵总量"),scale = 0.35},
-        {title = _("6.加入联盟"),image = UILib.alliance_building.palace,text = _("解锁联盟领地，参加联盟会战，并解锁更多新奇的玩法"),scale = 0.65},
+        {title = _("6.加入联盟"),image = UILib.alliance_building.palace,text = _("解锁联盟领地，参加联盟会战，并解锁更多新奇的玩法"),scale = 0.5},
     }
     return tips
 end

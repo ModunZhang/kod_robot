@@ -38,8 +38,50 @@ function AllianceFightApi:RecruitNormalSoldier()
         end
         dump(unlock_soldiers)
         local soldier_type = unlock_soldiers[math.random(#unlock_soldiers)]
-        print("立即招募普通士兵",soldier_type)
-        return NetManager:getInstantRecruitNormalSoldierPromise(soldier_type, 10)
+        print("招募普通士兵",soldier_type)
+        if math.random(2) == 2 then
+            return NetManager:getRecruitNormalSoldierPromise(soldier_type, 10)
+        else
+            return NetManager:getInstantRecruitNormalSoldierPromise(soldier_type, 10)
+        end
+    end
+end
+-- 招募特殊士兵
+function AllianceFightApi:RecruitSpecialSoldier()
+    -- 兵营是否已解锁
+    if app:IsBuildingUnLocked(5) then
+        local barracks = City:GetFirstBuildingByType("barracks")
+        local re_time = DataUtils:GetNextRecruitTime()
+        if tolua.type(re_time) == "boolean" then
+            -- 检查材料是否足够
+            local soldier_types = {
+                "skeletonWarrior",
+                "skeletonArcher",
+                "deathKnight",
+                "meatWagon",
+            }
+            local soldier_type = soldier_types[math.random(#soldier_types)]
+            local soldier_config = City:GetSoldierManager():GetSoldierConfig(soldier_type)
+            local count = 1 -- 招募一个
+            local specialMaterials = string.split(soldier_config.specialMaterials,",")
+            local is_enough = true
+            for k,v in pairs(specialMaterials) do
+                local temp = string.split(v, "_")
+                local total = City:GetMaterialManager():GetMaterialsByType(City:GetMaterialManager().MATERIAL_TYPE.SOLDIER)[temp[1]]
+                if total < count then
+                    is_enough = false
+                    break
+                end
+            end
+            if is_enough then
+                print("招募特殊士兵：",soldier_type)
+                if math.random(2) == 2 then
+                    return NetManager:getRecruitSpecialSoldierPromise(soldier_type, count)
+                else
+                    return NetManager:getInstantRecruitSpecialSoldierPromise(soldier_type, count)
+                end
+            end
+        end
     end
 end
 -- 开启联盟战
@@ -114,7 +156,7 @@ function AllianceFightApi:March()
             "village", -- 采集自己的村落
             "retreatFromVillage", -- 从村落撤军
             "enemyVillage", -- 采集敌方的村落
-            -- "shrine", -- 圣地
+            "shrine", -- 圣地
             "helpDefence", -- 协防
             "retreatHelped", -- 撤防
         }
@@ -196,8 +238,39 @@ function AllianceFightApi:March()
                 return NetManager:getAttackVillagePromise(dragonType,fight_soldiers,enemy_alliance:Id(),attack_village.id)
             end
         elseif excute == "shrine" then
-            -- TODO 圣地
-            return
+            -- 圣地
+            -- 小几率执行获取圣地战历史记录api
+            if math.random(100) < 5 then
+                print("小几率执行获取圣地战历史记录api")
+                return NetManager:getShrineReportsPromise()
+            else
+                local alliance_shirine = alliance:GetAllianceShrine()
+                if alliance_shirine:HaveEvent() and alliance_shirine:CheckSelfCanDispathSoldiers() and #fight_soldiers > 0 and dragonType then
+                    local shirineEvents = alliance_shirine:GetShrineEvents()
+                    local fightEvent = shirineEvents[math.random(#shirineEvents)]
+                    print("攻打圣地,派出龙:",dragonType)
+                    dump(fight_soldiers,"攻打圣地,派出士兵")
+                    return NetManager:getMarchToShrinePromose(fightEvent:Id(),dragonType,fight_soldiers)
+                else
+                    local member = alliance:GetSelf()
+                    if member:CanActivateShirneEvent()  then
+                        local alliance_stages = alliance_shirine:Stages()
+                        local can_active_stage = {}
+                        for k,stage in pairs(alliance_stages) do
+                            if not stage:IsLocked() then
+                                table.insert(can_active_stage, stage)
+                            end
+                        end
+                        local to_active_stage = can_active_stage[math.random(#can_active_stage)]
+                        if to_active_stage:NeedPerception() <= alliance_shirine:GetPerceptionResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()) 
+                            and not alliance_shirine:GetShrineEventByStageName(to_active_stage:StageName())
+                            then
+                            print("激活联盟圣地事件",to_active_stage:StageName())
+                            return NetManager:getActivateAllianceShrineStagePromise(to_active_stage:StageName())
+                        end
+                    end
+                end
+            end
         elseif excute == "helpDefence" and #fight_soldiers > 0 and dragonType and not alliance:GetAllianceBelvedere():IsReachEventLimit() then
             local allMembers = alliance:GetAllMembers()
             local can_help_member = {}
@@ -301,16 +374,32 @@ local function SpeedUpMarchEvent()
         setRun()
     end
 end
+local function RecruitSpecialSoldier()
+    local p = AllianceFightApi:RecruitSpecialSoldier()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 
 
 return {
     setRun,
     TreatSoldiers,
     RecruitNormalSoldier,
-    StartAllianceWar,
-    March,
-    SpeedUpMarchEvent,
+    RecruitSpecialSoldier,
+StartAllianceWar,
+March,
+SpeedUpMarchEvent,
 }
+
+
+
+
+
+
+
 
 
 

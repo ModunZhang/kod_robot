@@ -99,6 +99,17 @@ function AllianceBelvedere:Reset()
 	self:ClearAllListener()
 end
 
+function AllianceBelvedere:IsMeBeAttacked()
+	local other_events = self:GetOtherEvents()
+	for __,v in ipairs(other_events) do
+		local march_type = v:WithObject():MarchType()
+		if march_type ~= 'helpDefence' then
+			return true
+		end
+	end
+	return false
+end
+
 --返回是否有瞭望塔事件发生 和瞭望塔事件数量(包含协防事件)
 function AllianceBelvedere:HasEvents()
 	if self:GetAlliance():IsDefault() then return false,0 end

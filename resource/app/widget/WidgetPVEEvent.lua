@@ -169,8 +169,9 @@ function WidgetPVEEvent:CreateItem()
     node.progress:setMidpoint(cc.p(0,0))
     node.desc = UIKit:ttfLabel({
         text = "",
-        size = 16,
+        size = 18,
         color = 0xd1ca95,
+        shadow = true,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
 
     node.button = cc.ui.UIPushButton.new({

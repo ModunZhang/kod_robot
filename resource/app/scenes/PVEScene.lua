@@ -30,7 +30,6 @@ local DIRECTION_TAG = 911
 
 local timer = app.timer
 function PVEScene:ctor(user)
-    self:LoadAnimation()
     PVEScene.super.ctor(self)
     self.user = user
     self.move_step = 1
@@ -42,7 +41,7 @@ function PVEScene:onEnter()
     self:GetSceneLayer():GotoMapPositionInMiddle(point.x, point.y)
     self:GetSceneLayer():ZoomTo(0.8)
     self:GetSceneLayer():MoveCharTo(self.user:GetPVEDatabase():GetCharPosition())
-    app:GetAudioManager():PlayGameMusic("PVEScene",true)
+    app:GetAudioManager():PlayGameMusicOnSceneEnter("PVEScene",true)
     self.user:GetPVEDatabase():SetLocationHandle(self)
 end
 function PVEScene:onEnterTransitionFinish()
@@ -71,6 +70,16 @@ function PVEScene:onExit()
         end)
     end
 end
+function PVEScene:GetPreloadImages()
+    return {
+        {image = "animations/heihua_animation_0.pvr.ccz",list = "animations/heihua_animation_0.plist"},
+        {image = "animations/heihua_animation_1.pvr.ccz",list = "animations/heihua_animation_1.plist"},
+        {image = "animations/heihua_animation_2.pvr.ccz",list = "animations/heihua_animation_2.plist"},
+        {image = "animations/region_animation_0.pvr.ccz",list = "animations/region_animation_0.plist"},
+        {image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
+        {image = "pve_png_rgba5555.pvr.ccz",list = "pve_png_rgba5555.plist"},
+    }
+end
 function PVEScene:CreateDirectionArrow()
     if not self:getChildByTag(DIRECTION_TAG) then
         return WidgetDirectionSelect.new():pos(display.cx, display.cy)
@@ -85,10 +94,6 @@ function PVEScene:GetDirectionArrow()
 end
 function PVEScene:DestroyDirectionArrow()
     self:removeChildByTag(DIRECTION_TAG)
-end
-function PVEScene:LoadAnimation()
-    UILib.loadSolidersAnimation()
-    UILib.loadPveAnimation()
 end
 function PVEScene:CreateSceneLayer()
     return PVELayer.new(self, self.user)
@@ -260,15 +265,7 @@ function PVEScene:CheckTrap()
                 enemy.soldiers,-- pve 怪数据
                 function(dragonType, soldiers)
                     local dragon = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager():GetDragon(dragonType)
-                    local attack_dragon = {
-                        level = dragon:Level(),
-                        dragonType = dragonType,
-                        currentHp = dragon:Hp(),
-                        hpMax = dragon:GetMaxHP(),
-                        strength = dragon:TotalStrength(),
-                        vitality = dragon:TotalVitality(),
-                        dragon = dragon
-                    }
+
                     local attack_soldier = LuaUtils:table_map(soldiers, function(k, v)
                         return k, {
                             name = v.name,
@@ -277,8 +274,8 @@ function PVEScene:CheckTrap()
                         }
                     end)
 
-                    local report = GameUtils:DoBattle(
-                        {dragon = attack_dragon, soldiers = attack_soldier},
+                    local report = DataUtils:DoBattle(
+                        {dragon = dragon, soldiers = attack_soldier},
                         {dragon = enemy.dragon, soldiers = enemy.soldiers},
                         trap_obj:GetMap():Terrain(), _("散兵游勇")
                     )
@@ -322,6 +319,7 @@ end
 
 
 return PVEScene
+
 
 
 

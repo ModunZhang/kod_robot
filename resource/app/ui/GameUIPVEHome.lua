@@ -9,6 +9,7 @@ local WidgetHomeBottom = import("..widget.WidgetHomeBottom")
 local WidgetUseItems = import("..widget.WidgetUseItems")
 local ChatManager = import("..entity.ChatManager")
 local WidgetChat = import("..widget.WidgetChat")
+local light_gem = import("..particles.light_gem")
 local WidgetPVEEvent = import("..widget.WidgetPVEEvent")
 local pve_level = GameDatas.ClientInitGame.pve_level
 local timer = app.timer
@@ -122,7 +123,9 @@ function GameUIPVEHome:CreateTop()
     ):onButtonClicked(function(event)
         UIKit:newGameUI('GameUIStore'):AddToCurrentScene(true)
     end):addTo(top_bg):align(display.RIGHT_TOP, size.width - 45, 85)
-    cc.ui.UIImage.new("gem_icon_62x61.png"):addTo(gem_button):pos(-60, -62)
+    local gem_icon = cc.ui.UIImage.new("gem_icon_62x61.png"):addTo(gem_button):pos(-60, -62)
+    light_gem():addTo(gem_icon, 1022):pos(62/2, 61/2)
+
     self.gem_label = UIKit:ttfLabel({
         text = ""..string.formatnumberthousands(City:GetUser():GetGemResource():GetValue()),
         size = 20,
@@ -163,6 +166,8 @@ function GameUIPVEHome:CreateTop()
 
     self.reward = display.newSprite(UILib.item[self:GetRewardItemName()],nil,nil,{class=cc.FilteredSpriteWithOne})
         :addTo(reward_btn):scale(0.6)
+    local s = self.reward:getContentSize()
+    light_gem():addTo(self.reward, 10):pos(s.width/2, s.height/2)
     self:RefreshRewards()
 
 
@@ -230,6 +235,7 @@ function GameUIPVEHome:RefreshRewards()
     self.reward:setTexture(UILib.item[self:GetRewardItemName()])
     if self.layer:CurrentPVEMap():IsRewarded() then
         self.reward:setFilter(filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1}))
+        self.reward:removeAllChildren()
     else
         self.reward:clearFilter()
     end

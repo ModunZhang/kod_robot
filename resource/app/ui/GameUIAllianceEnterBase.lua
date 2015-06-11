@@ -312,6 +312,11 @@ function GameUIAllianceEnterBase:GetEnterButtons()
     end
 end
 
+function GameUIAllianceEnterBase:CheckMeIsProtectedWarinng()
+    local alliance = self:GetMyAlliance()
+    local me = alliance:GetSelf()
+    return me:IsProtected()
+end
 
 function GameUIAllianceEnterBase:BuildOneButton(image,title,music_info)
     local btn = WidgetPushButton.new({normal = "btn_138x110.png",pressed = "btn_pressed_138x110.png"},{}

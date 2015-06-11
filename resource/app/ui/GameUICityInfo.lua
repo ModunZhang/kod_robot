@@ -5,7 +5,39 @@ local WidgetChangeMap = import("..widget.WidgetChangeMap")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local GameUICityInfo = UIKit:createUIClass('GameUICityInfo')
 
+
+
+
+function GameUICityInfo:DisplayOn()
+    self.visible_count = self.visible_count + 1
+    self:FadeToSelf(self.visible_count > 0)
+end
+function GameUICityInfo:DisplayOff()
+    self.visible_count = self.visible_count - 1
+    self:FadeToSelf(self.visible_count > 0)
+end
+function GameUICityInfo:FadeToSelf(isFullDisplay)
+    self:stopAllActions()
+    if isFullDisplay then
+        self:show()
+        transition.fadeIn(self, {
+            time = 0.2,
+        })
+    else
+        transition.fadeOut(self, {
+            time = 0.2,
+            onComplete = function()
+                self:hide()
+            end,
+        })
+    end
+end
+
+
+
+
 function GameUICityInfo:ctor(user, location)
+    self.visible_count = 1
     GameUICityInfo.super.ctor(self, {type = UIKit.UITYPE.BACKGROUND})
     self.user = user
     self.location = location
@@ -155,7 +187,7 @@ function GameUICityInfo:CreateBottom()
     self.chat = WidgetChat.new():addTo(bottom_bg)
         :align(display.CENTER, bottom_bg:getContentSize().width/2, bottom_bg:getContentSize().height-11)
 
-    cc.ui.UILabel.new({text = "您正在访问其他玩家的城市, 无法使用其他功能, 点击左下角返回城市",
+    cc.ui.UILabel.new({text = _("您正在访问其他玩家的城市, 无法使用其他功能, 点击左下角返回城市"),
         size = 20,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_CENTER,

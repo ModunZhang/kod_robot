@@ -31,7 +31,7 @@ function WidgetResources:onExit()
     self.city:GetResourceManager():RemoveObserver(self)
 end
 function WidgetResources:OnSoliderCountChanged(...)
-    self.maintenance_cost.value:setString("-"..GameUtils:formatNumber(self.city:GetSoldierManager():GetTotalUpkeep()))
+    self.maintenance_cost.value:setString("-"..GameUtils:formatNumber(self.city:GetSoldierManager():GetTotalUpkeep()).."/h")
 end
 -- 资源刷新
 function WidgetResources:OnResourceChanged(resource_manager)
@@ -49,20 +49,19 @@ function WidgetResources:OnResourceChanged(resource_manager)
     end
 end
 
-local city = City
 local FOOD = ResourceManager.RESOURCE_TYPE.FOOD
 function WidgetResources:RefreshSpecifyResource(resource,item,maxvalue,occupy_citizen, type_)
     if maxvalue then
         item.ProgressTimer:setPercentage(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())/maxvalue*100)
         item.resource_label:setString(GameUtils:formatNumber(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())).."/"..GameUtils:formatNumber(maxvalue))
         if type_ == FOOD then
-            item.produce_capacity.value:setString(GameUtils:formatNumber(city:GetResourceManager():GetFoodProductionPerHour()) .."/h")
+            item.produce_capacity.value:setString(GameUtils:formatNumber(self.city:GetResourceManager():GetFoodProductionPerHour()) .."/h")
         else
             item.produce_capacity.value:setString(GameUtils:formatNumber(resource:GetProductionPerHour()).."/h")
         end
         item.occupy_citizen.value:setString(GameUtils:formatNumber(occupy_citizen).."")
     else
-        item.resource_label:setString(GameUtils:formatNumber(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())))
+        item.resource_label.value:setString(GameUtils:formatNumber(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())))
         --  local townHall = self.city:GetFirstBuildingByType("townHall")
         -- local title_value = townHall:IsInImposing() and _("正在征税") or _("当前没有进行征税")
         -- item.tax.title:setString(title_value)
@@ -90,7 +89,7 @@ function WidgetResources:InitAllResources()
             resource_current_value=crm:GetFoodResource():GetResourceValueByCurrentTime(current_time),
             total_income=GameUtils:formatNumber(crm:GetFoodProductionPerHour()).."/h",
             occupy_citizen=GameUtils:formatNumber(City:GetCitizenByType("farmer")),
-            maintenance_cost="-"..GameUtils:formatNumber(self.city:GetSoldierManager():GetTotalUpkeep()),
+            maintenance_cost="-"..GameUtils:formatNumber(self.city:GetSoldierManager():GetTotalUpkeep()).."/h",
             type = "food"
         },
         wood = {
@@ -235,14 +234,15 @@ function WidgetResources:AddResourceItem(parms)
     else
         -- coin 显示不同信息
         -- 当前coin
-        item.resource_label = cc.ui.UILabel.new({
-            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-            text = resource_current_value.."",
-            font = UIKit:getFontFilePath(),
-            size = 24,
-            align = ui.TEXT_ALIGN_CENTER,
-            color = UIKit:hex2c3b(0x403c2f),
-        }):align(display.LEFT_CENTER, 154, c_size.height-22):addTo(content)
+        item.resource_label = createTipItem({
+            title = _("当前数量"),
+            title_color = UIKit:hex2c3b(0x615b44),
+            value = resource_current_value ,
+            value_color = UIKit:hex2c3b(0x403c2f),
+            x = icon_bg:getPositionX()+icon_bg:getContentSize().width/2+180,
+            y = c_size.height-36
+        })
+        item.resource_label:addTo(content)
         -- 单位产能
         item.produce_capacity = createTipItem({
             title = _("单位产能"),
@@ -253,39 +253,18 @@ function WidgetResources:AddResourceItem(parms)
             y = c_size.height-70
         })
         item.produce_capacity:addTo(content)
-        -- item.resource_label:setAnchorPoint(cc.p(0,0.5))
-        -- item.resource_label:pos(-125, 40)
-        -- 是否在征税
-        -- local townHall = self.city:GetFirstBuildingByType("townHall")
-        -- local title_value = townHall:IsInImposing() and _("正在征税") or _("当前没有进行征税")
-        -- local tax_time = townHall:IsInImposing() and GameUtils:formatTimeStyle1(townHall:GetTaxEvent():LeftTime(app.timer:GetServerTime())) or ""
-        -- item.tax = createTipItem({
-        --     title = title_value,
-        --     title_color = UIKit:hex2c3b(0x615b44),
-        --     value = tax_time ,
-        --     value_color = UIKit:hex2c3b(0x403c2f),
-        --     x = 40,
-        --     y = -10
-        -- })
-        -- content:addWidget(item.tax)
-        --  空闲人口
-        -- item.free_citizen = createTipItem({
-        --     title = _("空闲人口"),
-        --     title_color = UIKit:hex2c3b(0x615b44),
-        --     value = occupy_citizen ,
-        --     value_color = UIKit:hex2c3b(0x403c2f),
-        --     x = 40,
-        --     y = -40
-        -- })
-        -- content:addWidget(item.free_citizen)
     end
 
     -- 使用道具增加资源按钮
-    WidgetPushButton.new({normal = "button_wareHouseUI_normal.png",pressed = "button_wareHouseUI_pressed.png"})
+    cc.ui.UIPushButton.new()
+        :addTo(content):align(display.CENTER, c_size.width/2, c_size.height/2)
         :onButtonClicked(function(event)
-            print("string.split(resource_icon, )[1]",string.split(resource_icon, "_")[1])
             local items = ItemManager:GetItemByName(parms.type.."Class_1")
             WidgetUseItems.new():Create({item = items}):AddToCurrentScene()
+        end):setContentSize(c_size)
+
+    WidgetPushButton.new({normal = "button_wareHouseUI_normal.png",pressed = "button_wareHouseUI_pressed.png"})
+        :onButtonClicked(function(event)
         end):align(display.CENTER, c_size.width-32, c_size.height/2):addTo(content)
         :addChild(display.newSprite("add.png"))
 
@@ -297,6 +276,7 @@ function WidgetResources:AddResourceItem(parms)
 end
 
 return WidgetResources
+
 
 
 

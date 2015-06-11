@@ -322,9 +322,9 @@ function GameUIResource:GetTitleByType(building)
     elseif type == ResourceManager.RESOURCE_TYPE.IRON then
         return _("矿工小屋"),_("铁矿产量"),_("当前产出铁矿")
     elseif type == ResourceManager.RESOURCE_TYPE.STONE then
-        return _("石匠小屋"),_("石料产量"),_("当前产出铁矿")
+        return _("石匠小屋"),_("石料产量"),_("当前产出石料")
     elseif type == ResourceManager.RESOURCE_TYPE.FOOD then
-        return _("农夫小屋"),_("粮食产量"),_("当前产出铁矿")
+        return _("农夫小屋"),_("粮食产量"),_("当前产出粮食")
     elseif type == ResourceManager.RESOURCE_TYPE.CITIZEN then
         return _("住宅"),_("城民上限"),_("当前城民增长")
     else

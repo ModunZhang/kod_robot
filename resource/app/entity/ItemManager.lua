@@ -165,6 +165,9 @@ function ItemManager:OnItemEventTimer(itemEvent)
         listener.OnItemEventTimer(listener,itemEvent)
     end)
 end
+function ItemManager:IsAnyItmeEventActive()
+   return LuaUtils:table_size(self.itemEvents) > 0
+end
 function ItemManager:GetItemEventByType( type )
     return self.itemEvents[type]
 end

@@ -57,9 +57,6 @@ local BUILDING_ANIMATIONS_FILES = {
     warehouse = {
         "animations/ziyuancangku.ExportJson",
     },
-    smoke = {
-        "animations/yan.ExportJson",
-    },
     hammer = {
         "animations/chuizi.ExportJson",
     },
@@ -85,6 +82,7 @@ local BUILDING_ANIMATIONS_FILES = {
         "animations/tong_box.ExportJson",
         "animations/yin_box.ExportJson",
         "animations/jin_box.ExportJson",
+        "animations/Box_guang.ExportJson",
     }
 }
 local BUILDING_ANIMATIONS = getAniNameFromAnimationFiles(BUILDING_ANIMATIONS_FILES)
@@ -728,7 +726,7 @@ local DAILY_TASK_ICON = {
 local PVEDefine = import("..entity.PVEDefine")
 local SpriteConfig = import("..sprites.SpriteConfig")
 local PVE = {
-    [PVEDefine.START_AIRSHIP] = {"image", "pve_char.png", 0.4},
+    [PVEDefine.START_AIRSHIP] = {"image", "pve_char.png", 1},
     [PVEDefine.WOODCUTTER] = {"image", SpriteConfig["woodcutter"]:GetConfigByLevel(1).png},
     [PVEDefine.QUARRIER] = {"image", SpriteConfig["quarrier"]:GetConfigByLevel(1).png},
     [PVEDefine.MINER] = {"image", SpriteConfig["miner"]:GetConfigByLevel(1).png},
@@ -851,6 +849,7 @@ local IAP_PACKAGE_IMAGE = {
         npc  = "store_npc_1_109x130.png",
         more = {normal = "store_more_red_button_n_584x34.png",pressed = "store_more_red_button_l_584x34.png"},
         small_content = "store_item_content_red_s_588x186.png",
+        light_position = {x = 200 ,y= 70}
     },
     product_2 = {
         content = "store_item_black_610x514.png",
@@ -858,6 +857,7 @@ local IAP_PACKAGE_IMAGE = {
         desc = "store_desc_red_282x92.png",
         more = {normal = "store_more_black_button_n_584x34.png",pressed = "store_more_black_button_l_584x34.png"},
         small_content = "store_item_content_black_s_588x186.png",
+        light_position = {x = 320 ,y= 70}
     },
     product_3 = {
         content = "store_item_black_610x514.png",
@@ -865,6 +865,7 @@ local IAP_PACKAGE_IMAGE = {
         desc = "store_desc_red_282x92.png",
         more = {normal = "store_more_black_button_n_584x34.png",pressed = "store_more_black_button_l_584x34.png"},
         small_content = "store_item_content_black_s_588x186.png",
+        light_position = {x = 320 ,y= 70}
     },
     product_4 = {
         content = "store_item_black_610x514.png",
@@ -872,6 +873,7 @@ local IAP_PACKAGE_IMAGE = {
         desc = "store_desc_red_282x92.png",
         more = {normal = "store_more_black_button_n_584x34.png",pressed = "store_more_black_button_l_584x34.png"},
         small_content = "store_item_content_black_s_588x186.png",
+        light_position = {x = 320 ,y= 70}
     },
     product_5 = {
         content = "store_item_red_610x514.png",
@@ -880,6 +882,7 @@ local IAP_PACKAGE_IMAGE = {
         npc  = "store_npc_2_171x130.png",
         more = {normal = "store_more_red_button_n_584x34.png",pressed = "store_more_red_button_l_584x34.png"},
         small_content = "store_item_content_red_s_588x186.png",
+        light_position = {x = 200 ,y= 70}
     },
 }
 

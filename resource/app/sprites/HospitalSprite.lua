@@ -1,3 +1,4 @@
+local heal = import("..particles.heal")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local HospitalSprite = class("HospitalSprite", FunctionUpgradingSprite)
 
@@ -49,23 +50,7 @@ end
 function HospitalSprite:PlayWoundedSoldiersAni()
     if not self:getChildByTag(WOUNDED_TAG) then
         local x,y = self:GetSprite():getPosition()
-        local emitter = cc.ParticleSnow:createWithTotalParticles(10)
-        :addTo(self, 1, WOUNDED_TAG):pos(x-30,y-80)
-        emitter:setPositionType(2)
-        emitter:setAngle(90)
-        emitter:setPosVar(cc.p(60,0))
-        emitter:setLife(2.0)
-        emitter:setLifeVar(0.5)
-        emitter:setStartSize(20)
-        emitter:setGravity(cc.p(0,1))
-        emitter:setSpeed(60)
-        emitter:setSpeedVar(20)
-        emitter:setStartColor(cc.c4f(1,1,1,0.8))
-        emitter:setStartColorVar(cc.c4f(0,0,0,0.1))
-        emitter:setEndColor(cc.c4f(1,1,1,0.1))
-        emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("+_red.png"))
-        emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
-        emitter:updateWithNoTime()
+        heal():addTo(self, 1, WOUNDED_TAG):pos(x-30,y-80)
     end
 end
 

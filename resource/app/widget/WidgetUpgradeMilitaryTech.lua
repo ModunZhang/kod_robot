@@ -243,7 +243,8 @@ function WidgetUpgradeMilitaryTech:PopNotSatisfyDialog(upgrade_listener,results)
                         listener =  function ()
                             UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
                             self:LeftButtonClicked()
-                        end
+                        end,
+                        btn_name = _("前往商店")
                     })
             end
             or upgrade_listener
@@ -269,6 +270,7 @@ function WidgetUpgradeMilitaryTech:OnMilitaryTechsDataChanged(city,changed_map)
     end
 end
 return WidgetUpgradeMilitaryTech
+
 
 
 

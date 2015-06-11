@@ -17,6 +17,9 @@ end
 function TowerEntity:GetTowerConfig()
     return self.config_building_function[self:GetType()][self:GetLevel()]
 end
+function TowerEntity:GetConfig()
+    return self.config_building_function[self:GetType()]
+end
 function TowerEntity:GetTowerNextLevelConfig()
     return self.config_building_function[self:GetType()][self:GetNextLevel()]
 end

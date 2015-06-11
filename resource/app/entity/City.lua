@@ -1588,6 +1588,18 @@ function City:GetAcademyBuildingLevel()
     end
 end
 
+function City:GeneralProductionLocalPush(productionTechnologyEvent)
+    if ext and ext.localpush then
+        local title = productionTechnologyEvent:GetBuffLocalizedDescComplete()
+        app:GetPushManager():UpdateTechnologyPush(productionTechnologyEvent:FinishTime(),title,productionTechnologyEvent:Id())
+    end
+end
+function City:CancelProductionLocalPush(Id)
+    if ext and ext.localpush then
+        app:GetPushManager():CancelTechnologyPush(Id)
+    end
+end
+
 
 function City:OnProductionTechEventsDataChaned(userData,deltaData)
     if not userData.productionTechEvents then return end
@@ -1606,6 +1618,7 @@ function City:OnProductionTechEventsDataChaned(userData,deltaData)
                 productionTechnologyEvent:SetEntity(self:FindTechByName(productionTechnologyEvent:Name()))
                 self.productionTechEvents[productionTechnologyEvent:Id()] = productionTechnologyEvent
                 productionTechnologyEvent:AddObserver(self)
+                self:GeneralProductionLocalPush(productionTechnologyEvent)
             end
         end
         self:NotifyListeneOnType(City.LISTEN_TYPE.PRODUCTION_EVENT_REFRESH, function(listener)
@@ -1622,6 +1635,7 @@ function City:OnProductionTechEventsDataChaned(userData,deltaData)
                     productionTechnologyEvent:SetEntity(self:FindTechByName(productionTechnologyEvent:Name()))
                     self.productionTechEvents[productionTechnologyEvent:Id()] = productionTechnologyEvent
                     productionTechnologyEvent:AddObserver(self)
+                    self:GeneralProductionLocalPush(productionTechnologyEvent)
                     return productionTechnologyEvent
                 end
             end
@@ -1629,6 +1643,7 @@ function City:OnProductionTechEventsDataChaned(userData,deltaData)
                 if self:FindProductionTechEventById(v.id) then
                     local productionTechnologyEvent = self:FindProductionTechEventById(v.id)
                     productionTechnologyEvent:UpdateData(v)
+                    self:GeneralProductionLocalPush(productionTechnologyEvent)
                     return productionTechnologyEvent
                 end
             end
@@ -1640,6 +1655,7 @@ function City:OnProductionTechEventsDataChaned(userData,deltaData)
                     productionTechnologyEvent = ProductionTechnologyEvent.new()
                     productionTechnologyEvent:UpdateData(v)
                     productionTechnologyEvent:SetEntity(self:FindTechByName(productionTechnologyEvent:Name()))
+                    self:CancelProductionLocalPush(productionTechnologyEvent:Id())
                     return productionTechnologyEvent
                 end
             end

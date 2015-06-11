@@ -79,7 +79,7 @@ function AllianceShrine:GetMaxStageFromServer(alliance_data,deltaData)
 		if alliance_data.shrineDatas then
 			local large_key = ""
 			for _,v in ipairs(alliance_data.shrineDatas) do
-				if v.stageName > large_key then
+				if v.stageName > large_key and v.maxStar > 0 then
 					large_key = v.stageName
 				end
 				self:GetStatgeByName(v.stageName):SetIsLocked(false)
@@ -95,11 +95,13 @@ function AllianceShrine:GetMaxStageFromServer(alliance_data,deltaData)
 	end
 	if is_delta_update then
 		local large_key = ""
+		local max_star = 0
 		local changed_map = GameUtils:Handler_DeltaData_Func(
 			deltaData.shrineDatas,
 			function(data)
 				if data.stageName > large_key then
 					large_key = data.stageName
+					max_star = data.maxStar
 				end
 				self:GetStatgeByName(data.stageName):SetIsLocked(false)
 				self:GetStatgeByName(data.stageName):SetStar(data.maxStar)
@@ -108,6 +110,7 @@ function AllianceShrine:GetMaxStageFromServer(alliance_data,deltaData)
 			function(data)
 				if data.stageName > large_key then
 					large_key = data.stageName
+					max_star = data.maxStar
 				end
 				self:GetStatgeByName(data.stageName):SetIsLocked(false)
 				self:GetStatgeByName(data.stageName):SetStar(data.maxStar)
@@ -118,7 +121,7 @@ function AllianceShrine:GetMaxStageFromServer(alliance_data,deltaData)
 		)
 		if large_key ~= "" then
 			local next_stage = self:GetStageByIndex(self:GetStatgeByName(large_key):Index() + 1)
-			if next_stage then
+			if next_stage and max_star > 0 then
 				next_stage:SetIsLocked(false)
 			end
 		end
@@ -264,10 +267,7 @@ function AllianceShrine:IsNeedRequestReportFromServer()
 end
 
 function AllianceShrine:OnShrineReportsDataChanged(alliance_data,deltaData)	
-	local is_fully_update = deltaData == nil
-	local is_delta_update = not is_fully_update and deltaData.shrineReports ~= nil
-
-	if is_fully_update then
+	if alliance_data.shrineReports then
 		if alliance_data.shrineReports then
 			self.shrineReports = {}
 			for _,v in ipairs(alliance_data.shrineReports) do
@@ -278,29 +278,7 @@ function AllianceShrine:OnShrineReportsDataChanged(alliance_data,deltaData)
 			end
 		end
 	end
-	if is_delta_update then
-		local change_map = GameUtils:Handler_DeltaData_Func(
-			deltaData.shrineReports
-			,function(event)
-					local report = ShrineReport.new()
-					report:Update(event)
-					report:SetStage(self:GetStatgeByName(report:StageName()))
-					table.insert(self.shrineReports,report)
-					return report
-			end
-			,function(event) 
-				--修改事件记录?
-			end
-			,function(event)
-				table.remove(self.shrineReports,#self.shrineReports)
-				local report = ShrineReport.new()
-				report:Update(event)
-				report:SetStage(self:GetStatgeByName(report:StageName()))
-				return report
-			end
-		)
-		self:OnShrineReportsChanged(GameUtils:pack_event_table(change_map))
-	end
+	self:OnShrineReportsChanged({})
 end
 
 function AllianceShrine:OnShrineEventsRefreshed()

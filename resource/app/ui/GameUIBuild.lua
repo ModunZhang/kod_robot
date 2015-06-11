@@ -68,29 +68,28 @@ function GameUIBuild:LoadBuildingQueue()
     }):addTo(back_ground, 2)
         :align(display.LEFT_CENTER, 60, back_ground:getContentSize().height/2)
 
-    WidgetPushButton.new(
-        {normal = "add_btn_up_50x50.png",pressed = "add_btn_down_50x50.png"}
-        ,{}
-        ,{
-            disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
-        })
-        :addTo(back_ground)
-        :align(display.CENTER, back_ground:getContentSize().width - 25, back_ground:getContentSize().height/2)
-        -- :setButtonEnabled(false)
-        :onButtonClicked(function ( event )
-            if event.name == "CLICKED_EVENT" then
-                UIKit:newGameUI("GameUIActivityRewardNew",4):AddToCurrentScene(true)
-            end
-        end)
 
+    if self.build_city:BuildQueueCounts() < 2 then
+        WidgetPushButton.new(
+            {normal = "add_btn_up_50x50.png",pressed = "add_btn_down_50x50.png"}
+            ,{}
+            ,{
+                disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
+            })
+            :addTo(back_ground)
+            :align(display.CENTER, back_ground:getContentSize().width - 25, back_ground:getContentSize().height/2)
+            -- :setButtonEnabled(false)
+            :onButtonClicked(function ( event )
+                if event.name == "CLICKED_EVENT" then
+                    UIKit:newGameUI("GameUIActivityRewardNew",4):AddToCurrentScene(true)
+                end
+            end)
+    end
 
     function back_ground:SetBuildingQueue(current, max)
         local enable = current > 0
         check:setButtonSelected(enable)
-        local str = string.format("%s %d/%d", _("建筑队列"), current, max)
-        if building_label:getString() ~= str then
-            building_label:setString(str)
-        end
+        building_label:setString(string.format(_("建筑队列 %d/%d"), current, max))
     end
 
     return back_ground
@@ -237,14 +236,14 @@ function GameUIBuild:CreateItemWithListView(list_view)
 
     local left_x, right_x = 5, 150
     local frame = display.newSprite("alliance_item_flag_box_126X126.png"):addTo(back_ground):pos((left_x + right_x) / 2, h/2):scale(134/126)
-    local info_btn = WidgetPushButton.new(
-        {normal = "info_26x26.png",pressed = "info_26x26.png"})
-        :addTo(frame)
-        :align(display.CENTER, 16, 16)
+    -- local info_btn = WidgetPushButton.new(
+    --     {normal = "info_26x26.png",pressed = "info_26x26.png"})
+    --     :addTo(frame)
+    --     :align(display.CENTER, 16, 16)
 
 
     local building_icon = display.newSprite(SpriteConfig["dwelling"]:GetConfigByLevel(1).png)
-        :addTo(back_ground):align(display.BOTTOM_CENTER, (left_x + right_x) / 2, 30)
+        :addTo(back_ground):align(display.BOTTOM_CENTER, (left_x + right_x) / 2, 15)
 
     local title_blue = display.newScale9Sprite("title_blue_430x30.png",0, 0,cc.size(410,30),cc.rect(15,10,400,10))
         :addTo(back_ground):align(display.LEFT_CENTER, right_x, h - 23)
@@ -297,9 +296,7 @@ function GameUIBuild:CreateItemWithListView(list_view)
     function item:SetType(item_info, on_build)
         building_icon:setTexture(item_info.png)
         building_icon:scale(item_info.scale)
-        if title_label:getString() ~= item_info.label then
-            title_label:setString(item_info.label)
-        end
+        title_label:setString(item_info.label)
         build_btn:onButtonClicked(function(event)
             on_build(self)
         end)
@@ -329,6 +326,7 @@ function GameUIBuild:CreateItemWithListView(list_view)
 end
 
 return GameUIBuild
+
 
 
 

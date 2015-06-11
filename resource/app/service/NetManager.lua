@@ -16,7 +16,7 @@ local function get_player_response_msg(response)
     if response.msg.playerData then
         local user_data = DataManager:getUserData()
         local edit = decodeInUserDataFromDeltaData(user_data, response.msg.playerData)
-        LuaUtils:outputTable("edit",edit)
+        LuaUtils:outputTable("get_player_response_msg edit",edit)
         DataManager:setUserData(user_data, edit)
         return response
     end
@@ -166,7 +166,6 @@ local function get_response_delete_report_msg(response)
                 clone_response.msg.playerData = {}
                 table.insert(clone_response.msg.playerData, v)
                 local edit = decodeInUserDataFromDeltaData(user_data, clone_response.msg.playerData)
-                LuaUtils:outputTable("删除战报 edit", edit)
                 DataManager:setUserData(user_data, edit)
             end
         end
@@ -529,20 +528,31 @@ end
 -- 登录
 function NetManager:getLoginPromise(deviceId)
     local device_id = device.getOpenUDID()
-    return get_none_blocking_request_promise("logic.entryHandler.login", {deviceId = deviceId or device_id}, nil, true):next(function(response)
+    local requestTime = ext.now()
+    return get_none_blocking_request_promise("logic.entryHandler.login", {
+        deviceId = deviceId or device_id,
+        requestTime = requestTime,
+    }, nil, true):next(function(response)
         if response.success then
             app:GetPushManager():CancelAll() -- 登录成功便清空本地通知
             local playerData = response.msg.playerData
             local user_alliance_data = response.msg.allianceData
             local user_enemy_alliance_data = response.msg.enemyAllianceData
+
+            local diff_time = ext.now() - requestTime 
+            local request_server_time = requestTime + playerData.deltaTime
+            local real_server_time = diff_time / 2 + request_server_time  
+            local delta_time = real_server_time - ext.now()
+
+            -- print_(requestTime, diff_time, playerData.deltaTime, delta_time, request_server_time, real_server_time)
             if self.m_was_inited_game then
-                self.m_netService:setDeltatime(playerData.serverTime - ext.now())
+                self.m_netService:setDeltatime(delta_time)
                 DataManager:setUserData(playerData)
                 DataManager:setUserAllianceData(user_alliance_data)
                 DataManager:setEnemyAllianceData(user_enemy_alliance_data)
             else
                 -- LuaUtils:outputTable("logic.entryHandler.login", response)
-                self.m_netService:setDeltatime(playerData.serverTime - ext.now())
+                self.m_netService:setDeltatime(delta_time)
                 local InitGame = import("app.service.InitGame")
                 InitGame(playerData) -- inner DataManager:setUserData ...
                 DataManager:setUserAllianceData(user_alliance_data)
@@ -554,7 +564,7 @@ function NetManager:getLoginPromise(deviceId)
     end)
 end
 -- 初始化玩家数据
-function NetManager:initPlayerData(terrain)
+function NetManager:initPlayerData(terrain, language)
     if DataManager:getUserData().basicInfo.terrain ~= "__NONE__" then
         assert(false)
     end
@@ -562,7 +572,8 @@ function NetManager:initPlayerData(terrain)
         terrain == "desert" or
         terrain == "iceField" )
     return get_blocking_request_promise("logic.playerHandler.initPlayerData", {
-        terrain = terrain
+        terrain = terrain,
+        language = language or app:GetGameLanguage(),
     }, "初始化玩家数据失败!"):done(get_player_response_msg)
 end
 -- 个人修改地形
@@ -1413,7 +1424,9 @@ function NetManager:getUseItemPromise(itemName,params)
         itemName = itemName,
         params = params,
     }, "使用道具失败!"):done(get_player_response_msg):done(function ()
-        GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具成功"),Localize_item.item_name[itemName]))
+        if not (string.find(itemName,"dragonChest") or string.find(itemName,"chest")) then
+            GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具成功"),Localize_item.item_name[itemName]))
+        end
         if itemName == "torch" then
             app:GetAudioManager():PlayeEffectSoundWithKey("UI_BUILDING_DESTROY")
         else
@@ -1441,7 +1454,7 @@ end
 
 --联盟商店补充道具
 function NetManager:getAddAllianceItemPromise(itemName,count)
-    return get_blocking_request_promise("logic.allianceHandler.addItem",
+    return get_blocking_request_promise("logic.allianceHandler.addShopItem",
         {
             itemName = itemName,
             count = count,
@@ -1450,7 +1463,7 @@ function NetManager:getAddAllianceItemPromise(itemName,count)
 end
 --购买联盟商店的道具
 function NetManager:getBuyAllianceItemPromise(itemName,count)
-    return get_blocking_request_promise("logic.allianceHandler.buyItem",
+    return get_blocking_request_promise("logic.allianceHandler.buyShopItem",
         {
             itemName = itemName,
             count = count,
@@ -1612,6 +1625,10 @@ end
 function NetManager:getPlayerWallInfoPromise(memberId)
     return get_blocking_request_promise("logic.playerHandler.getPlayerWallInfo",{memberId = memberId},"领取首次加入联盟奖励失败!")
 end
+--设置玩家语言
+function NetManager:getSetPlayerLanguagePromise(language_code)
+    return get_blocking_request_promise("logic.playerHandler.setPlayerLanguage",{language = language_code},"设置玩家语言失败!")
+end
 ----------------------------------------------------------------------------------------------------------------
 function NetManager:getUpdateFileList(cb)
     local updateServer = self.m_updateServer.host .. ":" .. self.m_updateServer.port .. "/update/res/fileList.json"
@@ -1665,6 +1682,7 @@ function NetManager:downloadFile(fileInfo, cb, progressCb)
         progressCb(totalSize, currentSize)
     end)
 end
+
 
 
 

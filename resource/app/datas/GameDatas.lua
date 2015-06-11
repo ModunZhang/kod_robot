@@ -424,7 +424,6 @@ GameDatas.PlayerInitData = {
 	["dragonMaterials"] = {},
 	["houses"] = {},
 	["playerLevel"] = {},
-	["pveLevel"] = {},
 }
 require("app.datas.PlayerInitData_intInit")
 require("app.datas.PlayerInitData_stringInit")
@@ -434,7 +433,6 @@ require("app.datas.PlayerInitData_soldierMaterials")
 require("app.datas.PlayerInitData_dragonMaterials")
 require("app.datas.PlayerInitData_houses")
 require("app.datas.PlayerInitData_playerLevel")
-require("app.datas.PlayerInitData_pveLevel")
 
 GameDatas.PlayerVillageExp = {
 	["exp"] = {},

@@ -1,4 +1,5 @@
 local SERVER_ERRORS = {
+    [500] = _("请求出错"),
     [501] = _("设备不存在"),
     [502] = _("用户不存在"),
     [503] = _("玩家不存在"),
@@ -189,38 +190,6 @@ local SERVER_ERRORS = {
     [688] = _("玩家禁止登录"),
     [689] = _("首次加入联盟奖励已经领取"),
     [690] = _("新手引导已经完成"),
-}
-
-local EQUIP_MATERIAL_DESC_LOCALIZE = {
-    ["ingo_1"] = _("打造红龙，蓝龙和绿龙1星装备所必须的材料"),
-    ["ingo_2"] = _("打造红龙，蓝龙和绿龙2星装备所必须的材料"),
-    ["ingo_3"] = _("打造红龙，蓝龙和绿龙3星装备所必须的材料"),
-    ["ingo_4"] = _("打造红龙，蓝龙和绿龙4星装备所必须的材料"),
-    ["redSoul_2"] = _("打造红龙2星装备所必须的材料"),
-    ["redSoul_3"] = _("打造红龙3星装备所必须的材料"),
-    ["redSoul_4"] = _("打造红龙4星装备所必须的材料"),
-    ["blueSoul_2"] = _("打造蓝龙2星装备所必须的材料"),
-    ["blueSoul_3"] = _("打造蓝龙3星装备所必须的材料"),
-    ["blueSoul_4"] = _("打造蓝龙4星装备所必须的材料"),
-    ["greenSoul_2"] = _("打造绿龙2星装备所必须的材料"),
-    ["greenSoul_3"] = _("打造绿龙3星装备所必须的材料"),
-    ["greenSoul_4"] = _("打造绿龙4星装备所必须的材料"),
-    ["redCrystal_1"] = _("打造红龙1星装备所必须的材料"),
-    ["redCrystal_2"] = _("打造红龙2星装备所必须的材料"),
-    ["redCrystal_3"] = _("打造红龙3星装备所必须的材料"),
-    ["redCrystal_4"] = _("打造红龙4星装备所必须的材料"),
-    ["blueCrystal_1"] = _("打造蓝龙1星装备所必须的材料"),
-    ["blueCrystal_2"] = _("打造蓝龙2星装备所必须的材料"),
-    ["blueCrystal_3"] = _("打造蓝龙3星装备所必须的材料"),
-    ["blueCrystal_4"] = _("打造蓝龙4星装备所必须的材料"),
-    ["greenCrystal_1"] = _("打造绿龙1星装备所必须的材料"),
-    ["greenCrystal_2"] = _("打造绿龙2星装备所必须的材料"),
-    ["greenCrystal_3"] = _("打造绿龙3星装备所必须的材料"),
-    ["greenCrystal_4"] = _("打造绿龙4星装备所必须的材料"),
-    ["runes_1"] = _("打造红龙，蓝龙和绿龙1星装备所必须的材料"),
-    ["runes_2"] = _("打造红龙，蓝龙和绿龙2星装备所必须的材料"),
-    ["runes_3"] = _("打造红龙，蓝龙和绿龙3星装备所必须的材料"),
-    ["runes_4"] = _("打造红龙，蓝龙和绿龙4星装备所必须的材料"),
 }
 
 local MATERIALS_DESC_MAP = {
@@ -1050,7 +1019,7 @@ local WONDER_TITLE_BUFF = {
 local MAILS = {
     __system = _("系统邮件"),
     __member = _("成员"),
-    __supervisor = _("监视"),
+    __supervisor = _("监事"),
     __quartermaster = _("军需官"),
     __general = _("将军"),
     __archon = _("盟主"),
@@ -1095,9 +1064,9 @@ local getLocaliedKeyByType = function(type)
 end
 
 local GAME_LANGUAGE = {
-    en_US = _("英文"),
-    zh_CN = _("简体中文"),
-    zh_TW = _("繁体中文"),
+    en = _("英文"),
+    cn = _("简体中文"),
+    tw = _("繁体中文"),
 
 }
 
@@ -1208,18 +1177,6 @@ local ALLIANCE_DECORATE_NAME = {
     decorate_mountain = _("山"),
     decorate_tree = _("树")
 }
-local LOGIN_TIPS = {
-    _("提示：预留一定的空闲城民，兵营将他们训练成士兵"),
-    _("登录提示帮助2"),
-    _("登录提示帮助3"),
-    _("登录提示帮助4"),
-    _("登录提示帮助5"),
-    _("登录提示帮助6"),
-    _("登录提示帮助7"),
-    _("登录提示帮助8"),
-    _("登录提示帮助9"),
-    _("登录提示帮助10"),
-}
 
 local SERVER_NAME = {
     bronze = _("青铜级"),
@@ -1229,6 +1186,13 @@ local SERVER_NAME = {
     diamond = _("钻石级"),
     master = _("大师级"),
 }
+
+local TERRAIN_FUNCTION = {
+    grassLand = _("草地产出绿龙材料，更容易培养绿龙"),
+    desert= _("沙漠产出红龙材料,更容易培养红龙"),
+    iceField = _("雪地产出蓝龙材料，更容易培养蓝龙"),
+}
+
 return {
     equip_material = EQUIP_MATERIAL_LOCALIZE,
     equip = EQUIP_LOCALIZE,
@@ -1286,7 +1250,6 @@ return {
     alliance_language = ALLIANCE_LANGUAGE,
     alliance_decorate_name = ALLIANCE_DECORATE_NAME,
     shrine_desc = SHRINE_DESC,
-    login_tips = LOGIN_TIPS,
     server_name = SERVER_NAME,
     equip_material_desc_localize = EQUIP_MATERIAL_DESC_LOCALIZE,
     materials_desc_map = MATERIALS_DESC_MAP,
@@ -1294,6 +1257,7 @@ return {
     soldier_desc_material = SOLDIER_DESC_MATERIAL,
     mails = MAILS,
     server_errors = SERVER_ERRORS,
+    terrain_function = TERRAIN_FUNCTION,
 }
 
 

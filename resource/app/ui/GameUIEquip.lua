@@ -40,14 +40,16 @@ function GameUIEquip:OnEndMakeEquipmentWithEvent(black_smith, event, equipment)
 end
 function GameUIEquip:OnMaterialsChanged(material_manager, material_type, changed)
     if MaterialManager.MATERIAL_TYPE.EQUIPMENT == material_type then
-        for dragon_type,dragon in pairs(self.dragon_map) do
-            if dragon.list_view then
-                for k, v in pairs(changed) do
-                    if EQUIPMENTS[k].usedFor == dragon_type then
-                        dragon.ui_map[k]:SetNumber(v.new)
-                    end
+        if self.list_node:isVisible() then
+            for k, v in pairs(changed) do
+                if self.equip_map[k] then
+                    self.equip_map[k]:SetNumber(v.new)
                 end
             end
+        end
+    elseif MaterialManager.MATERIAL_TYPE.DRAGON == material_type then
+        for k, v in pairs(self.equip_map) do
+            v:CheckMaterials()
         end
     end
 end
@@ -61,17 +63,23 @@ local STAR_BG = {
     "box_104x104_3.png",
     "box_104x104_4.png",
 }
-local function return_map_of_list_view_and_ui_map(list_view, ui_map,list_node)
-    return { list_view = list_view, ui_map = ui_map,list_node=list_node}
-end
 function GameUIEquip:ctor(gameui, black_smith)
     self.gameui = gameui
-    self.dragon_map = {}
+    self.equip_map = {}
     self.black_smith_city = black_smith:BelongCity()
     self.black_smith = black_smith
 end
 function GameUIEquip:Init()
     self.title = self:InitEquipmentTitle()
+
+    self.list_view, self.list_node = UIKit:commonListView({
+        -- bgColor = UIKit:hex2c4b(0x7a100000),
+        viewRect = cc.rect(0, 0, 568, 650),
+        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
+    })
+    self.list_node:addTo(self.gameui:GetView())
+        :align(display.BOTTOM_CENTER, window.cx, window.bottom_top + 20)
+
     self.black_smith_city:GetMaterialManager():AddObserver(self)
     self.black_smith:AddBlackSmithListener(self)
 end
@@ -95,54 +103,46 @@ function GameUIEquip:InitEquipmentTitle()
 end
 --
 function GameUIEquip:HideAll()
-    self.title:setVisible(false)
-    for _, v in pairs(self.dragon_map) do
-        v.list_view:setVisible(false)
-        v.list_node:setVisible(false)
-    end
+    self.title:hide()
+    self.list_view:hide()
+    self.list_node:hide()
 end
 function GameUIEquip:SwitchToDragon(dragon_type)
-    if not self.dragon_map[dragon_type] then
-        dragon_equipments = {}
-        dragon_equipments = return_map_of_list_view_and_ui_map(self:CreateDragonEquipmentsByType(dragon_type))
-        self.black_smith_city:GetMaterialManager():IteratorEquipmentMaterialsByType(function(k, v)
-            if EQUIPMENTS[k].usedFor == dragon_type and dragon_equipments.ui_map[k] then
-                dragon_equipments.ui_map[k]:SetNumber(v)
-            end
-        end)
-        self.dragon_map[dragon_type] = dragon_equipments
+    self.title:show()
+    self.list_node:show()
+    self.list_view:show()
+    self.list_view:removeAllItems()
+    local equip_map = {}
+    for i,v in ipairs(self:GetDragonEquipmentsByType(dragon_type)) do
+        local item = self:CreateItemWithListViewByEquipments(self.list_view, v.equipments, v.title, equip_map, i)
+        self.list_view:addItem(item)
     end
+    local materials_manager = self.black_smith_city:GetMaterialManager()
+    for k,v in pairs(equip_map) do
+        v:SetNumber(materials_manager:GetEquipmentMaterias()[k])
+    end
+    self.equip_map = equip_map
 
-    self.title:setVisible(true)
-    for k, v in pairs(self.dragon_map) do
-        if k == dragon_type then
-            v.list_view:setVisible(true)
-            v.list_node:setVisible(true)
-
-            for i,item in ipairs(v.list_view.items_) do
-                if i == 1 then
-                    local enable = self.black_smith:GetLevel() >= 1
-                    item.equip_node:setVisible(enable)
-                    item.unlock_label:setVisible(not enable)
-                elseif i == 2 then
-                    local enable = self.black_smith:GetLevel() >= 10
-                    item.equip_node:setVisible(enable)
-                    item.unlock_label:setVisible(not enable)
-                elseif i == 3 then
-                    local enable = self.black_smith:GetLevel() >= 20
-                    item.equip_node:setVisible(enable)
-                    item.unlock_label:setVisible(not enable)
-                elseif i == 4 then
-                    local enable = self.black_smith:GetLevel() >= 30
-                    item.equip_node:setVisible(enable)
-                    item.unlock_label:setVisible(not enable)
-                end
-            end
-        else
-            v.list_view:setVisible(false)
-            v.list_node:setVisible(false)
+    for i,item in ipairs(self.list_view.items_) do
+        if i == 1 then
+            local enable = self.black_smith:GetLevel() >= 1
+            item.equip_node:setVisible(enable)
+            item.unlock_label:setVisible(not enable)
+        elseif i == 2 then
+            local enable = self.black_smith:GetLevel() >= 10
+            item.equip_node:setVisible(enable)
+            item.unlock_label:setVisible(not enable)
+        elseif i == 3 then
+            local enable = self.black_smith:GetLevel() >= 20
+            item.equip_node:setVisible(enable)
+            item.unlock_label:setVisible(not enable)
+        elseif i == 4 then
+            local enable = self.black_smith:GetLevel() >= 30
+            item.equip_node:setVisible(enable)
+            item.unlock_label:setVisible(not enable)
         end
     end
+    self.list_view:reload()
 
     local event = self.black_smith:GetMakeEquipmentEvent()
     self.tips:setVisible(event:IsEmpty())
@@ -155,7 +155,6 @@ function GameUIEquip:SwitchToDragon(dragon_type)
 end
 function GameUIEquip:CreateDragonEquipmentsByType(dragon_type)
     local equip_map = {}
-    local dragon_equipments = self:GetDragonEquipmentsByType(dragon_type)
     local list_view ,listnode=  UIKit:commonListView({
         -- bgColor = UIKit:hex2c4b(0x7a100000),
         viewRect = cc.rect(0, 0, 568, 650),
@@ -163,7 +162,7 @@ function GameUIEquip:CreateDragonEquipmentsByType(dragon_type)
     })
     listnode:addTo(self.gameui:GetView()):align(display.BOTTOM_CENTER,window.cx,window.bottom_top + 20)
 
-    for i,v in ipairs(dragon_equipments) do
+    for i,v in ipairs(self:GetDragonEquipmentsByType(dragon_type)) do
         local item = self:CreateItemWithListViewByEquipments(list_view, v.equipments, v.title, equip_map, i)
         list_view:addItem(item)
     end
@@ -255,16 +254,11 @@ end
 
 function GameUIEquip:CreateEquipmentByType(equip_type)
     local equip_config = EQUIPMENTS[equip_type]
-    local info_press_tag = false
     -- 装备按钮
-    local equip_clicked = nil
     local equipment_btn = WidgetPushButton.new(
         {normal = "back_ground_104x132.png"})
         :onButtonClicked(function(event)
-            if not info_press_tag and type(equip_clicked) == "function" then
-                equip_clicked(event)
-            end
-            info_press_tag = false
+            UIKit:newWidgetUI("WidgetMakeEquip", equip_type, self.black_smith, self.black_smith_city):AddToCurrentScene()
         end)
     local bg = STAR_BG[equip_config.maxStar]
     local eq_bg = cc.ui.UIImage.new(bg):addTo(equipment_btn)
@@ -285,25 +279,31 @@ function GameUIEquip:CreateEquipmentByType(equip_type)
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_CENTER,
         color = UIKit:hex2c3b(0x403c2f)
-    }):addTo(number_bg_100x40)
-        :align(display.CENTER, pos.x, pos.y)
+    }):addTo(number_bg_100x40):align(display.CENTER, pos.x, pos.y)
 
 
+    equipment_btn.tips_green = display.newSprite("green_tips_icon_22x22.png")
+        :addTo(equipment_btn):align(display.RIGHT_TOP, 104/2, 132/2)
+
+
+    local materials_manager = self.black_smith_city:GetMaterialManager()
     function equipment_btn:SetNumber(number)
-        if number_label:getString() ~= tostring(number) then
-            number_label:setString(number)
-        end
+        number_label:setString(number)
+        return self
+    end
+    function equipment_btn:CheckMaterials()
+        self.tips_green:setVisible(materials_manager:IsAbleToMakeEquipmentByType(equip_type))
         return self
     end
 
-    equip_clicked = function(event)
-        UIKit:newWidgetUI("WidgetMakeEquip", equip_type, self.black_smith, self.black_smith_city):AddToCurrentScene()
-    end
 
-    return equipment_btn
+    return equipment_btn:CheckMaterials()
 end
 
 return GameUIEquip
+
+
+
 
 
 

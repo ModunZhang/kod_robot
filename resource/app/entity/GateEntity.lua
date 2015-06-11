@@ -13,6 +13,9 @@ end
 function GateEntity:GetWallConfig()
     return config_wall[self:GetLevel()]
 end
+function GateEntity:GetConfig()
+    return config_wall
+end
 function GateEntity:GetWallNextLevelConfig()
     return config_wall[self:GetNextLevel()]
 end

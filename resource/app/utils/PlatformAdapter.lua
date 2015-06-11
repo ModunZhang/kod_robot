@@ -42,6 +42,17 @@ function PlatformAdapter:ios()
     DEBUG_GET_ANIMATION_PATH = function(filePath)
         return filePath
     end
+
+    if CONFIG_IS_DEBUG then -- debug 关闭sdk统计
+        ext.market_sdk = {}
+        setmetatable(ext.market_sdk,{
+            __index= function(t,key)
+                return function ( ... )
+                    print("\nfunction: ext.market_sdk." .. key .. "\n","args: ",...)
+                end
+            end
+        })
+    end
 end
 
 
@@ -53,11 +64,13 @@ function PlatformAdapter:mac()
         end
     })
     --search path
+    --player 特殊处理
     local fileutils = cc.FileUtils:getInstance()
     fileutils:addSearchPath("dev/res/")
     fileutils:addSearchPath("dev/res/fonts/")
     fileutils:addSearchPath("dev/res/images/")
     fileutils:addSearchPath("dev/res/fonts/")
+    fileutils:addSearchPath("dev/res/images/rgba444_single/")
     fileutils:addSearchPath("dev/res/images/_Compressed_mac/")
     fileutils:addSearchPath("dev/res/images/_CanCompress/")
     ext.getDeviceToken = function ()end
@@ -86,13 +99,15 @@ function PlatformAdapter:common()
     --拓展输入框键盘的类型
     cc.EDITBOX_INPUT_MODE_ASCII_CAPABLE = 7
     --修改Quick函数
-    local printError__ = printError
-    printError = function(...)
-        printError__(...)
-        local errDesc =   debug.traceback("", 2)
-        device.showAlert("☠Quick Framework错误☠",errDesc,"复制！",function()
-            ext.copyText(errDesc)
-        end)
+    if CONFIG_LOG_DEBUG_FILE then
+        local printError__ = printError
+        printError = function(...)
+            printError__(...)
+            local errDesc =   debug.traceback("", 2)
+            device.showAlert("☠Quick Framework错误☠",errDesc,"复制！",function()
+                ext.copyText(errDesc)
+            end)
+        end
     end
     self:gameCenter()
 end

@@ -37,7 +37,7 @@ intInit["staminaMax"] = {
 }
 intInit["staminaRecoverPerHour"] = {
 	["type"] = "staminaRecoverPerHour",
-	["value"] = 4,
+	["value"] = 10,
 	["desc"] = "精力每小时恢复量"
 }
 intInit["dragonChestSelectCountPerItem"] = {
@@ -52,7 +52,7 @@ intInit["chestSelectCountPerItem"] = {
 }
 intInit["dragonReviveNeedMinutes"] = {
 	["type"] = "dragonReviveNeedMinutes",
-	["value"] = 3600,
+	["value"] = 60,
 	["desc"] = "龙复活需要的时间"
 }
 intInit["casinoTokenNeededPerNormalGacha"] = {
@@ -67,7 +67,7 @@ intInit["casinoTokenNeededPerAdvancedGacha"] = {
 }
 intInit["dragonMarchSpeed"] = {
 	["type"] = "dragonMarchSpeed",
-	["value"] = 480,
+	["value"] = 960,
 	["desc"] = "龙的行军速度"
 }
 intInit["playerLevelupRewardsHours"] = {
@@ -87,7 +87,7 @@ intInit["soldierMaxStar"] = {
 }
 intInit["playerCitizenRecoverFullNeedHours"] = {
 	["type"] = "playerCitizenRecoverFullNeedHours",
-	["value"] = 6,
+	["value"] = 4,
 	["desc"] = "城民恢复满需要的小时数"
 }
 intInit["freeNormalGachaCountPerDay"] = {
@@ -102,7 +102,7 @@ intInit["dailyQuestsRefreshMinites"] = {
 }
 intInit["playerHatchDragonNeedMinutes"] = {
 	["type"] = "playerHatchDragonNeedMinutes",
-	["value"] = 7200,
+	["value"] = 1440,
 	["desc"] = "孵化龙所需的时间"
 }
 intInit["changeTerrainNeedGemCount"] = {

@@ -5,7 +5,6 @@
 local WidgetAutoOrderAwardButton = class("WidgetAutoOrderAwardButton",cc.ui.UIPushButton)
 local config_online = GameDatas.Activities.online
 local UILib = import("..ui.UILib")
-local User = User
 
 function WidgetAutoOrderAwardButton:ctor()
 	WidgetAutoOrderAwardButton.super.ctor(self,{normal = "activity_68x78.png"})
@@ -108,7 +107,7 @@ function WidgetAutoOrderAwardButton:CheckVisible()
 end
 
 function WidgetAutoOrderAwardButton:GetElementSize()
-	return self:getCascadeBoundingBox().size
+	return {width = 68, height = 100}
 end
 -- For Data
 function WidgetAutoOrderAwardButton:GetNextTimePoint()

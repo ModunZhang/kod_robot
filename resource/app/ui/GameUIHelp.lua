@@ -41,7 +41,7 @@ function GameUIHelp:onEnter()
     pro:setType(display.PROGRESS_TIMER_BAR)
     pro:setBarChangeRate(cc.p(1,0))
     pro:setMidpoint(cc.p(0,0))
-    pro:align(display.LEFT_BOTTOM, 0, 2):addTo(bar)
+    pro:align(display.LEFT_BOTTOM, 0, 0):addTo(bar)
     self.loyalty_label = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
         font = UIKit:getFontFilePath(),
@@ -68,7 +68,9 @@ function GameUIHelp:onEnter()
     ):setButtonLabel(cc.ui.UILabel.new({UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,text = _("全部帮助"), size = 22, color = UIKit:hex2c3b(0xfff3c7)}))
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                NetManager:getHelpAllAllianceMemberSpeedUpPromise()
+                NetManager:getHelpAllAllianceMemberSpeedUpPromise():done(function ()
+                        GameGlobalUI:showTips(_("提示"),_("协助加速成功"))
+                end)
             end
         end):addTo(body):pos(rb_size.width/2, 50)
     help_all_button:setVisible(self:IsAbleToHelpAll())
@@ -91,6 +93,8 @@ end
 function GameUIHelp:InitHelpEvents()
     local help_events = self.alliance:GetCouldShowHelpEvents()
     if help_events then
+        self.help_listview:removeAllItems()
+        self.help_events_items = {}
         for k,event in pairs(help_events) do
             self:InsertItemToList(event)
         end
@@ -100,7 +104,6 @@ end
 function GameUIHelp:InsertItemToList(help_event)
     -- 当前玩家的求助事件需要置顶
     local item = self:CreateHelpItem(help_event)
-    -- 检查自己请求帮助的事件是否已经结束了
     if User:Id() == help_event:GetPlayerData():Id() then
         self.help_listview:addItem(item,1)
     else
@@ -285,7 +288,9 @@ function GameUIHelp:CreateHelpItem(event)
         ):setButtonLabel(cc.ui.UILabel.new({UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,text = _("帮助"), size = 22, color = UIKit:hex2c3b(0xfff3c7)}))
             :onButtonClicked(function(e)
                 if e.name == "CLICKED_EVENT" then
-                    NetManager:getHelpAllianceMemberSpeedUpPromise(event:Id())
+                    NetManager:getHelpAllianceMemberSpeedUpPromise(event:Id()):done(function ( )
+                        GameGlobalUI:showTips(_("提示"),_("协助加速成功"))
+                    end)
                 end
             end):addTo(bg):pos(470, 34)
     end
@@ -306,40 +311,41 @@ function GameUIHelp:CreateHelpItem(event)
     return item
 end
 function GameUIHelp:OnHelpEventChanged(changed_help_event)
-    if changed_help_event.added then
-        local added = changed_help_event.added
-        for _,event in pairs(added) do
-            if not self:IsHelpedByMe(event:GetEventData():HelpedMembers()) or not self:IsHelpedToMaxNum(event) then
-                self:InsertItemToList(event)
-            end
-        end
-        self.help_listview:reload()
-    end
-    if changed_help_event.removed then
-        local removed = changed_help_event.removed
-        for _,event in pairs(removed) do
-            self:DeleteHelpItem(event:Id())
-        end
-        self:performWithDelay(function ()
-            self.help_listview:reload()
-        end, 0.3)
-    end
-    if changed_help_event.edit then
-        local edit = changed_help_event.edit
-        for _,event in pairs(edit) do
-            local item = self.help_events_items[event:Id()]
-            if item then
-                if self:IsHelpedByMe(event:GetEventData():HelpedMembers()) or self:IsHelpedToMaxNum(event) then
-                    self:DeleteHelpItem(event:Id())
-                else
-                    item:SetHelp(event)
-                end
-            end
-        end
-        self:performWithDelay(function ()
-            self.help_listview:reload()
-        end, 0.3)
-    end
+    -- if changed_help_event.added then
+    --     local added = changed_help_event.added
+    --     for _,event in pairs(added) do
+    --         if not self:IsHelpedByMe(event:GetEventData():HelpedMembers()) or not self:IsHelpedToMaxNum(event) then
+    --             self:InsertItemToList(event)
+    --         end
+    --     end
+    --     self.help_listview:reload()
+    -- end
+    -- if changed_help_event.removed then
+    --     local removed = changed_help_event.removed
+    --     for _,event in pairs(removed) do
+    --         self:DeleteHelpItem(event:Id())
+    --     end
+    --     self:performWithDelay(function ()
+    --         self.help_listview:reload()
+    --     end, 0.3)
+    -- end
+    -- if changed_help_event.edit then
+    --     local edit = changed_help_event.edit
+    --     for _,event in pairs(edit) do
+    --         local item = self.help_events_items[event:Id()]
+    --         if item then
+    --             if self:IsHelpedByMe(event:GetEventData():HelpedMembers()) or self:IsHelpedToMaxNum(event) then
+    --                 self:DeleteHelpItem(event:Id())
+    --             else
+    --                 item:SetHelp(event)
+    --             end
+    --         end
+    --     end
+    --     self:performWithDelay(function ()
+    --         self.help_listview:reload()
+    --     end, 0.3)
+    -- end
+    self:InitHelpEvents()
     self.help_all_button:setVisible(self:IsAbleToHelpAll())
 end
 function GameUIHelp:OnCountInfoChanged()

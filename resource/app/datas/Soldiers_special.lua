@@ -86,7 +86,7 @@ special["meatWagon"] = {
 	["recruitTime"] = 60,
 	["treatCoin"] = 900,
 	["treatTime"] = 15,
-	["techBuildingName"] = "siege"
+	["techBuildingName"] = "workshop"
 }
 special["priest"] = {
 	["name"] = "priest",
@@ -174,5 +174,5 @@ special["steamTank"] = {
 	["recruitTime"] = 80,
 	["treatCoin"] = 1250,
 	["treatTime"] = 20,
-	["techBuildingName"] = "siege"
+	["techBuildingName"] = "workshop"
 }

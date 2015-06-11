@@ -195,7 +195,7 @@ function PVELayer:GetFteLayer()
 end
 function PVELayer:PromiseOfTrap()
     local size = self.char:getContentSize()
-    local wp = self.char:convertToWorldSpace(cc.p(size.width*0.3, size.height*0.3))
+    local wp = self.char:convertToWorldSpace(cc.p(size.width * 0.3 * self.char:getScaleX(), size.height*0.3))
     local lp = self.top_layer:convertToNodeSpace(wp)
     self.top_layer:removeAllChildren()
 
@@ -203,7 +203,7 @@ function PVELayer:PromiseOfTrap()
     local r = 5
     local exclamation_time = 0.5
     local exclamation_scale = 1
-    local s = display.newSprite("exclamation.png")
+    local exclamation = display.newSprite("exclamation.png")
         :addTo(self.top_layer):pos(lp.x, lp.y):scale(0)
         
     local p = promise.new()        
@@ -221,7 +221,7 @@ function PVELayer:PromiseOfTrap()
         cc.RotateBy:create(t, -r),
         cc.RotateBy:create(t, r),
         cc.CallFunc:create(function()
-            transition.scaleTo(s, {
+            transition.scaleTo(exclamation, {
                 scale = exclamation_scale,
                 time = exclamation_time,
                 easing = "backout",
@@ -247,8 +247,12 @@ function PVELayer:ResetCharPos()
     self:MoveCharTo(start.x, start.y)
 end
 function PVELayer:MoveCharTo(x, y)
+    local old_x, old_y = self.user:GetPVEDatabase():GetCharPosition()
     self:LightOn(x, y)
     self.char:pos(self:GetLogicMap():ConvertToMapPosition(x, y))
+    if (x - old_x) ~= 0 then
+        self.char:setScaleX((x - old_x) > 0 and -1 or 1)
+    end
     self:GotoLogicPoint(x, y, 10)
     self.user:GetPVEDatabase():SetCharPosition(x, y)
     self:NotifyExploring()
@@ -319,8 +323,8 @@ function PVELayer:getContentSize()
     if not self.content_size then
         local layer = self.background:getLayer("layer1")
         self.content_size = layer:getContentSize()
-        self.content_size.width = self.content_size.width + 1000
-        self.content_size.height = self.content_size.height + 1000
+        self.content_size.width = self.content_size.width + 2000
+        self.content_size.height = self.content_size.height + 2000
     end
     return self.content_size
 end

@@ -8,12 +8,13 @@ end)
 local sqrt = math.sqrt
 local floor = math.floor
 local abs = math.abs
+local fmod = math.fmod
 local elastic = 200
 function MapScene:ctor()
     User:ResetAllListeners()
     City:ResetAllListeners()
     Alliance_Manager:GetMyAlliance():ResetAllListeners()
-
+    self.my_alliance = Alliance_Manager:GetMyAlliance()
     self.blur_count = 1
     self.event_manager = EventManager.new(self)
     self.touch_judgment = TouchJudgment.new(self)
@@ -30,6 +31,9 @@ function MapScene:OnUserBasicChanged(user, changed)
     end
 end
 function MapScene:onEnter()
+    if self.PreLoadImages then
+        self:PreLoadImages()
+    end
     -- self.scene_node = display.newClippingRegionNode(cc.rect(0, 0, display.width, display.height)):addTo(self)
     -- self.scene_node:setContentSize(cc.size(display.width, display.height))
     self.scene_node = display.newNode():addTo(self)
@@ -40,9 +44,38 @@ function MapScene:onEnter()
     end
     self.top_layer = display.newNode():addTo(self, 3)
     self.screen_layer = display.newNode():addTo(self:GetSceneNode(), 4)
+    display.newNode():addTo(self):schedule(function()
+        local flag = false
+        if self.my_alliance:IsDefault() then
+            flag = false 
+        else
+            flag = self.my_alliance:GetAllianceBelvedere():IsMeBeAttacked() 
+        end
+        if flag then
+            self:Warning()
+        else
+            self:DisableWaring()
+        end
+    end, 1)
 end
 function MapScene:onExit()
+    if self.UnloadImages then
+        self:UnloadImages()
+    end
     self.touch_judgment:destructor()
+end
+function MapScene:PreLoadImages()
+    for _,v in ipairs(self:GetPreloadImages()) do
+        display.addSpriteFrames(DEBUG_GET_ANIMATION_PATH(v.list),DEBUG_GET_ANIMATION_PATH(v.image))
+    end
+end
+function MapScene:UnloadImages()
+    for _,v in ipairs(self:GetPreloadImages()) do
+        display.removeSpriteFramesWithFile(DEBUG_GET_ANIMATION_PATH(v.list),DEBUG_GET_ANIMATION_PATH(v.image))
+    end
+end
+function MapScene:GetPreloadImages()
+    return {}
 end
 function MapScene:GetScreenLayer()
     return self.screen_layer
@@ -84,6 +117,41 @@ function MapScene:ResetRenderState()
     -- self.render_scene:hide()
     -- self:GetSceneNode():show()
 end
+local WARNING_TAG = 99999
+function MapScene:DisableWaring()
+    if self:getChildByTag(WARNING_TAG) then
+        self:removeChildByTag(WARNING_TAG)
+    end
+end
+function MapScene:Warning()
+    if not self:getChildByTag(WARNING_TAG) then
+        self:CreateWaring()
+    end
+end
+function MapScene:CreateWaring()
+    local sprite = display.newSprite(
+        "click_empty.png", 
+        display.cx, 
+        display.cy, 
+        {class=cc.FilteredSpriteWithOne}
+    ):addTo(self, 2999, WARNING_TAG)
+    local size = sprite:getContentSize()
+    sprite:setScaleX(display.width / size.width)
+    sprite:setScaleY(display.height / size.height)
+    local time, lastTime = 0, 1
+    sprite:setFilter(filter.newFilter("CUSTOM",
+        json.encode({
+            frag = "shaders/warning.fs",
+            shaderName = "warning",
+            iResolution = {display.widthInPixels, display.heightInPixels}
+        })
+    ))
+    sprite:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
+        time = time + dt * 0.5
+        sprite:getFilter():getGLProgramState():setUniformFloat("ratio", abs(fmod(time, lastTime) - 0.5) / lastTime)
+    end)
+    sprite:scheduleUpdate()
+end
 function MapScene:GetSceneNode()
     return self.scene_node
 end
@@ -94,7 +162,7 @@ function MapScene:GetSceneLayer()
     return self.scene_layer
 end
 function MapScene:CreateSceneLayer()
-    assert(false, "必须在子类实现生成场景的方法")
+    assert(false)
 end
 function MapScene:CreateMultiTouchLayer()
     local touch_layer = display.newLayer()
@@ -198,7 +266,6 @@ function MapScene:OnTwoTouch(x1, y1, x2, y2, event_type)
     elseif event_type == "ended" then
         scene:ZoomEnd()
         self.distance = nil
-        -- 皮筋效果
         self:MakeElastic()
     end
 end
@@ -257,14 +324,11 @@ function MapScene:OnSceneScale()
 end
 
 function MapScene:onEnterTransitionFinish()
-    -- printLog("Info", "Check MessageDialog :%s",self.__cname)
-    -- local message = UIKit:getMessageDialogWillShow()
-    -- if message then
-
-    --     print("add MessageDialog---->",self.__cname,message.AddToCurrentScene,tolua.type(message))
-    --     -- message:addTo(self,3001,1000)
-    --     -- UIKit:clearMessageDialogWillShow()
-    -- end
+    local message = UIKit:getMessageDialogWillShow()
+    if message then
+        message:AddToScene(self, false)
+        UIKit:clearMessageDialogWillShow()
+    end
 end
 return MapScene
 

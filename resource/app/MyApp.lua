@@ -64,11 +64,14 @@ function MyApp:run()
                 "desert",
                 "iceField",
             }
-            return NetManager:initPlayerData(terrains[math.random(#terrains)])
+            return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
         end
     end):next(function()
-        print("登录游戏成功!")
         return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
+    end):next(function()
+        return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
+    end):next(function()
+        return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
     end):next(function()
         print("登录游戏成功!")
         return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")

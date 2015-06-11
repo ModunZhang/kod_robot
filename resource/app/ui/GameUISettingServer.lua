@@ -234,6 +234,7 @@ function GameUISettingServer:listviewListener(event)
     local listView = event.listView
     if "clicked" == event.name then
     	local server = self.data[event.itemPos]
+    	if not server then return end
     	self.server_code = server.id
     	self:RefreshCurrentPageList()
 		self:RefreshServerInfo()

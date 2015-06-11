@@ -13,6 +13,7 @@ local UILib = import(".UILib")
 local window = import("..utils.window")
 local Localize = import("..utils.Localize")
 local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
+local light_gem = import("..particles.light_gem")
 local loginDays = GameDatas.Vip.loginDays
 local VIP_LEVEL = GameDatas.Vip.level
 local config_store = GameDatas.StoreItems.items
@@ -243,7 +244,8 @@ function GameUIVip:CreateAD(index)
                 self:LeftButtonClicked()
             end
         end)
-
+    -- 金龙币上的粒子特效
+    light_gem():addTo(ad, 1022):pos(data.config.light_position.x , data.config.light_position.y):scale(1.2)
     local info_bg = display.newSprite(data.config.desc):addTo(ad)
     display.newSprite("store_gem_260x116.png"):addTo(info_bg):align(display.CENTER, 0, info_bg:getContentSize().height/2)
     if data.config.npc then
@@ -435,7 +437,7 @@ function GameUIVip:CreateVipExpBar()
             ExpBar:AddLevelBar(i,light)
             light:setFlippedX(true)
         end
-        local level_image = display.newSprite(i..".png"):addTo(lv_bg,1,i*100)
+        local level_image = display.newSprite(string.format("vip_%d.png",i)):addTo(lv_bg,1,i*100)
             :align(display.CENTER, lv_bg:getContentSize().width/2, lv_bg:getContentSize().height/2)
             :scale(0.5)
         ExpBar:AddLevelImage(i,level_image)
@@ -503,12 +505,13 @@ function GameUIVip:CreateVIPStatus()
         end)
 
     self.active_button = active_button
+    local vipLoginDaysCount = User:GetCountInfo().vipLoginDaysCount
     local widget_info = WidgetInfoNotListView.new(
         {
             info={
                 {_("当前VIP等级"),_("等级").." "..User:GetVipLevel()},
-                {_("下一次登录"),"+"..loginDays[User:GetCountInfo().vipLoginDaysCount].expAdd},
-                {_("连续登录"),User:GetCountInfo().vipLoginDaysCount},
+                {_("下一次登录"),"+"..loginDays[ (vipLoginDaysCount + 1 ) > #loginDays and #loginDays or (vipLoginDaysCount + 1 )].expAdd},
+                {_("连续登录"),vipLoginDaysCount},
             }
         }
     ):align(display.CENTER, bg_size.width/2, 90)
@@ -799,7 +802,6 @@ function GameUIVip:OnUserBasicChanged(from,changed_map)
         self.vip_layer:removeChildByTag(999, true)
         local exp_bar = self:CreateVipExpBar():addTo(self.vip_layer,1,999):pos(display.cx-287, display.top-300)
         exp_bar:LightLevelBar(vip_level,percent,exp)
-        self.active_button:setButtonEnabled(vip_level~=0)
         if self.player_node then
             self.player_node:RefreshUI()
         end

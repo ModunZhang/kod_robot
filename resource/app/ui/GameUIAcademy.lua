@@ -193,7 +193,7 @@ function GameUIAcademy:BuildTipsUI(technology_node,y)
 	self.process_timer = process_timer
 	local time_label = UIKit:ttfLabel({
 		text = "00:00:00",
-		size = 22,
+		size = 18,
 		color= 0xfff3c7
 	}):align(display.LEFT_CENTER,30,20):addTo(process_bg)
 	self.time_label = time_label

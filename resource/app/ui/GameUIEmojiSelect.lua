@@ -64,7 +64,7 @@ function GameUIEmojiSelect:BuildEmojiNode(start_index,end_index)
 	for index = start_index,end_index do
 		local img = EmojiTable[index]
 		local __,__,key = string.find(img, "(.+)%.")
-		local button = WidgetPushButton.new({normal = "#" .. img}):pos(x, y):addTo(emoji_node):scale(0.5)
+		local button = WidgetPushButton.new({normal = img}):pos(x, y):addTo(emoji_node):scale(0.5)
 		button:onButtonClicked(function()
 			self:callFunc__(key)
 			local action =  transition.sequence({cc.ScaleTo:create(0.1,0.6),cc.ScaleTo:create(0.1,0.5)})

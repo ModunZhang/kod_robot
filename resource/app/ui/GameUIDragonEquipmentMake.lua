@@ -81,8 +81,28 @@ function GameUIDragonEquipmentMake:BuildUI()
       }))
       :onButtonClicked(function()
             if self.blackSmith:IsUnlocked() then
-                WidgetMakeEquip.new(self:GetEquipment():GetCanLoadConfig().name, self.blackSmith, City):AddToCurrentScene()
-                self:LeftButtonClicked()
+              local equipment_name = self:GetEquipment():GetCanLoadConfig().name
+              local equip_config = EQUIPMENTS[equipment_name]
+              local blackSmith_level = self.blackSmith:GetLevel()
+              local equipment_star = equip_config.maxStar
+              local level_need = 1
+              if equipment_star == 1 then
+                  -- enable = blackSmith_level >= 1 
+                  level_need = 1
+              elseif equipment_star == 2 then
+                  level_need = 10
+              elseif equipment_star == 3 then
+                  level_need = 20
+              elseif equipment_star == 4 then
+                  level_need = 30
+              end
+              local enable = blackSmith_level >= level_need
+              if not enable then
+                UIKit:showMessageDialog(nil,  string.format(_("升级铁匠铺到%d级后解锁"), level_need), function()end)
+                 return
+              end
+              WidgetMakeEquip.new(self:GetEquipment():GetCanLoadConfig().name, self.blackSmith, City):AddToCurrentScene()
+              self:LeftButtonClicked()
             end
       end)
       load_button:setButtonEnabled(self.blackSmith:IsUnlocked())

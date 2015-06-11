@@ -7,12 +7,12 @@ local FteScene = class("FteScene", function()
 end)
 
 function FteScene:ctor()
-
 end
 function FteScene:onEnter()
-    app:GetAudioManager():PlayGameMusic("MyCityScene")
+    app:GetAudioManager():PlayGameMusicOnSceneEnter("MyCityScene",false)
 end
 function FteScene:onEnterTransitionFinish()
+    display.newSprite("fte_background.jpg"):addTo(self):pos(display.cx, display.cy)
     printLog("Info", "Check MessageDialog :%s",self.__cname)
     local message = UIKit:getMessageDialogWillShow()
     if message then
@@ -28,8 +28,8 @@ function FteScene:onEnterTransitionFinish()
     }):addTo(self):align(display.CENTER, display.cx, display.cy):hide()
     self.npc = UIKit:newGameUI('GameUINpc',
         {words = _("太好了，你终于醒过来了，觉醒者。。。我的名字叫赛琳娜，我们寻找那你这样的觉醒者已经很长时间了。。。"), brow = "smile"},
-        {words = "我建议你最好别乱动，你刚刚在同黑龙作战的过程中受了伤，伤口还没复原。。。"},
-        {words = "我知道你好友很多疑问，不过首先，我们需要前往寻找一个安全的地方？"}):AddToScene(self, true)
+        {words = _("我建议你最好别乱动，你刚刚在同黑龙作战的过程中受了伤，伤口还没复原。。。")},
+        {words = _("我知道你好友很多疑问，不过首先，我们需要前往寻找一个安全的地方？")}):AddToScene(self, true)
 
     self.npc:PromiseOfDialogEndWithClicked(3):next(function()
         return GameUINpc:PromiseOfLeave()
@@ -48,17 +48,16 @@ function FteScene:onEnterTransitionFinish()
         end
     end)
     self.npc:StartDialog()
-end
-function FteScene:onExit()
-
+    self.npc.ui_map.background:hide()
 end
 function FteScene:PormiseOfSchedule(time, func)
     return function()
-    	return cocos_promise.promiseOfSchedule(self, time, 0.1, func)
+        return cocos_promise.promiseOfSchedule(self, time, 0.1, func)
     end
 end
 
 
 return FteScene
+
 
 

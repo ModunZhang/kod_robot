@@ -319,7 +319,7 @@ function GameUIStrikeReport:CreateBelligerentsItem(height,player,isSelf)
         :addTo(player_item)
 
     UIKit:ttfLabel({
-        text = player.type and _("Level").." "..player.level or "["..player.alliance.tag.."]" ,
+        text = player.type and string.format(_("等级%d"),player.level) or "["..player.alliance.tag.."]" ,
         size = 22,
         color = 0xffedae
     }):align(display.CENTER,170,  height-75)
@@ -613,7 +613,7 @@ function GameUIStrikeReport:CreateDragonSkills()
             if self.report:GetStrikeLevel()>4 then
                 cc.ui.UILabel.new({
                     UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-                    text = _("Level")..r_parms.level,
+                    text = string.format(_("等级%d"),r_parms.level),
                     font = UIKit:getFontFilePath(),
                     size = 20,
                     color = UIKit:hex2c3b(0x403c2f)

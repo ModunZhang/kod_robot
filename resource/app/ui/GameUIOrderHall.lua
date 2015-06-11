@@ -154,7 +154,7 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
         local honour_bg = display.newSprite("back_ground_114x36.png"):align(display.CENTER, 330, 40):addTo(content)
         local need_honour = config[village_level+1>#config and #config or village_level+1].needHonour
         item.honour_label = UIKit:ttfLabel({
-            text = need_honour,
+            text = string.formatnumberthousands(need_honour),
             size = 20,
             color = 0x403c2f,
         }):addTo(honour_bg):align(display.CENTER,honour_bg:getContentSize().width/2,honour_bg:getContentSize().height/2)
@@ -190,7 +190,7 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
         total_resource:SetValue(config[village_level].production)
         if self.honour_label and village_level <#config then
             local need_honour = config[village_level+1].needHonour
-            self.honour_label:setString(need_honour)
+            self.honour_label:setString(string.formatnumberthousands(need_honour))
         else
             if self.honour_icon then
                 self.honour_icon:hide()
@@ -261,7 +261,7 @@ function GameUIOrderHall:ChangeProficiencyOption(option)
         table.insert(sortByProficiencyMember, member)
     end)
     table.sort( sortByProficiencyMember, function ( a,b )
-        return a:GetCollectLevelByType(option)>b:GetCollectLevelByType(option)
+        return a:GetCollectExpsByType(option)>b:GetCollectExpsByType(option)
     end)
     self.sortByProficiencyMember = sortByProficiencyMember
     self.proficiency_listview:reload()
@@ -364,7 +364,7 @@ function GameUIOrderHall:CreateProficiencyContent()
         local option = parent.option
         level_label:setString(_("等级")..member:GetCollectLevelByType(option))
         local exp , expTo = member:GetCollectExpsByType(option)
-        exp_label:setString(exp.."/"..expTo)
+        exp_label:setString(string.formatnumberthousands(exp) .."/".. string.formatnumberthousands(expTo))
         speed_label:setString("+"..(member:GetCollectEffectByType(option)*100).."%")
     end
     function content:GetContentData()

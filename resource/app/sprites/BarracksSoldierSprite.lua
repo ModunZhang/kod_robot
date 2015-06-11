@@ -20,7 +20,7 @@ local soldier_config = {
         {"qibing_3", 0, 10, 0.8},
     },
     ["catapult"] = {
-        {  "toushiche", 0, 10, 0.8},
+        {  "toushiche", 50, 10, 0.8},
         {"toushiche_2", 0, 10, 0.8},
         {"toushiche_3", 0, 10, 0.8},
     },
@@ -100,7 +100,7 @@ end
 function BarracksSoldierSprite:CreateSprite()
     local ani_name,_,_,s = unpack(soldier_config[self.soldier_type][self.soldier_star])
     local armature = ccs.Armature:create(ani_name):scale(s)
-    armature:setAnchorPoint(display.ANCHOR_POINTS[display.CENTER])
+    -- armature:setAnchorPoint(display.ANCHOR_POINTS[display.CENTER])
     return armature
 end
 function BarracksSoldierSprite:TurnEast()
@@ -121,7 +121,7 @@ function BarracksSoldierSprite:TurnSouth()
 end
 function BarracksSoldierSprite:GetSpriteOffset()
     local _,x,y = unpack(soldier_config[self.soldier_type][self.soldier_star])
-    return x,y
+    return 0,0
 end
 function BarracksSoldierSprite:GetMidLogicPosition()
     return self:GetLogicMap():ConvertToLogicPosition(self:getPosition())

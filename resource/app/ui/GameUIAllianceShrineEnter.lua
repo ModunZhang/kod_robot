@@ -85,14 +85,27 @@ function GameUIAllianceShrineEnter:FixedUI()
 	self.process_bar_bg:hide()
 end
 
+function GameUIAllianceShrineEnter:GetTroopsInfo()
+	local events = self:GetMyAlliance():GetAllianceShrine():GetShrineEvents()
+	local event_count = 0
+	local total_count = 0
+	local running_event_names = {}
+	for __,event in ipairs(events) do
+		event_count = event_count + 1
+		total_count = total_count + #event:PlayerTroops()
+	end
+	if event_count > 0 then
+		return event_count,total_count
+	else
+		return _("暂无"),_("暂无")
+	end
+end
+
 function GameUIAllianceShrineEnter:GetBuildingInfo()
-	local events = _("未知")
     local running_event = _("未知")
     local people_count =   _("未知")
     if self:IsMyAlliance() then
-	 	events = self:GetMyAlliance():GetAllianceShrine():GetShrineEvents()
-		running_event = #events > 0 and events[1]:StageName() or _("暂无")
-		people_count =   #events > 0 and  #events[1]:PlayerTroops() .. "/" .. events[1]:Stage():SuggestPlayer() or _("暂无")
+    	running_event,people_count = self:GetTroopsInfo()
 	end
 	local location = {
         {_("坐标"),0x615b44},

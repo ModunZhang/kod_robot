@@ -44,6 +44,7 @@ function WidgetPVEGetTaskRewards:onEnter()
         size = 22,
         color = 0x403c2f
     }):addTo(bg):align(display.LEFT_CENTER, 150, s3.height-35)
+
     UIKit:ttfLabel({
         text = _("击杀完成之后可获得大量银币，加油哦。"),
         size = 20,
@@ -51,7 +52,7 @@ function WidgetPVEGetTaskRewards:onEnter()
         dimensions = cc.size(380, 70),
         margin = 1,
         lineHeight = 35,
-    }):addTo(bg):align(display.LEFT_TOP, 150, s1.height-60)
+    }):addTo(bg):align(display.LEFT_TOP, 150, s3.height-60)
 
 
     self.get_btn = cc.ui.UIPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png", disabled = "grey_btn_186x66.png"})
@@ -69,8 +70,9 @@ function WidgetPVEGetTaskRewards:onEnter()
                     },
                 }, nil)
                 local data = User:EncodePveDataAndResetFightRewardsData()
+                local count = self.count
                 NetManager:getSetPveDataPromise(data):done(function()
-                    GameGlobalUI:showTips(_("获得奖励"), Localize.fight_reward.coin.."x"..GameUtils:formatNumber(self.count))
+                    GameGlobalUI:showTips(_("获得奖励"), Localize.fight_reward.coin.."x"..GameUtils:formatNumber(count))
                 end)
                 User:GetPVEDatabase():NewTarget()
                 self:getParent():GetHomePage().event_tab:PromiseOfSwitch()

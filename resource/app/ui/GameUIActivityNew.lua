@@ -62,6 +62,7 @@ function GameUIActivityNew:OnMoveInStage()
         	self:OnTabButtonClicked(tag)
         end
     ):pos(window.cx, window.bottom + 34)
+    self:RefreshAwardCountTips()
 end
 
 
@@ -136,7 +137,9 @@ end
 
 function GameUIActivityNew:OnTimer(current_time)
 	if self.activity_list_view and self.tab_buttons:GetSelectedButtonTag() == 'activity' then
-		local item = self.activity_list_view:getItems()[4]
+		local count = #self.activity_list_view:getItems()
+		local item = self.activity_list_view:getItems()[count]
+		if item.item_type ~= self.ITEMS_TYPE.PLAYER_LEVEL_UP then return end
 		if current_time <= self.player_level_up_time and item then
 			if not item.time_label then return end
 			self.player_level_up_time_residue = self.player_level_up_time - current_time
@@ -331,21 +334,36 @@ end
 function GameUIActivityNew:RefreshAwardListDataSource()
 	self.award_dataSource = {}
 	self.award_logic_index_map = {}
-	local index = 1
-	for key,v in pairs(User:GetIapGifts()) do
-		self.award_logic_index_map[key] = index
+	local data = {}
+	for __,v in pairs(User:GetIapGifts()) do
+		table.insert(data,v)
+	end
+
+	table.sort( data,function(a,b)
+		return a:Time() > b:Time()
+	end)
+	for index,v in ipairs(data) do
+		self.award_logic_index_map[v:Id()] = index
 		table.insert(self.award_dataSource,v)
-		index = index + 1
+	end
+end
+
+function GameUIActivityNew:RefreshAwardCountTips()
+	if self.tab_buttons then
+		local count = LuaUtils:table_size(User:GetIapGifts())
+		self.tab_buttons:SetButtonTipNumber('award',count)
 	end
 end
 
 function GameUIActivityNew:OnIapGiftsRefresh()
+	self:RefreshAwardCountTips()
 	if self.award_list and self.tab_buttons:GetSelectedButtonTag() == 'award' then
 		self:RefreshAwardList()
 	end
 end
 
 function GameUIActivityNew:OnIapGiftsChanged(changed_map)
+	self:RefreshAwardCountTips()
 	if self.award_list and self.tab_buttons:GetSelectedButtonTag() == 'award' then
 		self:RefreshAwardList()
 	end
@@ -510,8 +528,10 @@ function GameUIActivityNew:OnAwardButtonClicked(idx)
 	local data = self.award_dataSource[idx]
 	if data then
 		NetManager:getIapGiftPromise(data:Id()):done(function()
-			GameGlobalUI:showTips(_("提示"),Localize_item.item_name[data:Name()] .. " x" .. data:Count())
-			app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
+			if data:GetTime() > 0 then
+				GameGlobalUI:showTips(_("提示"),Localize_item.item_name[data:Name()] .. " x" .. data:Count())
+				app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
+			end
 		end)
 	end
 end

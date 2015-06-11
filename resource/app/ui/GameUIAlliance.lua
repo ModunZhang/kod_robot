@@ -114,6 +114,9 @@ function GameUIAlliance:CreateBetweenBgAndTitle()
 end
 
 function GameUIAlliance:OnMoveOutStage()
+    if self.need_refresh then
+        UIKit:NoWaitForNet()
+    end
     local myAlliance = Alliance_Manager:GetMyAlliance()
     myAlliance:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.BASIC)
     -- join or quit
@@ -302,7 +305,7 @@ function GameUIAlliance:RefreshJoinListContent(alliance,content,idx)
     content.memberValLabel:setString(string.format("%s/%s",alliance.members,alliance.membersMax))
     content.fightingValLabel:setString(string.formatnumberthousands(alliance.power))
     content.languageValLabel:setString(alliance.language)
-    content.killValLabel:setString(alliance.kill)
+    content.killValLabel:setString(string.formatnumberthousands(alliance.kill))
     content.leaderLabel:setString(alliance.archon)
     local terrain = alliance.terrain
     local flag_info = alliance.flag
@@ -631,7 +634,7 @@ function GameUIAlliance:getCommonListItem_(listType,alliance)
     }):addTo(info_bg):align(display.LEFT_BOTTOM, fightingTitleLabel:getPositionX(),10)
 
     local killValLabel = UIKit:ttfLabel({
-        text = alliance.kill,
+        text = string.formatnumberthousands(alliance.kill),
         size = 20,
         color = 0x403c2f
     }):addTo(info_bg):align(display.LEFT_BOTTOM, fightingValLabel:getPositionX(), 10)
@@ -693,7 +696,7 @@ function GameUIAlliance:getCommonListItem_(listType,alliance)
         memberValLabel:setString(string.format("%s/%s",alliance.members,alliance.membersMax))
         fightingValLabel:setString(alliance.power)
         languageValLabel:setString(alliance.language)
-        killValLabel:setString(alliance.kill)
+        killValLabel:setString(string.formatnumberthousands(alliance.kill))
     end
     item:addContent(bg)
     item:setItemSize(bg:getContentSize().width,bg:getContentSize().height)
@@ -792,7 +795,7 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
         :pos(16,events_title:getPositionY()+events_title:getContentSize().height+10)
     local titileBar = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(438,30), cc.rect(10,10,410,10))
         :addTo(headerBg):align(display.TOP_RIGHT, headerBg:getContentSize().width - 10, headerBg:getContentSize().height - 20)
-    local language_sprite = display.newSprite(string.format("#%s",UILib.alliance_language_frame[Alliance_Manager:GetMyAlliance():DefaultLanguage()]))
+    local language_sprite = display.newSprite(string.format("%s",UILib.alliance_language_frame[Alliance_Manager:GetMyAlliance():DefaultLanguage()]))
         :align(display.RIGHT_CENTER, 410,15)
         :addTo(titileBar)
         :scale(0.5)
@@ -1034,7 +1037,7 @@ function GameUIAlliance:RefreshOverViewUI()
         self.ui_overview.memberCountLabel:setString(string.format("%s/%s",m_count,m_maxCount))
         self.ui_overview.online_count_label:setString(m_online)
         self.ui_overview.powerLabel:setString(string.formatnumberthousands(alliance_data:Power()))
-        self.ui_overview.language_sprite:setSpriteFrame(UILib.alliance_language_frame[alliance_data:DefaultLanguage()])
+        self.ui_overview.language_sprite:setTexture(UILib.alliance_language_frame[alliance_data:DefaultLanguage()])
         self:RefreshNoticeView()
     end
 end
@@ -1367,15 +1370,6 @@ function GameUIAlliance:MembersListsourceDelegate(listView, tag, idx)
 end
 function GameUIAlliance:RefreshMembersListDataSource()
     self.data_members = clone(Alliance_Manager:GetMyAlliance():GetAllMembers())
-    table.sort(self.data_members, function(a,b)
-        local isOnline_a = (type(a.online) == 'boolean' and a.online) and true or false
-        local isOnline_b = (type(b.online) == 'boolean' and b.online) and true or false
-        if isOnline_a == isOnline_b then
-            return a.power > b.power
-        else
-            return isOnline_a
-        end
-    end)
     local data = self:filterMemberList("general")
     local next_data = self:filterMemberList("quartermaster")
     table.insertto(data,next_data)
@@ -1395,12 +1389,24 @@ function GameUIAlliance:filterMemberList(title)
     end)
 
     local result = {{data_type = 1 , data = title}}
+    local need_sort = true
     if LuaUtils:table_size(filter_data) == 0 then
         table.insert(result,{data_type = 2 , data = "__empty"})
+        need_sort = false
     else
         --player
         table.foreach(filter_data,function(k,v)
             table.insert(result,{data_type = 2 , data = v})
+        end)
+        need_sort = true
+    end
+    if need_sort  then
+        table.sort( result, function(a,b)
+            if a.data_type == b.data_type then 
+                return a.data.power > b.data.power 
+            else
+                return a.data_type < b.data_type
+            end
         end)
     end
     return result
@@ -1635,7 +1641,7 @@ function GameUIAlliance:OnInfoButtonClicked(tag)
         local mail = GameUIWriteMail.new(GameUIWriteMail.SEND_TYPE.ALLIANCE_MAIL)
         mail:SetTitle(_("联盟邮件"))
         mail:SetAddressee(_("发送联盟所有成员"))
-        mail:addTo(self)
+        mail:AddToCurrentScene(true)
     end
 end
 

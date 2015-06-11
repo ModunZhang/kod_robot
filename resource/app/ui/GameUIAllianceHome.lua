@@ -60,27 +60,31 @@ end
 function GameUIAllianceHome:onEnter()
     GameUIAllianceHome.super.onEnter(self)
     -- 获取历史记录
-    NetManager:getAllianceFightReportsPromise(self.alliance:Id()):done(function ()
-        self.city = City
-        self.visible_count = 1
-        self.top = self:CreateTop()
-        self.bottom = self:CreateBottom()
+    self.city = City
+    self.visible_count = 1
+    self.top = self:CreateTop()
+    self.bottom = self:CreateBottom()
 
 
-        local ratio = self.bottom:getScale()
-        local rect1 = self.chat:getCascadeBoundingBox()
-        local x, y = rect1.x, rect1.y + rect1.height - 2
-        local march = WidgetMarchEvents.new(self.alliance, ratio):addTo(self):pos(x, y)
-        self:AddMapChangeButton()
-        self:InitArrow()
-        if self.top then
+    local ratio = self.bottom:getScale()
+    local rect1 = self.chat:getCascadeBoundingBox()
+    local x, y = rect1.x, rect1.y + rect1.height - 2
+    local march = WidgetMarchEvents.new(self.alliance, ratio):addTo(self):pos(x, y)
+    self:AddMapChangeButton()
+    self:InitArrow()
+    if self.top then
+        if not self.alliance:AllianceFightReports() then
+            NetManager:getAllianceFightReportsPromise(self.alliance:Id()):done(function ()
+                self.top:Refresh()
+            end)
+        else
             self.top:Refresh()
         end
-        -- 中间按钮
-        self:CreateOperationButton()
-        self:AddOrRemoveListener(true)
-        self:Schedule()
-    end)
+    end
+    -- 中间按钮
+    self:CreateOperationButton()
+    self:AddOrRemoveListener(true)
+    self:Schedule()
 end
 function GameUIAllianceHome:onExit()
     self:AddOrRemoveListener(false)
@@ -159,7 +163,7 @@ function GameUIAllianceHome:Schedule()
         -- local x,y = alliance_map:FindMapObjectById(myself:MapId()):GetMidLogicPosition()
         -- self:UpdateMyAllianceBuildingArrows(screen_rect, alliance, layer)
         if not Alliance_Manager:GetMyAlliance():IsDefault() then
-            self:UpdateFriendArrows(screen_rect, Alliance_Manager:GetMyAlliance(), layer, lx, ly)
+            self:UpdateFriendArrows(screen_rect, Alliance_Manager:GetMyAlliance(), layer, lx, ly, myself)
         end
         if Alliance_Manager:HaveEnemyAlliance() then
             self:UpdateEnemyArrows(screen_rect, Alliance_Manager:GetEnemyAlliance(), layer, lx, ly)
@@ -354,11 +358,12 @@ function GameUIAllianceHome:CreateTop()
         :addTo(enemy_name_bg)
     local enemy_peace_label = UIKit:ttfLabel(
         {
-            text = _("请求开战玩家"),
-            size = 18,
+            text = alliance:GetMemeberById(User:Id()):IsTitleEqualOrGreaterThan("general") and _("开始战斗") or _("请求开战"),
+            size = 20,
             color = 0xffedae
-        }):align(display.LEFT_CENTER, -20,-26)
+        }):align(display.LEFT_CENTER, -20,-24)
         :addTo(top_enemy_bg)
+    local fight_icon_66x66 = display.newSprite("fight_icon_66x66.png"):addTo(top_enemy_bg):align(display.LEFT_CENTER, -108,-37)
 
     -- 和平期,战争期,准备期背景
     local period_bg = display.newSprite("box_104x104.png")
@@ -413,12 +418,16 @@ function GameUIAllianceHome:CreateTop()
         local status = alliance:Status()
         local enemyAlliance = Alliance_Manager:GetEnemyAlliance()
         period_label:setString(home:GetAlliancePeriod())
+        enemy_name_label:setVisible(status~="peace")
         -- 和平期
         if status=="peace" then
-            enemy_name_bg:setVisible(false)
             enemy_peace_label:setVisible(true)
+            fight_icon_66x66:setVisible(true)
+            if enemy_name_bg:getChildByTag(201) then
+                enemy_name_bg:removeChildByTag(201, true)
+            end
         else
-            enemy_name_bg:setVisible(true)
+            fight_icon_66x66:setVisible(false)
             enemy_peace_label:setVisible(false)
 
             -- 敌方联盟旗帜
@@ -519,8 +528,13 @@ function GameUIAllianceHome:OnAllianceBasicChanged(alliance,changed_map)
     if changed_map.honour then
         self.page_top:SetHonour(GameUtils:formatNumber(changed_map.honour.new))
     elseif changed_map.status then
-        LuaUtils:outputTable("OnAllianceBasicChanged changed_map", changed_map)
-        self.top:Refresh()
+        if not alliance:AllianceFightReports() then
+            NetManager:getAllianceFightReportsPromise(self.alliance:Id()):done(function ( ... )
+                self.top:Refresh()
+            end)
+        else
+            self.top:Refresh()
+        end
     elseif changed_map.name then
         self.self_name_label:setString("["..alliance:Tag().."] "..changed_map.name.new)
     elseif changed_map.tag then
@@ -621,14 +635,14 @@ end
 -- end
 local min = math.min
 local MAX_ARROW_COUNT = 5
-function GameUIAllianceHome:UpdateFriendArrows(screen_rect, alliance, layer, logic_x, logic_y)
+function GameUIAllianceHome:UpdateFriendArrows(screen_rect, alliance, layer, logic_x, logic_y, myself)
     local count = self:UpdateAllianceArrow(screen_rect, alliance, layer, logic_x, logic_y, self.friends_arrow_index, function(index)
         if not self.friends_arrows[index] then
             self.friends_arrows[index] = display.newSprite("arrow_blue-hd.png")
                 :addTo(self, -2):align(display.TOP_CENTER):hide()
         end
         return self.friends_arrows[index]
-    end)
+    end, myself:MapId())
     local friends_arrows = self.friends_arrows
     for i = count, #friends_arrows do
         friends_arrows[i]:hide()
@@ -656,12 +670,12 @@ function GameUIAllianceHome:UpdateEnemyArrows(screen_rect, alliance, layer, logi
     end
 end
 --
-function GameUIAllianceHome:UpdateAllianceArrow(screen_rect, alliance, layer, logic_x, logic_y, cur_index, func)
+function GameUIAllianceHome:UpdateAllianceArrow(screen_rect, alliance, layer, logic_x, logic_y, cur_index, func, except_map_id)
     local id = alliance:Id()
     local count = 1
     alliance:GetAllianceMap():IteratorCities(function(_, v)
         if count > MAX_ARROW_COUNT then return true end
-        if count == cur_index then
+        if count == cur_index and except_map_id ~= v.id then
             local x,y = v:GetMidLogicPosition()
             local dx, dy = (logic_x - x), (logic_y - y)
             if dx^2 + dy^2 > 1 then
@@ -757,6 +771,9 @@ function GameUIAllianceHome:GetAlliancePeriod()
 end
 
 return GameUIAllianceHome
+
+
+
 
 
 

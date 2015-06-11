@@ -588,6 +588,7 @@ function Alliance:OnHelpEventsChanged(alliance_data,deltaData)
     local is_delta_update = not is_fully_update and deltaData.helpEvents ~= nil
     if is_fully_update then
         if alliance_data.helpEvents then
+            self.help_events = {}
             for _,v in pairs(alliance_data.helpEvents) do
                 self.help_events[v.id] = HelpEvent.new():UpdateData(v)
             end

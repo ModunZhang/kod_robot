@@ -203,8 +203,8 @@ function AllianceApi:EditAllianceInfo()
         elseif excute_fun <= 10 then
             if me:CanEditAllianceJoinType() then
                 if alliance:JoinType() == "all" then
-                    -- print("修改联盟加入type到:audit")
-                    -- return NetManager:getEditAllianceJoinTypePromise("audit")
+                -- print("修改联盟加入type到:audit")
+                -- return NetManager:getEditAllianceJoinTypePromise("audit")
                 else
                     print("修改联盟加入type到:all")
                     return NetManager:getEditAllianceJoinTypePromise("all")
@@ -362,7 +362,104 @@ function AllianceApi:HelpSpeedUp()
 
     end
 end
+function AllianceApi:AllianceOtherApi()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    local member = alliance:GetSelf()
+    local random = math.random(100)
+    -- 发联盟邮件
+    if member:CanSendAllianceMail() and random < 5 then
+        return NetManager:getSendAllianceMailPromise("机器人联盟邮件", "机器人联盟邮件")
+    elseif random < 10 then
+        local members = alliance:GetAllMembers()
+        local member
+        for k,v in pairs(members) do
+            member = v
+            break
+        end
+        return NetManager:getPlayerWallInfoPromise(member:Id())
+    elseif random < 15 then
+        if alliance:Status() == 'fight' then
+            return
+        end
+        local locationX = math.random(25)
+        local locationY = math.random(25)
+        print("移动自己城市",locationX,locationY)
+        return NetManager:getBuyAndUseItemPromise("moveTheCity",{
+            ["moveTheCity"]={
+                locationX = locationX,
+                locationY = locationY
+            }
+        })
+    end
+end
+-- 联盟商店进货
+function AllianceApi:ShopStock()
+    local alliance = Alliance_Manager:GetMyAlliance()
 
+    local shop = alliance:GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+    local shop_config = GameDatas.AllianceBuilding.shop
+    -- 所有解锁的可进货道具
+    local unlock_items = {}
+    for i=1,shop.level do
+        local unlock = string.split(shop_config[i].itemsUnlock, ",")
+        for i,v in ipairs(unlock) do
+            unlock_items[v] = true
+        end
+    end
+    local super_items = alliance:GetItemsManager():GetAllSuperItems()
+    local stock_items = {}
+    for i=1,#super_items do
+        local super_item = super_items[i]
+        if unlock_items[super_item:Name()] then
+            table.insert(stock_items,super_item)
+        end
+    end
+
+    local item = stock_items[math.random(#stock_items)]
+    if item:IsAdvancedItem() and  alliance:GetSelf():CanAddAdvancedItemsToAllianceShop() and alliance:Honour() >= item:BuyPriceInAlliance() then
+        print("联盟商店进货：",item:Name())
+        return NetManager:getAddAllianceItemPromise(item:Name(),1)
+    end
+end
+function AllianceApi:BuyAllianceItem()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    local shop = alliance:GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+    local shop_config = GameDatas.AllianceBuilding.shop
+    -- 所有解锁的道具
+    local unlock_items = {}
+    for i=1,shop.level do
+        local unlock = string.split(shop_config[i].itemsUnlock, ",")
+        for i,v in ipairs(unlock) do
+            table.insert(unlock_items, alliance:GetItemsManager():GetItemByName(v))
+        end
+    end
+    local item = unlock_items[math.random(#unlock_items)]
+    if item:IsAdvancedItem() and not alliance:GetSelf():CanBuyAdvancedItemsFromAllianceShop() then
+        return
+    end
+    if User:Loyalty() >= item:SellPriceInAlliance() then
+        print("购买联盟商店道具：",item:Name())
+        return NetManager:getBuyAllianceItemPromise(item:Name(),1)
+    else
+        return self:Contribute()
+    end
+end
+-- 获取其他玩家重置送的礼物
+function AllianceApi:GetGift()
+    local gifts = User:GetIapGifts()
+    if not LuaUtils:table_empty(gifts) then
+        for k,data in pairs(gifts) do
+            print("获取其他玩家重置送的礼物",data:Id())
+            return NetManager:getIapGiftPromise(data:Id())
+        end
+    end
+end
+-- 获取首次加入联盟奖励
+function AllianceApi:FirstJoinAllianceReward()
+    if not User:GetCountInfo().firstJoinAllianceRewardGeted then
+        return NetManager:getFirstJoinAllianceRewardPromise()
+    end
+end
 local function setRun()
     app:setRun()
 end
@@ -439,7 +536,7 @@ local function getQuitAlliancePromise()
         setRun()
     end
 end
-function Contribute()
+local function Contribute()
     local p = AllianceApi:Contribute()
     if p then
         p:always(setRun)
@@ -447,7 +544,7 @@ function Contribute()
         setRun()
     end
 end
-function UpgradeAllianceBuilding()
+local function UpgradeAllianceBuilding()
     local p = AllianceApi:UpgradeAllianceBuilding()
     if p then
         p:always(setRun)
@@ -455,7 +552,7 @@ function UpgradeAllianceBuilding()
         setRun()
     end
 end
-function UpgradeAllianceVillage()
+local function UpgradeAllianceVillage()
     local p = AllianceApi:UpgradeAllianceVillage()
     if p then
         p:always(setRun)
@@ -463,7 +560,7 @@ function UpgradeAllianceVillage()
         setRun()
     end
 end
-function EditAllianceInfo()
+local function EditAllianceInfo()
     local p = AllianceApi:EditAllianceInfo()
     if p then
         p:always(setRun)
@@ -471,7 +568,7 @@ function EditAllianceInfo()
         setRun()
     end
 end
-function GiveLoyalty()
+local function GiveLoyalty()
     local p = AllianceApi:GiveLoyalty()
     if p then
         p:always(setRun)
@@ -479,7 +576,7 @@ function GiveLoyalty()
         setRun()
     end
 end
-function AllianceMemberApi()
+local function AllianceMemberApi()
     local p = AllianceApi:AllianceMemberApi()
     if p then
         p:always(setRun)
@@ -487,6 +584,48 @@ function AllianceMemberApi()
         setRun()
     end
 end
+local function AllianceOtherApi()
+    local p = AllianceApi:AllianceOtherApi()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function ShopStock()
+    local p = AllianceApi:ShopStock()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function BuyAllianceItem()
+    local p = AllianceApi:BuyAllianceItem()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function GetGift()
+    local p = AllianceApi:GetGift()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function FirstJoinAllianceReward()
+    local p = AllianceApi:FirstJoinAllianceReward()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+
+
 
 return {
     setRun,
@@ -501,7 +640,17 @@ return {
     GiveLoyalty,
     AllianceMemberApi,
     getQuitAlliancePromise,
+    AllianceOtherApi,
+    ShopStock,
+    BuyAllianceItem,
+    GetGift,
+    FirstJoinAllianceReward,
 }
+
+
+
+
+
 
 
 

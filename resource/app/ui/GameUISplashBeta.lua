@@ -16,7 +16,7 @@ end
 
 function GameUISplashBeta:onEnter()
 	GameUISplashBeta.super.onEnter(self)
-	app:GetAudioManager():PlayGameMusic("MainScene",true)
+	app:GetAudioManager():PlayGameMusicOnSceneEnter("MainScene",true)
 	self.bottom_layer = self:CreateOneLayer():addTo(self,GLOBAL_ZORDER.BOTTOM)
 	self.ui_layer = self:CreateOneLayer():addTo(self,GLOBAL_ZORDER.UI)
 	display.newSprite("splash_logo_515x92.png")

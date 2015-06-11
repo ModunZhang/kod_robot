@@ -51,16 +51,9 @@ function GameUICollectReport:ctor(report)
         }))
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                UIKit:showMessageDialog(_("删除战报"),_("您即将删除所选战报,删除后将无法恢复,您确定要这么做吗?"))
-                    :CreateOKButton(
-                        {
-                            listener =function ()
-                                NetManager:getDeleteReportsPromise({report.id}):done(function ()
-                                    self:removeFromParent()
-                                end)
-                            end
-                        }
-                    )
+                NetManager:getDeleteReportsPromise({report.id}):done(function ()
+                    self:removeFromParent()
+                end)
             end
         end):align(display.CENTER,106,50):addTo(body)
     -- 收藏按钮
@@ -173,6 +166,7 @@ return GameUICollectReport
 
 
    
+
 
 
 

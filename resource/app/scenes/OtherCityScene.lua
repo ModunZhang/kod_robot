@@ -9,7 +9,10 @@ function OtherCityScene:ctor(user, city, location)
 end
 function OtherCityScene:onEnter()
     OtherCityScene.super.onEnter(self)
-    UIKit:newGameUI('GameUICityInfo', self.user, self.location):AddToScene(self):setTouchSwallowEnabled(false)
+    self.home = UIKit:newGameUI('GameUICityInfo', self.user, self.location):AddToScene(self):setTouchSwallowEnabled(false)
+end
+function OtherCityScene:GetHomePage()
+    return self.home
 end
 --不处理任何场景建筑事件
 function OtherCityScene:OnTouchClicked(pre_x, pre_y, x, y)

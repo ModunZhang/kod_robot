@@ -42,7 +42,7 @@ function WidgetAccelerateGroup:ctor(eventType,eventId)
         local speedUp_item = ItemManager:GetItemByName(speedUp_item_name)
         local speedUp_item_num = speedUp_item:Count()
         local cost_text = ""
-        local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(cost_bg):align(display.CENTER, 20, cost_bg:getContentSize().height/2):scale(0.6)
+        local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(cost_bg):align(display.CENTER, 16, cost_bg:getContentSize().height/2-2):scale(0.6)
 
         if speedUp_item_num>0 then
             cost_text = string.format( _("拥有%d"), speedUp_item_num )
@@ -57,7 +57,7 @@ function WidgetAccelerateGroup:ctor(eventType,eventId)
             text = cost_text,
             size = 20,
             color = 0x403c2f
-        }):align(display.CENTER, width/2-220+gap_x*math.mod(i-1,4), 160-gap_y*math.floor((i-1)/4))
+        }):align(display.CENTER, width/2-215+gap_x*math.mod(i-1,4), 160-gap_y*math.floor((i-1)/4))
             :addTo(self)
         table.insert(self.own_labels, own_label)
 

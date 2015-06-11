@@ -51,7 +51,7 @@ function GameUISetting:BuildUI()
 		},
 		{text = _("推送通知"),image = "setting_notification_76x66.png"},
 		{text = _("已屏蔽用户"),image = "setting_shield_58x70.png"},
-		{text = _("我有建议"),image = "setting_user_voice_62x63.png"},
+		-- {text = _("我有建议"),image = "setting_user_voice_62x63.png"},
 		{text = _("遇到问题"),image = "setting_help_64x65.png"},
 	}
 	local x,y = window.left + 50,window.top_bottom - 80
@@ -88,6 +88,12 @@ function GameUISetting:BuildUI()
 	    end
 		x = x + 30 + 112
 	end
+	UIKit:ttfLabel({
+		text = string.format("Dragonfall %s(%s)", ext.getAppVersion(), app.client_tag or "0"),
+		color = 0x403c2f,
+	    size = 18,
+	    align = cc.TEXT_ALIGNMENT_CENTER
+	}):addTo(self:GetView()):align(display.CENTER,window.cx,window.bottom + 50)
 end
 
 function GameUISetting:OnButtonClicked(button)
@@ -125,11 +131,11 @@ function GameUISetting:OnButtonClicked(button)
 	elseif tag == 10 then
 		UIKit:newGameUI("GameUISettingShield"):AddToCurrentScene(true)
 	elseif tag == 11 then
-		if ext.userVoice then
-			ext.userVoice("dannyhe.uservoice.com",280112,"example@batcat.com","DragonFall","DragonFall")
-		end
-	elseif tag == 12 then
+		-- if ext.userVoice then
+		-- 	ext.userVoice("dannyhe.uservoice.com",280112,"example@batcat.com","DragonFall","DragonFall")
+		-- end
        	UIKit:newGameUI("GameUISettingContactUs"):AddToCurrentScene(true)
+	elseif tag == 12 then
 	end
 end
 

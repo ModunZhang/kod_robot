@@ -69,7 +69,7 @@ function GameUIDragonEquipment:onEnter()
 
      self.tab_buttons = WidgetRoundTabButtons.new({
         {tag = "intensify",label = _("强化"),default = true},
-        {tag = "info",label = _("信息")},
+        {tag = "info",label = _("重置")},
     }, function(tag)
        self:OnTabButtonClicked(tag)
     end,1):align(display.BOTTOM_CENTER,304,10):addTo(backgroundImage)
@@ -316,6 +316,7 @@ function GameUIDragonEquipment:IntensifyButtonClicked()
   NetManager:getEnhanceDragonEquipmentPromise(self.dragon:Type(),equipment:Body(),equipments):done(function()
       if string.len(self.intensify_tips) > 0 then
         GameGlobalUI:showTips(_("装备强化成功"),self.intensify_tips)
+        app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
       end
   end)
 end

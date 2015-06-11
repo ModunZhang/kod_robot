@@ -2,7 +2,7 @@ local resources = GameDatas.PlayerInitData.resources
 
 resources[1] = {
 	["level"] = 1,
-	["gem"] = 2000,
+	["gem"] = 1000,
 	["wood"] = 25000,
 	["stone"] = 25000,
 	["iron"] = 25000,
@@ -10,7 +10,7 @@ resources[1] = {
 	["citizen"] = 100,
 	["coin"] = 50000,
 	["cart"] = 20,
-	["blood"] = 1000,
+	["blood"] = 100,
 	["stamina"] = 100,
 	["casinoToken"] = 5000
 }

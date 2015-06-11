@@ -16,13 +16,6 @@ function GameUIAllianceShrine:ctor(city,default_tab,building)
 	self.default_tab = default_tab
 	self.my_alliance = Alliance_Manager:GetMyAlliance()
 	self.allianceShrine = self.my_alliance:GetAllianceShrine()
-	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnPerceotionChanged)
-	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnFightEventTimerChanged)
-	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
-	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnNewStageOpened)
-	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
-	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineReportsChanged)
-	self.my_alliance:AddListenOnType(self, self.my_alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged)
 	assert(self.allianceShrine)
 	self.event_bind_to_label = {}
 end
@@ -142,6 +135,13 @@ function GameUIAllianceShrine:OnMoveInStage()
 		end
 	):pos(window.cx, window.bottom + 34)
 	self.tab_buttons:SetButtonTipNumber("fight_event",#self:GetAllianceShrine():GetShrineEvents())
+	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnPerceotionChanged)
+	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnFightEventTimerChanged)
+	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
+	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnNewStageOpened)
+	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
+	self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineReportsChanged)
+	self.my_alliance:AddListenOnType(self, self.my_alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged)
 end
 
 function GameUIAllianceShrine:CreateBetweenBgAndTitle()
@@ -543,7 +543,7 @@ function GameUIAllianceShrine:reportsSouceDelegate(listView, tag, idx)
     end
 end
 function GameUIAllianceShrine:RefreshEventsListView()
-	self.events_list:removeAllItems()
+	-- self.events_list:removeAllItems()
 	local data = clone(self:GetAllianceShrine():GetShrineReports())
 	table.sort( data,function(a,b)
 		return a:Time() > b:Time()

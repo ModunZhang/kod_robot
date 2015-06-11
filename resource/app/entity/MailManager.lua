@@ -12,6 +12,11 @@ function MailManager:ctor()
     self.sendMails = nil
     self.reports = nil
     self.savedReports = nil
+    self.is_last_mail = false
+    self.is_last_saved_mail = false
+    self.is_last_send_mail = false
+    self.is_last_report = false
+    self.is_last_saved_report = false
 end
 function MailManager:Reset()
     self.mails = nil
@@ -19,11 +24,11 @@ function MailManager:Reset()
     self.sendMails = nil
     self.reports = nil
     self.savedReports = nil
-    self.fetch_last_mail = false
-    self.fetch_last_savedmail = false
-    self.fetch_last_sendmails = false
-    self.fetch_last_report = false
-    self.fetch_last_savedreport = false
+    self.is_last_mail = false
+    self.is_last_saved_mail = false
+    self.is_last_send_mail = false
+    self.is_last_report = false
+    self.is_last_saved_report = false
 end
 function MailManager:IncreaseUnReadMailsNum(num)
     self.unread_mail = self.unread_mail + num
@@ -150,6 +155,7 @@ function MailManager:DeleteMail(mail)
 end
 function MailManager:ModifyMail(mail)
     for k,v in pairs(self.mails) do
+        print("ModifyMail ",v.id, mail.id)
         if v.id == mail.id then
             if mail.isSaved ~= v.isSaved then
                 self:OnNewSavedMailsChanged(mail)
@@ -253,7 +259,7 @@ function MailManager:GetSavedReportByServerIndex(serverIndex)
     end
 end
 function MailManager:FetchMailsFromServer(fromIndex)
-    if self.fetch_last_mail then
+    if self.is_last_mail then
         return
     end
     return NetManager:getFetchMailsPromise(fromIndex):done(function(response)
@@ -261,16 +267,16 @@ function MailManager:FetchMailsFromServer(fromIndex)
             local user_data = DataManager:getUserData()
             local fetch_mails = response.msg.mails
             if #fetch_mails < 10 then
-                self.fetch_last_mail = true
+                self.is_last_mail = true
+            end
+            if not user_data.mails then
+                user_data.mails = {}
+            end
+            if not self.mails then
+                self.mails = {}
             end
             for i,v in ipairs(fetch_mails) do
-                if not user_data.mails then
-                    user_data.mails = {}
-                end
                 table.insert(user_data.mails, v)
-                if not self.mails then
-                    self.mails = {}
-                end
                 self:AddMailsToEnd(clone(v))
             end
         end
@@ -281,24 +287,24 @@ function MailManager:GetSavedMails()
     return self.savedMails
 end
 function MailManager:FetchSavedMailsFromServer(fromIndex)
-    if self.fetch_last_savedmail then
+    if self.is_last_saved_mail then
         return
     end
     return NetManager:getFetchSavedMailsPromise(fromIndex):done(function (response)
         if response.msg.mails then
+            local user_data = DataManager:getUserData()
             local fetch_mails = response.msg.mails
             if #fetch_mails < 10 then
-                self.fetch_last_savedmail = true
+                self.is_last_saved_mail = true
             end
-            local user_data = DataManager:getUserData()
+            if not user_data.savedMails then
+                user_data.savedMails = {}
+            end
+            if not self.savedMails then
+                self.savedMails = {}
+            end
             for i,v in ipairs(fetch_mails) do
-                if not user_data.savedMails then
-                    user_data.savedMails = {}
-                end
                 table.insert(user_data.savedMails, v)
-                if not self.savedMails then
-                    self.savedMails = {}
-                end
                 self:AddSavedMailsToEnd(clone(v))
             end
         end
@@ -313,7 +319,7 @@ function MailManager:GetSendMails()
     return self.sendMails
 end
 function MailManager:FetchSendMailsFromServer(fromIndex)
-    if self.fetch_last_sendmails then
+    if self.is_last_send_mail then
         return
     end
     return NetManager:getFetchSendMailsPromise(fromIndex):done(function(response)
@@ -321,16 +327,16 @@ function MailManager:FetchSendMailsFromServer(fromIndex)
             local user_data = DataManager:getUserData()
             local mails = response.msg.mails
             if #mails < 10 then
-                self.fetch_last_sendmails = true
+                self.is_last_send_mail = true
+            end
+            if not user_data.sendMails then
+                user_data.sendMails = {}
+            end
+            if not self.sendMails then
+                self.sendMails = {}
             end
             for i,v in ipairs(response.msg.mails) do
-                if not user_data.sendMails then
-                    user_data.sendMails = {}
-                end
                 table.insert(user_data.sendMails, v)
-                if not self.sendMails then
-                    self.sendMails = {}
-                end
                 self:AddSendMailsToEnd(clone(v))
             end
         end
@@ -383,8 +389,9 @@ function MailManager:OnNewMailsChanged( mails )
                 for k,v in pairs(u_mails) do
                     max_index = math.max(k,max_index)
                 end
-                local temp_mail = table.remove(u_mails,max_index)
-                table.insert(u_mails, 1 ,temp_mail)
+                local first = clone(u_mails[max_index])
+                u_mails[max_index] = nil
+                table.insert(u_mails, 1 ,first)
             end
         elseif type == "remove" then
             for i,data in ipairs(mail) do
@@ -393,6 +400,7 @@ function MailManager:OnNewMailsChanged( mails )
             end
         elseif type == "edit" then
             for i,data in ipairs(mail) do
+                LuaUtils:outputTable("edit mail", data)
                 table.insert(edit_mails, self:ModifyMail(clone(data)))
             end
         end
@@ -532,8 +540,9 @@ function MailManager:OnNewReportsChanged( __reports )
                 for k,v in pairs(u_reports) do
                     max_index = math.max(k,max_index)
                 end
-                local temp_report = table.remove(u_reports,max_index)
-                table.insert(u_reports, 1 ,temp_report)
+                local first = clone(u_reports[max_index])
+                u_reports[max_index] = nil
+                table.insert(u_reports, 1 ,first)
             end
         elseif type == "remove" then
             for k,data in pairs(rp) do
@@ -640,25 +649,25 @@ function MailManager:GetReports()
     return self.reports
 end
 function MailManager:FetchReportsFromServer(fromIndex)
-    if self.fetch_last_report then
+    if self.is_last_report then
         return
     end
     return NetManager:getReportsPromise(fromIndex)
         :done(function (response)
             if response.msg.reports then
+                local user_data = DataManager:getUserData()
                 local fetch_reports = response.msg.reports
                 if #fetch_reports < 10 then
-                    self.fetch_last_report = true
+                    self.is_last_report = true
                 end
-                local user_data = DataManager:getUserData()
+                if not user_data.reports then
+                    user_data.reports = {}
+                end
+                if not self.reports then
+                    self.reports = {}
+                end
                 for i,v in ipairs(fetch_reports) do
-                    if not user_data.reports then
-                        user_data.reports = {}
-                    end
                     table.insert(user_data.reports, v)
-                    if not self.reports then
-                        self.reports = {}
-                    end
                     self:AddReportsToEnd(clone(v))
                 end
             end
@@ -668,30 +677,35 @@ function MailManager:GetSavedReports()
     return self.savedReports
 end
 function MailManager:FetchSavedReportsFromServer(fromIndex)
-    if self.fetch_last_savedreport then
+    if self.is_last_saved_report then
         return
     end
     return NetManager:getSavedReportsPromise(fromIndex):done(function (response)
         if response.msg.reports then
+            local user_data = DataManager:getUserData()
             local fetch_reports = response.msg.reports
             if #fetch_reports < 10 then
-                self.fetch_last_savedreport = true
+                self.is_last_saved_report = true
             end
-            local user_data = DataManager:getUserData()
+            if not user_data.savedReports then
+                user_data.savedReports = {}
+            end
+            if not self.savedReports then
+                self.savedReports = {}
+            end
             for i,v in ipairs(fetch_reports) do
-                if not user_data.savedReports then
-                    user_data.savedReports = {}
-                end
                 table.insert(user_data.savedReports, v)
-                if not self.savedReports then
-                    self.savedReports = {}
-                end
                 self:AddSavedReportsToEnd(clone(v))
             end
         end
     end)
 end
 return MailManager
+
+
+
+
+
 
 
 

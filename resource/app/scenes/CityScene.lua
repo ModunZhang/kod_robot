@@ -12,14 +12,12 @@ function CityScene:ctor(city)
     CityScene.super.ctor(self)
 end
 function CityScene:onEnter()
-    self:LoadAnimation()
     CityScene.super.onEnter(self)
     self:GetSceneLayer():AddObserver(self)
     self:GetSceneLayer():InitWithCity(self:GetCity())
     self:PlayBackgroundMusic()
-    self:GotoLogicPointInstant(6, 4)
-    self:GetSceneLayer():ZoomTo(1)
-    self:PlayEffectIf()
+    self:GotoLogicPointInstant(5, 4)
+    self:GetSceneLayer():ZoomTo(0.8)
 
     --  cc.ui.UIPushButton.new({normal = "lock_btn.png",pressed = "lock_btn.png"})
     -- :addTo(self, 1000000):pos(display.cx, display.cy + 300)
@@ -28,17 +26,19 @@ function CityScene:onEnter()
     -- end)
 end
 function CityScene:onExit()
-    UILib.unLoadBuildingAnimation()
     self:stopAllActions()
     --TODO:注意：这里因为主城现在播放两个音乐文件 所以这里要关掉鸟叫的sound音效
     audio.stopAllSounds()
     CityScene.super.onExit(self)
 end
--- init ui
-function CityScene:LoadAnimation()
-    UILib.loadSolidersAnimation()
-    UILib.loadBuildingAnimation()
-    UILib.loadDragonAnimation()
+function CityScene:GetPreloadImages()
+    return {
+        {image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
+        {image = "city_png.pvr.ccz",list = "city_png.plist"},
+        {image = "city_prv_0.pvr.ccz",list = "city_prv_0.plist"},
+        {image = "city_prv_1.pvr.ccz",list = "city_prv_1.plist"},
+        {image = "city_prv_2.pvr.ccz",list = "city_prv_2.plist"},
+    }
 end
 function CityScene:GetCity()
     return self.city
@@ -60,14 +60,14 @@ function CityScene:GotoLogicPoint(x, y, speed)
     return self:GetSceneLayer():PromiseOfMove(point.x, point.y, speed)
 end
 function CityScene:PlayBackgroundMusic()
-    app:GetAudioManager():PlayGameMusic('MyCityScene')
+    app:GetAudioManager():PlayGameMusicOnSceneEnter('MyCityScene',false)
     -- self:performWithDelay(function()
     --     self:PlayBackgroundMusic()
     -- end, 113 + 30)
 end
 function CityScene:ChangeTerrain()
-    self:GetSceneLayer():ChangeTerrain()
-    self:PlayEffectIf()
+    -- self:GetSceneLayer():ChangeTerrain()
+    -- self:PlayEffectIf()
 end
 function CityScene:EnterEditMode()
     self:GetSceneLayer():EnterEditMode()
@@ -151,6 +151,9 @@ end
 
 function CityScene:onEnterTransitionFinish()
     CityScene.super.onEnterTransitionFinish(self)
+    self:GetScreenLayer():performWithDelay(function()
+        self:PlayEffectIf()
+    end, math.random(3))
 end
 
 
@@ -160,7 +163,7 @@ function CityScene:PlayEffectIf()
     self:GetScreenLayer():removeAllChildren()
     local terrain = self:GetCity():GetUser():Terrain()
     if terrain == "iceField" then
-        local emitter = cc.ParticleRain:createWithTotalParticles(200)
+        local emitter = cc.ParticleRain:createWithTotalParticles(100)
             :addTo(self:GetScreenLayer(), 1, EFFECT_TAG):pos(display.cx-80, display.height)
         emitter:setLife(7)
         emitter:setStartSize(10)
@@ -175,8 +178,9 @@ function CityScene:PlayEffectIf()
         emitter:setEndColor(cc.c4f(1,1,1,0))
         emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
         emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("snow.png"))
+        emitter:updateWithNoTime()
     elseif terrain == "grassLand" then
-        local emitter = cc.ParticleRain:createWithTotalParticles(50)
+        local emitter = cc.ParticleRain:createWithTotalParticles(100)
             :addTo(self:GetScreenLayer(), 1, EFFECT_TAG):pos(display.cx + 80, display.height)
         emitter:setPosVar(cc.p(display.cx,0))
         emitter:setGravity(cc.p(-10,-10))
@@ -201,6 +205,7 @@ function CityScene:PlayEffectIf()
         emitter:setEndColor(cc.c4f(1,1,1,0.5))
         emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
         emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("rain.png"))
+        emitter:updateWithNoTime()
     end
 end
 

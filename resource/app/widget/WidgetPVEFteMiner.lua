@@ -40,15 +40,7 @@ function WidgetPVEFteMiner:PormiseOfFte()
             enemy.soldiers,-- pve 怪数据
             function(dragonType, soldiers)
                 local dragon = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager():GetDragon(dragonType)
-                local attack_dragon = {
-                    level = dragon:Level(),
-                    dragonType = dragonType,
-                    currentHp = dragon:Hp(),
-                    hpMax = dragon:GetMaxHP(),
-                    strength = dragon:TotalStrength(),
-                    vitality = dragon:TotalVitality(),
-                    dragon = dragon
-                }
+                
                 local attack_soldier = LuaUtils:table_map(soldiers, function(k, v)
                     return k, {
                         name = v.name,
@@ -57,8 +49,8 @@ function WidgetPVEFteMiner:PormiseOfFte()
                     }
                 end)
 
-                local report = GameUtils:DoBattle(
-                    {dragon = attack_dragon, soldiers = attack_soldier},
+                local report = DataUtils:DoBattle(
+                    {dragon = dragon, soldiers = attack_soldier},
                     {dragon = enemy.dragon, soldiers = enemy.soldiers},
                     self:GetObject():GetMap():Terrain(), self:GetTitle()
                 )

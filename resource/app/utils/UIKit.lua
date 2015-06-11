@@ -11,9 +11,12 @@ local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local UILib = import("..ui.UILib")
 local UIListView = import("..ui.UIListView")
+local CURRENT_MODULE_NAME = ...
+local Localize = import(".Localize", CURRENT_MODULE_NAME)
 
 local error_code = {}
 for k,v in pairs(GameDatas.Errors.errors) do
+    v.message = Localize.server_errors[v.code]
     error_code[v.code] = v
 end
 
@@ -23,8 +26,6 @@ UIKit =
         GameUIBase = import('..ui.GameUIBase'),
         messageDialogs = {}
     }
-local CURRENT_MODULE_NAME = ...
-
 UIKit.BTN_COLOR = Enum("YELLOW","BLUE","GREEN","RED","PURPLE")
 UIKit.UITYPE = Enum("BACKGROUND","WIDGET","MESSAGEDIALOG")
 UIKit.open_ui_callbacks = {}
@@ -192,9 +193,13 @@ function UIKit:closeAllUI(force)
             v:LeftButtonClicked()
         end
     end
-    for __,v in pairs(self.messageDialogs) do
-        if v:GetUserData() ~= '__key__dialog' and '__alliance_war_tips__' ~= v:GetUserData() then
-            v:LeftButtonClicked()
+    for key,v in pairs(self.messageDialogs) do
+        if type(v.GetUserData) == 'function' then
+            if v:GetUserData() ~= '__key__dialog' and '__alliance_war_tips__' ~= v:GetUserData() then
+                v:LeftButtonClicked()
+            end
+        else
+            self.messageDialogs[key] = nil
         end
     end
 end
@@ -652,12 +657,46 @@ function UIKit:showMessageDialogWithParams(params)
     return dialog
 end
 
-function UIKit:showEvaluateDialog()
-    local dialog = UIKit:newGameUI("FullScreenPopDialogUI"):SetTitle("亲"):SetPopMessage("是否去app store评价我们?")
+function UIKit:getMessageDialogWithParams(params)
+    local title = params.title or _("提示")
+    local content = params.content or ""
+    local ok_callback = params.ok_callback or function()end
+    local ok_string = params.ok_string or _("确定")
+    local cancel_string = params.cancel_string or _("取消")
+    local visible_x_button = true
+    if  type(params.visible_x_button) == 'boolean' then
+        visible_x_button = params.visible_x_button
+    end
+    local x_button_callback = params.x_button_callback or function()end
+    local user_data = params.user_data or nil
+    local zorder = params.zorder or  3001
+
+    local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback,user_data):SetTitle(title):SetPopMessage(content):zorder(zorder)
+
+    dialog:CreateOKButton({listener = ok_callback,btn_name = ok_string})
+    if params.cancel_callback then
+        dialog:CreateCancelButton({listener = cancel_callback,btn_name = _("取消")})
+    end
+    dialog:VisibleXButton(visible_x_button)
+    if type(params.auto_close) ~= "boolean" then
+        if not visible_x_button then dialog:DisableAutoClose() end
+    else
+        if not params.auto_close then
+            dialog:DisableAutoClose()
+        end
+    end
+    return dialog
+end
+
+function UIKit:showEvaluateDialog(ok_callback)
+    local dialog = UIKit:newGameUI("FullScreenPopDialogUI"):SetTitle(_("评价我们")):SetPopMessage(_("喜欢我们的游戏吗？"))
         :CreateOKButton({
             listener =  function ()
-                device.openURL("http://www.baidu.com")
-            end,btn_name = _("支持一个")
+                device.openURL(CONFIG_APP_URL[device.platform])
+                if ok_callback then
+                    ok_callback()
+                end
+            end,btn_name = _("前去评价"),btn_images = {normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"}
         })
         :CreateCancelButton({
             listener = function ()
@@ -684,26 +723,22 @@ function UIKit:getMessageDialogWillShow()
 end
 function UIKit:clearMessageDialogWillShow()
     if self.willShowMessage_ then
-        local func = tolua.getcfunction(self.willShowMessage_, "release")
-        if func then
-            func(self)
-        end
+        self.willShowMessage_:release()
     end
     self.willShowMessage_ = nil
 end
 --如果是__key__dialog强制替换
 function UIKit:addMessageDialogWillShow(messageDialog)
-    local func = tolua.getcfunction(messageDialog, "retain")
-    if func then
-        func(self)
-    end
     if self.willShowMessage_ then
         print("addMessageDialogWillShow----->1",tolua.type(messageDialog))
         if messageDialog:GetUserData() == '__key__dialog' then
+            self.willShowMessage_:release()
+            messageDialog:retain()
             self.willShowMessage_ = messageDialog
         end
     else
         print("addMessageDialogWillShow----->2",tolua.type(messageDialog),messageDialog.__cname,type(messageDialog.AddToScene))
+        messageDialog:retain()
         self.willShowMessage_ = messageDialog
     end
 end
@@ -721,6 +756,7 @@ function UIKit:NoWaitForNet()
         scene:NoWaitForNet()
     end
 end
+
 
 function UIKit:getErrorCodeData(code)
     return error_code[code] or {}
@@ -746,8 +782,8 @@ function UIKit:GotoPreconditionBuilding(jump_building)
     end)
 end
 -- 暂时只有宝箱
-function UIKit:PlayUseItemAni(items)
-    if string.find(items:Name(),"dragonChest") then
+function UIKit:PlayUseItemAni(items,awards,message)
+    if string.find(items:Name(),"dragonChest") or string.find(items:Name(),"chest") then
         local ani = ""
         local item_name = items:Name()
         if item_name == "dragonChest_1" then
@@ -756,18 +792,18 @@ function UIKit:PlayUseItemAni(items)
             ani = "lvse_box"
         elseif item_name == "dragonChest_3" then
             ani = "zise_box"
+        elseif item_name == "chest_1" then
+            ani = "mu_box"
+        elseif item_name == "chest_2" then
+            ani = "tong_box"
+        elseif item_name == "chest_3" then
+            ani = "yin_box"
+        elseif item_name == "chest_4" then
+            ani = "jin_box"
         end
-        local box = ccs.Armature:create(ani):addTo(display.getRunningScene(),10000):align(display.CENTER, display.cx-50, display.cy)
-            :scale(0.5)
-        box:getAnimation():setMovementEventCallFunc(function (armatureBack, movementType, movementID)
-            if movementType == ccs.MovementEventType.start then
-            elseif movementType == ccs.MovementEventType.complete then
-                box:removeFromParent()
-            elseif movementType == ccs.MovementEventType.loopComplete then
-            end
-        end)
-
-        box:getAnimation():play("Animation1", -1, 0)
+        if ani then
+            self:newGameUI("GameUIChest", items,awards,message,ani):AddToCurrentScene():setLocalZOrder(10000)
+        end
     end
 end
 
@@ -793,7 +829,6 @@ end
 
 
 function UIKit:getIapPackageName(productId)
-    local Localize = import(".Localize", CURRENT_MODULE_NAME)
     return Localize.iap_package_name[productId]
 end
 

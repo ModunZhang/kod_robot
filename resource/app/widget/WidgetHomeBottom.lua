@@ -62,6 +62,11 @@ function WidgetHomeBottom:ctor(city)
             self.alliance_btn:setLocalZOrder(9)
         end
     end
+    display.newNode():addTo(self):schedule(function()
+        if math.random(app.timer:GetServerTime()) % 5 == 1 then
+            self:TipsOnTaskCount()
+        end
+    end, 5)
 end
 function WidgetHomeBottom:onEnter()
     local user = self.city:GetUser()
@@ -91,6 +96,13 @@ function WidgetHomeBottom:OnBottomButtonClicked(event)
     elseif tag == 5 then
         UIKit:newGameUI('GameUISetting',self.city):AddToCurrentScene(true)
     end
+end
+function WidgetHomeBottom:TipsOnTaskCount()
+    if self.task_count:getNumberOfRunningActions() > 0 or 
+        not self.task_count:isVisible() then
+        return
+    end
+    self.task_count:runAction(cc.JumpBy:create(0.5, cc.p(0,0), 10, 2))
 end
 
 

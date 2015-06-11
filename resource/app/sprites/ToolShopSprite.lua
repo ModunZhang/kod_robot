@@ -1,4 +1,5 @@
 local zz = import("..particles.zz")
+local smoke = import("..particles.smoke")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local ToolShopSprite = class("ToolShopSprite", FunctionUpgradingSprite)
 
@@ -17,7 +18,7 @@ end
 
 
 
-
+local WORK_TAG = 11201
 local EMPTY_TAG = 11400
 function ToolShopSprite:ctor(city_layer, entity, city)
     ToolShopSprite.super.ctor(self, city_layer, entity, city)
@@ -31,28 +32,23 @@ end
 function ToolShopSprite:DoAni()
     if self:GetEntity():IsUnlocked() then
         if self:GetEntity():IsMakingAny(app.timer:GetServerTime()) then
-            self:PlayAni()
+            self:PlayWorkAnimation()
             self:removeChildByTag(EMPTY_TAG)
         else
-            self:StopAni()
             self:PlayEmptyAnimation()
+            self:removeChildByTag(WORK_TAG)
         end
     end
 end
-function ToolShopSprite:PlayAni()
-    for _,v in pairs(self:GetAniArray()) do
-        local animation = v:show():getAnimation()
-        animation:setSpeedScale(2)
-        animation:playWithIndex(0)
-    end
-end
-function ToolShopSprite:StopAni()
-    for _,v in pairs(self:GetAniArray()) do
-        v:hide():getAnimation():stop()
-    end
-end
 
 
+----
+function ToolShopSprite:PlayWorkAnimation()
+    if not self:getChildByTag(WORK_TAG) then
+        local x,y = self:GetSprite():getPosition()
+        smoke():addTo(self,1,WORK_TAG):pos(x + 40,y + 70)
+    end
+end
 function ToolShopSprite:PlayEmptyAnimation()
     if not self:getChildByTag(EMPTY_TAG) then
         local x,y = self:GetSprite():getPosition()

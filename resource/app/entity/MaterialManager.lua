@@ -52,22 +52,33 @@ function MaterialManager:GetTableFromKey__(t)
     end
     return r
 end
+function MaterialManager:IsAbleToMakeEquipmentByType(equip_type)
+    local equip_config = dragonEquipments[equip_type]
+    local matrials = LuaUtils:table_map(string.split(equip_config.materials, ","), function(k, v)
+        return k, string.split(v, ":")
+    end)
+    local dm = self.material_map[DRAGON]
+    for k,v in pairs(matrials) do
+        local mk,mn = unpack(v)
+        if dm[mk] < tonumber(mn) then
+            return false
+        end
+    end
+    return true
+end
 function MaterialManager:GetMaterialMap()
     return self.material_map
+end
+function MaterialManager:GetEquipmentMaterias()
+    return self:GetMaterialsByType(EQUIPMENT)
 end
 function MaterialManager:GetMaterialsByType(material_type)
     return self.material_map[material_type]
 end
-function MaterialManager:IteratorBuildMaterialsByType(func)
-    self:IteratorMaterialsByType(BUILD, func)
-end
-function MaterialManager:IteratorDragonMaterialsByType(func)
+function MaterialManager:IteratorDragonMaterials(func)
     self:IteratorMaterialsByType(DRAGON, func)
 end
-function MaterialManager:IteratorSoldierMaterialsByType(func)
-    self:IteratorMaterialsByType(SOLDIER, func)
-end
-function MaterialManager:IteratorEquipmentMaterialsByType(func)
+function MaterialManager:IteratorEquipmentMaterials(func)
     self:IteratorMaterialsByType(EQUIPMENT, func)
 end
 function MaterialManager:IteratorMaterialsByType(material_type, func)
@@ -117,7 +128,7 @@ function MaterialManager:OnMaterialsComing(material_type, materials)
             if material_type == EQUIPMENT then
                 GameGlobalUI:showTips(_("制造装备完成"),get_list)
             else
-                -- GameGlobalUI:showTips(_("获得材料"),get_list)
+            -- GameGlobalUI:showTips(_("获得材料"),get_list)
             end
         end
     end
@@ -129,6 +140,7 @@ function MaterialManager:OnMaterialsComing(material_type, materials)
 end
 
 return MaterialManager
+
 
 
 

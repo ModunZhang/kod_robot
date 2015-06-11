@@ -1,4 +1,5 @@
 local zz = import("..particles.zz")
+local smoke = import("..particles.smoke")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local BlackSmithSprite = class("BlackSmithSprite", FunctionUpgradingSprite)
 
@@ -13,6 +14,7 @@ function BlackSmithSprite:OnEndMakeEquipmentWithEvent()
 end
 
 
+local WORK_TAG = 11201
 local EMPTY_TAG = 11400
 function BlackSmithSprite:ctor(city_layer, entity, city)
     BlackSmithSprite.super.ctor(self, city_layer, entity, city)
@@ -26,28 +28,22 @@ end
 function BlackSmithSprite:DoAni()
     if self:GetEntity():IsUnlocked() then
         if self:GetEntity():IsMakingEquipment() then
-            self:PlayAni()
+            self:PlayWorkAnimation()
             self:removeChildByTag(EMPTY_TAG)
         else
-            self:StopAni()
             self:PlayEmptyAnimation()
+            self:removeChildByTag(WORK_TAG)
         end
     end
 end
-function BlackSmithSprite:PlayAni()
-    for _,v in pairs(self:GetAniArray()) do
-        local animation = v:show():getAnimation()
-        animation:setSpeedScale(2)
-        animation:playWithIndex(0)
-    end
-end
-function BlackSmithSprite:StopAni()
-    for _,v in pairs(self:GetAniArray()) do
-        v:hide():getAnimation():stop()
-    end
-end
 
 
+function BlackSmithSprite:PlayWorkAnimation()
+    if not self:getChildByTag(WORK_TAG) then
+        local x,y = self:GetSprite():getPosition()
+        smoke():addTo(self,1,WORK_TAG):pos(x - 50,y + 90)
+    end
+end
 function BlackSmithSprite:PlayEmptyAnimation()
     if not self:getChildByTag(EMPTY_TAG) then
         local x,y = self:GetSprite():getPosition()

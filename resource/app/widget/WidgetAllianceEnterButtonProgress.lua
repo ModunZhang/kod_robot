@@ -18,14 +18,14 @@ function WidgetAllianceEnterButtonProgress:ctor()
 
         local percent = math.floor((statusFinishTime-app.timer:GetServerTime())/(statusFinishTime-statusStartTime)*100)
         self:setPercentage(percent)
-        self.time_label = UIKit:ttfLabel(
-            {
-                text = GameUtils:formatTimeStyle1(statusFinishTime-app.timer:GetServerTime()),
-                size = 20,
-                color = 0x7e0000
-            }):align(display.CENTER, 58, 64)
-            :addTo(self)
-        self.time_label:setRotationSkewY(180)
+        -- self.time_label = UIKit:ttfLabel(
+        --     {
+        --         text = GameUtils:formatTimeStyle1(statusFinishTime-app.timer:GetServerTime()),
+        --         size = 20,
+        --         color = 0x7e0000
+        --     }):align(display.CENTER, 58, 64)
+        --     :addTo(self)
+        -- self.time_label:setRotationSkewY(180)
         self.handle = scheduler.scheduleGlobal(handler(self, self.OnTimer), 1.0, false)
 
     end
@@ -41,12 +41,14 @@ function WidgetAllianceEnterButtonProgress:OnTimer()
         local percent = math.floor((statusFinishTime-current_time)/(statusFinishTime-statusStartTime)*100)
         self:setPercentage(percent)
 
-        if statusFinishTime>current_time then
-            self.time_label:setString(GameUtils:formatTimeStyle1(statusFinishTime-current_time))
-        end
+        -- if statusFinishTime>current_time then
+        --     self.time_label:setString(GameUtils:formatTimeStyle1(statusFinishTime-current_time))
+        -- end
         if percent<=0 then
             self:removeFromParent()
         end
+    else
+        self:removeFromParent()
     end
 end
 function WidgetAllianceEnterButtonProgress:onEnter()

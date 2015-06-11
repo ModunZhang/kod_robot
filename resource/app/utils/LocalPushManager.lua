@@ -21,6 +21,7 @@ function LocalPushManager:ctor(game_default)
 		localPush.switchNotification(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_TECHNOLOGY],self.flag_LOCAL_PUSH_KEY_TECHNOLOGY)
 		localPush.switchNotification(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_TOOL],self.flag_LOCAL_PUSH_KEY_TOOL)
 		localPush.switchNotification(LOCAL_PUSH_KEY[LOCAL_PUSH_KEY.LOCAL_PUSH_KEY_WATCH_TOWER],self.flag_LOCAL_PUSH_KEY_WATCH_TOWER)
+		localPush.switchNotification("GAME_GLOBAL_TIPS",true)
 	end
 end
 
@@ -40,10 +41,15 @@ function LocalPushManager:CancelAll()
 			self["push_queue_" .. v] = {}
 		end
 	end
+	self:AddOneDayGameTipsPush()
 end
 
 function LocalPushManager:CancelNotificationByIdentity(identity)
 	if not self:IsSupport() then return end
+	print("CancelNotificationByIdentity------>",identity)
+	if not identity or identity == json.null then
+		return
+	end
 	localPush.cancelNotification(identity)
 end
 -- key is string
@@ -89,7 +95,11 @@ function LocalPushManager:AddLocalPush(push_key,finishTime,msg,identity)
 	then 
 		return 
 	end
+	if not identity or identity == json.null then
+		return
+	end
 	self:CancelNotificationByIdentity(identity)
+	print("AddLocalPush---->",push_key,finishTime,msg,identity)
 	localPush.addNotification(push_key, finishTime,msg,identity)
 	local target_queue = self["push_queue_" .. push_key]
 	target_queue[identity] = {finishTime = finishTime,msg = msg,identity = identity}
@@ -117,6 +127,10 @@ function LocalPushManager:RecoverLocalPush(push_key)
 	end
 end
 --TODO:push相关函数的调用
+function LocalPushManager:AddOneDayGameTipsPush()
+	if not self:IsSupport() then return end
+	self:AddLocalPush("GAME_GLOBAL_TIPS",ext.now()/1000 + 24*60*60,_("尊敬的领主，您的城民真诚的恳求您归来，并为您准备了丰厚的礼品"),"GAME_GLOBAL_TIPS")
+end
 -- api
 function LocalPushManager:GetBuildPushState()
 	return self:GetLocalPushStateByKey("LOCAL_PUSH_KEY_BUILD")

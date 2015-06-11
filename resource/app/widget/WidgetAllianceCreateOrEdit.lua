@@ -13,6 +13,7 @@ local WidgetPushButton = import(".WidgetPushButton")
 local CONTENT_WIDTH = window.width - 80
 local UICheckBoxButton = import("..ui.UICheckBoxButton")
 local config_intInit = GameDatas.AllianceInitData.intInit
+local Localize = import("..utils.Localize")
 local WidgetAllianceCreateOrEdit = class("WidgetAllianceCreateOrEdit",function()
 	return display.newNode()
 end)
@@ -60,7 +61,7 @@ function WidgetAllianceCreateOrEdit:onEnter()
 	    	:pos(0,okButton:getPositionY()+85)
 	    -- landform & language
 	    self.landformPanel = self:createCheckAllianeGroup():addTo(self)
-	    	:pos(-10,self.createFlagPanel:getCascadeBoundingBox().height+50)
+	    	:pos(-10,self.createFlagPanel:getCascadeBoundingBox().height+60)
 	    -- textfield
 	    self.textfieldPanel = self:createTextfieldPanel():addTo(self)
 	    	:pos(-10,self.landformPanel:getPositionY()+self.landformPanel:getCascadeBoundingBox().height+20)
@@ -225,15 +226,19 @@ function WidgetAllianceCreateOrEdit:createCheckAllianeGroup()
 	local groupNode = display.newNode()
 	if self:IsCreate() then
 		local tipsLabel = UIKit:ttfLabel({
-				text = _("草地——产出强化绿龙的材料，更容易培养绿龙，更容易培养绿龙，草地产出绿金龙币，建造资源加成类的铺筑建筑"),
-				size = 18,
-				color = 0x615b44,
-				dimensions = cc.size(552, 0),
-		}):addTo(groupNode):align(display.LEFT_BOTTOM, 0, 0)
+			text = "",
+			size = 18,
+			color = 0x615b44,
+			dimensions = cc.size(552, 0),
+			align = cc.TEXT_ALIGNMENT_CENTER,
+		}):addTo(groupNode) --:align(display.LEFT_BOTTOM, 0, 0)
+		self.terrain_tips_label = tipsLabel
+		self:RefreshTerrainTips()
 		local landSelect = UIKit:CreateBoxPanelWithBorder({}):addTo(groupNode):pos(0,tipsLabel:getContentSize().height+10)
 		local title = display.newSprite("alliance_panel_bg_544x32.png")
 			:align(display.CENTER_TOP,landSelect:getContentSize().width/2, landSelect:getContentSize().height - 6)
 			:addTo(landSelect)
+		tipsLabel:align(display.CENTER_BOTTOM, landSelect:getContentSize().width/2, 0)
 		UIKit:ttfLabel({
 			text = _("联盟地形"),
 			size = 20,
@@ -264,6 +269,7 @@ function WidgetAllianceCreateOrEdit:createCheckAllianeGroup()
 	        :setButtonsLayoutMargin(10, 100, 0,0)
 	        :onButtonSelectChanged(function(event)
 	            self.terrain_info = event.selected
+	            self:RefreshTerrainTips()
 	            self:RefrshFlagSprite(3)
 	        end)
 	        :addTo(landSelect):pos(10,10)
@@ -274,6 +280,12 @@ function WidgetAllianceCreateOrEdit:createCheckAllianeGroup()
    		self.languageSelected  = WidgetAllianceLanguagePanel.new(Alliance_Manager:GetMyAlliance():DefaultLanguage()):addTo(groupNode):pos(0,0)
    	end
     return groupNode
+end
+
+function WidgetAllianceCreateOrEdit:RefreshTerrainTips()
+	local terrainName = self.alliance_ui_helper:GetTerrainNameByIndex(self.terrain_info)
+	local tips_content = Localize.terrain_function[terrainName]
+	self.terrain_tips_label:setString(tips_content or "")
 end
 
 function WidgetAllianceCreateOrEdit:createTextfieldPanel()

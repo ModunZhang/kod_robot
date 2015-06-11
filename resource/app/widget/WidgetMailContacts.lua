@@ -13,23 +13,25 @@ function WidgetMailContacts:ctor()
     self.contacts = contacts
     local body = self:GetBody()
     local size = body:getContentSize()
-    UIKit:ttfLabel({
+    local tips = UIKit:ttfLabel({
         text = _("向其他玩家发送邮件,会自动添加到最近联系人列表"),
         size = 20,
-        color = 0x403c2f
-    }):align(display.CENTER,size.width/2,size.height-40)
+        color = 0x403c2f,
+        dimensions = cc.size(520,0),
+        align = cc.TEXT_ALIGNMENT_CENTER,
+    }):align(display.TOP_CENTER,size.width/2,size.height-20)
         :addTo(body)
     local list,list_node = UIKit:commonListView_1({
         async = true, --异步加载
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
-        viewRect = cc.rect(0, 0,548,570),
+        viewRect = cc.rect(0, 0,548,674 - tips:getContentSize().height - 80),
     })
     self.head_icon_list = list
     list:setRedundancyViewVal(list:getViewRect().height + 76 * 2)
     list:setDelegate(handler(self, self.sourceDelegate))
     list:reload()
     list_node:addTo(body):align(display.BOTTOM_CENTER, size.width/2,20)
-    
+
 end
 function WidgetMailContacts:sourceDelegate(listView, tag, idx)
     if cc.ui.UIListView.COUNT_TAG == tag then
@@ -119,6 +121,7 @@ function WidgetMailContacts:CreateContactsContent()
     return content
 end
 return WidgetMailContacts
+
 
 
 

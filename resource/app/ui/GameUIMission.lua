@@ -7,7 +7,6 @@ local GameUIMission = UIKit:createUIClass("GameUIMission","GameUIWithCommonHeade
 local WidgetGrowUpTask = import('..widget.WidgetGrowUpTask')
 local WidgetBackGroundTabButtons = import('..widget.WidgetBackGroundTabButtons')
 local window = import("..utils.window")
-local User = import("..entity.User")
 local GrowUpTaskManager = import("..entity.GrowUpTaskManager")
 local Enum = import("..utils.Enum")
 local scheduler = import(cc.PACKAGE_NAME .. ".scheduler")
@@ -29,13 +28,13 @@ function GameUIMission:ctor(city,mission_type)
 end
 function GameUIMission:OnMoveInStage()
     self:CreateTabButtons()
-    self.city:GetUser():AddListenOnType(self, User.LISTEN_TYPE.TASK)
-    self.city:GetUser():AddListenOnType(self, User.LISTEN_TYPE.DAILY_TASKS)
+    self.city:GetUser():AddListenOnType(self, self.city:GetUser().LISTEN_TYPE.TASK)
+    self.city:GetUser():AddListenOnType(self, self.city:GetUser().LISTEN_TYPE.DAILY_TASKS)
     GameUIMission.super.OnMoveInStage(self)
 end
 function GameUIMission:OnMoveOutStage()
-    self.city:GetUser():RemoveListenerOnType(self, User.LISTEN_TYPE.TASK)
-    self.city:GetUser():RemoveListenerOnType(self, User.LISTEN_TYPE.DAILY_TASKS)
+    self.city:GetUser():RemoveListenerOnType(self, self.city:GetUser().LISTEN_TYPE.TASK)
+    self.city:GetUser():RemoveListenerOnType(self, self.city:GetUser().LISTEN_TYPE.DAILY_TASKS)
     GameUIMission.super.OnMoveOutStage(self)
 end
 function GameUIMission:OnTaskChanged(user)
@@ -57,6 +56,8 @@ function GameUIMission:CreateTabButtons()
     function(tag)
         self:OnTabButtonClicked(tag)
     end):addTo(self:GetView()):pos(window.cx, window.bottom + 34)
+    self.tab_buttons = tab_buttons
+    self:RefreshDisplayGreenPoint()
 end
 
 function GameUIMission:OnTabButtonClicked(tag)
@@ -326,15 +327,13 @@ function GameUIMission:GetDailyListData()
             table.insert(r,{category = v,percent = #tmp_data/4,title = text_table.title ,image = UILib.daily_task_icon[v],desc = text_table.desc})
         end
     end
-    dump(r,"GetDailyListData----->")
-    dump(dailyTasks,"GetDailyListData----->dailyTasks")
     return r
 end
 
 function GameUIMission:RefreshDailyListWithItemAndKeyOfDaily(item,key_of_daily)
     local tmp_data = self.city:GetUser():GetDailyTasksInfo(key_of_daily)
     local percent = #tmp_data/4
-    if percent >= 1 then
+    if User:CheckDailyTasksWasRewarded(key_of_daily) then
         item.finfish_tip_label:show()
         item.progress_bg:hide()
     else
@@ -393,7 +392,8 @@ function GameUIMission:GetDailyItem(data)
     item.progress = progress
     item.progress_bg = progress_bg
     progress_bg:align(display.LEFT_BOTTOM, 154, 12):addTo(content)
-    if data.percent >= 1 then
+    -- if data.percent >= 1 then
+    if User:CheckDailyTasksWasRewarded(data.category) then
         finfish_tip_label:show()
         progress_bg:hide()
     else
@@ -419,7 +419,21 @@ function GameUIMission:GetProgressBar()
     return bg,progress
 end
 
+function GameUIMission:RefreshDisplayGreenPoint()
+    if not self.tab_buttons then return end
+    for __,key_of_daily in ipairs(KEYS_OF_DAILY) do
+        local tmp_data = self.city:GetUser():GetDailyTasksInfo(key_of_daily)
+        local percent = #tmp_data/4
+        if percent < 1 then
+            self.tab_buttons:SetGreenTipsShow("daily",true)
+            return
+        end
+    end
+    self.tab_buttons:SetGreenTipsShow("daily",false)
+end
+
 function GameUIMission:OnDailyTasksChanged(user,changed_task_types)
+    self:RefreshDisplayGreenPoint()
     if not self:CurrentIsDailyMission() then return end
     for __,v in ipairs(changed_task_types) do
         self:RefreshDailyList(v)
@@ -432,6 +446,7 @@ function GameUIMission:dailyListviewListener(event)
     if "clicked" == event.name then
         local pos = event.itemPos
         local keys_of_daily = KEYS_OF_DAILY[pos]
+        if not keys_of_daily then return end
         app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
         UIKit:newGameUI("GameUIDailyMissionInfo",keys_of_daily):AddToCurrentScene(true)
     end

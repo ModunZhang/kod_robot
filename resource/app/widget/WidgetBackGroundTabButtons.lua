@@ -13,6 +13,7 @@ function WidgetBackGroundTabButtons:ctor(buttons, listener)
     self.node = node
 
     local unit_width = width / #buttons
+    self.unit_width = unit_width
     local origin_x = - width / 2
     local tabs = {}
     local default
@@ -108,10 +109,20 @@ function WidgetBackGroundTabButtons:SetButtonTipNumber(tab_tag,number)
     local tab = self:GetTabByTag(tab_tag)
     if not tab then return end
     if not tab.tip_numbers then
-        tab.tip_numbers = WidgetNumberTips.new():addTo(tab):align(display.RIGHT_CENTER, 150,25)
+        tab.tip_numbers = WidgetNumberTips.new():addTo(tab):align(display.RIGHT_CENTER, self.unit_width + 2,25)
     end
     tab.tip_numbers:SetNumber(number)
 end
+--这里坐标写死了 只有日常任务使用
+function WidgetBackGroundTabButtons:SetGreenTipsShow(tab_tag,visible)
+    local tab = self:GetTabByTag(tab_tag)
+    if not tab then return end
+     if not tab.tips_green then
+        tab.tips_green = display.newSprite("green_tips_icon_22x22.png"):addTo(tab):align(display.RIGHT_CENTER, self.unit_width + 10,25)
+    end
+    tab.tips_green:setVisible(visible)
+end
+
 return WidgetBackGroundTabButtons
 
 

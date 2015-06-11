@@ -1,5 +1,10 @@
 local errors = GameDatas.Errors.errors
 
+errors["commonError"] = {
+	["key"] = "commonError",
+	["code"] = 500,
+	["message"] = "通用错误"
+}
 errors["deviceNotExist"] = {
 	["key"] = "deviceNotExist",
 	["code"] = 501,

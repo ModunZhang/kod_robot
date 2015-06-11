@@ -23,9 +23,7 @@ WidgetBackGroundWithInnerTitle.TITLE_COLOR = {
     RED =2,
 }
 function WidgetBackGroundWithInnerTitle:SetTitle(title)
-    if self.title_label:getString() ~= title then
-        self.title_label:setString(title)
-    end
+    self.title_label:setString(title)
 end
 
 

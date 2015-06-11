@@ -7,6 +7,8 @@ local AllianceView = import(".AllianceView")
 local MapLayer = import(".MapLayer")
 local MultiAllianceLayer = class("MultiAllianceLayer", MapLayer)
 local intInit = GameDatas.AllianceInitData.intInit
+local NORMAL = GameDatas.Soldiers.normal
+local SPECIAL = GameDatas.Soldiers.special
 local ZORDER = Enum("BACKGROUND", "BUILDING", "LINE", "CORPS", "INFO")
 local fmod = math.fmod
 local ceil = math.ceil
@@ -357,7 +359,7 @@ function MultiAllianceLayer:RefreshVillageEvent(village_event, is_add)
                         :addTo(obj, 1, VILLAGE_TAG)
                         :pos(x,y+50):scale(1.5).rcount = 1
                 end
-            else
+            elseif flag then
                 flag.rcount = flag.rcount - 1
                 if flag.rcount <= 0 then
                     obj:removeChildByTag(VILLAGE_TAG)
@@ -542,7 +544,9 @@ function MultiAllianceLayer:ManagerCorpsFromChangedMap(changed_map,is_strkie,all
                         if is_strkie then
                             app:GetAudioManager():PlayeEffectSoundWithKey("STRIKE_PLAYER_ARRIVE")
                         else
-                            app:GetAudioManager():PlayeEffectSoundWithKey("ATTACK_PLAYER_ARRIVE")
+                            if not marchEvent:IsReturnEvent() then
+                                app:GetAudioManager():PlayeEffectSoundWithKey("ATTACK_PLAYER_ARRIVE")
+                            end
                         end
                     end
                 end
@@ -740,8 +744,9 @@ local location_map = {
     },
 }
 local function move_soldiers(corps, ani, dir_index, first_soldier)
+    local is_special = SPECIAL[first_soldier.name]
     local config = soldier_config[first_soldier.name]
-    local star = first_soldier.star or 1
+    local star = is_special and 3 or (first_soldier.star or 1)
     local ani_name, ox, oy = unpack(config[star])
     local _,_,s = unpack(soldier_dir_map[dir_index])
     for i,v in ipairs(location_map[config.count]) do
@@ -752,6 +757,10 @@ local function move_soldiers(corps, ani, dir_index, first_soldier)
 end
 function MultiAllianceLayer:CreateCorps(id, start_pos, end_pos, start_time, finish_time, dragonType, soldiers, ally)
     local march_info = self:GetMarchInfoWith(id, start_pos, end_pos)
+    if start_time == march_info.start_time and 
+        finish_time == march_info.finish_time then 
+        return 
+    end
     march_info.start_time = start_time
     march_info.finish_time = finish_time
     march_info.speed = (march_info.length / (finish_time - start_time))

@@ -85,6 +85,7 @@ function GameUIDragonSkill:onEnter()
       size = 20,
       color=0x403c2f,
       align = cc.ui.UILabel.TEXT_ALIGN_LEFT, 
+      dimensions = cc.size(220,0)
   }):addTo(self.backgroundImage):align(display.LEFT_TOP, skillBg:getPositionX()+skillBg:getContentSize().width+5, titleLabel:getPositionY()- titleLabel:getContentSize().height - 10)
   self.descLabel = descLabel
   if not self:SkillIsMaxLevel() then

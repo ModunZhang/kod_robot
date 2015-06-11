@@ -252,13 +252,13 @@ function WidgetUseItems:OpenBuffDialog( item )
 end
 function WidgetUseItems:OpenResourceDialog( item )
     local same_items = ItemManager:GetSameTypeItems(item)
-    local dialog = UIKit:newWidgetUI("WidgetPopDialog",4 * 130 +24 + 70,_("增益道具"),window.top-230)
+    local dialog = UIKit:newWidgetUI("WidgetPopDialog",(#same_items >4 and 4 or #same_items) * 130 +24 + 70,_("增益道具"),window.top-230)
     local body = dialog:GetBody()
     local size = body:getContentSize()
 
     local list,list_node = UIKit:commonListView_1({
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
-        viewRect = cc.rect(0, 0,546,4 * 130),
+        viewRect = cc.rect(0, 0,546,(#same_items >4 and 4 or #same_items) * 130),
     })
     list_node:addTo(body):align(display.BOTTOM_CENTER, size.width/2,20)
     local which_bg = true
@@ -507,8 +507,11 @@ function WidgetUseItems:OpenStrengthDialog( item )
         color = 0x615b44,
     }):align(display.LEFT_CENTER,80,blood_bg:getContentSize().height/2)
         :addTo(blood_bg)
+
+    local value = User:GetStrengthResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local prodperhour = User:GetStrengthResource():GetProductionPerHour()
     UIKit:ttfLabel({
-        text = User:GetStrengthResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()),
+        text = string.format(_("%s(+%d/每小时)"), string.formatnumberthousands(value), prodperhour),
         size = 22,
         color = 0x28251d,
     }):align(display.RIGHT_CENTER,blood_bg:getContentSize().width-40,blood_bg:getContentSize().height/2)
@@ -559,7 +562,7 @@ function WidgetUseItems:OpenIncreaseDragonExpOrHp( item )
         local dragon_bg = display.newSprite("dragon_bg_114x114.png")
             :align(display.LEFT_CENTER, 7,dragon_frame:getContentSize().height/2)
             :addTo(dragon_frame)
-        local dragon_img = display.newSprite(dragon:Type()..".png")
+        local dragon_img = display.newSprite(UILib.dragon_head[dragon:Type()])
             :align(display.CENTER, dragon_bg:getContentSize().width/2, dragon_bg:getContentSize().height/2+5)
             :addTo(dragon_bg)
         local box_bg = display.newSprite("box_426X126.png")

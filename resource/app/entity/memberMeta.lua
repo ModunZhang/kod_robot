@@ -17,6 +17,7 @@ property(memberMeta, "kill", 0)
 property(memberMeta, "power", 0)
 property(memberMeta, "loyalty", 0)
 property(memberMeta, "isProtected")
+property(memberMeta, "lastBeAttackedTime", 0)
 property(memberMeta, "keepLevel")
 property(memberMeta, "terrain")
 -- property(memberMeta, "wallLevel")
@@ -58,6 +59,9 @@ function memberMeta.new(x, y)
 end
 function memberMeta:DecodeFromJson(json)
     return setmetatable(json, memberMeta)
+end
+function memberMeta:LastBeAttackedTime()
+    return self.lastBeAttackedTime / 1000
 end
 function memberMeta:GetType()
     return "none"

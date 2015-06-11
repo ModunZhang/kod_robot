@@ -23,7 +23,9 @@ function VipEvent:UpdateData(json_data)
 end
 
 function VipEvent:Reset()
-    self:RemoveAllObserver()
+    self:SetId("")
+    self:SetStartTime(0)
+    self:SetFinishTime(0)
 end
 
 function VipEvent:OnTimer(current_time)
@@ -32,6 +34,8 @@ function VipEvent:OnTimer(current_time)
         self:NotifyObservers(function(listener)
             listener:OnVipEventTimer(self)
         end)
+    else
+        self.times_ = 0
     end
 end
 
@@ -42,5 +46,6 @@ function VipEvent:IsActived()
     return (self.times_ and self.times_ > 0) or (self.finishTime - self.startTime > 0)
 end
 return VipEvent
+
 
 

@@ -166,6 +166,7 @@ function WidgetRankingList:ReloadRank(rank)
         self.my_ranking:setString(string.format("%s : %d", str, rank.myData.rank))
     end
     self.current_rank = rank
+    self.listview:releaseAllFreeItems_()
     self.listview:reload()
 end
 function WidgetRankingList:touchListener(event)
@@ -223,10 +224,9 @@ function WidgetRankingList:CreatePlayerContentByIndex(idx)
     local player_head_icon = UIKit:GetPlayerIconOnly():addTo(item,1):pos(120, 40):scale(0.5)
 
 
-    local tag = self.drop_list:GetSelectedButtonTag()        
-    local png = tag == "power" and "dragon_strength_27x31.png" or "fight_62x70.png"
-    local s = tag == "power" and 1 or 0.5
-    display.newSprite(png):addTo(item):pos(400, 40):scale(s)
+    local tag = self.drop_list:GetSelectedButtonTag()  
+    local png = tag == "power" and "dragon_strength_27x31.png" or "battle_33x33.png"
+    display.newSprite(png):addTo(item):pos(380, 40)
     
 
     item.player_icon = player_head_icon
@@ -246,13 +246,13 @@ function WidgetRankingList:CreatePlayerContentByIndex(idx)
         text = "",
         size = 22,
         color = 0x403c2f,
-    }):align(display.LEFT_CENTER, 400 + 20, 40):addTo(item)
+    }):align(display.LEFT_CENTER, 380 + 20, 40):addTo(item)
 
     item.crown = display.newSprite(crown_map[1]):addTo(item, 10):pos(50, 40)
 
     function item:SetData(data)
         self.name:setString(data.name)
-        self.value:setString(data.value)
+        self.value:setString(string.formatnumberthousands(data.value))
         item.player_icon:setTexture(UIKit:GetPlayerIconImage(data.icon))
         return self
     end
@@ -290,9 +290,9 @@ function WidgetRankingList:CreateAllianceContentByIndex(idx)
         :pos(size.width/2, size.height/2)
 
     local tag = self.drop_list:GetSelectedButtonTag()        
-    local png = tag == "power" and "dragon_strength_27x31.png" or "fight_62x70.png"
-    local s = tag == "power" and 1 or 0.5
-    display.newSprite(png):addTo(item):pos(400, 40):scale(s)
+    local png = tag == "power" and "dragon_strength_27x31.png" or "battle_33x33.png"
+    -- local s = tag == "power" and 1 or
+    display.newSprite(png):addTo(item):pos(380, 40)
 
     item.rank = UIKit:ttfLabel({
         text = "",
@@ -316,14 +316,14 @@ function WidgetRankingList:CreateAllianceContentByIndex(idx)
         text = "",
         size = 22,
         color = 0x403c2f,
-    }):align(display.LEFT_CENTER, 400 + 20, 40):addTo(item)
+    }):align(display.LEFT_CENTER, 380 + 20, 40):addTo(item)
 
     item.crown = display.newSprite(crown_map[1]):addTo(item, 10):pos(50, 40)
 
     function item:SetData(data)
         self.name:setString(data.name)
         self.tag:setString(string.format("(%s)", data.tag))
-        self.value:setString(data.value)
+        self.value:setString(string.formatnumberthousands(data.value))
         if self.flag then
             self.flag:removeFromParent()
         end

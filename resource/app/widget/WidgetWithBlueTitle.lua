@@ -14,9 +14,7 @@ local WidgetWithBlueTitle = class("WidgetWithBlueTitle", function(height, title)
     return back_ground
 end)
 function WidgetWithBlueTitle:SetTitle(title)
-	if self.title_label:getString() ~= title then
-		self.title_label:setString(title)
-	end
+	self.title_label:setString(title)
 end
 
 

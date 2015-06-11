@@ -38,19 +38,19 @@ function GameGlobalUIUtils:showTips(title,content)
 end
 
 function GameGlobalUIUtils:showNotice(notice_type,notice_content)
-	-- local instance = cc.Director:getInstance():getRunningScene():getChildByTag(1030)
-	-- if not instance then
-	-- 	self.notice = GameUISystemNotice.new(self,notice_type,notice_content)
-	-- 	assert(self.notice)
-	-- 	cc.Director:getInstance():getRunningScene():addChild(self.notice, 1000001, 1030)
-	-- end
-	-- if self.notice:IsOpen() then
-	-- 	self.increase_notic_index = self.increase_notic_index + 1
-	-- 	self.noticeHeap:push({type = notice_type,content = notice_content,time = self.increase_notic_index})
-	-- else
-	-- 	self.increase_notic_index = 0
-	-- 	self.notice:showNotice(notice_type,notice_content)
-	-- end
+	local instance = cc.Director:getInstance():getRunningScene():getChildByTag(1030)
+	if not instance then
+		self.notice = GameUISystemNotice.new(self,notice_type,notice_content)
+		assert(self.notice)
+		cc.Director:getInstance():getRunningScene():addChild(self.notice, 1000001, 1030)
+	end
+	if self.notice:IsOpen() then
+		self.increase_notic_index = self.increase_notic_index + 1
+		self.noticeHeap:push({type = notice_type,content = notice_content,time = self.increase_notic_index})
+	else
+		self.increase_notic_index = 0
+		self.notice:showNotice(notice_type,notice_content)
+	end
 	
 end
 

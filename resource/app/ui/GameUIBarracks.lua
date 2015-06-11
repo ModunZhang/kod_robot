@@ -270,7 +270,7 @@ function GameUIBarracks:CreateSpecialItemWithListView( list_view, soldiers ,titl
     if tolua.type(re_time) == "boolean" then
         re_string = _("招募开启中")
     else
-        re_string = _("下一次开启招募:")..GameUtils:formatTimeStyle1(re_time-app.timer:GetServerTime())
+        re_string = _("下一次开启招募:")..GameUtils:formatTimeStyle1(re_time)
     end
     local re_status = UIKit:ttfLabel({
         text = re_string,
@@ -323,7 +323,7 @@ function GameUIBarracks:OnTimer(current_time)
         if ok then
             v:SetRecruitStatus(_("招募开启中"))
         else
-            v:SetRecruitStatus(_("下一次开启招募:")..GameUtils:formatTimeStyle1(time-current_time))
+            v:SetRecruitStatus(_("下一次开启招募:")..GameUtils:formatTimeStyle1(time))
         end
     end
 end

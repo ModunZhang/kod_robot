@@ -192,24 +192,24 @@ function GameUIAlliancePalace:CreateAwardContent()
         }
         widget_info:SetInfo(info)
         last_reward_time:setString(lastRewardTime)
-
-        -- 奖励按钮
-        if self.button then
-            self.button:removeFromParent(true)
+        if palace_ui.alliance:GetSelf():IsArchon() then
+            -- 奖励按钮
+            if self.button then
+                self.button:removeFromParent(true)
+            end
+            self.button = WidgetPushButton.new({normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"})
+                :setButtonLabel(UIKit:ttfLabel({
+                    text = _("奖赏"),
+                    size = 24,
+                    color = 0xffedae,
+                    shadow= true
+                }))
+                :onButtonClicked(function(event)
+                    if event.name == "CLICKED_EVENT" then
+                        palace_ui:OpenAwardDialog(member)
+                    end
+                end):align(display.BOTTOM_RIGHT, item_width-10,10):addTo(self)
         end
-        self.button = WidgetPushButton.new({normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"})
-            :setButtonLabel(UIKit:ttfLabel({
-                text = _("奖赏"),
-                size = 24,
-                color = 0xffedae,
-                shadow= true
-            }))
-            :onButtonClicked(function(event)
-                if event.name == "CLICKED_EVENT" then
-                    palace_ui:OpenAwardDialog(member)
-                end
-            end):align(display.BOTTOM_RIGHT, item_width-10,10):addTo(self)
-
     end
 
     function content:GetContentData()
@@ -292,7 +292,9 @@ function GameUIAlliancePalace:OpenAwardDialog(member)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
                 if self.alliance:GetSelf():IsArchon() then
-                    NetManager:getGiveLoyaltyToAllianceMemberPromise(member:Id(),slider:GetValue())
+                    NetManager:getGiveLoyaltyToAllianceMemberPromise(member:Id(),slider:GetValue()):done(function ()
+                        GameGlobalUI:showTips(_("提示"),_("发放成功"))
+                    end)
                     dialog:LeftButtonClicked()
                 else
                     UIKit:showMessageDialog(_("提示"),_("只有盟主拥有权限"))
@@ -517,6 +519,7 @@ function GameUIAlliancePalace:OnMemberChanged(alliance,changed_map)
     end
 end
 return GameUIAlliancePalace
+
 
 
 

@@ -1,7 +1,7 @@
 
 
-local offset = function(x, y)
-    return {x = x, y = y}
+local offset = function(x, y, ax, ay)
+    return {x = x, y = y, anchorPoint = cc.p(ax or 0.5, ay or 0.5)}
 end
 local function create_flip_none()
     return {x = false, y = false}
@@ -83,25 +83,18 @@ end
 
 
 
-local function smoke(x, y, s)
-    s = s or 0.8
-    smoke_offset_x = 276*0.5*s
-    smoke_offset_y = 274*0.5*s
-    return decorator("animation", "yan", offset(x + smoke_offset_x, y + smoke_offset_y), scale(s))
-end
-
 
 create_building_config(
     {"other_keep"}
-    ,create_config(MIN_LEVEL, level(5), "other_keep_1.png", offset(60, 225), scale(1))
-    ,create_config(level(6), level(15), "other_keep_2.png", offset(60, 245), scale(1))
-    ,create_config(level(16), MAX_LEVEL, "other_keep_3.png", offset(60, 285), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "other_keep_1.png", offset(60, 225, 0.3, 0.4), scale(1))
+    ,create_config(level(6), level(15), "other_keep_2.png", offset(60, 245, 0.3, 0.4), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "other_keep_3.png", offset(60, 285, 0.3, 0.35), scale(1))
 )
 create_building_config(
     {"my_keep"}
-    ,create_config(MIN_LEVEL, level(5), "my_keep_1.png", offset(60, 225), scale(1))
-    ,create_config(level(6), level(15), "my_keep_2.png", offset(60, 245), scale(1))
-    ,create_config(level(16), MAX_LEVEL, "my_keep_3.png", offset(60, 285), scale(1))
+    ,create_config(MIN_LEVEL, level(5), "my_keep_1.png", offset(60, 225, 0.3, 0.4), scale(1))
+    ,create_config(level(6), level(15), "my_keep_2.png", offset(60, 245, 0.3, 0.4), scale(1))
+    ,create_config(level(16), MAX_LEVEL, "my_keep_3.png", offset(60, 285, 0.3, 0.35), scale(1))
 )
 
 create_building_config(
@@ -115,17 +108,17 @@ create_building_config(
     ,create_config(MIN_LEVEL, MAX_LEVEL, "dragonEyrie.png", offset(45, 158), scale(1))
 )
 create_building_config(
-    {"watchTower", "#root/liaowangta/00000.png"}
+    {"watchTower", "root/liaowangta/00000.png"}
     ,create_config(MIN_LEVEL, MAX_LEVEL, "watchTower.png", offset(50, 180), scale(1), decorator("animation", "liaowangta", nil, nil, true))
 )
 create_building_config(
-    {"warehouse", "#root/ziyuancangku/00000.png"}
+    {"warehouse", "root/ziyuancangku/00000.png"}
     ,create_config(MIN_LEVEL, MAX_LEVEL, "warehouse.png", offset(-5, 105), scale(1), decorator("animation", "ziyuancangku", nil, nil, true))
 )
 create_building_config(
     {"toolShop"}
     ,create_config(MIN_LEVEL, 0, "locked_tile.png", offset(20, 120), scale(1))
-    ,create_config(1, MAX_LEVEL, "toolShop.png", offset(20, 100), scale(1), smoke(100, 147))
+    ,create_config(1, MAX_LEVEL, "toolShop.png", offset(20, 100), scale(1))
 )
 create_building_config(
     {"materialDepot"}
@@ -137,19 +130,19 @@ create_building_config(
     ,create_config(MIN_LEVEL, MAX_LEVEL, "armyCamp.png", offset(20, 100), scale(1))
 )
 create_building_config(
-    {"barracks", "#root/bingying/qizi/00000.png"}
+    {"barracks", "root/bingying/qizi/00000.png"}
     ,create_config(MIN_LEVEL, 0, "locked_tile.png", offset(20, 120), scale(1))
     ,create_config(1, MAX_LEVEL, "barracks.png", offset(20, 120), scale(1), decorator("animation", "bingyin_1"), decorator("animation", "bingyin", nil, nil, true))
 )
 create_building_config(
     {"blackSmith"}
     ,create_config(MIN_LEVEL, 0, "locked_tile.png", offset(20, 120), scale(1))
-    ,create_config(1, MAX_LEVEL, "blackSmith.png", offset(20, 100), scale(1), smoke(17, 181), smoke(28, 196))
+    ,create_config(1, MAX_LEVEL, "blackSmith.png", offset(20, 100), scale(1))
 )
 create_building_config(
     {"foundry"}
     ,create_config(MIN_LEVEL, 0, "locked_tile.png", offset(20, 120), scale(1))
-    ,create_config(1, MAX_LEVEL, "foundry.png", offset(20, 120), scale(1), smoke(45, 203), smoke(69, 170))
+    ,create_config(1, MAX_LEVEL, "foundry.png", offset(20, 120), scale(1))
 )
 create_building_config(
     {"stoneMason"}
@@ -162,7 +155,7 @@ create_building_config(
     ,create_config(1, MAX_LEVEL, "lumbermill.png", offset(20, 100), scale(1))
 )
 create_building_config(
-    {"mill", "#root/mofang/00000.png"}
+    {"mill", "root/mofang/00000.png"}
     ,create_config(MIN_LEVEL, 0, "locked_tile.png", offset(20, 120), scale(1))
     ,create_config(1, MAX_LEVEL, "mill.png", offset(20, 100), scale(1), decorator("animation", "mofang", nil, nil, true))
 )
@@ -177,7 +170,7 @@ create_building_config(
     ,create_config(1, MAX_LEVEL, "townHall.png", offset(20, 140), scale(1), decorator("animation", "shizhenting"))
 )
 create_building_config(
-    {"tradeGuild", "#root/maoyihanghui/000.png"}
+    {"tradeGuild", "root/maoyihanghui/000.png"}
     ,create_config(MIN_LEVEL, 0, "locked_tile.png", offset(20, 120), scale(1))
     ,create_config(1, MAX_LEVEL, "tradeGuild.png", offset(20, 100), scale(1), decorator("animation", "maoyihanghui", nil, nil, true))
 )
@@ -189,7 +182,7 @@ create_building_config(
 create_building_config(
     {"workshop"}
     ,create_config(MIN_LEVEL, 0, "locked_tile.png", offset(20, 120), scale(1))
-    ,create_config(1, MAX_LEVEL, "workShop.png", offset(20, 130), scale(1), smoke(19, 181))
+    ,create_config(1, MAX_LEVEL, "workShop.png", offset(20, 130), scale(1))
 )
 create_building_config(
     {"trainingGround"}

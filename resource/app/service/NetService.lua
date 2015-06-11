@@ -96,7 +96,7 @@ function NetService:get(url, args, cb, progressCb)
     if param then
         urlString = urlString .. "?" .. self.m_urlcode.encodetable(args)
     end
-
+    print("NetService:get---->",url)
     local request = network.createHTTPRequest(function(event)
         local request = event.request
         local eventName = event.name

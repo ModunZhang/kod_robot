@@ -23,15 +23,23 @@ end
 
 
 function WidgetBuildingIntroduce:SetUpgradeRequirementListview()
-    local wood = City.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local iron = City.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local stone = City.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local population = City.resource_manager:GetCitizenResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local city = self.city
+    local wood = city.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local iron = city.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local stone = city.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local population = city.resource_manager:GetCitizenResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
 
-    local materials = self.city:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)
+    local materials = city:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)
+
     local requirements = {
-        {resource_type = _("建造队列"),isVisible = true, isSatisfy = #City:GetUpgradingBuildings()<1,
-            icon="hammer_33x40.png",description=(City:BuildQueueCounts()-#City:GetUpgradingBuildings()).."/1"},
+        {
+            resource_type = "building_queue",
+            isVisible = #city:GetUpgradingBuildings()>=city:BuildQueueCounts(),
+            isSatisfy = #city:GetUpgradingBuildings()<city:BuildQueueCounts(),
+            icon="hammer_33x40.png",
+            description=_("建造队列已满")..(city:BuildQueueCounts()-#city:GetUpgradingBuildings()).."/"..1
+        },
+        
         {resource_type = _("木材"),isVisible = self.building:GetLevelUpWood()>0,      isSatisfy = wood>self.building:GetLevelUpWood(),
             icon="res_wood_82x73.png",description=self.building:GetLevelUpWood().."/"..wood},
 
@@ -41,7 +49,13 @@ function WidgetBuildingIntroduce:SetUpgradeRequirementListview()
         {resource_type = _("铁矿"),isVisible = self.building:GetLevelUpIron()>0,      isSatisfy = iron>self.building:GetLevelUpIron() ,
             icon="res_iron_91x63.png",description=self.building:GetLevelUpIron().."/"..iron},
 
-
+        {
+            resource_type = _("空闲城民"),
+            isVisible = self.building:GetLevelUpCitizen()>0,
+            isSatisfy = population>= self.building:GetLevelUpCitizen() ,
+            icon="res_citizen_88x82.png",
+            description=population.."/"..self.building:GetLevelUpCitizen()
+        },
         {
             resource_type = _("工程图纸"),
             isVisible = self.building:GetLevelUpBlueprints()>0,

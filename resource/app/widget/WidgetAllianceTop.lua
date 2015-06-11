@@ -22,7 +22,7 @@ function WidgetAllianceTop:onEnter()
     local mark_1 = display.newSprite("back_ground_28x14_1.png"):addTo(self):align(display.CENTER, size.width/2+11, size.height-7)
     local mark_2 = display.newSprite("back_ground_28x14_2.png"):addTo(self):align(display.CENTER, size.width/2-11, size.height-7)
 
-    local pv = UIPageView.new {
+    self.pv = UIPageView.new {
         viewRect = cc.rect(54, 8, size.width-104, size.height-14),
         row = 1,
         padding = {left = 0, right = 0, top = 10, bottom = 0},
@@ -42,9 +42,9 @@ function WidgetAllianceTop:onEnter()
             self.auto_change_page = scheduler.scheduleGlobal(handler(self, self.Change), 20.0, false)
         end
     end):addTo(self)
+    local pv = self.pv
     pv:setTouchSwallowEnabled(false)
     pv:setCascadeOpacityEnabled(true)
-    self.pv = pv
     -- add items
     self:CreateBtnsPageItem()
     self:CreateResourcesPageItem()

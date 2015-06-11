@@ -35,9 +35,7 @@ function WidgetTimeBar:ctor(label_color, bg, bar, params)
     self.back_ground = progress_bg
 end
 function WidgetTimeBar:SetProgressInfo(time_label, percent)
-    if self.progress_label:getString() ~= time_label then
-        self.progress_label:setString(time_label)
-    end
+    self.progress_label:setString(time_label)
     return self
 end
 function WidgetTimeBar:align(anchorPoint, x, y)

@@ -60,7 +60,6 @@ function GameUISquare:CreateSoldierUI()
                 :SetSoldier(soldier_name, soldier_star)
                 :SetNumber(soldier_num)
             add_count = add_count + 1
-            display.newSprite("i_icon_20x20.png"):addTo(self.soldier_map[soldier_name]):pos(40,-22)
 
             total_citizen = total_citizen + soldier_manager:GetSoldierConfig(soldier_name).citizen * soldier_num
         end

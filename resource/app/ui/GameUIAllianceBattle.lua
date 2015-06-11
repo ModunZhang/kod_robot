@@ -10,6 +10,7 @@ local AllianceMoonGate = import("..entity.AllianceMoonGate")
 local UIListView = import(".UIListView")
 local Flag = import("..entity.Flag")
 local WidgetAllianceHelper = import("..widget.WidgetAllianceHelper")
+local fire_wall = import("..particles.fire_wall")
 local revenge_limit = GameDatas.AllianceInitData.intInit.allianceRevengeMaxMinutes.value
 
 local GameUIAllianceBattle = UIKit:createUIClass('GameUIAllianceBattle', "GameUIWithCommonHeader")
@@ -201,7 +202,7 @@ function GameUIAllianceBattle:InitBattleStatistics()
                 color = 0x403c2f,
             }):addTo(layer)
                 :align(display.LEFT_CENTER,window.left+50,window.top-280)
-            WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png",disable="grey_btn_186x66.png"})
+            local button = WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png",disable="grey_btn_186x66.png"})
                 :setButtonLabel(UIKit:ttfLabel({
                     text = _("请求开战!"),
                     size = 24,
@@ -217,6 +218,8 @@ function GameUIAllianceBattle:InitBattleStatistics()
                         NetManager:getRequestAllianceToFightPromose()
                     end
                 end):align(display.RIGHT_CENTER,window.right-50,window.top-280):addTo(layer)
+
+            fire_wall(button:getCascadeBoundingBox()):addTo(button, -1000):pos(-186/2, 0)
         end
 
 
@@ -281,7 +284,7 @@ function GameUIAllianceBattle:InitBattleStatistics()
                 color = 0x403c2f,
             }):addTo(layer)
                 :align(display.LEFT_CENTER,window.left+50,window.top-740)
-            WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png",disable="grey_btn_186x66.png"})
+            local button = WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png",disable="grey_btn_186x66.png"})
                 :setButtonLabel(UIKit:ttfLabel({
                     text = _("开始战斗!"),
                     size = 24,
@@ -297,6 +300,8 @@ function GameUIAllianceBattle:InitBattleStatistics()
                         NetManager:getFindAllianceToFightPromose()
                     end
                 end):align(display.RIGHT_CENTER,window.right-50,window.top-740):addTo(layer)
+
+            fire_wall(button:getCascadeBoundingBox()):addTo(button, -1000):pos(-186/2, 0)
         end
     else
         local our_alliance = self.alliance
@@ -420,7 +425,7 @@ function GameUIAllianceBattle:InitBattleStatistics()
                     color = 0x403c2f,
                 }):addTo(layer)
                     :align(display.LEFT_CENTER,window.left+50,window.top-830)
-                WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png",disable="grey_btn_186x66.png"})
+                local button = WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png",disable="grey_btn_186x66.png"})
                     :setButtonLabel(UIKit:ttfLabel({
                         text = _("开始战斗!"),
                         size = 24,
@@ -432,6 +437,8 @@ function GameUIAllianceBattle:InitBattleStatistics()
                             NetManager:getFindAllianceToFightPromose()
                         end
                     end):align(display.RIGHT_CENTER,window.right-50,window.top-830):addTo(layer)
+
+                fire_wall(button:getCascadeBoundingBox()):addTo(button, -1000):pos(-186/2, 0)
             end
 
             info_bg_y = window.top-260
@@ -971,7 +978,7 @@ function GameUIAllianceBattle:CreateHistoryContent()
                 }))
             revenge_button:onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
-                    if alliance:Status()~="peace" then
+                    if alliance:Status() ~= "peace" and alliance:Status() ~= "protect" then
                         UIKit:showMessageDialog(_("提示"),_("已经处于联盟战期间"))
                         return
                     end
@@ -1227,7 +1234,7 @@ function GameUIAllianceBattle:OpenOtherAllianceDetails(alliance)
         }):align(display.LEFT_CENTER,x + attr_title:getContentSize().width+20,y)
             :addTo(attr_bg)
     end
-    addAttr(_("成员"),"30/50",10,60)
+    addAttr(_("成员"),alliance.members.."/"..alliance.membersMax,10,60)
     addAttr(_("语言"),basic.language,10,20)
     addAttr(_("战斗力"),basic.power,350,60)
     addAttr(_("击杀"),basic.kill,350,20)

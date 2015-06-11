@@ -23,6 +23,14 @@ function WidgetNumberTips:SetNumber(number)
 end
 
 
+function WidgetNumberTips:DisplayBlank(yesOrno)
+    if yesOrno then
+        self.label:setString("")
+        self:show()
+    else
+        self:hide()
+    end
+end
 
 
 

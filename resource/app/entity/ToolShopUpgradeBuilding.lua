@@ -142,7 +142,7 @@ function ToolShopUpgradeBuilding:MakeMaterialsByCategoryWithFinishTime(category,
     end)
 end
 function ToolShopUpgradeBuilding:EndMakeMaterialsByCategoryWithCurrentTime(category, materials, current_time, id)
-    if self.category[category]:IsStored(current_time) then return end
+    -- if self.category[category]:IsStored(current_time) then return end
     local event = self.category[category]
     event:SetContent(materials, 0, id)
     self.toolShop_building_observer:NotifyObservers(function(listener)

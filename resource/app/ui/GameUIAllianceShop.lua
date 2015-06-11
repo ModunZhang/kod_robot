@@ -129,18 +129,18 @@ function GameUIAllianceShop:HonourAndLoyalty()
     }):addTo(node):align(display.LEFT_CENTER, 0 , 17)
     local bg = WidgetUIBackGround.new({width = 126,height = 34},WidgetUIBackGround.STYLE_TYPE.STYLE_3)
         :addTo(node):align(display.LEFT_CENTER, h_title:getPositionX() + h_title:getContentSize().width + 20, h_title:getPositionY())
-    display.newSprite("honour_128x128.png"):addTo(bg):align(display.LEFT_CENTER, -10, bg:getContentSize().height/2):scale(0.3)
+    display.newSprite("honour_128x128.png"):addTo(bg):align(display.LEFT_CENTER, -18, bg:getContentSize().height/2):scale(0.4)
     -- 荣耀值
     local honour_label = UIKit:ttfLabel({
         text = GameUtils:formatNumber(self.alliance:Honour()),
         size = 20,
         color = 0x615b44
-    }):addTo(bg):align(display.CENTER, bg:getContentSize().width/2 , bg:getContentSize().height/2)
+    }):addTo(bg):align(display.CENTER, bg:getContentSize().width/2 + 2, bg:getContentSize().height/2)
 
     -- 忠诚值
     local bg = WidgetUIBackGround.new({width = 126,height = 34},WidgetUIBackGround.STYLE_TYPE.STYLE_3)
         :addTo(node):align(display.RIGHT_CENTER, 560, 17)
-    display.newSprite("loyalty_128x128.png"):addTo(bg):align(display.LEFT_CENTER, -16, bg:getContentSize().height/2):scale(0.4)
+    display.newSprite("loyalty_128x128.png"):addTo(bg):align(display.LEFT_CENTER, -20, bg:getContentSize().height/2):scale(0.4)
     local h_title = UIKit:ttfLabel({
         text = _("忠诚值"),
         size = 20,
@@ -151,13 +151,13 @@ function GameUIAllianceShop:HonourAndLoyalty()
         text = GameUtils:formatNumber(User:Loyalty()),
         size = 20,
         color = 0x615b44
-    }):addTo(bg):align(display.CENTER, bg:getContentSize().width/2 , bg:getContentSize().height/2)
+    }):addTo(bg):align(display.CENTER, bg:getContentSize().width/2 + 2 , bg:getContentSize().height/2)
 
     function node:SetHonour( honour )
-        honour_label:setString(string.formatnumberthousands(honour))
+        honour_label:setString(GameUtils:formatNumber(honour))
     end
     function node:SetLoyalty( loyalty )
-        loyalty_label:setString(string.formatnumberthousands(loyalty))
+        loyalty_label:setString(GameUtils:formatNumber(loyalty))
     end
     return node
 end
@@ -203,7 +203,7 @@ function GameUIAllianceShop:InitGoodsPart()
         if self:CheckSell(noraml_item:Name()) then
             table.insert(row_items,noraml_item)
         end
-        if LuaUtils:table_size(row_items) == 4 or i == #normal_items then
+        if LuaUtils:table_size(row_items) == 4 or (i == #normal_items and LuaUtils:table_size(row_items)>0) then
             local goods_item = __createListItem(list_width,goods_item_height)
             local node = display.newNode()
             node:setContentSize(cc.size(list_width,goods_item_height))
@@ -236,7 +236,7 @@ function GameUIAllianceShop:InitGoodsPart()
         if self:CheckSell(super_item:Name()) then
             table.insert(row_items,super_item)
         end
-        if LuaUtils:table_size(row_items) == 4 or i == #super_items then
+        if LuaUtils:table_size(row_items) == 4 or (i == #super_items and LuaUtils:table_size(row_items) > 0 ) then
             local goods_item = __createListItem(list_width,goods_item_height)
             local node = display.newNode()
             node:setContentSize(cc.size(list_width,goods_item_height))
@@ -385,7 +385,7 @@ function GameUIAllianceShop:InitStockPart()
         if self:CheckSell(super_item:Name()) then
             table.insert(row_items,super_item)
         end
-        if LuaUtils:table_size(row_items) == 4 or i == #super_items then
+        if LuaUtils:table_size(row_items) == 4 or (i == #super_items and LuaUtils:table_size(row_items)>0)then
             local goods_item = __createListItem(list_width,goods_item_height)
             local node = display.newNode()
             node:setContentSize(cc.size(list_width,goods_item_height))

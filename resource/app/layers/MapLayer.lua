@@ -27,16 +27,15 @@ function MapLayer:ctor(scene, min_scale, max_scale)
             local new_x, new_y = current_x + normal.x * speed, current_y + normal.y * speed
             local tx, ty = current_x + dx, current_y + dy
             if (tx - current_x) * (tx - new_x) <= 0 and (ty - current_y) * (ty - new_y) <= 0 then
-                self.target_position = nil
                 new_x, new_y = tx, ty
-                if self.move_callback then
-                    self.move_callback()
-                    self.move_callback = nil
-                end
+                self:FinishMoveTo()
             else
                 target_position[3] = speed * 0.98 > 8 and speed * 0.98 or 8
             end
-            self:setPosition(cc.p(new_x, new_y))
+            local is_collide = self:setPosition(cc.p(new_x, new_y))
+            if is_collide then
+                self:FinishMoveTo()
+            end
         end
         local target_scale = self.target_scale
         if target_scale then
@@ -69,6 +68,13 @@ function MapLayer:MoveToPosition(map_x, map_y, speed_)
         self.target_position = {map_x, map_y, speed_ or SPEED}
     else
         self.target_position = nil
+    end
+end
+function MapLayer:FinishMoveTo()
+    self.target_position = nil
+    if self.move_callback then
+        self.move_callback()
+        self.move_callback = nil
     end
 end
 function MapLayer:StopMoveAnimation()
@@ -176,6 +182,7 @@ function MapLayer:setPosition(position)
     local ry = y >= 0 and min(left_bottom_pos.y, right_top_pos.y) or max(left_bottom_pos.y, right_top_pos.y)
     super.setPosition(self, cc.p(rx, ry))
     self.scene:OnSceneMove()
+    return is_collide1 or is_collide2
 end
 function MapLayer:GetLeftBottomPositionWithConstrain(x, y)
     local parent_node = self:getParent()
@@ -195,11 +202,11 @@ function MapLayer:GetRightTopPositionWithConstrain(x, y)
     local display_top_right_position = parent_node:convertToNodeSpace(cc.p(display.right, display.top))
     local dx = display_top_right_position.x - scene_top_right_position.x
     local dy = display_top_right_position.y - scene_top_right_position.y
-    local is_collide_right = scene_top_right_position.x >= display_top_right_position.x
-    local is_collide_top = scene_top_right_position.y >= display_top_right_position.y
+    local is_collide_right = scene_top_right_position.x <= display_top_right_position.x
+    local is_collide_top = scene_top_right_position.y <= display_top_right_position.y
     local right_top_pos = {
-        x = is_collide_right and x or x + dx,
-        y = is_collide_top and y or y + dy
+        x = is_collide_right and x + dx or x,
+        y = is_collide_top and y + dy or y
     }
     return right_top_pos, is_collide_right or is_collide_top
 end

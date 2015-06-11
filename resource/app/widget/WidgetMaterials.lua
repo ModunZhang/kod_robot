@@ -89,7 +89,7 @@ function WidgetMaterials:OnBuildingUpgradeFinished(building)
     for i,v in pairs(self.material_box_table) do
         local material_map = self.city:GetMaterialManager():GetMaterialMap()[i]
         for k,m in pairs(v) do
-            m:SetNumber(material_map[k].."/"..building:GetMaxMaterial())
+            m:SetNumber(string.formatnumberthousands(material_map[k]).."/"..string.formatnumberthousands(building:GetMaxMaterial()))
         end
     end
 end
@@ -112,7 +112,7 @@ function WidgetMaterials:CreateItemWithListView(material_type,materials,notClean
     for i,material_name in ipairs(materials) do
         local material_box = WidgetMaterialBox.new(material_type,material_name,function ()
             self:OpenMaterialDetails(material_type,material_name,material_map[material_name].."/"..self.building:GetMaxMaterial())
-        end,true):addTo(row_item):SetNumber(material_map[material_name].."/"..self.building:GetMaxMaterial())
+        end,true):addTo(row_item):SetNumber(string.formatnumberthousands(material_map[material_name]).."/"..string.formatnumberthousands(self.building:GetMaxMaterial()))
             :pos(origin_x + (unit_width + gap_x) * row_count , -unit_height/2)
         self.material_box_table[material_type][material_name] = material_box
         row_count = row_count + 1
@@ -178,7 +178,7 @@ end
 function WidgetMaterials:OnMaterialsChanged(material_manager,material_type,changed_table)
     for k,v in pairs(changed_table) do
         if self.material_box_table[material_type] and self.material_box_table[material_type][k] then
-            self.material_box_table[material_type][k]:SetNumber(v.new.."/"..self.building:GetMaxMaterial())
+            self.material_box_table[material_type][k]:SetNumber(string.formatnumberthousands(v.new).."/"..string.formatnumberthousands(self.building:GetMaxMaterial()))
         end
     end
 end

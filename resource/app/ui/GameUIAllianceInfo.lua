@@ -236,8 +236,12 @@ function GameUIAllianceInfo:LoadInfo()
         :align(display.CENTER_TOP, l_size.width/2,l_size.height - 220)
         :addTo(layer)
 
+    local desc = alliance_data.desc 
+    if not desc or desc == json.null then
+        desc = _("联盟未设置联盟描述")
+    end
     local killTitleLabel = UIKit:ttfLabel({
-        text = alliance_data.desc and alliance_data.desc or _("联盟未设置联盟描述"),
+        text =  desc,
         size = 20,
         color = 0x615b44,
         dimensions = cc.size(530,0),

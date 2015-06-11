@@ -31,9 +31,10 @@ function GameUISettingLanguage:BuildUI()
 		color = 0xffedae
 	}):addTo(titleBar):align(display.CENTER,300,28)
 	local code = app:GetGameLanguage()
+	print(code,"code------>")
 	local languages = {
-		{image = 'flag_zh_83x83.png',code = 'zh_CN'},
-		{image = 'flag_zh_Hant_83x83.png',code = 'zh_TW'},
+		{image = 'flag_zh_Hant_83x83.png',code = 'tw'},
+		{image = 'flag_zh_83x83.png',code = 'cn'},
 	}
 	local x,y = 20,732
 	for i,v in ipairs(languages) do
@@ -57,11 +58,17 @@ function GameUISettingLanguage:GetItem(iamge,language_code,selected)
 		local code = app:GetGameLanguage()
 		if code ~= language_code then
 			UIKit:showMessageDialog(_("提示"),string.format(_("修改游戏语言为%s?\n确认后游戏将重新启动"),Localize.game_language[language_code]),function()
-				app:SetGameLanguage(language_code)
+				self:SendCodeToServer(language_code)
 			end,function()end,false)
 		end
 	end)
 	return sp
+end
+
+function GameUISettingLanguage:SendCodeToServer(code)
+	NetManager:getSetPlayerLanguagePromise(code):done(function(response)
+		app:SetGameLanguage(code)
+	end)
 end
 
 return GameUISettingLanguage

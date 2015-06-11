@@ -114,6 +114,13 @@ function GameUIQuickTechnology:OnProductionTechnologyEventTimer(event)
 	if self.time_label and self.time_label:isVisible() then
 		self.process_timer:setPercentage(event:GetPercent())
 		self.time_label:setString(GameUtils:formatTimeStyle1(event:GetTime()))
+		if event:GetTime() > DataUtils:getFreeSpeedUpLimitTime() then
+			self.speedButton:show()
+			self.freeSpeedUpButton:hide()
+		else
+			self.speedButton:hide()
+			self.freeSpeedUpButton:show()
+		end
 	end
 end
 
@@ -148,7 +155,7 @@ function GameUIQuickTechnology:BuildTipsUI(technology_node,y)
 	self.no_event_label_2 = no_event_label_2
 	local upgrade_label = UIKit:ttfLabel({
 		text = "",
-		size = 20,
+		size = 18,
 		color= 0x403c2f
 	}):align(display.LEFT_TOP,10,96):addTo(tips_bg)
 	self.upgrade_label = upgrade_label
@@ -174,7 +181,21 @@ function GameUIQuickTechnology:BuildTipsUI(technology_node,y)
 		:onButtonClicked(function()
 			UIKit:newGameUI("GameUITechnologySpeedUp"):AddToCurrentScene(true)
 		end)
+
 	self.speedButton = speedButton
+	local freeSpeedUpButton =  WidgetPushButton.new({normal = "purple_btn_up_148x76.png",pressed = "purple_btn_down_148x76.png"})
+		:align(display.RIGHT_BOTTOM, 546, 10)
+		:addTo(tips_bg)
+		:setButtonLabel("normal",UIKit:commonButtonLable({text = _("免费加速")}))
+		:onButtonClicked(function()
+			if City:HaveProductionTechEvent() then
+				local event = City:GetProductionTechEventsArray()[1]
+				NetManager:getFreeSpeedUpPromise("productionTechEvents",event:Id()):done(function()
+					self:CheckUIChanged()
+				end)
+			end
+		end)
+	self.freeSpeedUpButton = freeSpeedUpButton
 end
 
 function GameUIQuickTechnology:BuildTechnologyUI(height)
@@ -204,6 +225,13 @@ function GameUIQuickTechnology:CheckUIChanged()
 		self.speedButton:show()
 		local event = City:GetProductionTechEventsArray()[1]
 		if event then
+			if event:GetTime() > DataUtils:getFreeSpeedUpLimitTime() then
+				self.speedButton:show()
+				self.freeSpeedUpButton:hide()
+			else
+				self.speedButton:hide()
+				self.freeSpeedUpButton:show()
+			end
 			self.upgrade_label:setString(string.format(_("正在研发%s到 Level %d"),event:Entity():GetLocalizedName(),event:Entity():GetNextLevel()))
 			self.process_timer:setPercentage(event:GetPercent())
 			self.time_label:setString(GameUtils:formatTimeStyle1(event:GetTime()))
@@ -216,6 +244,7 @@ function GameUIQuickTechnology:CheckUIChanged()
 		self.process_bg:hide()
 		self.time_label:hide()
 		self.speedButton:hide()
+		self.freeSpeedUpButton:hide()
 	end
 end
 
@@ -264,6 +293,10 @@ function GameUIQuickTechnology:GetItem(tech)
 	end
 	item.changeState(tech:Enable())
 	item:onButtonClicked(function(event)
+		if not tech:IsOpen() then
+			UIKit:showMessageDialog(nil, _("该技能暂未开放！"))
+			return
+		end
         UIKit:newGameUI("GameUIUpgradeTechnology",tech):AddToCurrentScene(true)
 	end)
 	item:setTag(tech:Index())

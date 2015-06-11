@@ -84,7 +84,8 @@ function WidgetDropItem:CreateRewardsPanel(task)
 
     local size = content:getContentSize()
     local desc = UIKit:ttfLabel({
-        text = task:Desc(),
+        -- text = task:Desc(),
+        text = "",
         size = 18,
         color = 0x615b44,
         dimensions = cc.size(500,0)

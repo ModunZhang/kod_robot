@@ -296,15 +296,17 @@ function WidgetMarchEvents:CreateReturnItem(entity)
     node.prefix = entity:GetEventPrefix()
     node.desc = UIKit:ttfLabel({
         text = node.prefix,
-        size = 16,
+        size = 18,
         color = 0xd1ca95,
+        shadow = true,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
 
     node.time = UIKit:ttfLabel({
         text = GameUtils:formatTimeStyle1(event:GetTime()),
-        size = 16,
+        size = 18,
         color = 0xd1ca95,
         align = cc.TEXT_ALIGNMENT_RIGHT,
+        shadow = true,
     }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 170, half_height)
     node.speed_btn = WidgetPushButton.new({
         normal = "march_speedup_btn_up.png",
@@ -314,7 +316,8 @@ function WidgetMarchEvents:CreateReturnItem(entity)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("加速"),
             size = 18,
-            color= 0xfff3c7
+            color= 0xfff3c7,
+            shadow = true,
         }))
         :onButtonClicked(function()
             self:OnSpeedUpButtonClicked(entity)
@@ -329,7 +332,8 @@ function WidgetMarchEvents:CreateReturnItem(entity)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("部队"),
             size = 18,
-            color= 0xfff3c7
+            color= 0xfff3c7,
+            shadow = true,
         }))
         :onButtonClicked(function()
             self:OnInfoButtonClicked(entity)
@@ -353,15 +357,17 @@ function WidgetMarchEvents:CreateAttackItem(entity)
     node.prefix = entity:GetEventPrefix()
     node.desc = UIKit:ttfLabel({
         text = node.prefix,
-        size = 16,
+        size = 18,
         color = 0xd1ca95,
+        shadow = true,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
 
     node.time = UIKit:ttfLabel({
         text = GameUtils:formatTimeStyle1(event:GetTime()),
-        size = 16,
+        size = 18,
         color = 0xd1ca95,
         align = cc.TEXT_ALIGNMENT_RIGHT,
+        shadow = true,
     }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 170, half_height)
 
     node.speed_btn = WidgetPushButton.new({
@@ -372,7 +378,8 @@ function WidgetMarchEvents:CreateAttackItem(entity)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("加速"),
             size = 18,
-            color= 0xfff3c7
+            color= 0xfff3c7,
+            shadow = true,
         }))
         :onButtonClicked(function()
             self:OnSpeedUpButtonClicked(entity)
@@ -387,7 +394,8 @@ function WidgetMarchEvents:CreateAttackItem(entity)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("撤退"),
             size = 18,
-            color= 0xfff3c7
+            color= 0xfff3c7,
+            shadow = true,
         }))
         :onButtonClicked(function()
             self:OnRetreatButtonClicked(entity)
@@ -426,15 +434,17 @@ function WidgetMarchEvents:CreateDefenceItem(entity)
     end
     node.desc = UIKit:ttfLabel({
         text = display_text,
-        size = 16,
+        size = 18,
         color = 0xd1ca95,
+        shadow = true,
     }):addTo(node):align(display.LEFT_CENTER, 10, half_height)
 
     node.time = UIKit:ttfLabel({
         text = time_str,
-        size = 16,
+        size = 18,
         color = 0xd1ca95,
         align = cc.TEXT_ALIGNMENT_RIGHT,
+        shadow = true,
     }):addTo(node):align(display.RIGHT_CENTER, WIDGET_WIDTH - 170, half_height)
 
     node.speed_btn = WidgetPushButton.new({
@@ -445,7 +455,8 @@ function WidgetMarchEvents:CreateDefenceItem(entity)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("撤军"),
             size = 18,
-            color= 0xfff3c7
+            color= 0xfff3c7,
+            shadow = true,
         }))
         :onButtonClicked(function()
             self:OnRetreatButtonClicked(entity)
@@ -460,7 +471,8 @@ function WidgetMarchEvents:CreateDefenceItem(entity)
         :setButtonLabel(UIKit:commonButtonLable({
             text = _("部队"),
             size = 18,
-            color= 0xfff3c7
+            color= 0xfff3c7,
+            shadow = true,
         }))
         :onButtonClicked(function()
             self:OnInfoButtonClicked(entity)
