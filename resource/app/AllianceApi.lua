@@ -381,8 +381,8 @@ function AllianceApi:AllianceOtherApi()
         if alliance:Status() == 'fight' then
             return
         end
-        local locationX = math.random(25)
-        local locationY = math.random(25)
+        local locationX = math.random(24)
+        local locationY = math.random(24)
         print("移动自己城市",locationX,locationY)
         return NetManager:getBuyAndUseItemPromise("moveTheCity",{
             ["moveTheCity"]={
