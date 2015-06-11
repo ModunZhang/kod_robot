@@ -262,9 +262,9 @@ function AllianceFightApi:March()
                             end
                         end
                         local to_active_stage = can_active_stage[math.random(#can_active_stage)]
-                        if to_active_stage:NeedPerception() <= alliance_shirine:GetPerceptionResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()) 
+                        if to_active_stage:NeedPerception() <= alliance_shirine:GetPerceptionResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
                             and not alliance_shirine:GetShrineEventByStageName(to_active_stage:StageName())
-                            then
+                        then
                             print("激活联盟圣地事件",to_active_stage:StageName())
                             return NetManager:getActivateAllianceShrineStagePromise(to_active_stage:StageName())
                         end
@@ -389,10 +389,11 @@ return {
     TreatSoldiers,
     RecruitNormalSoldier,
     RecruitSpecialSoldier,
-StartAllianceWar,
-March,
-SpeedUpMarchEvent,
+    StartAllianceWar,
+    March,
+    SpeedUpMarchEvent,
 }
+
 
 
 

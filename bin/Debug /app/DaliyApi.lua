@@ -379,6 +379,14 @@ function DaliyApi:GetDaliyRewards()
             end
         end
     end
+
+    -- 成就奖励
+    local tasks = User:GetTaskManager():GetFirstCompleteTasks()
+    local i1, i2, i3 = unpack(tasks)
+    if i1 then
+        print("领取成就任务奖励",i1:TaskType(), i1.id)
+        return NetManager:getGrowUpTaskRewardsPromise(i1:TaskType(), i1.id)
+    end
 end
 
 local function setRun()

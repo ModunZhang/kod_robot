@@ -289,12 +289,30 @@ function OtherApi:GetRank()
 end
 -- vip
 function OtherApi:VIP()
-   if User:IsVIPActived() then
-       -- 增加vip点数
-       return  NetManager:getBuyAndUseItemPromise("vipPoint_"..math.random(3,4),{})
-   else
-       return  NetManager:getBuyAndUseItemPromise("vipActive_"..math.random(3,5),{})
-   end
+    if User:IsVIPActived() then
+        -- 增加vip点数
+        return  NetManager:getBuyAndUseItemPromise("vipPoint_"..math.random(3,4),{})
+    else
+        return  NetManager:getBuyAndUseItemPromise("vipActive_"..math.random(3,5),{})
+    end
+end
+-- 聊天
+function OtherApi:Chat()
+    local channels =
+        {
+            "global",
+            "alliance",
+            "allianceFight",
+        }
+
+    local alliance = Alliance_Manager:GetMyAlliance()
+    local channel
+    if alliance:Status() == "fight" then
+        channel = channels[math.random(3)]
+    else
+        channel = channels[math.random(2)]
+    end
+    return NetManager:getSendChatPromise(channel,"你们这群渣渣！！！！")
 end
 local function setRun()
     app:setRun()
@@ -358,6 +376,15 @@ local function VIP()
         setRun()
     end
 end
+local function Chat()
+    local p = OtherApi:Chat()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+
 return {
     setRun,
     SetCityTerrain,
@@ -367,7 +394,9 @@ return {
     Gacha,
     GetRank,
     VIP,
+    Chat,
 }
+
 
 
 

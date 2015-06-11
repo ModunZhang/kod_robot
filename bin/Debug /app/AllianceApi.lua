@@ -364,84 +364,91 @@ function AllianceApi:HelpSpeedUp()
 end
 function AllianceApi:AllianceOtherApi()
     local alliance = Alliance_Manager:GetMyAlliance()
-    local member = alliance:GetSelf()
-    local random = math.random(100)
-    -- 发联盟邮件
-    if member:CanSendAllianceMail() and random < 5 then
-        return NetManager:getSendAllianceMailPromise("机器人联盟邮件", "机器人联盟邮件")
-    elseif random < 10 then
-        local members = alliance:GetAllMembers()
-        local member
-        for k,v in pairs(members) do
-            member = v
-            break
+    if not alliance:IsDefault() then
+        local member = alliance:GetSelf()
+        local random = math.random(100)
+        -- 发联盟邮件
+        if member:CanSendAllianceMail() and random < 5 then
+            return NetManager:getSendAllianceMailPromise("机器人联盟邮件", "机器人联盟邮件")
+        elseif random < 10 then
+            local members = alliance:GetAllMembers()
+            local member
+            for k,v in pairs(members) do
+                member = v
+                break
+            end
+            return NetManager:getPlayerWallInfoPromise(member:Id())
+        elseif random < 15 then
+            if alliance:Status() == 'fight' then
+                return
+            end
+            local locationX = math.random(24)
+            local locationY = math.random(24)
+            print("移动自己城市",locationX,locationY)
+            return NetManager:getBuyAndUseItemPromise("moveTheCity",{
+                ["moveTheCity"]={
+                    locationX = locationX,
+                    locationY = locationY
+                }
+            })
         end
-        return NetManager:getPlayerWallInfoPromise(member:Id())
-    elseif random < 15 then
-        if alliance:Status() == 'fight' then
-            return
-        end
-        local locationX = math.random(24)
-        local locationY = math.random(24)
-        print("移动自己城市",locationX,locationY)
-        return NetManager:getBuyAndUseItemPromise("moveTheCity",{
-            ["moveTheCity"]={
-                locationX = locationX,
-                locationY = locationY
-            }
-        })
     end
 end
 -- 联盟商店进货
 function AllianceApi:ShopStock()
     local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() then
 
-    local shop = alliance:GetAllianceMap():FindAllianceBuildingInfoByName("shop")
-    local shop_config = GameDatas.AllianceBuilding.shop
-    -- 所有解锁的可进货道具
-    local unlock_items = {}
-    for i=1,shop.level do
-        local unlock = string.split(shop_config[i].itemsUnlock, ",")
-        for i,v in ipairs(unlock) do
-            unlock_items[v] = true
+        local shop = alliance:GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+        local shop_config = GameDatas.AllianceBuilding.shop
+        -- 所有解锁的可进货道具
+        local unlock_items = {}
+        for i=1,shop.level do
+            local unlock = string.split(shop_config[i].itemsUnlock, ",")
+            for i,v in ipairs(unlock) do
+                unlock_items[v] = true
+            end
         end
-    end
-    local super_items = alliance:GetItemsManager():GetAllSuperItems()
-    local stock_items = {}
-    for i=1,#super_items do
-        local super_item = super_items[i]
-        if unlock_items[super_item:Name()] then
-            table.insert(stock_items,super_item)
+        local super_items = alliance:GetItemsManager():GetAllSuperItems()
+        local stock_items = {}
+        for i=1,#super_items do
+            local super_item = super_items[i]
+            if unlock_items[super_item:Name()] then
+                table.insert(stock_items,super_item)
+            end
         end
-    end
 
-    local item = stock_items[math.random(#stock_items)]
-    if item:IsAdvancedItem() and  alliance:GetSelf():CanAddAdvancedItemsToAllianceShop() and alliance:Honour() >= item:BuyPriceInAlliance() then
-        print("联盟商店进货：",item:Name())
-        return NetManager:getAddAllianceItemPromise(item:Name(),1)
+        local item = stock_items[math.random(#stock_items)]
+        if item:IsAdvancedItem() and  alliance:GetSelf():CanAddAdvancedItemsToAllianceShop() and alliance:Honour() >= item:BuyPriceInAlliance() then
+            print("联盟商店进货：",item:Name())
+            return NetManager:getAddAllianceItemPromise(item:Name(),1)
+        end
     end
 end
 function AllianceApi:BuyAllianceItem()
     local alliance = Alliance_Manager:GetMyAlliance()
-    local shop = alliance:GetAllianceMap():FindAllianceBuildingInfoByName("shop")
-    local shop_config = GameDatas.AllianceBuilding.shop
-    -- 所有解锁的道具
-    local unlock_items = {}
-    for i=1,shop.level do
-        local unlock = string.split(shop_config[i].itemsUnlock, ",")
-        for i,v in ipairs(unlock) do
-            table.insert(unlock_items, alliance:GetItemsManager():GetItemByName(v))
+    if not alliance:IsDefault() then
+
+        local shop = alliance:GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+        local shop_config = GameDatas.AllianceBuilding.shop
+        -- 所有解锁的道具
+        local unlock_items = {}
+        for i=1,shop.level do
+            local unlock = string.split(shop_config[i].itemsUnlock, ",")
+            for i,v in ipairs(unlock) do
+                table.insert(unlock_items, alliance:GetItemsManager():GetItemByName(v))
+            end
         end
-    end
-    local item = unlock_items[math.random(#unlock_items)]
-    if item:IsAdvancedItem() and not alliance:GetSelf():CanBuyAdvancedItemsFromAllianceShop() then
-        return
-    end
-    if User:Loyalty() >= item:SellPriceInAlliance() then
-        print("购买联盟商店道具：",item:Name())
-        return NetManager:getBuyAllianceItemPromise(item:Name(),1)
-    else
-        return self:Contribute()
+        local item = unlock_items[math.random(#unlock_items)]
+        if item:IsAdvancedItem() and not alliance:GetSelf():CanBuyAdvancedItemsFromAllianceShop() then
+            return
+        end
+        if User:Loyalty() >= item:SellPriceInAlliance() then
+            print("购买联盟商店道具：",item:Name())
+            return NetManager:getBuyAllianceItemPromise(item:Name(),1)
+        else
+            return self:Contribute()
+        end
     end
 end
 -- 获取其他玩家重置送的礼物
@@ -646,6 +653,8 @@ return {
     GetGift,
     FirstJoinAllianceReward,
 }
+
+
 
 
 
