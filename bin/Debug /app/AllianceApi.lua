@@ -382,15 +382,21 @@ function AllianceApi:AllianceOtherApi()
             if alliance:Status() == 'fight' then
                 return
             end
+            if alliance:GetAllianceBelvedere():HasEvents() then
+                return
+            end
             local locationX = math.random(24)
             local locationY = math.random(24)
-            print("移动自己城市",locationX,locationY)
-            return NetManager:getBuyAndUseItemPromise("moveTheCity",{
-                ["moveTheCity"]={
-                    locationX = locationX,
-                    locationY = locationY
-                }
-            })
+            local can_move = alliance:GetAllianceMap():CanMoveBuilding(alliance:GetAllianceMap():GetMapObjectsByType("member")[alliance:GetSelf():MapId()], locationX, locationY)
+            if can_move then
+                print("移动自己城市",locationX,locationY)
+                return NetManager:getBuyAndUseItemPromise("moveTheCity",{
+                    ["moveTheCity"]={
+                        locationX = locationX,
+                        locationY = locationY
+                    }
+                })
+            end
         end
     end
 end
@@ -653,6 +659,7 @@ return {
     GetGift,
     FirstJoinAllianceReward,
 }
+
 
 
 

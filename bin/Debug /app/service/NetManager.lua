@@ -503,7 +503,7 @@ end
 -- 获取服务器列表
 function NetManager:getLogicServerInfoPromise()
     local device_id = device.getOpenUDID()
-    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {deviceId = device_id}, "获取逻辑服务器失败",true)
+    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {deviceId = device_id, tag = 4983}, "获取逻辑服务器失败",true)
         :done(function(result)
             self:CleanAllEventListeners()
             self.m_netService:disconnect()

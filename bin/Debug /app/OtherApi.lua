@@ -391,13 +391,13 @@ end
 
 return {
     setRun,
-    -- SetCityTerrain,
-    -- SwitchBuilding,
-    -- SetPlayerIcon,
-    -- MailApi,
-    -- Gacha,
-    -- GetRank,
-    -- VIP,
+    SetCityTerrain,
+    SwitchBuilding,
+    SetPlayerIcon,
+    MailApi,
+    Gacha,
+    GetRank,
+    VIP,
     Chat,
 }
 
