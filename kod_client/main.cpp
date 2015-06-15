@@ -77,6 +77,11 @@ static int pipefd[2];
 void 
 sig_handler( int sig )
 {	
+	if (sig == SIGCHLD)
+	{
+        wait(NULL);
+//		return;
+	}
 	printf("receive sig %d\n", sig);
 	int save_errno = errno;
 	int msg = sig;
@@ -239,15 +244,16 @@ run()
 	fd_set test_set;  
 	FD_ZERO(&test_set);
 	FD_SET(pipefd[0], &test_set);
+    CONTINUE:
    	int result = select( pipefd[0] + 1, &test_set, (fd_set *)0, (fd_set *)0, NULL); 
    	switch(result)   
    	{   
    		case -1:
    		{
-   			// if ( errno == EINTR )
-   			// {
-   			// 	continue;
-   			// }
+   			 if ( errno == EINTR )
+   			 {
+   			 	goto CONTINUE;
+   			 }
        		perror("select");
        		stop_server = true;
    		}
@@ -303,6 +309,7 @@ main(int argc, char *argv[])
 		device_id_string = argv[1];
 	}
 	addsig(SIGTERM);
+	addsig(SIGCHLD);
 	int ret = socketpair( PF_UNIX, SOCK_STREAM, 0, pipefd );
 	assert( ret != -1 );
 

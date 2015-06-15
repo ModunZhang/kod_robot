@@ -662,6 +662,8 @@ union luai_Cast { double l_d; long l_l; };
 @* the file streams.
 ** CHANGE it if you have a way to implement it in your system.
 */
+#define LUA_USE_POPEN
+
 #if defined(LUA_USE_POPEN)
 
 #define lua_popen(L,c,m)	((void)L, fflush(NULL), popen(c,m))

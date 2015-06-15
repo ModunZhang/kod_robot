@@ -34,7 +34,18 @@ function MyApp:ctor()
     app = self
     app.GetPushManager = function()
         return {
-            CancelAll = function() end
+            CancelAll = function() end,
+            CancelBuildPush = function ( ... ) end,
+            UpdateBuildPush = function ( ... ) end,
+            CancelWatchTowerPush = function ( ... ) end,
+            UpdateSoldierPush = function ( ... ) end,
+            CancelSoldierPush = function ( ... ) end,
+            UpdateTechnologyPush = function ( ... ) end,
+            CancelTechnologyPush = function ( ... ) end,
+            UpdateToolEquipmentPush = function ( ... ) end,
+            CancelToolEquipmentPush = function ( ... ) end,
+            UpdateWatchTowerPush = function ( ... ) end,
+            CancelWatchTowerPush = function ( ... ) end,
         }
     end
 end
@@ -45,15 +56,15 @@ function MyApp:GetChatManager()
     return self.ChatManager_
 end
 function MyApp:GetUpdateFile()
-    -- local t = io.popen("curl 54.223.172.65:3000/update/res/fileList.json")
-    -- local msg = t:read("*all")
-    -- t:close()
-    -- local serverFileList = json.decode(msg)
+    local t = io.popen("curl 54.223.172.65:3000/update/res/fileList.json")
+    local msg = t:read("*all")
+    t:close()
+    local serverFileList = json.decode(msg)
 
-    self.client_tag = 4983
+    self.client_tag = serverFileList.tag
     --注意这里debug模式和mac上再次重写了ext.getAppVersion
     ext.getAppVersion = function()
-        return 1.0
+        return serverFileList.appVersion
     end
 end
 function MyApp:run()
@@ -63,15 +74,11 @@ function MyApp:run()
         file:write("login : "..device.getOpenUDID().."\n")
         io.close(file)
     end
-    print("run 1")
     NetManager:getConnectGateServerPromise():next(function()
-        print("run 2")
         return NetManager:getLogicServerInfoPromise()
     end):next(function()
-        print("run 3")
         return NetManager:getConnectLogicServerPromise()
     end):next(function()
-        print("run 4")
         return NetManager:getLoginPromise(device.getOpenUDID())
     end):next(function()
         if DataManager:getUserData().basicInfo.terrain == "__NONE__" then

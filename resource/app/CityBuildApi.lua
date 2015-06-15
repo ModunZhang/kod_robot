@@ -124,7 +124,7 @@ function CityBuildApi:SpeedUpBuildingEvents()
         local eventType = u_building:EventType()
         local eventId = u_building:UniqueUpgradingKey()
         -- 免费加速
-        if u_building:IsAbleToFreeSpeedUpByTime(app.timer:GetServerTime()) and u_building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 5 then
+        if u_building:IsAbleToFreeSpeedUpByTime(app.timer:GetServerTime()) and u_building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 60 then
             print("免费加速",u_building:GetType())
             return NetManager:getFreeSpeedUpPromise(eventType,eventId)
         else

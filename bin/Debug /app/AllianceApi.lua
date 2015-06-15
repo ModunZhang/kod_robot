@@ -79,10 +79,10 @@ function AllianceApi:AllianceMemberApi()
         else
             -- 踢出
             local auth,title_can = me:CanKickOutMember(member:Title())
-            if not title_can or not auth then
+            if not title_can or not auth or alliance:Status() == "fight" then
                 return
             end
-            return NetManager:getAllianceMemberApiPromise(member:Id())
+            return NetManager:getKickAllianceMemberOffPromise(member:Id())
         end
     end
 end
