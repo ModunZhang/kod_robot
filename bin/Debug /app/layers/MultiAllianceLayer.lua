@@ -110,6 +110,7 @@ function MultiAllianceLayer:ctor(scene, arrange, ...)
     Observer.extend(self)
     MultiAllianceLayer.super.ctor(self, scene, 0.4, 1.2)
     self.info_action = display.newNode():addTo(self)
+    self.track_id = nil
     self.arrange = arrange
     self.alliances = {...}
     self.alliance_views = {}
@@ -199,6 +200,9 @@ function MultiAllianceLayer:ctor(scene, arrange, ...)
     --         },
     --         ENEMY
     --     )
+end
+function MultiAllianceLayer:TrackCorpsById(id)
+    self.track_id = id
 end
 function MultiAllianceLayer:Schedule()
     self.info_action:schedule(function()
@@ -448,6 +452,10 @@ function MultiAllianceLayer:StartCorpsTimer()
                     local program = line:getFilter():getGLProgramState()
                     program:setUniformFloat("percent", fmod(time - floor(time), 1.0))
                     program:setUniformFloat("elapse", line.is_enemy and (cc.pGetLength(cc.pSub(cur_vec, march_info.origin_start)) / march_info.origin_length) or 0)
+
+                    if self.track_id == id then
+                        self:GotoMapPositionInMiddle(cur_vec.x, cur_vec.y)
+                    end
                 else
                     self:DeleteCorpsById(id)
                 end

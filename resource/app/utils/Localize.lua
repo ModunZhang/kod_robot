@@ -629,6 +629,7 @@ local BUILDING_DESCRIPTION = {
 
     ["dwelling"] = _("住宅能够容纳城民并产出银币。升级建筑提升城民的最大上限和银币增长速度"),
     ["dwelling_citizen"] = _("提供城民上限"),
+    ["dwelling_poduction"] = _("每小时银币产量"),
     ["recoveryCitizen"] = _("每小时城民恢复速度"),
 
     ["woodcutter"] = _("将城民派往木工小屋获得持续的木材产出。建筑等级越高需要更多的城民，木材产出也会更高。"),

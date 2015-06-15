@@ -12,7 +12,7 @@ end
 
 
 function WidgetAutoOrderGachaButton:OnGachaButtonClicked(event)
-    UIKit:newGameUI("GameUIGacha",City):AddToCurrentScene(true):DisableAutoClose()
+    UIKit:newGameUI("GameUIGacha",City):AddToCurrentScene(true)
 end
 
 

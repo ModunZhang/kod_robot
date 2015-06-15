@@ -61,7 +61,7 @@ function WidgetAllianceTop:onExit()
 end
 function WidgetAllianceTop:Change()
     local pv = self.pv
-    if not pv:IsOnTouch() then
+    if not pv:IsOnTouch() and pv:getNumberOfRunningActions() < 1 then
         pv:setTouchEnabled(false)
         pv:gotoPage(pv:getCurPageIdx() == 1 and 2 or 1,true)
         pv:performWithDelay(function ()

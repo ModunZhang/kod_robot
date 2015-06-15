@@ -421,15 +421,15 @@ end
 
 function GameUIMission:RefreshDisplayGreenPoint()
     if not self.tab_buttons then return end
+    local count = 0
     for __,key_of_daily in ipairs(KEYS_OF_DAILY) do
         local tmp_data = self.city:GetUser():GetDailyTasksInfo(key_of_daily)
         local percent = #tmp_data/4
         if percent < 1 then
-            self.tab_buttons:SetGreenTipsShow("daily",true)
-            return
+            count = count + 1
         end
     end
-    self.tab_buttons:SetGreenTipsShow("daily",false)
+    self.tab_buttons:SetButtonTipNumber("daily",count)
 end
 
 function GameUIMission:OnDailyTasksChanged(user,changed_task_types)

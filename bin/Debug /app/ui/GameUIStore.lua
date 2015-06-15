@@ -60,12 +60,6 @@ function GameUIStore:FormatGemRewards(rewards,allianceRewards)
 	local result_rewards = {}
 	local rewards_price = {}
 	local all_rewards = string.split(rewards, ",")
-	for __,v in ipairs(all_rewards) do
-		local one_reward = string.split(v,":")
-		local category,key,count = unpack(one_reward)
-		table.insert(result_rewards,{category = category,key = key,count = count})
-		rewards_price[key] = count
-	end
 	if allianceRewards then
 		local all_alliance_rewards = string.split(allianceRewards,",")
 		for __,v in ipairs(all_alliance_rewards) do
@@ -73,6 +67,12 @@ function GameUIStore:FormatGemRewards(rewards,allianceRewards)
 			local category,key,count = unpack(one_reward)
 			table.insert(result_rewards,{category = category,key = key,count = count,isToAlliance = true})
 		end
+	end
+	for __,v in ipairs(all_rewards) do
+		local one_reward = string.split(v,":")
+		local category,key,count = unpack(one_reward)
+		table.insert(result_rewards,{category = category,key = key,count = count})
+		rewards_price[key] = count
 	end
 	return result_rewards,DataUtils:getItemsPrice(rewards_price)
 end

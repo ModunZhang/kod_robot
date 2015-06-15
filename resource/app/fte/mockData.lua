@@ -345,10 +345,10 @@ local function FightWithNpc(floor)
 
     if floor > 2 then
         mock{
-            {"soldierMaterials.magicBox", 2},
-            {"soldierMaterials.deathHand", 2},
-            {"soldierMaterials.soulStone", 2},
-            {"soldierMaterials.heroBones", 2},
+            {"soldierMaterials.magicBox", 1},
+            {"soldierMaterials.deathHand", 1},
+            {"soldierMaterials.soulStone", 1},
+            {"soldierMaterials.heroBones", 1},
         }
     end
 

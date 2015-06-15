@@ -27,7 +27,7 @@ function PVEFteScene:ctor(...)
     PVEFteScene.super.ctor(self, ...)
 end
 function PVEFteScene:onExit()
-    self.touch_judgment:destructor()
+    PVEFteScene.super.super.onExit(self)
 end
 function PVEFteScene:OnTouchClicked(pre_x, pre_y, x, y)
 

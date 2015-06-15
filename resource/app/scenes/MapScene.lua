@@ -62,7 +62,6 @@ function MapScene:onExit()
     if self.UnloadImages then
         self:UnloadImages()
     end
-    self.touch_judgment:destructor()
 end
 function MapScene:PreLoadImages()
     for _,v in ipairs(self:GetPreloadImages()) do

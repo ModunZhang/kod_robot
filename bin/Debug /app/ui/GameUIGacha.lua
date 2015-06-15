@@ -29,7 +29,7 @@ end
 
 function GameUIGacha:OnMoveInStage()
     GameUIGacha.super.OnMoveInStage(self)
-    self:CreateTabButtons({
+    self.tab_buttons = self:CreateTabButtons({
         {
             label = _("普通抽奖"),
             tag = "ordinary",
@@ -257,7 +257,9 @@ function GameUIGacha:CreateGachaPool(layer)
                             self.continuous_draw_items = nil
                             -- 恢复ui退出home_button
                             main:GetHomeButton():setButtonEnabled(true)
-
+                            main:DisableAutoClose(false)
+                            main.tab_buttons:GetTabByTag("ordinary"):Enable(true)
+                            main.tab_buttons:GetTabByTag("deluxe"):Enable(true)
                             -- 弹出评价
                             if main.appraise then
                                 UIKit:showEvaluateDialog(function ()
@@ -284,6 +286,9 @@ function GameUIGacha:CreateGachaPool(layer)
     function GachaPool:StartLotteryDraw(item)
         -- 禁用ui退出home_button
         main:GetHomeButton():setButtonEnabled(false)
+        main.tab_buttons:GetTabByTag("ordinary"):Enable(false)
+        main.tab_buttons:GetTabByTag("deluxe"):Enable(false)
+        main:DisableAutoClose(true)
         self.award =self.award or {} -- 抽到物品的图标和名字node,开启下次抽奖需移除
         local item_name = item[1]
         self.current_gacha_item_count = item[2]
@@ -295,7 +300,7 @@ function GameUIGacha:CreateGachaPool(layer)
         layer:EnAbleButton(false)
         local terminal_point
         for i,item in ipairs(items) do
-            if item:GetGachaItemName() == item_name then
+            if item:GetGachaItemName() == item_name and item:GetGachaItemCount()== self.current_gacha_item_count then
                 terminal_point = i
                 -- 存在抽到的道具box对象，以便之后获取其位置做抽到奖品动画效果
                 self.draw_item_box = item

@@ -79,7 +79,6 @@ function UIAutoClose:DisableAutoClose(disable)
     end
     self.disable = disable
 end
-
 function UIAutoClose:addCloseCleanFunc(func)
     self.clean_func=func
 end

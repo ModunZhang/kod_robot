@@ -94,6 +94,10 @@ function AllianceBattleScene:GotoLogicPosition(x, y, id)
     local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(x, y, id)
     return self:GetSceneLayer():PromiseOfMove(point.x, point.y)
 end
+function AllianceBattleScene:OnTouchBegan(...)
+    AllianceBattleScene.super.OnTouchBegan(self, ...)
+    self:GetSceneLayer():TrackCorpsById(nil)
+end
 function AllianceBattleScene:OnTouchClicked(pre_x, pre_y, x, y)
     if self.event_manager:TouchCounts() ~= 0 or 
         self.util_node:getNumberOfRunningActions() > 0 then 

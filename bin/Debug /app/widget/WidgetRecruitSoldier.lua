@@ -63,13 +63,11 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
 
     -- title label
     local size = title_blue:getContentSize()
-    self.title = cc.ui.UILabel.new({
+    self.title = UIKit:ttfLabel({
         size = 24,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0xffedae)
-    }):addTo(title_blue)
-        :align(display.LEFT_CENTER, 10, size.height/2)
+        color = 0xffedae
+    }):addTo(title_blue):align(display.LEFT_CENTER, 10, size.height/2)
 
 
     -- info
@@ -86,35 +84,31 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
 
     --
     local size = back_ground:getContentSize()
-    local label = cc.ui.UILabel.new({
+    local label = UIKit:ttfLabel({
         text = _("强势对抗"),
         size = 22,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0x5bb800)
-    }):addTo(back_ground, 2)
-        :align(display.LEFT_BOTTOM, label_origin_x -12 , size.height - 85 - 11)
+        color = 0x5bb800
+    }):addTo(back_ground, 2):align(display.LEFT_BOTTOM, label_origin_x -12 , size.height - 85 - 11)
 
     local vs_map = return_vs_soldiers_map(soldier_name)
     local strong_vs = {}
     for i, v in ipairs(vs_map.strong_vs) do
         table.insert(strong_vs, Localize.soldier_category[v])
     end
-    local soldier_name = cc.ui.UILabel.new({
+    local soldier_name = UIKit:ttfLabel({
         text = table.concat(strong_vs, ", "),
         size = 20,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0x403c2f)
+        color = 0x403c2f
     }):addTo(back_ground, 2)
         :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, size.height - 85 - 11)
 
-    local label = cc.ui.UILabel.new({
+    local label = UIKit:ttfLabel({
         text = _("弱势对抗"),
         size = 22,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0x890000)
+        color = 0x890000
     }):addTo(back_ground, 2)
         :align(display.LEFT_BOTTOM, label_origin_x-12, size.height - 120 - 11)
 
@@ -122,12 +116,11 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
     for i, v in ipairs(vs_map.weak_vs) do
         table.insert(weak_vs, Localize.soldier_category[v])
     end
-    local soldier_name = cc.ui.UILabel.new({
+    local soldier_name = UIKit:ttfLabel({
         text = table.concat(weak_vs, ", "),
         size = 20,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0x403c2f)
+        color = 0x403c2f
     }):addTo(back_ground, 2)
         :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, size.height - 120 - 11)
 
@@ -136,21 +129,20 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
     cc.ui.UIImage.new("res_food_91x74.png"):addTo(back_ground, 2)
         :align(display.CENTER, size.width - 133, size.height - 100):scale(0.4)
 
-    cc.ui.UILabel.new({
+    UIKit:ttfLabel({
         text = _("维护费"),
         size = 18,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0x615b44)
+        color = 0x615b44
     }):addTo(back_ground, 2)
         :align(display.LEFT_CENTER, size.width - 100, size.height - 90)
 
     -- upkeep
-    self.upkeep = cc.ui.UILabel.new({
+    self.upkeep = UIKit:ttfLabel({
+        text = "0",
         size = 20,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = UIKit:hex2c3b(0x403c2f)
+        color = 0x403c2f
     }):addTo(back_ground, 2)
         :align(display.CENTER, size.width - 75, size.height - 120)
 
@@ -187,20 +179,17 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
             local icon_iamge = cc.ui.UIImage.new(need_image):addTo(need, 2)
                 :align(display.CENTER, x, size.height - origin_y)
             icon_iamge:scale(38/icon_iamge:getContentSize().width)
-            local total = cc.ui.UILabel.new({
+            local total = UIKit:ttfLabel({
                 size = 20,
-                font = UIKit:getFontFilePath(),
                 align = cc.ui.TEXT_ALIGN_CENTER,
-                color = UIKit:hex2c3b(0x403c2f)
+                color = 0x403c2f
             }):addTo(need, 2)
                 :align(display.CENTER, x, size.height - origin_y - 36)
 
-            local need = cc.ui.UILabel.new({
+            local need = UIKit:ttfLabel({
                 size = 20,
-                font = UIKit:getFontFilePath(),
                 align = cc.ui.TEXT_ALIGN_CENTER,
-                color = UIKit:hex2c3b(0x403c2f)
-            -- color = display.COLOR_RED
+                color = 0x403c2f
             }):addTo(need, 2)
                 :align(display.CENTER, x, size.height - origin_y - 56)
             self.res_map[res_type] = { total = total, need = need }
@@ -225,20 +214,17 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
             cc.ui.UIImage.new(png):addTo(need, 2)
                 :align(display.CENTER, x, size.height - origin_y):scale(scale)
 
-            local total = cc.ui.UILabel.new({
+            local total = UIKit:ttfLabel({
                 size = 20,
-                font = UIKit:getFontFilePath(),
                 align = cc.ui.TEXT_ALIGN_CENTER,
-                color = UIKit:hex2c3b(0x403c2f)
+                color = 0x403c2f
             }):addTo(need, 2)
                 :align(display.CENTER, x, size.height - origin_y - 36)
 
-            local need = cc.ui.UILabel.new({
+            local need = UIKit:ttfLabel({
                 size = 20,
-                font = UIKit:getFontFilePath(),
                 align = cc.ui.TEXT_ALIGN_CENTER,
-                color = UIKit:hex2c3b(0x403c2f)
-            -- color = display.COLOR_RED
+                color = 0x403c2f
             }):addTo(need, 2)
                 :align(display.CENTER, x, size.height - origin_y - 56)
 
@@ -250,8 +236,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
         :SetSliderSize(445, 24)
         :OnSliderValueChanged(function(event)
             self:OnCountChanged(math.floor(event.value))
-        end)
-        :LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.RIGHT,0)
+        end):LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.RIGHT,0)
     self.slider_input = slider_input
 
     local ok = self:GetRecruitSpecialTime()
@@ -293,7 +278,7 @@ function WidgetRecruitSoldier:AddButtons()
             shadow = true
         }))
         :onButtonClicked(function(event)
-            if City:GetUser():GetGemResource():GetValue()< tonumber(self.gem_label:getString())then
+            if City:GetUser():GetGemResource():GetValue() < self:GetNeedGemWithInstantRecruit(self.count) then
                 UIKit:showMessageDialog(_("主人"),_("您当前没有足够金龙币")):CreateOKButton(
                     {
                         listener = function ()
@@ -325,7 +310,7 @@ function WidgetRecruitSoldier:AddButtons()
 
             if iskindof(display.getRunningScene(), "CityScene") then
                 display.getRunningScene():GetSceneLayer()
-                :MoveBarracksSoldiers(self.soldier_name)
+                    :MoveBarracksSoldiers(self.soldier_name)
             end
 
             self:Close()
@@ -337,14 +322,10 @@ function WidgetRecruitSoldier:AddButtons()
         :align(display.CENTER, -100, -50):scale(0.5)
 
     -- gem count
-    self.gem_label = cc.ui.UILabel.new({
+    self.gem_label = UIKit:ttfLabel({
         size = 18,
-        font = UIKit:getFontFilePath(),
-        align = cc.ui.TEXT_ALIGN_CENTER,
-        color = UIKit:hex2c3b(0x403c2f)
-    }):addTo(instant_button, 2)
-        :align(display.LEFT_CENTER, -100 + 20, -50)
-
+        color = 0x403c2f
+    }):addTo(instant_button, 2):align(display.LEFT_CENTER, -100 + 20, -50)
 
     -- 招募
     self.normal_button = WidgetPushButton.new(
@@ -407,46 +388,39 @@ function WidgetRecruitSoldier:AddButtons()
 
     -- 时间
     local center = -20
-    self.recruit_time = cc.ui.UILabel.new({
+    self.recruit_time = UIKit:ttfLabel({
         size = 18,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_CENTER,
-        color = UIKit:hex2c3b(0x403c2f)
-    }):addTo(anchorNode, 2)
-        :align(display.CENTER, center, -50)
+        color = 0x403c2f
+    }):addTo(anchorNode, 2):align(display.CENTER, center, -50)
 
-    self.recruit_buff_time = cc.ui.UILabel.new({
-        text = "(-00:00:00)",
+    self.recruit_buff_time = UIKit:ttfLabel({
         size = 18,
-        font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_CENTER,
-        color = UIKit:hex2c3b(0x068329)
-    }):addTo(anchorNode, 2)
-        :align(display.CENTER, center, -70)
+        color = 0x068329
+    }):addTo(anchorNode, 2):align(display.CENTER, center, -70)
 end
 function WidgetRecruitSoldier:onEnter()
     self:SetSoldier(self.soldier_name, self.star)
     self.count = 1
 
+    app.timer:AddListener(self)
     self.barracks:AddBarracksListener(self)
     self.city:GetResourceManager():AddObserver(self)
+    self.city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
 
     self:OnResourceChanged(self.city:GetResourceManager())
-    self:OnCountChanged(self.count)
-    local max = self:GetCurrentMaxRecruitNum(self.res_total_map)
-    self.slider_input:SetValue(max)
-
-    self.city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
-    app.timer:AddListener(self)
+    self.slider_input:SetValue(self:GetCurrentMaxRecruitNum(self.res_total_map))
+    self:OnCountChanged(self.slider_input:GetValue())
 
     if #WidgetRecruitSoldier.open_callbacks > 0 then
         table.remove(WidgetRecruitSoldier.open_callbacks, 1)(self)
     end
 end
 function WidgetRecruitSoldier:onExit()
+    app.timer:RemoveListener(self)
     self.barracks:RemoveBarracksListener(self)
     self.city:GetResourceManager():RemoveObserver(self)
-    app.timer:RemoveListener(self)
     self.city:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
     UIKit:getRegistry().removeObject(self.__cname)
 end
@@ -537,16 +511,10 @@ function WidgetRecruitSoldier:Close()
     return self
 end
 function WidgetRecruitSoldier:OnCountChanged(count)
-    -- 数量和时间
-    local soldier_config = self.soldier_config
-    local soldier_ui_config = self.soldier_ui_config
-    local total_time = soldier_config.recruitTime * count
-    -- self.soldier_current_count:setString(string.format("%d", count))
-    self.upkeep:setString(string.format("%s%d/%s", count > 0 and "-" or "", soldier_config.consumeFoodPerHour * count, _("小时")))
-    -- 检查资源
-    local need_resource = self:CheckNeedResource(self.res_total_map, count)
     self.count = count
-
+    local soldier_config = self.soldier_config
+    local total_time = soldier_config.recruitTime * count
+    self.upkeep:setString(string.format("%s%d/%s", count > 0 and "-" or "", soldier_config.consumeFoodPerHour * count, _("小时")))
     local ok = self:GetRecruitSpecialTime()
     if ok or not soldier_config.specialMaterials then
         -- 按钮
@@ -555,11 +523,19 @@ function WidgetRecruitSoldier:OnCountChanged(count)
         self.recruit_time:setString(GameUtils:formatTimeStyle1(total_time))
         local buff_str = string.format("(-%s)", GameUtils:formatTimeStyle1(DataUtils:getSoldierRecruitBuffTime(soldier_config.type,total_time)))
         self.recruit_buff_time:setString(buff_str)
+        self.gem_label:setString(string.formatnumberthousands(self:GetNeedGemWithInstantRecruit(count)))
+    end
+end
+function WidgetRecruitSoldier:GetNeedGemWithInstantRecruit(count)
+    local soldier_config = self.soldier_config
+    if not soldier_config.specialMaterials or (self:GetRecruitSpecialTime()) then
+        local need_resource = self:CheckNeedResource(self.res_total_map, count)
+        local total_time = soldier_config.recruitTime * count
         local gem_resource, buy = DataUtils:buyResource(need_resource, {})
         local gem_time = DataUtils:getGemByTimeInterval(total_time-DataUtils:getSoldierRecruitBuffTime(soldier_config.type,total_time))
-        self.gem_label:setString(gem_resource + gem_time)
+        return gem_resource + gem_time
     end
-
+    return 0
 end
 function WidgetRecruitSoldier:CheckNeedResource(total_resouce, count)
     local soldier_config = self.soldier_config
@@ -677,6 +653,7 @@ end
 function WidgetRecruitSoldier:PormiseOfFte()
     local fte_layer = self:getParent():GetFteLayer()
     fte_layer:Enable():SetTouchObject(self:Find())
+    self.gem_label:setString(0)
 
 
     local p = promise.new()
@@ -686,12 +663,12 @@ function WidgetRecruitSoldier:PormiseOfFte()
 
         if iskindof(display.getRunningScene(), "CityScene") then
             display.getRunningScene():GetSceneLayer()
-            :MoveBarracksSoldiers(self.soldier_name, true)
+                :MoveBarracksSoldiers(self.soldier_name, true)
         end
-        
+
         mockData.InstantRecruitSoldier(self.soldier_name, self.count)
 
-        
+
 
         self:getParent():LeftButtonClicked()
 
@@ -709,8 +686,12 @@ function WidgetRecruitSoldier:FindNormal()
     return self.normal_button
 end
 function WidgetRecruitSoldier:PromiseOfFteSpecial()
-    self:AddButtons()
-    self:OnCountChanged(self.count)
+    if not self.instant_button then
+        self:AddButtons()
+        self:OnCountChanged(self.count)
+    end    
+    self.gem_label:setString(0)
+
     local fte_layer = self:getParent():GetFteLayer()
     fte_layer:Enable():SetTouchObject(self:Find())
 
@@ -722,16 +703,16 @@ function WidgetRecruitSoldier:PromiseOfFteSpecial()
 
         if iskindof(display.getRunningScene(), "CityScene") then
             display.getRunningScene():GetSceneLayer()
-            :MoveBarracksSoldiers(self.soldier_name, true)
+                :MoveBarracksSoldiers(self.soldier_name, true)
         end
 
-        
+
         mockData.InstantRecruitSoldier(self.soldier_name, self.count)
 
-        
+
 
         self:getParent():LeftButtonClicked()
-        
+
         p:resolve()
     end)
 
@@ -749,6 +730,7 @@ end
 
 
 return WidgetRecruitSoldier
+
 
 
 

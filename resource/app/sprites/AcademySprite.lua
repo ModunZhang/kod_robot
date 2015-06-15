@@ -19,7 +19,7 @@ function AcademySprite:ctor(city_layer, entity, city)
     display.newNode():addTo(self):schedule(function()
         self:CheckEvent()
     end, 1)
-    self:StopAni()
+    self:CheckEvent()
 end
 function AcademySprite:RefreshSprite()
     AcademySprite.super.RefreshSprite(self)
@@ -28,18 +28,23 @@ end
 function AcademySprite:CheckEvent()
     if self:GetEntity():IsUnlocked() then
         if self:GetEntity():BelongCity():HaveProductionTechEvent() then
-            if self:getChildByTag(EMPTY_TAG) then
-                self:removeChildByTag(EMPTY_TAG)
-            end
-            if not self.event_ani then
-                self:PlayAni()
-            end
+            self:PlayWorkingAnimation()
         else
-            if self.event_ani then
-                self:StopAni()
-            end
             self:PlayEmptyAnimation()
         end
+    end
+end
+function AcademySprite:PlayWorkingAnimation()
+    if self:getChildByTag(EMPTY_TAG) then
+        self:removeChildByTag(EMPTY_TAG)
+        self:PlayAni()
+    end
+end
+function AcademySprite:PlayEmptyAnimation()
+    if not self:getChildByTag(EMPTY_TAG) then
+        local x,y = self:GetSprite():getPosition()
+        zz():addTo(self,1,EMPTY_TAG):pos(x + 50,y + 50)
+        self:StopAni()
     end
 end
 function AcademySprite:PlayAni()
@@ -47,20 +52,13 @@ function AcademySprite:PlayAni()
     animation:stop()
     animation:setSpeedScale(2)
     animation:playWithIndex(0)
-    self.event_ani = true
 end
 function AcademySprite:StopAni()
     self:GetAniArray()[1]:hide():getAnimation():stop()
-    self.event_ani = false
-end
-function AcademySprite:PlayEmptyAnimation()
-    if not self:getChildByTag(EMPTY_TAG) then
-        local x,y = self:GetSprite():getPosition()
-        zz():addTo(self,1,EMPTY_TAG):pos(x + 50,y + 50)
-    end
 end
 
 return AcademySprite
+
 
 
 

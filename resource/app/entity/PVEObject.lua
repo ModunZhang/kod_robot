@@ -74,8 +74,8 @@ end
 function PVEObject:GetNextEnemy()
     return self:GetEnemyByIndex(self.searched + 1)
 end
-function PVEObject:GetEnemyByIndex(index)
-    return self:DecodeToEnemy(self:GetEnemyInfo(index))
+function PVEObject:GetEnemyByIndex(index, force)
+    return self:DecodeToEnemy(self:GetEnemyInfo(index), force)
 end
 function PVEObject:GetEnemyInfo(index)
     local unique = self.type == PVEDefine.TRAP and random(#pve_normal) or (self.x * (self.y * 100) + (index + self.type))
@@ -87,7 +87,7 @@ function PVEObject:GetEnemyInfo(index)
         return pve_boss[self:Floor()]
     end
 end
-function PVEObject:DecodeToEnemy(raw_data)
+function PVEObject:DecodeToEnemy(raw_data, force)
     local raw_dragon
     local cur_floor_dragon_config = pve_dragon[self:Floor()]
     if normal_map[self.type] then
@@ -102,7 +102,7 @@ function PVEObject:DecodeToEnemy(raw_data)
     level = tonumber(level)
     local strength, vitality = dragonLevel[level].strength, dragonLevel[level].vitality
     local soldiers_raw = string.split(raw_data.soldiers, ";")
-    local rewards_raw = reward_map[self.type] or raw_data.rewards
+    local rewards_raw = force and raw_data.rewards or (reward_map[self.type] or raw_data.rewards)
     return {
         dragon = {
             level = level,

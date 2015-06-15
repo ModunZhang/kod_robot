@@ -63,9 +63,7 @@ function WidgetHomeBottom:ctor(city)
         end
     end
     display.newNode():addTo(self):schedule(function()
-        if math.random(app.timer:GetServerTime()) % 5 == 1 then
-            self:TipsOnTaskCount()
-        end
+        self:TipsOnTaskCount()
     end, 5)
 end
 function WidgetHomeBottom:onEnter()
@@ -102,7 +100,7 @@ function WidgetHomeBottom:TipsOnTaskCount()
         not self.task_count:isVisible() then
         return
     end
-    self.task_count:runAction(cc.JumpBy:create(0.5, cc.p(0,0), 10, 2))
+    self.task_count:runAction(cc.JumpBy:create(1, cc.p(0,0), 30, 3))
 end
 
 

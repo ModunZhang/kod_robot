@@ -17,15 +17,15 @@ function TouchJudgment:ctor(touch_handle)
     self.time_has_expired = 0
     self.one_touch_array = {}
     self.one_touch_begin = nil
-    self.time_handle = scheduler.scheduleUpdateGlobal(function(dt)
+
+    local touch_node = display.newNode():addTo(touch_handle)
+    touch_node:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
         local millisecond = dt * 1000
         self.time = self.time + millisecond
         self:UpdateExpireTime(millisecond)
         self:UpdateResistanceTime(millisecond)
     end)
-end
-function TouchJudgment:destructor()
-    scheduler.unscheduleGlobal(self.time_handle)
+    touch_node:scheduleUpdate()
 end
 function TouchJudgment:UpdateExpireTime(millisecond)
     if #self.one_touch_array > 0 then

@@ -149,13 +149,13 @@ function UpgradeBuilding:GetLevel()
 end
 
 function UpgradeBuilding:GeneralLocalPush()
-    -- local pushIdentity = self.x .. self.y .. self.w .. self.h .. self.orient
-    -- local title = format(_("修建%s到LV%d完成"),Localize.getLocaliedKeyByType(self.building_type),(self.level+1))
-    -- app:GetPushManager():UpdateBuildPush(self.upgrade_to_next_level_time,title,pushIdentity)
+    local pushIdentity = self.x .. self.y .. self.w .. self.h .. self.orient
+    local title = format(_("修建%s到LV%d完成"),Localize.getLocaliedKeyByType(self.building_type),(self.level+1))
+    app:GetPushManager():UpdateBuildPush(self.upgrade_to_next_level_time,title,pushIdentity)
 end
 function UpgradeBuilding:CancelLocalPush()
-    -- local pushIdentity = self.x .. self.y .. self.w .. self.h .. self.orient
-    -- app:GetPushManager():CancelBuildPush(pushIdentity)
+    local pushIdentity = self.x .. self.y .. self.w .. self.h .. self.orient
+    app:GetPushManager():CancelBuildPush(pushIdentity)
 end
 function UpgradeBuilding:IsNeedToUpdate()
     return self.upgrade_to_next_level_time ~= 0

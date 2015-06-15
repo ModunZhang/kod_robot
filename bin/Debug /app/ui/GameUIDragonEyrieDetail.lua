@@ -371,6 +371,7 @@ function GameUIDragonEyrieDetail:UpgradeDragonStar()
 
     if dragon:Star() == 4 then
         UIKit:showMessageDialog(_("提示"), _("5星上限即将开放!"), function()end)
+        return
     end
 
     NetManager:getUpgradeDragonStarPromise(dragon:Type())

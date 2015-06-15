@@ -550,8 +550,11 @@ function GameUIPVESendTroop:CreateTroopsShow()
                     -- 克制关系框
                     local pve_soldier = self.pve_soldiers[i]
                     if pve_soldier then
-                        local forbear_pic = self:GetForbear(name,pve_soldier.name) and "forbear_up.png" or "forbear_down.png"
-                        display.newSprite(forbear_pic):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2+5,soldier_head_icon:getContentSize().height/2+5):scale(1.22)
+                        local forbear =  self:GetForbear(name,pve_soldier.name)
+                        if forbear ~= "nil" then
+                            local forbear_pic = forbear and "forbear_up.png" or "forbear_down.png"
+                            display.newSprite(forbear_pic):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2+5,soldier_head_icon:getContentSize().height/2+5):scale(1.22)
+                        end
                     end
                 else
                     break
@@ -564,7 +567,8 @@ function GameUIPVESendTroop:CreateTroopsShow()
         local SOLDIER_VS_MAP = GameDatas.ClientInitGame.soldier_vs
         local my_category = Localize.soldier_category_map[my_soldier]
         local pve_category = Localize.soldier_category_map[pve_soldier]
-        return SOLDIER_VS_MAP[my_category][pve_category] == "strong"
+        local forbear = SOLDIER_VS_MAP[my_category][pve_category]
+        return tolua.type(forbear) == "nil" and "nil" or forbear == "strong"
     end
     function TroopsShow:TurnShows( isRight )
         local current_page = self:GetCurrentPage()
@@ -665,6 +669,7 @@ end
 
 
 return GameUIPVESendTroop
+
 
 
 

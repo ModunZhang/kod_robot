@@ -303,6 +303,10 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
         if addtion>0 then
             efficiency = string.format("%s+%d,",bd.dwelling_citizen,addtion)
         end
+         local addtion = building:GetNextLevelProductionPerHour()-building:GetProductionPerHour()
+        if addtion>0 then
+            efficiency = efficiency..string.format("%s+%d,",bd.dwelling_poduction,addtion)
+        end
     elseif self.building:GetType()=="woodcutter" then
         local addtion = building:GetNextLevelProductionPerHour()-building:GetProductionPerHour()
         if addtion>0 then

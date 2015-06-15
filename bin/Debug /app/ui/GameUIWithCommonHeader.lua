@@ -66,8 +66,11 @@ function GameUIWithCommonHeader:onEnter()
     end
 
 end
-function GameUIWithCommonHeader:DisableAutoClose()
-    self.disable_auto_close = true
+function GameUIWithCommonHeader:DisableAutoClose(disable)
+    if type(disable) ~= 'boolean'  then
+        disable = true
+    end
+    self.disable_auto_close = disable
     return self
 end
 function GameUIWithCommonHeader:onExit()

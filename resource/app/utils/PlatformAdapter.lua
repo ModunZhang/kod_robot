@@ -90,6 +90,96 @@ function PlatformAdapter:mac()
         filePath = string.gsub(filePath,"animations/","animations_mac/")
         return filePath
     end
+
+
+
+    local path = device.writablePath.."tmp"
+    local function ensureTmpDir()
+        os.execute(string.format('\nif [ ! -d "%s" ]; then\nmkdir %s\nfi\n', path, path))
+    end
+    local function getPid()
+        os.execute(string.format('echo $PPID > %s', path.."/p.d"))
+        local f = io.open(path.."/p.d", "r")
+        if not f then return {} end
+        local pids = f:read("*all")
+        f:close()
+        os.execute(string.format('rm -f %s', path.."/p.d"))
+        local r = {}
+        for i,v in ipairs(string.split(pids, "\n")) do
+            if #string.trim(v) > 0 then
+                table.insert(r, tonumber(v))
+            end
+        end
+        return r[1]
+    end
+    local function getKodPids()
+        os.execute(string.format("ps -e|grep player3|grep kod|grep -v 'grep'|awk '{print $1}' > %s", path.."/player3.d"))
+        local f = io.open(path.."/player3.d", "r")
+        if not f then return {} end
+        local pids = f:read("*all")
+        f:close()
+        os.execute(string.format('rm -f %s', path.."/player3.d"))
+        local r = {}
+        for i,v in ipairs(string.split(pids, "\n")) do
+            if #string.trim(v) > 0 then
+                r[tonumber(v)] = true
+            end
+        end
+        return r
+    end
+    local function getPidMap()
+        os.execute(string.format("touch %s", path.."/map.d"))
+        local f = io.open(path.."/map.d", "rw+")
+        local pid_map = f:read("*all")
+        local r = {}
+        for i,v in ipairs(string.split(pid_map, "\n")) do
+            if #string.trim(v) > 0  then
+                local spid,sindex = unpack(string.split(string.trim(v), ","))
+                r[tonumber(spid)] = tonumber(sindex)
+            end
+        end
+        f:close()
+        return r
+    end
+    local function sourcePidMap(map)
+        os.execute(string.format("touch %s", path.."/map.d"))
+        local f = io.open(path.."/map.d", "w")
+        for k,v in pairs(map) do
+            f:write(string.format("%s,%s\n", k,v))
+        end
+        f:close()
+    end
+
+
+    ensureTmpDir()
+    local kod_pids_map = getKodPids()
+    -- dump(kod_pids_map)
+    local run_pids_map = getPidMap()
+    -- dump(run_pids_map)
+    local indexes = {}
+    for k,v in pairs(run_pids_map) do
+        if not kod_pids_map[k] then
+            run_pids_map[k] = nil
+        else
+            table.insert(indexes, v)
+        end
+    end
+    table.sort(indexes, function(a,b) return a < b end)
+    -- dump(indexes)
+    local pid_array = {}
+    for i,v in ipairs(indexes) do
+        pid_array[v] = true
+    end
+    local pid = getPid()
+    run_pids_map[pid] = #pid_array + 1
+    -- dump(run_pids_map)
+    sourcePidMap(run_pids_map)
+
+
+    local getOpenUDID = device.getOpenUDID
+    device.getOpenUDID = function()
+        return getOpenUDID().."_"..run_pids_map[pid]
+    end
 end
 
 

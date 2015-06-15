@@ -85,7 +85,7 @@ function WidgetDragons:IsScrollable()
 end
 
 function WidgetDragons:onExit()
-    self.touch_judgment:destructor()
+    
 end
 local auto_speed = 200
 function WidgetDragons:UpdatePosition(dt)

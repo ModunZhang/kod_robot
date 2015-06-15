@@ -32,7 +32,7 @@ function WidgetPVEFteMiner:PormiseOfFte()
             if index == 1 then
                 return self:DecodeToEnemy(self:GetEnemyInfo(index))
             end
-            return self:DecodeToEnemy(fte[index - 1])
+            return self:DecodeToEnemy(fte[index - 1], true)
         end
 
         local enemy = obj:GetNextEnemy()

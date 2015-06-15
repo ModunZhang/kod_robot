@@ -112,10 +112,10 @@ function MailManager:GetUnReadMailsAndReportsNum()
     return self.unread_mail + self.unread_report
 end
 function MailManager:GetUnReadMailsNum()
-    return self.unread_mail
+    return self.unread_mail or 0
 end
 function MailManager:GetUnReadReportsNum()
-    return self.unread_report
+    return self.unread_report or 0
 end
 function MailManager:AddSavedMail(mail)
     table.insert(self.savedMails,1, mail)

@@ -29,6 +29,7 @@ function MyApp:ctor()
     NetManager:init()
     self.GameDefautlt_ = GameDefautlt.new()
     self.ChatManager_  = ChatManager.new(self:GetGameDefautlt())
+    self:GetUpdateFile()
     self.timer = Timer.new()
     app = self
     app.GetPushManager = function()
@@ -43,7 +44,18 @@ end
 function MyApp:GetChatManager()
     return self.ChatManager_
 end
+function MyApp:GetUpdateFile()
+    -- local t = io.popen("curl 54.223.172.65:3000/update/res/fileList.json")
+    -- local msg = t:read("*all")
+    -- t:close()
+    -- local serverFileList = json.decode(msg)
 
+    self.client_tag = 4983
+    --注意这里debug模式和mac上再次重写了ext.getAppVersion
+    ext.getAppVersion = function()
+        return 1.0
+    end
+end
 function MyApp:run()
     local file = io.open("log", "a+")
 
@@ -51,11 +63,15 @@ function MyApp:run()
         file:write("login : "..device.getOpenUDID().."\n")
         io.close(file)
     end
+    print("run 1")
     NetManager:getConnectGateServerPromise():next(function()
+        print("run 2")
         return NetManager:getLogicServerInfoPromise()
     end):next(function()
+        print("run 3")
         return NetManager:getConnectLogicServerPromise()
     end):next(function()
+        print("run 4")
         return NetManager:getLoginPromise(device.getOpenUDID())
     end):next(function()
         if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
@@ -139,6 +155,8 @@ function MyApp:IsBuildingUnLocked(location_id)
 end
 
 return MyApp
+
+
 
 
 

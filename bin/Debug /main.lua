@@ -97,6 +97,13 @@ printLog = function ( ... )
 end
 
 
+function getUpdateFile()
+    local t = io.popen("curl 54.223.172.65:3000/update/res/fileList.json")
+    local a = t:read("*all")
+    t:close()
+    return a
+end
+
 require("config")
 require("functions")
 require("json")

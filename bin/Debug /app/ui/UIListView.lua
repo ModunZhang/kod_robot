@@ -110,7 +110,7 @@ function UIListView:ctor(params)
     else
         self.needTips = true
     end
-     self.isTipsStringShow = false
+    self.isTipsStringShow = false
 end
 
 function UIListView:onCleanup()
@@ -979,6 +979,7 @@ function UIListView:asyncLoadWithCurrentPosition_()
     for i = current_min_index, current_max_index do
         if i > count then
             self:unloadOneItem_(i)
+            self:scrollAuto()
         else
             self:callAsyncLoadDelegate_(self, UIListView.ASY_REFRESH , i)
         end
@@ -1446,6 +1447,8 @@ end
 
 
 return UIListView
+
+
 
 
 

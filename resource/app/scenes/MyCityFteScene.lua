@@ -217,7 +217,7 @@ function MyCityFteScene:OpenUI(building, default_tab)
         end
         app:GetAudioManager():PlayeEffectSoundWithKey("AIRSHIP")
     elseif type_ == "FairGround" then
-        UIKit:newGameUI("GameUIGacha", self.city):AddToScene(self, true):DisableAutoClose()
+        UIKit:newGameUI("GameUIGacha", self.city):AddToScene(self, true)
     elseif type_ == "square" then
         UIKit:newGameUI("GameUISquare", self.city):AddToScene(self, true)
     else

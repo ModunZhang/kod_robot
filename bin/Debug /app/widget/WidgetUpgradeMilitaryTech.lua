@@ -178,34 +178,34 @@ function WidgetUpgradeMilitaryTech:UpgradeRequirement()
         {
             resource_type = Localize.fight_reward.coin,
             isVisible = level_up_config.coin>0,
-            isSatisfy = current_coin>level_up_config.coin,
+            isSatisfy = current_coin >= level_up_config.coin,
             icon=UILib.resource.coin,description=current_coin..'/'..level_up_config.coin
         },
         {
             resource_type = Localize.sell_type.trainingFigure,
             isVisible = level_up_config.trainingFigure>0,
-            isSatisfy = has_materials.trainingFigure>level_up_config.trainingFigure,
+            isSatisfy = has_materials.trainingFigure >= level_up_config.trainingFigure,
             icon=UILib.materials.trainingFigure,
             description=has_materials.trainingFigure..'/'..level_up_config.trainingFigure
         },
         {
             resource_type = Localize.sell_type.bowTarget,
             isVisible = level_up_config.bowTarget>0,
-            isSatisfy = has_materials.bowTarget>level_up_config.bowTarget,
+            isSatisfy = has_materials.bowTarget >= level_up_config.bowTarget,
             icon=UILib.materials.bowTarget,
             description=has_materials.bowTarget..'/'..level_up_config.bowTarget
         },
         {
             resource_type = Localize.sell_type.saddle,
             isVisible = level_up_config.saddle>0,
-            isSatisfy = has_materials.saddle>level_up_config.saddle,
+            isSatisfy = has_materials.saddle >= level_up_config.saddle,
             icon=UILib.materials.saddle,
             description=has_materials.saddle..'/'..level_up_config.saddle
         },
         {
             resource_type = Localize.sell_type.ironPart,
             isVisible = level_up_config.ironPart>0,
-            isSatisfy = has_materials.ironPart>level_up_config.ironPart,
+            isSatisfy = has_materials.ironPart >= level_up_config.ironPart,
             icon=UILib.materials.ironPart,
             description=has_materials.ironPart..'/'..level_up_config.ironPart
         },

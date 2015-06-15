@@ -85,6 +85,7 @@ function HelpEvent:UpdateData(json_data)
                 end
                 local name = Alliance_Manager:GetMyAlliance():GetMemeberById(new_help_member):Name()
                 GameGlobalUI:showTips(_("提示"),string.format(_("%s帮助升级%s成功"),name,event_name))
+                app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
                 break
             end
         end

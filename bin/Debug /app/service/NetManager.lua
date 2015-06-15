@@ -503,7 +503,8 @@ end
 -- 获取服务器列表
 function NetManager:getLogicServerInfoPromise()
     local device_id = device.getOpenUDID()
-    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {deviceId = device_id, tag = 4983}, "获取逻辑服务器失败",true)
+    
+    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {deviceId = device_id,tag = app.client_tag}, "获取逻辑服务器失败",true)
         :done(function(result)
             self:CleanAllEventListeners()
             self.m_netService:disconnect()
@@ -539,9 +540,9 @@ function NetManager:getLoginPromise(deviceId)
             local user_alliance_data = response.msg.allianceData
             local user_enemy_alliance_data = response.msg.enemyAllianceData
 
-            local diff_time = ext.now() - requestTime 
+            local diff_time = ext.now() - requestTime
             local request_server_time = requestTime + playerData.deltaTime
-            local real_server_time = diff_time / 2 + request_server_time  
+            local real_server_time = diff_time / 2 + request_server_time
             local delta_time = real_server_time - ext.now()
 
             -- print_(requestTime, diff_time, playerData.deltaTime, delta_time, request_server_time, real_server_time)
@@ -950,12 +951,16 @@ end
 function NetManager:getHelpAllianceMemberSpeedUpPromise(eventId)
     return get_none_blocking_request_promise("logic.allianceHandler.helpAllianceMemberSpeedUp", {
         eventId = eventId,
-    }, "协助玩家加速失败!"):done(get_player_response_msg)
+    }, "协助玩家加速失败!"):done(get_player_response_msg):done(function()
+        app:GetAudioManager():PlayeEffectSoundWithKey("USE_ITEM")
+    end)
 end
 -- 协助所有玩家加速
 function NetManager:getHelpAllAllianceMemberSpeedUpPromise()
     return get_none_blocking_request_promise("logic.allianceHandler.helpAllAllianceMemberSpeedUp", {}
-        , "协助所有玩家加速失败!"):done(get_player_response_msg)
+        , "协助所有玩家加速失败!"):done(get_player_response_msg):done(function()
+        app:GetAudioManager():PlayeEffectSoundWithKey("USE_ITEM")
+        end)
 end
 -- 解锁玩家第二条行军队列
 function NetManager:getUnlockPlayerSecondMarchQueuePromise()
@@ -1623,7 +1628,7 @@ function NetManager:getFirstJoinAllianceRewardPromise()
 end
 --获取玩家城墙血量
 function NetManager:getPlayerWallInfoPromise(memberId)
-    return get_blocking_request_promise("logic.playerHandler.getPlayerWallInfo",{memberId = memberId},"领取首次加入联盟奖励失败!")
+    return get_blocking_request_promise("logic.playerHandler.getPlayerWallInfo",{memberId = memberId},"获取玩家城墙血量失败!")
 end
 --设置玩家语言
 function NetManager:getSetPlayerLanguagePromise(language_code)
@@ -1682,6 +1687,7 @@ function NetManager:downloadFile(fileInfo, cb, progressCb)
         progressCb(totalSize, currentSize)
     end)
 end
+
 
 
 

@@ -159,7 +159,7 @@ function GameUILoginBeta:showVersion()
     if  CONFIG_IS_DEBUG or device.platform == 'mac' then
         local __debugVer = require("debug_version")
         self.verLabel:setString(string.format(_("版本%s(%s)"), ext.getAppVersion(), __debugVer))
-        app.client_tag = __debugVer
+        -- app.client_tag = __debugVer
     else
         local jsonPath = cc.FileUtils:getInstance():fullPathForFilename("fileList.json")
         local file = io.open(jsonPath)
@@ -178,6 +178,22 @@ end
 function GameUILoginBeta:OnMoveInStage()
     self:showVersion()
     if CONFIG_IS_DEBUG or device.platform == 'mac' then
+        if not app.client_tag then
+            NetManager:getUpdateFileList(function(success, msg)
+                    if not success then
+                        device.showAlert(_("错误"), _("检查游戏更新失败!"), { _("确定") },function(event)
+                            app:restart(false)
+                        end)
+                        return
+                    end
+                    local serverFileList = json.decode(msg)
+                    app.client_tag = serverFileList.tag
+                    --注意这里debug模式和mac上再次重写了ext.getAppVersion
+                    ext.getAppVersion = function()
+                        return serverFileList.appVersion
+                    end
+            end)
+        end
     	self:loadLocalResources()
     else
     	self:loadLocalJson()
@@ -258,19 +274,32 @@ function GameUILoginBeta:getLogicServerInfo()
         end, 0.5) 
     end):catch(function(err)
         local content, title = err:reason()
+        local need_restart = false
         if title == 'timeout' then
             content = _("请求超时")
         else
             local code = content.code 
-            if UIKit:getErrorCodeKey(code) == "serverUnderMaintain" then
+            if code == 508 then
                 content = _("服务器维护中")
+                need_restart = false
+            elseif code == 691 then
+                content = _("游戏版本验证失败")
+                need_restart = true
+            elseif code == 692 then
+                content = _("游戏版本不匹配")
+                need_restart = true
             else
                 content = _("获取游戏服务器信息失败!")
+                need_restart = false
             end
         end
         dump(err:reason())
         self:showError(content,function()
-        	self:connectGateServer()
+            if need_restart then
+                app:restart(false)
+            else
+        	   self:connectGateServer()
+            end
         end)
     end)
 end
@@ -371,9 +400,10 @@ function GameUILoginBeta:getUpdateFileList()
     self.m_currentSize = 0
     local localFileList = json.decode(self.m_localJson)
     local serverFileList = json.decode(self.m_serverJson)
-    local localAppVersion = ext.getAppVersion() 
-    local serverAppVersion = serverFileList.appVersion
-    if localAppVersion < serverAppVersion then
+    local localAppVersion = tonumber(ext.getAppVersion())
+    local serverMinAppVersion = tonumber(serverFileList.appMinVersion)
+    local serverAppVersion = tonumber(serverFileList.appVersion)
+    if localAppVersion < serverMinAppVersion then
         device.showAlert(_("错误"), _("游戏版本过低,请更新!"), { _("确定") }, function(event)
             if CONFIG_IS_DEBUG then
                 device.openURL("https://batcat.sinaapp.com/ad_hoc/build-index.html")
@@ -384,6 +414,14 @@ function GameUILoginBeta:getUpdateFileList()
         end)
         return
     end
+
+    if localAppVersion > serverAppVersion then
+        device.showAlert(_("错误"), _("服务器正在部署,请稍候!"), { _("确定") }, function(event)
+            self:loadServerJson()
+        end)
+        return
+    end
+
 
     local updateFileList = {}
     for k, v in pairs(serverFileList.files) do
