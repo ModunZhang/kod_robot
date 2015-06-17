@@ -21,6 +21,104 @@ function AllianceApi:JoinAlliance(id)
         return NetManager:getJoinAllianceDirectlyPromise(id)
     end
 end
+function AllianceApi:RequestToJoinAlliance()
+    -- 从聊天中找到一个需要申请加入的联盟
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if alliance:IsDefault() then
+        NetManager:getFetchChatPromise("global"):done(function(response)
+            local chat_data = response.msg.chats
+            local chat_count = #chat_data
+            local call_over = true
+            local call_count = 1
+            while call_count <= chat_count and call_over do
+                call_over = false
+                local chat = chat_data[call_count]
+                print("chat.allianceTag=",chat.allianceTag)
+                if chat.allianceTag ~="" then
+                    NetManager:getSearchAllianceByTagPromsie(chat.allianceTag):done(function ( response )
+                        local data = response.msg.allianceDatas[1]
+                        print("data.joinType ",data.joinType ~= "all",data.joinType )
+                        if data.joinType ~= "all" then
+                            dump(User:RequestToAllianceEvents(),"User:RequestToAllianceEvents()")
+                            local is_requested = false
+                            for i,v in ipairs(User:RequestToAllianceEvents()) do
+                                if v.id == data.id  then
+                                    is_requested = true
+                                end
+                            end
+                            if not is_requested then
+                                NetManager:getRequestToJoinAlliancePromise(data.id):always(function ()
+                                    call_count = call_count + 1
+                                    call_over = true
+                                    print("getRequestToJoinAlliancePromise!!!!!!!!!")
+                                end)
+                            else
+                                call_count = call_count + 1
+                                call_over = true
+                            end
+                        else
+                            call_count = call_count + 1
+                            call_over = true
+                        end
+                    end)
+                else
+                    call_count = call_count + 1
+                    call_over = true
+                end
+            end
+        end)
+    end
+end
+function AllianceApi:CancelJoinAlliance()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if alliance:IsDefault() and math.random(100) < 5 then
+        for i,v in ipairs(User:RequestToAllianceEvents()) do
+            return NetManager:getCancelJoinAlliancePromise(v.id)
+        end
+    end
+end
+function AllianceApi:ApproveOrRejectJoinAllianceRequest()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() and alliance:GetSelf():CanHandleAllianceApply()then
+        NetManager:getJoinRequestEventsPromise(alliance:Id()):done(function ( response )
+            local joinRequestEvents = response.msg.joinRequestEvents
+            for i,v in ipairs(joinRequestEvents) do
+                if math.random(2) == 2 then
+                    print("getApproveJoinAllianceRequestPromise")
+                    NetManager:getApproveJoinAllianceRequestPromise(v.id)
+                else
+                    print("getRemoveJoinAllianceReqeustsPromise")
+                    NetManager:getRemoveJoinAllianceReqeustsPromise({v.id})
+                end
+                break
+            end
+        end)
+    end
+end
+function AllianceApi:InviteToJoinAlliance()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() and alliance:GetSelf():CanInvatePlayer()then
+        NetManager:getFetchChatPromise("global"):done(function(response)
+            local chat_data = response.msg.chats
+            local chat_count = #chat_data
+            local call_over = true
+            local call_count = 1
+            while call_count <= chat_count and call_over do
+                call_over = false
+                local chat = chat_data[call_count]
+                if chat.allianceTag == "" and chat.id ~= User:Id() then
+                    NetManager:getInviteToJoinAlliancePromise(chat.id):always(function ()
+                        call_count = call_count + 1
+                        call_over = true
+                    end)
+                else
+                    call_count = call_count + 1
+                    call_over = true
+                end
+            end
+        end)
+    end
+end
 function AllianceApi:getQuitAlliancePromise()
     if not Alliance_Manager:GetMyAlliance():IsDefault() and
         Alliance_Manager:GetMyAlliance():Status() ~= "prepare" and
@@ -184,6 +282,7 @@ function AllianceApi:EditAllianceInfo()
     local me = alliance:GetSelf()
     if not alliance:IsDefault()  and alliance:Status() ~= "fight" and alliance:Status() ~= "prepare" then
         local excute_fun = math.random(100)
+        -- local excute_fun = 9
         if excute_fun <= 5 then
             local need_honour =GameDatas.AllianceInitData.intInit.editAllianceTerrianHonour.value
             if me:CanEditAlliance() and need_honour <= alliance:Honour() then
@@ -203,11 +302,11 @@ function AllianceApi:EditAllianceInfo()
         elseif excute_fun <= 10 then
             if me:CanEditAllianceJoinType() then
                 if alliance:JoinType() == "all" then
-                -- print("修改联盟加入type到:audit")
-                -- return NetManager:getEditAllianceJoinTypePromise("audit")
+                    print("修改联盟加入type到:audit")
+                    return NetManager:getEditAllianceJoinTypePromise("audit")
                 else
-                    print("修改联盟加入type到:all")
-                    return NetManager:getEditAllianceJoinTypePromise("all")
+                -- print("修改联盟加入type到:all")
+                -- return NetManager:getEditAllianceJoinTypePromise("all")
                 end
             end
         elseif excute_fun <= 15 then
@@ -469,7 +568,8 @@ function AllianceApi:GetGift()
 end
 -- 获取首次加入联盟奖励
 function AllianceApi:FirstJoinAllianceReward()
-    if not User:GetCountInfo().firstJoinAllianceRewardGeted then
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not User:GetCountInfo().firstJoinAllianceRewardGeted and not alliance:IsDefault() then
         return NetManager:getFirstJoinAllianceRewardPromise()
     end
 end
@@ -478,41 +578,26 @@ local function setRun()
 end
 
 -- 联盟方法组
-local function JoinAlliance()
-    if Alliance_Manager:GetMyAlliance():IsDefault() then
-        local page = 0
-        local joined = false
-        local function join()
-            if joined then
-                return
-            end
-            NetManager:getFetchCanDirectJoinAlliancesPromise(page):done(function(response)
-                if not response.msg or not response.msg.allianceDatas then
-                    setRun()
-                    return
-                end
-                if response.msg.allianceDatas then
-                    if #response.msg.allianceDatas == 0 then
-                        setRun()
-                        return
-                    end
-                    for i,find_alliance in ipairs(response.msg.allianceDatas) do
-                        if find_alliance.members < find_alliance.membersMax then
-                            local find_id = find_alliance.id
-                            local p = AllianceApi:JoinAlliance(find_id)
-                            if p then
-                                p:always(setRun)
-                                joined = true
-                                return
-                            end
-                        end
-                    end
-                    page = page + 10
-                    join()
-                end
-            end)
-        end
-        join()
+local function RequestToJoinAlliance()
+    local p = AllianceApi:RequestToJoinAlliance()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function ApproveOrRejectJoinAllianceRequest()
+    local p = AllianceApi:ApproveOrRejectJoinAllianceRequest()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
+local function InviteToJoinAlliance()
+    local p = AllianceApi:InviteToJoinAlliance()
+    if p then
+        p:always(setRun)
     else
         setRun()
     end
@@ -525,6 +610,55 @@ local function CreateAlliance()
         setRun()
     end
 end
+
+local function JoinAlliance()
+    if Alliance_Manager:GetMyAlliance():IsDefault() then
+        -- 没有联盟前的操作
+        local excute = math.random(100)
+        if excute < 10 then
+            local page = 0
+            local joined = false
+            local function join()
+                if joined then
+                    return
+                end
+                NetManager:getFetchCanDirectJoinAlliancesPromise(page):done(function(response)
+                    if not response.msg or not response.msg.allianceDatas then
+                        setRun()
+                        return
+                    end
+                    if response.msg.allianceDatas then
+                        if #response.msg.allianceDatas == 0 then
+                            setRun()
+                            return
+                        end
+                        for i,find_alliance in ipairs(response.msg.allianceDatas) do
+                            if find_alliance.members < find_alliance.membersMax then
+                                local find_id = find_alliance.id
+                                local p = AllianceApi:JoinAlliance(find_id)
+                                if p then
+                                    p:always(setRun)
+                                    joined = true
+                                    return
+                                end
+                            end
+                        end
+                        page = page + 10
+                        join()
+                    end
+                end)
+            end
+            join()
+        elseif excute < 98 then
+            RequestToJoinAlliance()
+        else
+            CreateAlliance()
+        end
+    else
+        setRun()
+    end
+end
+
 local function RequestSpeedUp()
     local p = AllianceApi:RequestSpeedUp()
     if p then
@@ -637,13 +771,22 @@ local function FirstJoinAllianceReward()
         setRun()
     end
 end
-
+local function CancelJoinAlliance()
+    local p = AllianceApi:CancelJoinAlliance()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 
 
 return {
     setRun,
     JoinAlliance,
-    CreateAlliance,
+    ApproveOrRejectJoinAllianceRequest,
+    InviteToJoinAlliance,
+    CancelJoinAlliance,
     RequestSpeedUp,
     HelpSpeedUp,
     Contribute,
@@ -659,6 +802,18 @@ return {
     GetGift,
     FirstJoinAllianceReward,
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
