@@ -161,6 +161,19 @@ function AllianceFightApi:March()
             "retreatHelped", -- 撤防
         }
         local excute = march_types[math.random(#march_types)]
+        if alliance:Status()=="fight" then
+            local reRandom = math.random(10)
+            if reRandom < 5 then
+                excute = "attackCity"
+            elseif reRandom < 6 then
+                excute = "retreatHelped"
+            elseif reRandom < 7 then
+                excute = "enemyVillage"
+            else
+                excute = "strikeCity"
+            end
+        end
+
         if excute == "attackCity" and not alliance:GetAllianceBelvedere():IsReachEventLimit() then
             -- 攻打城市
             if alliance:Status()=="fight" and #fight_soldiers > 0 and dragonType then
