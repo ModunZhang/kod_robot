@@ -548,7 +548,7 @@ function AllianceApi:BuyAllianceItem()
         if item:IsAdvancedItem() and not alliance:GetSelf():CanBuyAdvancedItemsFromAllianceShop() then
             return
         end
-        if User:Loyalty() >= item:SellPriceInAlliance() then
+        if User:Loyalty() >= item:SellPriceInAlliance() and item:Count() > 0 then
             print("购买联盟商店道具：",item:Name())
             return NetManager:getBuyAllianceItemPromise(item:Name(),1)
         else
