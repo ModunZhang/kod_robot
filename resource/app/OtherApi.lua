@@ -316,7 +316,9 @@ function OtherApi:Chat()
     else
         channel = channels[math.random(1)]
     end
-    return NetManager:getSendChatPromise(channel,"你们这群渣渣！！！！")
+    if math.random(10) < 3 then
+        return NetManager:getSendChatPromise(channel,"我是"..User:Name())
+    end
 end
 local function setRun()
     app:setRun()

@@ -120,7 +120,7 @@ function AllianceFightApi:March()
         local dragonWidget = 0
         local dragon
         for k,d in pairs(dragon_manager:GetDragons()) do
-            if d:Status()=="free" and not d:IsDead() then
+            if d:Status() == "free" and not d:IsDead() and d:Ishated() then
                 if d:GetWeight() > dragonWidget then
                     dragonWidget = d:GetWeight()
                     dragonType = k
@@ -300,7 +300,7 @@ function AllianceFightApi:March()
             local player = can_help_member[math.random(#can_help_member)]
             local playerId = player:Id()
 
-            if playerId then
+            if playerId and not City:IsHelpedToTroopsWithPlayerId(playerId) then
                 print("协防玩家城市:",player:Name())
                 print("协防玩家城市,派出龙:",dragonType)
                 dump(fight_soldiers,"协防玩家城市,派出士兵")
