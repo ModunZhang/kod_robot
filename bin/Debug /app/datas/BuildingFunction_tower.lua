@@ -7,7 +7,7 @@ tower[1] = {
 	["archer"] = 11,
 	["cavalry"] = 11,
 	["siege"] = 11,
-	["defencePower"] = 22
+	["defencePower"] = 44
 }
 tower[2] = {
 	["level"] = 2,
@@ -16,7 +16,7 @@ tower[2] = {
 	["archer"] = 12,
 	["cavalry"] = 12,
 	["siege"] = 12,
-	["defencePower"] = 24
+	["defencePower"] = 48
 }
 tower[3] = {
 	["level"] = 3,
@@ -25,7 +25,7 @@ tower[3] = {
 	["archer"] = 13,
 	["cavalry"] = 13,
 	["siege"] = 13,
-	["defencePower"] = 26
+	["defencePower"] = 52
 }
 tower[4] = {
 	["level"] = 4,
@@ -34,7 +34,7 @@ tower[4] = {
 	["archer"] = 14,
 	["cavalry"] = 14,
 	["siege"] = 14,
-	["defencePower"] = 28
+	["defencePower"] = 56
 }
 tower[5] = {
 	["level"] = 5,
@@ -43,7 +43,7 @@ tower[5] = {
 	["archer"] = 15,
 	["cavalry"] = 15,
 	["siege"] = 15,
-	["defencePower"] = 30
+	["defencePower"] = 60
 }
 tower[6] = {
 	["level"] = 6,
@@ -52,7 +52,7 @@ tower[6] = {
 	["archer"] = 16,
 	["cavalry"] = 16,
 	["siege"] = 16,
-	["defencePower"] = 32
+	["defencePower"] = 64
 }
 tower[7] = {
 	["level"] = 7,
@@ -61,7 +61,7 @@ tower[7] = {
 	["archer"] = 17,
 	["cavalry"] = 17,
 	["siege"] = 17,
-	["defencePower"] = 34
+	["defencePower"] = 68
 }
 tower[8] = {
 	["level"] = 8,
@@ -70,7 +70,7 @@ tower[8] = {
 	["archer"] = 18,
 	["cavalry"] = 18,
 	["siege"] = 18,
-	["defencePower"] = 36
+	["defencePower"] = 72
 }
 tower[9] = {
 	["level"] = 9,
@@ -79,7 +79,7 @@ tower[9] = {
 	["archer"] = 19,
 	["cavalry"] = 19,
 	["siege"] = 19,
-	["defencePower"] = 38
+	["defencePower"] = 76
 }
 tower[10] = {
 	["level"] = 10,
@@ -88,7 +88,7 @@ tower[10] = {
 	["archer"] = 20,
 	["cavalry"] = 20,
 	["siege"] = 20,
-	["defencePower"] = 40
+	["defencePower"] = 80
 }
 tower[11] = {
 	["level"] = 11,
@@ -97,7 +97,7 @@ tower[11] = {
 	["archer"] = 21,
 	["cavalry"] = 21,
 	["siege"] = 21,
-	["defencePower"] = 42
+	["defencePower"] = 84
 }
 tower[12] = {
 	["level"] = 12,
@@ -106,7 +106,7 @@ tower[12] = {
 	["archer"] = 22,
 	["cavalry"] = 22,
 	["siege"] = 22,
-	["defencePower"] = 44
+	["defencePower"] = 88
 }
 tower[13] = {
 	["level"] = 13,
@@ -115,7 +115,7 @@ tower[13] = {
 	["archer"] = 23,
 	["cavalry"] = 23,
 	["siege"] = 23,
-	["defencePower"] = 46
+	["defencePower"] = 92
 }
 tower[14] = {
 	["level"] = 14,
@@ -124,7 +124,7 @@ tower[14] = {
 	["archer"] = 24,
 	["cavalry"] = 24,
 	["siege"] = 24,
-	["defencePower"] = 48
+	["defencePower"] = 96
 }
 tower[15] = {
 	["level"] = 15,
@@ -133,7 +133,7 @@ tower[15] = {
 	["archer"] = 25,
 	["cavalry"] = 25,
 	["siege"] = 25,
-	["defencePower"] = 50
+	["defencePower"] = 100
 }
 tower[16] = {
 	["level"] = 16,
@@ -142,7 +142,7 @@ tower[16] = {
 	["archer"] = 26,
 	["cavalry"] = 26,
 	["siege"] = 26,
-	["defencePower"] = 52
+	["defencePower"] = 104
 }
 tower[17] = {
 	["level"] = 17,
@@ -151,7 +151,7 @@ tower[17] = {
 	["archer"] = 27,
 	["cavalry"] = 27,
 	["siege"] = 27,
-	["defencePower"] = 54
+	["defencePower"] = 108
 }
 tower[18] = {
 	["level"] = 18,
@@ -160,7 +160,7 @@ tower[18] = {
 	["archer"] = 28,
 	["cavalry"] = 28,
 	["siege"] = 28,
-	["defencePower"] = 56
+	["defencePower"] = 112
 }
 tower[19] = {
 	["level"] = 19,
@@ -169,7 +169,7 @@ tower[19] = {
 	["archer"] = 29,
 	["cavalry"] = 29,
 	["siege"] = 29,
-	["defencePower"] = 58
+	["defencePower"] = 116
 }
 tower[20] = {
 	["level"] = 20,
@@ -178,7 +178,7 @@ tower[20] = {
 	["archer"] = 30,
 	["cavalry"] = 30,
 	["siege"] = 30,
-	["defencePower"] = 60
+	["defencePower"] = 120
 }
 tower[21] = {
 	["level"] = 21,
@@ -187,7 +187,7 @@ tower[21] = {
 	["archer"] = 31,
 	["cavalry"] = 31,
 	["siege"] = 31,
-	["defencePower"] = 62
+	["defencePower"] = 124
 }
 tower[22] = {
 	["level"] = 22,
@@ -196,7 +196,7 @@ tower[22] = {
 	["archer"] = 32,
 	["cavalry"] = 32,
 	["siege"] = 32,
-	["defencePower"] = 64
+	["defencePower"] = 128
 }
 tower[23] = {
 	["level"] = 23,
@@ -205,7 +205,7 @@ tower[23] = {
 	["archer"] = 33,
 	["cavalry"] = 33,
 	["siege"] = 33,
-	["defencePower"] = 66
+	["defencePower"] = 132
 }
 tower[24] = {
 	["level"] = 24,
@@ -214,7 +214,7 @@ tower[24] = {
 	["archer"] = 34,
 	["cavalry"] = 34,
 	["siege"] = 34,
-	["defencePower"] = 68
+	["defencePower"] = 136
 }
 tower[25] = {
 	["level"] = 25,
@@ -223,7 +223,7 @@ tower[25] = {
 	["archer"] = 35,
 	["cavalry"] = 35,
 	["siege"] = 35,
-	["defencePower"] = 70
+	["defencePower"] = 140
 }
 tower[26] = {
 	["level"] = 26,
@@ -232,7 +232,7 @@ tower[26] = {
 	["archer"] = 36,
 	["cavalry"] = 36,
 	["siege"] = 36,
-	["defencePower"] = 72
+	["defencePower"] = 144
 }
 tower[27] = {
 	["level"] = 27,
@@ -241,7 +241,7 @@ tower[27] = {
 	["archer"] = 37,
 	["cavalry"] = 37,
 	["siege"] = 37,
-	["defencePower"] = 74
+	["defencePower"] = 148
 }
 tower[28] = {
 	["level"] = 28,
@@ -250,7 +250,7 @@ tower[28] = {
 	["archer"] = 38,
 	["cavalry"] = 38,
 	["siege"] = 38,
-	["defencePower"] = 76
+	["defencePower"] = 152
 }
 tower[29] = {
 	["level"] = 29,
@@ -259,7 +259,7 @@ tower[29] = {
 	["archer"] = 39,
 	["cavalry"] = 39,
 	["siege"] = 39,
-	["defencePower"] = 78
+	["defencePower"] = 156
 }
 tower[30] = {
 	["level"] = 30,
@@ -268,7 +268,7 @@ tower[30] = {
 	["archer"] = 40,
 	["cavalry"] = 40,
 	["siege"] = 40,
-	["defencePower"] = 80
+	["defencePower"] = 160
 }
 tower[31] = {
 	["level"] = 31,
@@ -277,7 +277,7 @@ tower[31] = {
 	["archer"] = 41,
 	["cavalry"] = 41,
 	["siege"] = 41,
-	["defencePower"] = 82
+	["defencePower"] = 164
 }
 tower[32] = {
 	["level"] = 32,
@@ -286,7 +286,7 @@ tower[32] = {
 	["archer"] = 42,
 	["cavalry"] = 42,
 	["siege"] = 42,
-	["defencePower"] = 84
+	["defencePower"] = 168
 }
 tower[33] = {
 	["level"] = 33,
@@ -295,7 +295,7 @@ tower[33] = {
 	["archer"] = 43,
 	["cavalry"] = 43,
 	["siege"] = 43,
-	["defencePower"] = 86
+	["defencePower"] = 172
 }
 tower[34] = {
 	["level"] = 34,
@@ -304,7 +304,7 @@ tower[34] = {
 	["archer"] = 44,
 	["cavalry"] = 44,
 	["siege"] = 44,
-	["defencePower"] = 88
+	["defencePower"] = 176
 }
 tower[35] = {
 	["level"] = 35,
@@ -313,7 +313,7 @@ tower[35] = {
 	["archer"] = 45,
 	["cavalry"] = 45,
 	["siege"] = 45,
-	["defencePower"] = 90
+	["defencePower"] = 180
 }
 tower[36] = {
 	["level"] = 36,
@@ -322,7 +322,7 @@ tower[36] = {
 	["archer"] = 46,
 	["cavalry"] = 46,
 	["siege"] = 46,
-	["defencePower"] = 92
+	["defencePower"] = 184
 }
 tower[37] = {
 	["level"] = 37,
@@ -331,7 +331,7 @@ tower[37] = {
 	["archer"] = 47,
 	["cavalry"] = 47,
 	["siege"] = 47,
-	["defencePower"] = 94
+	["defencePower"] = 188
 }
 tower[38] = {
 	["level"] = 38,
@@ -340,7 +340,7 @@ tower[38] = {
 	["archer"] = 48,
 	["cavalry"] = 48,
 	["siege"] = 48,
-	["defencePower"] = 96
+	["defencePower"] = 192
 }
 tower[39] = {
 	["level"] = 39,
@@ -349,7 +349,7 @@ tower[39] = {
 	["archer"] = 49,
 	["cavalry"] = 49,
 	["siege"] = 49,
-	["defencePower"] = 98
+	["defencePower"] = 196
 }
 tower[40] = {
 	["level"] = 40,
@@ -358,5 +358,5 @@ tower[40] = {
 	["archer"] = 50,
 	["cavalry"] = 50,
 	["siege"] = 50,
-	["defencePower"] = 100
+	["defencePower"] = 200
 }

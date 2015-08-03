@@ -19,7 +19,6 @@ local EMPTY_TAG = 11400
 function BlackSmithSprite:ctor(city_layer, entity, city)
     BlackSmithSprite.super.ctor(self, city_layer, entity, city)
     entity:AddBlackSmithListener(self)
-    self:DoAni()
 end
 function BlackSmithSprite:RefreshSprite()
     BlackSmithSprite.super.RefreshSprite(self)

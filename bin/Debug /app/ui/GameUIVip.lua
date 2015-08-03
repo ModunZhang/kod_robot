@@ -91,7 +91,7 @@ function GameUIVip:AdapterPlayerList()
     table.insert(infos,{_("击杀"),string.formatnumberthousands(User:Kill())})
     table.insert(infos,{_("忠诚值"),GameUtils:formatNumber(User:Loyalty())})
     table.insert(infos,{_("联盟"),alliance and alliance:Name() or ""})
-    table.insert(infos,{_("职位"),member and member:Title() or ""})
+    table.insert(infos,{_("职位"),member and Localize.alliance_title[member:Title()] or ""})
     return infos
 end
 
@@ -511,7 +511,7 @@ function GameUIVip:CreateVIPStatus()
             info={
                 {_("当前VIP等级"),_("等级").." "..User:GetVipLevel()},
                 {_("下一次登录"),"+"..loginDays[ (vipLoginDaysCount + 1 ) > #loginDays and #loginDays or (vipLoginDaysCount + 1 )].expAdd},
-                {_("连续登录"),vipLoginDaysCount},
+                {_("连续登录(天)"),vipLoginDaysCount},
             }
         }
     ):align(display.CENTER, bg_size.width/2, 90)

@@ -116,20 +116,24 @@ function GameUISelectTerrain:BuildUI()
     }
     ui_map.check_box_group = UICanCanelCheckBoxButtonGroup.new(display.LEFT_TO_RIGHT):addButton(
         UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = _("草地"),size = 20,color = 0x5c553f}))
-            :setButtonLabelOffset(40, 0)
+            -- :setButtonLabel(UIKit:ttfLabel({text = _("草地"),size = 20,color = 0x5c553f}))
+            -- :setButtonLabelOffset(40, 0)
             :setButtonSelected(true)
     ):addButton(
         UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = _("沙漠"),size = 20,color = 0x5c553f}))
-            :setButtonLabelOffset(40, 0)
+            -- :setButtonLabel(UIKit:ttfLabel({text = _("沙漠"),size = 20,color = 0x5c553f}))
+            -- :setButtonLabelOffset(40, 0)
     ):addButton(
         UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = _("雪地"),size = 20,color = 0x5c553f}))
-            :setButtonLabelOffset(40, 0)
-    ):addTo(self:GetBody()):pos(10, s.height - 430)
-        :setButtonsLayoutMargin(0,90,0,0)
+            -- :setButtonLabel(UIKit:ttfLabel({text = _("雪地"),size = 20,color = 0x5c553f}))
+            -- :setButtonLabelOffset(40, 0)
+    ):addTo(self:GetBody()):pos(40, s.height - 430)
+        :setButtonsLayoutMargin(0,130,0,0)
         :setIsSwitchModel(false)
+
+    UIKit:ttfLabel({text = _("草地"),size = 20,color = 0x5c553f}):addTo(self:GetBody()):pos(100, s.height - 400)
+    UIKit:ttfLabel({text = _("沙漠"),size = 20,color = 0x5c553f}):addTo(self:GetBody()):pos(290, s.height - 400)
+    UIKit:ttfLabel({text = _("雪地"),size = 20,color = 0x5c553f}):addTo(self:GetBody()):pos(480, s.height - 400)
 
     local list_bg = display.newScale9Sprite("back_ground_540x64.png", s.width/2, s.height - 490, cc.size(540, 156))
         :align(display.TOP_CENTER):addTo(self:GetBody())

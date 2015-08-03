@@ -1,4 +1,5 @@
 local UILib = import("..ui.UILib")
+local StarBar = import("..ui.StarBar")
 local WidgetSoldier = class("WidgetSoldier", function()
 	return display.newNode()
 end)
@@ -15,6 +16,18 @@ function WidgetSoldier:ctor(soldierName, soldierStar, isPveSoldier)
     self.soldier_png = t2
     local size = self.soldier_png:getContentSize() 
     self.soldier_png:scale(128 / math.max(size.width, size.height))
+
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png")
+    :addTo(self.soldier_png):align(display.CENTER,58,15)
+	self.starbar = StarBar.new({
+        max = 3,
+        bg = "Stars_bar_bg.png",
+        fill = "Stars_bar_highlight.png",
+        num = soldierStar,
+        margin = 5,
+        direction = StarBar.DIRECTION_HORIZONTAL,
+        scale = 0.8,
+    }):addTo(self.soldier_png):align(display.CENTER,58,15)
 end
 function WidgetSoldier:SetSoldeir(soldierName, soldierStar, isPveSoldier)
 	local bg,png = self:GetBgAndPng(soldierName, soldierStar, isPveSoldier)
@@ -22,6 +35,7 @@ function WidgetSoldier:SetSoldeir(soldierName, soldierStar, isPveSoldier)
 	self.soldier_png:setTexture(png)
 	local size = self.soldier_png:getContentSize() 
     self.soldier_png:scale(128 / math.max(size.width, size.height))
+    self.starbar:setNum(soldierStar)
     return self
 end
 function WidgetSoldier:GetBgAndPng(soldierName, soldierStar, isPveSoldier)

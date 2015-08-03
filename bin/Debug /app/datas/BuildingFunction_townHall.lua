@@ -86,7 +86,7 @@ townHall[14] = {
 }
 townHall[15] = {
 	["level"] = 15,
-	["houseAdd"] = 2,
+	["houseAdd"] = 3,
 	["efficiency"] = 7.500000,
 	["power"] = 3830
 }
@@ -128,13 +128,13 @@ townHall[21] = {
 }
 townHall[22] = {
 	["level"] = 22,
-	["houseAdd"] = 3,
+	["houseAdd"] = 4,
 	["efficiency"] = 11.000000,
 	["power"] = 21090
 }
 townHall[23] = {
 	["level"] = 23,
-	["houseAdd"] = 3,
+	["houseAdd"] = 4,
 	["efficiency"] = 11.500000,
 	["power"] = 24340
 }
@@ -170,19 +170,19 @@ townHall[28] = {
 }
 townHall[29] = {
 	["level"] = 29,
-	["houseAdd"] = 4,
+	["houseAdd"] = 5,
 	["efficiency"] = 14.500000,
 	["power"] = 73810
 }
 townHall[30] = {
 	["level"] = 30,
-	["houseAdd"] = 4,
+	["houseAdd"] = 5,
 	["efficiency"] = 15.000000,
 	["power"] = 85200
 }
 townHall[31] = {
 	["level"] = 31,
-	["houseAdd"] = 4,
+	["houseAdd"] = 5,
 	["efficiency"] = 15.500000,
 	["power"] = 98390
 }
@@ -212,25 +212,25 @@ townHall[35] = {
 }
 townHall[36] = {
 	["level"] = 36,
-	["houseAdd"] = 5,
+	["houseAdd"] = 6,
 	["efficiency"] = 18.000000,
 	["power"] = 215210
 }
 townHall[37] = {
 	["level"] = 37,
-	["houseAdd"] = 5,
+	["houseAdd"] = 6,
 	["efficiency"] = 18.500000,
 	["power"] = 289400
 }
 townHall[38] = {
 	["level"] = 38,
-	["houseAdd"] = 5,
+	["houseAdd"] = 6,
 	["efficiency"] = 19.000000,
 	["power"] = 320140
 }
 townHall[39] = {
 	["level"] = 39,
-	["houseAdd"] = 5,
+	["houseAdd"] = 6,
 	["efficiency"] = 19.500000,
 	["power"] = 354920
 }

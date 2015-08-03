@@ -5,9 +5,8 @@
 local WidgetAutoOrderGachaButton = class("WidgetAutoOrderGachaButton",cc.ui.UIPushButton)
 
 function WidgetAutoOrderGachaButton:ctor()
-	WidgetAutoOrderGachaButton.super.ctor(self,{normal = "casinoTokenClass_2_128x128.png"})
+	WidgetAutoOrderGachaButton.super.ctor(self,{normal = "tmp_casinoToken_icon_66x53.png"})
 	self:onButtonClicked(handler(self, self.OnGachaButtonClicked))
-	self:scale(80/128)
 end
 
 

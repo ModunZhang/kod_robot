@@ -1,24 +1,15 @@
 local UILib = import("..ui.UILib")
-local Sprite = import(".Sprite")
 local fire = import("..particles.fire")
 local smoke_city = import("..particles.smoke_city")
 local SpriteConfig = import(".SpriteConfig")
-local CitySprite = class("CitySprite", Sprite)
+local WithInfoSprite = import(".WithInfoSprite")
+local CitySprite = class("CitySprite", WithInfoSprite)
 
 
 local timer = app.timer
 function CitySprite:ctor(city_layer, entity, is_my_alliance)
-    self:setNodeEventEnabled(true)
-    self.is_my_alliance = is_my_alliance
-    local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
-    CitySprite.super.ctor(self, city_layer, entity, x, y)
-
+    CitySprite.super.ctor(self, city_layer, entity, is_my_alliance)
     self:CheckStatus()
-end
-function CitySprite:onExit()
-    if self.info then
-        self.info:removeFromParent()
-    end
 end
 function CitySprite:GetSpriteFile()
     return self:GetConfig().png
@@ -35,46 +26,19 @@ end
 function CitySprite:GetSpriteOffset()
     return self:GetLogicMap():ConvertToLocalPosition(0, 0)
 end
-function CitySprite:RefreshSprite()
-    CitySprite.super.RefreshSprite(self)
-    self.sprite:setAnchorPoint(self:GetConfig().offset.anchorPoint)
-
-
-    if self.info then
-        self.info:removeFromParent()
-        self.info = nil
-    end
-
-    local lx,ly = self:GetEntity():GetLogicPosition()
-    local map_layer = self:GetMapLayer()
-    local logic_map = map_layer:GetLogicMap()
-    local x,y = map_layer:GetLogicMap():ConvertToMapPosition(lx,ly)
-    local w,h = logic_map:GetSize()
-    self.info = display.newNode():addTo(map_layer:GetInfoNode()):pos(x, y - 50):scale(0.8):zorder(x * lx + ly)
-
-    self.banner = display.newSprite("city_banner.png"):addTo(self.info):align(display.CENTER_TOP)
-    self.level = UIKit:ttfLabel({
-        size = 22,
-        color = 0xffedae,
-    }):addTo(self.banner):align(display.CENTER, 30, 30)
-    self.name = UIKit:ttfLabel({
-        size = 20,
-        color = 0xffedae,
-    }):addTo(self.banner):align(display.LEFT_CENTER, 60, 32)
-    self:RefreshInfo()
-end
-
 local FIRE_TAG = 11900
 local SMOKE_TAG = 12000
 function CitySprite:RefreshInfo()
+    CitySprite.super.RefreshInfo(self)
+    self:GetSprite():setAnchorPoint(self:GetConfig().offset.anchorPoint)
+
+    self:CheckStatus()
+end
+function CitySprite:GetInfo()
     local entity = self:GetEntity()
     local info = entity:GetAllianceMemberInfo()
     local banners = self.is_my_alliance and UILib.my_city_banner or UILib.enemy_city_banner
-    self.banner:setTexture(banners[info:HelpedByTroopsCount()])
-    self.level:setString(info:KeepLevel())
-    self.name:setString(string.format("[%s]%s", entity:GetAlliance():Tag(), info:Name()))
-
-    self:CheckStatus()
+    return info:KeepLevel(), string.format("[%s]%s", entity:GetAlliance():Tag(), info:Name()), banners[info:HelpedByTroopsCount()]
 end
 function CitySprite:CheckStatus()
     local memberInfo = self:GetEntity():GetAllianceMemberInfo()

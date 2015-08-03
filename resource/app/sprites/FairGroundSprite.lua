@@ -15,6 +15,9 @@ function FairGroundSprite:GetEntity()
         end,
         GetLogicPosition = function()
             return -1, -1
+        end,
+        IsHouse = function()
+            return false
         end
     }
 end

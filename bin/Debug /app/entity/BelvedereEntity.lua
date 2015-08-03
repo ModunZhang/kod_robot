@@ -48,6 +48,8 @@ function BelvedereEntity:GetTitle()
 			return _("占领村落(行军中)")
 		elseif march_type == 'shrine' then
 			return _("攻打联盟圣地(行军中)")
+		elseif march_type == 'monster' then
+			return _("攻打黑龙军团(行军中)")
 		end
 	elseif self:GetType() == self.ENTITY_TYPE.MARCH_RETURN then
 		local march_type = self:WithObject():MarchType()
@@ -59,6 +61,8 @@ function BelvedereEntity:GetTitle()
 			return _("占领村落(返回中)")
 		elseif march_type == 'shrine' then
 			return _("攻打联盟圣地(返回中)")
+		elseif march_type == 'monster' then
+			return _("攻打黑龙军团(返回中)")
 		end
 	elseif self:GetType() == self.ENTITY_TYPE.STRIKE_OUT then
 		local march_type = self:WithObject():MarchType()
@@ -128,6 +132,8 @@ function BelvedereEntity:GetDestination()
 			return Localize.village_name[village_data.name] .. "Lv" .. village_data.level
 		elseif self:WithObject():MarchType() == 'shrine' then
 			return _("圣地")
+		elseif self:WithObject():MarchType() == 'monster' then
+			return self:WithObject():GetTargetName()
 		end
 	elseif self:GetType() == self.ENTITY_TYPE.MARCH_RETURN  
 		or self:GetType() == self.ENTITY_TYPE.STRIKE_RETURN then

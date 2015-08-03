@@ -110,8 +110,21 @@ end
 function ToolShopUpgradeBuilding:RemoveToolShopListener(listener)
     self.toolShop_building_observer:RemoveObserver(listener)
 end
+function ToolShopUpgradeBuilding:IteratorEvents(func)
+    for k,v in pairs(self.category) do
+        func(k,v)
+    end
+end
 function ToolShopUpgradeBuilding:GetMakeMaterialsEvents()
     return self.category
+end
+function ToolShopUpgradeBuilding:IsStoredAny(current_time)
+    for _,v in pairs(self.category) do
+        if v:IsStored(current_time) then
+            return true
+        end
+    end
+    return false
 end
 function ToolShopUpgradeBuilding:IsMakingAny(current_time)
     for _,v in pairs(self.category) do
@@ -186,6 +199,14 @@ function ToolShopUpgradeBuilding:GetNextLevelProduction()
     local config = config_function[self:GetNextLevel()]
     return config["production"]
 end
+function ToolShopUpgradeBuilding:GetProductionType()
+    local config = config_function[self:GetEfficiencyLevel()]
+    return config["productionType"]
+end
+function ToolShopUpgradeBuilding:GetNextLevelProductionType()
+    local config = config_function[self:GetNextLevel()]
+    return config["productionType"]
+end
 function ToolShopUpgradeBuilding:IsNeedToUpdate()
     if self.upgrade_to_next_level_time ~= 0 then
         return true
@@ -236,9 +257,9 @@ function ToolShopUpgradeBuilding:OnFunctionDataChange(userData, deltaData, curre
 
 
     for _,v in pairs(userData.materialEvents) do
-        if v.category == "buildingMaterials" then
+        if v.type == "buildingMaterials" then
             events[BUILDING_EVENT] = v
-        elseif v.category == "technologyMaterials" then
+        elseif v.type == "technologyMaterials" then
             events[TECHNOLOGY_EVENT] = v
         end
     end

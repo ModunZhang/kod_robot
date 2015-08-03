@@ -14,6 +14,10 @@ local mockData = import("..fte.mockData")
 local WidgetFteArrow = import("..widget.WidgetFteArrow")
 local fte = {
         {
+            ["soldiers"] = "sentinel_1,16;horseArcher_1,6;ballista_1,2;ranger_1,4",
+            ["rewards"] = "resources,iron,1000"
+        },
+        {
             ["soldiers"] = "deathKnight,1;skeletonWarrior,1",
             ["rewards"] = "soldierMaterials,deathHand,1;soldierMaterials,soulStone,1"
         },
@@ -29,10 +33,7 @@ function WidgetPVEFteMiner:PormiseOfFte()
         local obj = self:GetObject()
             
         function obj:GetEnemyByIndex(index)
-            if index == 1 then
-                return self:DecodeToEnemy(self:GetEnemyInfo(index))
-            end
-            return self:DecodeToEnemy(fte[index - 1], true)
+            return self:DecodeToEnemy(fte[index])
         end
 
         local enemy = obj:GetNextEnemy()

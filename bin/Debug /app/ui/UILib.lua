@@ -13,7 +13,7 @@ local function getAniNameFromAnimationFiles(animation_files)
 end
 
 local PLAYER_ICON = {
-    [0] = "Icon_empireRise_91x117.png", -- 系统头像
+    [0] = "Icon_empireRise_128x128.png", -- 系统头像
     "player_icon_1.png",
     "player_icon_2.png",
     "player_icon_3.png",
@@ -273,14 +273,22 @@ local SOLDIER_ANIMATION_FILES = {
     },
     skeletonWarrior = {
         "animations/kulouyongshi.ExportJson",
+        "animations/kulouyongshi.ExportJson",
+        "animations/kulouyongshi.ExportJson",
     },
     skeletonArcher = {
+        "animations/kulousheshou.ExportJson",
+        "animations/kulousheshou.ExportJson",
         "animations/kulousheshou.ExportJson",
     },
     deathKnight = {
         "animations/siwangqishi.ExportJson",
+        "animations/siwangqishi.ExportJson",
+        "animations/siwangqishi.ExportJson",
     },
     meatWagon = {
+        "animations/jiaorouche.ExportJson",
+        "animations/jiaorouche.ExportJson",
         "animations/jiaorouche.ExportJson",
     },
     wall = {
@@ -388,6 +396,25 @@ local SOLDIER_COLOR_BG_IMAGES = {
     crossbowman = "blue_bg_128x128.png",
     horseArcher = "blue_bg_128x128.png",
     ballista = "yellow_bg_128x128.png",
+    skeletonWarrior = "green_bg_128x128.png",
+    skeletonArcher = "green_bg_128x128.png",
+    deathKnight = "green_bg_128x128.png",
+    meatWagon = "green_bg_128x128.png",
+    priest = "green_bg_128x128.png",
+    demonHunter = "green_bg_128x128.png",
+    paladin = "green_bg_128x128.png",
+    steamTank = "green_bg_128x128.png",
+}
+local BLACK_SOLDIER_COLOR_BG_IMAGES = {
+    wall = "red_bg_128x128.png",
+    ranger = "red_bg_128x128.png",
+    catapult = "red_bg_128x128.png",
+    lancer = "red_bg_128x128.png",
+    swordsman = "red_bg_128x128.png",
+    sentinel = "red_bg_128x128.png",
+    crossbowman = "red_bg_128x128.png",
+    horseArcher = "red_bg_128x128.png",
+    ballista = "red_bg_128x128.png",
     skeletonWarrior = "green_bg_128x128.png",
     skeletonArcher = "green_bg_128x128.png",
     deathKnight = "green_bg_128x128.png",
@@ -698,6 +725,7 @@ local ITEM = {
     restoreWall_1 = "restoreWall_1_128x128.png",
     restoreWall_2 = "restoreWall_2_128x128.png",
     restoreWall_3 = "restoreWall_3_128x128.png",
+    sweepScroll = "sweep_128x128.png",
 }
 
 local SOLDIER_ANIMATIONS = getAniNameFromAnimationFiles(SOLDIER_ANIMATION_FILES)
@@ -718,7 +746,7 @@ local OTHER_ALLIANCE_BUILDING = setmetatable({
 }, {__index = ALLIANCE_BUILDING})
 
 local DAILY_TASK_ICON = {
-    empireRise = "Icon_empireRise_91x117.png",
+    empireRise = "Icon_empireRise_128x128.png",
     conqueror = "Icon_conqueror_104x117.png",
     brotherClub = "Icon_brotherClub_122x124.png",
     growUp = "Icon_growUp_108x115.png"
@@ -1072,6 +1100,7 @@ return {
     soldier_animation = SOLDIER_ANIMATIONS,
     soldier_image = SOLDIER_IMAGES,
     soldier_color_bg_images = SOLDIER_COLOR_BG_IMAGES,
+    black_soldier_color_bg_images = BLACK_SOLDIER_COLOR_BG_IMAGES,
     black_soldier_image = BLACK_SOLDIER_IMAGES,
     dragon_head  = DRAGON_HEAD,
     dragon_animations = DRAGON_ANIMATIONS,

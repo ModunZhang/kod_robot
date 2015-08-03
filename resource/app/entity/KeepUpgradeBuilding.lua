@@ -6,12 +6,13 @@ local KeepUpgradeBuilding = class("KeepUpgradeBuilding", UpgradeBuilding)
 function KeepUpgradeBuilding:ctor(building_info)
     KeepUpgradeBuilding.super.ctor(self, building_info)
 end
-function KeepUpgradeBuilding:GetFreeUnlockPoint(city)
+function KeepUpgradeBuilding:GetFreeUnlockPoint()
+    local city = self:BelongCity()
     local unlock_tile_count = 0
     city:IteratorTilesByFunc(function(x, y, tile)
         local building = city:GetBuildingByLocationId(tile.location_id)
         if building and x < 5 then
-            unlock_tile_count = unlock_tile_count + ((tile:IsUnlocked() or building:IsUpgrading()) and 1 or 0)
+            unlock_tile_count = unlock_tile_count + ((building:IsUnlocked() or building:IsUpgrading()) and 1 or 0)
         end
     end)
     return self:GetUnlockPoint() - unlock_tile_count

@@ -154,7 +154,7 @@ function WidgetAllianceBuildingUpgrade:SetUpgradeEfficiency()
         elseif building.name == "shop" then
             efficiency = string.format(_("道具个数+%d"),#string.split(next_c.itemsUnlock,",") - #string.split(now_c.itemsUnlock,","))
         elseif building.name == "orderHall" then
-            efficiency = _("各类型的村落个数+1")
+            efficiency = string.format(_("各类型的村落个数+%d"),next_c.villageCount - now_c.villageCount)
         else
             efficiency = string.format( "本地化缺失%s", building.name )
         end

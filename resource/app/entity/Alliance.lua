@@ -62,6 +62,7 @@ property(Alliance, "maxMembers", 0)
 property(Alliance, "describe", "")
 property(Alliance, "notice", "")
 property(Alliance, "archon", "")
+property(Alliance, "monsterRefreshTime", 0)
 -- 成员信息
 property(Alliance, "members", {})
 property(Alliance, "memberCount", 0)
@@ -74,9 +75,11 @@ property(Alliance, "countInfo", {})
 property(Alliance, "events", {})
 property(Alliance, "joinRequestEvents", nil)
 property(Alliance, "villages", {})
+property(Alliance, "monsters", {})
 property(Alliance, "villageLevels", {})
 property(Alliance, "allianceFight", {})
 property(Alliance, "allianceFightReports", nil)
+property(Alliance, "lastAllianceFightReport", nil)
 --行军事件
 property(Alliance, "attackMarchEvents", {})
 property(Alliance, "attackMarchReturnEvents", {})
@@ -409,12 +412,12 @@ end
 function Alliance:Reset()
     property(self, "RESET")
     self.help_events = {}
-    self:OnOperation("quit")
     self.alliance_map:Reset()
     self.alliance_shrine:Reset()
     self:GetAllianceBelvedere():Reset()
     self:ResetMarchEvent()
     self:ResetVillageEvents()
+    self:OnOperation("quit")
 end
 function Alliance:OnOperation(operation_type)
     self:NotifyListeneOnType(Alliance.LISTEN_TYPE.OPERATION, function(listener)
@@ -473,6 +476,7 @@ function Alliance:OnAllianceDataChanged(alliance_data,refresh_time,deltaData)
 
     self:OnVillageLevelsChanged(alliance_data, deltaData)
     self:OnVillagesChanged(alliance_data,deltaData)
+    self:OnMonstersChanged(alliance_data,deltaData)
     self.alliance_shrine:OnAllianceDataChanged(alliance_data,deltaData,refresh_time)
     self.alliance_map:OnAllianceDataChanged(alliance_data, deltaData)
 
@@ -508,6 +512,7 @@ function Alliance:OnAllianceBasicInfoChangedFirst(alliance_data,deltaData)
     self:SetStatus(basicInfo.status)
     self:SetStatusStartTime(basicInfo.statusStartTime)
     self:SetStatusFinishTime(basicInfo.statusFinishTime)
+    self:SetMonsterRefreshTime(basicInfo.monsterRefreshTime)
 end
 function Alliance:OnAllianceEventsChanged(alliance_data,deltaData)
     local is_fully_update = deltaData == nil
@@ -1234,7 +1239,42 @@ function Alliance:OnVillagesChanged(alliance_data,deltaData)
         )
     end
 end
-
+function Alliance:OnMonstersChanged(alliance_data,deltaData)
+    if not alliance_data.monsters then return end
+    local is_fully_update = deltaData == nil
+    local is_delta_update = not is_fully_update and deltaData.monsters ~= nil
+    if is_fully_update then
+        self.monsters = {}
+        for _,v in ipairs(alliance_data.monsters) do
+            self.monsters[v.id] = v
+        end
+    end
+    if is_delta_update then
+        if #deltaData.monsters > 0 then
+            self.monsters = {}
+            for _,v in ipairs(alliance_data.monsters) do
+                self.monsters[v.id] = v
+            end
+        else
+            local changed_map = GameUtils:Handler_DeltaData_Func(
+                deltaData.monsters
+                ,function(event_data)
+                    self.monsters[event_data.id] = event_data
+                end
+                ,function(event_data)
+                    if self.monsters[event_data.id] then
+                        self.monsters[event_data.id] = event_data
+                    end
+                end
+                ,function(event_data)
+                    if self.monsters[event_data.id] then
+                        self.monsters[event_data.id] = nil
+                    end
+                end
+            )
+        end
+    end
+end
 function Alliance:IteratorAllianceVillageInfo(func)
     for _,v in pairs(self.villages) do
         func(v)
@@ -1243,6 +1283,10 @@ end
 
 function Alliance:GetAllianceVillageInfos()
     return self.villages
+end
+
+function Alliance:GetAllianceMonsterInfos()
+    return self.monsters
 end
 
 function Alliance:SetIsMyAlliance(isMyAlliance)
@@ -1255,8 +1299,8 @@ end
 
 function Alliance:updateWatchTowerLocalPushIf(marchEvent)
     if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
-        if not marchEvent:IsReturnEvent() then 
-            local marchType = marchEvent:MarchType() 
+        if not marchEvent:IsReturnEvent() then
+            local marchType = marchEvent:MarchType()
             local msg = marchEvent:IsStrikeEvent() and _("你的城市正被敌军突袭") or _("你的城市正被敌军攻击")
             local warningTime = self:GetAllianceBelvedere():GetWarningTime()
             if marchType == 'city' then
@@ -1268,7 +1312,7 @@ end
 --因为这里添加了音效效果 so 所有的事件删除都要调用此方法
 function Alliance:cancelLocalMarchEventPushIf(marchEvent)
     if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
-        if marchEvent:IsReturnEvent() then 
+        if marchEvent:IsReturnEvent() then
             if not marchEvent:IsStrikeEvent() then --我的一般进攻部队返回城市
                 audioManager_:PlayeEffectSoundWithKey("TROOP_BACK")
             end
@@ -1278,6 +1322,7 @@ function Alliance:cancelLocalMarchEventPushIf(marchEvent)
     end
 end
 return Alliance
+
 
 
 

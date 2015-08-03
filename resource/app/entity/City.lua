@@ -1,5 +1,7 @@
 local HOUSES = GameDatas.PlayerInitData.houses[1]
 local config_productionTechs = GameDatas.ProductionTechs.productionTechs
+local Localize = import("..utils.Localize")
+local RecommendedMission = import(".RecommendedMission")
 local GrowUpTaskManager = import(".GrowUpTaskManager")
 local BuildingRegister = import(".BuildingRegister")
 local promise = import("..utils.promise")
@@ -108,7 +110,23 @@ function City:ctor(user)
     self.upgrading_building_callbacks = {}
     self.finish_upgrading_callbacks = {}
 end
+--------------------
 function City:GetRecommendTask()
+    -- local task = self:GetBeginnersTask()
+    -- if task then
+    --     return task
+    -- end
+    local building_map = self:GetHighestCanUpgradeBuildingMap()
+    local tasks = self:GetUser():GetTaskManager():GetAvailableTasksByCategory(GrowUpTaskManager.TASK_CATEGORY.BUILD)
+    local re_task
+    for i,v in pairs(tasks.tasks) do
+        if building_map[v:BuildingType()] then
+            re_task = not re_task and v or (v.index < re_task.index and v or re_task)
+        end
+    end
+    return re_task
+end
+function City:GetHighestCanUpgradeBuildingMap()
     local building_map = {}
     self:IteratorCanUpgradeBuildings(function(building)
         if building:IsUnlocked() then
@@ -125,15 +143,178 @@ function City:GetRecommendTask()
             building_map[k] = nil
         end
     end
-    local tasks = self:GetUser():GetTaskManager():GetAvailableTasksByCategory(GrowUpTaskManager.TASK_CATEGORY.BUILD)
-    local re_task
-    for i,v in pairs(tasks.tasks) do
-        if building_map[v:BuildingType()] then
-            re_task = not re_task and v or (v.index < re_task.index and v or re_task)
+    return building_map
+end
+---------
+-- 领取奖励
+local reward_meta = {}
+reward_meta.__index = reward_meta
+function reward_meta:Index()
+    return self.index
+end
+function reward_meta:Title()
+    return _("领取一次奖励")
+end
+function reward_meta:TaskType()
+    return "reward"
+end
+-- 解锁建筑
+local unlock_meta = {}
+unlock_meta.__index = unlock_meta
+function unlock_meta:Title()
+    return string.format(_("解锁建筑%s"), Localize.building_name[self.name])
+end
+function unlock_meta:Location()
+    return self.location_id
+end
+function unlock_meta:TaskType()
+    return "unlock"
+end
+function unlock_meta:BuildingType()
+    return self.name
+end
+-- 城市建设
+local upgrade_meta = {}
+upgrade_meta.__index = upgrade_meta
+function upgrade_meta:Title()
+    if self.level == 1 then
+        return string.format(_("解锁建筑%s"), Localize.building_name[self.name])
+    end
+    return string.format(_("将%s升级到等级%d"), Localize.building_name[self.name], self.level)
+end
+function upgrade_meta:TaskType()
+    return "cityBuild"
+end
+function upgrade_meta:BuildingType()
+    return self.name
+end
+-- 科技研发
+local tech_meta = {}
+tech_meta.__index = tech_meta
+function tech_meta:Title()
+    return string.format(_("研发%s到等级%d"), Localize.productiontechnology_name[self.name], self.level)
+end
+function tech_meta:TaskType()
+    return "productionTech"
+end
+-- 招募士兵
+local recruit_meta = {}
+recruit_meta.__index = recruit_meta
+function recruit_meta:Index()
+    return self.index
+end
+function recruit_meta:Title()
+    return string.format(_("招募一次%s"), Localize.soldier_name[self.name])
+end
+function recruit_meta:TaskType()
+    return "recruit"
+end
+-- 探索pve
+local explore_meta = {}
+explore_meta.__index = explore_meta
+function explore_meta:Index()
+    return self.index
+end
+function explore_meta:Title()
+    return _("搭乘飞艇进行一次探险")
+end
+function explore_meta:TaskType()
+    return "explore"
+end
+-- 建造小屋
+local build_meta = {}
+build_meta.__index = build_meta
+function build_meta:Title()
+    return string.format(_("建造一个%s"), Localize.building_name[self.name])
+end
+function build_meta:TaskType()
+    return "build"
+end
+-- 领取新手冲级奖励
+local encourage_meta = {}
+encourage_meta.__index = encourage_meta
+function encourage_meta:Title()
+    return _("领取新手冲级奖励")
+end
+function encourage_meta:TaskType()
+    return "encourage"
+end
+---
+
+local default = {}
+for i,v in ipairs(RecommendedMission) do
+    default[i] = false
+end
+function City:GetBeginnersTask()
+    local count = self:GetUser():GetTaskManager():GetCompleteTaskCount()
+    local key = string.format("recommend_tasks_%s", self:GetUser():Id())
+    local flag = app:GetGameDefautlt():getTableForKey(key, default)
+    for i,v in ipairs(RecommendedMission) do
+        if v.type == "reward" and not flag[i] and count > 0 then
+            return setmetatable({ index = i }, reward_meta)
+        elseif v.type == "unlock" then
+            if self:GetFirstBuildingByType("keep"):GetFreeUnlockPoint() > 0 then
+                for i,lstr in ipairs(string.split(v.name, ",")) do
+                    local location_id = tonumber(lstr)
+                    local building = self:GetBuildingByLocationId(location_id)
+                    if not building:IsUnlocked() and not building:IsUnlocking() then
+                        return setmetatable({ name = building:GetType(), location_id = location_id }, unlock_meta)
+                    end
+                end
+            end
+        elseif v.type == "upgrade" then
+            local building = self:GetHighestBuildingByType(v.name)
+            if building then
+                if building:GetLevel() < v.min then
+                    if building:IsUpgrading() then
+                        if building:GetNextLevel() < v.min then
+                            return setmetatable({ name = v.name, level = building:GetNextLevel() + 1 }, upgrade_meta)
+                        end
+                    else
+                        return setmetatable({ name = v.name, level = building:GetLevel() + 1 }, upgrade_meta)
+                    end
+                end
+            end
+        elseif v.type == "technology" then
+            local event
+            self:IteratorProductionTechEvents(function(t)
+                if v.name == t:Name() then
+                    event = t
+                end
+            end)
+            local level = self:FindTechByName(v.name):Level()
+            if level < v.min then
+                if event then
+                    if level + 1 < v.min then
+                        return setmetatable({ name = v.name, level = level + 2 }, tech_meta)
+                    end
+                else
+                    return setmetatable({ name = v.name, level = level + 1 }, tech_meta)
+                end
+            end
+        elseif v.type == "recruit" and 
+            not flag[i] and 
+            self:GetSoldierManager():GetTreatCountBySoldierType(v.name) == 0 then
+            return setmetatable({ name = v.name, index = i }, recruit_meta)
+        elseif v.type == "explore" and not flag[i] then
+            return setmetatable({ index = i }, explore_meta)
+        elseif v.type == "build" then
+            if #self:GetDecoratorsByType(v.name) < v.min and self:GetLeftBuildingCountsByType(v.name) > 0 then
+                return setmetatable({ name = v.name }, build_meta)
+            end
+        elseif v.type == "encourage" and self:GetUser():HavePlayerLevelUpReward() then
+            return setmetatable({}, encourage_meta)
         end
     end
-    return re_task
 end
+function City:SetBeginnersTaskFlag(index)
+    -- local key = string.format("recommend_tasks_%s", self:GetUser():Id())
+    -- local flag = app:GetGameDefautlt():getTableForKey(key, default)
+    -- flag[index] = true
+    -- app:GetGameDefautlt():setTableForKey(key, flag)
+    -- app:GetGameDefautlt():flush()
+end
+--------------------
 function City:GetUser()
     return self.belong_user
 end
@@ -518,20 +699,26 @@ function City:GetMaxHouseCanBeBuilt(house_type)
     end
     return max
 end
-function City:GetBuildingsIsUnlocked()
+function City:GetFunctionBuildingsWithOrder()
     local r = {}
     for k,v in pairs(self.building_location_map) do
-        if v:IsUnlocked() or v:IsUnlocking() then
-            insert(r, v)
-        end
+        insert(r, v)
     end
     table.sort(r, function(a, b)
-        if a:GetLevel() < b:GetLevel() then
-            return true
-        elseif a:GetLevel() > b:GetLevel() then
+        if a:IsUnlocked() and b:IsUnlocked() then
+            if a:GetLevel() < b:GetLevel() then
+                return true
+            elseif a:GetLevel() > b:GetLevel() then
+                return false
+            end
+            return a:IsImportantThanBuilding(b)
+        elseif not a:IsUnlocked() and b:IsUnlocked() then
             return false
+        elseif a:IsUnlocked() and not b:IsUnlocked() then
+            return true
+        elseif not a:IsUnlocked() and not b:IsUnlocked() then
+            return a:IsImportantThanBuilding(b)
         end
-        return a:IsImportantThanBuilding(b)
     end)
     return r
 end
@@ -796,6 +983,9 @@ function City:IteratorCanUpgradeBuildingsByUserData(user_data, current_time, del
                     for _,v in ipairs(houses.edit or {}) do
                         need_delta_update_houses[location_id * 100 + v.location] = v
                     end
+                    for _,v in ipairs(houses.add or {}) do
+                        need_delta_update_houses[location_id * 100 + v.location] = v
+                    end
                 end
             end
         end
@@ -939,6 +1129,14 @@ function City:CreateDecorator(current_time, decorator_building)
     end)
 
 end
+function City:GetRuinByLocationIdAndHouseLocationId(id, house_id)
+    local x,y = self:GetTileByLocationId(id):GetAbsolutePositionByLocation(house_id)
+    for k,v in pairs(self.ruins) do
+        if v.x == x and v.y == y then
+            return v
+        end
+    end
+end
 --获取没有被占用了的废墟
 function City:GetRuinsNotBeenOccupied()
     local r = {}
@@ -1013,7 +1211,7 @@ end
 function City:OnUserDataChanged(userData, current_time, deltaData)
     local need_update_resouce_buildings, is_unlock_any_tiles, unlock_table = self:OnHouseChanged(userData, current_time, deltaData)
     -- 更新建筑信息
-        self:IteratorCanUpgradeBuildingsByUserData(userData, current_time, deltaData)
+    self:IteratorCanUpgradeBuildingsByUserData(userData, current_time, deltaData)
     -- 更新地块信息
     if is_unlock_any_tiles then
         LuaUtils:outputTable("unlock_table", unlock_table)
@@ -1110,16 +1308,16 @@ function City:OnHouseChanged(userData, current_time, deltaData)
             local decorators = self:GetDecoratorsByLocationId(location_id)
             table.foreach(decorators, function(_, building)
 
-                -- 当前位置有小建筑并且推送的数据里面没有就认为是拆除
-                local house_location_id = tile:GetBuildingLocation(building)
-                local house_info = find_building_info_by_location(location.houses, house_location_id)
-                
-                -- 没有找到，就是已经被拆除了
-                -- 如果类型不对，也认为是拆除
-                if not house_info or (house_info.type ~= building:GetType()) then
-                    self:DestoryDecorator(current_time, building)
-                end
+                    -- 当前位置有小建筑并且推送的数据里面没有就认为是拆除
+                    local house_location_id = tile:GetBuildingLocation(building)
+                    local house_info = find_building_info_by_location(location.houses, house_location_id)
 
+                    -- 没有找到，就是已经被拆除了
+                    -- 如果类型不对也认为是删除
+                    if not house_info or
+                        (house_info.type ~= building:GetType()) then
+                        self:DestoryDecorator(current_time, building)
+                    end
             end)
 
             -- 新建的
@@ -1529,7 +1727,9 @@ end
 
 function City:IteratorTechs(func)
     for index,v in pairs(self.productionTechs) do
-        func(k,v)
+        if func(index,v) then
+            return
+        end
     end
 end
 
@@ -1699,6 +1899,9 @@ function City:FindProductionTechEventById(_id)
 end
 
 return City
+
+
+
 
 
 

@@ -42,7 +42,19 @@ end
 function DragonEyrieUpgradeBuilding:GetDragonManager()
     return self.dragon_manger_ 
 end
-
+-- 检查当前能否解锁一条龙
+function DragonEyrieUpgradeBuilding:CheckIfHateDragon()
+    return self:GetDragonManager():GetHatedCount() < config_function[self:GetLevel()].dragonCount
+end
+-- 解锁下一条龙的龙巢等级
+function DragonEyrieUpgradeBuilding:GetNextHateLevel()
+    local current_count = config_function[self:GetLevel()].dragonCount
+    for i=self:GetLevel() + 1,#config_function do
+        if config_function[i].dragonCount > current_count then
+            return i
+        end
+    end
+end
 --withBuff 
 function DragonEyrieUpgradeBuilding:GetTotalHPRecoveryPerHour(dragon_type)
     local info = self:GetTotalHPRecoveryPerHourInfo()

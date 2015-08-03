@@ -75,12 +75,12 @@ function WidgetSliderWithInput:ctor(params)
         local btn_unit  = ""
         if e_value>=1000 then
             local f_value = GameUtils:formatNumber(e_value)
-            if change_unit == 1000 then
+            -- if change_unit == 1000 then
                 btn_value = string.sub(f_value,1,-2)
                 btn_unit = string.sub(f_value,-1,-1)
-            else
-                btn_value = string.sub(f_value,1,-2)
-            end
+            -- else
+            --     btn_value = string.sub(f_value,1,-2)
+            -- end
         else
             btn_value = e_value
         end

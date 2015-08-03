@@ -59,9 +59,9 @@ function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
             font = UIKit:getFontFilePath(),
             size = 22,
             valign = ui.TEXT_VALIGN_TOP,
-            dimensions = cc.size(320, 120),
+            dimensions = cc.size(420, 0),
             color = UIKit:hex2c3b(0x615b44)
-        }):align(display.LEFT_TOP, 150,bg_height-70)
+        }):align(display.LEFT_TOP, 150,bg_height-60)
         :addTo(bg)
 
     local list,list_node = UIKit:commonListView_1({

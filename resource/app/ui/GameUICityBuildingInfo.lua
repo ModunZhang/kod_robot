@@ -14,158 +14,158 @@ local AllianceBuilding = GameDatas.AllianceBuilding
 -- 每个建筑详情列数和宽度
 local building_details_map = {
     ["keep"] = {
-        {130,  		130, 		130, 		130			   },
+        {130,       130,        130,        130            },
         {_("等级"), _("战斗力"),_("可解锁地块"),_("可协助加速") },
-        {"level",  	"power", 	"unlock", "beHelpedCount"},
+        {"level",   "power",    "unlock", "beHelpedCount"},
     },
     ["watchTower"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("瞭望塔效果")},
-        {"level",  	"power"},
+        {"level",   "power"},
     },
     ["warehouse"] = {
-        {90,		100,		200,			130		  },
+        {90,        100,        200,            130       },
         {_("等级"), _("战斗力"),_("资源存储上限"),_("暗仓保护") },
-        {"level",  	"power", 	"maxWood"},
+        {"level",   "power",    "maxWood"},
     },
     ["dragonEyrie"] = {
-        {90,		130,			300				},
+        {90,        130,            300             },
         {_("等级"), _("战斗力"),_("巨龙生命值恢复每小时")},
-        {"level",  	"power", 	"hpRecoveryPerHour"},
+        {"level",   "power",    "hpRecoveryPerHour"},
     },
     ["toolShop"] = {
-        {90,			130,			300},
-        {_("等级"), _("战斗力"),_("制造工具数量")},
-        {"level",  	"power", 	"production"},
+        {90,        100,        180,            150      },
+        {_("等级"), _("战斗力"),_("制造工具数量"),_("降低资源消耗")},
+        {"level",   "power", "production"},
     },
     ["materialDepot"] = {
-        {90,			130,			300},
+        {90,            130,            300},
         {_("等级"), _("战斗力"),_("材料存储上限")},
-        {"level",  	"power", 	"maxMaterial"},
+        {"level",   "power",    "soldierMaterials"},
     },
     ["barracks"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("最大招募"),_("新解锁士兵") },
-        {"level",  	"power", 	"maxRecruit"},
+        {"level",   "power",    "maxRecruit"},
     },
     ["blackSmith"] = {
         {90,130,300},
         {_("等级"), _("战斗力"),_("提升炼制速度")},
-        {"level",  	"power"},
+        {"level",   "power"},
     },
     ["foundry"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("增加矿工小屋"),_("增加铁矿保护") },
-        {"level",  	"power", 	"houseAdd"},
+        {"level",   "power",    "houseAdd"},
     },
     ["stoneMason"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("增加石匠小屋"),_("增加石料保护") },
-        {"level",  	"power", 	"houseAdd"},
+        {"level",   "power",    "houseAdd"},
     },
     ["lumbermill"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("增加木工小屋"),_("增加木材保护") },
-        {"level",  	"power", 	"houseAdd"},
+        {"level",   "power",    "houseAdd"},
     },
     ["mill"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("增加农夫小屋"),_("增加粮食保护") },
-        {"level",  	"power", 	"houseAdd"},
+        {"level",   "power",    "houseAdd"},
     },
     ["hospital"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("容纳伤兵上限")},
-        {"level",  	"power", 	"maxCitizen"},
+        {"level",   "power",    "maxCitizen"},
     },
     ["townHall"] = {
-        {90,			100,		200,		130},
+        {90,            100,        200,        130},
         {_("等级"), _("战斗力"),_("增加住宅"),_("提升任务奖励") },
-        {"level",  	"power", 	"houseAdd"},
+        {"level",   "power",    "houseAdd"},
     },
     ["tradeGuild"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("运输车总量"),_("运输车生产") },
-        {"level",  	"power", 	"maxCart", 	"cartRecovery"},
+        {"level",   "power",    "maxCart",  "cartRecovery"},
     },
     ["academy"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("提升科技研发速度")},
-        {"level",  	"power"},
+        {"level",   "power"},
     },
     ["hunterHall"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("提升弓手招募速度")},
-        {"level",  	"power"},
+        {"level",   "power"},
     },
     ["trainingGround"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("提升步兵招募速度")},
-        {"level",  	"power"},
+        {"level",   "power"},
     },
     ["stable"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("提升骑兵招募速度")},
-        {"level",  	"power"},
+        {"level",   "power"},
     },
     ["workshop"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("提升攻城机械招募速度")},
-        {"level",  	"power"},
+        {"level",   "power"},
     },
     ["tower"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("城墙攻击"),_("城墙防御") },
-        {"level",  	"power"    ,"infantry" ,"defencePower"},
+        {"level",   "power"    ,"infantry" ,"defencePower"},
     },
     ["wall"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("耐久度"),_("耐久度恢复每小时") },
-        {"level",  	"power"    ,"wallHp" ,"wallRecovery"},
+        {"level",   "power"    ,"wallHp" ,"wallRecovery"},
     },
     ["dwelling"] = {
-        {90,			100,		200,			130},
+        {90,            100,        200,            130},
         {_("等级"), _("战斗力"),_("城民上限"),_("银币产出每小时") },
-        {"level",  	"power"    ,"citizen" ,"production"},
+        {"level",   "power"    ,"citizen" ,"production"},
     },
     ["woodcutter"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("木材产出每小时")},
-        {"level",  	"power"    ,"production" },
+        {"level",   "power"    ,"production" },
     },
     ["quarrier"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("石料产出每小时")},
-        {"level",  	"power"    ,"production" },
+        {"level",   "power"    ,"production" },
     },
     ["miner"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("铁矿产出每小时")},
-        {"level",  	"power"    ,"production" },
+        {"level",   "power"    ,"production" },
     },
     ["farmer"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("粮食产出每小时")},
-        {"level",  	"power"    ,"production" },
+        {"level",   "power"    ,"production" },
     },
 
     ["orderHall"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("村落定期生成数量")},
-        {"level",  	"power"    ,"villageCount" },
+        {"level",   "power"    ,"villageCount" },
     },
     ["palace"] = {
-        {90,			130,		300},
+        {90,            130,        300},
         {_("等级"), _("战斗力"),_("联盟成员")},
-        {"level",  	"power"    ,"memberCount" },
+        {"level",   "power"    ,"memberCount" },
     },
     ["shop"] = {
-        {90,		130,			300},
+        {90,        130,            300},
         {_("等级"), _("战斗力"),_("可进货道具")},
-        {"level",  	"power"},
+        {"level",   "power"},
     },
     ["shrine"] = {
-        {90,		100,		200,			130},
+        {90,        100,        200,            130},
         {_("等级"), _("战斗力"),_("感知力上限"),_("感知力恢复每小时")},
         {"level","power","perception","pRecoveryPerHour"},
     },
@@ -307,6 +307,14 @@ function GameUICityBuildingInfo:CreateDetails()
                 value = string.formatnumberthousands(value)
             end
             table.insert(details, value)
+        elseif parent.building_name == "toolShop" then
+            local value
+            if idx == 40 then
+                value = ""..((idx-1) * 0.5 + 0.5).."%"
+            else
+                value = ""..((idx-1) * 0.5).."%"
+            end
+            table.insert(details, value)
         elseif parent.building_name == "barracks" then
             local unlockedSoldiers_current = string.split(parent.config[idx].unlockedSoldiers, ",")
             if idx > 1 then
@@ -385,6 +393,7 @@ function GameUICityBuildingInfo:CreateContent(content,index,color,image)
 end
 
 return GameUICityBuildingInfo
+
 
 
 

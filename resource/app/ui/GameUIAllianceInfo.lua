@@ -46,28 +46,40 @@ function GameUIAllianceInfo:filterMemberList(title)
         return v.title == title
     end)
 
-    local result = {{data_type = 1 , data = title}}
-    if #filter_data == 0 then
+    local result = {}
+    if LuaUtils:table_empty(filter_data) then
         table.insert(result,{data_type = 2 , data = "__empty"})
     else
         --player
         table.foreach(filter_data,function(k,v)
             table.insert(result,{data_type = 2 , data = v})
         end)
+        table.sort(result, function(a,b)
+            local a_data,b_data = a.data, b.data
+            local isOnline_a = type(a_data.online) == 'boolean' and a_data.online
+            local isOnline_b = type(b_data.online) == 'boolean' and b_data.online
+            if isOnline_a == isOnline_b then
+                return a_data.power > b_data.power
+            else
+                return isOnline_a
+            end
+        end)
     end
+    table.insert(result, 1, {data_type = 1 , data = title})
     return result
 end
 
 function GameUIAllianceInfo:RefreshListDataSource()
     local data = self:filterMemberList("general")
     local next_data = self:filterMemberList("quartermaster")
-    table.insertto(data,next_data)
+    table.insertto(data, next_data, #data + 1)
     next_data = self:filterMemberList("supervisor")
-    table.insertto(data,next_data)
+    table.insertto(data, next_data, #data + 1)
     next_data = self:filterMemberList("elite")
-    table.insertto(data,next_data)
+    table.insertto(data, next_data, #data + 1)
     next_data = self:filterMemberList("member")
-    table.insertto(data,next_data)
+    table.insertto(data, next_data, #data + 1)
+    dump(data)
     self.list_dataSource = data
 end
 
@@ -154,7 +166,7 @@ function GameUIAllianceInfo:LoadInfo()
         text = string.format("%d/%d",alliance_data.members,alliance_data.membersMax), --count of members
         size = 20,
         color = 0x403c2f
-    }):addTo(info_bg):align(display.LEFT_TOP,70, memberTitleLabel:getPositionY())
+    }):addTo(info_bg):align(display.LEFT_TOP,memberTitleLabel:getPositionX() + memberTitleLabel:getContentSize().width + 10, memberTitleLabel:getPositionY())
 
 
     local fightingTitleLabel = UIKit:ttfLabel({
@@ -167,7 +179,7 @@ function GameUIAllianceInfo:LoadInfo()
         text = string.formatnumberthousands(alliance_data.power),
         size = 20,
         color = 0x403c2f
-    }):addTo(info_bg):align(display.LEFT_TOP, 400, fightingTitleLabel:getPositionY())
+    }):addTo(info_bg):align(display.LEFT_TOP, fightingTitleLabel:getPositionX() + fightingTitleLabel:getContentSize().width + 10, fightingTitleLabel:getPositionY())
 
 
     local languageTitleLabel = UIKit:ttfLabel({
@@ -180,7 +192,7 @@ function GameUIAllianceInfo:LoadInfo()
         text = Localize.alliance_language[alliance_data.language], -- language
         size = 20,
         color = 0x403c2f
-    }):addTo(info_bg):align(display.LEFT_BOTTOM,memberValLabel:getPositionX(),10)
+    }):addTo(info_bg):align(display.LEFT_BOTTOM,languageTitleLabel:getPositionX() + languageTitleLabel:getContentSize().width + 10,10)
 
 
     local killTitleLabel = UIKit:ttfLabel({
@@ -194,7 +206,7 @@ function GameUIAllianceInfo:LoadInfo()
         text = string.formatnumberthousands(alliance_data.kill),
         size = 20,
         color = 0x403c2f
-    }):addTo(info_bg):align(display.LEFT_BOTTOM, fightingValLabel:getPositionX(), 10)
+    }):addTo(info_bg):align(display.LEFT_BOTTOM, killTitleLabel:getPositionX() + killTitleLabel:getContentSize().width + 10, 10)
 
     local leaderIcon = display.newSprite("alliance_item_leader_39x39.png")
         :addTo(layer)
@@ -236,7 +248,7 @@ function GameUIAllianceInfo:LoadInfo()
         :align(display.CENTER_TOP, l_size.width/2,l_size.height - 220)
         :addTo(layer)
 
-    local desc = alliance_data.desc 
+    local desc = alliance_data.desc
     if not desc or desc == json.null then
         desc = _("联盟未设置联盟描述")
     end
@@ -253,11 +265,17 @@ end
 
 function GameUIAllianceInfo:OnJoinActionClicked(joinType,sender)
     if  joinType == 'all' then --如果是直接加入
+        local alliance = self:GetAllianceData()
+        if alliance.members == alliance.membersMax then
+            UIKit:showMessageDialog(_("提示"),
+                _("联盟人数已达最大"))
+            return
+        end
         NetManager:getJoinAllianceDirectlyPromise(self:GetAllianceData().id):fail(function()
 
             end):done(function()
-        GameGlobalUI:showTips(_("提示"),string.format(_("加入%s联盟成功!"),self:GetAllianceData().name))
-        self:LeftButtonClicked()
+            GameGlobalUI:showTips(_("提示"),string.format(_("加入%s联盟成功!"),self:GetAllianceData().name))
+            self:LeftButtonClicked()
             end)
     else
         NetManager:getRequestToJoinAlliancePromise(self:GetAllianceData().id):done(function()
@@ -347,6 +365,7 @@ function GameUIAllianceInfo:LoadContact()
                 self:SendMail(self:GetAllianceArchonData().id, editbox_subject:getText(), textView:getText())
             end
         end)
+
     textView:setRectTrackedNode(send_button)
     return self.mail_layer
 end
@@ -366,7 +385,13 @@ function GameUIAllianceInfo:SendMail(addressee,title,content)
         UIKit:showMessageDialog(_("主人"),_("不能给自己发送邮件"))
         return
     end
-    NetManager:getSendPersonalMailPromise(addressee, title, content,self.contacts):done(function(result)
+    local ar_data = self:GetAllianceArchonData()
+    NetManager:getSendPersonalMailPromise(addressee, title, content,{
+                    id = ar_data.id,
+                    name = ar_data.name,
+                    icon = ar_data.icon,
+                    allianceTag = self:GetAllianceData().tag,
+                }):done(function(result)
         self:removeFromParent()
         return result
     end)
@@ -421,7 +446,7 @@ function GameUIAllianceInfo:LoadMembers()
     local time_str = _("在线")
     local isOnline = (type(archon_data.online) == 'boolean' and archon_data.online) and true or false
     if not isOnline then
-        time_str = _("最后登录:") .. NetService:formatTimeAsTimeAgoStyleByServerTime(archon_data.lastLoginTime)
+        time_str = _("最后登录:") .. NetService:formatTimeAsTimeAgoStyleByServerTime(archon_data.lastLogoutTime)
     end
     UIKit:GetPlayerCommonIcon(archon_data.icon,isOnline):addTo(box):pos(63,67)
     local loginLabel = UIKit:ttfLabel({
@@ -627,6 +652,7 @@ function GameUIAllianceInfo:listviewListener(event)
     end
 end
 return GameUIAllianceInfo
+
 
 
 

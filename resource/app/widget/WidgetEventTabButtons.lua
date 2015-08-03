@@ -50,7 +50,7 @@ function WidgetEventTabButtons:OnUpgrading(building, current_time, city)
     self:GetTabByKey("build"):SetOrResetProgress(self:BuildingPercent(building))
     if self:IsShow() and self:GetCurrentTab() == "build" then
         self:IteratorAllItem(function(i, v)
-            if i ~= 1 and v:GetEventKey() == building:UniqueKey() then
+            if i ~= 1 and v.GetEventKey and v:GetEventKey() == building:UniqueKey() then
                 v:SetProgressInfo(self:BuildingDescribe(building))
                 self:SetProgressItemBtnLabel(self:IsAbleToFreeSpeedup(building),building:UniqueUpgradingKey(),v)
             end
@@ -688,7 +688,7 @@ function WidgetEventTabButtons:UpgradeBuildingHelpOrSpeedup(building)
     end
 end
 function WidgetEventTabButtons:MiliTaryTechUpgradeOrSpeedup(event)
-    if DataUtils:getFreeSpeedUpLimitTime()>event:GetTime() then
+    if DataUtils:getFreeSpeedUpLimitTime() > event:GetTime() and event:GetTime() > 2 then
         NetManager:getFreeSpeedUpPromise(event:GetEventType(),event:Id())
     else
         if not Alliance_Manager:GetMyAlliance():IsDefault() then
@@ -993,7 +993,7 @@ function WidgetEventTabButtons:OnProductionTechnologyEventDataRefresh()
 end
 
 function WidgetEventTabButtons:ProductionTechnologyEventUpgradeOrSpeedup(event)
-    if DataUtils:getFreeSpeedUpLimitTime() > event:GetTime() then
+    if DataUtils:getFreeSpeedUpLimitTime() > event:GetTime() and event:GetTime() > 2 then
         NetManager:getFreeSpeedUpPromise("productionTechEvents",event:Id())
     else
         if not Alliance_Manager:GetMyAlliance():IsDefault() then

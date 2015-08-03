@@ -6,6 +6,9 @@ local Observer = import(".Observer")
 local MarchAttackEvent = class("MarchAttackEvent",Observer)
 local Enum = import("..utils.Enum")
 local property = import("..utils.property")
+local Localize = import("..utils.Localize")
+
+local monsterConfig = GameDatas.AllianceInitData.monster
 
 MarchAttackEvent.MARCH_EVENT_PLAYER_ROLE = Enum("SENDER","RECEIVER","NOTHING")
 
@@ -18,6 +21,7 @@ property(MarchAttackEvent, "attackPlayerData", {})
 property(MarchAttackEvent, "defencePlayerData", {})
 property(MarchAttackEvent, "defenceVillageData", {})
 property(MarchAttackEvent, "defenceShrineData", {})
+property(MarchAttackEvent, "defenceMonsterData", {})
 property(MarchAttackEvent, "isStrikeEvent",false)
 
 
@@ -27,6 +31,19 @@ function MarchAttackEvent:ctor(isStrike)
 		isStrike = false
 	end
 	self:SetIsStrikeEvent(isStrike)
+end
+function MarchAttackEvent:GetTargetName()
+	if self:MarchType() == "city" or self:MarchType() == "helpDefence"then
+		return self:GetDefenceData().name
+	elseif self:MarchType() == "village" then
+		local village_data = self:GetDefenceData() 
+		return Localize.village_name[village_data.name] .. "Lv" .. village_data.level
+	elseif self:MarchType() == "shrine" then
+		return _("圣地")
+	elseif self:MarchType() == "monster" then
+		local soldier_type = unpack(string.split(self:GetDefenceData().name, "_"))
+		return Localize.soldier_name[soldier_type]
+	end
 end
 --判断该玩家是这个事件的发送者/接受者/无关
 function MarchAttackEvent:GetPlayerRole()
@@ -79,6 +96,8 @@ function MarchAttackEvent:GetDefenceData()
 		return self:DefencePlayerData()
 	elseif self:MarchType() == "shrine" then
 		return self:DefenceShrineData()
+	elseif self:MarchType() == "monster" then
+		return self:DefenceMonsterData()
 	else
 		assert(false,"不支持此种行军事件 --> " .. self:MarchType())
 	end
@@ -101,6 +120,7 @@ function MarchAttackEvent:UpdateData(json_data,refresh_time)
 	self:SetDefencePlayerData(json_data.defencePlayerData or {})
 	self:SetDefenceVillageData(json_data.defenceVillageData or {})
 	self:SetDefenceShrineData(json_data.defenceShrineData or {})
+	self:SetDefenceMonsterData(json_data.defenceMonsterData or {})
 	self.times_ = math.ceil(self:ArriveTime() - refresh_time)
 end
 

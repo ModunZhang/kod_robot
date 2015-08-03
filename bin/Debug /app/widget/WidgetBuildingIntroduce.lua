@@ -2,22 +2,61 @@ local WidgetPopDialog = import(".WidgetPopDialog")
 local WidgetRequirementListview = import(".WidgetRequirementListview")
 local MaterialManager = import("..entity.MaterialManager")
 local Localize = import("..utils.Localize")
+local SpriteConfig = import("..sprites.SpriteConfig")
 
 local WidgetBuildingIntroduce = class("WidgetBuildingIntroduce", WidgetPopDialog)
 
 function WidgetBuildingIntroduce:ctor(building)
-    WidgetBuildingIntroduce.super.ctor(self,420,_("升级条件"),display.top - 300)
+    WidgetBuildingIntroduce.super.ctor(self,500,_("升级条件"),display.top - 280)
     self.building = building
     self.city = City
     local body = self.body
     local size = body:getContentSize()
     local width,height = size.width,size.height
-    UIKit:ttfLabel({
-        text = Localize.building_name[building:GetType()].."(LV"..building:GetLevel()..")",
-        size = 24,
-        color = 0x403c2f
-    }):align(display.LEFT_CENTER,30,height-50)
+
+    -- 建筑功能介绍
+    local building_bg = display.newSprite("alliance_item_flag_box_126X126.png")
+        :align(display.LEFT_TOP, 24, height - 30)
+        :scale(136/126)
         :addTo(body)
+
+    local build_png = SpriteConfig[building:GetType()]:GetConfigByLevel(1).png
+    local building_image = display.newScale9Sprite(build_png, building_bg:getContentSize().width/2, building_bg:getContentSize().height/2):addTo(building_bg)
+    building_image:setAnchorPoint(cc.p(0.5,0.5))
+    building_image:setScale(90/math.max(building_image:getContentSize().width,building_image:getContentSize().height))
+
+    local configs = SpriteConfig[building:GetType()]:GetAnimationConfigsByLevel(1)
+    local p = building_image:getAnchorPointInPoints()
+    for _,v in ipairs(configs) do
+        if v.deco_type == "image" then
+            display.newSprite(v.deco_name):addTo(building_image)
+                :pos(p.x + v.offset.x, p.y + v.offset.y)
+        elseif v.deco_type == "animation" then
+            local offset = v.offset
+            local armature = ccs.Armature:create(v.deco_name)
+                :addTo(building_image):scale(v.scale or 1)
+                :align(display.CENTER, offset.x or p.x, offset.y or p.y)
+            armature:getAnimation():setSpeedScale(2)
+            armature:getAnimation():playWithIndex(0)
+        end
+    end
+
+    local title_bg = display.newScale9Sprite("title_blue_430x30.png", width/2 - 116, height - 30,cc.size(380,30),cc.rect(15,10,400,10))
+        :align(display.LEFT_TOP)
+        :addTo(body)
+    local bd = Localize.building_name
+    local building_name = UIKit:ttfLabel({
+        text = bd[building:GetType()],
+        size = 24,
+        color = 0xffedae
+    }):align(display.LEFT_CENTER,20, 15):addTo(title_bg)
+    local bd = Localize.building_description
+    local building_introduces = UIKit:ttfLabel({
+        text = bd[building:GetType()],
+        size = 20,
+        dimensions = cc.size(380, 0),
+        color = 0x615b44
+    }):align(display.LEFT_TOP,width/2 - 116, height - 70):addTo(body)
     self:SetUpgradeRequirementListview()
 end
 

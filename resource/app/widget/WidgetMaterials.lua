@@ -20,19 +20,6 @@ local TECHNOLOGY_MATERIALS = {
 }
 
 local DRAGON_MATERIALS = {
-    "ingo_1" ,
-    "ingo_2" ,
-    "ingo_3" ,
-    "ingo_4",
-    "redSoul_2" ,
-    "redSoul_3" ,
-    "redSoul_4" ,
-    "blueSoul_2" ,
-    "blueSoul_3" ,
-    "blueSoul_4" ,
-    "greenSoul_2",
-    "greenSoul_3",
-    "greenSoul_4" ,
     "redCrystal_1",
     "redCrystal_2" ,
     "redCrystal_3" ,
@@ -45,10 +32,23 @@ local DRAGON_MATERIALS = {
     "greenCrystal_2" ,
     "greenCrystal_3" ,
     "greenCrystal_4" ,
+    "ingo_1" ,
+    "ingo_2" ,
+    "ingo_3" ,
+    "ingo_4",
     "runes_1" ,
     "runes_2" ,
     "runes_3" ,
     "runes_4" ,
+    "redSoul_2" ,
+    "redSoul_3" ,
+    "redSoul_4" ,
+    "blueSoul_2" ,
+    "blueSoul_3" ,
+    "blueSoul_4" ,
+    "greenSoul_2",
+    "greenSoul_3",
+    "greenSoul_4" ,
 }
 local SOLDIER_METARIALS = {
     "heroBones" ,
@@ -109,14 +109,18 @@ function WidgetMaterials:CreateItemWithListView(material_type,materials,notClean
     local row_item = display.newNode()
     local row_count = 0
     self.material_box_table[material_type]={}
+    local change_line_count = 3
     for i,material_name in ipairs(materials) do
+        if string.find(material_name,"redSoul") or string.find(material_name,"blueSoul") or string.find(material_name,"greenSoul") then
+            change_line_count = 2
+        end
         local material_box = WidgetMaterialBox.new(material_type,material_name,function ()
             self:OpenMaterialDetails(material_type,material_name,material_map[material_name].."/"..self.building:GetMaxMaterial())
         end,true):addTo(row_item):SetNumber(string.formatnumberthousands(material_map[material_name]).."/"..string.formatnumberthousands(self.building:GetMaxMaterial()))
             :pos(origin_x + (unit_width + gap_x) * row_count , -unit_height/2)
         self.material_box_table[material_type][material_name] = material_box
         row_count = row_count + 1
-        if row_count>3 or i==#materials then
+        if row_count > change_line_count or i == #materials then
             local item = list_view:newItem()
             item:addContent(row_item)
             item:setItemSize(548, unit_height)
@@ -149,7 +153,7 @@ function WidgetMaterials:GetMateriasl( m_type )
     end
 end
 function WidgetMaterials:OpenMaterialDetails(material_type,material_name,num)
-    UIKit:newWidgetUI("WidgetMaterialDetails",material_type,material_name,num):AddToCurrentScene()
+UIKit:newWidgetUI("WidgetMaterialDetails",material_type,material_name,num):AddToCurrentScene()
 end
 function WidgetMaterials:CreateSelectButton()
     self.dropList = WidgetRoundTabButtons.new(

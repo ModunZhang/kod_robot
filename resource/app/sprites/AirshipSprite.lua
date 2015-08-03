@@ -32,6 +32,9 @@ function AirshipSprite:GetEntity()
         end,
         GetMidLogicPosition = function()
             return self.logic_x + 3, self.logic_y + 3
+        end,
+        IsHouse = function()
+            return false
         end
     }
 end

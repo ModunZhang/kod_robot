@@ -1,75 +1,7 @@
+local UILib = import("..ui.UILib")
 local Sprite = import(".Sprite")
 local BarracksSoldierSprite = class("BarracksSoldierSprite", Sprite)
-
 local min = math.min
-local soldier_config = {
-    ----
-    ["swordsman"] = {
-        {"bubing_1", 0, 10, 0.8},
-        {"bubing_2", -10, 5, 0.8},
-        {"bubing_3", 0, 0, 0.8},
-    },
-    ["ranger"] = {
-        {"gongjianshou_1", 0, 10, 0.8},
-        {"gongjianshou_2", 0, 10, 0.8},
-        {"gongjianshou_3", 0, 10, 0.8},
-    },
-    ["lancer"] = {
-        {"qibing_1", 0, 10, 0.8},
-        {"qibing_2", 0, 10, 0.8},
-        {"qibing_3", 0, 10, 0.8},
-    },
-    ["catapult"] = {
-        {  "toushiche", 50, 10, 0.8},
-        {"toushiche_2", 0, 10, 0.8},
-        {"toushiche_3", 0, 10, 0.8},
-    },
-
-    -----
-    ["sentinel"] = {
-        {"shaobing_1", 0, 10, 0.8},
-        {"shaobing_2", 0, 10, 0.8},
-        {"shaobing_3", 0, 10, 0.8},
-    },
-    ["crossbowman"] = {
-        {"nugongshou_1", 0, 10, 0.8},
-        {"nugongshou_2", 0, 10, 0.8},
-        {"nugongshou_3", 10, 10, 0.8},
-    },
-    ["horseArcher"] = {
-        {"youqibing_1", 0, 10, 0.8},
-        {"youqibing_2", 0, 10, 0.8},
-        {"youqibing_3", 0, 10, 0.8},
-    },
-    ["ballista"] = {
-        {"nuche_1", 0, 10, 0.8},
-        {"nuche_2", 0, 10, 0.8},
-        {"nuche_3", 0, 10, 0.8},
-    },
-    ----
-    ["skeletonWarrior"] = {
-        {"kulouyongshi", 0, 10, 0.8},
-        {"kulouyongshi", 0, 10, 0.8},
-        {"kulouyongshi", 0, 10, 0.8},
-    },
-    ["skeletonArcher"] = {
-        {"kulousheshou", 30, 5, 0.8},
-        {"kulousheshou", 30, 5, 0.8},
-        {"kulousheshou", 30, 5, 0.8},
-    },
-    ["deathKnight"] = {
-        {"siwangqishi", 0, 5, 0.8},
-        {"siwangqishi", 0, 5, 0.8},
-        {"siwangqishi", 0, 5, 0.8},
-    },
-    ["meatWagon"] = {
-        {"jiaorouche", 0, 10, 0.8},
-        {"jiaorouche", 0, 10, 0.8},
-        {"jiaorouche", 0, 10, 0.8},
-    },
-}
-
-
 function BarracksSoldierSprite:ctor(city_layer, soldier_type, star)
     self.soldier_type = soldier_type
     self.soldier_star = star
@@ -94,33 +26,35 @@ function BarracksSoldierSprite:ctor(city_layer, soldier_type, star)
 
     -- self:CreateBase()
 end
-function BarracksSoldierSprite:PlayAnimation(animation)
-    self.sprite:getAnimation():play(animation)
-end
 function BarracksSoldierSprite:CreateSprite()
-    local ani_name,_,_,s = unpack(soldier_config[self.soldier_type][self.soldier_star])
-    local armature = ccs.Armature:create(ani_name):scale(s)
-    -- armature:setAnchorPoint(display.ANCHOR_POINTS[display.CENTER])
-    return armature
+    return ccs.Armature:create(self:GetAniName())
 end
 function BarracksSoldierSprite:TurnEast()
-    self:GetSprite():setScaleX(self:GetSprite():getScaleY())
-    self:PlayAnimation("move_45")
-end
-function BarracksSoldierSprite:TurnWest()
-    self:GetSprite():setScaleX(-self:GetSprite():getScaleY())
-    self:PlayAnimation("move_-45")
-end
-function BarracksSoldierSprite:TurnNorth()
-    self:GetSprite():setScaleX(-self:GetSprite():getScaleY())
-    self:PlayAnimation("move_45")
+    self:SetupAniConfig("move_45", true)
 end
 function BarracksSoldierSprite:TurnSouth()
-    self:GetSprite():setScaleX(self:GetSprite():getScaleY())
-    self:PlayAnimation("move_-45")
+    self:SetupAniConfig("move_45")
+end
+function BarracksSoldierSprite:TurnWest()
+    self:SetupAniConfig("move_-45")
+end
+function BarracksSoldierSprite:TurnNorth()
+    self:SetupAniConfig("move_-45", true)
+end
+function BarracksSoldierSprite:SetupAniConfig(act, isFlip)
+    local ap,flip,s,shadow = unpack(UIKit:GetSoldierMoveAniConfig(self:GetAniName(), act))
+    s = s * 0.7
+    local sprite = self:GetSprite()
+    sprite:setScaleX(((not flip and isFlip) or (flip and not isFlip)) and -s or s)
+    sprite:setScaleX(-self:GetSprite():getScaleX())
+    sprite:setScaleY(s)
+    sprite:setAnchorPoint(ap)
+    sprite:getAnimation():play(act)
+end
+function BarracksSoldierSprite:GetAniName()
+    return UILib.soldier_animation[self.soldier_type][self.soldier_star]
 end
 function BarracksSoldierSprite:GetSpriteOffset()
-    local _,x,y = unpack(soldier_config[self.soldier_type][self.soldier_star])
     return 0,0
 end
 function BarracksSoldierSprite:GetMidLogicPosition()
@@ -143,12 +77,12 @@ function BarracksSoldierSprite:UpdateVelocityByPoints(start_point, end_point)
     local distance = cc.pGetLength(dir)
     self.speed = {x = speed * dir.x / distance, y = speed * dir.y / distance}
     local degree = math.deg(cc.pGetAngle(dir,cc.p(1,-1)))
-    if degree < 0 and degree > -15 then
+    if degree > -15 and degree < 0 then
         self:TurnEast()
-    elseif degree < -50 and degree > -90 then
-        self:TurnSouth()
-    elseif degree > 100 and degree < 120 then
+    elseif degree > -90 and degree < -50 then
         self:TurnNorth()
+    elseif degree > 100 and degree < 120 then
+        self:TurnSouth()
     else
         self:TurnWest()
     end

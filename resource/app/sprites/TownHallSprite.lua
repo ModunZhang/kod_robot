@@ -10,41 +10,54 @@ function TownHallSprite:OnNewDailyQuestsEvent(changed_map)
             break
         end
     end
-    self:DoAni()
+    self:CheckEvent()
 end
-
-
 
 
 local EMPTY_TAG = 11400
+local TIP_TAG = 11201
 function TownHallSprite:ctor(city_layer, entity, city)
     TownHallSprite.super.ctor(self, city_layer, entity, city)
     city:GetUser():AddListenOnType(self, city:GetUser().LISTEN_TYPE.NEW_DALIY_QUEST_EVENT)
-    self:DoAni()
+    display.newNode():addTo(self):schedule(function()
+        self:CheckEvent()
+    end,1)
 end
 function TownHallSprite:RefreshSprite()
     TownHallSprite.super.RefreshSprite(self)
-    self:DoAni()
+    self:CheckEvent()
 end
-function TownHallSprite:DoAni()
+function TownHallSprite:CheckEvent()
     if self:GetEntity():IsUnlocked() then
-        if self:GetEntity():BelongCity():GetUser():IsOnDailyQuestEvents() then
-            self:PlayAni()
-            self:removeChildByTag(EMPTY_TAG)
+        local user = self:GetEntity():BelongCity():GetUser()
+        if user:IsOnDailyQuestEvents() then
+            self:GetAniArray()[1]:show()
+            self:RemoveEmptyanimation()
+        elseif user:IsFinishedAllDailyQuests() then
+            self:GetAniArray()[1]:hide()
+            self:RemoveEmptyanimation()
         else
-            self:StopAni()
+            self:GetAniArray()[1]:hide()
             self:PlayEmptyAnimation()
+        end
+        if user:CouldGotDailyQuestReward() then
+            if not self:getChildByTag(TIP_TAG) then
+                local x,y = self:GetSpriteTopPosition()
+                x = x - 20
+                y = y - 100
+                display.newSprite("tmp_tips_56x60.png")
+                    :addTo(self,1,TIP_TAG):align(display.BOTTOM_CENTER,x,y)
+                    :runAction(UIKit:ShakeAction(true,2))
+            end
+        elseif self:getChildByTag(TIP_TAG) then
+            self:removeChildByTag(TIP_TAG)
         end
     end
 end
-function TownHallSprite:PlayAni()
-    local animation = self:GetAniArray()[1]:show():getAnimation()
-    animation:stop()
-    animation:setSpeedScale(2)
-    animation:playWithIndex(0)
-end
-function TownHallSprite:StopAni()
-    self:GetAniArray()[1]:hide():getAnimation():stop()
+function TownHallSprite:RemoveEmptyanimation()
+    if self:getChildByTag(EMPTY_TAG) then
+        self:removeChildByTag(EMPTY_TAG)
+    end
 end
 function TownHallSprite:PlayEmptyAnimation()
     if not self:getChildByTag(EMPTY_TAG) then
@@ -54,6 +67,7 @@ function TownHallSprite:PlayEmptyAnimation()
 end
 
 return TownHallSprite
+
 
 
 

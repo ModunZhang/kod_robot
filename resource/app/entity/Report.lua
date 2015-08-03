@@ -10,8 +10,8 @@ property(Report, "createTime", 0)
 property(Report, "isRead", false)
 property(Report, "isSaved", false)
 property(Report, "index", 0)
-Report.REPORT_TYPE = Enum("strikeCity","cityBeStriked","strikeVillage","villageBeStriked","attackCity","attackVillage","collectResource")
-local STRIKECITY,CITYBESTRIKED,STRIKEVILLAGE,VILLAGEBESTRIKED,ATTACKCITY,ATTACKVILLAGE,COLLECTRESOURCE = 1,2,3,4,5,6,7
+Report.REPORT_TYPE = Enum("strikeCity","cityBeStriked","strikeVillage","villageBeStriked","attackCity","attackVillage","collectResource","attackMonster","attackShrine")
+local STRIKECITY,CITYBESTRIKED,STRIKEVILLAGE,VILLAGEBESTRIKED,ATTACKCITY,ATTACKVILLAGE,COLLECTRESOURCE,ATTACKMONSTER,ATTACKSHRINE = 1,2,3,4,5,6,7,8,9
 function Report:ctor(id,type,createTime,isRead,isSaved,index)
     self:SetId(id)
     self:SetType(type)
@@ -69,12 +69,15 @@ end
 function Report:GetEnemyPlayerData()
     local data = self:GetData()
     if self.player_id == data.attackPlayerData.id then
-        return data.helpDefencePlayerData or data.defencePlayerData or data.defenceVillageData
+        return data.helpDefencePlayerData or data.defencePlayerData or data.defenceVillageData or data.defenceMonsterData
     else
         return data.attackPlayerData
     end
 end
-
+function Report:GetShrineRoundDatas()
+    local data = self:GetData()
+    return data.roundDatas
+end
 function Report:GetMyHelpFightTroop()
     local data = self:GetData()
     if self.player_id == data.attackPlayerData.id then
@@ -151,22 +154,6 @@ function Report:GetEnemyHelpFightDragon()
         end
     end
 end
-function Report:GetMyDefenceFightPlayerData()
-    local data = self:GetData()
-    if self.player_id == data.attackPlayerData.id then
-        return data.attackPlayerData
-    else
-        return data.defencePlayerData or data.defenceVillageData
-    end
-end
-function Report:GetEnemyDefenceFightPlayerData()
-    local data = self:GetData()
-    if self.player_id == data.attackPlayerData.id then
-        return data.defencePlayerData or data.defenceVillageData
-    else
-        return data.attackPlayerData
-    end
-end
 function Report:GetMyDefenceFightTroop()
     local data = self:GetData()
     if self.player_id == data.attackPlayerData.id then
@@ -183,6 +170,7 @@ function Report:GetEnemyDefenceFightTroop()
     if self.player_id == data.attackPlayerData.id then
         return data.defencePlayerData and data.defencePlayerData.soldiers
             or data.defenceVillageData and data.defenceVillageData.soldiers
+            or data.defenceMonsterData and data.defenceMonsterData.soldiers
     else
         return data.attackPlayerData and data.attackPlayerData.soldiers or data.attackPlayerData.fightWithDefenceTroop and data.attackPlayerData.fightWithDefenceTroop.soldiers
     end
@@ -202,6 +190,7 @@ function Report:GetEnemyDefenceFightDragon()
     if self.player_id == data.attackPlayerData.id then
         return data.defencePlayerData and data.defencePlayerData.dragon
             or data.defenceVillageData and data.defenceVillageData.dragon
+            or data.defenceMonsterData and data.defenceMonsterData.dragon
     else
         return data.attackPlayerData.fightWithDefenceTroop and data.attackPlayerData.fightWithDefenceTroop.dragon
             or data.attackPlayerData and data.attackPlayerData.dragon
@@ -224,6 +213,9 @@ function Report:GetMyRoundDatas()
         if data.fightWithDefenceVillageReports then
             table.insert(round_datas, data.fightWithDefenceVillageReports.attackPlayerSoldierRoundDatas)
         end
+        if data.fightWithDefenceMonsterReports then
+            table.insert(round_datas, data.fightWithDefenceMonsterReports.attackPlayerSoldierRoundDatas)
+        end
     else
         if data.fightWithHelpDefencePlayerReports then
             table.insert(round_datas, data.fightWithHelpDefencePlayerReports.defencePlayerSoldierRoundDatas)
@@ -244,6 +236,9 @@ function Report:GetEnemyRoundDatas()
         end
         if data.fightWithDefencePlayerReports then
             table.insert(round_datas, data.fightWithDefencePlayerReports.defencePlayerSoldierRoundDatas)
+        end
+        if data.fightWithDefenceMonsterReports then
+            table.insert(round_datas, data.fightWithDefenceMonsterReports.defenceMonsterSoldierRoundDatas)
         end
     else
         if data.fightWithHelpDefencePlayerReports then
@@ -269,7 +264,7 @@ function Report:GetMyRewards()
         return data.helpDefencePlayerData.rewards
     elseif data.defencePlayerData and data.defencePlayerData.id == self.player_id then
         return data.defencePlayerData.rewards
-    elseif self.type == Report.REPORT_TYPE[COLLECTRESOURCE] then
+    elseif self.type == Report.REPORT_TYPE[COLLECTRESOURCE] or self.type == Report.REPORT_TYPE[ATTACKSHRINE] then
         return data.rewards
     end
 end
@@ -329,6 +324,8 @@ function Report:GetBattleAt()
         return Localize.village_name[data.attackTarget.name]
     elseif self.type == Report.REPORT_TYPE[COLLECTRESOURCE] then
         return Localize.village_name[data.collectTarget.name]
+    elseif self.type == Report.REPORT_TYPE[ATTACKMONSTER] then
+        return data.attackTarget.level
     end
 end
 function Report:GetBattleLocation()
@@ -339,7 +336,10 @@ function Report:GetBattleLocation()
         or self.type == Report.REPORT_TYPE[STRIKEVILLAGE] then
         return data.strikeTarget.location
     elseif self.type == Report.REPORT_TYPE[ATTACKCITY]
-        or self.type == Report.REPORT_TYPE[ATTACKVILLAGE] then
+        or self.type == Report.REPORT_TYPE[ATTACKVILLAGE]
+        or self.type == Report.REPORT_TYPE[ATTACKMONSTER]
+        or self.type == Report.REPORT_TYPE[ATTACKSHRINE]
+    then
         return data.attackTarget.location
     elseif self.type == Report.REPORT_TYPE[COLLECTRESOURCE] then
         return data.collectTarget.location
@@ -398,6 +398,11 @@ function Report:GetReportTitle()
         end
     elseif report_type=="collectResource" then
         return _("采集报告")
+    elseif report_type=="attackMonster" then
+        local result = self:GetReportResult()
+        return result and _("进攻黑龙军团成功") or _("进攻黑龙军团失败")
+    elseif report_type=="attackShrine" then
+        return self:GetAttackTarget().isWin and _("攻打联盟圣地成功") or _("攻打联盟圣地失败")
     end
 end
 function Report:IsFromMe()
@@ -414,6 +419,10 @@ function Report:IsFromMe()
         return data.attackTarget.id ~= self.player_id
     elseif report_type=="collectResource" then
         return "collectResource"
+    elseif report_type=="attackMonster" then
+        return "attackMonster"
+    elseif report_type=="attackShrine" then
+        return "attackShrine"
     end
 end
 function Report:IsAttackOrStrike()
@@ -429,6 +438,10 @@ function Report:IsAttackOrStrike()
         return "attack"
     elseif report_type=="collectResource" then
         return "collect"
+    elseif report_type=="attackMonster" then
+        return "strike"
+    elseif report_type=="attackShrine" then
+        return "strike"
     end
 end
 function Report:IsWin()
@@ -464,6 +477,10 @@ function Report:IsWin()
         return self:GetReportResult()
     elseif report_type=="collectResource" then
         return true
+    elseif report_type=="attackMonster" then
+        return self:GetReportResult()
+    elseif report_type=="attackShrine" then
+        return self:GetAttackTarget().isWin
     end
 end
 function Report:IsHasHelpDefencePlayer()
@@ -481,6 +498,7 @@ function Report:GetFightDefenceName()
     return data.helpDefencePlayerData and data.helpDefencePlayerData.name
         or data.defencePlayerData and data.defencePlayerData.name
         or data.defenceVillageData and Localize.village_name[data.defenceVillageData.type].." Lv "..data.defenceVillageData.level
+        or data.defenceMonsterData and Localize.soldier_name[data.defenceMonsterData.soldiers[1].name]
 end
 function Report:IsDragonFight()
     local data = self:GetFightReports()
@@ -492,7 +510,7 @@ function Report:GetFightAttackDragonRoundData()
 end
 function Report:GetFightDefenceDragonRoundData()
     local data = self:GetFightReports()
-    return data.defencePlayerDragonFightData or {}
+    return data.defencePlayerDragonFightData or data.defenceMonsterDragonFightData or {}
 end
 function Report:GetFightAttackSoldierRoundData()
     local data = self:GetFightReports()
@@ -500,7 +518,7 @@ function Report:GetFightAttackSoldierRoundData()
 end
 function Report:GetFightDefenceSoldierRoundData()
     local data = self:GetFightReports()
-    return data.defencePlayerSoldierRoundDatas or {}
+    return data.defencePlayerSoldierRoundDatas or data.defenceMonsterSoldierRoundDatas or {}
 end
 function Report:IsFightWall()
     local data = self:GetFightReports()
@@ -522,13 +540,13 @@ function Report:GetOrderedAttackSoldiers()
 end
 function Report:GetOrderedDefenceSoldiers()
     local data = self:GetData()
-    local defenceData = data.helpDefencePlayerData or data.defencePlayerData
+    local defenceData = data.helpDefencePlayerData or data.defencePlayerData or data.defenceMonsterData
     local soldiers = defenceData and defenceData.soldiers or {}
     return soldiers
 end
 function Report:GetFightReports()
     local data = self:GetData()
-    return data.fightWithHelpDefencePlayerReports or data.fightWithDefencePlayerReports
+    return data.fightWithHelpDefencePlayerReports or data.fightWithDefencePlayerReports or data.fightWithDefenceMonsterReports
         or {}
 end
 function Report:GetReportResult()
@@ -562,7 +580,6 @@ function Report:GetReportResult()
                     return false
                 end
             end
-
             return my_round[#my_round].isWin
         elseif data.fightWithDefencePlayerReports then
             -- 打到城墙，直接算赢
@@ -572,6 +589,35 @@ function Report:GetReportResult()
             end
             local my_round = data.fightWithDefencePlayerReports.attackPlayerSoldierRoundDatas
             local defence_round = data.fightWithDefencePlayerReports.defencePlayerSoldierRoundDatas
+            -- 判定是否双方所有士兵都参加了战斗
+            local my_soldiers = self:GetOrderedAttackSoldiers()
+            local defence_soldiers = self:GetOrderedDefenceSoldiers()
+            for i,s in ipairs(my_soldiers) do
+                local isFight = false
+                for i,r in ipairs(my_round) do
+                    if s.name == r.soldierName then
+                        isFight = true
+                    end
+                end
+                if not isFight then
+                    return true
+                end
+            end
+            for i,s in ipairs(defence_soldiers) do
+                local isFight = false
+                for i,r in ipairs(defence_round) do
+                    if s.name == r.soldierName then
+                        isFight = true
+                    end
+                end
+                if not isFight then
+                    return false
+                end
+            end
+            return my_round[#my_round].isWin
+        elseif data.fightWithDefenceMonsterReports then
+            local my_round = data.fightWithDefenceMonsterReports.attackPlayerSoldierRoundDatas
+            local defence_round = data.fightWithDefenceMonsterReports.defenceMonsterSoldierRoundDatas
             -- 判定是否双方所有士兵都参加了战斗
             local my_soldiers = self:GetOrderedAttackSoldiers()
             local defence_soldiers = self:GetOrderedDefenceSoldiers()
@@ -673,21 +719,27 @@ function Report:GetAttackDragonLevel()
     local data = self.data
     local attack = data.attackPlayerData
     return attack.fightWithHelpDefenceTroop and attack.fightWithHelpDefenceTroop.dragon.level or
-        attack.fightWithDefenceTroop and attack.fightWithDefenceTroop.dragon.level
+        attack.fightWithDefenceTroop and attack.fightWithDefenceTroop.dragon.level or
+        attack.dragon and attack.dragon.level
 end
 function Report:GetDefenceDragonLevel()
     local data = self.data
     local helpDefencePlayerData = data.helpDefencePlayerData
     local defencePlayerData = data.defencePlayerData
+    local defenceMonsterData = data.defenceMonsterData
 
     return helpDefencePlayerData and helpDefencePlayerData.dragon.level or
-        defencePlayerData and defencePlayerData.dragon.level
+        defencePlayerData and defencePlayerData.dragon.level or
+        defenceMonsterData and defenceMonsterData.dragon.level
 end
 function Report:GetAttackTargetTerrain()
     local data = self.data
     return data.attackTarget.terrain
 end
 return Report
+
+
+
 
 
 

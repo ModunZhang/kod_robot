@@ -5,9 +5,6 @@ function DragonSprite:ctor(map_layer, tarrain)
     AnimationSprite.super.ctor(self, map_layer, nil, 0, 0)
     self:ReloadSpriteCauseTerrainChanged(tarrain)
 end
-function DragonSprite:SetPositionWithZOrder()
-
-end
 function DragonSprite:GetLogicZorder()
     return 1
 end

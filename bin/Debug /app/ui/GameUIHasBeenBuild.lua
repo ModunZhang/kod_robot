@@ -83,6 +83,7 @@ function Item:ctor(parent_ui)
     self.condition_label = UIKit:ttfLabel({
         size = 20,
         color = 0x7e0000,
+        dimensions = cc.size(220,0)
     }):addTo(back_ground, 2):align(display.LEFT_CENTER, 170 - 5, h/2)
 
     self.desc_label = UIKit:ttfLabel({
@@ -104,9 +105,9 @@ function Item:ctor(parent_ui)
 
     self.button = WidgetPushButton.new(
         {
-        normal = "purple_btn_up_148x58.png",
-        pressed = "purple_btn_down_148x58.png",
-        disabled = "gray_btn_148x58.png",
+            normal = "purple_btn_up_148x58.png",
+            pressed = "purple_btn_down_148x58.png",
+            disabled = "gray_btn_148x58.png",
         })
         :addTo(self):align(display.CENTER, w - 90, 40)
         :setButtonLabel(UIKit:ttfLabel({
@@ -117,7 +118,9 @@ function Item:ctor(parent_ui)
         :onButtonClicked(function(event)
             local building = self.building
             if self.status == "free" then
-                NetManager:getFreeSpeedUpPromise(building:EventType(), building:UniqueUpgradingKey())
+                if building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 2 then
+                    NetManager:getFreeSpeedUpPromise(building:EventType(), building:UniqueUpgradingKey())
+                end
             elseif self.status == "instant" then
                 local city = building:BelongCity()
                 if building:getUpgradeNowNeedGems() > city:GetUser():GetGemResource():GetValue() then
@@ -135,17 +138,26 @@ function Item:ctor(parent_ui)
                     )
                     return
                 end
-                if city:IsFunctionBuilding(building) then
-                    local location_id = city:GetLocationIdByBuilding(building)
-                    NetManager:getInstantUpgradeBuildingByLocationPromise(location_id)
-                elseif city:IsHouse(building) then
-                    local tile = city:GetTileWhichBuildingBelongs(building)
-                    local house_location = tile:GetBuildingLocation(building)
-                    NetManager:getInstantUpgradeHouseByLocationPromise(tile.location_id, house_location)
-                elseif city:IsGate(building) then
-                    NetManager:getInstantUpgradeWallByLocationPromise()
-                elseif city:IsTower(building) then
-                    NetManager:getInstantUpgradeTowerPromise()
+                local instant_build = function ()
+                    if city:IsFunctionBuilding(building) then
+                        local location_id = city:GetLocationIdByBuilding(building)
+                        NetManager:getInstantUpgradeBuildingByLocationPromise(location_id)
+                    elseif city:IsHouse(building) then
+                        local tile = city:GetTileWhichBuildingBelongs(building)
+                        local house_location = tile:GetBuildingLocation(building)
+                        NetManager:getInstantUpgradeHouseByLocationPromise(tile.location_id, house_location)
+                    elseif city:IsGate(building) then
+                        NetManager:getInstantUpgradeWallByLocationPromise()
+                    elseif city:IsTower(building) then
+                        NetManager:getInstantUpgradeTowerPromise()
+                    end
+                end
+                if app:GetGameDefautlt():IsOpenGemRemind() then
+                    UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),string.formatnumberthousands(building:getUpgradeNowNeedGems())), function()
+                        instant_build()
+                    end,true,true)
+                else
+                    instant_build()
                 end
             elseif self.status == "normal" then
                 local illegal, is_pre_condition = building:IsAbleToUpgrade(false)
@@ -193,7 +205,7 @@ function Item:ctor(parent_ui)
 end
 function Item:SetBuildingType(building_type, level)
     local config = SpriteConfig[building_type]
-    local png = SpriteConfig[building_type]:GetConfigByLevel(level).png
+    local png = SpriteConfig[building_type]:GetConfigByLevel(level > 0 and level or 1).png
     self.title_label:setString(Localize.building_name[building_type])
     self.building_icon:setTexture(png)
     self.building_icon:setPosition(building_config_map[building_type].offset.x,building_config_map[building_type].offset.y)
@@ -264,8 +276,11 @@ function Item:UpdateDesc(building)
         if building:IsMaxLevel() then
             self.desc_label:setString(_("已经到最大等级了"))
             self.desc_label:setPositionY(70)
+        elseif building:GetLevel() == 0 then
+            self.desc_label:setString(_("可解锁建筑"))
+            self.desc_label:setPositionY(35)
         else
-            self.desc_label:setString(string.format(_("从等级%d升级到等级%d"), building:GetLevel(), building:GetNextLevel()))
+            self.desc_label:setString(string.format(_("升级到等级%d"), building:GetLevel(), building:GetNextLevel()))
             self.desc_label:setPositionY(35)
         end
     end
@@ -320,13 +335,11 @@ function Item:ChangeStatus(status)
         self.condition_label:hide()
     end
     self.status = status
-    local is_building = is_building_map[status]
-    if is_building then
-        self.progress:show()
-    else
-        self.progress:hide()
-    end
+    self.progress:setVisible(is_building_map[status])
     self:UpdateDesc(self.building)
+    if self.building:GetLevel() <= 0 then
+        button:hide()
+    end
     return self
 end
 
@@ -425,7 +438,7 @@ end
 function GameUIHasBeenBuild:RefreshCurrentList(tag)
     self.building_list_view:removeAllItems()
     if tag == "function" then
-        self.buildings = self.build_city:GetBuildingsIsUnlocked()
+        self.buildings = self.build_city:GetFunctionBuildingsWithOrder()
     else
         self.buildings = self.build_city:GetHousesWhichIsBuilded()
     end
@@ -470,6 +483,7 @@ end
 
 
 return GameUIHasBeenBuild
+
 
 
 

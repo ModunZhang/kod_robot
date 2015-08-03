@@ -1,6 +1,7 @@
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local UIScrollView = import(".UIScrollView")
+local StarBar = import(".StarBar")
 local Localize = import("..utils.Localize")
 local UIListView = import(".UIListView")
 local WidgetSlider = import("..widget.WidgetSlider")
@@ -83,7 +84,7 @@ function GameUIAllianceSendTroops:ctor(march_callback,params)
     self.isPVE = type(params.isPVE) == 'boolean' and params.isPVE or false
     self.returnCloseAction = type(params.returnCloseAction) == 'boolean' and params.returnCloseAction or false
     self.toLocation = params.toLocation or cc.p(0,0)
-    self.targetIsMyAlliance = type(params.targetIsMyAlliance) == 'boolean' and params.targetIsMyAlliance or true
+    self.targetIsMyAlliance = params.targetIsMyAlliance
     self.terrain = User:Terrain()
     GameUIAllianceSendTroops.super.ctor(self,City,_("准备进攻"))
     local manager = ccs.ArmatureDataManager:getInstance()
@@ -193,7 +194,16 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                     UIKit:showMessageDialog(_("提示"),_("龙未处于空闲状态"))
                     return
                 elseif self.dragon:Hp()<1 then
-                    UIKit:showMessageDialog(_("提示"),_("选择的龙已经死亡"))
+                    UIKit:showMessageDialog(_("提示"),_("选择的龙已经死亡")):CreateCancelButton(
+                            {
+                                listener = function ()
+                                    UIKit:newGameUI("GameUIDragonEyrieMain", City, City:GetFirstBuildingByType("dragonEyrie"), "dragon", false, self.dragon:Type()):AddToCurrentScene(true)
+                                    self:LeftButtonClicked()
+                                end,
+                                btn_name= _("查看"),
+                                btn_images = {normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"}
+                            }
+                        )
                     return
                 elseif self.show:IsExceed() then
                     UIKit:showMessageDialog(_("提示"),_("派出的部队超过了所选龙的带兵上限"))
@@ -216,42 +226,13 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                     end
                     return
                 end
-                -- if self.dragon:IsHpLow() then
-                --     UIKit:showMessageDialog(_("行军"),_("您的龙的HP低于20%,有很大几率阵亡,确定要派出吗?"))
-                --         :CreateOKButton(
-                --             {
-                --                 listener =  function ()
-                --                     if self.dragon:IsDefenced() then
-                --                         NetManager:getCancelDefenceDragonPromise():done(function()
-                --                             -- self.march_callback(dragonType,soldiers)
-                --                             -- -- 确认派兵后关闭界面
-                --                             -- self:LeftButtonClicked()
-                --                             self:CallFuncMarch_Callback(dragonType,soldiers)
-                --                         end)
-                --                     else
-                --                         -- self.march_callback(dragonType,soldiers)
-                --                         -- -- 确认派兵后关闭界面
-                --                         -- self:LeftButtonClicked()
-                --                         self:CallFuncMarch_Callback(dragonType,soldiers)
-                --                     end
-                --                 end
-                --             }
-                --         )
-                -- else
                 if self.dragon:IsDefenced() then
                     NetManager:getCancelDefenceDragonPromise():done(function()
-                        -- self.march_callback(dragonType,soldiers)
-                        -- -- 确认派兵后关闭界面
-                        -- self:LeftButtonClicked()
                         self:CallFuncMarch_Callback(dragonType,soldiers)
                     end)
                 else
-                    -- self.march_callback(dragonType,soldiers)
-                    -- 确认派兵后关闭界面
-                    -- self:LeftButtonClicked()
                     self:CallFuncMarch_Callback(dragonType,soldiers)
                 end
-                -- end
             end
 
         end):align(display.RIGHT_CENTER,window.right-50,window.top-910):addTo(self:GetView())
@@ -347,10 +328,9 @@ function GameUIAllianceSendTroops:SelectDragonPart()
 end
 function GameUIAllianceSendTroops:RefreashDragon(dragon)
     self.dragon_img:setTexture(UILib.dragon_head[dragon:Type()])
-    self.dragon_name:setString(_(dragon:Type()).."（LV "..dragon:Level().."）")
+    self.dragon_name:setString(Localize.dragon[dragon:Type()].."（LV "..dragon:Level().."）")
     self.dragon_vitality:setString(_("生命值")..dragon:Hp().."/"..dragon:GetMaxHP())
     self.dragon = dragon
-    print("RefreashDragon>>>>",dragon:Type())
     self:RefreashSoldierShow()
 end
 
@@ -433,7 +413,7 @@ function GameUIAllianceSendTroops:SelectSoldiers()
                     }
                     UIKit:newWidgetUI("WidgetInput", p):AddToCurrentScene()
                 end
-            end):align(display.CENTER,  340,90):addTo(content)
+            end):align(display.CENTER,  420,90):addTo(content)
         local btn_text = UIKit:ttfLabel({
             text = 0,
             size = 22,
@@ -471,14 +451,33 @@ function GameUIAllianceSendTroops:SelectSoldiers()
             size = 20,
             color = 0x403c2f
         }):addTo(content)
-            :align(display.LEFT_CENTER, 400,90)
+            :align(display.LEFT_CENTER, 480,90)
 
         -- 士兵头像
         local soldier_ui_config = UILib.soldier_image[name][star]
-        display.newSprite(UILib.soldier_color_bg_images[name]):addTo(content)
+        WidgetPushButton.new({normal = UILib.soldier_color_bg_images[name],pressed = UILib.soldier_color_bg_images[name]})
+        :onButtonClicked(function(event)
+            if event.name == "CLICKED_EVENT" then
+                UIKit:newWidgetUI("WidgetSoldierDetails", name, star):AddToCurrentScene()
+            end
+        end):addTo(content)
             :align(display.CENTER,60,64):scale(104/128)
+
+        -- display.newSprite(UILib.soldier_color_bg_images[name]):addTo(content)
+        --     :align(display.CENTER,60,64):scale(104/128)
         local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER,60,64):addTo(content):scale(104/128)
         local soldier_head_bg  = display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2,soldier_head_icon:getContentSize().height/2)
+        local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_head_icon):align(display.BOTTOM_CENTER,soldier_head_icon:getContentSize().width/2 - 10, 4)
+        local soldier_star = StarBar.new({
+            max = 3,
+            bg = "Stars_bar_bg.png",
+            fill = "Stars_bar_highlight.png",
+            num = star,
+            margin = 5,
+            direction = StarBar.DIRECTION_HORIZONTAL,
+            scale = 0.8,
+        }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
+        display.newSprite("i_icon_20x20.png"):addTo(soldier_star_bg):align(display.LEFT_CENTER,5, 11)
 
         item:addContent(content)
         list:addItem(item)
@@ -789,6 +788,8 @@ function GameUIAllianceSendTroops:onExit()
 end
 
 return GameUIAllianceSendTroops
+
+
 
 
 

@@ -266,13 +266,13 @@ function GameUIAllianceContribute:CreateContributeItem(params)
         text = GameUtils:formatNumber(params.own),
         size = 20,
         color = params.own < params.donate and 0x7e0000 or 0x288400,
-    }):align(display.LEFT_CENTER, own_title_label:getPositionX()+own_title_label:getContentSize().width,60)
+    }):align(display.LEFT_CENTER, own_title_label:getPositionX()+own_title_label:getContentSize().width + 10,60)
         :addTo(item)
     local donate_label = UIKit:ttfLabel({
         text = GameUtils:formatNumber(params.donate),
         size = 20,
         color = 0x288400,
-    }):align(display.LEFT_CENTER, donate_title_label:getPositionX()+donate_title_label:getContentSize().width,20)
+    }):align(display.LEFT_CENTER, donate_title_label:getPositionX()+donate_title_label:getContentSize().width + 10,20)
         :addTo(item)
     item.donate = params.donate
     local checkbox_image = {
@@ -313,6 +313,11 @@ function GameUIAllianceContribute:CreateContributeItem(params)
     return item
 end
 function GameUIAllianceContribute:IsAbleToContribute()
+    local status = self.alliance:Status()
+    if status == "prepare" or status == "fight" then
+        UIKit:showMessageDialog(_("提示"),_("联盟战期间不能进行捐赠"))
+        return false
+    end
     local r_type = self.group:GetSelectedType()
     if not r_type then
         UIKit:showMessageDialog(_("提示"),_("请选择一种资源"))

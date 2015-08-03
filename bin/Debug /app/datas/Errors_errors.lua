@@ -965,3 +965,53 @@ errors["versionNotEqual"] = {
 	["code"] = 692,
 	["message"] = "版本不匹配"
 }
+errors["theAllianceDoNotNeedRequestToJoin"] = {
+	["key"] = "theAllianceDoNotNeedRequestToJoin",
+	["code"] = 693,
+	["message"] = "此联盟不需要申请加入"
+}
+errors["monsterNotExist"] = {
+	["key"] = "monsterNotExist",
+	["code"] = 694,
+	["message"] = "野怪不存在"
+}
+errors["canNotBuyYourOwnSellItem"] = {
+	["key"] = "canNotBuyYourOwnSellItem",
+	["code"] = 695,
+	["message"] = "不能购买自己出售的商品"
+}
+errors["hatchConditionNotMatch"] = {
+	["key"] = "hatchConditionNotMatch",
+	["code"] = 696,
+	["message"] = "孵化条件不满足"
+}
+errors["pveSecionIsLocked"] = {
+	["key"] = "pveSecionIsLocked",
+	["code"] = 697,
+	["message"] = "关卡未解锁"
+}
+errors["canNotGetPvEStarRewardyet"] = {
+	["key"] = "canNotGetPvEStarRewardyet",
+	["code"] = 698,
+	["message"] = "还不能领取PvE星级奖励"
+}
+errors["pveStarRewardAlreadyGet"] = {
+	["key"] = "pveStarRewardAlreadyGet",
+	["code"] = 699,
+	["message"] = "Pve星级奖励已经领取"
+}
+errors["currentSectionReachMaxFightCount"] = {
+	["key"] = "currentSectionReachMaxFightCount",
+	["code"] = 700,
+	["message"] = "当前关卡已达最大战斗次数"
+}
+errors["playerStaminaNotEnough"] = {
+	["key"] = "playerStaminaNotEnough",
+	["code"] = 700,
+	["message"] = "玩家体力值不足"
+}
+errors["currentPvESectionCanNotBeSweepedYet"] = {
+	["key"] = "currentPvESectionCanNotBeSweepedYet",
+	["code"] = 701,
+	["message"] = "当前PvE关卡还不能被扫荡"
+}

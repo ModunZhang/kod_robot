@@ -73,7 +73,7 @@ function GameUIAllianceHome:onEnter()
     self:AddMapChangeButton()
     self:InitArrow()
     if self.top then
-        if not self.alliance:AllianceFightReports() then
+        if not self.alliance:AllianceFightReports() and self.alliance:Status() == "protect" then
             NetManager:getAllianceFightReportsPromise(self.alliance:Id()):done(function ()
                 self.top:Refresh()
             end)
@@ -106,6 +106,7 @@ function GameUIAllianceHome:AddOrRemoveListener(isAdd)
         local alliance_belvedere = self.alliance:GetAllianceBelvedere()
         alliance_belvedere:AddListenOnType(self, alliance_belvedere.LISTEN_TYPE.OnMarchDataChanged)
         alliance_belvedere:AddListenOnType(self, alliance_belvedere.LISTEN_TYPE.OnCommingDataChanged)
+        self.alliance:GetAllianceShrine():AddListenOnType(self,self.alliance:GetAllianceShrine().LISTEN_TYPE.OnShrineEventsChanged)
         -- 添加到全局计时器中，以便显示各个阶段的时间
         app.timer:AddListener(self)
     else
@@ -123,6 +124,7 @@ function GameUIAllianceHome:AddOrRemoveListener(isAdd)
         local alliance_belvedere = self.alliance:GetAllianceBelvedere()
         alliance_belvedere:RemoveListenerOnType(self, alliance_belvedere.LISTEN_TYPE.OnMarchDataChanged)
         alliance_belvedere:RemoveListenerOnType(self, alliance_belvedere.LISTEN_TYPE.OnCommingDataChanged)
+        self.alliance:GetAllianceShrine():RemoveListenerOnType(self,self.alliance:GetAllianceShrine().LISTEN_TYPE.OnShrineEventsChanged)
     end
 end
 
@@ -226,24 +228,17 @@ function GameUIAllianceHome:ReturnMyCity()
     scene:GotoLogicPosition(location.x, location.y, alliance:Id())
 end
 function GameUIAllianceHome:CreateOperationButton()
-    local order = WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.BOTTOM_TO_TOP):addTo(self):pos(display.right-50,420)
+    local order = WidgetAutoOrder.new(WidgetAutoOrder.ORIENTATION.BOTTOM_TO_TOP,50):addTo(self):pos(display.right-50,420)
 
     local first_row = 420
     local first_col = 177
     local label_padding = 100
     for i, v in ipairs({
-        {"fight_62x70.png", _("战斗")},
+        {"fight_62x70.png"},
+        {"tmp_btn_shrine_72x72.png"},
     }) do
-        local col = i - 1
-        local y =  first_row + col*label_padding
         local button = WidgetPushButton.new({normal = v[1]})
             :onButtonClicked(handler(self, self.OnMidButtonClicked))
-            -- :setButtonLabel("normal",cc.ui.UILabel.new({text = v[2],
-            --     size = 16,
-            --     font = UIKit:getFontFilePath(),
-            --     color = UIKit:hex2c3b(0xf5e8c4)}
-            -- )
-            -- )
             :setButtonLabelOffset(0, -40)
         button:setTag(i)
         button:setTouchSwallowEnabled(true)
@@ -263,6 +258,11 @@ function GameUIAllianceHome:CreateOperationButton()
                     self.alliance_belvedere_events_count:SetNumber(count)
                 end
                 return hasEvent
+            end
+        elseif i == 2 then
+            local alliance = self.alliance
+            function button:CheckVisible()
+                return alliance:GetAllianceShrine():HaveEvent()
             end
         end
         order:AddElement(button)
@@ -286,7 +286,9 @@ end
 function GameUIAllianceHome:OnProductionTechnologyEventDataChanged()
     self.operation_button_order:RefreshOrder()
 end
-
+function GameUIAllianceHome:OnShrineEventsChanged(changed_map)
+    self.operation_button_order:RefreshOrder()
+end
 function GameUIAllianceHome:TopBg()
     local top_bg = display.newSprite("alliance_home_top_bg_768x116.png")
         :align(display.TOP_CENTER, window.cx, window.top)
@@ -499,8 +501,10 @@ function GameUIAllianceHome:CreateBottom()
         :align(display.CENTER, bottom_bg:getContentSize().width/2, bottom_bg:getContentSize().height-11)
     return bottom_bg
 end
+function GameUIAllianceHome:ChangeChatChannel(channel_index)
+    self.chat:ChangeChannel(channel_index)
+end
 function GameUIAllianceHome:OnTopButtonClicked(event)
-    print("OnTopButtonClicked=",event.name)
     if event.name == "CLICKED_EVENT" then
         UIKit:newGameUI("GameUIAllianceBattle", self.city):AddToCurrentScene(true)
     end
@@ -520,6 +524,15 @@ function GameUIAllianceHome:OnMidButtonClicked(event)
             end
         end
         UIKit:newGameUI('GameUIWathTowerRegion',self.city,default_tab):AddToCurrentScene(true)
+    elseif tag == 2 then
+        local buildings = self.alliance:GetAllianceMap():GetMapObjectsByType("building")
+        local shrine_info
+        for k,v in pairs(buildings) do
+            if v.name == "shrine" then
+                shrine_info = v
+            end
+        end
+        UIKit:newGameUI("GameUIAllianceShrine",self.city,"fight_event",shrine_info:GetAllianceBuildingInfo()):AddToCurrentScene(true)
     end
 end
 

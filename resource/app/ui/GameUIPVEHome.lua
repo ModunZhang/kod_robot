@@ -196,7 +196,9 @@ function GameUIPVEHome:CreateBottom()
 
     return bottom_bg
 end
-
+function GameUIPVEHome:ChangeChatChannel(channel_index)
+    self.chat:ChangeChannel(channel_index)
+end
 -- function GameUIPVEHome:SetBoxStatus(can_get)
 --     self.box:show()
 --     self.box_bg:setButtonEnabled(can_get)

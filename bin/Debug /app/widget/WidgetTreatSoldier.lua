@@ -5,6 +5,7 @@ local WidgetSoldierDetails = import("..widget.WidgetSoldierDetails")
 local HospitalUpgradeBuilding = import("..entity.HospitalUpgradeBuilding")
 local SoldierManager = import("..entity.SoldierManager")
 local UILib = import("..ui.UILib")
+local StarBar = import("..ui.StarBar")
 local WidgetSlider = import("..widget.WidgetSlider")
 local Localize = import("..utils.Localize")
 local WidgetPushButton = import("..widget.WidgetPushButton")
@@ -114,7 +115,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
 
     local size = back_ground:getContentSize()
     local label = cc.ui.UILabel.new({
-        text = "强势对抗",
+        text = _("强势对抗"),
         size = 22,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
@@ -137,7 +138,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width -12, size.height - 85 - 11)
 
     local label = cc.ui.UILabel.new({
-        text = "弱势对抗",
+        text = _("弱势对抗"),
         size = 22,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
@@ -271,7 +272,15 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
                             btn_name= _("前往商店")
                         })
             else
-                treat_fun()
+                if app:GetGameDefautlt():IsOpenGemRemind() then
+                    UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),
+                        string.formatnumberthousands(self.treat_now_gems)
+                    ), function()
+                        treat_fun()
+                    end,true,true)
+                else
+                    treat_fun()
+                end
             end
         end):SetFilter({
         disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
@@ -333,24 +342,27 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
                     )
             elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.TREATING_AND_LACK_RESOURCE then
                 UIKit:showMessageDialog(_("主人"),_("正在治愈，资源不足"))
-                    :CreateOKButton(
+                    :CreateOKButtonWithPrice(
                         {
-                            listener = treat_fun
+                            listener = treat_fun,
+                            price = hospital:GetTreatGems(soldiers)
                         }
                     )
-                    :CreateNeeds({value = hospital:GetTreatGems(soldiers)})
+                    :CreateCancelButton()
             elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.LACK_RESOURCE then
                 UIKit:showMessageDialog(_("主人"),_("资源不足，是否花费金龙币补足"))
-                    :CreateOKButton({
-                        listener = treat_fun
+                    :CreateOKButtonWithPrice({
+                        listener = treat_fun,
+                        price = hospital:GetTreatGems(soldiers)
                     })
-                    :CreateNeeds({value = hospital:GetTreatGems(soldiers)})
+                    :CreateCancelButton()
             elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.TREATING then
                 UIKit:showMessageDialog(_("主人"),_("正在治愈，是否花费魔法石立即完成"))
-                    :CreateOKButton({
-                        listener = treat_fun
+                    :CreateOKButtonWithPrice({
+                        listener = treat_fun,
+                        price = hospital:GetTreatGems(soldiers)
                     })
-                    :CreateNeeds({value = hospital:GetTreatGems(soldiers)})
+                    :CreateCancelButton()
             else
                 treat_fun()
             end
@@ -383,8 +395,15 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         :align(display.CENTER, center, -70)
 
     self.back_ground = back_ground
-
+    local res_map = {}
+    res_map.treatCoin = City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    for k, v in pairs(self.res_map) do
+        local total = res_map[k]
+        v.total:setString(GameUtils:formatNumber(total))
+    end
+    self.res_total_map = res_map
     self:SetSoldier(soldier_type, star)
+    self:OnCountChanged(self:GetMaxTreatNum())
 end
 function WidgetTreatSoldier:onEnter()
     City:GetResourceManager():AddObserver(self)
@@ -408,6 +427,17 @@ function WidgetTreatSoldier:SetSoldier(soldier_type, star)
         :onButtonClicked(function(event)
             WidgetSoldierDetails.new(self.soldier_type, self.star):addTo(self)
         end)
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(self.soldier):align(display.BOTTOM_CENTER,-10, -60)
+    display.newSprite("i_icon_20x20.png"):addTo(soldier_star_bg):align(display.LEFT_CENTER,5, 11)
+    self.soldier_star = StarBar.new({
+        max = 3,
+        bg = "Stars_bar_bg.png",
+        fill = "Stars_bar_highlight.png",
+        num = star,
+        margin = 5,
+        direction = StarBar.DIRECTION_HORIZONTAL,
+        scale = 0.8,
+    }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
 
     local rect = self.soldier:getCascadeBoundingBox()
     display.newSprite("box_soldier_128x128.png"):addTo(self.soldier):align(display.CENTER, 0,0)
@@ -429,6 +459,7 @@ function WidgetTreatSoldier:OnSoliderStarCountChanged(soldier_manager,star_chang
             local soldier_config, soldier_ui_config = self:GetConfigBySoldierTypeAndStar(v, self.star)
             self.soldier:setButtonImage(cc.ui.UIPushButton.NORMAL, soldier_ui_config, true)
             self.soldier:setButtonImage(cc.ui.UIPushButton.PRESSED, soldier_ui_config, true)
+            self.soldier_star:setNum(self.star)
             self.soldier_config = soldier_config
             self.soldier_ui_config = soldier_ui_config
         end
@@ -496,6 +527,9 @@ function WidgetTreatSoldier:OnCountChanged(count)
     self.gem_label:setString(self.treat_now_gems)
 end
 return WidgetTreatSoldier
+
+
+
 
 
 

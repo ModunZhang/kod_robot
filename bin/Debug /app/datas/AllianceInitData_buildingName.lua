@@ -119,10 +119,24 @@ buildingName["foodVillage"] = {
 	["type"] = "village",
 	["moveNeedHonour"] = 100
 }
+buildingName["coinVillage"] = {
+	["name"] = "coinVillage",
+	["width"] = 1,
+	["height"] = 1,
+	["type"] = "village",
+	["moveNeedHonour"] = 100
+}
 buildingName["member"] = {
 	["name"] = "member",
 	["width"] = 1,
 	["height"] = 1,
 	["type"] = "member",
+	["moveNeedHonour"] = 0
+}
+buildingName["monster"] = {
+	["name"] = "monster",
+	["width"] = 1,
+	["height"] = 1,
+	["type"] = "monster",
 	["moveNeedHonour"] = 0
 }

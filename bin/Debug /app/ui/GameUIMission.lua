@@ -4,6 +4,7 @@
 --
 local UIKit = UIKit
 local GameUIMission = UIKit:createUIClass("GameUIMission","GameUIWithCommonHeader")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
 local WidgetGrowUpTask = import('..widget.WidgetGrowUpTask')
 local WidgetBackGroundTabButtons = import('..widget.WidgetBackGroundTabButtons')
 local window = import("..utils.window")
@@ -20,9 +21,10 @@ local GameUIDailyMissionInfo = import(".GameUIDailyMissionInfo")
 
 GameUIMission.MISSION_TYPE = Enum("achievement","daily")
 
-function GameUIMission:ctor(city,mission_type)
+function GameUIMission:ctor(city,mission_type, need_tips)
     GameUIMission.super.ctor(self,city, _("任务"))
     self.city = city
+    self.need_tips = need_tips
     self.init_mission_type = mission_type or self.MISSION_TYPE.achievement
     self.action_node = display.newNode():addTo(self)
 end
@@ -179,9 +181,14 @@ function GameUIMission:RefreshAchievementList()
     local header = self:GetGetAchievementListHeaderItem(true)
     self.achievement_list:addItem(header)
     local finished_mission = self:GetAchievementMissionData(true)
-    for __,v in ipairs(finished_mission) do
+    for i,v in ipairs(finished_mission) do
         local item = self:GetAchievementListItem(true,v)
         self.achievement_list:addItem(item)
+        if i == 1 and self.need_tips then
+            WidgetFteArrow.new(_("点击领取奖励"))
+            :addTo(item:getContent().button)
+            :TurnRight():align(display.RIGHT_CENTER, -150, 0)
+        end
     end
     header = self:GetGetAchievementListHeaderItem(false)
     self.achievement_list:addItem(header)
@@ -274,6 +281,7 @@ function GameUIMission:GetAchievementMissionData(isFinish)
     end
 end
 function GameUIMission:OnGetAchievementRewardButtonClicked(data)
+    self.need_tips = false
     NetManager:getGrowUpTaskRewardsPromise(data:TaskType(), data.id):done(function()
         GameGlobalUI:showTips(_("获得奖励"), data:GetRewards())
         if not self.is_hooray_on then
@@ -285,6 +293,7 @@ function GameUIMission:OnGetAchievementRewardButtonClicked(data)
             end, 1.5)
         end
     end)
+    self:RefreshRecommendMissionDesc()
 end
 
 function GameUIMission:OnTodoAchievementMissionClicked(data)
@@ -380,8 +389,9 @@ function GameUIMission:GetDailyItem(data)
     UIKit:ttfLabel({
         text = data.desc,
         size = 20,
-        color= 0x403c2f
-    }):align(display.LEFT_BOTTOM, 156, 68):addTo(content)
+        color= 0x403c2f,
+        dimensions = cc.size(400,0)
+    }):align(display.LEFT_CENTER, 156, 78):addTo(content)
     local progress_bg,progress =  self:GetProgressBar()
     local finfish_tip_label = UIKit:ttfLabel({
         text = _("今日的任务已经全部完成！"),
@@ -453,9 +463,14 @@ function GameUIMission:dailyListviewListener(event)
 end
 
 
+function GameUIMission:onCleanup()
+    GameUIMission.super.onCleanup(self)
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("mission_header_bg_616x184.jpg")
+end
+
+
 -- fte
 local promise = import("..utils.promise")
-local WidgetFteArrow = import("..widget.WidgetFteArrow")
 function GameUIMission:Find()
     return self.achievement_list.items_[2]:getContent().button
 end

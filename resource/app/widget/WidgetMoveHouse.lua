@@ -23,10 +23,15 @@ function WidgetMoveHouse:ctor(house)
             :addTo(self):pos(224,108)
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
+                    if self.move_to_ruins:GetEntity().IsUpgrading and self.move_to_ruins:GetEntity():IsUpgrading() then
+                        UIKit:showMessageDialog(_("提示"),_("小屋当前不能被移动"),function()end)
+                        return
+                    end
                     local from_house_tile = City:GetTileWhichBuildingBelongs(house)
                     local _fromBuildingLocation = from_house_tile.location_id
                     local _fromHouseLocation = from_house_tile:GetBuildingLocation(house)
                     local to_house_tile = City:GetTileWhichBuildingBelongs(self.move_to_ruins:GetEntity())
+
                     local _toBuildingLocation = to_house_tile.location_id
                     local _toHouseLocation = to_house_tile:GetBuildingLocation(self.move_to_ruins:GetEntity())
                     NetManager:getUseItemPromise("movingConstruction",{

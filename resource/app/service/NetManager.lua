@@ -98,6 +98,37 @@ local function get_response_delete_mail_msg(response)
 
     return response
 end
+local function get_response_delete_send_mail_msg(response)
+    if response.msg.playerData then
+        local user_data = DataManager:getUserData()
+        local mail_response = response.msg.playerData
+        for i,v in ipairs(mail_response) do
+            if type(v) == "table" then
+                local keys = string.split(v[1], ".")
+                local newKey = ""
+                local len = #keys
+                for i=1,len do
+                    local k = tonumber(keys[i]) or keys[i]
+                    if type(k) == "number" then
+                        local client_index = MailManager:GetSendMailIndexByServerIndex(k) - 1
+                        newKey = newKey..client_index..(i~=len and "." or "")
+                    else
+                        newKey = newKey..keys[i]..(i~=len and "." or "")
+                    end
+                end
+
+                v[1] = newKey
+                local clone_response = clone(response)
+                clone_response.msg.playerData = {}
+                table.insert(clone_response.msg.playerData, v)
+                local edit = decodeInUserDataFromDeltaData(user_data, clone_response.msg.playerData)
+                DataManager:setUserData(user_data, edit)
+            end
+        end
+    end
+
+    return response
+end
 
 local function get_response_report_msg(response)
     if response.msg.playerData then
@@ -281,7 +312,6 @@ local function get_blocking_request_promise(request_route, data, m,need_catch,lo
 end
 local function get_none_blocking_request_promise(request_route, data, m, need_catch)
     need_catch = need_catch or false
-    -- return cocos_promise.promiseWithTimeOut(get_request_promise(request_route, data, m), TIME_OUT)
     return cocos_promise.promiseFilterNetError(get_request_promise(request_route, data, m), need_catch)
 end
 local function get_callback_promise(callbacks, m)
@@ -314,12 +344,15 @@ function NetManager:init()
         port = nil,
     }
 end
-
+function NetManager:IsLogin()
+    return self.is_login
+end
 function NetManager:getServerTime()
     return self.m_netService:getServerTime()
 end
 
 function NetManager:disconnect()
+    self.is_login = false
     self:removeEventListener("disconnect")
     self.m_netService:disconnect()
 end
@@ -364,6 +397,132 @@ local logic_event_map = {
     onPlayerDataChanged = function(success, response)
         if not NetManager.m_was_inited_game then return end
         if success then
+            -- 特殊处理战报移除
+            for i,v in ipairs(response) do
+                if string.find(v[1],"reports") then
+                    if v[2] == json.null then
+                        local report_remove_data = table.remove(response,i)
+                        local tmp_table = {}
+                        table.insert(tmp_table, report_remove_data)
+                        local need_deal = true
+                        for i,v in ipairs(tmp_table) do
+                            if type(v) == "table" then
+                                local keys = string.split(v[1], ".")
+                                local newKey = ""
+                                local len = #keys
+                                for i=1,len do
+                                    local k = tonumber(keys[i]) or keys[i]
+                                    if type(k) == "number" then
+                                        if not MailManager:GetReportByServerIndex(k) then
+                                            need_deal = false
+                                            break
+                                        end
+                                        local client_index = MailManager:GetReportByServerIndex(k) - 1
+                                        newKey = newKey..client_index..(i~=len and "." or "")
+                                    else
+                                        newKey = newKey..keys[i]..(i~=len and "." or "")
+                                    end
+                                end
+                                v[1] = newKey
+                            end
+                        end
+                        if need_deal then
+                            local user_data = DataManager:getUserData()
+                            local edit = decodeInUserDataFromDeltaData(user_data, tmp_table)
+                            DataManager:setUserData(user_data, edit)
+                        else
+                            -- 将邮件管理器中的所有存在的战报index - 1
+                            MailManager:DecreaseReportsIndex()
+                        end
+                    end
+                end
+            end
+            -- 特殊处理邮件移除
+            for i,v in ipairs(response) do
+                if string.find(v[1],"mails") then
+                    if v[2] == json.null then
+                        local report_remove_data = table.remove(response,i)
+                        local tmp_table = {}
+                        table.insert(tmp_table, report_remove_data)
+                        local need_deal = true
+                        for i,v in ipairs(tmp_table) do
+                            if type(v) == "table" then
+                                local keys = string.split(v[1], ".")
+                                local newKey = ""
+                                local len = #keys
+                                for i=1,len do
+                                    local k = tonumber(keys[i]) or keys[i]
+                                    if type(k) == "number" then
+                                        if not MailManager:GetSendMailIndexByServerIndex(k) then
+                                            need_deal = false
+                                            break
+                                        end
+                                        local client_index = MailManager:GetSendMailIndexByServerIndex(k) - 1
+                                        newKey = newKey..client_index..(i~=len and "." or "")
+                                    else
+                                        newKey = newKey..keys[i]..(i~=len and "." or "")
+                                    end
+                                end
+                                v[1] = newKey
+                            end
+                        end
+                        if need_deal then
+                            local user_data = DataManager:getUserData()
+                            local edit = decodeInUserDataFromDeltaData(user_data, tmp_table)
+                            DataManager:setUserData(user_data, edit)
+                        else
+                            -- 将邮件管理器中的所有存在的战报index - 1
+                            MailManager:DecreaseMailsIndex()
+                        end
+                    end
+                end
+            end
+            -- 特殊已发邮件移除
+            for i,v in ipairs(response) do
+                if string.find(v[1],"sendMails") then
+                    if v[2] == json.null then
+                        local report_remove_data = table.remove(response,i)
+                        local tmp_table = {}
+                        table.insert(tmp_table, report_remove_data)
+                        local need_deal = true
+                        for i,v in ipairs(tmp_table) do
+                            if type(v) == "table" then
+                                local keys = string.split(v[1], ".")
+                                local newKey = ""
+                                local len = #keys
+                                for i=1,len do
+                                    local k = tonumber(keys[i]) or keys[i]
+                                    if type(k) == "number" then
+                                        local send_index = MailManager:GetSendMailIndexByServerIndex(k)
+                                        if not send_index then
+                                            need_deal = false
+                                            break
+                                        end
+                                        local client_index = send_index - 1
+                                        newKey = newKey..client_index..(i~=len and "." or "")
+                                    else
+                                        newKey = newKey..keys[i]..(i~=len and "." or "")
+                                    end
+                                end
+                                v[1] = newKey
+                            end
+                        end
+                        if need_deal then
+                            LuaUtils:outputTable("self.sendMails", MailManager:GetSendMails())
+
+                            local user_data = DataManager:getUserData()
+                            dump(tmp_table,"tmp_table")
+                            dump(user_data.sendMails,"user_data.sendMails")
+                            local edit = decodeInUserDataFromDeltaData(user_data, tmp_table)
+                            LuaUtils:outputTable("send mails edit", edit)
+                            DataManager:setUserData(user_data, edit)
+                        else
+                            -- 将邮件管理器中的所有存在的战报index - 1
+                            MailManager:DecreaseSendMailsIndex()
+                        end
+                    end
+                end
+            end
             local user_data = DataManager:getUserData()
             local edit = decodeInUserDataFromDeltaData(user_data, response)
             LuaUtils:outputTable("edit", edit)
@@ -371,14 +530,18 @@ local logic_event_map = {
             if not user_data.reports then
                 for i,v in ipairs(response) do
                     if v[1] and string.find(v[1],"reports") then
-                        MailManager:IncreaseUnReadReportNum(1)
+                        if v[2] ~= json.null then
+                            MailManager:IncreaseUnReadReportNum(1)
+                        end
                     end
                 end
             end
             if not user_data.mails then
                 for i,v in ipairs(response) do
                     if v[1] and string.find(v[1],"mails") then
-                        MailManager:IncreaseUnReadMailsNum(1)
+                        if v[2] ~= json.null then
+                            MailManager:IncreaseUnReadMailsNum(1)
+                        end
                     end
                 end
             end
@@ -425,6 +588,11 @@ local logic_event_map = {
         if not NetManager.m_was_inited_game then return end
         if success and DataManager:hasUserData() then
             LuaUtils:outputTable("onAllianceFight", response)
+            for i,data in ipairs(response.allianceData) do
+                if string.find(data[1],"allianceFightReports") then
+                    Alliance_Manager:GetMyAlliance():SetLastAllianceFightReport(data[2])
+                end
+            end
             local user_enemy_alliance_data = response.enemyAllianceData
             DataManager:setEnemyAllianceData(user_enemy_alliance_data)
             local user_alliance_data = DataManager:getUserAllianceData()
@@ -493,7 +661,7 @@ local function get_connectGateServer_promise()
     NetManager.m_netService:connect(NetManager.m_gateServer.host, NetManager.m_gateServer.port, function(success)
         p:resolve({success = success, msg = {code = SUCCESS_CODE}})
     end)
-    return cocos_promise.promiseWithTimeOut(p, TIME_OUT)
+    return p
 end
 function NetManager:getConnectGateServerPromise()
     return get_connectGateServer_promise():next(function(result)
@@ -503,7 +671,6 @@ end
 -- 获取服务器列表
 function NetManager:getLogicServerInfoPromise()
     local device_id = device.getOpenUDID()
-    
     return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {deviceId = device_id,tag = app.client_tag}, "获取逻辑服务器失败",true)
         :done(function(result)
             self:CleanAllEventListeners()
@@ -519,7 +686,7 @@ local function get_connectLogicServer_promise()
     NetManager.m_netService:connect(NetManager.m_logicServer.host, NetManager.m_logicServer.port, function(success)
         p:resolve({success = success, msg = {code = SUCCESS_CODE}})
     end)
-    return cocos_promise.promiseWithTimeOut(p, TIME_OUT)
+    return p
 end
 function NetManager:getConnectLogicServerPromise()
     return get_connectLogicServer_promise():next(function(result)
@@ -530,6 +697,7 @@ end
 function NetManager:getLoginPromise(deviceId)
     local device_id = device.getOpenUDID()
     local requestTime = ext.now()
+    self.is_login = false
     return get_none_blocking_request_promise("logic.entryHandler.login", {
         deviceId = deviceId or device_id,
         requestTime = requestTime,
@@ -560,6 +728,7 @@ function NetManager:getLoginPromise(deviceId)
                 DataManager:setEnemyAllianceData(user_enemy_alliance_data)
                 self.m_was_inited_game = true
             end
+            self.is_login = true
         end
         return response
     end)
@@ -659,9 +828,9 @@ end
 
 
 -- 制造材料
-local function get_makeMaterial_promise(category)
+local function get_makeMaterial_promise(type)
     return get_blocking_request_promise("logic.playerHandler.makeMaterial", {
-        category = category,
+        type = type,
         finishNow = false
     }, "制造材料失败!"):done(get_player_response_msg)
 end
@@ -698,6 +867,12 @@ function NetManager:getInstantMakeDragonEquipmentPromise(equipment_name)
 end
 -- 招募士兵
 local function get_recruitNormalSoldier_promise(soldierName, count, finish_now)
+    local task = City:GetRecommendTask()
+    if task then
+        if task:TaskType() == "recruit" and task.name == soldierName then
+            City:SetBeginnersTaskFlag(task:Index())
+        end
+    end
     return get_blocking_request_promise("logic.playerHandler.recruitNormalSoldier", {
         soldierName = soldierName,
         count = count,
@@ -881,6 +1056,12 @@ function NetManager:getFetchSendMailsPromise(fromIndex)
         fromIndex = fromIndex
     }, "获取已发送邮件失败!")
 end
+-- 删除已发邮件
+function NetManager:getDeleteSendMailsPromise(mailIds)
+    return get_blocking_request_promise("logic.playerHandler.deleteSendMails", {
+        mailIds = mailIds
+    }, "删除已发邮件失败!"):done(get_response_delete_send_mail_msg)
+end
 -- 删除邮件
 function NetManager:getDeleteMailsPromise(mailIds)
     return get_blocking_request_promise("logic.playerHandler.deleteMails", {
@@ -938,7 +1119,11 @@ function NetManager:getRequestAllianceToSpeedUpPromise(eventType, eventId)
     return get_blocking_request_promise("logic.allianceHandler.requestAllianceToSpeedUp", {
         eventType = eventType,
         eventId = eventId,
-    }, "请求加速失败!"):done(get_player_response_msg)
+    }, "请求加速失败!"):done(get_player_response_msg):done(get_alliance_response_msg):done(function(result)
+        GameGlobalUI:showTips(_("提示"),_("已向全体盟友发出帮助请求"))
+        app:GetAudioManager():PlayeEffectSoundWithKey("USE_ITEM")
+        return result
+    end)
 end
 -- 免费加速建筑升级
 function NetManager:getFreeSpeedUpPromise(eventType, eventId)
@@ -949,16 +1134,16 @@ function NetManager:getFreeSpeedUpPromise(eventType, eventId)
 end
 -- 协助玩家加速
 function NetManager:getHelpAllianceMemberSpeedUpPromise(eventId)
-    return get_none_blocking_request_promise("logic.allianceHandler.helpAllianceMemberSpeedUp", {
+    return get_blocking_request_promise("logic.allianceHandler.helpAllianceMemberSpeedUp", {
         eventId = eventId,
-    }, "协助玩家加速失败!"):done(get_player_response_msg):done(function()
+    }, "协助玩家加速失败!"):done(get_player_response_msg):done(get_alliance_response_msg):done(function()
         app:GetAudioManager():PlayeEffectSoundWithKey("USE_ITEM")
     end)
 end
 -- 协助所有玩家加速
 function NetManager:getHelpAllAllianceMemberSpeedUpPromise()
-    return get_none_blocking_request_promise("logic.allianceHandler.helpAllAllianceMemberSpeedUp", {}
-        , "协助所有玩家加速失败!"):done(get_player_response_msg):done(function()
+    return get_blocking_request_promise("logic.allianceHandler.helpAllAllianceMemberSpeedUp", {}
+        , "协助所有玩家加速失败!"):done(get_player_response_msg):done(get_alliance_response_msg):done(function()
         app:GetAudioManager():PlayeEffectSoundWithKey("USE_ITEM")
         end)
 end
@@ -1291,6 +1476,11 @@ function NetManager:getRetreatFromVillagePromise(allianceId,eventId)
     return get_blocking_request_promise("logic.allianceHandler.retreatFromVillage",
         {villageEventId = eventId},"村落撤退失败!"):done(get_player_response_msg)
 end
+--进攻野怪
+function NetManager:getAttackMonsterPromise(dragonType,soldiers,defenceAllianceId,defenceMonsterId)
+    return get_blocking_request_promise("logic.allianceHandler.attackMonster",
+        {defenceMonsterId = defenceMonsterId,defenceAllianceId=defenceAllianceId,dragonType=dragonType,soldiers = soldiers},"进攻野怪失败!"):done(get_player_response_msg)
+end
 --突袭村落
 function NetManager:getStrikeVillagePromise(dragonType,defenceAllianceId,defenceVillageId)
     return get_blocking_request_promise("logic.allianceHandler.strikeVillage",
@@ -1430,7 +1620,11 @@ function NetManager:getUseItemPromise(itemName,params)
         params = params,
     }, "使用道具失败!"):done(get_player_response_msg):done(function ()
         if not (string.find(itemName,"dragonChest") or string.find(itemName,"chest")) then
-            GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具成功"),Localize_item.item_name[itemName]))
+            if params[itemName] and params[itemName].count then
+                GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具X %d成功"),Localize_item.item_name[itemName],params[itemName].count))
+            else
+                GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具成功"),Localize_item.item_name[itemName]))
+            end
         end
         if itemName == "torch" then
             app:GetAudioManager():PlayeEffectSoundWithKey("UI_BUILDING_DESTROY")
@@ -1446,7 +1640,11 @@ function NetManager:getBuyAndUseItemPromise(itemName,params)
         itemName = itemName,
         params = params,
     }, "购买并使用道具失败!"):done(get_player_response_msg):done(function()
-        GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具成功"),Localize_item.item_name[itemName]))
+        if params[itemName] and params[itemName].count then
+            GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具X %d成功"),Localize_item.item_name[itemName],params[itemName].count))
+        else
+            GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具成功"),Localize_item.item_name[itemName]))
+        end
         if itemName == "torch" then
             app:GetAudioManager():PlayeEffectSoundWithKey("UI_BUILDING_DESTROY")
         else
@@ -1538,6 +1736,12 @@ function NetManager:getPassSelinasTestPromise()
 end
 -- 获取成就任务奖励
 function NetManager:getGrowUpTaskRewardsPromise(taskType, taskId)
+    local task = City:GetRecommendTask()
+    if task then
+        if task:TaskType() == "reward" then
+            City:SetBeginnersTaskFlag(task:Index())
+        end
+    end
     return get_blocking_request_promise("logic.playerHandler.getGrowUpTaskRewards",{
         taskType = taskType,
         taskId = taskId
@@ -1634,6 +1838,21 @@ end
 function NetManager:getSetPlayerLanguagePromise(language_code)
     return get_blocking_request_promise("logic.playerHandler.setPlayerLanguage",{language = language_code},"设置玩家语言失败!")
 end
+--设置远程推送状态
+function NetManager:getSetApnStatusPromise(type,status)
+    return get_blocking_request_promise("logic.playerHandler.setApnStatus",{type = type,status = status},"设置远程推送状态失败!"):done(get_player_response_msg)
+end
+
+
+function NetManager:getAttackPveSectionPromise(sectionName, dragonType, soldiers)
+    return get_blocking_request_promise("logic.playerHandler.attackPveSection",{
+        sectionName = sectionName,
+        dragonType = dragonType,
+        soldiers = soldiers,
+    },"攻打npc失败!"):done(get_player_response_msg)
+end
+
+
 ----------------------------------------------------------------------------------------------------------------
 function NetManager:getUpdateFileList(cb)
     local updateServer = self.m_updateServer.host .. ":" .. self.m_updateServer.port .. "/update/res/fileList.json"
@@ -1687,6 +1906,10 @@ function NetManager:downloadFile(fileInfo, cb, progressCb)
         progressCb(totalSize, currentSize)
     end)
 end
+
+
+
+
 
 
 

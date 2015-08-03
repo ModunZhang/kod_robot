@@ -33,6 +33,9 @@ function CityScene:onExit()
 end
 function CityScene:GetPreloadImages()
     return {
+        {image = "animations/heihua_animation_0.pvr.ccz",list = "animations/heihua_animation_0.plist"},
+        {image = "animations/heihua_animation_1.pvr.ccz",list = "animations/heihua_animation_1.plist"},
+        {image = "animations/heihua_animation_2.pvr.ccz",list = "animations/heihua_animation_2.plist"},
         {image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
         {image = "city_png.pvr.ccz",list = "city_png.plist"},
         {image = "city_prv_0.pvr.ccz",list = "city_prv_0.plist"},

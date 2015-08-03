@@ -81,6 +81,17 @@ end
 function MaterialManager:IteratorEquipmentMaterials(func)
     self:IteratorMaterialsByType(EQUIPMENT, func)
 end
+-- 检查对应类型的材料是否有超过材料仓库上限
+function MaterialManager:CheckOutOfRangeByType(material_type)
+    local isOut = false
+    local limit = City:GetFirstBuildingByType("materialDepot"):GetMaxMaterial()
+    self:IteratorMaterialsByType(material_type, function (k,v)
+        if v >= limit then
+            isOut = true
+        end
+    end)
+    return isOut
+end
 function MaterialManager:IteratorMaterialsByType(material_type, func)
     for k, v in pairs(self.material_map[material_type]) do
         func(k, v)

@@ -5,6 +5,7 @@
 local WidgetPopDialog = import(".WidgetPopDialog")
 local WidgetInfoText = import(".WidgetInfoText")
 local WidgetPushButton = import(".WidgetPushButton")
+local StarBar = import("..ui.StarBar")
 local window = import("..utils.window")
 local Localize = import("..utils.Localize")
 local UILib = import("..ui.UILib")
@@ -226,27 +227,38 @@ function WidgetSoldierPromoteDetails:onEnter()
         end)
 end
 function WidgetSoldierPromoteDetails:CreateSoldierBox(isGray)
-        local soldier_type = self.soldier_type
-        local star = isGray and self.star +1 or self.star
-        local soldier_box = display.newSprite("box_light_148x148.png")
-        local blue_bg = display.newSprite("back_ground_121x122.png", soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
+    local soldier_type = self.soldier_type
+    local star = isGray and self.star +1 or self.star
+    local soldier_box = display.newSprite("box_light_148x148.png")
+    local blue_bg = display.newSprite("back_ground_121x122.png", soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
 
-        local soldier_icon = display.newSprite(UILib.soldier_image[soldier_type][star], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
-        soldier_icon:scale(124/math.max(soldier_icon:getContentSize().width,soldier_icon:getContentSize().height))
-        if isGray then
-            local my_filter = filter
-            local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
-            blue_bg:setFilter(filters)
-            soldier_icon:setFilter(filters)
-        end
-
-        return soldier_box
+    local soldier_icon = display.newSprite(UILib.soldier_image[soldier_type][star], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
+    soldier_icon:scale(124/math.max(soldier_icon:getContentSize().width,soldier_icon:getContentSize().height))
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_icon):align(display.BOTTOM_CENTER,soldier_icon:getContentSize().width/2-16, 0)
+    StarBar.new({
+        max = 3,
+        bg = "Stars_bar_bg.png",
+        fill = "Stars_bar_highlight.png",
+        num = star,
+        margin = 5,
+        direction = StarBar.DIRECTION_HORIZONTAL,
+        scale = 0.8,
+    }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
+    if isGray then
+        local my_filter = filter
+        local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
+        blue_bg:setFilter(filters)
+        soldier_icon:setFilter(filters)
     end
+
+    return soldier_box
+end
 function WidgetSoldierPromoteDetails:onExit()
     WidgetSoldierPromoteDetails.super.onExit(self)
 end
 
 return WidgetSoldierPromoteDetails
+
 
 
 

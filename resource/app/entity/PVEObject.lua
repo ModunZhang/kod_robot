@@ -8,6 +8,7 @@ local pve_boss = GameDatas.ClientInitGame.pve_boss
 local pve_npc = GameDatas.ClientInitGame.pve_npc
 local pve_func = GameDatas.ClientInitGame.pve_func
 local dragonLevel = GameDatas.Dragons.dragonLevel
+local special = GameDatas.Soldiers.special
 local random = math.random
 local randomseed = math.randomseed
 local TOTAL = {
@@ -74,8 +75,8 @@ end
 function PVEObject:GetNextEnemy()
     return self:GetEnemyByIndex(self.searched + 1)
 end
-function PVEObject:GetEnemyByIndex(index, force)
-    return self:DecodeToEnemy(self:GetEnemyInfo(index), force)
+function PVEObject:GetEnemyByIndex(index)
+    return self:DecodeToEnemy(self:GetEnemyInfo(index))
 end
 function PVEObject:GetEnemyInfo(index)
     local unique = self.type == PVEDefine.TRAP and random(#pve_normal) or (self.x * (self.y * 100) + (index + self.type))
@@ -87,7 +88,7 @@ function PVEObject:GetEnemyInfo(index)
         return pve_boss[self:Floor()]
     end
 end
-function PVEObject:DecodeToEnemy(raw_data, force)
+function PVEObject:DecodeToEnemy(raw_data)
     local raw_dragon
     local cur_floor_dragon_config = pve_dragon[self:Floor()]
     if normal_map[self.type] then
@@ -102,7 +103,17 @@ function PVEObject:DecodeToEnemy(raw_data, force)
     level = tonumber(level)
     local strength, vitality = dragonLevel[level].strength, dragonLevel[level].vitality
     local soldiers_raw = string.split(raw_data.soldiers, ";")
-    local rewards_raw = force and raw_data.rewards or (reward_map[self.type] or raw_data.rewards)
+    local is_special_soldiers = false
+    for k,v in pairs(soldiers_raw) do
+        local soldierType = unpack(string.split(v, ","))
+        if special[soldierType] then
+            is_special_soldiers = true
+            break
+        end
+    end
+    local rewards_raw = (reward_map[self.type] and not is_special_soldiers)
+        and reward_map[self.type]
+        or raw_data.rewards
     return {
         dragon = {
             level = level,
@@ -212,6 +223,9 @@ function PVEObject:Dump()
 end
 
 return PVEObject
+
+
+
 
 
 

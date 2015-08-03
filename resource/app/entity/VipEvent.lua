@@ -26,6 +26,7 @@ function VipEvent:Reset()
     self:SetId("")
     self:SetStartTime(0)
     self:SetFinishTime(0)
+    self.times_ = 0
 end
 
 function VipEvent:OnTimer(current_time)

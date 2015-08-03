@@ -107,7 +107,7 @@ function NetService:get(url, args, cb, progressCb)
 
         elseif eventName == "failed" then
             cb(false, request:getErrorCode(), request:getErrorMessage())
-        elseif eventName == "inprogress" then
+        elseif eventName == "inprogress" or eventName == "progress" then
             local totalLength = event.dltotal
             local currentLength = event.dlnow
             if progressCb then progressCb(totalLength, currentLength) end

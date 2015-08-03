@@ -4,6 +4,9 @@
 --
 local GameUILoginBeta = UIKit:createUIClass('GameUILoginBeta','GameUISplashBeta')
 local WidgetPushButton = import("..widget.WidgetPushButton")
+local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
+local UIListView = import(".UIListView")
+local Localize = import("..utils.Localize")
 local LOCAL_RESOURCES_PERCENT = 60
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 
@@ -15,7 +18,7 @@ function GameUILoginBeta:ctor()
     self.m_totalSize = 0
     self.m_currentSize = 0
     self.local_resources = {
-		{image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
+        {image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
         {image = "animations/dragon_animation_0.pvr.ccz",list = "animations/dragon_animation_0.plist"},
         {image = "animations/dragon_animation_1.pvr.ccz",list = "animations/dragon_animation_1.plist"},
         {image = "animations/dragon_animation_2.pvr.ccz",list = "animations/dragon_animation_2.plist"},
@@ -35,28 +38,29 @@ function GameUILoginBeta:ctor()
         {image = "ui_png.pvr.ccz",list = "ui_png.plist"},
         {image = "ui_pvr_0.pvr.ccz",list = "ui_pvr_0.plist"},
         {image = "ui_pvr_1.pvr.ccz",list = "ui_pvr_1.plist"},
-		-- {image = "emoji.png",list = "emoji.plist"},
+    -- {image = "emoji.png",list = "emoji.plist"},
 
-        
-        -- {image = "animations/heihua_animation_0.pvr.ccz",list = "animations/heihua_animation_0.plist"},
-        -- {image = "animations/heihua_animation_1.pvr.ccz",list = "animations/heihua_animation_1.plist"},
-        -- {image = "animations/heihua_animation_2.pvr.ccz",list = "animations/heihua_animation_2.plist"},
-        -- {image = "animations/region_animation_0.pvr.ccz",list = "animations/region_animation_0.plist"},
-	}
-	self.local_resources_percent_per = LOCAL_RESOURCES_PERCENT / #self.local_resources
+
+    -- {image = "animations/heihua_animation_0.pvr.ccz",list = "animations/heihua_animation_0.plist"},
+    -- {image = "animations/heihua_animation_1.pvr.ccz",list = "animations/heihua_animation_1.plist"},
+    -- {image = "animations/heihua_animation_2.pvr.ccz",list = "animations/heihua_animation_2.plist"},
+    -- {image = "animations/region_animation_0.pvr.ccz",list = "animations/region_animation_0.plist"},
+    }
+    self.local_resources_percent_per = LOCAL_RESOURCES_PERCENT / #self.local_resources
 end
 
 function GameUILoginBeta:onEnter()
-	GameUILoginBeta.super.onEnter(self)
-	assert(self.ui_layer)
-	self:createProgressBar()
+    GameUILoginBeta.super.onEnter(self)
+    assert(self.ui_layer)
+    self:createProgressBar()
     self:createTips()
     self:createStartGame()
     self:createVerLabel()
+    self:createUserAgreement()
 end
 
 function GameUILoginBeta:Reset()
-	self.m_localJson = nil
+    self.m_localJson = nil
     self.m_serverJson = nil
     self.m_jsonFileName = nil
     self.m_totalSize = nil
@@ -128,15 +132,116 @@ function GameUILoginBeta:createStartGame()
         :addTo(self.ui_layer):hide():align(display.LEFT_BOTTOM, 0, 0)
     self.start_button = button
     button:onButtonClicked(function()
-        button:setButtonEnabled(false)
-        display.getRunningScene().startGame = true
-        local sp = cc.Spawn:create(cc.ScaleTo:create(1,1.5),cc.FadeOut:create(1))
-        local seq = transition.sequence({sp,cc.CallFunc:create(function()
-                self:connectLogicServer()
-            end)})
-            self.star_game_sprite:runAction(seq)
-        end)
+        -- 检查用户是否同意了用户协议
+        if self:IsAgreement() then
+            self:startGame()
+        else
+            UIKit:showMessageDialog(_("提示"),_("我已阅读并同意[用户协议]"))
+                :CreateOKButton(
+                    {
+                        listener = function ()
+                            self:SetAgreeAgreement("agree")
+                            self:startGame()
+                        end,
+                        btn_name= _("同意")
+                    }
+                ):CreateCancelButton(
+                {
+                    listener = function ()
+                        self:OpenUserAgreement()
+                    end,
+                    btn_name= _("阅读"),
+                    btn_images = {normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"}
+                }
+                )
+        end
+    end)
 end
+function GameUILoginBeta:SetAgreeAgreement()
+    app:GetGameDefautlt():setStringForKey("USER_AGREEMENT","agree")
+end
+function GameUILoginBeta:SetNotAgreeAgreement()
+    app:GetGameDefautlt():setStringForKey("USER_AGREEMENT","not_agree")
+end
+function GameUILoginBeta:IsAgreement()
+    return app:GetGameDefautlt():getStringForKey("USER_AGREEMENT") == "agree"
+end
+function GameUILoginBeta:startGame()
+    local button = self.start_button
+    button:setButtonEnabled(false)
+    display.getRunningScene().startGame = true
+    local sp = cc.Spawn:create(cc.ScaleTo:create(1,1.5),cc.FadeOut:create(1))
+    local seq = transition.sequence({sp,cc.CallFunc:create(function()
+        self:connectLogicServer()
+    end)})
+    self.star_game_sprite:runAction(seq)
+end
+function GameUILoginBeta:createUserAgreement()
+    local user_agreement_label = cc.ui.UILabel.new({
+        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        text = _("[用户协议]"),
+        font = UIKit:getFontFilePath(),
+        size = 18,
+        align = cc.ui.UILabel.TEXT_ALIGN_CENTER,
+        color = UIKit:hex2c3b(0x2a575d),
+    }):addTo(self.ui_layer,2)
+        :align(display.LEFT_BOTTOM,display.left+2,display.bottom)
+    local button = WidgetPushButton.new()
+        :addTo(self.ui_layer,2):align(display.LEFT_BOTTOM, display.left+2,display.bottom)
+        :onButtonClicked(function(event)
+            if event.name == "CLICKED_EVENT" then
+                local seq = transition.sequence({cc.ScaleTo:create(0.1,1.3),cc.ScaleTo:create(0.1,1),cc.CallFunc:create(function()
+                    self:OpenUserAgreement()
+                end)})
+                user_agreement_label:runAction(seq)
+            end
+        end)
+    button:setContentSize(user_agreement_label:getContentSize())
+    button:setTouchSwallowEnabled(true)
+end
+function GameUILoginBeta:OpenUserAgreement()
+    local dialog = UIKit:newWidgetUI("WidgetPopDialog",770,_("用户协议"),display.top-130):addTo(self.ui_layer,2)
+    local body = dialog:GetBody()
+    local size = body:getContentSize()
+    local bg = WidgetUIBackGround.new({width = 580 , height = 658},WidgetUIBackGround.STYLE_TYPE.STYLE_5):align(display.CENTER_BOTTOM, size.width/2, 80):addTo(body)
+    local user_agreement_label = UIKit:ttfLabel({
+        text = Localize.user_agreement.agreement,
+        size = 20,
+        color = 0x403c2f,
+        align = cc.ui.UILabel.TEXT_ALIGN_CENTER,
+        dimensions = cc.size(555, 0),
+    })
+    local w,h =  user_agreement_label:getContentSize().width,user_agreement_label:getContentSize().height
+    -- 提示内容
+    local  listview = UIListView.new{
+        viewRect = cc.rect(10,10, w, 640),
+        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
+    }:addTo(bg)
+    local item = listview:newItem()
+    item:setItemSize(w,h)
+    item:addContent(user_agreement_label)
+    listview:addItem(item)
+    listview:reload()
+
+    cc.ui.UIPushButton.new(btn_images or {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+        :setButtonLabel(UIKit:ttfLabel({text =_("同意"), size = 24, color = 0xffedae,shadow=true}))
+        :onButtonClicked(function(event)
+            if event.name == "CLICKED_EVENT" then
+                self:SetAgreeAgreement()
+                self:startGame()
+                dialog:LeftButtonClicked()
+            end
+        end):align(display.RIGHT_CENTER, size.width - 20, 44):addTo(body)
+    cc.ui.UIPushButton.new(btn_images or {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"})
+        :setButtonLabel(UIKit:ttfLabel({text =_("不同意"), size = 24, color = 0xffedae,shadow=true}))
+        :onButtonClicked(function(event)
+            if event.name == "CLICKED_EVENT" then
+                self:SetNotAgreeAgreement("not_agree")
+                dialog:LeftButtonClicked()
+            end
+        end):align(display.LEFT_CENTER, 20, 44):addTo(body)
+end
+
 
 function GameUILoginBeta:showStartState()
     self.star_game_sprite:show()
@@ -149,16 +254,16 @@ function GameUILoginBeta:createVerLabel()
         text = "版本:1.0.0(ddf3d)",
         font = UIKit:getFontFilePath(),
         size = 18,
-        align = cc.ui.UILabel.TEXT_ALIGN_CENTER, 
+        align = cc.ui.UILabel.TEXT_ALIGN_CENTER,
         color = UIKit:hex2c3b(0x2a575d),
     }):addTo(self.ui_layer,2)
-    :align(display.RIGHT_BOTTOM,display.right-2,display.bottom)
+        :align(display.RIGHT_BOTTOM,display.right-2,display.bottom)
 end
 
 function GameUILoginBeta:showVersion()
     if  CONFIG_IS_DEBUG or device.platform == 'mac' then
         local __debugVer = require("debug_version")
-        self.verLabel:setString(string.format(_("版本%s(%s)"), ext.getAppVersion(), __debugVer))
+        self.verLabel:setString("测试"..string.format(_("版本%s(%s)"), ext.getAppVersion(), __debugVer))
         -- app.client_tag = __debugVer
     else
         local jsonPath = cc.FileUtils:getInstance():fullPathForFilename("fileList.json")
@@ -180,54 +285,54 @@ function GameUILoginBeta:OnMoveInStage()
     if CONFIG_IS_DEBUG or device.platform == 'mac' then
         if not app.client_tag then
             NetManager:getUpdateFileList(function(success, msg)
-                    if not success then
-                        device.showAlert(_("错误"), _("检查游戏更新失败!"), { _("确定") },function(event)
-                            app:restart(false)
-                        end)
-                        return
-                    end
-                    local serverFileList = json.decode(msg)
-                    app.client_tag = serverFileList.tag
-                    --注意这里debug模式和mac上再次重写了ext.getAppVersion
-                    ext.getAppVersion = function()
-                        return serverFileList.appVersion
-                    end
+                if not success then
+                    device.showAlert(_("错误"), _("检查游戏更新失败!"), { _("确定") },function(event)
+                        app:restart(false)
+                    end)
+                    return
+                end
+                local serverFileList = json.decode(msg)
+                app.client_tag = serverFileList.tag
+                --注意这里debug模式和mac上再次重写了ext.getAppVersion
+                ext.getAppVersion = function()
+                    return serverFileList.appVersion
+                end
             end)
         end
-    	self:loadLocalResources()
+        self:loadLocalResources()
     else
-    	self:loadLocalJson()
-		self:loadServerJson()
+        self:loadLocalJson()
+        self:loadServerJson()
     end
 end
 
 function GameUILoginBeta:onCleanup()
-	GameUILoginBeta.super.onCleanup(self)
-	-- clean  all  unused textures
-	cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_beta_bg_3987x1136.jpg")
- 	cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_logo_515x92.png")
- 	cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_process_color_606x25.png")
- 	cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_process_bg_606x25.png")
+    GameUILoginBeta.super.onCleanup(self)
+    -- clean  all  unused textures
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_beta_bg_3987x1136.jpg")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_logo_515x92.png")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_process_color_606x25.png")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_process_bg_606x25.png")
     cc.Director:getInstance():getTextureCache():removeTextureForKey("splash_tips_bg_544x30.png")
- 	cc.Director:getInstance():getTextureCache():removeTextureForKey("start_game_292x28.png.png")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("start_game_292x28.png.png")
 end
 
 
 function GameUILoginBeta:loadLocalResources()
-	self:setProgressPercent(0)
-	self:setProgressText(_("正在加载游戏资源..."))
-	--TODO:这里暂时用emoji图片和已经合图的动画文件测试 60的进度用来加载资源
-	local count = #self.local_resources
-	for i,v in ipairs(self.local_resources) do
-		self:__loadToTextureCache(v,i == count)
-	end
-	
+    self:setProgressPercent(0)
+    self:setProgressText(_("正在加载游戏资源..."))
+    --TODO:这里暂时用emoji图片和已经合图的动画文件测试 60的进度用来加载资源
+    local count = #self.local_resources
+    for i,v in ipairs(self.local_resources) do
+        self:__loadToTextureCache(v,i == count)
+    end
+
 end
 
 function GameUILoginBeta:__loadToTextureCache(config,shouldLogin)
-	display.addSpriteFrames(DEBUG_GET_ANIMATION_PATH(config.list),DEBUG_GET_ANIMATION_PATH(config.image),function()
-		self:setProgressPercent(self.progress_num + self.local_resources_percent_per)
-		if shouldLogin then self:loginAction() end
+    display.addSpriteFrames(DEBUG_GET_ANIMATION_PATH(config.list),DEBUG_GET_ANIMATION_PATH(config.image),function()
+        self:setProgressPercent(self.progress_num + self.local_resources_percent_per)
+        if shouldLogin then self:loginAction() end
     end)
 end
 
@@ -241,7 +346,7 @@ function GameUILoginBeta:setProgressPercent(num,animac)
         local progressTo = cc.ProgressTo:create(1,num)
         self.progressTimer:runAction(progressTo)
     else
-    	self.progress_num = num
+        self.progress_num = num
         self.progressTimer:setPercentage(num)
     end
 end
@@ -256,11 +361,12 @@ function GameUILoginBeta:connectGateServer()
         self:setProgressPercent(80)
         self:getLogicServerInfo()
     end):catch(function(err)
-        self:showError(_("连接网关服务器失败!"),function()
-            self:performWithDelay(function()
-                self:loginAction()
-            end, 1)
-        	
+        GameUtils:PingBaidu(function(success)
+            self:showError(success and _("服务器维护中") or _("连接网关服务器失败!"),function()
+                self:performWithDelay(function()
+                    self:loginAction()
+                end, 1)
+            end)
         end)
     end)
 end
@@ -271,14 +377,14 @@ function GameUILoginBeta:getLogicServerInfo()
             self.progress_bar:hide()
             self.tips_ui:hide()
             self:showStartState()
-        end, 0.5) 
+        end, 0.5)
     end):catch(function(err)
         local content, title = err:reason()
         local need_restart = false
         if title == 'timeout' then
             content = _("请求超时")
         else
-            local code = content.code 
+            local code = content.code
             if code == 508 then
                 content = _("服务器维护中")
                 need_restart = false
@@ -298,7 +404,7 @@ function GameUILoginBeta:getLogicServerInfo()
             if need_restart then
                 app:restart(false)
             else
-        	   self:connectGateServer()
+                self:connectGateServer()
             end
         end)
     end)
@@ -312,7 +418,7 @@ function GameUILoginBeta:connectLogicServer()
     end):catch(function(err)
         self:showError(_("连接游戏服务器失败!"),function()
             self:performWithDelay(function()
-        	   self:connectLogicServer()
+                self:connectLogicServer()
             end,1)
         end)
         UIKit:NoWaitForNet()
@@ -321,11 +427,13 @@ function GameUILoginBeta:connectLogicServer()
 end
 function GameUILoginBeta:login()
     NetManager:getLoginPromise():done(function(response)
-        ext.market_sdk.onPlayerLogin(User:Id(),User:Name(),User:ServerName())
-        ext.market_sdk.onPlayerLevelUp(User:Level())
+        local userData = DataManager:getUserData()
+        ext.market_sdk.onPlayerLogin(userData._id, userData.basicInfo.name, userData.logicServerId)
+        ext.market_sdk.onPlayerLevelUp(User:GetPlayerLevelByExp(userData.basicInfo.levelExp))
+
         self:performWithDelay(function()
             if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
-  		        app:EnterFteScene()
+                app:EnterFteScene()
             else
                 self:checkFte()
                 if GLOBAL_FTE then
@@ -340,8 +448,8 @@ function GameUILoginBeta:login()
         NetManager:disconnect()
         local content, title = err:reason()
         if title == 'syntaxError' then
-                self:showError(content,function()
-                    app:restart(false)
+            self:showError(content,function()
+                app:restart(false)
             end)
             return
         end
@@ -356,11 +464,11 @@ function GameUILoginBeta:login()
             end
         end
         self:showError(content,function()
-			self:connectLogicServer()
-		end)
+            self:connectLogicServer()
+        end)
     end):always(function()
         UIKit:NoWaitForNet()
-    end)      
+    end)
 end
 
 function GameUILoginBeta:showError(msg,cb)
@@ -391,11 +499,11 @@ function GameUILoginBeta:loadServerJson()
         end
 
         self.m_serverJson = msg
-        self:getUpdateFileList()
+        self:donwLoadFilesWithFileList()
     end)
 end
 
-function GameUILoginBeta:getUpdateFileList()
+function GameUILoginBeta:donwLoadFilesWithFileList()
     self.m_totalSize = 0
     self.m_currentSize = 0
     local localFileList = json.decode(self.m_localJson)
@@ -439,7 +547,7 @@ function GameUILoginBeta:getUpdateFileList()
         dump(updateFileList,"updateFileList------>")
         self:downloadFiles(updateFileList)
     else
-    	self:setProgressPercent(100)
+        self:setProgressPercent(100)
         self:performWithDelay(function()
             self:loadLocalResources()
         end, 0.8)
@@ -457,9 +565,9 @@ function GameUILoginBeta:downloadFiles(files)
         NetManager:downloadFile(file, function(success)
             if not success then
                 self:showError(_("文件下载失败!"), function()
-        			app:restart()
-        		end)
-                return 
+                    app:restart()
+                end)
+                return
             end
             self.m_currentSize = self.m_currentSize + fileTotal
             self:downloadFiles(files)
@@ -485,7 +593,7 @@ function GameUILoginBeta:saveServerJson()
     local file = io.open(filePath, "w")
     if not file then
         self:showError(_("文件下载失败!"), function()
-        	app:restart()
+            app:restart()
         end)
         return
     end
@@ -597,8 +705,7 @@ function GameUILoginBeta:checkFte()
         mockData.FightWithNpc(3)
     end
     if check("InstantRecruitSoldier_skeletonWarrior") then
-        mockData.RecruitSoldier("skeletonWarrior", 1)
-        mockData.FinishRecruitSoldier()
+        mockData.InstantRecruitSoldier("skeletonWarrior", 1)
     end
     if check("BuildHouseAt_7_3") then
         mockData.BuildHouseAt(7,3,"quarrier")
@@ -612,3 +719,9 @@ end
 
 
 return GameUILoginBeta
+
+
+
+
+
+

@@ -564,17 +564,17 @@ end
 function SoldierManager:FindSoldierStarByBuildingType(building_type)
     local soldiers_star = {}
     if building_type=="trainingGround" then
-        soldiers_star.sentinel = self:GetStarBySoldierType("sentinel")
-        soldiers_star.swordsman = self:GetStarBySoldierType("swordsman")
+        soldiers_star[1] = {"swordsman",self:GetStarBySoldierType("swordsman")}
+        soldiers_star[2] = {"sentinel",self:GetStarBySoldierType("sentinel")}
     elseif building_type=="stable" then
-        soldiers_star.horseArcher = self:GetStarBySoldierType("horseArcher")
-        soldiers_star.lancer = self:GetStarBySoldierType("lancer")
+        soldiers_star[1] = {"lancer",self:GetStarBySoldierType("lancer")}
+        soldiers_star[2] = {"horseArcher",self:GetStarBySoldierType("horseArcher")}
     elseif building_type=="hunterHall" then
-        soldiers_star.ranger = self:GetStarBySoldierType("ranger")
-        soldiers_star.crossbowman = self:GetStarBySoldierType("crossbowman")
+        soldiers_star[1] = {"ranger",self:GetStarBySoldierType("ranger")}
+        soldiers_star[2] = {"crossbowman",self:GetStarBySoldierType("crossbowman")}
     elseif building_type=="workshop" then
-        soldiers_star.ballista = self:GetStarBySoldierType("ballista")
-        soldiers_star.catapult = self:GetStarBySoldierType("catapult")
+        soldiers_star[1] = {"catapult",self:GetStarBySoldierType("catapult")}
+        soldiers_star[2] = {"ballista",self:GetStarBySoldierType("ballista")}
     end
     return soldiers_star
 end

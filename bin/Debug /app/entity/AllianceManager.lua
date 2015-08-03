@@ -101,7 +101,7 @@ function AllianceManager:RefreshAllianceSceneIf(old_alliance_status)
         end
         if old_alliance_status == "" then return end
         if scene_name == 'AllianceBattleScene' or scene_name == 'AllianceScene' or scene_name == 'MyCityScene' then
-            if not UIKit:GetUIInstance('GameUIWarSummary') then
+            if not UIKit:GetUIInstance('GameUIWarSummary') and my_alliance:LastAllianceFightReport() then
                 UIKit:newGameUI("GameUIWarSummary"):AddToCurrentScene(true)
             end
         end

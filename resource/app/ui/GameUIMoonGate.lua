@@ -301,6 +301,10 @@ end
 function GameUIMoonGate:onExit()
     GameUIMoonGate.super.onExit(self)
 end
+function GameUIMoonGate:onCleanup()
+    GameUIMoonGate.super.onCleanup(self)
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("world_map_2000x2000.jpg")
+end
 
 return GameUIMoonGate
 

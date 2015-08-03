@@ -99,7 +99,9 @@ function WidgetMilitaryTechnologyStatus:CreateUpgradingStatus()
             shadow= true
         }))
         :onButtonClicked(function (event)
-            NetManager:getFreeSpeedUpPromise(self.event:GetEventType(),self.event:Id())
+            if self.event:GetTime() > 2 then
+                NetManager:getFreeSpeedUpPromise(self.event:GetEventType(),self.event:Id())
+            end
         end)
         :align(display.CENTER, 474, 44):addTo(upgrading_node)
     free_speed_up_btn:setVisible(is_free)

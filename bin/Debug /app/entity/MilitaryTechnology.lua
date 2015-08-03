@@ -57,7 +57,7 @@ function MilitaryTechnology:GetTechLocalize()
     if soldiers[2] == "hpAdd" then
         return string.format(_("%s血量增加"),soldier_category[soldiers[1]])
     end
-    return string.format(_("%s对%s的攻击"),soldier_category[soldiers[1]],soldier_category[soldiers[2]])
+    return string.format(_("对%s的攻击"),soldier_category[soldiers[2]])
 end
 -- 获取技能类别
 function MilitaryTechnology:GetTechCategory()

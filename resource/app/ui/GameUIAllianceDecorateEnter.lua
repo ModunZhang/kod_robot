@@ -13,7 +13,13 @@ function GameUIAllianceDecorateEnter:GetUIHeight()
 end
 
 function GameUIAllianceDecorateEnter:GetHonourLabelText()
-    return GameUtils:formatNumber(buildingName[self:GetBuilding():GetName()].moveNeedHonour)
+    return GameUtils:formatNumber(self:GetMoveNeedHonour())
+end
+function GameUIAllianceDecorateEnter:GetMoveNeedHonour()
+    if buildingName[self:GetBuilding():GetName()] then
+        return buildingName[self:GetBuilding():GetName()].moveNeedHonour 
+    end
+    return 0
 end
 
 function GameUIAllianceDecorateEnter:FixedUI()
@@ -81,7 +87,7 @@ function GameUIAllianceDecorateEnter:GetEnterButtons()
     		local alliacne =  self:GetMyAlliance()
             local isEqualOrGreater = alliacne:GetSelf():CanEditAllianceObject()
             if isEqualOrGreater then
-                if self:GetMyAlliance():Honour() < self:GetHonourLabelText() then 
+                if self:GetMyAlliance():Honour() < self:GetMoveNeedHonour() then 
                     UIKit:showMessageDialog(nil, _("联盟荣耀值不足"),function()end)
                     return 
                 end

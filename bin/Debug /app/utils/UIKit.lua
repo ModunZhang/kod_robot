@@ -625,12 +625,63 @@ function UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_
     return dialog
 end
 
+function UIKit:showConfirmUseGemMessageDialog(title,tips,ok_callback,cancel_callback,visible_x_button,x_button_callback,user_data)
+    title = title or _("提示")
+    tips = tips or ""
+    if type(visible_x_button) ~= 'boolean' then visible_x_button = true end
+    local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback,user_data):SetTitle(title):SetMessageBgSize(342,190):SetPopMessage(tips)
+    if ok_callback then
+        dialog:CreateOKButton({
+            listener =  function ()
+                if ok_callback then
+                    ok_callback()
+                end
+            end,
+            y = display.top-560
+        })
+    end
+
+    dialog:CreateCancelButton({
+        listener = function ()
+        end,btn_name = _("取消"),y = display.top-560})
+    dialog:VisibleXButton(visible_x_button)
+    if not visible_x_button then
+        dialog:DisableAutoClose()
+    end
+    -- 取消提醒按钮
+    self:ttfLabel({
+        text = _("不再提醒"),
+        size = 18,
+        color = 0x615b44
+    }):addTo(dialog):align(display.RIGHT_CENTER,display.cx+240,display.top-620)
+    local tmp_bg = display.newSprite("activity_check_bg_55x51.png"):addTo(dialog):pos(display.cx+256,display.top-620):scale(0.6)
+    tmp_bg:hide()
+    local saved_button = cc.ui.UICheckBoxButton.new({
+        off = "activity_check_bg_55x51.png",
+        on = "activity_check_body_55x51.png",
+    }):onButtonStateChanged(function(event)
+        dump(event)
+        if event.state == "on" then
+            tmp_bg:show()
+            app:GetGameDefautlt():CloseGemRemind()
+        else
+            app:GetGameDefautlt():OpenGemRemind()
+            tmp_bg:hide()
+        end
+    end):addTo(dialog):pos(display.cx+256,display.top-620):scale(0.6)
+    self:__addMessageDialogToCurrentScene(dialog)
+    dialog:zorder(4001)
+    return dialog
+end
+
 function UIKit:showMessageDialogWithParams(params)
     local title = params.title or _("提示")
     local content = params.content or ""
     local ok_callback = params.ok_callback or function()end
     local ok_string = params.ok_string or _("确定")
+    local ok_btn_images = params.ok_btn_images or {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"}
     local cancel_string = params.cancel_string or _("取消")
+    local cancel_btn_images = params.cancel_btn_images or {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"}
     local visible_x_button = true
     if  type(params.visible_x_button) == 'boolean' then
         visible_x_button = params.visible_x_button
@@ -641,9 +692,9 @@ function UIKit:showMessageDialogWithParams(params)
 
     local dialog = UIKit:newGameUI("FullScreenPopDialogUI",x_button_callback,user_data):SetTitle(title):SetPopMessage(content):zorder(zorder)
 
-    dialog:CreateOKButton({listener = ok_callback,btn_name = ok_string})
+    dialog:CreateOKButton({listener = ok_callback,btn_name = ok_string, btn_images = ok_btn_images})
     if params.cancel_callback then
-        dialog:CreateCancelButton({listener = cancel_callback,btn_name = _("取消")})
+        dialog:CreateCancelButton({listener = cancel_callback,btn_name = cancel_string,btn_images = cancel_btn_images})
     end
     dialog:VisibleXButton(visible_x_button)
     if type(params.auto_close) ~= "boolean" then
@@ -655,6 +706,22 @@ function UIKit:showMessageDialogWithParams(params)
     end
     self:__addMessageDialogToCurrentScene(dialog)
     return dialog
+end
+-- 可能得到材料的派兵行为检查
+function UIKit:showSendTroopMessageDialog(attack_func,material_type,effect_str)
+    if City:GetMaterialManager():CheckOutOfRangeByType(material_type) then
+        local dialog = self:showMessageDialogWithParams({
+            title = _("提示"),
+            content = _(string.format(_("当前材料库房中的%s材料已满，你可能无法获得此次战斗所得的材料奖励。是否仍要派兵？"),effect_str)),
+            ok_callback = attack_func,
+            ok_btn_images = {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},
+            ok_string = _("强行派兵"),
+            cancel_callback = function () end,
+            cancel_btn_images = {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"}
+        })
+    else
+        attack_func()
+    end
 end
 
 function UIKit:getMessageDialogWithParams(params)
@@ -892,8 +959,270 @@ function UIKit:GetItemImage(reward_type,item_key)
         if item_key == 'loyalty' then
             return "loyalty_128x128.png"
         end
+    elseif reward_type == 'basicInfo' then
+        if item_key == 'marchQueue' then
+            return "tmp_march_queue_128x128.png"
+        end
     end
 end
+
+function UIKit:ShakeAction(is_forever, delay)
+    is_forever = is_forever or true
+    delay = delay or 0
+    local t = 0.025
+    local r = 5
+    local shake_list = {
+        cc.RotateBy:create(t, r),
+        cc.RotateBy:create(t, -r),
+        cc.RotateBy:create(t, -r),
+        cc.RotateBy:create(t, r),
+        cc.RotateBy:create(t, r),
+        cc.RotateBy:create(t, -r),
+        cc.RotateBy:create(t, -r),
+        cc.RotateBy:create(t, r),
+        cc.RotateBy:create(t, r),
+        cc.RotateBy:create(t, -r),
+        cc.RotateBy:create(t, -r),
+        cc.RotateBy:create(t, r),
+    }
+    if delay > 0 then
+        table.insert(shake_list, cca.delay(delay))
+    end
+    if is_forever then
+        return cc.RepeatForever:create(transition.sequence(shake_list))
+    end
+    return transition.sequence(shake_list)
+end
+function UIKit:ButtonAddScaleAction(button)
+    button:onButtonPressed(function(event)
+        event.target:runAction(cc.ScaleTo:create(0.1, 1.2))
+    end):onButtonRelease(function(event)
+        event.target:runAction(cc.ScaleTo:create(0.1, 1))
+    end)
+    return button
+end
+
+---
+local soldier_animap = {
+    -- 普通兵种
+    --
+    bubing_1 = {cc.p(0.55, 0.38), false, 1},
+    bubing_2 = {cc.p(0.61, 0.45), false, 1},
+    bubing_3 = {cc.p(0.59, 0.48), false, 1},
+    --
+    gongjianshou_1 = {cc.p(0.52, 0.37), false, 1},
+    gongjianshou_2 = {cc.p(0.52, 0.37), false, 1},
+    gongjianshou_3 = {cc.p(0.52, 0.37), false, 1},
+    --
+    qibing_1 = {cc.p(0.5, 0.45), false, 1},
+    qibing_2 = {cc.p(0.5, 0.46), false, 1},
+    qibing_3 = {cc.p(0.5, 0.48), false, 1},
+    --
+    toushiche = {cc.p(0.39, 0.4), false, 1},
+    toushiche_2 = {cc.p(0.39, 0.4), false, 1},
+    toushiche_3 = {cc.p(0.37, 0.4), false, 1},
+    --
+    shaobing_1 = {cc.p(0.5, 0.36), false, 1},
+    shaobing_2 = {cc.p(0.5, 0.36), false, 1},
+    shaobing_3 = {cc.p(0.5, 0.36), false, 1},
+    --
+    nugongshou_1 = {cc.p(0.5, 0.38), false, 1},
+    nugongshou_2 = {cc.p(0.5, 0.38), false, 1},
+    nugongshou_3 = {cc.p(0.34, 0.38), false, 1},
+    --
+    youqibing_1 = {cc.p(0.5, 0.38), false, 1},
+    youqibing_2 = {cc.p(0.5, 0.38), false, 1},
+    youqibing_3 = {cc.p(0.5, 0.38), false, 1},
+    --
+    nuche_1 = {cc.p(0.5, 0.45), false, 1},
+    nuche_2 = {cc.p(0.5, 0.45), false, 1},
+    nuche_3 = {cc.p(0.5, 0.45), false, 1},
+
+    -- 特殊兵种
+    kulouyongshi = {cc.p(0.5, 0.45), false, 1.6},
+    kulousheshou = {cc.p(0.28, 0.45), false, 1.6},
+    siwangqishi = {cc.p(0.5, 0.45), false, 1.5},
+    jiaorouche = {cc.p(0.37, 0.45), false, 1.4},
+    -- 黑化兵
+    heihua_bubing_2 = {cc.p(0.5, 0.3), false, 1},
+    heihua_bubing_3 = {cc.p(0.45, 0.33), true, 0.9},
+    --
+    heihua_gongjianshou_2 = {cc.p(0.1, 0.09), true, 1, true},
+    heihua_gongjianshou_3 = {cc.p(0.47, 0.22), true, 1},
+    --
+    heihua_qibing_2 = {cc.p(0.5, 0.4), true, 0.9},
+    heihua_qibing_3 = {cc.p(0.55, 0.45), true, 0.9},
+    --
+    heihua_toushiche_2 = {cc.p(0.4, 0.4), true, 0.7},
+    heihua_toushiche_3 = {cc.p(0.4, 0.45), true, 0.7},
+    --
+    heihua_shaobing_2 = {cc.p(0.5, 0.22), true, 0.9},
+    heihua_shaobing_3 = {cc.p(0.5, 0.3), true, 0.9},
+    --
+    heihua_nugongshou_2 = {cc.p(0.48, 0.35), true, 0.9},
+    heihua_nugongshou_3 = {cc.p(0.48, 0.3), true, 0.9},
+    --
+    heihua_youqibing_2 = {cc.p(0.48, 0.3), true, 0.9},
+    heihua_youqibing_3 = {cc.p(0.48, 0.35), true, 0.9},
+    --
+    heihua_nuche_2 = {cc.p(0.5, 0.4), true, 0.7},
+    heihua_nuche_3 = {cc.p(0.5, 0.45), true, 0.7},
+}
+local dragon_fly_45_ani = {
+    red_long = {cc.p(0.52, 0.47), false, 1},
+    blue_long = {cc.p(0.52, 0.47), false, 1},
+    green_long = {cc.p(0.52, 0.47), false, 1},
+}
+local dragon_fly_neg_45_ani = {
+    red_long = {cc.p(0.53, 0.49), false, 1},
+    blue_long = {cc.p(0.53, 0.49), false, 1},
+    green_long = {cc.p(0.53, 0.49), false, 1},
+}
+local soldier_move_45_ani = {
+    -- 普通兵种
+    --
+    bubing_1 = {cc.p(0.54, 0.38), false, 1},
+    bubing_2 = {cc.p(0.57, 0.48), false, 1},
+    bubing_3 = {cc.p(0.54, 0.54), false, 1},
+    --
+    gongjianshou_1 = {cc.p(0.5, 0.31), false, 1},
+    gongjianshou_2 = {cc.p(0.5, 0.35), false, 1},
+    gongjianshou_3 = {cc.p(0.49, 0.35), false, 1},
+    --
+    qibing_1 = {cc.p(0.48, 0.45), false, 1},
+    qibing_2 = {cc.p(0.48, 0.45), false, 1},
+    qibing_3 = {cc.p(0.48, 0.48), false, 1},
+    --
+    toushiche = {cc.p(0.39, 0.4), false, 1},
+    toushiche_2 = {cc.p(0.39, 0.44), false, 1},
+    toushiche_3 = {cc.p(0.37, 0.44), false, 1},
+    --
+    shaobing_1 = {cc.p(0.47, 0.47), false, 1},
+    shaobing_2 = {cc.p(0.47, 0.47), false, 1},
+    shaobing_3 = {cc.p(0.5, 0.46), false, 1},
+    --
+    nugongshou_1 = {cc.p(0.47, 0.4), false, 1},
+    nugongshou_2 = {cc.p(0.47, 0.38), false, 1},
+    nugongshou_3 = {cc.p(0.32, 0.4), false, 1},
+    --
+    youqibing_1 = {cc.p(0.48, 0.38), false, 1},
+    youqibing_2 = {cc.p(0.48, 0.38), false, 1},
+    youqibing_3 = {cc.p(0.48, 0.38), false, 1},
+    --
+    nuche_1 = {cc.p(0.5, 0.45), false, 1},
+    nuche_2 = {cc.p(0.5, 0.45), false, 1},
+    nuche_3 = {cc.p(0.49, 0.45), false, 1},
+
+    -- 特殊兵种
+    kulouyongshi = {cc.p(0.47, 0.45), false, 1},
+    kulousheshou = {cc.p(0.24, 0.46), false, 1},
+    siwangqishi = {cc.p(0.5, 0.45), false, 1},
+    jiaorouche = {cc.p(0.338, 0.48), false, 1},
+}
+local soldier_move_neg_45_ani = {
+    -- 普通兵种
+    --
+    bubing_1 = {cc.p(0.51, 0.31), false, 1},
+    bubing_2 = {cc.p(0.57, 0.4), false, 1},
+    bubing_3 = {cc.p(0.52, 0.4), false, 1},
+    --
+    gongjianshou_1 = {cc.p(0.51, 0.37), false, 1},
+    gongjianshou_2 = {cc.p(0.52, 0.37), false, 1},
+    gongjianshou_3 = {cc.p(0.52, 0.38), false, 1},
+    --
+    qibing_1 = {cc.p(0.4, 0.36), false, 1},
+    qibing_2 = {cc.p(0.4, 0.36), false, 1},
+    qibing_3 = {cc.p(0.4, 0.38), false, 1},
+    --
+    toushiche = {cc.p(0.39, 0.43), false, 1},
+    toushiche_2 = {cc.p(0.39, 0.45), false, 1},
+    toushiche_3 = {cc.p(0.37, 0.44), false, 1},
+    --
+    shaobing_1 = {cc.p(0.45, 0.3), false, 1},
+    shaobing_2 = {cc.p(0.45, 0.3), false, 1},
+    shaobing_3 = {cc.p(0.47, 0.33), false, 1},
+    --
+    nugongshou_1 = {cc.p(0.46, 0.4), false, 1},
+    nugongshou_2 = {cc.p(0.46, 0.38), false, 1},
+    nugongshou_3 = {cc.p(0.3, 0.4), false, 1},
+    --
+    youqibing_1 = {cc.p(0.48, 0.38), false, 1},
+    youqibing_2 = {cc.p(0.48, 0.38), false, 1},
+    youqibing_3 = {cc.p(0.48, 0.38), false, 1},
+    --
+    nuche_1 = {cc.p(0.5, 0.45), false, 1},
+    nuche_2 = {cc.p(0.5, 0.45), false, 1},
+    nuche_3 = {cc.p(0.49, 0.45), false, 1},
+
+    -- 特殊兵种
+    kulouyongshi = {cc.p(0.46, 0.44), false, 1},
+    kulousheshou = {cc.p(0.26, 0.46), false, 1},
+    siwangqishi = {cc.p(0.4, 0.38), false, 1},
+    jiaorouche = {cc.p(0.345, 0.48), false, 1},
+}
+
+local function createAniWithConfig(ani, config, default_animation)
+    local ap,flip,s,shadow = unpack(config)
+    local sprite = ccs.Armature:create(ani)
+    sprite:setScaleX(flip and -s or s)
+    sprite:setScaleY(s)
+    sprite:setAnchorPoint(ap)
+    sprite:getAnimation():play(default_animation)
+    if shadow then
+        display.newSprite("tmp_soldier_shadow.png")
+            :addTo(sprite):setAnchorPoint(cc.p(0.25,0.45))
+    end
+    return sprite
+end
+function UIKit:CreateIdle45Ani(ani)
+    return createAniWithConfig(ani, soldier_animap[ani], "idle_45")
+end
+function UIKit:CreateDragonFly45Ani(ani)
+    return createAniWithConfig(ani, dragon_fly_45_ani[ani], "flying_45")
+end
+function UIKit:CreateDragonFlyNeg45Ani(ani)
+    return createAniWithConfig(ani, dragon_fly_neg_45_ani[ani], "flying_-45")
+end
+function UIKit:CreateSoldierMove45Ani(ani)
+    return createAniWithConfig(ani, soldier_move_45_ani[ani], "move_45")
+end
+function UIKit:CreateSoldierMoveNeg45Ani(ani)
+    return createAniWithConfig(ani, soldier_move_neg_45_ani[ani], "move_-45")
+end
+function UIKit:GetSoldierMoveAniConfig(ani, act)
+    if act == "move_45" then
+        return soldier_move_45_ani[ani]
+    elseif act == "move_-45" then
+        return soldier_move_neg_45_ani[ani]
+    else
+        assert(false)
+    end
+end
+function UIKit:CreateNameBanner(name, dragon_type)
+    local node = display.newNode()
+    local size = self:ttfLabel({
+        text = name,
+        color = 0xfffab9,
+        size = 18,
+    }):addTo(node, 1):align(display.CENTER):getContentSize()
+    display.newSprite("arrow_green_22x32.png"
+        , nil, nil, {class=cc.FilteredSpriteWithOne})
+        :addTo(node)
+        :setScale(size.width / 22 * 1.3, size.height/32 * 1.01)
+        :setFilter(filter.newFilter("CUSTOM",
+            json.encode({
+                frag = "shaders/banner.fs",
+                shaderName = "banner",
+            })
+        ))
+    local dragon_bg = display.newSprite("dragon_bg_114x114.png")
+        :addTo(node, 2):scale(0.3):pos(-size.width/2-20, 0)
+    display.newSprite(UILib.dragon_head[dragon_type or "redDragon"])
+        :align(display.CENTER, dragon_bg:getContentSize().width/2, dragon_bg:getContentSize().height/2+5)
+        :addTo(dragon_bg)
+    return node
+end
+
 
 
 

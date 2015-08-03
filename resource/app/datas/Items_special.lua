@@ -235,9 +235,9 @@ special["moveTheCity"] = {
 	["effect"] = "NONE",
 	["order"] = 25,
 	["isSell"] = true,
-	["price"] = 500,
-	["sellPriceInAlliance"] = 25000,
-	["buyPriceInAlliance"] = 25000,
+	["price"] = 300,
+	["sellPriceInAlliance"] = 15000,
+	["buyPriceInAlliance"] = 15000,
 	["isAdvancedItem"] = true
 }
 special["dragonExp_1"] = {
@@ -389,4 +389,14 @@ special["restoreWall_3"] = {
 	["sellPriceInAlliance"] = 100000,
 	["buyPriceInAlliance"] = 100000,
 	["isAdvancedItem"] = true
+}
+special["sweepScroll"] = {
+	["name"] = "sweepScroll",
+	["effect"] = "NONE",
+	["order"] = 41,
+	["isSell"] = true,
+	["price"] = 50,
+	["sellPriceInAlliance"] = 250,
+	["buyPriceInAlliance"] = 250,
+	["isAdvancedItem"] = false
 }

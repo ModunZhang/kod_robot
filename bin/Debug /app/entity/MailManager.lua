@@ -189,9 +189,24 @@ function MailManager:ModifyMail(mail)
 end
 
 function MailManager:DeleteSendMail(mail)
+    local delete_mail_server_index
     for k,v in pairs(self.sendMails) do
         if v.id == mail.id then
+            dump(v,"DeleteSendMail mail")
+            delete_mail_server_index = v.index
             table.remove(self.sendMails,k)
+        end
+    end
+    for k,v in pairs(DataManager:getUserData().sendMails) do
+        if v.index > delete_mail_server_index then
+            local old = clone(v.index)
+            v.index = old - 1
+        end
+    end
+    for k,v in pairs(self.sendMails) do
+        if v.index > delete_mail_server_index then
+            local old = clone(v.index)
+            v.index = old - 1
         end
     end
 end
@@ -215,6 +230,9 @@ function MailManager:GetMails()
     return self.mails
 end
 function MailManager:GetMailByServerIndex(serverIndex)
+    if not self.mails then
+        return
+    end
     local mails = self.mails
     for i,v in ipairs(mails) do
         print(".....v.index == index",v.title,v.index,serverIndex,v.index == serverIndex)
@@ -225,7 +243,24 @@ function MailManager:GetMailByServerIndex(serverIndex)
         end
     end
 end
+function MailManager:GetSendMailIndexByServerIndex(serverIndex)
+    if not self.sendMails then
+        return
+    end
+    local sendMails = self.sendMails
+    for i,v in ipairs(sendMails) do
+        print(".....v.index == index",v.title,v.index,serverIndex,v.index == serverIndex,i)
+    end
+    for i,v in ipairs(sendMails) do
+        if v.index == serverIndex then
+            return i
+        end
+    end
+end
 function MailManager:GetSavedMailByServerIndex(serverIndex)
+    if not self.savedMails then
+        return
+    end
     local savedMails = self.savedMails
     for i,v in ipairs(savedMails) do
         print("收藏夹.....v.index == index",v.title,v.index,serverIndex,v.index == serverIndex)
@@ -237,6 +272,9 @@ function MailManager:GetSavedMailByServerIndex(serverIndex)
     end
 end
 function MailManager:GetReportByServerIndex(serverIndex)
+    if not self.reports then
+        return
+    end
     local reports = self.reports
     for i,v in ipairs(reports) do
         print(".....v.index == index",v:Index(),serverIndex)
@@ -248,6 +286,9 @@ function MailManager:GetReportByServerIndex(serverIndex)
     end
 end
 function MailManager:GetSavedReportByServerIndex(serverIndex)
+    if not self.savedReports then
+        return
+    end
     local reports = self.savedReports
     for i,v in ipairs(reports) do
         print("收藏战报.....v.index == index",v:Index(),serverIndex)
@@ -313,10 +354,11 @@ end
 function MailManager:GetSendMails()
     if not self.sendMails then return end
     -- 按时间排序
-    table.sort(self.sendMails,function ( a , b )
+    local clone_send_mails = clone(self.sendMails)
+    table.sort(clone_send_mails,function ( a , b )
         return a.sendTime > b.sendTime
     end)
-    return self.sendMails
+    return clone_send_mails
 end
 function MailManager:FetchSendMailsFromServer(fromIndex)
     if self.is_last_send_mail then
@@ -335,9 +377,9 @@ function MailManager:FetchSendMailsFromServer(fromIndex)
             if not self.sendMails then
                 self.sendMails = {}
             end
-            for i,v in ipairs(response.msg.mails) do
-                table.insert(user_data.sendMails, v)
+            for i,v in ipairs(mails) do
                 self:AddSendMailsToEnd(clone(v))
+                table.insert(user_data.sendMails, clone(v))
             end
         end
     end)
@@ -400,7 +442,6 @@ function MailManager:OnNewMailsChanged( mails )
             end
         elseif type == "edit" then
             for i,data in ipairs(mail) do
-                LuaUtils:outputTable("edit mail", data)
                 table.insert(edit_mails, self:ModifyMail(clone(data)))
             end
         end
@@ -448,13 +489,17 @@ function MailManager:OnNewSendMailsChanged( sendMails )
     for type,mail in pairs(sendMails) do
         if type == "add" then
             for i,data in ipairs(mail) do
-                table.insert(add_mails, data)
-                table.insert(self.sendMails, data)
+                -- 收到
+                if not data.index then
+                    data.index = self.sendMails[1] and (self.sendMails[1].index + 1) or 0
+                end
+                table.insert(add_mails, clone(data))
+                table.insert(self.sendMails, clone(data))
             end
         elseif type == "remove" then
             for i,data in ipairs(mail) do
-                table.insert(remove_mails, data)
-                self:DeleteSendMail(data)
+                table.insert(remove_mails, clone(data))
+                self:DeleteSendMail(clone(data))
             end
         end
     end
@@ -621,13 +666,46 @@ function MailManager:DeleteReport( report )
         end
     end
 end
+function MailManager:DecreaseReportsIndex()
+    if self.reports then
+        for k,v in pairs(self.reports) do
+            v:SetIndex(v:Index() - 1)
+        end
+    end
+    if self.savedReports then
+        for k,v in pairs(self.savedReports) do
+            v:SetIndex(v:Index() - 1)
+        end
+    end
+end
+function MailManager:DecreaseSendMailsIndex()
+    if self.sendMails then
+        for k,v in pairs(self.sendMails) do
+            local index = clone(v.index)
+            v.index = index - 1
+        end
+    end
+end
+function MailManager:DecreaseMailsIndex()
+    if self.mails then
+        for k,v in pairs(self.mails) do
+            local index = clone(v.index)
+            v.index = index - 1
+        end
+    end
+    if self.savedMails then
+        for k,v in pairs(self.savedMails) do
+            local index = clone(v.index)
+            v.index = index - 1
+        end
+    end
+end
 function MailManager:ModifyReport( report )
     for k,v in pairs(self.reports) do
         if v:Id() == report.id then
             if v:IsSaved() ~= report.isSaved then
                 self:OnNewSavedReportsChanged(Report:DecodeFromJsonData(report))
             end
-            print("v:IsRead()",v:IsRead(),"report.isRead ",report.isRead )
             if v:IsRead() ~= report.isRead then
                 self:OnNewSavedReportsChanged(Report:DecodeFromJsonData(report),true)
             end
@@ -701,6 +779,9 @@ function MailManager:FetchSavedReportsFromServer(fromIndex)
     end)
 end
 return MailManager
+
+
+
 
 
 

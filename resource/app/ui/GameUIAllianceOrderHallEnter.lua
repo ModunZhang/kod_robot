@@ -36,21 +36,15 @@ function GameUIAllianceOrderHallEnter:GetBuildingInfo()
         {_("坐标"),0x615b44},
         {self:GetLocation(),0x403c2f},
     }
-    local village_count,current_collect_village = _("未知"),_("未知")
+    local village_count = _("未知")
     if self:IsMyAlliance() then
-    	village_count = 50
-    	current_collect_village = _("暂无")
+    	village_count = LuaUtils:table_size(self:GetMyAlliance():Villages())
     end
     local label_2 = {
         {_("当前村落数量"),0x615b44},
         {village_count,0x403c2f},
     } 
-    local label_3 = 
-    {
-	    {_("当前采集村落"),0x615b44},
-        {current_collect_village,0x403c2f},
-    }
-  	return {location,label_2,label_3}
+  	return {location,label_2}
 end
 
 function GameUIAllianceOrderHallEnter:GetNormalButton()

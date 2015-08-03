@@ -208,7 +208,6 @@ function GameUINpc:CreateLabel()
         text = "",
         size = 22,
         color = 0xffedae,
-        align = cc.ui.UILabel.TEXT_ALIGN_CENTER,
     }):addTo(self.ui_map.dialog_bg):align(display.LEFT_TOP, size.width / 2 - 20, size.height - 40)
     label:setLineBreakWithoutSpace(true)
     label:setMaxLineWidth(300)

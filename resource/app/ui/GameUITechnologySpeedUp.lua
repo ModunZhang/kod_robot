@@ -27,9 +27,9 @@ function GameUITechnologySpeedUp:ctor()
 end
 
 function GameUITechnologySpeedUp:FreeSpeedUpAction()
-	NetManager:getFreeSpeedUpPromise("productionTechEvents",self:GetEvent():Id()):done(function()
-		self:LeftButtonClicked()
-	end)
+	if self:GetEvent():GetTime() > 2 then
+		NetManager:getFreeSpeedUpPromise("productionTechEvents",self:GetEvent():Id())
+	end
 end
 
 function GameUITechnologySpeedUp:onCleanup()

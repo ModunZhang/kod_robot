@@ -241,7 +241,9 @@ function GameUIAlliance:GetJoinList(tag)
             if not response.msg or not response.msg.allianceDatas then return end
             if response.msg.allianceDatas  then
                 self.join_list_data_source = response.msg.allianceDatas
-                self:RefreshJoinListView()
+                if self.RefreshJoinListView then
+                    self:RefreshJoinListView()
+                end
             end
         end)
     else
@@ -251,7 +253,9 @@ function GameUIAlliance:GetJoinList(tag)
             if not response.msg or not response.msg.allianceDatas then return end
             if response.msg.allianceDatas then
                 self.join_list_data_source = response.msg.allianceDatas
-                self:RefreshJoinListView()
+                if self.RefreshJoinListView then
+                    self:RefreshJoinListView()
+                end
             end
         end):always(function()
             self.isLoadingJoin = false
@@ -352,6 +356,11 @@ function GameUIAlliance:OnJoinListActionButtonClicked(idx)
     local alliance = self.join_list_data_source[idx]
     if not alliance then return end
     if  alliance.joinType == 'all' then --如果是直接加入
+        if alliance.members == alliance.membersMax then
+            UIKit:showMessageDialog(_("提示"),
+                _("联盟人数已达最大"))
+            return
+        end
         NetManager:getJoinAllianceDirectlyPromise(alliance.id):fail(function()
             self:SearchAllianAction(self.editbox_tag_search:getText())
         end):done(function()
@@ -490,7 +499,7 @@ function GameUIAlliance:NoAllianceTabEvent_inviteIf()
         size = 22,
         color= 0x615b44,
         align = cc.TEXT_ALIGNMENT_CENTER
-    }):align(display.BOTTOM_CENTER,window.cx,760):addTo(invateNode)
+    }):align(display.BOTTOM_CENTER,320,760):addTo(invateNode)
     self.invateListView = list
     self:RefreshInvateListView()
     return invateNode
@@ -524,7 +533,7 @@ function GameUIAlliance:NoAllianceTabEvent_applyIf()
         size = 22,
         color= 0x615b44,
         align = cc.TEXT_ALIGNMENT_CENTER
-    }):align(display.BOTTOM_CENTER,window.cx,760):addTo(applyNode)
+    }):align(display.BOTTOM_CENTER,320,760):addTo(applyNode)
     self:RefreshApplyListView()
     return applyNode
 end
@@ -938,9 +947,9 @@ function GameUIAlliance:GetEventItemByIndexAndEvent()
     local content = display.newNode():size(520,84)
     local bg0 = display.newScale9Sprite("back_ground_548x40_1.png",0,0,cc.size(520,84),cc.rect(10,10,528,20)):addTo(content):align(display.LEFT_BOTTOM, 0, 0)
     local bg1 = display.newScale9Sprite("back_ground_548x40_2.png",0,0,cc.size(520,84),cc.rect(10,10,528,20)):addTo(content):align(display.LEFT_BOTTOM, 0, 0)
-    local normal = display.newScale9Sprite("title_blue_430x30.png",0,0,cc.size(222,30),cc.rect(10,10,410,10)):addTo(content):align(display.LEFT_TOP, 0,70)
+    local normal = display.newScale9Sprite("title_blue_430x30.png",0,0,cc.size(222,30),cc.rect(20,10,390,10)):addTo(content):align(display.LEFT_TOP, 0,70)
     local important = display.newSprite("alliance_event_type_green_222x30.png"):addTo(content):align(display.LEFT_TOP, 0,70)
-    local war = display.newSprite("title_red_166x30.png",0,0,cc.size(222,30),cc.rect(10,10,146,10)):addTo(content):align(display.LEFT_TOP, 0,70)
+    local war = display.newScale9Sprite("title_red_166x30.png",0,0,cc.size(222,30),cc.rect(20,10,126,10)):addTo(content):align(display.LEFT_TOP, 0,70)
     local title_label = UIKit:ttfLabel({
         text = "title",
         size = 20,
@@ -955,7 +964,7 @@ function GameUIAlliance:GetEventItemByIndexAndEvent()
         text = "content",
         size = 20,
         color = 0x403c2f,
-        dimensions = cc.size(300, 60)
+        dimensions = cc.size(280, 60)
     }):align(display.LEFT_CENTER,0,0)
     content_label:pos(normal:getPositionX()+normal:getContentSize().width + 10,42):addTo(content)
     content.bg0 = bg0
@@ -991,6 +1000,7 @@ end
 function GameUIAlliance:GetEventContent(event)
     local event_type = event.type
     local params_,params = event.params,{}
+    dump(event)
     for _,v in ipairs(params_) do
         if 'promotionDown' == event_type or 'promotionUp' == event_type then
             if Localize.alliance_title[v] then
@@ -1007,6 +1017,16 @@ function GameUIAlliance:GetEventContent(event)
         elseif 'upgrade' == event_type then
             if Localize.building_name[v] then
                 v = Localize.building_name[v]
+            end
+        elseif 'shrine' == event_type then
+            v = string.gsub(v,"_","-")
+        elseif 'buildingUpgrade' == event_type then
+            if Localize.building_name[v] then
+                v = Localize.building_name[v]
+            end
+        elseif 'villageUpgrade' == event_type then
+            if Localize.village_name[v] then
+                v = Localize.village_name[v]
             end
         end
         table.insert(params, v)
@@ -1434,7 +1454,7 @@ function GameUIAlliance:RefreshMemberList()
     if archon.online then
         self.member_list_bg.loginLabel:setString(_("在线"))
     else
-        self.member_list_bg.loginLabel:setString(_("最后登录:") .. NetService:formatTimeAsTimeAgoStyleByServerTime(archon.lastLoginTime))
+        self.member_list_bg.loginLabel:setString(_("最后登录:") .. NetService:formatTimeAsTimeAgoStyleByServerTime(archon.lastLogoutTime))
     end
     local display_title,___ = self:GetAllianceTitleAndLevelPng("archon")
     self.member_list_bg.archon_title_label:setString(display_title)
@@ -1626,6 +1646,10 @@ function GameUIAlliance:OnInfoButtonClicked(tag)
     if tag == 1 then
         if Alliance_Manager:GetMyAlliance():GetSelf():IsArchon() and Alliance_Manager:GetMyAlliance():GetMembersCount() > 1 then
             UIKit:showMessageDialog(_("提示"),_("仅当联盟成员为空时,盟主才能退出联盟"), function()end)
+            return
+        end
+        if Alliance_Manager:GetMyAlliance():Status() == "fight" or Alliance_Manager:GetMyAlliance():Status() == "prepare" then
+            UIKit:showMessageDialog(_("提示"),_("联盟正在战争准备期或战争期,不能退出联盟"), function()end)
             return
         end
         UIKit:showMessageDialog(_("退出联盟"),

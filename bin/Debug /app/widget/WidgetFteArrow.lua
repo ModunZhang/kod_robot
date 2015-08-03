@@ -10,12 +10,12 @@ function WidgetFteArrow:OnPositionChanged(x, y, tx, ty)
     self:pos(p.x, p.y)
 end
 
-function WidgetFteArrow:ctor(text)
+function WidgetFteArrow:ctor(text, size)
     self.back = display.newScale9Sprite("fte_label_background.png"):addTo(self)
     local s = self.back:getContentSize()
     self.label = UIKit:ttfLabel({
         text = text or "",
-        size = 22,
+        size = size or 22,
         color = 0xffedae,
         align = cc.TEXT_ALIGNMENT_CENTER,
     }):addTo(self.back)

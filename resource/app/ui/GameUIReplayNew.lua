@@ -831,6 +831,11 @@ function GameUIReplayNew:ctor(report, callback)
     self.defence_soldiers = soldiers
 
     self.callback = callback
+
+    for _,v in ipairs(self:GetPreloadImages()) do
+        display.addSpriteFrames(DEBUG_GET_ANIMATION_PATH(v.list),DEBUG_GET_ANIMATION_PATH(v.image))
+    end
+
     local manager = ccs.ArmatureDataManager:getInstance()
     manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH("animations/paizi.ExportJson"))
     UILib.loadPveAnimation()
@@ -1649,6 +1654,13 @@ function GameUIReplayNew:BuildUI()
         })
     ):addTo(bottom):align(display.CENTER, s1.width - 110, 50)
     return ui_map
+end
+function GameUIReplayNew:GetPreloadImages()
+    return {
+        {image = "animations/ui_animation_0.pvr.ccz",list = "animations/ui_animation_0.plist"},
+        {image = "animations/ui_animation_1.pvr.ccz",list = "animations/ui_animation_1.plist"},
+        {image = "animations/ui_animation_2.pvr.ccz",list = "animations/ui_animation_2.plist"},
+    }
 end
 
 

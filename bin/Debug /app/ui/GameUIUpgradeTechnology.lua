@@ -410,7 +410,15 @@ end
 function GameUIUpgradeTechnology:OnUpgradNowButtonClicked()
     local canUpgrade,msg = self:CheckCanUpgradeNow()
     if canUpgrade then
-        NetManager:getUpgradeProductionTechPromise(self:GetProductionTechnology():Name(),true)
+        if app:GetGameDefautlt():IsOpenGemRemind() then
+            UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),
+                string.formatnumberthousands(self:GetUpgradeNowGems())
+            ), function()
+                NetManager:getUpgradeProductionTechPromise(self:GetProductionTechnology():Name(),true)
+            end,true,true)
+        else
+            NetManager:getUpgradeProductionTechPromise(self:GetProductionTechnology():Name(),true)
+        end
     else
         UIKit:showMessageDialog(_("提示"),msg, function()end)
     end
@@ -433,9 +441,15 @@ function GameUIUpgradeTechnology:OnUpgradButtonClicked()
             end
         end)
     else
-        UIKit:showMessageDialog(_("提示"),msg, function ()
-            self:ForceUpgrade(gems_cost)
-        end):CreateNeeds({value = gems_cost})
+        UIKit:showMessageDialog(_("提示"),msg):CreateOKButtonWithPrice(
+            {
+                listener = function()
+                    self:ForceUpgrade(gems_cost)
+                end,
+                btn_images = {normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"},
+                price = gems_cost
+            }
+        ):CreateCancelButton()
     end
 end
 
@@ -594,6 +608,9 @@ function GameUIUpgradeTechnology:CheckMeIsReachLimitLevel()
 end
 
 return GameUIUpgradeTechnology
+
+
+
 
 
 

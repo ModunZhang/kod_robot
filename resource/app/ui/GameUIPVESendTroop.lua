@@ -6,6 +6,7 @@ local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local UIScrollView = import(".UIScrollView")
 local Localize = import("..utils.Localize")
+local StarBar = import(".StarBar")
 local UIListView = import(".UIListView")
 local WidgetSlider = import("..widget.WidgetSlider")
 local WidgetSelectDragon = import("..widget.WidgetSelectDragon")
@@ -18,6 +19,7 @@ local normal = GameDatas.Soldiers.normal
 local SPECIAL = GameDatas.Soldiers.special
 
 local GameUIPVESendTroop = UIKit:createUIClass("GameUIPVESendTroop","GameUIWithCommonHeader")
+GameUIPVESendTroop.dragon = nil
 
 function GameUIPVESendTroop:ctor(pve_soldiers,march_callback)
     GameUIPVESendTroop.super.ctor(self,City,_("准备进攻"))
@@ -26,9 +28,9 @@ function GameUIPVESendTroop:ctor(pve_soldiers,march_callback)
     self.soldier_manager = City:GetSoldierManager()
     self.dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
     self.soldiers_table = {}
-
     -- 默认选中最强的并且可以出战的龙,如果都不能出战，则默认最强龙
-    self.dragon = self.dragon_manager:GetDragon(self.dragon_manager:GetCanFightPowerfulDragonType()) or self.dragon_manager:GetDragon(self.dragon_manager:GetPowerfulDragonType())
+    self.dragon = self.dragon or self.dragon_manager:GetDragon(self.dragon_manager:GetCanFightPowerfulDragonType()) or self.dragon_manager:GetDragon(self.dragon_manager:GetPowerfulDragonType())
+    GameUIPVESendTroop.dragon = self.dragon
 end
 
 function GameUIPVESendTroop:OnMoveInStage()
@@ -126,11 +128,25 @@ function GameUIPVESendTroop:OnMoveInStage()
                     UIKit:showMessageDialog(_("主人"),_("请选择要派遣的部队"))
                     return
                 end
-                self.march_callback(dragonType,soldiers)
-                -- 确认派兵后关闭界面
-                self:LeftButtonClicked()
+                local has_special_soldier = false
+                for k,v in pairs(self.pve_soldiers) do
+                    if SPECIAL[v.name] then
+                        has_special_soldier = true
+                        break
+                    end
+                end
+                if has_special_soldier then
+                    UIKit:showSendTroopMessageDialog(function ()
+                        self.march_callback(dragonType,soldiers)
+                        -- 确认派兵后关闭界面
+                        self:LeftButtonClicked()
+                    end,City:GetMaterialManager().MATERIAL_TYPE.SOLDIER,_("士兵"))
+                else
+                    self.march_callback(dragonType,soldiers)
+                    -- 确认派兵后关闭界面
+                    self:LeftButtonClicked()
+                end
             end
-
         end):align(display.RIGHT_CENTER,window.right-50,window.top-910):addTo(self:GetView())
 
 
@@ -201,9 +217,10 @@ function GameUIPVESendTroop:SelectDragonPart()
 end
 function GameUIPVESendTroop:RefreashDragon(dragon)
     self.dragon_img:setTexture(UILib.dragon_head[dragon:Type()])
-    self.dragon_name:setString(_(dragon:Type()).."（LV "..dragon:Level().."）")
+    self.dragon_name:setString(Localize.dragon[dragon:Type()].."（LV ".. dragon:Level()..")")
     self.dragon_vitality:setString(_("生命值")..dragon:Hp().."/"..dragon:GetMaxHP())
     self.dragon = dragon
+    GameUIPVESendTroop.dragon = self.dragon
 end
 
 function GameUIPVESendTroop:SelectDragon()
@@ -335,6 +352,16 @@ function GameUIPVESendTroop:SelectSoldiers()
 
         local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER,60,64):addTo(content):scale(104/128)
         local soldier_head_bg  = display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2,soldier_head_icon:getContentSize().height/2)
+        local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_head_icon):align(display.BOTTOM_CENTER,soldier_head_icon:getContentSize().width/2 - 10, 4)
+        local soldier_star = StarBar.new({
+            max = 3,
+            bg = "Stars_bar_bg.png",
+            fill = "Stars_bar_highlight.png",
+            num = star,
+            margin = 5,
+            direction = StarBar.DIRECTION_HORIZONTAL,
+            scale = 0.8,
+        }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
 
         item:addContent(content)
         list:addItem(item)
@@ -669,6 +696,9 @@ end
 
 
 return GameUIPVESendTroop
+
+
+
 
 
 

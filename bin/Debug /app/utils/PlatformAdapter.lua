@@ -85,6 +85,9 @@ function PlatformAdapter:mac()
     ext.getAppVersion = function()
         return "Debug Version"
     end
+    ext.getDeviceLanguage = function()
+        return "zh-Hans"
+    end
     DEBUG_GET_ANIMATION_PATH = function(filePath)
         filePath = string.gsub(filePath,".pvr.ccz",".png")
         filePath = string.gsub(filePath,"animations/","animations_mac/")
@@ -179,6 +182,7 @@ function PlatformAdapter:mac()
     local getOpenUDID = device.getOpenUDID
     device.getOpenUDID = function()
         return getOpenUDID().."_"..run_pids_map[pid]
+        -- return "2"
     end
 end
 

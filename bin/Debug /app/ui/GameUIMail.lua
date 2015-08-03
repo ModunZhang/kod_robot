@@ -6,6 +6,7 @@ local window = import("..utils.window")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetAllianceHelper = import("..widget.WidgetAllianceHelper")
+local StarBar = import(".StarBar")
 local Flag = import("..entity.Flag")
 local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local WidgetPopDialog = import("..widget.WidgetPopDialog")
@@ -159,7 +160,7 @@ function GameUIMail:CreateMailControlBox()
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
                 local control_type = self:GetCurrentSelectType()
-                local replace_text = (control_type == "mail" and _("邮件")) or (control_type == "report" and _("战报"))
+                local replace_text = (control_type == "mail" and _("邮件")) or (control_type == "report" and _("战报")) or (control_type == "send_mails" and _("邮件"))
                 UIKit:showMessageDialog(string.format(_("删除%s"),replace_text),string.format(_("您即将删除所选%s,删除的%s将无法恢复,您确定要这么做吗?"),replace_text,replace_text))
                     :CreateOKButton(
                         {
@@ -251,6 +252,29 @@ function GameUIMail:CreateMailControlBox()
                                             end
                                         end
                                     end)
+                                elseif control_type == "send_mails" then
+                                    NetManager:getDeleteSendMailsPromise(ids):done(function ()
+                                        self:SelectAllMailsOrReports(false)
+                                        self.mail_control_box:hide()
+
+                                        if self.sent_layer:isVisible() then
+                                            -- 批量删除结束后获取
+                                            if #self.manager:GetSendMails() < 10 then
+                                                local response = self.manager:FetchSendMailsFromServer(#self.manager:GetSendMails())
+                                                if response then
+                                                    response:done(function ( response )
+                                                        self.send_mail_listview:asyncLoadWithCurrentPosition_()
+                                                        self.is_deleting = false
+                                                        return response
+                                                    end)
+                                                else
+                                                    self.is_deleting = false
+                                                end
+                                            else
+                                                self.is_deleting = false
+                                            end
+                                        end
+                                    end)
                                 end
                             end
                         }
@@ -266,6 +290,9 @@ function GameUIMail:CreateMailControlBox()
         }))
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
+                if self.sent_layer:isVisible() then
+                    return
+                end
                 local select_map,select_type = self:GetSelectMailsOrReports()
                 local ids = {}
                 for k,v in pairs(select_map) do
@@ -728,24 +755,32 @@ function GameUIMail:DelegateSendMails( listView, tag, idx )
         else
             content = item:getContent()
         end
-        content:SetData(idx)
-        local size = content:getContentSize()
-        item:setItemSize(size.width, size.height)
-        -- 当取到客户端本地最后一封发件箱邮件后，请求服务器获得更多以前的邮件
-        if idx == #self.manager:GetSendMails() then
-            self.manager:FetchSendMailsFromServer(#self.manager:GetSendMails())
+        if content.SetData then
+            content:SetData(idx)
+            local size = content:getContentSize()
+            item:setItemSize(size.width, size.height)
+            -- 当取到客户端本地最后一封发件箱邮件后，请求服务器获得更多以前的邮件
+            if idx == #self.manager:GetSendMails() then
+                self.manager:FetchSendMailsFromServer(#self.manager:GetSendMails())
+            end
+        else
+            listView:unloadOneItem_(idx)
         end
         return item
     elseif UIListView.ASY_REFRESH == tag then
         for i,v in ipairs(listView:getItems()) do
             if v.idx_ == idx then
                 local content = v:getContent()
-                content:SetData(idx)
-                local size = content:getContentSize()
-                v:setItemSize(size.width, size.height)
-                -- 当取到客户端本地最后一封发件箱邮件后，请求服务器获得更多以前的邮件
-                if idx == #self.manager:GetSendMails() then
-                    self.manager:FetchSendMailsFromServer(#self.manager:GetSendMails())
+                if not content.SetData then
+                    listView:unloadOneItem_(idx)
+                else
+                    content:SetData(idx)
+                    local size = content:getContentSize()
+                    v:setItemSize(size.width, size.height)
+                    -- 当取到客户端本地最后一封发件箱邮件后，请求服务器获得更多以前的邮件
+                    if idx == #self.manager:GetSendMails() then
+                        self.manager:FetchSendMailsFromServer(#self.manager:GetSendMails())
+                    end
                 end
             end
         end
@@ -756,10 +791,10 @@ function GameUIMail:CreateSendMailContent()
     local content = display.newNode()
     content:setContentSize(cc.size(item_width, item_height))
     -- 标题背景框
-    local title_bg = display.newScale9Sprite("title_grey_482x30.png",item_width/2, item_height-24,cc.size(552,30),cc.rect(10,5,462,20))
+    local title_bg = display.newScale9Sprite("title_grey_482x30.png",item_width/2 + 39, item_height-24,cc.size(482,30),cc.rect(10,5,462,20))
         :addTo(content,2)
     -- 不变的模板部分
-    local content_title_bg = display.newScale9Sprite("back_ground_166x84.png",item_width-8,10,cc.size(552,60),cc.rect(15,10,136,64))
+    local content_title_bg = display.newScale9Sprite("back_ground_166x84.png",item_width-4,10,cc.size(482,60),cc.rect(15,10,136,64))
         :align(display.RIGHT_BOTTOM)
         :addTo(content,2)
 
@@ -803,12 +838,7 @@ function GameUIMail:CreateSendMailContent()
                             parent.manager:DecreaseUnReadMailsNum(1)
                         end)
                     end
-                    --如果是发送邮件
-                    if mail.toId then
-                        parent:ShowSendMailDetails(mail)
-                    else
-                        parent:ShowMailDetails(mail)
-                    end
+                    parent:ShowSendMailDetails(mail)
                 end
             end):addTo(self)
             :pos(item_width/2, item_height/2)
@@ -819,6 +849,11 @@ function GameUIMail:CreateSendMailContent()
         from_name_label:setString(_("From")..":"..((mail.fromAllianceTag~="" and "["..mail.fromAllianceTag.."]".. name or name)))
         date_label:setString(GameUtils:formatTimeStyle2(mail.sendTime/1000))
         mail_content_title_label:setString(mail.title)
+        if self.check_box then
+            self.check_box:removeFromParent(true)
+        end
+        self.check_box = parent:CreateCheckBox(self):align(display.LEFT_CENTER,14,item_height/2)
+            :addTo(self)
     end
 
     function content:GetContentData()
@@ -860,6 +895,8 @@ function GameUIMail:GetCurrentSelectType()
         or (self.saved_layer:isVisible() and self.saved_reports_listview:isVisible())
     then
         return "report"
+    elseif self.sent_layer:isVisible() then
+        return "send_mails"
     end
 end
 -- @parms source_data : mail(map) or report对象
@@ -891,6 +928,8 @@ function GameUIMail:GetSelectMailsOrReports()
         select_type = "report"
     elseif self.saved_layer:isVisible() and self.save_mails_listview:isVisible() then
         select_type = "mail"
+    elseif self.sent_layer:isVisible() then
+        select_type = "send_mails"
     end
     return self.selected_items,select_type
 end
@@ -923,7 +962,10 @@ function GameUIMail:SelectAllMailsOrReports(isSelect)
             self.saved_reports_listview:asyncLoadWithCurrentPosition_()
         end
     elseif self.sent_layer:isVisible() then
-
+        for i,v in ipairs(self.manager:GetSendMails()) do
+            self:SelectItems(v,isSelect)
+        end
+        self.send_mail_listview:asyncLoadWithCurrentPosition_()
     end
 end
 function GameUIMail:SaveOrUnsaveMail(mail,target)
@@ -1053,8 +1095,8 @@ function GameUIMail:ShowSendMailDetails(mail)
     local size = bg:getContentSize()
 
     -- mail content bg
-    local content_bg = WidgetUIBackGround.new({width=568,height = 544},WidgetUIBackGround.STYLE_TYPE.STYLE_5):addTo(bg)
-    content_bg:align(display.LEFT_BOTTOM,(bg:getContentSize().width-content_bg:getContentSize().width)/2,30)
+    local content_bg = WidgetUIBackGround.new({width=568,height = 494},WidgetUIBackGround.STYLE_TYPE.STYLE_5):addTo(bg)
+    content_bg:align(display.LEFT_BOTTOM,(bg:getContentSize().width-content_bg:getContentSize().width)/2,80)
 
     -- player head icon
     UIKit:GetPlayerCommonIcon(mail.fromIcon):align(display.CENTER, 76, bg:getContentSize().height - 90):addTo(bg)
@@ -1092,7 +1134,7 @@ function GameUIMail:ShowSendMailDetails(mail)
             color = 0x403c2f,
             ellipsis = true,
             dimensions = cc.size(300,20)
-        }):align(display.LEFT_CENTER,155 + subject_label:getContentSize().width+20, bg:getContentSize().height-100)
+        }):align(display.LEFT_CENTER,155 + subject_label:getContentSize().width+20, bg:getContentSize().height-96)
         :addTo(bg)
     -- 日期
     local date_title_label = cc.ui.UILabel.new(
@@ -1111,9 +1153,30 @@ function GameUIMail:ShowSendMailDetails(mail)
             color = UIKit:hex2c3b(0x403c2f)
         }):align(display.LEFT_CENTER, 155 + date_title_label:getContentSize().width+20, bg:getContentSize().height-140)
         :addTo(bg)
+    -- 删除按钮
+    local delete_label = cc.ui.UILabel.new({
+        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        text = _("删除"),
+        size = 20,
+        font = UIKit:getFontFilePath(),
+        color = UIKit:hex2c3b(0xfff3c7)})
+    delete_label:enableShadow()
+
+    local del_btn = WidgetPushButton.new(
+        {normal = "red_btn_up_148x58.png", pressed = "red_btn_down_148x58.png"},
+        {scale9 = false}
+    ):setButtonLabel(delete_label)
+        :addTo(bg):align(display.CENTER, size.width/2, 42)
+        :onButtonClicked(function(event)
+            if event.name == "CLICKED_EVENT" then
+                NetManager:getDeleteSendMailsPromise({mail.id}):done(function ()
+                    dialog:LeftButtonClicked()
+                end)
+            end
+        end)
     -- 内容
     local content_listview = UIListView.new{
-        viewRect = cc.rect(0, 10, 550, 520),
+        viewRect = cc.rect(0, 10, 550, 470),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }:addTo(content_bg):pos(10, 0)
     local content_item = content_listview:newItem()
@@ -1159,7 +1222,7 @@ function GameUIMail:ShowMailDetails(mail)
             color = 0x403c2f,
             ellipsis = true,
             dimensions = cc.size(300,20)
-        }):align(display.LEFT_CENTER,155 + subject_label:getContentSize().width+20, size.height-60)
+        }):align(display.LEFT_CENTER,155 + subject_label:getContentSize().width+20, size.height-56)
         :addTo(body)
     -- 日期
     local date_title_label = cc.ui.UILabel.new(
@@ -1356,8 +1419,11 @@ function GameUIMail:CreateReportContent()
                         UIKit:newGameUI("GameUIWarReport", report):AddToCurrentScene(true)
                     elseif report:Type() == "collectResource" then
                         UIKit:newGameUI("GameUICollectReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackMonster" then
+                        UIKit:newGameUI("GameUIMonsterReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackShrine" then
+                        UIKit:newGameUI("GameUIShrineReportInMail", report):AddToCurrentScene(true)
                     end
-
                 end
             end):addTo(self):pos(item_width/2, item_height/2)
 
@@ -1408,7 +1474,7 @@ function GameUIMail:CreateReportContent()
                     color = 0x403c2f
                 }):align(display.CENTER, report_content_bg:getContentSize().width/2-20, 60)
                 :addTo(report_content_bg)
-            display.newSprite(UILib.resource[rewards.name], 190, 30):addTo(report_content_bg):scale(0.5)
+            display.newSprite(UILib.resource[rewards.name], 190, 30):addTo(report_content_bg):scale(0.4)
             UIKit:ttfLabel(
                 {
                     text = "+"..string.formatnumberthousands(rewards.count),
@@ -1416,6 +1482,55 @@ function GameUIMail:CreateReportContent()
                     color = 0x403c2f
                 }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-20, 30)
                 :addTo(report_content_bg)
+        elseif isFromMe == "attackMonster" then
+            local monster_level = report:GetAttackTarget().level
+            local monster_data = report:GetEnemyPlayerData().soldiers[1]
+            local soldier_type = monster_data.name
+            local soldier_star = monster_data.star
+            local soldier_ui_config = UILib.black_soldier_image[soldier_type][tonumber(soldier_star)]
+
+            display.newSprite(UILib.black_soldier_color_bg_images[soldier_type]):addTo(report_content_bg)
+                :align(display.CENTER_TOP,180, 86):scale(80/128)
+
+            local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER_TOP,180, 86):addTo(report_content_bg)
+            soldier_head_icon:scale(80/soldier_head_icon:getContentSize().height)
+            display.newSprite("box_soldier_128x128.png")
+                :align(display.CENTER, soldier_head_icon:getContentSize().width/2, soldier_head_icon:getContentSize().height-64)
+                :addTo(soldier_head_icon)
+
+            UIKit:ttfLabel(
+                {
+                    text = _("黑龙军团"),
+                    size = 18,
+                    color = 0x615b44
+                }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-10, 70)
+                :addTo(report_content_bg)
+            UIKit:ttfLabel(
+                {
+                    text = Localize.soldier_name[soldier_type] .. " " ..string.format(_("等级%s"),monster_level),
+                    size = 20,
+                    color = 0x403c2f
+                }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-10, 25)
+                :addTo(report_content_bg)
+        elseif isFromMe == "attackShrine" then
+            display.newScale9Sprite("alliance_shrine.png"):addTo(report_content_bg)
+                :align(display.CENTER_TOP,160, 80):scale(0.6)
+            -- 圣地关卡名字
+            local attackTarget = report:GetAttackTarget()
+            UIKit:ttfLabel(
+                {
+                    text = string.gsub(attackTarget.stageName,"_","-")..Localize.shrine_desc[attackTarget.stageName][1],
+                    size = 18,
+                    color = 0x403c2f
+                }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-20, 60)
+                :addTo(report_content_bg)
+            print("attackTarget.fightStar=",attackTarget.fightStar)
+            StarBar.new({
+                max = 3,
+                bg = "alliance_shire_star_60x58_0.png",
+                fill = "alliance_shire_star_60x58_1.png",
+                num = attackTarget.fightStar
+            }):addTo(report_content_bg):align(display.LEFT_CENTER,report_content_bg:getContentSize().width/2-20, 30):scale(0.5)
         else
             -- 战报发出方信息
             -- 旗帜
@@ -1511,8 +1626,8 @@ end
 function GameUIMail:InitSavedReports()
     local dropList = WidgetRoundTabButtons.new(
         {
-            {tag = "menu_1",label = "战报",default = true},
-            {tag = "menu_2",label = "邮件"},
+            {tag = "menu_1",label = _("战报"),default = true},
+            {tag = "menu_2",label = _("邮件")},
         },
         function(tag)
             if tag == 'menu_2' then
@@ -1627,6 +1742,10 @@ function GameUIMail:CreateSavedReportContent()
                         UIKit:newGameUI("GameUIWarReport", report):AddToCurrentScene(true)
                     elseif report:Type() == "collectResource" then
                         UIKit:newGameUI("GameUICollectReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackMonster" then
+                        UIKit:newGameUI("GameUIMonsterReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackShrine" then
+                        UIKit:newGameUI("GameUIShrineReportInMail", report):AddToCurrentScene(true)
                     end
 
                 end
@@ -1643,7 +1762,6 @@ function GameUIMail:CreateSavedReportContent()
                 title_bg_image = "title_red_556x34.png"
             end
         end
-        print("saved reports title image=",title_bg_image)
         local title_bg = display.newSprite(title_bg_image, item_width/2, 52+item_height/2):addTo(self)
         local report_title =  UIKit:ttfLabel(
             {
@@ -1687,6 +1805,55 @@ function GameUIMail:CreateSavedReportContent()
                     color = 0x403c2f
                 }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-20, 30)
                 :addTo(report_content_bg)
+        elseif isFromMe == "attackMonster" then
+            local monster_level = report:GetAttackTarget().level
+            local monster_data = report:GetEnemyPlayerData().soldiers[1]
+            local soldier_type = monster_data.name
+            local soldier_star = monster_data.star
+            local soldier_ui_config = UILib.black_soldier_image[soldier_type][tonumber(soldier_star)]
+
+            display.newSprite(UILib.black_soldier_color_bg_images[soldier_type]):addTo(report_content_bg)
+                :align(display.CENTER_TOP,120, 86):scale(80/128)
+
+            local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER_TOP,120, 86):addTo(report_content_bg)
+            soldier_head_icon:scale(80/soldier_head_icon:getContentSize().height)
+            display.newSprite("box_soldier_128x128.png")
+                :align(display.CENTER, soldier_head_icon:getContentSize().width/2, soldier_head_icon:getContentSize().height-64)
+                :addTo(soldier_head_icon)
+
+            UIKit:ttfLabel(
+                {
+                    text = _("黑龙军团"),
+                    size = 18,
+                    color = 0x615b44
+                }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-70, 70)
+                :addTo(report_content_bg)
+            UIKit:ttfLabel(
+                {
+                    text = Localize.soldier_name[soldier_type] .. " " ..string.format(_("等级%s"),monster_level),
+                    size = 20,
+                    color = 0x403c2f
+                }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-70, 25)
+                :addTo(report_content_bg)
+        elseif isFromMe == "attackShrine" then
+            display.newScale9Sprite("alliance_shrine.png"):addTo(report_content_bg)
+                :align(display.CENTER_TOP,160, 80):scale(0.6)
+            -- 圣地关卡名字
+            local attackTarget = report:GetAttackTarget()
+            UIKit:ttfLabel(
+                {
+                    text = string.gsub(attackTarget.stageName,"_","-")..Localize.shrine_desc[attackTarget.stageName][1],
+                    size = 18,
+                    color = 0x403c2f
+                }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-20, 60)
+                :addTo(report_content_bg)
+            print("attackTarget.fightStar=",attackTarget.fightStar)
+            StarBar.new({
+                max = 3,
+                bg = "alliance_shire_star_60x58_0.png",
+                fill = "alliance_shire_star_60x58_1.png",
+                num = attackTarget.fightStar
+            }):addTo(report_content_bg):align(display.LEFT_CENTER,report_content_bg:getContentSize().width/2-20, 30):scale(0.5)        
         else
             -- 战报发出方信息
             -- 旗帜
@@ -2138,6 +2305,15 @@ function GameUIMail:GetEnemyAllianceTag(report)
 end
 
 return GameUIMail
+
+
+
+
+
+
+
+
+
 
 
 

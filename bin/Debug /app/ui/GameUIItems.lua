@@ -85,10 +85,10 @@ function GameUIItems:InitShop()
     self.shop_listview = list
 
     self.shop_dropList = WidgetRoundTabButtons.new({
-        {tag = "menu_1",label = "特殊" , default = self.default_tab == "shop"},
-        {tag = "menu_2",label = "持续增益"},
-        {tag = "menu_3",label = "资源"},
-        {tag = "menu_4",label = "时间加速"},
+        {tag = "menu_1",label = _("特殊") , default = self.default_tab == "shop"},
+        {tag = "menu_2",label = _("持续增益")},
+        {tag = "menu_3",label = _("资源")},
+        {tag = "menu_4",label = _("时间加速")},
     }, function(tag)
         self.top_tab = tag
         self:ReloadShopList(tag)
@@ -234,7 +234,13 @@ function GameUIItems:CreateShopContentByIndex( idx )
                                 }
                             )
                     else
-                        NetManager:getBuyItemPromise(items:Name(),1)
+                        if app:GetGameDefautlt():IsOpenGemRemind() then
+                            UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),string.formatnumberthousands(items:Price())), function()
+                                NetManager:getBuyItemPromise(items:Name(),1)
+                            end,true,true)
+                        else
+                            NetManager:getBuyItemPromise(items:Name(),1)
+                        end
                     end
                 end
             end)
@@ -285,6 +291,7 @@ function GameUIItems:IsItemCouldUseInShop(items)
         and items:Name()~="chestKey_2"
         and items:Name()~="chestKey_3"
         and items:Name()~="chestKey_4"
+        and items:Name()~="sweepScroll"
     then
         return true
     end
@@ -298,6 +305,7 @@ function GameUIItems:IsItemCouldUseNow(items)
         and items:Name()~="dragonHp_1"
         and items:Name()~="dragonHp_2"
         and items:Name()~="dragonHp_3"
+        and items:Name()~="sweepScroll"
     then
         return true
     end
@@ -315,10 +323,10 @@ function GameUIItems:InitMyItems()
     self.myItems_listview = list
 
     self.myItems_dropList = WidgetRoundTabButtons.new({
-        {tag = "menu_1",label = "特殊",default = self.default_tab == "myItems"},
-        {tag = "menu_2",label = "持续增益"},
-        {tag = "menu_3",label = "资源"},
-        {tag = "menu_4",label = "时间加速"},
+        {tag = "menu_1",label = _("特殊"),default = self.default_tab == "myItems"},
+        {tag = "menu_2",label = _("持续增益")},
+        {tag = "menu_3",label = _("资源")},
+        {tag = "menu_4",label = _("时间加速")},
     }, function(tag)
         self.top_tab = tag
         self:ReloadMyItemsList(tag)
@@ -491,34 +499,40 @@ function GameUIItems:UseItemFunc( items )
             end
             clone_items = clone(ItemManager:GetItems())
         end
-        NetManager:getUseItemPromise(items:Name(),{}):done(function (response)
-            local message = ""
-            local awards = {}
-            if string.find(name,"dragonChest") then
-                for i,v in ipairs(response.msg.playerData) do
-                    if string.find(v[1],"dragonMaterials") then
-                        local m_name = string.split(v[1], ".")[2]
-                        local m_count = v[2]-clone_dragon_materials[m_name]
-                        message = message .. Localize.equip_material[m_name].."x"..m_count.." "
-                        table.insert(awards, {name = m_name, count = m_count})
+
+        if items:Category() == items.CATEGORY.RESOURCE then
+            UIKit:newWidgetUI("WidgetUseMutiItems", items):AddToCurrentScene()
+        else
+            NetManager:getUseItemPromise(items:Name(),{}):done(function (response)
+                local message = ""
+                local awards = {}
+                if string.find(name,"dragonChest") then
+                    for i,v in ipairs(response.msg.playerData) do
+                        if string.find(v[1],"dragonMaterials") then
+                            local m_name = string.split(v[1], ".")[2]
+                            local m_count = v[2]-clone_dragon_materials[m_name]
+                            message = message .. Localize.equip_material[m_name].."x"..m_count.." "
+                            table.insert(awards, {name = m_name, count = m_count})
+                        end
                     end
-                end
-                -- GameGlobalUI:showTips(_("获得"),message)
-            elseif string.find(name,"chest") then
-                LuaUtils:outputTable("name", response)
-                for i,v in ipairs(response.msg.playerData) do
-                    if tolua.type(v[2]) == "table" then
-                        local m_name = v[2].name
-                        local m_count = v[2].count - clone_items[v[2].name]:Count()
-                        message = message .. Localize_item.item_name[m_name].."x"..m_count.." "
-                        table.insert(awards, {name = m_name, count = m_count})
+                    -- GameGlobalUI:showTips(_("获得"),message)
+                elseif string.find(name,"chest") then
+                    LuaUtils:outputTable("name", response)
+                    for i,v in ipairs(response.msg.playerData) do
+                        if tolua.type(v[2]) == "table" then
+                            local m_name = v[2].name
+                            local m_count = v[2].count - clone_items[v[2].name]:Count()
+                            message = message .. Localize_item.item_name[m_name].."x"..m_count.." "
+                            table.insert(awards, {name = m_name, count = m_count})
+                        end
                     end
+                    -- GameGlobalUI:showTips(_("获得"),message)
                 end
-                -- GameGlobalUI:showTips(_("获得"),message)
-            end
-            -- 提示统一动画播放之后提示
-            UIKit:PlayUseItemAni(items,awards,message)
-        end)
+                -- 提示统一动画播放之后提示
+                UIKit:PlayUseItemAni(items,awards,message)
+            end)
+        end
+
     else
         local dialog = WidgetUseItems.new():Create({
             item = items
@@ -555,6 +569,8 @@ function GameUIItems:OnItemsChanged( changed_map )
     end
 end
 return GameUIItems
+
+
 
 
 

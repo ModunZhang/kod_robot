@@ -21,10 +21,12 @@ function GameUIBuildingSpeedUp:ctor(building)
     building:AddUpgradeListener(self)
 end
 function GameUIBuildingSpeedUp:FreeSpeedUpAction()
-    local event_type = self.building:EventType()
-    local unique_key = self.building:UniqueUpgradingKey()
-    self:LeftButtonClicked()
-    NetManager:getFreeSpeedUpPromise(event_type,unique_key)
+    if self.building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 2 then
+        local event_type = self.building:EventType()
+        local unique_key = self.building:UniqueUpgradingKey()
+        self:LeftButtonClicked()
+        NetManager:getFreeSpeedUpPromise(event_type,unique_key)
+    end
 end
 function GameUIBuildingSpeedUp:onExit()
     self.building:RemoveUpgradeListener(self)

@@ -39,12 +39,12 @@ function DragonEvent:OnTimer(current_time)
 end
 
 function DragonEvent:GetTime()
-	return self.times_ or 0
+	return self.times_ or math.ceil(self:FinishTime() - app.timer:GetServerTime())
 end
 
 function DragonEvent:GetPercent()
 	local totalTime = self:FinishTime() - self:StartTime()
-	return math.ceil(100 - self:GetTime()/totalTime*100)
+	return math.floor(100 - (math.ceil(self:FinishTime() - app.timer:GetServerTime()))/totalTime*100)
 end
 
 

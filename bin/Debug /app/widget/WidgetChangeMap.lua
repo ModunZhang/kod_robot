@@ -8,6 +8,7 @@ local window = import("..utils.window")
 
 local WidgetChangeMap = class("WidgetChangeMap", function ()
     local layer = display.newLayer()
+    layer:setNodeEventEnabled(true)
     layer:setTouchSwallowEnabled(false)
     return layer
 end)
@@ -19,7 +20,7 @@ function WidgetChangeMap:ctor(map_type, location)
     if display.width >640 then
         scale_x = display.width/768
     end
-
+    self.scale_x = scale_x
     local btn = WidgetPushButton.new(
         {normal = "map_bg_100X100.png", pressed = "map_bg_100X100.png"}
     ):addTo(self)
@@ -63,11 +64,53 @@ function WidgetChangeMap:ctor(map_type, location)
     self.icon = display.newSprite(change_icon):addTo(btn):align(display.CENTER, 50, 10)
     btn:setTouchSwallowEnabled(true)
     self.btn = btn
+    self:AddShrineOpenedIcon()
 end
 function WidgetChangeMap:GetWorldRect()
     return self.btn:getCascadeBoundingBox()
 end
+function WidgetChangeMap:onEnter()
+    local my_allaince = Alliance_Manager:GetMyAlliance()
+    my_allaince:AddListenOnType(self, my_allaince.LISTEN_TYPE.BASIC)
+
+end
+function WidgetChangeMap:onExit()
+    local my_allaince = Alliance_Manager:GetMyAlliance()
+    my_allaince:RemoveListenerOnType(self, my_allaince.LISTEN_TYPE.BASIC)
+end
+function WidgetChangeMap:OnAllianceBasicChanged(alliance, changed_map)
+    if Alliance_Manager:GetMyAlliance():IsDefault() then return end
+    self:AddShrineOpenedIcon()
+end
+
+function WidgetChangeMap:AddShrineOpenedIcon()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if alliance:Status() == "fight" or alliance:Status() == "prepare"  then
+        if not self.shrine_icon then
+            local icon = display.newSprite("tmp_shrine_open_icon_96x96.png"):addTo(self)
+                :align(display.LEFT_CENTER,window.cx-320 * self.scale_x, 50 * self.scale_x)
+                :scale(self.scale_x)
+            icon:setOpacity(122)
+            icon:runAction(cc.RepeatForever:create(transition.sequence{
+                cc.FadeTo:create(1.5, 255),
+                cc.FadeTo:create(1.5, 122),
+            }))
+            self.shrine_icon = icon
+        end
+    else
+        if self.shrine_icon then
+            self.shrine_icon:hide()
+        end
+    end
+end
 return WidgetChangeMap
+
+
+
+
+
+
+
 
 
 

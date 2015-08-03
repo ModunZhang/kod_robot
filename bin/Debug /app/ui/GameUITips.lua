@@ -23,6 +23,11 @@ function GameUITips:onEnter()
     GameUITips.super.onEnter(self)
     self:BuildUI()
 end
+function GameUITips:onCleanup()
+    GameUITips.super.onCleanup(self)
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("region_tips_556x344.jpg")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("pve_tips_554x340.jpg")
+end
 
 function GameUITips:BuildUI()
     local bg = WidgetUIBackGround.new({height=self.height})

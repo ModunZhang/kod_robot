@@ -51,7 +51,7 @@ function RichText:Text(str, line)
     if not str or string.len(str) == 0 then str = "[]" end
     line = line or math.huge
     self:removeAllChildren()
-    local items = LuaUtils:table_map(json.decode(str), function(k, v)
+    local items = LuaUtils:table_map(json.decode(str) or {""}, function(k, v)
         local type_ = type(v)
         if type_ == "string" then
             return k, {type = "text", value = v, size = self.size}

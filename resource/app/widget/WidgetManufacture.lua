@@ -19,6 +19,11 @@ function WidgetManufacture:OnBeginMakeMaterialsWithEvent(tool_shop, event)
     self:UpdateEvent(event)
     self:UpdateNeedStatus()
     app:GetAudioManager():PlayeEffectSoundWithKey("UI_TOOLSHOP_CRAFT_START")
+    self:performWithDelay(function()
+        tool_shop:IteratorEvents(function(k,v)
+            self:UpdateEvent(v)
+        end)
+    end, 0)
 end
 function WidgetManufacture:OnMakingMaterialsWithEvent(tool_shop, event, current_time)
     self:UpdateEvent(event)
@@ -118,22 +123,41 @@ function WidgetManufacture:Manufacture()
         })
         dump(total_buy)
         if need_gems > 0 then
-            UIKit:showMessageDialog(_("提示"), "资源不足!",function()
-                NetManager:getMakeBuildingMaterialPromise()
-            end):CreateNeeds({value = need_gems})
+            UIKit:showMessageDialog(_("提示"), "资源不足!")
+                :CreateOKButtonWithPrice(
+                    {
+                        listener = function()
+                            if need_gems > User:GetGemResource():GetValue() then
+                                UIKit:showMessageDialog(_("主人"),_("金龙币不足"))
+                                    :CreateOKButton(
+                                        {
+                                            listener = function ()
+                                                UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                            end,
+                                            btn_name= _("前往商店")
+                                        }
+                                    )
+                            else
+                                NetManager:getMakeBuildingMaterialPromise()
+                            end
+                        end,
+                        btn_images = {normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"},
+                        price = need_gems
+                    }
+                ):CreateCancelButton()
         else
             NetManager:getMakeBuildingMaterialPromise()
         end
     end)
     item:GetMaterial():SetClicked(function()
         local content = self.toolShop:GetBuildingEvent():Content()
-        NetManager:getFetchMaterialsPromise(self.toolShop:GetBuildingEvent():Id()):done(function()
-            local desc_t = {}
-            for i,v in ipairs(content) do
-                table.insert(desc_t, string.format("%sx%d", Localize.materials[v.type], v.count))
-            end
-            GameGlobalUI:showTips(_("获取建筑材料"), table.concat(desc_t, ", "))
-        end)
+        if self:CheckOverFlow(content) then
+            self:CreateFetchDialog(function()
+                self:FetchBuildMaterials(content)
+            end, _("当前材料库房中的建筑材料已满，你可能无法获得这些材料。是否仍要获取？"))
+        else
+            self:FetchBuildMaterials(content)
+        end
     end)
     item:SetStoreMaterials(materials)
 
@@ -168,22 +192,41 @@ function WidgetManufacture:Manufacture()
             iron = iron_cur,
         })
         if need_gems > 0 then
-            UIKit:showMessageDialog(_("提示"), "资源不足!",function()
-                NetManager:getMakeTechnologyMaterialPromise()
-            end):CreateNeeds({value = need_gems})
+            UIKit:showMessageDialog(_("提示"), "资源不足!")
+                :CreateOKButtonWithPrice(
+                    {
+                        listener = function()
+                            if need_gems > User:GetGemResource():GetValue() then
+                                UIKit:showMessageDialog(_("主人"),_("金龙币不足"))
+                                    :CreateOKButton(
+                                        {
+                                            listener = function ()
+                                                UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                            end,
+                                            btn_name= _("前往商店")
+                                        }
+                                    )
+                            else
+                                NetManager:getMakeTechnologyMaterialPromise()
+                            end
+                        end,
+                        btn_images = {normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"},
+                        price = need_gems
+                    }
+                ):CreateCancelButton()
         else
             NetManager:getMakeTechnologyMaterialPromise()
         end
     end)
     item:GetMaterial():SetClicked(function()
         local content = self.toolShop:GetTechnologyEvent():Content()
-        NetManager:getFetchMaterialsPromise(self.toolShop:GetTechnologyEvent():Id()):done(function()
-            local desc_t = {}
-            for i,v in ipairs(content) do
-                table.insert(desc_t, string.format("%sx%d", Localize.materials[v.type], v.count))
-            end
-            GameGlobalUI:showTips(_("获取科技材料"), table.concat(desc_t, ", "))
-        end)
+        if self:CheckOverFlow(content) then
+            self:CreateFetchDialog(function()
+                self:FetchTechnologyMaterials(content)
+            end, _("当前材料库房中的科技材料已满，你可能无法获得这些材料。是否仍要获取？"))
+        else
+            self:FetchTechnologyMaterials(content)
+        end
     end)
     item:SetStoreMaterials(materials)
 
@@ -191,6 +234,24 @@ function WidgetManufacture:Manufacture()
     self.technology_event = item
 
     self.list_view:reload()
+end
+function WidgetManufacture:FetchBuildMaterials(content)
+    NetManager:getFetchMaterialsPromise(self.toolShop:GetBuildingEvent():Id()):done(function()
+        local desc_t = {}
+        for i,v in ipairs(content) do
+            table.insert(desc_t, string.format("%sx%d", Localize.materials[v.name], v.count))
+        end
+        GameGlobalUI:showTips(_("获取建筑材料"), table.concat(desc_t, ", "))
+    end)
+end
+function WidgetManufacture:FetchTechnologyMaterials(content)
+    NetManager:getFetchMaterialsPromise(self.toolShop:GetTechnologyEvent():Id()):done(function()
+        local desc_t = {}
+        for i,v in ipairs(content) do
+            table.insert(desc_t, string.format("%sx%d", Localize.materials[v.name], v.count))
+        end
+        GameGlobalUI:showTips(_("获取科技材料"), table.concat(desc_t, ", "))
+    end)
 end
 function WidgetManufacture:IsQueueEmpty()
     local current_time = app.timer:GetServerTime()
@@ -474,7 +535,7 @@ function WidgetManufacture:CreateMaterialItemWithListView(list_view, title, mate
     end
     function item:SetGetMaterials(materials)
         local get_material = LuaUtils:table_map(materials, function(k, v)
-            return v.type, v.count
+            return v.name, v.count
         end)
         for k, v in pairs(materials_map) do
             v:ShowNumber(get_material[k])
@@ -490,9 +551,39 @@ function WidgetManufacture:CreateMaterialItemWithListView(list_view, title, mate
     item:setItemSize(549, height + 10)
     return item
 end
+function WidgetManufacture:CheckOverFlow(content)
+    local limit = self.toolShop:BelongCity():GetFirstBuildingByType("materialDepot"):GetMaxMaterial()
+    local mm = City:GetMaterialManager():GetMaterialsByType(City:GetMaterialManager().MATERIAL_TYPE.TECHNOLOGY)
+    for k,v in pairs(City:GetMaterialManager():GetMaterialsByType(City:GetMaterialManager().MATERIAL_TYPE.BUILD)) do
+        mm[k] = v
+    end
+    local overflows = {}
+    for _,v in ipairs(content) do
+        if mm[v.name] + v.count > limit then
+            overflows[v.name] = true
+        end
+    end
+    return next(overflows)
+end
+function WidgetManufacture:CreateFetchDialog(func,text)
+    local dialog = UIKit:showMessageDialogWithParams({
+        title = _("提示"),
+        content = text,
+        ok_callback = func,
+        ok_btn_images = {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},
+        ok_string = _("强行获取"),
+        cancel_callback = function () end,
+        cancel_btn_images = {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"}
+    })
+end
 
 
 return WidgetManufacture
+
+
+
+
+
 
 
 

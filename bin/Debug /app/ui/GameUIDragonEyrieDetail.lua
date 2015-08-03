@@ -16,7 +16,6 @@ local UIListView = import(".UIListView")
 local Localize = import("..utils.Localize")
 local config_intInit = GameDatas.PlayerInitData.intInit
 local WidgetUseItems = import("..widget.WidgetUseItems")
-local GameUIDragonHateSpeedUp = import(".GameUIDragonHateSpeedUp")
 local UILib = import(".UILib")
 local MaterialManager = import("..entity.MaterialManager")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
@@ -713,7 +712,7 @@ function GameUIDragonEyrieDetail:GetInfoListItem(index,title,val)
     }):align(display.LEFT_CENTER, 10, 24):addTo(bg)
 
     UIKit:ttfLabel({
-        text = string.formatnumberthousands(tonumber(val)),
+        text = val,
         color = 0x403c2f,
         size = 20,
         align = cc.TEXT_ALIGNMENT_RIGHT,

@@ -16,7 +16,6 @@ function WorkShopSprite:ctor(city_layer, entity, city)
     WorkShopSprite.super.ctor(self, city_layer, entity, city)
     city:GetSoldierManager():AddListenOnType(self, city:GetSoldierManager().LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
     city:GetSoldierManager():AddListenOnType(self, city:GetSoldierManager().LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
-    self:DoAni()
 end
 function WorkShopSprite:RefreshSprite()
     WorkShopSprite.super.RefreshSprite(self)

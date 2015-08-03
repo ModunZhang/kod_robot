@@ -3,6 +3,7 @@
 -- Date: 2015-01-21 11:06:57
 --
 local WidgetPopDialog = import(".WidgetPopDialog")
+local StarBar = import("..ui.StarBar")
 local window = import("..utils.window")
 local Localize = import("..utils.Localize")
 local UILib = import("..ui.UILib")
@@ -62,6 +63,16 @@ function WidgetPromoteSoldier:CreateSoldierBox(isGray)
         soldier_icon:setFilter(filters)
     end
     soldier_box.soldier_icon = soldier_icon
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_icon):align(display.BOTTOM_CENTER,soldier_icon:getContentSize().width/2-16, 0)
+    StarBar.new({
+        max = 3,
+        bg = "Stars_bar_bg.png",
+        fill = "Stars_bar_highlight.png",
+        num = star,
+        margin = 5,
+        direction = StarBar.DIRECTION_HORIZONTAL,
+        scale = 0.8,
+    }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
     function soldier_box:SetSoldierIcon(isNext)
         local current_star = City:GetSoldierManager():GetStarBySoldierType(soldier_type)
         local star = isNext and current_star+1 or current_star
@@ -99,7 +110,15 @@ function WidgetPromoteSoldier:UpgradeButtons()
 
                 local results = self:IsAbleToUpgradeNow()
                 if LuaUtils:table_empty(results) then
-                    upgrade_listener()
+                    if app:GetGameDefautlt():IsOpenGemRemind() then
+                        UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),
+                            string.formatnumberthousands(self:GetInstantUpgradeGems())
+                        ), function()
+                            upgrade_listener()
+                        end,true,true)
+                    else
+                        upgrade_listener()
+                    end
                 else
                     self:PopNotSatisfyDialog(function ()end,results)
                 end
@@ -132,9 +151,6 @@ function WidgetPromoteSoldier:UpgradeButtons()
                 else
                     local dialog =  self:PopNotSatisfyDialog(upgrade_listener,results)
                     local need_gem = self:GetUpgradeGems()
-                    if need_gem~=0 then
-                        dialog:CreateNeeds({value = self:GetUpgradeGems()})
-                    end
                     if need_gem > User:GetGemResource():GetValue() then
                         dialog:CreateOKButton({
                             listener =  function ()
@@ -143,9 +159,10 @@ function WidgetPromoteSoldier:UpgradeButtons()
                             btn_name = _("前往商店")
                         })
                     else
-                        dialog:CreateOKButton({
-                            listener =  upgrade_listener
-                        })
+                        dialog:CreateOKButtonWithPrice({
+                            listener =  upgrade_listener,
+                            price = need_gem
+                        }):CreateCancelButton()
                     end
                 end
             end,
@@ -312,6 +329,8 @@ function WidgetPromoteSoldier:GetNextLevelConfig()
     return NORMAL[self.soldier_type.."_"..(City:GetSoldierManager():GetStarBySoldierType(self.soldier_type)+1)]
 end
 return WidgetPromoteSoldier
+
+
 
 
 

@@ -35,6 +35,7 @@ function GameUISettingLanguage:BuildUI()
 	local languages = {
 		{image = 'flag_zh_Hant_83x83.png',code = 'tw'},
 		{image = 'flag_zh_83x83.png',code = 'cn'},
+		{image = 'flag_en_83x83.png',code = 'en'},
 	}
 	local x,y = 20,732
 	for i,v in ipairs(languages) do

@@ -5,6 +5,7 @@
 local WidgetAutoOrderAwardButton = class("WidgetAutoOrderAwardButton",cc.ui.UIPushButton)
 local config_online = GameDatas.Activities.online
 local UILib = import("..ui.UILib")
+local WidgetNumberTips = import(".WidgetNumberTips")
 
 function WidgetAutoOrderAwardButton:ctor()
 	WidgetAutoOrderAwardButton.super.ctor(self,{normal = "activity_68x78.png"})
@@ -44,6 +45,7 @@ function WidgetAutoOrderAwardButton:onEnter()
 	local countInfo = User:GetCountInfo()
     local onlineTime = (countInfo.todayOnLineTime - countInfo.lastLoginTime)/1000
 	self.online_time = onlineTime
+	self.can_receive_num = WidgetNumberTips.new():addTo(self):pos(24,-24):hide()
 	app.timer:AddListener(self)
 end
 
@@ -61,9 +63,33 @@ function WidgetAutoOrderAwardButton:OnTimer(dt)
 			self:CheckState()
 			self:SetTimeInfo(diff_time)
 		end
+		self.can_receive_num:hide()
+	else
+		self.can_receive_num:show()
+		self.can_receive_num:SetNumber(self:GetCanReceiveOnLineNum())
 	end
 end
-
+function WidgetAutoOrderAwardButton:GetCanReceiveOnLineNum()
+    local on_line_time = DataUtils:getPlayerOnlineTimeMinutes()
+    local count = 0
+    for __,v in pairs(config_online) do
+        if v.onLineMinutes <= on_line_time then
+            if not self:IsTimePointRewarded(v.timePoint) then
+            	count = count + 1
+            end
+        end
+    end
+    return count
+end
+function WidgetAutoOrderAwardButton:IsTimePointRewarded(timepoint)
+    local countInfo = User:GetCountInfo()
+    for __,v in ipairs(countInfo.todayOnLineTimeRewards) do
+        if v == timepoint then
+            return true
+        end
+    end
+    return false
+end
 function WidgetAutoOrderAwardButton:StarAction()
 	self:StopAction()
 	self.sprite_[1]:runAction(self:GetShakeAction())
@@ -76,8 +102,8 @@ function WidgetAutoOrderAwardButton:StopAction()
 end
 
 function WidgetAutoOrderAwardButton:GetShakeAction()
-    local t = 0.025
-    local r = 5
+    local t = 0.05
+    local r = 12
     local action = transition.sequence({
         cc.RotateBy:create(t, r),
         cc.RotateBy:create(t, -r),

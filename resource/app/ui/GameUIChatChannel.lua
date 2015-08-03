@@ -20,8 +20,8 @@ local BASE_CELL_HEIGHT  = 82
 local CELL_FIX_WIDTH    = 484
 
 function GameUIChatChannel:ctor(default_tag)
-	GameUIChatChannel.super.ctor(self,City,_("聊天"))
-	self.default_tag = default_tag
+    GameUIChatChannel.super.ctor(self,City,_("聊天"))
+    self.default_tag = default_tag
     self.chatManager = app:GetChatManager()
 end
 
@@ -30,8 +30,8 @@ function GameUIChatChannel:GetChatManager()
 end
 
 function GameUIChatChannel:OnMoveInStage()
-	GameUIChatChannel.super.OnMoveInStage(self)
-	self:CreateBackGround()
+    GameUIChatChannel.super.OnMoveInStage(self)
+    self:CreateBackGround()
     self:CreateTextFieldBody()
     self:CreateListView()
     self:CreateTabButtons()
@@ -44,7 +44,7 @@ end
 function GameUIChatChannel:onCleanup()
     self:GetChatManager():RemoveListenerOnType(self,ChatManager.LISTEN_TYPE.TO_TOP)
     self:GetChatManager():RemoveListenerOnType(self,ChatManager.LISTEN_TYPE.TO_REFRESH)
-    GameUIChatChannel.super.onCleanup(self)    
+    GameUIChatChannel.super.onCleanup(self)
 end
 
 function GameUIChatChannel:TO_REFRESH()
@@ -52,6 +52,11 @@ function GameUIChatChannel:TO_REFRESH()
 end
 
 function GameUIChatChannel:TO_TOP(chat_data)
+    for i,v in ipairs(chat_data) do
+        if v.channel ~= self._channelType then
+            self.tab_buttons:SetGreenTipsShow(v.channel,true)
+        end
+    end
     local data = chat_data
     local isLastMessageInViewRect = false
     local count = #data
@@ -81,7 +86,7 @@ function GameUIChatChannel:CreateTextFieldBody()
     end):addTo(self:GetView()):align(display.LEFT_TOP, window.left+40, window.top - 100)
     display.newSprite("chat_emoji_37x37.png"):addTo(emojiButton):pos(34,-25)
 
-	local function onEdit(event, editbox)
+    local function onEdit(event, editbox)
         if event == "return" then
             if not self.sendChatButton:CanSendChat() then
                 GameGlobalUI:showTips(_("提示"),_("对不起你的聊天频率太频繁"))
@@ -101,10 +106,10 @@ function GameUIChatChannel:CreateTextFieldBody()
                 end
             end
             local msg = editbox:getText()
-            if not msg or string.len(string.trim(msg)) == 0 then 
+            if not msg or string.len(string.trim(msg)) == 0 then
                 GameGlobalUI:showTips(_("错误"), _("聊天内容不能为空"))
-                return 
-            end  
+                return
+            end
             editbox:setText('')
             self:GetChatManager():SendChat(self._channelType,msg,function()
                 self.sendChatButton:StartTimer()
@@ -113,7 +118,7 @@ function GameUIChatChannel:CreateTextFieldBody()
     end
 
     local editbox = cc.ui.UIInput.new({
-    	UIInputType = 1,
+        UIInputType = 1,
         image = "input_box.png",
         size = cc.size(417,51),
         listener = onEdit,
@@ -143,10 +148,10 @@ function GameUIChatChannel:CreateTextFieldBody()
             end
         end
         local msg = editbox:getText()
-        if not msg or string.len(string.trim(msg)) == 0 then 
+        if not msg or string.len(string.trim(msg)) == 0 then
             GameGlobalUI:showTips(_("错误"), _("聊天内容不能为空"))
-            return 
-        end  
+            return
+        end
         editbox:setText('')
         self:GetChatManager():SendChat(self._channelType,msg,function()
             sendChatButton:StartTimer()
@@ -156,14 +161,14 @@ function GameUIChatChannel:CreateTextFieldBody()
 end
 
 function GameUIChatChannel:CreateShopButton()
-	--right button
-	local rightbutton = cc.ui.UIPushButton.new({normal = "home_btn_up.png",pressed = "home_btn_down.png"}, {scale9 = false}, {down = "HOME_PAGE"})
-		:onButtonClicked(function(event)
-			self:CreatShieldView()
-    	end)
-    	:align(display.TOP_RIGHT, 670, 86)
-   	display.newSprite("chat_setting.png")
-   		:addTo(rightbutton):scale(0.8)
+    --right button
+    local rightbutton = cc.ui.UIPushButton.new({normal = "home_btn_up.png",pressed = "home_btn_down.png"}, {scale9 = false}, {down = "HOME_PAGE"})
+        :onButtonClicked(function(event)
+            self:CreatShieldView()
+        end)
+        :align(display.TOP_RIGHT, 670, 86)
+    display.newSprite("chat_setting.png")
+        :addTo(rightbutton):scale(0.8)
         :pos(-49,-30)
 
     return rightbutton
@@ -174,7 +179,7 @@ function GameUIChatChannel:FetchCurrentChannelMessages()
 end
 
 function GameUIChatChannel:CreateTabButtons()
-	local tab_buttons = WidgetBackGroundTabButtons.new({
+    local tab_buttons = WidgetBackGroundTabButtons.new({
         {
             label = _("世界"),
             tag = "global",
@@ -195,7 +200,29 @@ function GameUIChatChannel:CreateTabButtons()
         self._channelType = tag
         self:ShowTipsIf()
         self:RefreshListView()
+        if self.tab_buttons then
+            self.tab_buttons:SetGreenTipsShow(tag,false)
+        end
+
+        local pageIdx
+        if tag == "global" then
+            pageIdx = 1
+        elseif tag == "alliance" then
+            pageIdx = 2
+        else
+            pageIdx = 3
+        end
+        app:GetChatManager():setChannelReadStatus(tag,false)
+        app:GetGameDefautlt():setStringForKey("LAST_CHAT_CHANNEL",""..pageIdx)
+        display.getRunningScene():GetHomePage():ChangeChatChannel(pageIdx)
     end):addTo(self:GetView()):pos(window.cx, window.bottom + 34)
+    local channelReadStatus = app:GetChatManager():getAllChannelReadStatus()
+    for k,v in pairs(channelReadStatus) do
+        if k ~= self.default_tag then
+            tab_buttons:SetGreenTipsShow(k,v)
+        end
+    end
+    self.tab_buttons = tab_buttons
 end
 
 function GameUIChatChannel:ShowTipsIf()
@@ -220,7 +247,7 @@ function GameUIChatChannel:GetChatIcon(icon)
 end
 
 function GameUIChatChannel:GetChatItemCell()
-	local content = display.newNode()
+    local content = display.newNode()
     local other_content = display.newNode()
     local bottom = display.newScale9Sprite("chat_bubble_bottom_484x14.png"):addTo(other_content):align(display.RIGHT_BOTTOM,LISTVIEW_WIDTH, 0)
     local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png"):addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH, 14)
@@ -228,14 +255,14 @@ function GameUIChatChannel:GetChatItemCell()
     local chat_icon = self:GetChatIcon():addTo(other_content):align(display.LEFT_TOP, 3, 72)
     local from_label = UIKit:ttfLabel({
         text = "[ P/L ] SkinnMart",
-        size = 16,
+        size = 18,
         color= 0x005e6c,
         align = cc.TEXT_ALIGNMENT_LEFT,
     }):align(display.LEFT_BOTTOM, 7, 15):addTo(header)
 
     local vip_label =  UIKit:ttfLabel({
         text = "VIP 99",
-        size = 12,
+        size = 14,
         color= 0xdd7f00,
         align = cc.TEXT_ALIGNMENT_LEFT,
     }):align(display.LEFT_BOTTOM, 22 + from_label:getContentSize().width, 17):addTo(header)
@@ -249,11 +276,11 @@ function GameUIChatChannel:GetChatItemCell()
 
     local translation_sp = display.newSprite("chat_translation_45x43.png"):align(display.RIGHT_BOTTOM, 478,12):addTo(header):scale(25/45)
 
-    local content_label = RichText.new({width = 430,size = 18,color = 0x403c2f})
+    local content_label = RichText.new({width = 430,size = 22,color = 0x403c2f})
     content_label:Text("")
     content_label:align(display.LEFT_BOTTOM, 10, 0):addTo(middle)
 
-    -- set var 
+    -- set var
     other_content.content_label = content_label
     other_content.time_label = time_label
     other_content.translation_sp = translation_sp
@@ -267,7 +294,7 @@ function GameUIChatChannel:GetChatItemCell()
     content:addChild(other_content)
     content.other_content = other_content
     -- end of other_content
-    -- mine 
+    -- mine
     local mine_content = display.newNode()
     local bottom = display.newScale9Sprite("chat_bubble_bottom_484x14.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 0)
     local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 14)
@@ -276,14 +303,14 @@ function GameUIChatChannel:GetChatItemCell()
 
     local from_label = UIKit:ttfLabel({
         text = "[ P/L ] SkinnMart",
-        size = 16,
+        size = 18,
         color= 0x005e6c,
         align = cc.TEXT_ALIGNMENT_LEFT,
     }):align(display.LEFT_BOTTOM, 7, 15):addTo(header)
 
     local vip_label =  UIKit:ttfLabel({
         text = "VIP 99",
-        size = 12,
+        size = 14,
         color= 0xdd7f00,
         align = cc.TEXT_ALIGNMENT_LEFT,
     }):align(display.LEFT_BOTTOM, 22 + from_label:getContentSize().width, 17):addTo(header)
@@ -296,7 +323,7 @@ function GameUIChatChannel:GetChatItemCell()
     }):align(display.BOTTOM_RIGHT, 478, 16):addTo(header)
 
 
-    local content_label = RichText.new({width = 430,size = 18,color = 0x403c2f})
+    local content_label = RichText.new({width = 430,size = 22,color = 0x403c2f})
     content_label:Text("")
     content_label:align(display.LEFT_BOTTOM, 10, 0):addTo(middle)
 
@@ -320,7 +347,7 @@ end
 
 function GameUIChatChannel:CreateListView()
     display.newSprite("listview_edging.png"):align(display.BOTTOM_CENTER, window.cx, window.bottom + 784):addTo(self:GetView())
-	self.listView = UIListView.new {
+    self.listView = UIListView.new {
         viewRect = cc.rect(window.left + (window.width - LISTVIEW_WIDTH)/2, window.bottom+90, LISTVIEW_WIDTH, 700),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
         alignment = cc.ui.UIListView.ALIGNMENT_LEFT,
@@ -331,7 +358,7 @@ function GameUIChatChannel:CreateListView()
 end
 
 function GameUIChatChannel:RefreshListView()
-    if not  self._channelType then 
+    if not  self._channelType then
         self._channelType = 'global'
     end
     if self._channelType ~= 'global' then
@@ -357,7 +384,7 @@ function GameUIChatChannel:RefreshListView()
 end
 
 function GameUIChatChannel:sourceDelegate(listView, tag, idx)
- if cc.ui.UIListView.COUNT_TAG == tag then
+    if cc.ui.UIListView.COUNT_TAG == tag then
         return #self.dataSource_
     elseif cc.ui.UIListView.CELL_TAG == tag then
         local item
@@ -387,18 +414,18 @@ function GameUIChatChannel:HandleCellUIData(mainContent,chat,update_time)
     local isVip = chat.vip and chat.vip > 0
     local currentContent = nil
     if isSelf then
-      mainContent.other_content:hide()
-      currentContent = mainContent.mine_content
+        mainContent.other_content:hide()
+        currentContent = mainContent.mine_content
     else
-      mainContent.mine_content:hide()
-      currentContent = mainContent.other_content
+        mainContent.mine_content:hide()
+        currentContent = mainContent.other_content
     end
     currentContent:show()
 
     local bottom = currentContent.bottom
     local middle = currentContent.middle
     local header = currentContent.header
-    
+
     --header node
     local timeLabel = currentContent.time_label
     local titleLabel = currentContent.from_label
@@ -436,7 +463,7 @@ function GameUIChatChannel:HandleCellUIData(mainContent,chat,update_time)
             header:align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH, bottom:getContentSize().height+middle:getContentSize().height)
             local fix_height = height - 20
             palyerIcon:align(display.LEFT_TOP,3, bottom:getContentSize().height+middle:getContentSize().height + header:getContentSize().height)
-            local final_height = BASE_CELL_HEIGHT + fix_height 
+            local final_height = BASE_CELL_HEIGHT + fix_height
             mainContent.other_content:size(LISTVIEW_WIDTH,final_height)
             mainContent.mine_content:size(LISTVIEW_WIDTH,final_height)
             mainContent:size(LISTVIEW_WIDTH,final_height)
@@ -521,7 +548,7 @@ function GameUIChatChannel:listviewListener(event)
         if not listView:isItemFullyInViewRect(event.itemPos) then
             return
         end
-    	self:CreatePlayerMenu(event,chat)
+        self:CreatePlayerMenu(event,chat)
     end
 end
 
@@ -534,7 +561,7 @@ function GameUIChatChannel:CreatePlayerMenu(event,chat)
     local targetY = window.cy - 100
     local distance = targetY - p.y
     if distance <= 0 then
-        targetY = p.y 
+        targetY = p.y
     end
     local alliance_string = _("查看联盟")
     local my_alliance = Alliance_Manager:GetMyAlliance()
@@ -543,10 +570,10 @@ function GameUIChatChannel:CreatePlayerMenu(event,chat)
     if my_alliance:IsDefault() then -- 我没有联盟
         if has_other_alliane then
             alliance_string = _("加入联盟")
-        else
-            alliance_string = _("无联盟信息")
-            enbale_alliance_info = false
-        end
+    else
+        alliance_string = _("无联盟信息")
+        enbale_alliance_info = false
+    end
     else
         if not has_other_alliane then
             alliance_string = _("邀请加入")
@@ -630,7 +657,7 @@ end
 
 function GameUIChatChannel:CreateEmojiPanel()
     UIKit:newGameUI("GameUIEmojiSelect",function(code)
-         local text = self.editbox:getText()
+        local text = self.editbox:getText()
         self.editbox:setText(string.trim(text) .. code)
     end):AddToCurrentScene(true)
 end
@@ -643,3 +670,4 @@ function GameUIChatChannel:LeftButtonClicked()
 end
 
 return GameUIChatChannel
+

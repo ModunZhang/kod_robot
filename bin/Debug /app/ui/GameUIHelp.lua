@@ -211,11 +211,11 @@ function GameUIHelp:GetHelpEventDesc( eventData )
     elseif type == "militaryTechEvents" then
         local names = string.split(name, "_")
         if names[2] == "hpAdd" then
-            return string.format(_("研发%s血量增加 等级 %d"),Localize.soldier_category[names[1]],eventData:Level()+1)
+            return string.format(_("研发%s血量增加 等级 %d"),Localize.soldier_category[names[1]],eventData:Level())
         end
         return string.format(_("研发%s对%s的攻击到 等级 %d"),Localize.soldier_category[names[1]],Localize.soldier_category[names[2]],eventData:Level())
     elseif type == "soldierStarEvents" then
-        return string.format(_("晋升%s的星级 star %d"),Localize.soldier_name[name],eventData:Level()+1)
+        return string.format(_("晋升%s的星级 star %d"),Localize.soldier_name[name],eventData:Level())
     elseif type == "materialEvents" then
         return _("未处理")
     elseif type == "soldierEvents" then

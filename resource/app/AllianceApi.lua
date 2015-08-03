@@ -136,6 +136,9 @@ function AllianceApi:AllianceMemberApi()
     local alliance = Alliance_Manager:GetMyAlliance()
     if not alliance:IsDefault() then
         local members = alliance:GetAllMembers()
+        if LuaUtils:table_size(members) == 1 then
+            return
+        end
         local member_index = math.random(LuaUtils:table_size(members))
         local count = 0
         local member

@@ -141,7 +141,6 @@ function WidgetMilitaryTechnology:onExit()
 end
 function WidgetMilitaryTechnology:OnMilitaryTechsDataChanged(soldier_manager,changed_map)
     for k,v in pairs(changed_map) do
-        print("OnMilitaryTechsDataChanged>>>",k,v:Level())
         if self.items_list[k] then
             self.items_list[k]:LevelUpRefresh(v)
         end

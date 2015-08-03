@@ -14,7 +14,7 @@ local format = string.format
 UpgradeBuilding.NOT_ABLE_TO_UPGRADE = {
     TILE_NOT_UNLOCKED = _("地块未解锁"),
     IS_MAX_LEVEL = _("建筑已经达到最高等级"),
-    IS_MAX_UNLOCK = _("建造数量已达建造上限"),
+    IS_MAX_UNLOCK = _("升级城堡解锁此建筑"),
     LEVEL_CAN_NOT_HIGHER_THAN_KEEP_LEVEL = _("请首先提升城堡等级"),
     RESOURCE_NOT_ENOUGH = _("资源不足"),
     BUILDINGLIST_NOT_ENOUGH = _("建造队列不足"),
@@ -102,12 +102,13 @@ function UpgradeBuilding:InstantUpgradeBy(level)
     self:InstantUpgradeTo(self.level + level)
 end
 function UpgradeBuilding:InstantUpgradeTo(level)
+    local is_upgrading = self.upgrade_to_next_level_time ~= 0
     self.level = level
     self.upgrade_to_next_level_time = 0
 
     self:CancelLocalPush()
     self.upgrade_building_observer:NotifyObservers(function(listener)
-        listener:OnBuildingUpgradeFinished(self)
+        listener:OnBuildingUpgradeFinished(self, is_upgrading)
     end)
 end
 function UpgradeBuilding:UpgradeByCurrentTime(current_time)
@@ -315,8 +316,13 @@ function UpgradeBuilding:IsBuildingUpgradeLegal()
     if #level_up_config == level then
         return UpgradeBuilding.NOT_ABLE_TO_UPGRADE.IS_MAX_LEVEL
     end
+    -- 是否已经解锁内圈
+    local tile = city:GetTileWhichBuildingBelongs(self)
+    if not city:IsUnlockedInAroundNumber(math.max(tile.x,tile.y) - 1) then
+        return UpgradeBuilding.NOT_ABLE_TO_UPGRADE.TILE_NOT_UNLOCKED
+    end
     -- 是否达到建造上限
-    if city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint(city) < 1 and self.level==0 then
+    if city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint() < 1 and self.level==0 then
         return UpgradeBuilding.NOT_ABLE_TO_UPGRADE.IS_MAX_UNLOCK
     end
     local config
@@ -453,16 +459,14 @@ function UpgradeBuilding:getUpgradeRequiredGems()
     required_gems = required_gems + DataUtils:buyResource(resource_config.resources, has_resourcce)
     required_gems = required_gems + DataUtils:buyMaterial(resource_config.materials, has_materials)
     --当升级队列不足时，立即完成正在升级的建筑中所剩升级时间最少的建筑
-    if #city:GetUpgradingBuildings()>0 then
+    if city:GetAvailableBuildQueueCounts() == 0 then
         local min_time = math.huge
         for k,v in pairs(city:GetUpgradingBuildings()) do
             local left_time = v:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime())
             if left_time<min_time then
                 min_time=left_time
-                print("完成上个升级的建筑",v:GetType())
             end
-        end
-        print("完成上个升级事件的时间",min_time)
+        end     
         required_gems = required_gems + DataUtils:getGemByTimeInterval(min_time)
     end
 
@@ -470,6 +474,7 @@ function UpgradeBuilding:getUpgradeRequiredGems()
 end
 
 return UpgradeBuilding
+
 
 
 

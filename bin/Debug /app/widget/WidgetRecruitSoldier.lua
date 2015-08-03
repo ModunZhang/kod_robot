@@ -1,6 +1,7 @@
 local GameUtils = GameUtils
 local cocos_promise = import("..utils.cocos_promise")
 local UILib = import("..ui.UILib")
+local StarBar = import("..ui.StarBar")
 local Localize = import("..utils.Localize")
 local MaterialManager = import("..entity.MaterialManager")
 local SoldierManager = import("..entity.SoldierManager")
@@ -102,7 +103,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = 0x403c2f
     }):addTo(back_ground, 2)
-        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, size.height - 85 - 11)
+        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width , size.height - 85 - 11)
 
     local label = UIKit:ttfLabel({
         text = _("弱势对抗"),
@@ -122,7 +123,7 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = 0x403c2f
     }):addTo(back_ground, 2)
-        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, size.height - 120 - 11)
+        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width, size.height - 120 - 11)
 
 
     -- food icon
@@ -300,20 +301,42 @@ function WidgetRecruitSoldier:AddButtons()
                     NetManager:getInstantRecruitSpecialSoldierPromise(self.soldier_name, self.count)
                 end
             else
-                NetManager:getInstantRecruitNormalSoldierPromise(self.soldier_name, self.count)
+                NetManager:getInstantRecruitNormalSoldierPromise(self.soldier_name, self.count):always(function()
+                    if iskindof(display.getRunningScene(), "MyCityScene") then
+                        display.getRunningScene():GetHomePage():OnTaskChanged()
+                    end
+                end)
             end
 
-            if type(self.instant_button_clicked) == "function" then
-                self:instant_button_clicked()
+            if app:GetGameDefautlt():IsOpenGemRemind() then
+                UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),
+                    string.formatnumberthousands(self:GetNeedGemWithInstantRecruit(self.count))
+                ), function()
+                    if type(self.instant_button_clicked) == "function" then
+                        self:instant_button_clicked()
+                    end
+
+
+                    if iskindof(display.getRunningScene(), "CityScene") then
+                        display.getRunningScene():GetSceneLayer()
+                            :MoveBarracksSoldiers(self.soldier_name)
+                    end
+
+                    self:Close()
+                end,true,true)
+            else
+                if type(self.instant_button_clicked) == "function" then
+                    self:instant_button_clicked()
+                end
+
+
+                if iskindof(display.getRunningScene(), "CityScene") then
+                    display.getRunningScene():GetSceneLayer()
+                        :MoveBarracksSoldiers(self.soldier_name)
+                end
+
+                self:Close()
             end
-
-
-            if iskindof(display.getRunningScene(), "CityScene") then
-                display.getRunningScene():GetSceneLayer()
-                    :MoveBarracksSoldiers(self.soldier_name)
-            end
-
-            self:Close()
         end)
     self.instant_button = instant_button
 
@@ -358,25 +381,66 @@ function WidgetRecruitSoldier:AddButtons()
                     local content = string.format("%s%s%s", queue_need_gem > 0 and _("您当前没有足够的队列") or "", required_gems > 0 and _("您当前没有足够的资源") or "", _("是否花费魔法石立即补充"))
 
                     UIKit:showMessageDialog(title, content,function()
-                        NetManager:getRecruitSpecialSoldierPromise(self.soldier_name, self.count)
-                        self:Close()
-                    end):CreateNeeds({value = queue_need_gem + required_gems})
+                        end):CreateOKButtonWithPrice({
+                        listener = function ()
+                            if User:GetGemResource():GetValue() < (queue_need_gem + required_gems) then
+                                UIKit:showMessageDialog(_("提示"),_("金龙币不足"))
+                                    :CreateOKButton(
+                                        {
+                                            listener = function ()
+                                                UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                            end,
+                                            btn_name= _("前往商店")
+                                        }
+                                    )
+                                return
+                            end
+                            NetManager:getRecruitSpecialSoldierPromise(self.soldier_name, self.count)
+                            local parent = self:getParent()
+                            self:Close()
+                            parent:LeftButtonClicked()
+                        end,
+                        price = queue_need_gem + required_gems
+                        }):CreateCancelButton()
                 else
                     NetManager:getRecruitSpecialSoldierPromise(self.soldier_name, self.count)
+                    local parent = self:getParent()
                     self:Close()
+                    parent:LeftButtonClicked()
                 end
             else
                 local required_gems = DataUtils:buyResource(self:GetNeedResouce(self.count), {})
                 if queue_need_gem + required_gems > 0 then
+
                     local title = string.format("%s/%s", queue_need_gem > 0 and _("队列不足") or "", required_gems > 0 and _("资源不足") or "")
                     local content = string.format("%s%s%s", queue_need_gem > 0 and _("您当前没有足够的队列") or "", required_gems > 0 and _("您当前没有足够的资源") or "", _("是否花费魔法石立即补充"))
                     UIKit:showMessageDialog(title, content,function()
-                        NetManager:getRecruitNormalSoldierPromise(self.soldier_name, self.count)
-                        self:Close()
-                    end):CreateNeeds({value = queue_need_gem + required_gems})
+                        end):CreateOKButtonWithPrice({
+                        listener = function ()
+                            if User:GetGemResource():GetValue() < (queue_need_gem + required_gems) then
+                                UIKit:showMessageDialog(_("提示"),_("金龙币不足"))
+                                    :CreateOKButton(
+                                        {
+                                            listener = function ()
+                                                UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                            end,
+                                            btn_name= _("前往商店")
+                                        }
+                                    )
+                                return
+                            end
+                            NetManager:getRecruitNormalSoldierPromise(self.soldier_name, self.count)
+                            local parent = self:getParent()
+                            self:Close()
+                            parent:LeftButtonClicked()
+                        end,
+                        price = queue_need_gem + required_gems
+                        }):CreateCancelButton()
                 else
                     NetManager:getRecruitNormalSoldierPromise(self.soldier_name, self.count)
+                    local parent = self:getParent()
                     self:Close()
+                    parent:LeftButtonClicked()
                 end
             end
         end)
@@ -449,6 +513,18 @@ function WidgetRecruitSoldier:SetSoldier(soldier_name, star)
             WidgetSoldierDetails.new(soldier_name, self.star):addTo(self)
         end)
 
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(self.soldier):align(display.BOTTOM_CENTER,-10, -60)
+    display.newSprite("i_icon_20x20.png"):addTo(soldier_star_bg):align(display.LEFT_CENTER,5, 11)
+    self.soldier_star = StarBar.new({
+        max = 3,
+        bg = "Stars_bar_bg.png",
+        fill = "Stars_bar_highlight.png",
+        num = star,
+        margin = 5,
+        direction = StarBar.DIRECTION_HORIZONTAL,
+        scale = 0.8,
+    }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
+
     local rect = self.soldier:getCascadeBoundingBox()
     display.newSprite("box_soldier_128x128.png"):addTo(self.soldier):align(display.CENTER, 0,0)
 
@@ -514,7 +590,7 @@ function WidgetRecruitSoldier:OnCountChanged(count)
     self.count = count
     local soldier_config = self.soldier_config
     local total_time = soldier_config.recruitTime * count
-    self.upkeep:setString(string.format("%s%d/%s", count > 0 and "-" or "", soldier_config.consumeFoodPerHour * count, _("小时")))
+    self.upkeep:setString(string.format("%s%d/%s", count > 0 and "-" or "", math.ceil(soldier_config.consumeFoodPerHour * count), _("小时")))
     local ok = self:GetRecruitSpecialTime()
     if ok or not soldier_config.specialMaterials then
         -- 按钮
@@ -615,7 +691,7 @@ function WidgetRecruitSoldier:CheckMaterials(count)
         for k,v in pairs(specialMaterials) do
             local temp = string.split(v, "_")
             local total = self.city:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.SOLDIER)[temp[1]]
-            if total< count then
+            if total < (count * tonumber(temp[2])) then
                 return v
             end
         end
@@ -628,6 +704,7 @@ function WidgetRecruitSoldier:OnSoliderStarCountChanged(soldier_manager,star_cha
             local soldier_config, soldier_ui_config = self:GetConfigBySoldierTypeAndStar(soldier_name, self.star)
             self.soldier:setButtonImage(cc.ui.UIPushButton.NORMAL, soldier_ui_config, true)
             self.soldier:setButtonImage(cc.ui.UIPushButton.PRESSED, soldier_ui_config, true)
+            self.soldier_star:setNum(self.star)
             self.soldier_config = soldier_config
             self.soldier_ui_config = soldier_ui_config
         end
@@ -689,7 +766,7 @@ function WidgetRecruitSoldier:PromiseOfFteSpecial()
     if not self.instant_button then
         self:AddButtons()
         self:OnCountChanged(self.count)
-    end    
+    end
     self.gem_label:setString(0)
 
     local fte_layer = self:getParent():GetFteLayer()
@@ -730,6 +807,13 @@ end
 
 
 return WidgetRecruitSoldier
+
+
+
+
+
+
+
 
 
 

@@ -17,8 +17,13 @@ return function(userData)
     ItemManager = ItemManager_.new()
     Alliance_Manager = AllianceManager_.new()
     if GLOBAL_FTE then
-        DataManager:getFteData().basicInfo.name = userData.basicInfo.name
-        DataManager:getFteData().basicInfo.terrain = userData.basicInfo.terrain
+        DataManager:getFteData()._id                = userData._id
+        DataManager:getFteData().serverId           = userData.serverId
+        DataManager:getFteData().serverTime         = userData.serverTime
+        DataManager:getFteData().logicServerId      = userData.logicServerId
+        DataManager:getFteData().basicInfo.name     = userData.basicInfo.name
+        DataManager:getFteData().basicInfo.terrain  = userData.basicInfo.terrain
+        DataManager:getFteData().basicInfo.language = userData.basicInfo.language
         User = User_.new(initData._id)
         City = City_.new(User):InitWithJsonData(initData)
         DataManager:setFteUserDeltaData()

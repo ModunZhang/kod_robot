@@ -23,9 +23,9 @@ function GameUIMilitaryTechSpeedUp:ctor(event)
 end
 
 function GameUIMilitaryTechSpeedUp:FreeSpeedUpAction()
-    NetManager:getFreeSpeedUpPromise(self:GetEvent():GetEventType(),self:GetEvent():Id()):done(function()
-        self:LeftButtonClicked()
-    end)
+    if self:GetEvent():GetTime() > 2 then
+        NetManager:getFreeSpeedUpPromise(self:GetEvent():GetEventType(),self:GetEvent():Id())
+    end
 end
 
 function GameUIMilitaryTechSpeedUp:onCleanup()

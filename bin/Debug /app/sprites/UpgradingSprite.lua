@@ -34,7 +34,7 @@ local res_map = {
     [ResourceManager.RESOURCE_TYPE.STONE] = "stone",
     [ResourceManager.RESOURCE_TYPE.CITIZEN] = "citizen",
 }
-function UpgradingSprite:OnBuildingUpgradeFinished(building)
+function UpgradingSprite:OnBuildingUpgradeFinished(building, is_upgrading)
     if self.label then
         self.label:setString(building:GetType().." "..building:GetLevel())
     end
@@ -47,6 +47,7 @@ function UpgradingSprite:OnBuildingUpgradeFinished(building)
     -- animation
     self:StopBuildingAnimation()
 
+    if not is_upgrading then return end
     local running_scene = display.getRunningScene()
     if iskindof(running_scene, "MyCityScene") and building:IsHouse() then
         local _,tp = self:GetWorldPosition()

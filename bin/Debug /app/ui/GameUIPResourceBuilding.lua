@@ -221,8 +221,17 @@ function GameUIPResourceBuilding:RebuildPart()
         :setButtonLabel(UIKit:ttfLabel({text = _("立即转换"), size = 22, color = 0xffedae,shadow = true}))
         :onButtonClicked(function(event)
             if self:CheckSwitch(self.selected_rebuild_to_building) then
-                NetManager:getSwitchBuildingPromise(City:GetLocationIdByBuilding(self.building),self.selected_rebuild_to_building)
-                self:LeftButtonClicked()
+                if app:GetGameDefautlt():IsOpenGemRemind() then
+                    UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),
+                        string.formatnumberthousands(intInit.switchProductionBuilding.value)
+                    ), function()
+                        NetManager:getSwitchBuildingPromise(City:GetLocationIdByBuilding(self.building),self.selected_rebuild_to_building)
+                        self:LeftButtonClicked()
+                    end,true,true)
+                else
+                    NetManager:getSwitchBuildingPromise(City:GetLocationIdByBuilding(self.building),self.selected_rebuild_to_building)
+                    self:LeftButtonClicked()
+                end
             end
         end)
         :align(display.CENTER_RIGHT, bg_size.width-20, 50)
@@ -299,6 +308,8 @@ function GameUIPResourceBuilding:GotoPreconditionBuilding(preName)
     self:LeftButtonClicked()
 end
 return GameUIPResourceBuilding
+
+
 
 
 

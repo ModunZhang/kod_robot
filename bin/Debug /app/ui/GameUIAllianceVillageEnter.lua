@@ -295,16 +295,19 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
     if villageEvent then --我方占领
         if villageEvent:GetPlayerRole() == villageEvent.EVENT_PLAYER_ROLE.Me then --自己占领
             local che_button = self:BuildOneButton("capture_38x56.png",_("撤军")):onButtonClicked(function()
-                    NetManager:getRetreatFromVillagePromise(alliance_id,villageEvent:Id())
-                    self:LeftButtonClicked()
-            end)
-            local info_button = self:BuildOneButton("icon_info_56x56.png",_("部队")):onButtonClicked(function()
-                self:FindTroopShowInfoFromAllianceBelvedere()
+                NetManager:getRetreatFromVillagePromise(alliance_id,villageEvent:Id())
                 self:LeftButtonClicked()
             end)
-            buttons =  {che_button,info_button}
-        elseif villageEvent:GetPlayerRole() ==   villageEvent.EVENT_PLAYER_ROLE.Ally then --盟友占领
-            local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
+        local info_button = self:BuildOneButton("icon_info_56x56.png",_("部队")):onButtonClicked(function()
+            self:FindTroopShowInfoFromAllianceBelvedere()
+            self:LeftButtonClicked()
+        end)
+        buttons =  {che_button,info_button}
+    elseif villageEvent:GetPlayerRole() ==   villageEvent.EVENT_PLAYER_ROLE.Ally then --盟友占领
+        local isMyAlliance = self:IsMyAlliance()
+        local position = self:GetLogicPosition()
+        local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
+            UIKit:showMessageDialog(_("提示"), _("当前资源点已被盟友占领，你可能无法进行采集，仍要派兵吗？"), function ()
                 UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
                     if checkMeIsProtectedWarinng then
                         UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
@@ -319,96 +322,69 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
                             gameuialliancesendtroops:LeftButtonClicked()
                         end)
                     end
-                end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
-                self:LeftButtonClicked()
+                end,{targetIsMyAlliance = isMyAlliance,toLocation = position,returnCloseAction = true}):AddToCurrentScene(true)
             end)
-            buttons = {attack_button}
-        end
+        end, function ()
+        end)
+    buttons = {attack_button}
+    end
     else --我方未占领
         if self:HasEnemyAlliance() then
             villageEvent = self:GetEnemyAlliance():FindVillageEventByVillageId(village_id)
             if villageEvent then -- 敌方占领
                 local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
-                UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-                    if checkMeIsProtectedWarinng then
-                        UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
+                    UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                        if checkMeIsProtectedWarinng then
+                            UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
+                                NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
+                                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                                    gameuialliancesendtroops:LeftButtonClicked()
+                                end)
+                            end)
+                        else
                             NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
                                 app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
                                 gameuialliancesendtroops:LeftButtonClicked()
                             end)
-                        end)
-                    else
-                        NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                            gameuialliancesendtroops:LeftButtonClicked()
-                        end)
-                    end
-                end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
+                        end
+                    end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
                     self:LeftButtonClicked()
                 end)
-                local strike_button = self:BuildOneButton("strike_66x62.png",_("突袭")):onButtonClicked(function()
-                    UIKit:newGameUI("GameUIStrikePlayer",GameUIStrikePlayer.STRIKE_TYPE.VILLAGE,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),defenceAllianceId = alliance_id,defenceVillageId = village_id}):AddToCurrentScene(true)
-                    self:LeftButtonClicked()
-                end)
-                buttons = {attack_button,strike_button}
-                if not self:IsMyAlliance() and self:GetMyAlliance():Status() == "prepare" then
-                    local progress_1 = WidgetAllianceEnterButtonProgress.new()
-                        :pos(-68, -54)
-                        :addTo(attack_button)
-                    local my_allaince_status = Alliance_Manager:GetMyAlliance():Status()
-                    attack_button:setButtonEnabled(my_allaince_status == "fight")
-                    local progress_2 = WidgetAllianceEnterButtonProgress.new()
-                        :pos(-68, -54)
-                        :addTo(strike_button)
-                    strike_button:setButtonEnabled(my_allaince_status == "fight")
-                end
-            else -- 无人占领
-                local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
-                UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-                    if checkMeIsProtectedWarinng then
-                        UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
-                            NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                                gameuialliancesendtroops:LeftButtonClicked()
-                            end)
-                        end)
-                    else
-                        NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                            gameuialliancesendtroops:LeftButtonClicked()
-                        end)
-                    end
-                end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
-                    self:LeftButtonClicked()
-                end)
-                if not self:IsMyAlliance() and self:GetMyAlliance():Status() == "prepare" then
-                    local progress_1 = WidgetAllianceEnterButtonProgress.new()
-                        :pos(-68, -54)
-                        :addTo(attack_button)
-                    local my_allaince_status = Alliance_Manager:GetMyAlliance():Status()
-                    attack_button:setButtonEnabled(my_allaince_status == "fight")
-                end
-                buttons = {attack_button}
-            end
-        else -- 无人占领
-            local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
-                UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-                    if checkMeIsProtectedWarinng then
-                        UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
-                            NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                                gameuialliancesendtroops:LeftButtonClicked()
-                            end)
-                        end)
-                    else
-                        NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                            gameuialliancesendtroops:LeftButtonClicked()
-                        end)
-                    end
-                end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
+            local strike_button = self:BuildOneButton("strike_66x62.png",_("突袭")):onButtonClicked(function()
+                UIKit:newGameUI("GameUIStrikePlayer",GameUIStrikePlayer.STRIKE_TYPE.VILLAGE,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),defenceAllianceId = alliance_id,defenceVillageId = village_id}):AddToCurrentScene(true)
                 self:LeftButtonClicked()
             end)
+            buttons = {attack_button,strike_button}
+            if not self:IsMyAlliance() and self:GetMyAlliance():Status() == "prepare" then
+                local progress_1 = WidgetAllianceEnterButtonProgress.new()
+                    :pos(-68, -54)
+                    :addTo(attack_button)
+                local my_allaince_status = Alliance_Manager:GetMyAlliance():Status()
+                attack_button:setButtonEnabled(my_allaince_status == "fight")
+                local progress_2 = WidgetAllianceEnterButtonProgress.new()
+                    :pos(-68, -54)
+                    :addTo(strike_button)
+                strike_button:setButtonEnabled(my_allaince_status == "fight")
+            end
+            else -- 无人占领
+                local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
+                    UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                        if checkMeIsProtectedWarinng then
+                            UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
+                                NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
+                                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                                    gameuialliancesendtroops:LeftButtonClicked()
+                                end)
+                            end)
+                        else
+                            NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
+                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                                gameuialliancesendtroops:LeftButtonClicked()
+                            end)
+                        end
+                    end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
+                    self:LeftButtonClicked()
+                end)
             if not self:IsMyAlliance() and self:GetMyAlliance():Status() == "prepare" then
                 local progress_1 = WidgetAllianceEnterButtonProgress.new()
                     :pos(-68, -54)
@@ -417,7 +393,35 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
                 attack_button:setButtonEnabled(my_allaince_status == "fight")
             end
             buttons = {attack_button}
-        end
+            end
+    else -- 无人占领
+        local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
+            UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                if checkMeIsProtectedWarinng then
+                    UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
+                        NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
+                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                            gameuialliancesendtroops:LeftButtonClicked()
+                        end)
+                    end)
+                else
+                    NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
+                        app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                        gameuialliancesendtroops:LeftButtonClicked()
+                    end)
+                end
+            end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
+            self:LeftButtonClicked()
+        end)
+    if not self:IsMyAlliance() and self:GetMyAlliance():Status() == "prepare" then
+        local progress_1 = WidgetAllianceEnterButtonProgress.new()
+            :pos(-68, -54)
+            :addTo(attack_button)
+        local my_allaince_status = Alliance_Manager:GetMyAlliance():Status()
+        attack_button:setButtonEnabled(my_allaince_status == "fight")
+    end
+    buttons = {attack_button}
+    end
     end
     return buttons
 end
@@ -458,4 +462,6 @@ function GameUIAllianceVillageEnter:OnMoveOutStage()
     GameUIAllianceVillageEnter.super.OnMoveOutStage(self)
 end
 return GameUIAllianceVillageEnter
+
+
 

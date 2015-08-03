@@ -1,3 +1,4 @@
+local StarBar = import("..ui.StarBar")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local UIListView = import(".UIListView")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
@@ -570,7 +571,16 @@ function GameUIWarReport:CreateSoldiersInfo(soldier)
     local soldier_head_bg  = display.newSprite("box_soldier_128x128.png")
         :align(display.CENTER, soldier_head_icon:getContentSize().width/2, soldier_head_icon:getContentSize().height-64)
         :addTo(soldier_head_icon)
-
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_head_bg):align(display.BOTTOM_LEFT,6, 4)
+    local soldier_star = StarBar.new({
+        max = 3,
+        bg = "Stars_bar_bg.png",
+        fill = "Stars_bar_highlight.png",
+        num = soldier_level,
+        margin = 5,
+        direction = StarBar.DIRECTION_HORIZONTAL,
+        scale = 0.8,
+    }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
 
     UIKit:ttfLabel({
         text = soldier.count,

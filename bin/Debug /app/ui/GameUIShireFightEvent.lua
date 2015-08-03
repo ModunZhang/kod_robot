@@ -266,26 +266,29 @@ function GameUIShireFightEvent:DispathSoliderButtonClicked()
         UIKit:showMessageDialog(nil,_("你已经向圣地派遣了部队"))
         return
     end
-    UIKit:newGameUI("GameUIAllianceSendTroops",function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-        if type(self.GetFightEvent) ~= 'function' then gameuialliancesendtroops:LeftButtonClicked() end
-        if total_march_time >=  self:GetFightEvent():GetTime() then
-            UIKit:showMessageDialog(_("提示"),
-                _("检测到你的行军时间大于圣地事件时间,可能部队未达到之前，圣地事件已结束。是否继续派兵?"),
-                function()
-                    NetManager:getMarchToShrinePromose(self:GetFightEvent():Id(),dragonType,soldiers):done(function()
-                        app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+    local attack_func = function ()
+        UIKit:newGameUI("GameUIAllianceSendTroops",function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+            if type(self.GetFightEvent) ~= 'function' then gameuialliancesendtroops:LeftButtonClicked() end
+            if total_march_time >=  self:GetFightEvent():GetTime() then
+                UIKit:showMessageDialog(_("提示"),
+                    _("检测到你的行军时间大于圣地事件时间,可能部队未达到之前，圣地事件已结束。是否继续派兵?"),
+                    function()
+                        NetManager:getMarchToShrinePromose(self:GetFightEvent():Id(),dragonType,soldiers):done(function()
+                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                        end)
+                        gameuialliancesendtroops:LeftButtonClicked()
+                    end,
+                    function()
                     end)
-                    gameuialliancesendtroops:LeftButtonClicked()
-                end,
-                function()
+            else
+                NetManager:getMarchToShrinePromose(self:GetFightEvent():Id(),dragonType,soldiers):done(function()
+                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
                 end)
-        else
-            NetManager:getMarchToShrinePromose(self:GetFightEvent():Id(),dragonType,soldiers):done(function()
-                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-            end)
-            gameuialliancesendtroops:LeftButtonClicked()
-        end
-    end,{toLocation = self:GetAllianceShrineLocation(),targetIsMyAlliance = true,returnCloseAction = true}):AddToCurrentScene(true)
+                gameuialliancesendtroops:LeftButtonClicked()
+            end
+        end,{toLocation = self:GetAllianceShrineLocation(),targetIsMyAlliance = true,returnCloseAction = true}):AddToCurrentScene(true)
+    end
+    UIKit:showSendTroopMessageDialog(attack_func,City:GetMaterialManager().MATERIAL_TYPE.DRAGON,_("龙"))
 end
 
 function GameUIShireFightEvent:InfomationButtonClicked()
@@ -293,5 +296,7 @@ function GameUIShireFightEvent:InfomationButtonClicked()
 end
 
 return GameUIShireFightEvent
+
+
 
 

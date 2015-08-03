@@ -25,6 +25,9 @@ function TradeManager:GetSoldDealsCount()
     end
     return count
 end
+function TradeManager:IsSoldOut()
+    return self:GetSoldDealsCount() > 0
+end
 function TradeManager:OnUserDataChanged(user_data,deltaData)
     local is_fully_update = deltaData == nil
     if is_fully_update then

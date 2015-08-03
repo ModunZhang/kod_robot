@@ -190,6 +190,12 @@ local SERVER_ERRORS = {
     [688] = _("玩家禁止登录"),
     [689] = _("首次加入联盟奖励已经领取"),
     [690] = _("新手引导已经完成"),
+    [691] = _("版本验证失败"),
+    [692] = _("版本不匹配"),
+    [693] = _("此联盟不需要申请加入"),
+    [694] = _("野怪不存在"),
+    [695] = _("不能购买自己出售的商品"),
+    [696] = _("孵化条件不满足"),
 }
 
 local MATERIALS_DESC_MAP = {
@@ -585,7 +591,6 @@ local BUILDING_DESCRIPTION = {
 
     ["toolShop"] = _("工具作坊提供建筑材料和科技材料的制作，每次制作都能随机获得一些材料，升级建筑能够提升每次制作材料的数量"),
     ["poduction"] = _("一次随机生产道具"),
-    ["poduction_1"] = _("个"),
 
     ["barracks"] = _("兵营提供军事单位的招募。招募的部队可用于进攻敌方城市，村落采集资源，防御城市。升级建筑能够提升每次招募的最大数量"),
     ["maxRecruit"] = _("最大招募人口数量"),
@@ -746,14 +751,14 @@ end
 
 local ALLIANCE_EVENTS = {
     donate = _("向联盟慷慨捐赠，提升荣耀值%s"),
-    promotionDown = _("在联盟中的职位被降级到%s"),
+    promotionDown = _("的联盟职位被%s降级为%s"),
     join = _("一个新成员加入联盟"),
-    kick = _("一个玩家被逐出联盟"),
+    kick = _("被%s踢出了联盟"),
     quit = _("退出联盟"),
     request = _("一个玩家申请加入我们的联盟"),
     notice = _("一个新的联盟公告发布"),
     desc = _("一个新的联盟宣言发布"),
-    handover = _("晋升为联盟新的盟主"),
+    handover = _("成为了新的盟主！（原盟主：%s）"),
     tools = _("向联盟商店补充了一批新的高级道具"),
     upgrade = _("%s 升级到 %s"),
     name = _("最近更改联盟的名称为%s"),
@@ -762,7 +767,11 @@ local ALLIANCE_EVENTS = {
     terrain = _("修改联盟地形为%s"),
     language = _("修改联盟语言更改为%s"),
     gve = _("激活了圣地的神秘事件"),
-    promotionUp = _("在联盟中的职位被晋级到%s"),
+    promotionUp = _("的联盟职位被%s晋级为%s"),
+    shrine = _("开启了联盟圣地%s关卡"),
+    fight = _("开启了联盟战"),
+    buildingUpgrade = _("升级了%s"),
+    villageUpgrade = _("升级了%s"),
 }
 
 local SOLDIER_CATEGORY = {
@@ -1193,7 +1202,9 @@ local TERRAIN_FUNCTION = {
     desert= _("沙漠产出红龙材料,更容易培养红龙"),
     iceField = _("雪地产出蓝龙材料，更容易培养蓝龙"),
 }
-
+local USER_AGREEMENT = {
+    agreement = _("Batcatstudio游戏用户使用许可协议本地化ID")
+}
 return {
     equip_material = EQUIP_MATERIAL_LOCALIZE,
     equip = EQUIP_LOCALIZE,
@@ -1259,6 +1270,7 @@ return {
     mails = MAILS,
     server_errors = SERVER_ERRORS,
     terrain_function = TERRAIN_FUNCTION,
+    user_agreement = USER_AGREEMENT,
 }
 
 

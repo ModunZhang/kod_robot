@@ -49,6 +49,16 @@ function GameDefautlt:setTableForKey(key,t)
     local jsonString = json.encode(t)
     self:setStringForKey(key,jsonString)
 end
+-- 消费金龙币提醒
+function GameDefautlt:IsOpenGemRemind()
+    return self:getStringForKey("USE_GEM_TIPS") ~= "no"
+end
+function GameDefautlt:OpenGemRemind()
+    return self:setStringForKey("USE_GEM_TIPS","yes")
+end
+function GameDefautlt:CloseGemRemind()
+    return self:setStringForKey("USE_GEM_TIPS","no")
+end
 -- 邮件最近联系人
 function GameDefautlt:getRecentContacts()
     return self:getTableForKey("RECENT_CONTACTS:"..User:Id(),{})

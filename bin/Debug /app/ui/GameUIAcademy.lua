@@ -212,9 +212,11 @@ function GameUIAcademy:BuildTipsUI(technology_node,y)
 		:onButtonClicked(function()
 			if City:HaveProductionTechEvent() then
 				local event = City:GetProductionTechEventsArray()[1]
-				NetManager:getFreeSpeedUpPromise("productionTechEvents",event:Id()):done(function()
-					self:CheckUIChanged()
-				end)
+				if event:GetTime() > 2 then
+					NetManager:getFreeSpeedUpPromise("productionTechEvents",event:Id()):done(function()
+						self:CheckUIChanged()
+					end)
+				end
 			end
 		end)
 	self.freeSpeedUpButton = freeSpeedUpButton

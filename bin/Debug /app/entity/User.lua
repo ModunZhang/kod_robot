@@ -1,4 +1,4 @@
-local PVEDatabase = import(".PVEDatabase")
+-- local PVEDatabase = import(".PVEDatabase")
 local Resource = import(".Resource")
 local VipEvent = import(".VipEvent")
 local Localize = import("..utils.Localize")
@@ -78,6 +78,12 @@ property(User, "serverId", "")
 property(User, "serverLevel", "")
 property(User, "requestToAllianceEvents", {})
 property(User, "inviteToAllianceEvents", {})
+property(User, "apnStatus", {
+    onCityBeAttacked = true,
+    onAllianceFightStart = true,
+    onAllianceShrineEventStart = true,
+    onAllianceFightPrepare = true
+    })
 property(User, "allianceInfo", {
     loyalty = 0,
     woodExp = 0,
@@ -103,12 +109,6 @@ function User:ctor(p)
     }
     self:GetGemResource():SetValueLimit(math.huge) -- 会有人充值这么多的金龙币吗？
     self:GetStrengthResource():SetValueLimit(intInit.staminaMax.value)
-
-    self.staminaUsed = 0
-    self.gemUsed = nil
-    self.pve_database = PVEDatabase.new(self)
-    local _,_, index = self.pve_database:GetCharPosition()
-    self:GotoPVEMapByLevel(index)
     -- 每日任务
     self.dailyQuests = {}
     self.dailyQuestEvents = {}
@@ -130,20 +130,6 @@ function User:ctor(p)
 end
 function User:IsBindGameCenter()
     return self:GcId() ~= "" and self:GcId() ~= json.null
-end
-function User:GotoPVEMapByLevel(level)
-    self.pve_database:ResetAllMapsListener()
-    self.cur_pve_map = self.pve_database:GetMapByIndex(level)
-end
--- return 是否成功使用体力
-function User:UseStrength(num)
-    if self:HasAnyStength(num) then
-        self.staminaUsed = self.staminaUsed + num
-        self:GetStrengthResource():ReduceResourceByCurrentTime(app.timer:GetServerTime(), num or 1)
-        self:OnResourceChanged()
-        return true
-    end
-    return false
 end
 function User:GetCollectLevelByType(collectType)
     local exp = self.allianceInfo[collect_type[collectType]]
@@ -175,52 +161,8 @@ end
 function User:HasAnyStength(num)
     return self:GetStrengthResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()) >= (num or 1)
 end
-function User:ResetPveData()
-    self:SetPveData(nil, nil, nil)
-end
-function User:GetStaminaUsed()
-    return self.staminaUsed
-end
-function User:SetPveData(fight_data, rewards_data, gemUsed)
-    self.fight_data = fight_data
-    self.rewards_data = rewards_data
-    self.gemUsed = gemUsed
-end
-function User:EncodePveDataAndResetFightRewardsData()
-    local fightData = self.fight_data
-    local rewards = self.rewards_data
-    self.fight_data = nil
-    self.rewards_data = nil
-
-    for i,v in ipairs(rewards or {}) do
-        v.probability = nil
-    end
-    local staminaUsed = self.staminaUsed
-    self.staminaUsed = 0
-
-    local gemUsed = self.gemUsed
-    self.gemUsed = nil
-    return {
-        pveData = {
-            gemUsed = gemUsed,
-            staminaUsed = staminaUsed,
-            location = self.pve_database:EncodeLocation(),
-            floor = self.cur_pve_map:EncodeMap(),
-        },
-        fightData = fightData,
-        rewards = rewards,
-    -- rewardedFloor = nil,
-    }
-end
 function User:ResetAllListeners()
-    self.pve_database:ResetAllMapsListener()
     self:ClearAllListener()
-end
-function User:GetCurrentPVEMap()
-    return self.cur_pve_map
-end
-function User:GetPVEDatabase()
-    return self.pve_database
 end
 function User:GetGemResource()
     return self.resources[GEM]
@@ -311,9 +253,10 @@ function User:OnUserDataChanged(userData, current_time, deltaData)
     self:OnBasicInfoChanged(userData, deltaData)
     self:OnCountInfoChanged(userData, deltaData)
     self:OnIapGiftsChanged(userData, deltaData)
-    self:GetPVEDatabase():OnUserDataChanged(userData, deltaData)
+    -- self:GetPVEDatabase():OnUserDataChanged(userData, deltaData)
     self:OnAllianceDonateChanged(userData, deltaData)
     self:OnAllianceInfoChanged(userData, deltaData)
+    self:OnApnStatusChanged(userData, deltaData)
     if self.growUpTaskManger:OnUserDataChanged(userData, deltaData) then
         self:OnTaskChanged()
     end
@@ -445,6 +388,60 @@ end
 function User:GetCountInfo()
     return self.countInfo
 end
+-- 每日登陆奖励是否领取
+function User:HaveEveryDayLoginReward()
+    local countInfo = self:GetCountInfo()
+    local flag = countInfo.day60 % 30 == 0 and 30 or countInfo.day60 % 30
+    local geted = countInfo.day60RewardsCount % 30 == 0 and 30 or countInfo.day60RewardsCount % 30 -- <= geted
+    return flag > geted or (geted == 30 and flag == 1)
+end
+-- 连续登陆奖励是否领取
+function User:HaveContinutyReward()
+    local countInfo = self:GetCountInfo()
+    local config_day14 = GameDatas.Activities.day14
+    for i,v in ipairs(config_day14) do
+        local config_rewards = string.split(v.rewards,",")
+        if #config_rewards == 1 then
+            local reward_type,item_key,count = unpack(string.split(v.rewards,":"))
+            if v.day == countInfo.day14 and countInfo.day14 > countInfo.day14RewardsCount then
+                return true
+            end
+        else
+
+            for __,one_reward in ipairs(config_rewards) do
+                local reward_type,item_key,count = unpack(string.split(one_reward,":"))
+                if reward_type == 'soldiers' then
+                    if v.day == countInfo.day14 and countInfo.day14 > countInfo.day14RewardsCount then
+                        return true
+                    end
+                end
+            end
+        end
+    end
+end
+-- 城堡冲级奖励是否领取
+function User:HavePlayerLevelUpReward()
+    local countInfo = self:GetCountInfo()
+    local current_level = City:GetFirstBuildingByType('keep'):GetLevel()
+    local config_levelup = GameDatas.Activities.levelup
+    local config_intInit = GameDatas.PlayerInitData.intInit
+    for __,v in ipairs(config_levelup) do
+        if not (app.timer:GetServerTime() > countInfo.registerTime/1000 + config_intInit.playerLevelupRewardsHours.value * 60 * 60) then
+            if  v.level <= current_level then
+                local max_level = 0
+                local l_flag = true
+                for __,l in ipairs(countInfo.levelupRewards) do
+                    if l == v.index then
+                        l_flag = false
+                    end
+                end
+                if l_flag then
+                    return true
+                end
+            end
+        end
+    end
+end
 -- 获取当天剩余普通免费gacha次数
 function User:GetOddFreeNormalGachaCount()
     local vip_add = self:GetVipEvent():IsActived() and self:GetVIPNormalGachaAdd() or 0
@@ -552,7 +549,7 @@ function User:OnVipEventDataChange(userData, deltaData)
         if remove and #remove >0 then
             -- vip 激活结束，刷新资源
             -- 通知出去
-            self.vip_event:UpdateData(remove[1])
+            self.vip_event:Reset()
             City:GetResourceManager():UpdateByCity(City, app.timer:GetServerTime())
             self:NotifyListeneOnType(User.LISTEN_TYPE.VIP_EVENT_OVER, function(listener)
                 listener:OnVipEventOver(self.vip_event)
@@ -634,6 +631,20 @@ function User:OnAllianceInfoChanged( userData, deltaData )
     self:NotifyListeneOnType(User.LISTEN_TYPE.ALLIANCE_INFO, function(listener)
         listener:OnAllianceInfoChanged()
     end)
+end
+function User:OnApnStatusChanged( userData, deltaData )
+    local is_fully_update = deltaData == nil
+    local is_delta_update = not is_fully_update and deltaData.apnStatus
+    if is_fully_update then
+        dump(userData.apnStatus,"userData.apnStatus")
+        self.apnStatus = clone(userData.apnStatus)
+    end
+    if is_delta_update then
+        dump(deltaData.apnStatus,"deltaData.apnStatus")
+        for i,v in pairs(deltaData.apnStatus) do
+            self.apnStatus[i] = v
+        end
+    end
 end
 function User:OnAllianceDonateChanged( userData, deltaData )
     local is_fully_update = deltaData == nil
@@ -779,6 +790,24 @@ function User:IsOnDailyQuestEvents()
         return true
     end
 end
+-- 判定是否完成所有任务
+function User:IsFinishedAllDailyQuests()
+     return LuaUtils:table_empty(self.dailyQuests)
+end
+-- 判定是否能领取每日任务奖励
+function User:CouldGotDailyQuestReward()
+    local dailyQuestEvents = self.dailyQuestEvents
+    if LuaUtils:table_empty(dailyQuestEvents) then
+        return false
+    else
+        for k,v in pairs(dailyQuestEvents) do
+            if v.finishTime == 0 then
+                return true
+            end
+        end
+        return false
+    end
+end
 function User:OnDailyQuestsRefresh()
     self:NotifyListeneOnType(User.LISTEN_TYPE.DALIY_QUEST_REFRESH, function(listener)
         listener:OnDailyQuestsRefresh()
@@ -825,59 +854,6 @@ function User:GetBestDragon()
 end
 
 return User
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

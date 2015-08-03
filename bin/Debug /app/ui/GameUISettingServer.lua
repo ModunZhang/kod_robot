@@ -79,7 +79,7 @@ function GameUISettingServer:BuildServersUI()
  		color= 0x403c2f
  	}):align(display.LEFT_BOTTOM, 30, 76):addTo(self.bg)
  	local honour_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(130,30),cc.rect(15,10,136,64)):addTo(self.bg):align(display.LEFT_CENTER, 42, 56)
- 	local honour_icon = display.newSprite("honour_128x128.png"):align(display.LEFT_CENTER, -12, 15):scale(0.48):addTo(honour_bg):scale(0.5)
+ 	local honour_icon = display.newSprite("honour_128x128.png"):align(display.LEFT_CENTER, -12, 15):scale(0.48):addTo(honour_bg):scale(0.35)
 
  	local gems_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(130,30),cc.rect(15,10,136,64)):addTo(self.bg):align(display.LEFT_CENTER, honour_bg:getPositionX()+130+26, 56)
  	local gems_icon = display.newSprite("gem_icon_62x61.png"):align(display.LEFT_CENTER, -12, 15):addTo(gems_bg):scale(0.7)
@@ -187,7 +187,7 @@ function GameUISettingServer:GetItemContent()
 		text = "HIGH",
 		size = 20,
 		color= 0x970000
-	}):align(display.LEFT_BOTTOM, 198, 48):addTo(content)
+	}):align(display.LEFT_BOTTOM, desc_label:getContentSize().width + desc_label:getPositionX() + 10, 48):addTo(content)
 	local here_label = UIKit:ttfLabel({
 		text = _("你在这儿"),
 		size = 20,

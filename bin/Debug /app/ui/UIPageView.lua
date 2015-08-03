@@ -683,7 +683,7 @@ function UIPageView:scrollAuto()
     end
 
     if dis > 0 then
-        if bChange then
+        if bChange and pageL then
             transition.moveTo(page,
                 {x = pageRX, y = posY, time = 0.3,
                     onComplete = function()
@@ -706,7 +706,7 @@ function UIPageView:scrollAuto()
             end
         end
     else
-        if bChange then
+        if bChange and pageR then
             transition.moveTo(page,
                 {x = pageLX, y = posY, time = 0.3,
                     onComplete = function()

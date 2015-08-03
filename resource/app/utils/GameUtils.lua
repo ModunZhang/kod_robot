@@ -91,12 +91,12 @@ function GameUtils:formatTimeAsTimeAgoStyle( time )
     elseif(time == 3600) then
         timeText = string.format(_("%d小时前"), 1)
     elseif(time < 86400) then
-        time = math.ceil(time / 3600)
+        time = math.floor(time / 3600)
         timeText = string.format(_("%d小时前"), time)
     elseif(time == 86400) then
         timeText = string.format(_("%d天前"), 1)
     else
-        time = math.ceil(time / 86400)
+        time = math.floor(time / 86400)
         timeText = string.format(_("%d天前"), time)
     end
 
@@ -270,6 +270,19 @@ function GameUtils:Translate(text,cb)
 end
 
 
+-- get method
+function GameUtils:PingBaidu(callback)
+    local request = network.createHTTPRequest(function(event)
+        if event.name == "completed" then
+            callback(true)
+        elseif eventName == "failed" then
+            callback(false)
+        end
+    end, "http://www.baidu.com", "GET")
+    request:setTimeout(180)
+    request:start()
+end
+
 --ver 2.2.4
 --TODO:return po文件对应的语言代码！
 function GameUtils:getCurrentLanguage()
@@ -291,24 +304,29 @@ function GameUtils:getCurrentLanguage()
     }
     return mapping[cc.Application:getInstance():getCurrentLanguage() + 1]
 end
-
+local apple_lang_map = {
+    ['zh-Hans'] = 'cn',
+    ['zh-Hant'] = 'tw',
+    ['en'] = 'en',
+}
+local lang_map = {
+    cn = { po = 'zh_CN', code = 'cn' },
+    tw = { po = 'zh_TW', code = 'tw' },
+    en = { po = 'en', code = 'en' },
+}
 function GameUtils:GetAppleLanguageCode()
     local code = ext.getDeviceLanguage()
-    if 'zh-Hans' == code then
-        return 'cn'
-    elseif 'zh-Hant' == code then
-        return 'tw'
+    if apple_lang_map[code] then
+        return apple_lang_map[code]
     else
         return 'tw'
     end
 end
-
 function GameUtils:GetPoFileLanguageCode(language_code)
     local currentLanguage = language_code or self:getCurrentLanguage()
-    if language_code == 'cn' then
-        return "zh_CN",'cn'
-    elseif language_code == 'tw' then
-        return "zh_TW",'tw'
+    if lang_map[language_code] then
+        local t = lang_map[language_code]
+        return t.po, t.code
     else
         return "zh_TW",'tw'
     end
@@ -432,6 +450,12 @@ function GameUtils:formatTimeStyleDayHour(time,min_day)
     else
         return GameUtils:formatTimeStyle1(time)
     end
+end
+
+function GameUtils:LoadImagesWithFormat(func, format)
+    cc.Texture2D:setDefaultAlphaPixelFormat(format or cc.TEXTURE2D_PIXEL_FORMAT_RGBA8888)
+    func()
+    cc.Texture2D:setDefaultAlphaPixelFormat(cc.TEXTURE2D_PIXEL_FORMAT_RGBA8888)
 end
 
 

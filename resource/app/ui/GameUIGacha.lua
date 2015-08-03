@@ -433,6 +433,7 @@ function GameUIGacha:InitOrdinary()
                         item_name = "casinoTokenClass_1"
                     }):AddToCurrentScene()
                 else
+                    local clone_items = clone(ItemManager:GetItems())
                     NetManager:getNormalGachaPromise():done(function(response)
                         if response.msg.playerData then
                             local data = response.msg.playerData
@@ -441,12 +442,7 @@ function GameUIGacha:InitOrdinary()
                                 local key = string.split(v[1], ".")[1]
                                 if key == "items" then
                                     items[1] = v[2].name
-                                    local count
-                                    for __,gacha_config in ipairs(NORMAL) do
-                                        if gacha_config.itemName == v[2].name then
-                                            count = gacha_config.itemCount
-                                        end
-                                    end
+                                    local count = clone_items[v[2].name]:Count() > 0 and v[2].count - clone_items[v[2].name]:Count() or v[2].count
                                     items[2] = count
                                 end
                             end
@@ -629,6 +625,14 @@ function GameUIGacha:OnCountInfoChanged()
         }):addTo(button,1,112):align(display.CENTER,0,-12)
     end
 end
+
+
+function GameUIGacha:onCleanup()
+    GameUIGacha.super.onCleanup(self)
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("background_gacha_1.jpg")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("background_gacha_2.jpg")
+end
+
 return GameUIGacha
 
 

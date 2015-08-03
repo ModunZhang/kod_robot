@@ -40,28 +40,33 @@ function PVEMap:ctor(database, index)
     self.database = database
 end
 function PVEMap:LoadProperty()
-    local pve_layer = cc.TMXTiledMap:create(self:GetFileName()):getLayer("layer1")
-    local size = pve_layer:getLayerSize()
-    local total_objects = 0
-    for x = 0, size.width - 1 do
-        for y = 0, size.height - 1 do
-            local point = cc.p(x, y)
-            local gid = (pve_layer:getTileGIDAt(point))
-            if gid > 0 then
-                total_objects = total_objects + PVEObject:TotalByType(gid)
-                if gid == PVEDefine.START_AIRSHIP then
-                    self.start_point = point
-                elseif gid == PVEDefine.ENTRANCE_DOOR then
-                    self.end_point = point
+    GameUtils:LoadImagesWithFormat(function()
+        local pve_layer = cc.TMXTiledMap:create(self:GetFileName()):getLayer("layer1")
+        local size = pve_layer:getLayerSize()
+        local total_objects = 0
+        for x = 0, size.width - 1 do
+            for y = 0, size.height - 1 do
+                local point = cc.p(x, y)
+                local gid = (pve_layer:getTileGIDAt(point))
+                if gid > 0 then
+                    total_objects = total_objects + PVEObject:TotalByType(gid)
+                    if gid == PVEDefine.START_AIRSHIP then
+                        self.start_point = point
+                    elseif gid == PVEDefine.ENTRANCE_DOOR then
+                        self.end_point = point
+                    end
                 end
             end
         end
-    end
-    pve_layer:removeFromParent()
-    self.width = size.width
-    self.height = size.height
-    self.total_objects = total_objects
-    self.fogs = BitBaseN.new(self.width * self.height)
+        pve_layer:removeFromParent()
+        self.width = size.width
+        self.height = size.height
+        self.total_objects = total_objects
+        self.fogs = BitBaseN.new(self.width * self.height)
+
+        display.removeSpriteFrameByImageName(imageName)
+        -- res/tmxmaps/edit.png
+    end, cc.TEXTURE2_D_PIXEL_FORMAT_A8)
     return self
 end
 function PVEMap:Name()
@@ -237,6 +242,7 @@ function PVEMap:DumpObjects()
 end
 
 return PVEMap
+
 
 
 

@@ -21,7 +21,7 @@ function GameUIUnlockBuilding:ctor( city, tile )
     self:setNodeEventEnabled(true)
     self:Init()
     self.city:GetResourceManager():AddObserver(self)
-    
+
     self.__type  = UIKit.UITYPE.BACKGROUND
 end
 function GameUIUnlockBuilding:OnResourceChanged(resource_manager)
@@ -45,13 +45,13 @@ function GameUIUnlockBuilding:Init()
     self.building_image = display.newScale9Sprite(build_png, display.cx-197, display.top-245):addTo(self)
     self.building_image:setAnchorPoint(cc.p(0.5,0.5))
     self.building_image:setScale(124/self.building_image:getContentSize().width)
-    
+
     local configs = SpriteConfig[self.building:GetType()]:GetAnimationConfigsByLevel(1)
     local p = self.building_image:getAnchorPointInPoints()
     for _,v in ipairs(configs) do
         if v.deco_type == "image" then
             display.newSprite(v.deco_name):addTo(self.building_image)
-            :pos(p.x + v.offset.x, p.y + v.offset.y)
+                :pos(p.x + v.offset.x, p.y + v.offset.y)
         elseif v.deco_type == "animation" then
             local offset = v.offset
             local armature = ccs.Armature:create(v.deco_name)
@@ -148,9 +148,9 @@ function GameUIUnlockBuilding:Init()
 end
 
 function GameUIUnlockBuilding:InitBuildingIntroduces()
-  local title_bg = display.newScale9Sprite("title_blue_430x30.png", display.cx-110, display.top-214,cc.size(380,30),cc.rect(15,10,400,10))
-           :align(display.LEFT_CENTER)
-           :addTo(self)
+    local title_bg = display.newScale9Sprite("title_blue_430x30.png", display.cx-110, display.top-214,cc.size(380,30),cc.rect(15,10,400,10))
+        :align(display.LEFT_CENTER)
+        :addTo(self)
     self.building_name = UIKit:ttfLabel({
         size = 24,
         color = 0xffedae
@@ -265,35 +265,49 @@ end
 
 function GameUIUnlockBuilding:PopNotSatisfyDialog(listener,can_not_update_type)
     local dialog = UIKit:showMessageDialog()
+    local required_gems =self.building:getUpgradeRequiredGems()
+    local owen_gem = City:GetUser():GetGemResource():GetValue()
     if can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.RESOURCE_NOT_ENOUGH then
-        local required_gems =self.building:getUpgradeRequiredGems()
-        local owen_gem = City:GetUser():GetGemResource():GetValue()
-        if owen_gem<required_gems then
-            dialog:SetTitle(_("提示"))
-            dialog:SetPopMessage(UpgradeBuilding.NOT_ABLE_TO_UPGRADE.GEM_NOT_ENOUGH)
-        else
-            dialog:CreateOKButton(
-                {
-                    listener = function()
-                        listener()
-                    end
-                }
-            )
-            dialog:SetTitle(_("补充资源"))
-            dialog:SetPopMessage(_("您当前没有足够的资源,是否花费魔法石立即补充"))
-            dialog:CreateNeeds({value = required_gems})
-        end
-    elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.BUILDINGLIST_NOT_ENOUGH then
-        local required_gems =self.building:getUpgradeRequiredGems()
-        dialog:CreateOKButton(
+        dialog:CreateOKButtonWithPrice(
             {
                 listener = function()
-                    listener()
-                end
-            })
+                    if owen_gem<required_gems then
+                        UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
+                            {
+                                listener = function ()
+                                    UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                end,
+                                btn_name= _("前往商店")
+                            })
+                    else
+                        listener()
+                    end
+                end,
+                price = required_gems
+            }
+        ):CreateCancelButton()
+        dialog:SetTitle(_("补充资源"))
+        dialog:SetPopMessage(_("您当前没有足够的资源,是否花费魔法石立即补充"))
+    elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.BUILDINGLIST_NOT_ENOUGH then
+        dialog:CreateOKButtonWithPrice(
+            {
+                listener = function()
+                    if owen_gem<required_gems then
+                        UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
+                            {
+                                listener = function ()
+                                    UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                end,
+                                btn_name= _("前往商店")
+                            })
+                    else
+                        listener()
+                    end
+                end,
+                price = required_gems
+            }):CreateCancelButton()
         dialog:SetTitle(_("立即开始"))
         dialog:SetPopMessage(_("您当前没有空闲的建筑,是否花费魔法石立即完成上一个队列"))
-        dialog:CreateNeeds({value = required_gems})
     elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.GEM_NOT_ENOUGH then
         dialog:SetTitle(_("提示"))
             :SetPopMessage(can_not_update_type)
@@ -303,6 +317,22 @@ function GameUIUnlockBuilding:PopNotSatisfyDialog(listener,can_not_update_type)
                     self:LeftButtonClicked()
                 end
             })
+    elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.IS_MAX_UNLOCK then
+        dialog:SetTitle(_("提示"))
+        dialog:SetPopMessage(can_not_update_type)
+        dialog:CreateOKButton(
+            {
+                listener = function()
+                    local building_sprite = display.getRunningScene():GetSceneLayer():FindBuildingSpriteByBuilding(self.city:GetFirstBuildingByType("keep"), self.city)
+                    local x,y = self.city:GetFirstBuildingByType("keep"):GetMidLogicPosition()
+                    display.getRunningScene():GotoLogicPoint(x,y,40):next(function()
+                        display.getRunningScene():AddIndicateForBuilding(building_sprite)
+                    end)
+                    self:LeftButtonClicked()
+                end,
+                btn_name= _("前往")
+            }
+        )
     else
         dialog:SetTitle(_("提示"))
         dialog:SetPopMessage(can_not_update_type)
@@ -338,7 +368,7 @@ function GameUIUnlockBuilding:PormiseOfFte()
 
     local str = string.format(_("点击解锁新建筑：%s"), Localize.building_name[self.building:GetType()])
     self:GetFteLayer().arrow = WidgetFteArrow.new(str):addTo(self:GetFteLayer())
-    :TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
+        :TurnRight():align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
 
 
     return self.city:PromiseOfUpgradingByLevel(self.building:GetType())
@@ -346,6 +376,12 @@ end
 
 
 return GameUIUnlockBuilding
+
+
+
+
+
+
 
 
 

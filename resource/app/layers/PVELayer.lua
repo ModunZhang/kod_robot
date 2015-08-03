@@ -45,20 +45,30 @@ function PVELayer:ctor(scene, user)
     self.pve_listener = Observer.new()
     self.user = user
     self.pve_map = user:GetCurrentPVEMap()
-    self.pve_layer = cc.TMXTiledMap:create(self.pve_map:GetFileName()):addTo(self):hide():getLayer("layer1")
+
+    GameUtils:LoadImagesWithFormat(function()
+        self.pve_layer = cc.TMXTiledMap:create(self.pve_map:GetFileName())
+            :addTo(self):hide():getLayer("layer1")
+    end, cc.TEXTURE2_D_PIXEL_FORMAT_A8)
+
     local size = self.pve_layer:getLayerSize()
     local w, h = size.width, size.height
 
     self.scene_node = display.newNode():addTo(self)
 
-    self.background = cc.TMXTiledMap:create(
-        string.format("tmxmaps/pve_background_%s_%dx%d.tmx",
-            self.pve_map:Terrain(), w, h)
-    ):addTo(self.scene_node, ZORDER.BACKGROUND)
+    GameUtils:LoadImagesWithFormat(function()
+        self.background = cc.TMXTiledMap:create(
+            string.format("tmxmaps/pve_background_%s_%dx%d.tmx",
+                self.pve_map:Terrain(), w, h)
+        ):addTo(self.scene_node, ZORDER.BACKGROUND)
+    end, cc.TEXTURE2_D_PIXEL_FORMAT_RGB5_A1)
 
-    self.war_fog_layer = cc.TMXTiledMap:create(
-        string.format("tmxmaps/pve_fog_%dx%d.tmx", w, h)
-    ):addTo(self.scene_node, ZORDER.FOG):pos(-80, -80):getLayer("layer1")
+
+    GameUtils:LoadImagesWithFormat(function()
+        self.war_fog_layer = cc.TMXTiledMap:create(
+            string.format("tmxmaps/pve_fog_%dx%d.tmx", w, h)
+        ):addTo(self.scene_node, ZORDER.FOG):pos(-80, -80):getLayer("layer1")
+    end, cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A4444)
 
     self.building_layer = display.newNode():addTo(self.scene_node, ZORDER.BUILDING)
     self.object_layer = display.newNode():addTo(self.scene_node, ZORDER.OBJECT)
@@ -178,8 +188,8 @@ function PVELayer:SetObjectStatus(object)
             local x,y = unpack(offset_map[object:Type()])
             local size1 = sprite:getContentSize()
             local flag = display.newSprite("pve_icon_flag.png")
-            :align(display.BOTTOM_RIGHT, x, y):scale(1.5)
-            :addTo(sprite, 10)
+                :align(display.BOTTOM_RIGHT, x, y):scale(1.5)
+                :addTo(sprite, 10)
         end
     end
 end
@@ -205,8 +215,8 @@ function PVELayer:PromiseOfTrap()
     local exclamation_scale = 1
     local exclamation = display.newSprite("exclamation.png")
         :addTo(self.top_layer):pos(lp.x, lp.y):scale(0)
-        
-    local p = promise.new()        
+
+    local p = promise.new()
     self.char:runAction(transition.sequence({
         cc.RotateBy:create(t, r),
         cc.RotateBy:create(t, -r),
@@ -339,6 +349,8 @@ function PVELayer:GotoLogicPoint(x, y, s)
 end
 
 return PVELayer
+
+
 
 
 

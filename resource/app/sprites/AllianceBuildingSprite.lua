@@ -1,7 +1,7 @@
 local UILib = import("..ui.UILib")
 local Localize = import("..utils.Localize")
-local Sprite = import(".Sprite")
-local AllianceBuildingSprite = class("AllianceBuildingSprite", Sprite)
+local WithInfoSprite = import(".WithInfoSprite")
+local AllianceBuildingSprite = class("AllianceBuildingSprite", WithInfoSprite)
 
 local building_map = {
     palace = {UILib.alliance_building.palace, 1},
@@ -18,14 +18,9 @@ local other_building_map = {
     moonGate = {UILib.other_alliance_building.moonGate, 1},
 }
 function AllianceBuildingSprite:ctor(city_layer, entity, is_my_alliance)
-    self:setNodeEventEnabled(true)
-    self.is_my_alliance = is_my_alliance
-    local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
-    AllianceBuildingSprite.super.ctor(self, city_layer, entity, x, y)   
+    AllianceBuildingSprite.super.ctor(self, city_layer, entity, is_my_alliance)   
     self:CheckEventIf(true)
-    -- self:CreateBase()
 end
-
 function AllianceBuildingSprite:CheckEventIf(yesOrno)
     local entity = self:GetEntity()
     if not entity:GetAlliance():IsDefault() and 
@@ -42,7 +37,6 @@ function AllianceBuildingSprite:CheckEventIf(yesOrno)
         end
     end
 end
-
 function AllianceBuildingSprite:OnShrineEventsChanged()
     self:CheckEvent()
 end
@@ -51,9 +45,7 @@ function AllianceBuildingSprite:OnShrineEventsRefresh()
 end
 function AllianceBuildingSprite:onExit()
     self:CheckEventIf(false)
-    if self.info then
-        self.info:removeFromParent()
-    end
+    AllianceBuildingSprite.super.onExit(self)
 end
 function AllianceBuildingSprite:GetSpriteFile()
     if self.is_my_alliance then
@@ -63,39 +55,20 @@ function AllianceBuildingSprite:GetSpriteFile()
     end
 end
 function AllianceBuildingSprite:GetSpriteOffset()
-    -- return self:GetLogicMap():ConvertToLocalPosition(0, 0)
     return 0, -60
 end
 function AllianceBuildingSprite:RefreshSprite()
     AllianceBuildingSprite.super.RefreshSprite(self)
     self:GetSprite():align(display.BOTTOM_CENTER)
-    if self.info then
-        self.info:removeFromParent()
-        self.info = nil
-    end
-    local map_layer = self:GetMapLayer()
-    local x,y = map_layer:GetLogicMap():ConvertToMapPosition(self:GetEntity():GetLogicPosition())
-    self.info = display.newNode():addTo(map_layer:GetInfoNode()):pos(x, y - 50):scale(0.8):zorder(x * y)
-
-
-    local banners = self.is_my_alliance and UILib.my_city_banner or UILib.enemy_city_banner
-    self.banner = display.newSprite(banners[0]):addTo(self.info):align(display.CENTER_TOP)
-    self.level = UIKit:ttfLabel({
-        size = 22,
-        color = 0xffedae,
-    }):addTo(self.banner):align(display.CENTER, 30, 30)
-    self.name = UIKit:ttfLabel({
-        size = 20,
-        color = 0xffedae,
-    }):addTo(self.banner):align(display.LEFT_CENTER, 60, 32)
-    self:RefreshInfo()
 end
-function AllianceBuildingSprite:RefreshInfo()
+function AllianceBuildingSprite:GetInfo()
     local entity = self:GetEntity()
     local info = entity:GetAllianceBuildingInfo()
-    self.level:setString(info.level)
-    self.name:setString(string.format("[%s]%s", entity:GetAlliance():Tag(), Localize.alliance_buildings[info.name]))
+    return info.level, string.format("[%s]%s", entity:GetAlliance():Tag(), Localize.alliance_buildings[info.name])
 end
+
+
+
 local ANI_TAG = 110
 function AllianceBuildingSprite:CheckEvent()
     if self:GetEntity():GetAllianceBuildingInfo().name == "shrine" then

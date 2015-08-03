@@ -45,7 +45,7 @@ local function HateDragon()
     }
     if not check("HateDragon") then
         mark("HateDragon")
-        ext.market_sdk.onPlayerEvent("孵化", dragon_str)
+        ext.market_sdk.onPlayerEvent("孵化龙", "empty")
     end
 end
 local function DefenceDragon()
@@ -55,7 +55,7 @@ local function DefenceDragon()
     }
     if not check("DefenceDragon") then
         mark("DefenceDragon")
-        ext.market_sdk.onPlayerEvent("驻防", dragon_str)
+        ext.market_sdk.onPlayerEvent("驻防龙", "empty")
     end
 end
 
@@ -90,7 +90,6 @@ local function FinishBuildHouseAt(building_location_id, level)
     local key = string.format("FinishBuildHouseAt_%d_%d", building_location_id, level)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("建造小屋完成", key)
     end
 end
 local function BuildHouseAt(building_location_id, house_location_id, house_type)
@@ -128,7 +127,7 @@ local function BuildHouseAt(building_location_id, house_location_id, house_type)
     local key = string.format("BuildHouseAt_%d_%d", building_location_id, house_location_id)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("建造小屋", key)
+        ext.market_sdk.onPlayerEvent("建造小屋:"..building_location_id.."_"..house_type, "empty")
     end
 end
 local function UpgradeHouseTo(building_location_id, house_location_id, house_type, level)
@@ -158,7 +157,6 @@ local function UpgradeHouseTo(building_location_id, house_location_id, house_typ
     local key = string.format("UpgradeHouseTo_%d_%d_%d", building_location_id, house_location_id, level)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("升级小屋", key)
     end
 end
 local function FinishUpgradingBuilding(type, level)
@@ -195,7 +193,7 @@ local function FinishUpgradingBuilding(type, level)
     local key = string.format("FinishUpgradingBuilding_%s_%d", type, level)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("升级建筑完成", key)
+        ext.market_sdk.onPlayerEvent("升级建筑完成:"..type.."_"..level, "empty")
     end
 end
 local function UpgradeBuildingTo(type, level)
@@ -231,7 +229,7 @@ local function UpgradeBuildingTo(type, level)
     local key = string.format("UpgradeBuildingTo_%s_%d", type, level)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("升级建筑", key)
+        ext.market_sdk.onPlayerEvent("升级建筑:"..type.."_"..level, "empty")
     end
 end
 
@@ -276,7 +274,7 @@ local function RecruitSoldier(type_, count)
     local key = string.format("RecruitSoldier_%s", type_)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("招募士兵", key)
+        ext.market_sdk.onPlayerEvent("招募士兵:"..type_, "empty")
     end
 end
 
@@ -290,7 +288,7 @@ local function InstantRecruitSoldier(name, count)
     local key = string.format("InstantRecruitSoldier_%s", name)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("获得士兵", key)
+        ext.market_sdk.onPlayerEvent("立即招募士兵:"..name, "empty")
     end
 end
 
@@ -305,29 +303,29 @@ local function GetSoldier()
     local key = string.format("GetSoldier")
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("获得士兵", key)
+        ext.market_sdk.onPlayerEvent("获得士兵", "empty")
     end
 end
 
-local function ActiveVip()
-    local start_time = NetManager:getServerTime()
-    mock{
-        {
-            "vipEvents.0",
-            {
-                id = 1,
-                startTime = start_time,
-                finishTime = start_time + 24 * 60 * 60 * 1000
-            }
-        }
-    }
+-- local function ActiveVip()
+--     local start_time = NetManager:getServerTime()
+--     mock{
+--         {
+--             "vipEvents.0",
+--             {
+--                 id = 1,
+--                 startTime = start_time,
+--                 finishTime = start_time + 24 * 60 * 60 * 1000
+--             }
+--         }
+--     }
 
-    local key = string.format("ActiveVip")
-    if not check(key) then
-        mark(key)
-        ext.market_sdk.onPlayerEvent("激活vip", key)
-    end
-end
+--     local key = string.format("ActiveVip")
+--     if not check(key) then
+--         mark(key)
+--         ext.market_sdk.onPlayerEvent("激活vip", key)
+--     end
+-- end
 
 
 
@@ -355,7 +353,7 @@ local function FightWithNpc(floor)
     local key = string.format("FightWithNpc%d", floor)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("探索pve", key)
+        ext.market_sdk.onPlayerEvent("探索pve:"..floor, "empty")
     end
 end
 
@@ -376,7 +374,7 @@ local function FinishTreatSoldier()
     local key = string.format("FinishTreatSoldier")
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("治疗士兵完成", key)
+        ext.market_sdk.onPlayerEvent("治疗士兵完成", "empty")
     end
 end
 
@@ -414,7 +412,7 @@ local function TreatSoldier(type_, count)
     local key = string.format("TreatSoldier")
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("治疗士兵", key)
+        ext.market_sdk.onPlayerEvent("治疗士兵", "empty")
     end
 end
 
@@ -430,7 +428,7 @@ local function FinishResearch()
     local key = string.format("FinishResearch")
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("研发科技完成", key)
+        ext.market_sdk.onPlayerEvent("研发科技完成", "empty")
     end
 end
 
@@ -462,7 +460,7 @@ local function Research()
     local key = string.format("Research")
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("研发科技", key)
+        ext.market_sdk.onPlayerEvent("研发科技", "empty")
     end
 end
 
@@ -471,7 +469,7 @@ local function CheckMaterials()
     local key = string.format("CheckMaterials")
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("查看材料", key)
+        ext.market_sdk.onPlayerEvent("查看材料", "empty")
     end
 end
 
@@ -480,7 +478,7 @@ local function Skip()
     local key = "BuildHouseAt_8_3"
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("跳过", key)
+        ext.market_sdk.onPlayerEvent("跳过引导", "empty")
     end
 end
 

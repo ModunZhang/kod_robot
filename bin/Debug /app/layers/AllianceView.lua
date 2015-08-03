@@ -1,5 +1,6 @@
 local CitySprite = import("..sprites.CitySprite")
 local VillageSprite = import("..sprites.VillageSprite")
+local MonsterSprite = import("..sprites.MonsterSprite")
 local AllianceDecoratorSprite = import("..sprites.AllianceDecoratorSprite")
 local AllianceBuildingSprite = import("..sprites.AllianceBuildingSprite")
 local memberMeta = import("..entity.memberMeta")
@@ -45,6 +46,7 @@ end
 local TILE_WIDTH = 160
 function AllianceView:ctor(layer, alliance, logic_base_x, logic_base_y)
     Observer.extend(self)
+    self.monster_refresh = display.newNode():addTo(self)
     self.layer = layer
     self.alliance = alliance
     self.objects = {}
@@ -147,6 +149,9 @@ function AllianceView:GetZOrderBy(sprite, x, y)
     local width, _ = self:GetLogicMap():GetSize()
     return x + y * width + 100
 end
+function AllianceView:GetMapObjectById(id)
+    return self.objects[id]
+end
 function AllianceView:GetMapObjects()
     return self.objects
 end
@@ -173,13 +178,13 @@ function AllianceView:RefreshBuildings(alliance_map)
     self:IteratorAllianceObjects(function(_,v) v:removeFromParent() end)
     self.objects = {}
     alliance_map:IteratorAllObjects(function(_, entity)
-        self.objects[entity:Id()] = self:CreateObject(entity)
+        self:CreateObject(entity)
     end)
     self.layer:RefreshAllVillageEvents()
 end
-function AllianceView:OnBuildingDeltaUpdate(allianceMap, deltaMapObjects)
+function AllianceView:OnBuildingDeltaUpdate(allianceMap, deltaMapObjects, old_monsters, new_monsters)
     for _,entity in ipairs(deltaMapObjects.add or {}) do
-        self.objects[entity:Id()] = self:CreateObject(entity)
+        self:CreateObject(entity)
     end
     for _,entity in ipairs(deltaMapObjects.edit or {}) do
     -- todo
@@ -187,6 +192,14 @@ function AllianceView:OnBuildingDeltaUpdate(allianceMap, deltaMapObjects)
     for _,entity in ipairs(deltaMapObjects.remove or {}) do
         self:RemoveEntity(entity)
     end
+    -- 刷新野怪
+    for _,v in pairs(old_monsters or {}) do
+        self:RemoveEntity(v)
+    end
+    for _,v in pairs(new_monsters or {}) do
+        self:CreateObject(v)
+    end
+
     -- 修改位置
     for index,_ in pairs(deltaMapObjects) do
         if type(index) == "number" then
@@ -195,9 +208,21 @@ function AllianceView:OnBuildingDeltaUpdate(allianceMap, deltaMapObjects)
     end
     self.layer:RefreshAllVillageEvents()
 end
+function AllianceView:GenerateMonsters(t)
+    local entity = table.remove(t, 1)
+    if entity then
+        if not self.objects[entity:Id()] then
+            self.monster_refresh:performWithDelay(function()
+                self:GenerateMonsters(t)
+            end, 0.5)
+        end
+    end
+end
 function AllianceView:RefreshEntity(entity)
-    self.objects[entity:Id()]:removeFromParent()
-    self.objects[entity:Id()] = self:CreateObject(entity)
+    if self.objects[entity:Id()] then
+        self.objects[entity:Id()]:removeFromParent()
+    end
+    self:CreateObject(entity)
 end
 function AllianceView:CreateObject(entity)
     local type_ = entity:GetType()
@@ -208,9 +233,14 @@ function AllianceView:CreateObject(entity)
         object = CitySprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
     elseif type_ == "village" then
         object = VillageSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
+    elseif type_ == "monster" then
+        object = MonsterSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
     elseif type_ == "decorate" then
         object = AllianceDecoratorSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
+    else
+        assert(object)
     end
+    self.objects[entity:Id()] = object
     return object
 end
 function AllianceView:RemoveEntity(entity)

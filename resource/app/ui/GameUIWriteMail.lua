@@ -20,12 +20,19 @@ function GameUIWriteMail:ctor(send_type,contacts)
     local r_size = write_mail:getContentSize()
 
     -- 收件人
-    self.addressee_title_label = UIKit:ttfLabel(
+    UIKit:ttfLabel(
         {
-            text = contacts and _("收件人")..":      "..contacts.name,
+            text =  _("收件人")..":",
             size = 20,
             color = 0x615b44
-        }):align(display.LEFT_CENTER,58, r_size.height-70)
+        }):align(display.RIGHT_CENTER,120, r_size.height-70)
+        :addTo(write_mail)
+    self.addressee_title_label = UIKit:ttfLabel(
+        {
+            text = contacts and contacts.name,
+            size = 20,
+            color = 0x615b44
+        }):align(display.LEFT_CENTER,150, r_size.height-70)
         :addTo(write_mail)
     -- 主题
     local subject_title_label = cc.ui.UILabel.new(
@@ -123,7 +130,7 @@ end
 
 -- -- 收件人ID
 function GameUIWriteMail:SetAddressee( addressee )
-    self.addressee_title_label:setString( _("收件人")..":      "..addressee)
+    self.addressee_title_label:setString(addressee)
     return self
 end
 -- 邮件主题

@@ -163,9 +163,10 @@ end
 function CommonUpgradeUI:InitBuildingIntroduces()
     self.building_introduces = UIKit:ttfLabel({
         size = 18,
-        dimensions = cc.size(380, 90),
+        dimensions = cc.size(380, 0),
         color = 0x615b44
-    }):align(display.LEFT_CENTER,display.cx-110, display.top-190):addTo(self)
+    }):align(display.LEFT_TOP,display.cx-110, display.top-150):addTo(self)
+
     self:SetBuildingIntroduces()
 end
 function CommonUpgradeUI:SetBuildingIntroduces()
@@ -184,16 +185,11 @@ function CommonUpgradeUI:InitNextLevelEfficiency()
     }):align(display.CENTER,bg_size.width/2,bg_size.height/2):addTo(bg)
 
     local efficiency_bg = display.newSprite("back_ground_398x97.png", window.cx+74, window.top-310):addTo(self)
+    self.intro_list = UIListView.new({
+        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
+        viewRect = cc.rect(10,8,380,80),
+    }):addTo(efficiency_bg)
 
-    local efficiency_bg_size = efficiency_bg:getContentSize()
-    self.efficiency = UIKit:ttfLabel({
-        size = 20,
-        dimensions = cc.size(370,0),
-        valign = cc.ui.UILabel.TEXT_VALIGN_CENTER,
-        align = cc.ui.UILabel.TEXT_ALIGN_CENTER,
-        color = 0x403c2f
-    }):addTo(efficiency_bg):align(display.LEFT_CENTER)
-    self.efficiency:pos(14,efficiency_bg_size.height/2)
     self:SetUpgradeEfficiency()
 end
 
@@ -221,12 +217,21 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
     elseif self.building:GetType()=="warehouse" then
         local additon = building:GetResourceNextLevelValueLimit()-building:GetResourceValueLimit()
         if additon>0 then
-            efficiency = string.format("%s%d,",bd.warehouse_max,additon)
+            efficiency = string.format("%s+%d,",bd.warehouse_max,additon)
         end
     elseif self.building:GetType()=="toolShop" then
         local additon = building:GetNextLevelProduction()-building:GetProduction()
         if additon>0 then
-            efficiency = string.format("%s+%d%s,",bd.poduction,additon,bd.poduction_1)
+            efficiency = string.format("%s+%d,",bd.poduction,additon)
+        end
+        local additon = building:GetNextLevelProductionType()-building:GetProductionType()
+        if additon>0 then
+            efficiency = efficiency..string.format(_("一次随机制造种类+%d,"),additon)
+        end
+        if self.building:GetLevel() == 39 then
+            efficiency = efficiency .. string.format(_("制造材料资源消耗降低%.1f%%,"),1.0)
+        else
+            efficiency = efficiency .. string.format(_("制造材料资源消耗降低%.1f%%,"),0.5)
         end
     elseif self.building:GetType()=="materialDepot" then
         local additon = building:GetNextLevelMaxMaterial()-building:GetMaxMaterial()
@@ -303,7 +308,7 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
         if addtion>0 then
             efficiency = string.format("%s+%d,",bd.dwelling_citizen,addtion)
         end
-         local addtion = building:GetNextLevelProductionPerHour()-building:GetProductionPerHour()
+        local addtion = building:GetNextLevelProductionPerHour()-building:GetProductionPerHour()
         if addtion>0 then
             efficiency = efficiency..string.format("%s+%d,",bd.dwelling_poduction,addtion)
         end
@@ -366,34 +371,49 @@ function CommonUpgradeUI:SetUpgradeEfficiency()
         local eff = self.building:GetEfficiency()
         local next_eff = self.building:GetNextLevelEfficiency()
         if next_eff - eff > 0 then
-            efficiency = string.format(_("步兵招募速度+%d%%,"),(next_eff - eff) * 100)
+            efficiency = string.format(_("步兵招募速度+%.0f%%,"),(next_eff - eff) * 100)
         end
     elseif self.building:GetType()=="stable" then
         local eff = self.building:GetEfficiency()
         local next_eff = self.building:GetNextLevelEfficiency()
         if next_eff - eff > 0 then
-            efficiency = string.format(_("骑兵招募速度+%d%%,"),(next_eff - eff) * 100)
+            efficiency = string.format(_("骑兵招募速度+%.0f%%,"),(next_eff - eff) * 100)
         end
     elseif self.building:GetType()=="hunterHall" then
         local eff = self.building:GetEfficiency()
         local next_eff = self.building:GetNextLevelEfficiency()
         if next_eff - eff > 0 then
-            efficiency = string.format(_("弓手招募速度+%d%%,"),(next_eff - eff) * 100)
+            efficiency = string.format(_("弓手招募速度+%.0f%%,"),(next_eff - eff) * 100)
         end
     elseif self.building:GetType()=="workshop" then
         local eff = self.building:GetEfficiency()
         local next_eff = self.building:GetNextLevelEfficiency()
         if next_eff - eff > 0 then
-            efficiency = string.format(_("攻城系招募速度+%d%%,"),(next_eff - eff) * 100)
+            efficiency = string.format(_("攻城系招募速度+%.0f%%,"),(next_eff - eff) * 100)
         end
     else
         assert(false,"本地化丢失")
     end
     -- 增加power,每个建筑都有的属性
     efficiency = efficiency ..string.format("%s+%d",bd.power,building:GetNextLevelPower()-building:GetPower())
-    self.efficiency:setString(efficiency)
+    local efficiency_content = UIKit:ttfLabel({
+        text = efficiency,
+        size = 20,
+        dimensions = cc.size(370,0),
+        valign = cc.ui.UILabel.TEXT_VALIGN_CENTER,
+        align = cc.ui.UILabel.TEXT_ALIGN_CENTER,
+        color = 0x403c2f
+    })
+    efficiency_content:setLineBreakWithoutSpace(true)
+    local list = self.intro_list
+    list:removeAllItems()
+    local item = list:newItem()
+    item:setItemSize(370, efficiency_content:getContentSize().height)
+    item:addContent(efficiency_content)
+    list:addItem(item)
+    list:reload()
     if self.building:GetNextLevel() == self.building:GetLevel() then
-        self.efficiency:getParent():setVisible(false)
+        list:getParent():setVisible(false)
     end
 end
 
@@ -413,29 +433,41 @@ function CommonUpgradeUI:InitUpgradePart()
             style = UIKit.BTN_COLOR.GREEN,
             labelParams = {text = _("立即升级")},
             listener = function ()
-                local upgrade_listener = function()
-                    if self.building:GetType()=="tower" then
-                        NetManager:getInstantUpgradeTowerPromise()
-                    elseif self.building:GetType()=="wall" then
-                        NetManager:getInstantUpgradeWallByLocationPromise()
-                    else
-                        if City:IsFunctionBuilding(self.building) then
-
-                            local location_id = City:GetLocationIdByBuilding(self.building)
-                            NetManager:getInstantUpgradeBuildingByLocationPromise(location_id)
+                local commend = function ()
+                    local upgrade_listener = function()
+                        if self.building:GetType()=="tower" then
+                            NetManager:getInstantUpgradeTowerPromise()
+                        elseif self.building:GetType()=="wall" then
+                            NetManager:getInstantUpgradeWallByLocationPromise()
                         else
-                            local tile = City:GetTileWhichBuildingBelongs(self.building)
-                            local house_location = tile:GetBuildingLocation(self.building)
-                            NetManager:getInstantUpgradeHouseByLocationPromise(tile.location_id, house_location)
+                            if City:IsFunctionBuilding(self.building) then
+
+                                local location_id = City:GetLocationIdByBuilding(self.building)
+                                NetManager:getInstantUpgradeBuildingByLocationPromise(location_id)
+                            else
+                                local tile = City:GetTileWhichBuildingBelongs(self.building)
+                                local house_location = tile:GetBuildingLocation(self.building)
+                                NetManager:getInstantUpgradeHouseByLocationPromise(tile.location_id, house_location)
+                            end
                         end
+                    end
+
+                    local can_not_update_type = self.building:IsAbleToUpgrade(true)
+                    if can_not_update_type then
+                        self:PopNotSatisfyDialog(upgrade_listener,can_not_update_type)
+                    else
+                        upgrade_listener()
                     end
                 end
 
-                local can_not_update_type = self.building:IsAbleToUpgrade(true)
-                if can_not_update_type then
-                    self:PopNotSatisfyDialog(upgrade_listener,can_not_update_type)
+                if app:GetGameDefautlt():IsOpenGemRemind() then
+                    UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),
+                        string.formatnumberthousands(self.building:getUpgradeNowNeedGems())
+                    ), function()
+                        commend()
+                    end,true,true)
                 else
-                    upgrade_listener()
+                    commend()
                 end
             end,
         }
@@ -641,7 +673,7 @@ function CommonUpgradeUI:InitAccelerationPart()
     -- 正在升级文本说明
     cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = string.format(_("正在升级 %s 到等级 %d"),Localize.getBuildingLocalizedKeyByBuildingType(self.building:GetType()),self.building:GetLevel()+1),
+        text = string.format(_("正在升级 %s 到等级 %d"),Localize.building_name[self.building:GetType()],self.building:GetLevel()+1),
         font = UIKit:getFontFilePath(),
         size = 22,
         color = UIKit:hex2c3b(0x403c2f)
@@ -712,8 +744,10 @@ function CommonUpgradeUI:CreateFreeSpeedUpBuildingUpgradeButton()
         }))
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                local eventType = self.building:EventType()
-                NetManager:getFreeSpeedUpPromise(eventType,self.building:UniqueUpgradingKey())
+                if self.building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 2 then
+                    local eventType = self.building:EventType()
+                    NetManager:getFreeSpeedUpPromise(eventType,self.building:UniqueUpgradingKey())
+                end
             end
         end):align(display.CENTER, display.cx+194, display.top - 435):addTo(self.acc_layer)
     local building = self.building
@@ -762,56 +796,112 @@ end
 
 function CommonUpgradeUI:PopNotSatisfyDialog(listener,can_not_update_type)
     local dialog = UIKit:showMessageDialog()
+    local required_gems =self.building:getUpgradeRequiredGems()
+    local owen_gem = City:GetUser():GetGemResource():GetValue()
     if can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.RESOURCE_NOT_ENOUGH then
-        local required_gems =self.building:getUpgradeRequiredGems()
-        local owen_gem = City:GetUser():GetGemResource():GetValue()
         dialog:SetTitle(_("补充资源"))
         dialog:SetPopMessage(_("您当前没有足够的资源,是否花费魔法石立即补充"))
-
-        if owen_gem<required_gems then
-            dialog:CreateNeeds({value = required_gems,color =0x7e0000})
-            dialog:CreateOKButton(
+        dialog:CreateOKButtonWithPrice(
+            {
+                listener = function()
+                    if owen_gem<required_gems then
+                        UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
+                            {
+                                listener = function ()
+                                    UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                end,
+                                btn_name= _("前往商店")
+                            })
+                    else
+                        listener()
+                    end
+                end,
+                btn_images = {normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"},
+                price = required_gems
+            }
+        ):CreateCancelButton()
+    elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.BUILDINGLIST_NOT_ENOUGH then
+        if City:BuildQueueCounts() == 2 then
+            dialog:CreateOKButtonWithPrice(
                 {
                     listener = function()
-                        UIKit:newGameUI('GameUIStore'):AddToCurrentScene(true)
-                        self:getParent():getParent():LeftButtonClicked()
-                    end
+                        if owen_gem<required_gems then
+                            UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
+                                {
+                                    listener = function ()
+                                        UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                    end,
+                                    btn_name= _("前往商店")
+                                })
+                        else
+                            listener()
+                        end
+                    end,
+                    btn_images = {normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"},
+                    price = required_gems,
                 }
-            )
+            ):CreateCancelButton()
         else
-            dialog:CreateNeeds({value = required_gems})
-            dialog:CreateOKButton(
+            dialog:CreateOKButtonWithPrice(
                 {
                     listener = function()
                         listener()
-                    end
+                    end,
+                    price = required_gems,
+                    btn_name = _("立即完成")
                 }
-            )
-        end
-    elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.BUILDINGLIST_NOT_ENOUGH then
-        local required_gems = self.building:getUpgradeRequiredGems()
-        dialog:CreateOKButton(
-            {
+            ):CreateCancelButton({
                 listener = function()
-                    listener()
-                end
-            }
-        )
+                    UIKit:newGameUI("GameUIActivityRewardNew",4):AddToCurrentScene(true)
+                end,
+                btn_name = {_("开启"),_("第2队列")},
+                btn_images = {normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"},
+                label_size = 20
+            })
+        end
         dialog:SetTitle(_("立即开始"))
         dialog:SetPopMessage(_("您当前没有空闲的建筑,是否花费魔法石立即完成上一个队列"))
-        dialog:CreateNeeds({value = required_gems})
     elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.BUILDINGLIST_AND_RESOURCE_NOT_ENOUGH then
-        local required_gems = self.building:getUpgradeRequiredGems()
-        dialog:CreateOKButton(
-            {
-                listener = function(sender,type)
-                    listener()
-                end
-            }
-        )
+        if City:BuildQueueCounts() == 2 then
+            dialog:CreateOKButtonWithPrice(
+                {
+                    listener = function()
+                        if owen_gem<required_gems then
+                            UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
+                                {
+                                    listener = function ()
+                                        UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                    end,
+                                    btn_name= _("前往商店")
+                                })
+                        else
+                            listener()
+                        end
+                    end,
+                    btn_images = {normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"},
+                    price = required_gems
+                }
+            ):CreateCancelButton()
+        else
+            dialog:CreateOKButtonWithPrice(
+                {
+                    listener = function()
+                        listener()
+                    end,
+                    price = required_gems,
+                    btn_name = _("立即完成")
+                }
+            ):CreateCancelButton({
+                listener = function()
+                    UIKit:newGameUI("GameUIActivityRewardNew",4):AddToCurrentScene(true)
+                end,
+                btn_name = {_("开启"),_("第2队列")},
+                btn_images = {normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"},
+                label_size = 20
+            })
+        end
         dialog:SetTitle(_("立即开始"))
         dialog:SetPopMessage(can_not_update_type)
-        dialog:CreateNeeds({value = required_gems})
     elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.PRE_CONDITION then
         local jump_building = self.building:GetPreConditionBuilding()
         if tolua.type(jump_building) == "string" then
@@ -855,7 +945,7 @@ function CommonUpgradeUI:PopNotSatisfyDialog(listener,can_not_update_type)
                 }
             )
         end
-    elseif can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.GEM_NOT_ENOUGH then
+    elseif can_not_update_type == UpgradeBuilding.NOT_ABLE_TO_UPGRADE.GEM_NOT_ENOUGH then
         dialog:SetTitle(_("提示"))
         dialog:SetPopMessage(can_not_update_type)
         dialog:CreateOKButton(
@@ -874,6 +964,20 @@ function CommonUpgradeUI:PopNotSatisfyDialog(listener,can_not_update_type)
 end
 
 return CommonUpgradeUI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

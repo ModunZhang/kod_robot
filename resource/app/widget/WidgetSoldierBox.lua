@@ -1,5 +1,6 @@
 local UIPushButton = cc.ui.UIPushButton
 local UILib = import("..ui.UILib")
+local StarBar = import("..ui.StarBar")
 local WidgetPushButton = import(".WidgetPushButton")
 local WidgetSoldierBox = class("WidgetSoldierBox", function()
     return display.newNode()
@@ -42,6 +43,18 @@ function WidgetSoldierBox:SetSoldier(soldier_type, star)
         self.soldier = display.newSprite(soldier_ui_config, nil, nil, {class=cc.FilteredSpriteWithOne}):addTo(self.soldier_bg)
             :align(display.CENTER, 0, 20)
         self.soldier:scale(104/self.soldier:getContentSize().height)
+
+        self.soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(self.soldier_bg):align(display.BOTTOM_CENTER,0, -28)
+        display.newSprite("i_icon_20x20.png"):addTo(self.soldier_star_bg):align(display.LEFT_CENTER,0, 11)
+        self.soldier_star = StarBar.new({
+            max = 3,
+            bg = "Stars_bar_bg.png",
+            fill = "Stars_bar_highlight.png",
+            num = star,
+            margin = 5,
+            direction = StarBar.DIRECTION_HORIZONTAL,
+            scale = 0.8,
+        }):addTo(self.soldier_star_bg):align(display.LEFT_CENTER,18, 11)
         display.newSprite("box_soldier_128x128.png"):addTo(self.soldier):align(display.CENTER, self.soldier:getContentSize().width/2, self.soldier:getContentSize().height-64)
     end
     return self
@@ -58,9 +71,11 @@ function WidgetSoldierBox:Enable(b)
     if b then
         self.soldier:clearFilter()
         self.soldier_color_bg:clearFilter()
+        self.soldier_star_bg:show()
     else
         self.soldier:setFilter(filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1}))
         self.soldier_color_bg:setFilter(filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1}))
+        self.soldier_star_bg:hide()
     end
     return self
 end
@@ -87,6 +102,7 @@ function WidgetSoldierBox:SetButtonListener( cb )
 end
 
 return WidgetSoldierBox
+
 
 
 

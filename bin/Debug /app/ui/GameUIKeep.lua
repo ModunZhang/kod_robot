@@ -238,7 +238,7 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
                 aglin = ui.TEXT_ALIGN_LEFT,
                 valign = ui.TEXT_VALIGN_CENTER,
                 dimensions = cc.size(374, 0),
-                color = 0x615b44}):align(display.CENTER_LEFT, -120, -10)
+                color = 0x615b44}):align(display.TOP_LEFT, -120, 30)
             content:addWidget(building_tip)
 
             -- 建筑图片 放置区域左右边框
@@ -348,7 +348,7 @@ function GameUIKeep:CreateChangeTerrainWindow()
                     _("红龙"),
                 },
             }
-            self.terrain_eff_label:setString(string.format(_("%s地形能提升%d%% %s的生命回复速度和额外的力量"),t_name[event.selected][1],intInit.dragonStrengthTerrainAddPercent.value,t_name[event.selected][2]))
+            self.terrain_eff_label:setString(string.format(_("提升%d%% %s的生命回复速度和额外的力量"),intInit.dragonStrengthTerrainAddPercent.value,t_name[event.selected][2]))
 
         end)
         :align(display.CENTER, 80 , 50)
@@ -403,7 +403,7 @@ function GameUIKeep:CreateChangeTerrainWindow()
             size = 20,
             dimensions = cc.size(260,100),
             color = UIKit:hex2c3b(0x615b44)
-        }):align(display.LEFT_TOP, 140, 80)
+        }):align(display.LEFT_TOP, 140, 90)
         :addTo(bg2)
     -- 回复按钮
     local buy_label = cc.ui.UILabel.new({

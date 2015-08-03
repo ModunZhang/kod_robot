@@ -1,64 +1,23 @@
---
--- Author: Danny He
--- Date: 2014-11-28 08:56:14
---
-local Sprite = import(".Sprite")
-local VillageSprite = class("VillageSprite", Sprite)
 local Localize = import("..utils.Localize")
-local UILib = import("..ui.UILib")
 local SpriteConfig = import(".SpriteConfig")
+local WithInfoSprite = import(".WithInfoSprite")
+local VillageSprite = class("VillageSprite", WithInfoSprite)
 
 function VillageSprite:ctor(city_layer, entity, is_my_alliance)
-    self:setNodeEventEnabled(true)
-    self.is_my_alliance = is_my_alliance
-    local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
-    VillageSprite.super.ctor(self, city_layer, entity, x, y)
-    -- self:CreateBase()
-end
-function VillageSprite:onExit()
-    if self.info then
-        self.info:removeFromParent()
-    end
+    VillageSprite.super.ctor(self, city_layer, entity, is_my_alliance)
 end
 function VillageSprite:GetSpriteFile()
-    local village_info = self:VillageInfo()
-    local build_png = SpriteConfig[village_info.name]:GetConfigByLevel(village_info.level).png
-	return build_png
+    local village_info = self:GetEntity():GetAllianceVillageInfo()
+    local config = SpriteConfig[village_info.name]:GetConfigByLevel(village_info.level)
+	return config.png, config.scale
 end
 function VillageSprite:GetSpriteOffset()
 	return self:GetLogicMap():ConvertToLocalPosition(0, 0)
 end
-function VillageSprite:VillageInfo()
-    return self:GetEntity():GetAllianceVillageInfo() 
+function VillageSprite:GetInfo()
+    return self:GetEntity():GetAllianceVillageInfo().level, Localize.village_name[self:GetEntity():GetName()]
 end
-function VillageSprite:RefreshSprite()
-    VillageSprite.super.RefreshSprite(self)
-    if self.info then
-        self.info:removeFromParent()
-        self.info = nil
-    end
 
-    local map_layer = self:GetMapLayer()
-    local x,y = map_layer:GetLogicMap():ConvertToMapPosition(self:GetEntity():GetLogicPosition())
-    self.info = display.newNode():addTo(map_layer:GetInfoNode()):pos(x, y - 50):scale(0.8):zorder(x * y)
-
-    local banners = self.is_my_alliance and UILib.my_city_banner or UILib.enemy_city_banner
-    self.banner = display.newSprite(banners[0]):addTo(self.info):align(display.CENTER_TOP)
-    self.level = UIKit:ttfLabel({
-        size = 22,
-        color = 0xffedae,
-    }):addTo(self.banner):align(display.CENTER, 30, 30)
-    self.name = UIKit:ttfLabel({
-        size = 20,
-        color = 0xffedae,
-    }):addTo(self.banner):align(display.LEFT_CENTER, 60, 32)
-    self:RefreshInfo()
-end
-function VillageSprite:RefreshInfo()
-    local info = self:VillageInfo()
-    self.level:setString(info.level)
-    self.name:setString(Localize.village_name[self:GetEntity():GetName()])
-end
 
 
 ---

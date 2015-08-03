@@ -136,12 +136,12 @@ func_map = {
 api_group_index = 1
 api_index = 1
 function MyApp:RunAI()
-    print("RunAI robot id:", device.getOpenUDID())
+    print("RunAI robot id:", device.getOpenUDID(),running)
     if running then
         running = false
         local group = func_map[api_group_index]
-        group[api_index]()
         print("run func index",api_group_index,api_index)
+        group[api_index]()
         if (api_index + 1) > #group then
             api_group_index = math.random(#func_map)
             api_index = 1

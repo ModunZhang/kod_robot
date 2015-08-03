@@ -2,6 +2,7 @@
 -- Author: Kenny Dai
 -- Date: 2015-01-20 17:51:56
 --
+local StarBar = import("..ui.StarBar")
 local window = import("..utils.window")
 local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetSoldierPromoteDetails = import(".WidgetSoldierPromoteDetails")
@@ -28,9 +29,8 @@ function WidgetPromoteSoliderList:ctor(building)
     local soldiers_star = City:GetSoldierManager():FindSoldierStarByBuildingType(self.building:GetType())
     self.items_list = {}
     self.boxes = {}
-    for k,v in pairs(soldiers_star) do
-        print("WidgetPromoteSoliderList",k,v)
-        self.items_list[k] =  self:CreateItem(k,v)
+    for k,v in ipairs(soldiers_star) do
+        self.items_list[v[1]] =  self:CreateItem(v[1],v[2])
     end
     self.listview:reload()
 end
@@ -118,6 +118,16 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
     local blue_bg = display.newSprite("back_ground_121x122.png", soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
     local soldier_icon = display.newSprite(UILib.soldier_image[soldier_type][index], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
     soldier_icon:scale(124/math.max(soldier_icon:getContentSize().width,soldier_icon:getContentSize().height))
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_icon):align(display.BOTTOM_CENTER,soldier_icon:getContentSize().width/2-16, 0)
+    StarBar.new({
+        max = 3,
+        bg = "Stars_bar_bg.png",
+        fill = "Stars_bar_highlight.png",
+        num = index,
+        margin = 5,
+        direction = StarBar.DIRECTION_HORIZONTAL,
+        scale = 0.8,
+    }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
     if status ~= "unlock" then
         local my_filter = filter
         local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})

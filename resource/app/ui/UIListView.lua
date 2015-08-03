@@ -640,7 +640,20 @@ function UIListView:moveItems(beginIdx, endIdx, x, y, bAni)
         end
     end
 end
-
+--[[
+    @author Kenny Dai
+    将指定index 的 item 显示出来
+]]
+function UIListView:showItemWithPos(idx)
+    local item_width,item_height = self.items_[idx]:getItemSize()
+     if UIScrollView.DIRECTION_VERTICAL == self.direction then
+        self:scrollTo(cc.p(0,self.viewRect_.height - self.items_[idx]:getPositionY() - item_height)) 
+        self:scrollAuto()
+    else
+        self:scrollTo(cc.p(- self.items_[idx]:getPositionX() - item_width,0)) 
+        self:scrollAuto()
+    end
+end
 function UIListView:notifyListener_(event)
     if not self.touchListener_ then
         return

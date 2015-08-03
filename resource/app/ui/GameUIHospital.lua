@@ -168,8 +168,17 @@ function GameUIHospital:CreateHealAllSoldierItem()
             style = UIKit.BTN_COLOR.GREEN,
             labelParams = {text = _("立即治愈")},
             listener = function ()
-                self:TreatNowListener()
-                app:GetAudioManager():PlayeEffectSoundWithKey("INSTANT_TREATE_SOLDIER")
+                if app:GetGameDefautlt():IsOpenGemRemind() then
+                    UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),
+                        string.formatnumberthousands(self.treat_all_now_need_gems)
+                    ), function()
+                        self:TreatNowListener()
+                        app:GetAudioManager():PlayeEffectSoundWithKey("INSTANT_TREATE_SOLDIER")
+                    end,true,true)
+                else
+                    self:TreatNowListener()
+                    app:GetAudioManager():PlayeEffectSoundWithKey("INSTANT_TREATE_SOLDIER")
+                end
             end,
         }
     ):pos(bg_size.width/2-150, 95)
@@ -249,24 +258,27 @@ function GameUIHospital:TreatListener()
                 })
     elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.TREATING_AND_LACK_RESOURCE then
         UIKit:showMessageDialog(_("提示"),_("正在治愈，资源不足"))
-            :CreateOKButton(
+            :CreateOKButtonWithPrice(
                 {
-                    listener = treat_fun
+                    listener = treat_fun,
+                    price = self.building:GetTreatGems(soldiers)
                 }
             )
-            :CreateNeeds({value = self.building:GetTreatGems(soldiers)})
+            :CreateCancelButton()
     elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.LACK_RESOURCE then
         UIKit:showMessageDialog(_("提示"),_("资源不足，是否花费金龙币补足"))
-            :CreateOKButton({
-                listener = treat_fun
+            :CreateOKButtonWithPrice({
+                listener = treat_fun,
+                price = self.building:GetTreatGems(soldiers)
             })
-            :CreateNeeds({value = self.building:GetTreatGems(soldiers)})
+            :CreateCancelButton()
     elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.TREATING then
         UIKit:showMessageDialog(_("提示"),_("正在治愈，是否花费魔法石立即完成"))
-            :CreateOKButton({
-                listener = treat_fun
+            :CreateOKButtonWithPrice({
+                listener = treat_fun,
+                price = self.building:GetTreatGems(soldiers)
             })
-            :CreateNeeds({value = self.building:GetTreatGems(soldiers)})
+            :CreateCancelButton()
     else
         treat_fun()
     end
@@ -309,7 +321,7 @@ function GameUIHospital:SetTreatAllSoldiersNeedResources(params)
             current_value:setColor(UIKit:hex2c4b(params[v][2] < params[v][1] and 0x7e0000 or 0x403c2f))
             need_value:setString("/"..GameUtils:formatNumber(params[v][1]))
             need_value:setPositionX(current_value:getPositionX()+current_value:getContentSize().width)
-             local item_size =cc.size(40 + current_value:getContentSize().width + need_value:getContentSize().width ,30)
+            local item_size =cc.size(40 + current_value:getContentSize().width + need_value:getContentSize().width ,30)
             item:setContentSize(item_size)
         end
     end
@@ -544,6 +556,8 @@ function GameUIHospital:OnResourceChanged(resource_manager)
     })
 end
 return GameUIHospital
+
+
 
 
 

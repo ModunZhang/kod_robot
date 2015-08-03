@@ -449,7 +449,7 @@ function GameUIStrikeReport:CreateEnemyResource()
     local r_list_height = r_count * r_tip_height
 
     -- 敌方资源列表
-    local group = self:CreateSmallBackGround({width=548,height=r_list_height+34,title=_("资源产量"),isSelf=false})
+    local group = self:CreateSmallBackGround({width=548,height=r_list_height+34,title=_("最大可掠夺量"),isSelf=false})
     local group_width , group_height = 546,r_list_height+50
 
     -- 构建所有资源标签项
@@ -491,7 +491,7 @@ function GameUIStrikeReport:CreateEnemyResource()
 end
 function GameUIStrikeReport:GetEnemyResource(resources)
     local unpack_resources = {}
-    for k,v in pairs({"wood","stone","food","iron"}) do
+    for k,v in pairs({"wood","stone","food","iron","coin"}) do
         local va = resources[v]
         table.insert(unpack_resources, {
             resource_type = Localize.fight_reward[v],
@@ -673,7 +673,7 @@ function GameUIStrikeReport:CreateGarrison()
                     color = UIKit:hex2c3b(0x403c2f)
                 }):align(display.RIGHT_CENTER,group_width-30,18):addTo(r_item_bg)
                 StarBar.new({
-                    max = 5,
+                    max = 3,
                     bg = "Stars_bar_bg.png",
                     fill = "Stars_bar_highlight.png",
                     num = r_parms.star,

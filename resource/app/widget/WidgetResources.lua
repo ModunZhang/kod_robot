@@ -25,13 +25,66 @@ function WidgetResources:onEnter()
     self:InitAllResources()
     self.city:GetResourceManager():AddObserver(self)
     self.city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
+    local user = self.city:GetUser()
+    user:AddListenOnType(self, user.LISTEN_TYPE.VIP_EVENT_ACTIVE)
+    user:AddListenOnType(self, user.LISTEN_TYPE.VIP_EVENT_OVER)
+    ItemManager:AddListenOnType(self,ItemManager.LISTEN_TYPE.ITEM_EVENT_CHANGED)
+    local resourceBuildingMap = {
+        wood = "lumbermill",
+        stone = "stoneMason",
+        iron = "foundry",
+        food = "mill"
+    }
+    for k,v in pairs(resourceBuildingMap) do
+        self.city:GetFirstBuildingByType(v):AddUpgradeListener(self)
+    end
 end
 function WidgetResources:onExit()
     self.city:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
     self.city:GetResourceManager():RemoveObserver(self)
+    local user = self.city:GetUser()
+    user:RemoveListenerOnType(self, user.LISTEN_TYPE.VIP_EVENT_ACTIVE)
+    user:RemoveListenerOnType(self, user.LISTEN_TYPE.VIP_EVENT_OVER)
+    ItemManager:RemoveListenerOnType(self,ItemManager.LISTEN_TYPE.ITEM_EVENT_CHANGED)
+    local resourceBuildingMap = {
+        wood = "lumbermill",
+        stone = "stoneMason",
+        iron = "foundry",
+        food = "mill"
+    }
+    for k,v in pairs(resourceBuildingMap) do
+        self.city:GetFirstBuildingByType(v):RemoveUpgradeListener(self)
+    end
+end
+function WidgetResources:OnItemEventChanged()
+    self:RefreshProtectPercent()
+end
+function WidgetResources:OnBuildingUpgradingBegin( bulding )
+end
+function WidgetResources:OnBuildingUpgrading( bulding )
+end
+function WidgetResources:OnBuildingUpgradeFinished( bulding )
+    self:RefreshProtectPercent()
+end
+function WidgetResources:OnVipEventActive( vip_event )
+    self:RefreshProtectPercent()
+end
+function WidgetResources:OnVipEventOver( vip_event )
+    self:RefreshProtectPercent()
 end
 function WidgetResources:OnSoliderCountChanged(...)
     self.maintenance_cost.value:setString("-"..GameUtils:formatNumber(self.city:GetSoldierManager():GetTotalUpkeep()).."/h")
+end
+function WidgetResources:RefreshProtectPercent()
+    if self.resource_items then
+        for k,v in pairs(self.resource_items) do
+            if v.protectPro then
+                local p = DataUtils:GetResourceProtectPercent(v.type) * 100
+                v.protectPro:setPercentage(18)
+                v.protectPro:setPercentage(math.min(v.r_percent,p))
+            end
+        end
+    end
 end
 -- 资源刷新
 function WidgetResources:OnResourceChanged(resource_manager)
@@ -47,12 +100,14 @@ function WidgetResources:OnResourceChanged(resource_manager)
             self:RefreshSpecifyResource(resource_manager:GetResourceByType(k),v,resource_max[k],City:GetCitizenByType(City.RESOURCE_TYPE_TO_BUILDING_TYPE[k]), k)
         end
     end
+    self:RefreshProtectPercent()
 end
 
 local FOOD = ResourceManager.RESOURCE_TYPE.FOOD
 function WidgetResources:RefreshSpecifyResource(resource,item,maxvalue,occupy_citizen, type_)
     if maxvalue then
-        item.ProgressTimer:setPercentage(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())/maxvalue*100)
+        item.r_percent = math.floor(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())/maxvalue*100)
+        item.ProgressTimer:setPercentage(item.r_percent)
         item.resource_label:setString(GameUtils:formatNumber(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())).."/"..GameUtils:formatNumber(maxvalue))
         if type_ == FOOD then
             item.produce_capacity.value:setString(GameUtils:formatNumber(self.city:GetResourceManager():GetFoodProductionPerHour()) .."/h")
@@ -62,12 +117,6 @@ function WidgetResources:RefreshSpecifyResource(resource,item,maxvalue,occupy_ci
         item.occupy_citizen.value:setString(GameUtils:formatNumber(occupy_citizen).."")
     else
         item.resource_label.value:setString(GameUtils:formatNumber(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime())))
-        --  local townHall = self.city:GetFirstBuildingByType("townHall")
-        -- local title_value = townHall:IsInImposing() and _("正在征税") or _("当前没有进行征税")
-        -- item.tax.title:setString(title_value)
-        -- local tax_time = townHall:IsInImposing() and GameUtils:formatTimeStyle1(townHall:GetTaxEvent():LeftTime(app.timer:GetServerTime())) or ""
-        -- item.tax.value:setString(tax_time)
-        -- item.free_citizen.value:setString(self.city:GetResourceManager():GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime()))
     end
 end
 function WidgetResources:CreateResourceListView()
@@ -139,6 +188,7 @@ function WidgetResources:AddResourceItem(parms)
     local total_income = parms.total_income
     local occupy_citizen = parms.occupy_citizen
     local maintenance_cost = parms.maintenance_cost
+    local r_type = parms.type
 
     local item = self.resource_listview:newItem()
     local item_width, item_height = 568,156
@@ -189,13 +239,15 @@ function WidgetResources:AddResourceItem(parms)
         item.ProgressTimer:setBarChangeRate(cc.p(1,0))
         item.ProgressTimer:setMidpoint(cc.p(0,0))
         item.ProgressTimer:align(display.LEFT_BOTTOM, 0, 0):addTo(bar)
-        item.ProgressTimer:setPercentage(resource_current_value/resource_limit_value*100)
+        local r_percent = resource_current_value/resource_limit_value * 100
+        item.r_percent = math.floor(r_percent)
+        item.ProgressTimer:setPercentage(r_percent)
         item.resource_label = UIKit:ttfLabel({
             text = GameUtils:formatNumber(resource_current_value).."/"..GameUtils:formatNumber(resource_limit_value),
             size = 20,
             color = 0xfff3c7,
-        }):addTo(bar):align(display.LEFT_CENTER,10 , bar:getContentSize().height/2)
-
+            shadow = true
+        }):addTo(bar,2):align(display.LEFT_CENTER,10 , bar:getContentSize().height/2)
 
         -- 单位产能
         item.produce_capacity = createTipItem({
@@ -230,7 +282,18 @@ function WidgetResources:AddResourceItem(parms)
             self.maintenance_cost = item.maintenance_cost
             item.maintenance_cost:addTo(content)
         end
-
+        -- 资源保护进度条
+        if r_type ~= "coin" then
+            local progressFill = display.newSprite("tmp_progress_green_bar_348x40_2.png")
+            local progresstimer = cc.ProgressTimer:create(progressFill)
+            progresstimer:setType(display.PROGRESS_TIMER_BAR)
+            progresstimer:setBarChangeRate(cc.p(1,0))
+            progresstimer:setMidpoint(cc.p(0,0))
+            progresstimer:align(display.LEFT_BOTTOM, 0, 1):addTo(bar)
+            local p_percent = DataUtils:GetResourceProtectPercent(r_type) * 100
+            progresstimer:setPercentage(math.min(p_percent,r_percent))
+            item.protectPro = progresstimer
+        end
     else
         -- coin 显示不同信息
         -- 当前coin
@@ -265,9 +328,9 @@ function WidgetResources:AddResourceItem(parms)
 
     WidgetPushButton.new({normal = "button_wareHouseUI_normal.png",pressed = "button_wareHouseUI_pressed.png"})
         :onButtonClicked(function(event)
-        end):align(display.CENTER, c_size.width-32, c_size.height/2):addTo(content)
+            end):align(display.CENTER, c_size.width-32, c_size.height/2):addTo(content)
         :addChild(display.newSprite("add.png"))
-
+    item.type = r_type
     item:addContent(content)
     self.resource_listview:addItem(item)
     self.resource_listview:reload()
@@ -276,6 +339,9 @@ function WidgetResources:AddResourceItem(parms)
 end
 
 return WidgetResources
+
+
+
 
 
 

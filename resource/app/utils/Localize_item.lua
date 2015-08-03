@@ -188,6 +188,7 @@ local ITEM_NAME = {
     vipPoint_2 = string.format(_("%sVIP点数"),string.formatnumberthousands(tonumber(special.vipPoint_2.effect))),
     vipPoint_3 = string.format(_("%sVIP点数"),string.formatnumberthousands(tonumber(special.vipPoint_3.effect))),
     vipPoint_4 = string.format(_("%sVIP点数"),string.formatnumberthousands(tonumber(special.vipPoint_4.effect))),
+    sweepScroll = _("扫荡卷"),
 
     -- speedup
     speedup_1 = string.format(_("%s加速"),formatMin(speedup.speedup_1.effect)),
@@ -348,6 +349,7 @@ local ITEM_DESC= {
     vipPoint_2 = string.format(_("增加%sVIP点数，以提高你的VIP等级"),string.formatnumberthousands(tonumber(special.vipPoint_2.effect))),
     vipPoint_3 = string.format(_("增加%sVIP点数，以提高你的VIP等级"),string.formatnumberthousands(tonumber(special.vipPoint_3.effect))),
     vipPoint_4 = string.format(_("增加%sVIP点数，以提高你的VIP等级"),string.formatnumberthousands(tonumber(special.vipPoint_4.effect))),
+    sweepScroll = _("不发生战斗的情况下，获得关卡的奖励"),
 
     -- speedup
     speedup_1 = string.format(_("将当前事件的剩余时间缩短%s"),formatMin(speedup.speedup_1.effect)),

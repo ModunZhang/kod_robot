@@ -148,6 +148,7 @@ end
 function GameUIAllianceJoinTips:onCleanup()
 	User:RemoveListenerOnType(self, User.LISTEN_TYPE.COUNT_INFO)
 	GameUIAllianceJoinTips.super.onCleanup(self)
+	cc.Director:getInstance():getTextureCache():removeTextureForKey("join_alliance_tips_bg_572x536.jpg")
 end
 
 return GameUIAllianceJoinTips

@@ -78,6 +78,7 @@ GameDatas.AllianceInitData = {
 	["buildingName"] = {},
 	["buildings"] = {},
 	["fightRewards"] = {},
+	["monsters"] = {},
 }
 require("app.datas.AllianceInitData_intInit")
 require("app.datas.AllianceInitData_stringInit")
@@ -87,6 +88,7 @@ require("app.datas.AllianceInitData_shrineStage")
 require("app.datas.AllianceInitData_buildingName")
 require("app.datas.AllianceInitData_buildings")
 require("app.datas.AllianceInitData_fightRewards")
+require("app.datas.AllianceInitData_monsters")
 
 GameDatas.AllianceVillage = {
 	["woodVillage"] = {},
@@ -492,6 +494,13 @@ GameDatas.ProductionTechs = {
 	["productionTechs"] = {},
 }
 require("app.datas.ProductionTechs_productionTechs")
+
+GameDatas.PvE = {
+	["sections"] = {},
+	["stages"] = {},
+}
+require("app.datas.PvE_sections")
+require("app.datas.PvE_stages")
 
 GameDatas.Soldiers = {
 	["normal"] = {},

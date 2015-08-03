@@ -176,9 +176,9 @@ function GameUIShrineReport:GetFightItemContent()
     
     local result_label = UIKit:ttfLabel({
         text = "",
-        size = 20,
+        size = 24,
         align = cc.TEXT_ALIGNMENT_CENTER,
-    }):align(display.CENTER_BOTTOM, 464,66):addTo(content_part)
+    }):align(display.CENTER_BOTTOM, 464,30):addTo(content_part)
     content_part.name_label = name_label
     content_part.kill_label = kill_label
     content_part.result_label = result_label
@@ -195,6 +195,7 @@ function GameUIShrineReport:GetChatIcon(icon)
 end
 
 function GameUIShrineReport:fillFightItemContent(item_content,list_data,item,item_idx)
+    dump(list_data,"list_data")
     if list_data.type == 1 then
         item_content.content_part:hide()
         local content = item_content.title_part
@@ -227,33 +228,19 @@ function GameUIShrineReport:fillFightItemContent(item_content,list_data,item,ite
         if content.button then
             content.button:removeSelf()
         end
-        local button = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
-        :addTo(content):setButtonLabel("normal", UIKit:commonButtonLable({text = _("回放")})):align(display.RIGHT_BOTTOM,538, 8):onButtonClicked(function()
-            self:OnRePlayClicked(content.idx)
-        end)
         content.button = button
         item_content:size(548,92)
         item:setItemSize(548,92)
     end
 end
 function GameUIShrineReport:adapterFightDataToListView()
-    local player_map = LuaUtils:table_map(self:GetShrineReport():PlayerDatas(),function(k,v)
-        return v.id,v
-    end)
     local data_source = {}
     for i,rounds in ipairs(self:GetShrineReport():FightDatas()) do
         table.insert(data_source,{type = 1,data = i,index = i})
-        for j=#rounds.roundDatas,1,-1 do
-            local data = rounds.roundDatas[j]
-            local killScore = 0
-            for __,v in ipairs(data.defenceSoldierRoundDatas) do
-                killScore = killScore +  self:GetSoldierKillScore(v.soldierName,v.soldierStar,v.soldierDamagedCount)
-            end
-            data.killScore = killScore
-            local palyer_data = player_map[data.playerId]
-            if palyer_data then
-                data.playerIcon = palyer_data.icon
-            end
+        for j,r_data in ipairs(rounds.roundDatas) do
+            local data = r_data
+            data.killScore = r_data.playerKill
+            data.playerIcon = r_data.playerIcon
             local normal_data = {type = 2,data = data,index = j}
             table.insert(data_source,normal_data)
         end

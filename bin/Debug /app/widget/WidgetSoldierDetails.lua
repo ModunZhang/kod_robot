@@ -1,6 +1,7 @@
 local UIListView = import('..ui.UIListView')
 local WidgetSlider = import('.WidgetSlider')
 local UILib = import("..ui.UILib")
+local StarBar = import("..ui.StarBar")
 local Localize = import("..utils.Localize")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
@@ -13,7 +14,20 @@ local window = import("..utils.window")
 
 local normal = GameDatas.Soldiers.normal
 local special = GameDatas.Soldiers.special
+local soldier_vs = GameDatas.ClientInitGame.soldier_vs
 
+local function return_vs_soldiers_map(soldier_name)
+    local strong_vs = {}
+    local weak_vs = {}
+    for k, v in pairs(soldier_vs[DataUtils:GetSoldierTypeByName(soldier_name)]) do
+        if v == "strong" then
+            table.insert(strong_vs, k)
+        elseif v == "weak" then
+            table.insert(weak_vs, k)
+        end
+    end
+    return {strong_vs = strong_vs, weak_vs = weak_vs}
+end
 
 local WidgetSoldierDetails = class("WidgetSoldierDetails", WidgetPopDialog)
 
@@ -36,44 +50,83 @@ function WidgetSoldierDetails:InitSoldierDetails()
 
     -- bg
     local bg = self.body
+    local soldier_type = self.soldier_type
 
     local bg_width,bg_height = bg:getContentSize().width,bg:getContentSize().height
 
+    local title_blue = display.newScale9Sprite("title_blue_430x30.png",0,0,cc.size(410,30), cc.rect(10,10,410,10)):addTo(bg, 2)
+        :align(display.RIGHT_CENTER, bg_width-20, bg_height - 44)
+
+    local title_size = title_blue:getContentSize()
     self.soldier_name_label = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = Localize.soldier_name[self.soldier_type],
+        text = Localize.soldier_name[soldier_type].." X"..string.formatnumberthousands(self.soldier_count),
         font = UIKit:getFontFilePath(),
         size = 24,
-        color = UIKit:hex2c3b(0x5a5544)
-    }):align(display.LEFT_CENTER,180,bg_height-50):addTo(bg,2)
-    local soldier_ui_config = UILib.soldier_image[self.soldier_type][self.soldier_level]
+        color = UIKit:hex2c3b(0xffedae)
+    }):addTo(title_blue):align(display.LEFT_CENTER, 15, title_size.height/2)
+    local soldier_ui_config = UILib.soldier_image[soldier_type][self.soldier_level]
 
 
-    display.newSprite(UILib.soldier_color_bg_images[self.soldier_type]):addTo(bg)
+    display.newSprite(UILib.soldier_color_bg_images[soldier_type]):addTo(bg)
         :align(display.CENTER_TOP,100, bg_height-30):scale(130/128)
 
     local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER_TOP,100, bg_height-30)
     soldier_head_icon:scale(130/soldier_head_icon:getContentSize().height)
     display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):align(display.CENTER, soldier_head_icon:getContentSize().width/2, soldier_head_icon:getContentSize().height-64)
     bg:addChild(soldier_head_icon)
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_head_icon):align(display.BOTTOM_CENTER,soldier_head_icon:getContentSize().width/2 - 10, 4)
+    self.soldier_star = StarBar.new({
+            max = 3,
+            bg = "Stars_bar_bg.png",
+            fill = "Stars_bar_highlight.png",
+            num = self.soldier_level,
+            margin = 5,
+            direction = StarBar.DIRECTION_HORIZONTAL,
+            scale = 0.8,
+        }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
 
-
-    local num_title_label = cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = _("数量"),
-        font = UIKit:getFontFilePath(),
+    --
+    local label_origin_x = 205
+    local label = UIKit:ttfLabel({
+        text = _("强势对抗"),
         size = 22,
-        color = UIKit:hex2c3b(0x5a5544)
-    }):align(display.LEFT_CENTER,180,bg_height-90):addTo(bg,2)
+        align = cc.ui.TEXT_ALIGN_RIGHT,
+        color = 0x5bb800
+    }):addTo(bg, 2):align(display.LEFT_BOTTOM, label_origin_x - 12 , bg_height - 95 - 11)
 
-    local soldier_count = self.soldier_count
-    self.total_soldier = cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = string.formatnumberthousands(soldier_count),
-        font = UIKit:getFontFilePath(),
+    local vs_map = return_vs_soldiers_map(soldier_type)
+    local strong_vs = {}
+    for i, v in ipairs(vs_map.strong_vs) do
+        table.insert(strong_vs, Localize.soldier_category[v])
+    end
+    local soldier_name = UIKit:ttfLabel({
+        text = table.concat(strong_vs, ", "),
         size = 22,
-        color = UIKit:hex2c3b(0x5a5544)
-    }):align(display.LEFT_CENTER,num_title_label:getPositionX()+num_title_label:getContentSize().width+10,bg_height-90):addTo(bg,2)
+        align = cc.ui.TEXT_ALIGN_RIGHT,
+        color = 0x403c2f
+    }):addTo(bg, 2)
+        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, bg_height - 95 - 11)
+
+    local label = UIKit:ttfLabel({
+        text = _("弱势对抗"),
+        size = 22,
+        align = cc.ui.TEXT_ALIGN_RIGHT,
+        color = 0x890000
+    }):addTo(bg, 2)
+        :align(display.LEFT_BOTTOM, label_origin_x-12, bg_height - 135 - 11)
+
+    local weak_vs = {}
+    for i, v in ipairs(vs_map.weak_vs) do
+        table.insert(weak_vs, Localize.soldier_category[v])
+    end
+    local soldier_name = UIKit:ttfLabel({
+        text = table.concat(weak_vs, ", "),
+        size = 22,
+        align = cc.ui.TEXT_ALIGN_RIGHT,
+        color = 0x403c2f
+    }):addTo(bg, 2)
+        :align(display.LEFT_BOTTOM, label_origin_x + label:getContentSize().width - 12, bg_height - 135 - 11)
 
     -- 士兵属性
     self:InitSoldierAttr()

@@ -53,6 +53,12 @@ function PVEScene:onEnterTransitionFinish()
 
         UIKit:newGameUI("GameUITips", "pve", _("玩法介绍"), true):AddToScene(self, true)
     end
+    local task = City:GetRecommendTask()
+    if task then
+        if task:TaskType() == "explore" then
+            City:SetBeginnersTaskFlag(task:Index())
+        end
+    end
 end
 function PVEScene:onExit()
     PVEScene.super.onExit(self)

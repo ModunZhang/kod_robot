@@ -5,6 +5,7 @@
 local window = import("..utils.window")
 local Localize = import("..utils.Localize")
 local WidgetTips = import("..widget.WidgetTips")
+local WidgetFteArrow = import("..widget.WidgetFteArrow")
 local WidgetSoldierBox = import("..widget.WidgetSoldierBox")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetTimerProgress = import("..widget.WidgetTimerProgress")
@@ -12,10 +13,11 @@ local WidgetRecruitSoldier = import("..widget.WidgetRecruitSoldier")
 local SoldierManager = import("..entity.SoldierManager")
 local GameUIBarracks = UIKit:createUIClass("GameUIBarracks", "GameUIUpgradeBuilding")
 local WidgetRecruitSoldier_tag = 1
-function GameUIBarracks:ctor(city, barracks,default_tab)
+function GameUIBarracks:ctor(city, barracks,default_tab,need_recruit_soldier)
     GameUIBarracks.super.ctor(self, city, _("兵营"),barracks,default_tab)
     self.barracks_city = city
     self.barracks = barracks
+    self.need_recruit_soldier = need_recruit_soldier
 
     self.special_soldier_items={}
 end
@@ -204,7 +206,18 @@ function GameUIBarracks:TabButtons()
             self:RefershUnlockInfo()
         end
     end):pos(window.cx, window.bottom + 34)
+    self.tab_buttons:SetGreenTipsShow("specialRecruit",self:GetRecruitSpecialTime())
 end
+local arrow_left_dir_map = {
+    swordsman = true,
+    sentinel = true,
+    ranger = true,
+    crossbowman = true,
+    lancer = false,
+    horseArcher = false,
+    catapult = false,
+    ballista = false,
+}
 function GameUIBarracks:CreateItemWithListView(list_view, soldiers)
     local rect = list_view:getViewRect()
     local origin_x = - rect.width / 2
@@ -212,21 +225,39 @@ function GameUIBarracks:CreateItemWithListView(list_view, soldiers)
     local unit_width = 130
     local gap_x = (widget_rect.width - unit_width * 4) / 3
     local row_item = display.newNode()
+    local need_up_view = false
     for i, soldier_name in pairs(soldiers) do
         self.soldier_map[soldier_name] =
             WidgetSoldierBox.new(nil, function(event)
                 if self.soldier_map[soldier_name]:IsLocked() then
                     return
                 end
+                self.soldier_map[soldier_name]:removeChildByTag(111)
                 WidgetRecruitSoldier.new(self.barracks, self.barracks_city, soldier_name)
                     :addTo(self,1000, WidgetRecruitSoldier_tag):pos(0,0)
             end):addTo(row_item)
                 :alignByPoint(cc.p(0.5, 0.5), origin_x + (unit_width + gap_x) * (i - 1) + unit_width / 2, 0)
                 :SetSoldier(soldier_name, self.barracks_city:GetSoldierManager():GetStarBySoldierType(soldier_name))
+        if self.need_recruit_soldier == soldier_name then
+            if arrow_left_dir_map[soldier_name] then
+                WidgetFteArrow.new(_("点击士兵"))
+                :addTo(self.soldier_map[soldier_name],1,111)
+                :TurnLeft():align(display.LEFT_CENTER, 50, 20)    
+            else
+                WidgetFteArrow.new(_("点击士兵"))
+                :addTo(self.soldier_map[soldier_name],1,111)
+                :TurnRight():align(display.RIGHT_CENTER, -50, 20)
+            end
+            self.soldier_map[soldier_name]:zorder(10)
+            need_up_view = true
+        end
     end
 
     local item = list_view:newItem()
     item:addContent(row_item)
+    if need_up_view then 
+        item:zorder(100)
+    end
     item:setItemSize(widget_rect.width, 172)
     return item
 end

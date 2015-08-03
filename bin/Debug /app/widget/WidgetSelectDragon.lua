@@ -35,14 +35,14 @@ function WidgetSelectDragon:ctor(params)
             :addTo(box_bg,2)
         -- 总力量
         local dragon_vitality = UIKit:ttfLabel({
-            text = _("总力量")..dragon:TotalStrength(),
+            text = _("总力量").." "..dragon:TotalStrength(),
             size = 20,
             color = 0x615b44,
         }):align(display.LEFT_CENTER,20,60)
             :addTo(box_bg)
         -- 龙活力
         local dragon_vitality = UIKit:ttfLabel({
-            text = _("生命值")..dragon:Hp().."/"..dragon:GetMaxHP(),
+            text = _("生命值").." "..dragon:Hp().."/"..dragon:GetMaxHP(),
             size = 20,
             color = 0x615b44,
         }):align(display.LEFT_CENTER,20,20)
@@ -57,7 +57,7 @@ function WidgetSelectDragon:ctor(params)
             text = d_status,
             size = 20,
             color = s_color,
-        }):align(display.RIGHT_CENTER,300,100)
+        }):align(display.LEFT_CENTER,dragon_name:getContentSize().width + dragon_name:getPositionX() + 10,100)
             :addTo(box_bg)
         
         return dragon_frame

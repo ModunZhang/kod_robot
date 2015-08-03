@@ -10,6 +10,7 @@ local WidgetPushButton = import("..widget.WidgetPushButton")
 local UIListView = import(".UIListView")
 local WidgetSoldierBox = import("..widget.WidgetSoldierBox")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
+local WidgetShrineRewardsInfo = import("..widget.WidgetShrineRewardsInfo")
 local AllianceShrine = import("..entity.AllianceShrine")
 local UILib = import(".UILib")
 local Localize = import("..utils.Localize")
@@ -138,29 +139,19 @@ function GameUIAllianceShrineDetail:BuildUI()
     --begin listview
     local items_box_x,items_box_y = 0,0
     if self:IsActivate() then
-        items_box_x,items_box_y = 25,self.event_button:getPositionY()+self.event_button:getCascadeBoundingBox().height+30
+        items_box_x,items_box_y = background:getContentSize().width/2,self.event_button:getPositionY()+self.event_button:getCascadeBoundingBox().height+10
     else
-        items_box_x,items_box_y = 25,20
+        items_box_x,items_box_y = background:getContentSize().width/2,20
     end
-    local items_box = UIKit:CreateBoxPanel(172)
-        :addTo(background)
-        :pos(items_box_x,items_box_y)
-    local bar = display.newSprite("player_node_title_546x34.png"):align(display.LEFT_TOP,2,169):addTo(items_box)
-    local label = UIKit:ttfLabel({
-        text = _("事件完成奖励"),
-        size = 20,
-        color = 0xffedae
-    }):align(display.CENTER,274,17):addTo(bar)
-    WidgetPushTransparentButton.new(cc.rect(0,0,548,30)):addTo(bar):onButtonClicked(function()
-        self:ShowRewardsButtonClicked()
-    end):align(display.LEFT_BOTTOM, 0, 0)
-    display.newSprite("info_16x33.png"):align(display.LEFT_CENTER,label:getPositionX()+label:getContentSize().width/2 + 5,15):addTo(bar):scale(0.8)
-    self.item_list = UIListView.new({
-        viewRect = cc.rect(10,10, 536, 120),
-        direction = cc.ui.UIScrollView.DIRECTION_HORIZONTAL
-    }):addTo(items_box)
-    self:RefreshItemListView()
-    local soldier_x,soldier_y = 14,items_box:getPositionY()+172+10
+
+    local items_box = WidgetShrineRewardsInfo.new({
+        title = _("事件完成奖励"),
+        h = 186,
+        info = self:GetShrineStage()
+    }):addTo(background)
+        :align(display.BOTTOM_CENTER,items_box_x,items_box_y)
+
+    local soldier_x,soldier_y = 14,self:IsActivate() and items_box:getPositionY()+342+10 or 210
     local info_box = display.newScale9Sprite("background_568x120.png", 0,0,cc.size(568,142),cc.rect(15,10,538,100))
         :align(display.LEFT_BOTTOM,19,soldier_y+5):addTo(background)
     self.info_list = UIListView.new({
@@ -224,35 +215,6 @@ function GameUIAllianceShrineDetail:RefreshInfoListView()
     self.info_list:reload()
 end
 
-
-function GameUIAllianceShrineDetail:RefreshItemListView()
-    self.item_list:removeAllItems()
-    local terrain = Alliance_Manager:GetMyAlliance():Terrain()
-    local goldRewards = self:GetShrineStage():GoldRewards(terrain)
-    for __,v in ipairs(goldRewards) do
-        local item = self.item_list:newItem()
-        local content = display.newScale9Sprite("box_118x118.png")
-        if v.type == 'dragonMaterials' then
-            local sp = display.newSprite(UILib.dragon_material_pic_map[v.sub_type]):align(display.CENTER,59,59)
-            local size = sp:getContentSize()
-            sp:scale(100/math.max(size.width,size.height)):addTo(content)
-            UIKit:addTipsToNode(content,Localize.equip_material[v.sub_type],self)
-        elseif v.type == 'allianceInfo' then
-            if v.sub_type == 'loyalty' then
-                local sp = display.newSprite("loyalty_128x128.png"):align(display.CENTER,59,59)
-                sp:scale(0.78):addTo(content)
-            end
-            UIKit:addTipsToNode(content,_("忠诚值"),self)
-        end
-
-        item:addContent(content)
-        item:setMargin({left = 10, right = 70, top = 0, bottom = 0})
-        item:setItemSize(118,118,false)
-        self.item_list:addItem(item)
-    end
-    self.item_list:reload()
-end
-
 function GameUIAllianceShrineDetail:IsNotDragon(stageTroop)
     local name = stageTroop.type or ""
     if name == 'blueDragon'
@@ -283,10 +245,6 @@ end
 
 function GameUIAllianceShrineDetail:GetShrineStage()
     return self.shrineStage_
-end
-
-function GameUIAllianceShrineDetail:ShowRewardsButtonClicked()
-    UIKit:newGameUI("GameUIAllianceShrineRewardList",self:GetShrineStage()):AddToCurrentScene(true)
 end
 
 function GameUIAllianceShrineDetail:OnEventButtonClicked()

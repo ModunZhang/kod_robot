@@ -105,6 +105,7 @@ function ItemManager:__OnItemsChanged(__items)
 end
 function ItemManager:OnItemEventsChanged( itemEvents )
     if not itemEvents then return end
+    self.itemEvents = {}
     for i,v in ipairs(itemEvents) do
         local event = ItemEvent.new()
         event:UpdateData(v)
