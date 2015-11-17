@@ -17,7 +17,6 @@ local Localize = import("..utils.Localize")
 local config_intInit = GameDatas.PlayerInitData.intInit
 local WidgetUseItems = import("..widget.WidgetUseItems")
 local UILib = import(".UILib")
-local MaterialManager = import("..entity.MaterialManager")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 local GameUIShowDragonUpStarAnimation = import(".GameUIShowDragonUpStarAnimation")
 -- building = DragonEyrie
@@ -114,14 +113,24 @@ end
 
 function GameUIDragonEyrieDetail:OnMoveInStage()
     GameUIDragonEyrieDetail.super.OnMoveInStage(self)
+    local User = User
     self:BuildUI()
+    User:AddListenOnType(self, "dragonEquipments")
     self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
-    City:GetMaterialManager():AddObserver(self)
+
+    scheduleAt(self, function()
+        if not self:GetDragon():Ishated() then return end
+        if self.skill_ui and self.skill_ui.blood_label then
+            self.skill_ui.blood_label:setString(string.formatnumberthousands(User:GetResValueByType("blood")))
+        end
+    end)
+    
 end
 
 function GameUIDragonEyrieDetail:OnMoveOutStage()
+    local User = User
+    User:RemoveListenerOnType(self, "dragonEquipments")
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
-    City:GetMaterialManager():RemoveObserver(self)
     GameUIDragonEyrieDetail.super.OnMoveOutStage(self)
 end
 
@@ -142,7 +151,7 @@ function GameUIDragonEyrieDetail:BuildDragonContent()
             x = 307
             y = 250
         end
-        local dragon = DragonSprite.new(display.getRunningScene():GetSceneLayer(),self:GetDragon():GetTerrain())
+        local dragon = DragonSprite.new(display.getRunningScene():GetSceneLayer(),self:GetDragon():Type())
             :addTo(self.dragon_base)
             :align(display.CENTER, x,y)
         dragon:setTag(101)
@@ -154,14 +163,6 @@ function GameUIDragonEyrieDetail:BuildDragonContent()
             :align(display.CENTER, 307,180)
             :addTo(self.dragon_base)
         dragon:setTag(101)
-    end
-end
-
-function GameUIDragonEyrieDetail:OnResourceChanged(resource_manager)
-    GameUIDragonEyrieDetail.super.OnResourceChanged(self,resource_manager)
-    if not self:GetDragon():Ishated() then return end
-    if self.skill_ui and self.skill_ui.blood_label then
-        self.skill_ui.blood_label:setString(string.formatnumberthousands(resource_manager:GetBloodResource():GetValue()))
     end
 end
 
@@ -200,7 +201,7 @@ function GameUIDragonEyrieDetail:RefreshUI()
     elseif button_tag == 'skill' then
         self.hp_process_bg:hide()
         self:RefreshSkillList()
-        self.skill_ui.blood_label:setString(string.formatnumberthousands(City:GetResourceManager():GetBloodResource():GetValue()))
+        self.skill_ui.blood_label:setString(string.formatnumberthousands(User:GetResValueByType("blood")))
         self.lv_label:hide()
     else
         self.lv_label:show()
@@ -315,7 +316,7 @@ function GameUIDragonEyrieDetail:PlaceEquipmentBoxIntoEqNode()
 end
 
 
-function GameUIDragonEyrieDetail:OnMaterialsChanged()
+function GameUIDragonEyrieDetail:OnUserDataChanged_dragonEquipments(userData, deltaData)
     if self.tab_buttons:GetCurrentTag() == 'equipment' then
         local canloadAnyEq = self:FillEquipemtBox()
         self.equipment_ui.upgrade_star_btn:setVisible(not canloadAnyEq)
@@ -350,7 +351,7 @@ end
 
 function GameUIDragonEyrieDetail:OnDragonExpItemUseButtonClicked()
     local widgetUseItems = WidgetUseItems.new():Create({
-        item_type = WidgetUseItems.USE_TYPE.DRAGON_EXP,
+        item_name = "dragonExp_1",
         dragon = self:GetDragon()
     })
     widgetUseItems:AddToCurrentScene()
@@ -378,7 +379,7 @@ end
 
 function GameUIDragonEyrieDetail:CheckCanLoadEquipment(equipment)
     if equipment:IsLocked() or equipment:IsLoaded() then return false end
-    local player_equipments = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.EQUIPMENT)
+    local player_equipments = User.dragonEquipments
     local eq_name = equipment:IsLoaded() and equipment:Name() or equipment:GetCanLoadConfig().name
     return (player_equipments[eq_name] or 0) > 0 
 end
@@ -732,8 +733,7 @@ end
 
 function GameUIDragonEyrieDetail:OnHeroBloodUseItemClicked()
     local widgetUseItems = WidgetUseItems.new():Create({
-        item_type = WidgetUseItems.USE_TYPE.HERO_BLOOD,
-        dragon = self:GetDragon()
+        item_name = "heroBlood_1",
     })
     widgetUseItems:AddToCurrentScene()
 end

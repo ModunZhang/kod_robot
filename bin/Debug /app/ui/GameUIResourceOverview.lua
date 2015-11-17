@@ -59,9 +59,7 @@ function GameUIResourceOverview:onExit()
     GameUIResourceOverview.super.onExit(self)
 
 end
-function GameUIResourceOverview:OnResourceChanged(resource_manager)
-    GameUIResourceOverview.super.OnResourceChanged(self,resource_manager)
-end
+
 
 return GameUIResourceOverview
 

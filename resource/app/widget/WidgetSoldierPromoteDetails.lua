@@ -14,11 +14,12 @@ local NORMAL = GameDatas.Soldiers.normal
 local WidgetSoldierPromoteDetails = class("WidgetSoldierPromoteDetails", WidgetPopDialog)
 
 
-function WidgetSoldierPromoteDetails:ctor(soldier_type,star,building)
+function WidgetSoldierPromoteDetails:ctor(soldier_type,star,building,can_not_next)
     WidgetSoldierPromoteDetails.super.ctor(self,720,_("兵种晋级"))
     self.soldier_type = soldier_type
     self.star = star
     self.building = building
+    self.can_not_next = can_not_next
 end
 
 function WidgetSoldierPromoteDetails:onEnter()
@@ -211,26 +212,28 @@ function WidgetSoldierPromoteDetails:onEnter()
 
     WidgetInfoText.new({info = info}):addTo(body):align(display.CENTER_BOTTOM, size.width/2, 100)
 
-
-    WidgetPushButton.new(
-        {normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png"})
-        :addTo(body)
-        :align(display.CENTER, size.width/2 , 50)
-        :setButtonLabel(UIKit:ttfLabel({
-            text = _("下一步"),
-            size = 24,
-            color = 0xfff3c7
-        }))
-        :onButtonClicked(function(event)
-            UIKit:newWidgetUI("WidgetPromoteSoldier",soldier_type,self.building:GetType()):AddToCurrentScene()
-            self:LeftButtonClicked()
-        end)
+    if not self.can_not_next then
+        WidgetPushButton.new(
+            {normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png"})
+            :addTo(body)
+            :align(display.CENTER, size.width/2 , 50)
+            :setButtonLabel(UIKit:ttfLabel({
+                text = _("下一步"),
+                size = 24,
+                color = 0xfff3c7,
+                shadow = true
+            }))
+            :onButtonClicked(function(event)
+                UIKit:newWidgetUI("WidgetPromoteSoldier",soldier_type,self.building:GetType()):AddToCurrentScene()
+                self:LeftButtonClicked()
+            end)
+    end
 end
 function WidgetSoldierPromoteDetails:CreateSoldierBox(isGray)
     local soldier_type = self.soldier_type
     local star = isGray and self.star +1 or self.star
     local soldier_box = display.newSprite("box_light_148x148.png")
-    local blue_bg = display.newSprite("back_ground_121x122.png", soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
+    local blue_bg = display.newSprite(UILib.soldier_color_bg_images[soldier_type], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
 
     local soldier_icon = display.newSprite(UILib.soldier_image[soldier_type][star], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
     soldier_icon:scale(124/math.max(soldier_icon:getContentSize().width,soldier_icon:getContentSize().height))
@@ -251,6 +254,7 @@ function WidgetSoldierPromoteDetails:CreateSoldierBox(isGray)
         soldier_icon:setFilter(filters)
     end
 
+    display.newSprite("box_soldier_128x128.png"):addTo(soldier_box):align(display.CENTER, soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2)
     return soldier_box
 end
 function WidgetSoldierPromoteDetails:onExit()
@@ -258,6 +262,7 @@ function WidgetSoldierPromoteDetails:onExit()
 end
 
 return WidgetSoldierPromoteDetails
+
 
 
 

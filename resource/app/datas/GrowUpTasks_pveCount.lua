@@ -8,7 +8,7 @@ pveCount[0] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 3750,
+	["coin"] = 5000,
 	["gem"] = 0,
 	["exp"] = 50
 }
@@ -20,7 +20,7 @@ pveCount[1] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 7500,
+	["coin"] = 12500,
 	["gem"] = 0,
 	["exp"] = 100
 }
@@ -32,7 +32,7 @@ pveCount[2] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 18750,
+	["coin"] = 25000,
 	["gem"] = 0,
 	["exp"] = 200
 }
@@ -44,7 +44,7 @@ pveCount[3] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 37500,
+	["coin"] = 50000,
 	["gem"] = 0,
 	["exp"] = 400
 }
@@ -56,7 +56,7 @@ pveCount[4] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 75000,
+	["coin"] = 125000,
 	["gem"] = 0,
 	["exp"] = 600
 }
@@ -68,7 +68,7 @@ pveCount[5] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 187500,
+	["coin"] = 250000,
 	["gem"] = 0,
 	["exp"] = 800
 }
@@ -80,7 +80,7 @@ pveCount[6] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 375000,
+	["coin"] = 500000,
 	["gem"] = 0,
 	["exp"] = 1200
 }
@@ -92,7 +92,7 @@ pveCount[7] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 750000,
+	["coin"] = 500000,
 	["gem"] = 0,
 	["exp"] = 1920
 }
@@ -104,8 +104,8 @@ pveCount[8] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 0,
-	["gem"] = 200,
+	["coin"] = 500000,
+	["gem"] = 100,
 	["exp"] = 3800
 }
 pveCount[9] = {
@@ -116,8 +116,8 @@ pveCount[9] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 0,
-	["gem"] = 500,
+	["coin"] = 500000,
+	["gem"] = 200,
 	["exp"] = 7550
 }
 pveCount[10] = {
@@ -128,7 +128,7 @@ pveCount[10] = {
 	["stone"] = 0,
 	["iron"] = 0,
 	["food"] = 0,
-	["coin"] = 0,
-	["gem"] = 1000,
+	["coin"] = 500000,
+	["gem"] = 500,
 	["exp"] = 18800
 }

@@ -5,7 +5,6 @@ local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local SpriteConfig = import("..sprites.SpriteConfig")
 local UIListView = import(".UIListView")
 local UILib = import(".UILib")
-local AllianceMap = import("..entity.AllianceMap")
 local Alliance = import("..entity.Alliance")
 local Localize = import("..utils.Localize")
 local AllianceVillage = GameDatas.AllianceVillage
@@ -33,11 +32,11 @@ function GameUIOrderHall:OnMoveInStage()
             tag = "village",
             default = "village" == self.default_tab,
         },
-        {
-            label = _("熟练度"),
-            tag = "proficiency",
-            default = "proficiency" == self.default_tab,
-        },
+        -- {
+        --     label = _("熟练度"),
+        --     tag = "proficiency",
+        --     default = "proficiency" == self.default_tab,
+        -- },
     }, function(tag)
         if tag == 'village' then
             self.village_layer:setVisible(true)
@@ -46,18 +45,17 @@ function GameUIOrderHall:OnMoveInStage()
             self.village_layer:Reset()
             self.village_layer:setVisible(false)
         end
-        if tag == 'proficiency' then
-            self.proficiency_layer:setVisible(true)
-            self:InitProficiencyPart()
-        else
-            self.proficiency_layer:Reset()
-            self.proficiency_layer:setVisible(false)
-        end
+        -- if tag == 'proficiency' then
+        --     self.proficiency_layer:setVisible(true)
+        --     self:InitProficiencyPart()
+        -- else
+        --     self.proficiency_layer:Reset()
+        --     self.proficiency_layer:setVisible(false)
+        -- end
     end):pos(window.cx, window.bottom + 34)
 
 
-    self.alliance:AddListenOnType(self, Alliance.LISTEN_TYPE.VILLAGE_LEVELS_CHANGED)
-    self.alliance:GetAllianceMap():AddListenOnType(self,AllianceMap.LISTEN_TYPE.BUILDING_INFO)
+    self.alliance:AddListenOnType(self, "villageLevels")
 end
 function GameUIOrderHall:CreateBetweenBgAndTitle()
     GameUIOrderHall.super.CreateBetweenBgAndTitle(self)
@@ -71,13 +69,13 @@ function GameUIOrderHall:CreateBetweenBgAndTitle()
         self:removeAllChildren()
     end
     -- proficiency_layer
-    local proficiency_layer = display.newLayer():addTo(self:GetView())
-    self.proficiency_layer = proficiency_layer
-    function proficiency_layer:Reset()
-        self.proficiency_listview = nil
-        self.proficiency_drop_list = nil
-        self:removeAllChildren()
-    end
+    -- local proficiency_layer = display.newLayer():addTo(self:GetView())
+    -- self.proficiency_layer = proficiency_layer
+    -- function proficiency_layer:Reset()
+    --     self.proficiency_listview = nil
+    --     self.proficiency_drop_list = nil
+    --     self:removeAllChildren()
+    -- end
 end
 
 function GameUIOrderHall:InitVillagePart()
@@ -176,7 +174,7 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
             }))
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
-                    if alliance:Honour() < need_honour then
+                    if alliance.basicInfo.honour < need_honour then
                         UIKit:showMessageDialog(_("提示"),_("荣耀点不足"))
                     else
                         NetManager:getUpgradeAllianceVillagePromise(village_type):done(function ( response )
@@ -265,7 +263,7 @@ end
 function GameUIOrderHall:ChangeProficiencyOption(option)
     self.option = option
     local sortByProficiencyMember = {}
-    self.alliance:IteratorAllMembers(function ( id,member )
+    self.alliance:IteratorAllMembers(function ( member )
         table.insert(sortByProficiencyMember, member)
     end)
     table.sort( sortByProficiencyMember, function ( a,b )
@@ -381,9 +379,8 @@ function GameUIOrderHall:CreateProficiencyContent()
     return content
 end
 
-function GameUIOrderHall:OnVillageLevelsChanged(alliance)
-    dump(alliance:GetVillageLevels())
-    for k,v in pairs(alliance:GetVillageLevels()) do
+function GameUIOrderHall:OnAllianceDataChanged_villageLevels(allianceData, deltaData)
+    for k,v in pairs(allianceData.villageLevels) do
         if self.village_items[k] then
             self.village_items[k]:LevelUpRefresh(k,v)
         end
@@ -391,13 +388,10 @@ function GameUIOrderHall:OnVillageLevelsChanged(alliance)
 end
 
 function GameUIOrderHall:onExit()
-    self.alliance:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.VILLAGE_LEVELS_CHANGED)
-    self.alliance:GetAllianceMap():RemoveListenerOnType(self,AllianceMap.LISTEN_TYPE.BUILDING_INFO)
+    self.alliance:RemoveListenerOnType(self, "villageLevels")
     GameUIOrderHall.super.onExit(self)
 end
-function GameUIOrderHall:OnBuildingInfoChange(building)
 
-end
 return GameUIOrderHall
 
 

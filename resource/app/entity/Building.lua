@@ -1,6 +1,5 @@
 local Enum = import("..utils.Enum")
 local Orient = import(".Orient")
-local Observer = import(".Observer")
 local Building = class("Building")
 local orient_desc = {
     [Orient.X] = "Orient.X",
@@ -54,7 +53,6 @@ function Building:ctor(building_info)
     self.building_type = building_info.building_type and building_info.building_type or "none"
     self.orient = building_info.orient and building_info.orient or Orient.X
     self.can_change_head = self.w ~= self.h
-    self.base_building_observer = Observer.new()
     self.city = building_info.city
 end
 function Building:BelongCity()
@@ -64,34 +62,6 @@ function Building:UniqueKey()
     return string.format("%s_%d_%d", self:GetType(), self.x, self.y)
 end
 function Building:OnTimer(current_time)
-
-end
-function Building:ResetAllListeners()
-    self:GetBaseObserver():RemoveAllObserver()
-end
-function Building:AddBaseListener(listener)
-    -- assert(listener.OnOrientChanged)
-    assert(listener.OnLogicPositionChanged)
-    assert(listener.OnTransformed)
-    return self.base_building_observer:AddObserver(listener)
-end
-function Building:RemoveBaseListener(listener)
-    self.base_building_observer:RemoveObserver(listener)
-end
--- function Building:CopyListenerFrom(building)
---     self.base_building_observer:CopyListenerFrom(building:GetBaseObserver())
--- end
-function Building:CopyValueFrom(building)
-    self.x = building.x
-    self.y = building.y
-    self.w = building.w
-    self.h = building.h
-    self.building_type = building.building_type
-    self.orient = building.orient
-    self.can_change_head = self.can_change_head
-end
-function Building:GetBaseObserver()
-    return self.base_building_observer
 end
 function Building:GetSize()
     return self.w, self.h
@@ -111,24 +81,6 @@ function Building:IsHouse()
 end
 function Building:GetOrient()
     return self.orient
-end
--- function Building:SetOrient(orient)
---     if not self.can_change_head then return end
---     assert(orient == Orient.X or orient == Orient.Y)
---     if self.orient ~= orient then
---         local old_orient = self.orient
---         self.orient = orient
---         self.w, self.h = self.h, self.w
---         self.base_building_observer:NotifyObservers(function(listener)
---             listener:OnOrientChanged(old_orient, orient, self.w, self.h)
---         end)
---     end
--- end
-function Building:SetLogicPosition(x, y)
-    self.x, self.y = x, y
-    self.base_building_observer:NotifyObservers(function(listener)
-        listener:OnLogicPositionChanged(x, y)
-    end)
 end
 function Building:GetLogicPosition()
     return self.x, self.y

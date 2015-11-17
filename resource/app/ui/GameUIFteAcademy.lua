@@ -10,7 +10,7 @@ end
 local promise = import("..utils.promise")
 local WidgetFteArrow = import("..widget.WidgetFteArrow")
 function GameUIFteAcademy:Find()
-    return self:GetItemByTag(self:GetTech():Index())
+    return self:GetItemByTag(self:GetTech().index)
 end
 function GameUIFteAcademy:PromiseOfFte()
     self.scrollView:getScrollNode():setTouchEnabled(false)
@@ -35,11 +35,11 @@ function GameUIFteAcademy:PromiseOfFte()
 end
 function GameUIFteAcademy:GetTech()
     local t
-    self.city:IteratorTechs(function(index,tech)
-        if tech:Name() == "forestation" then
+    for tech_name,tech in pairs(self.city:GetUser().productionTechs) do
+        if tech_name == "forestation" then
             t = tech
         end
-    end)
+    end
     return t
 end
 

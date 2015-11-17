@@ -8,8 +8,6 @@ local window = import("..utils.window")
 local Localize = import("..utils.Localize")
 local UILib = import("..ui.UILib")
 local WidgetRequirementListview = import(".WidgetRequirementListview")
-local MaterialManager = import("..entity.MaterialManager")
-local SoldierManager = import("..entity.SoldierManager")
 local NORMAL = GameDatas.Soldiers.normal
 
 local WidgetPromoteSoldier = class("WidgetPromoteSoldier", WidgetPopDialog)
@@ -18,23 +16,22 @@ function WidgetPromoteSoldier:ctor(soldier_type,building_type)
     WidgetPromoteSoldier.super.ctor(self,780,_("兵种晋级"))
     self.soldier_type = soldier_type
     self.building_type = building_type
-    self.star = City:GetSoldierManager():GetStarBySoldierType(soldier_type)
+    self.star = User:SoldierStarByName(soldier_type)
 end
 
 function WidgetPromoteSoldier:onEnter()
     WidgetPromoteSoldier.super.onEnter(self)
     self:SoldierImage()
     self:UpgradeButtons()
-    self:UpgradeRequirement()
-
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_DATA_CHANGED)
-    City:GetResourceManager():AddObserver(self)
+    User:AddListenOnType(self, "soldierStars")
+    User:AddListenOnType(self, "militaryTechs")
+    scheduleAt(self, function()
+        self:UpgradeRequirement()
+    end)
 end
 function WidgetPromoteSoldier:onExit()
-    City:GetResourceManager():RemoveObserver(self)
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_DATA_CHANGED)
+    User:RemoveListenerOnType(self, "soldierStars")
+    User:RemoveListenerOnType(self, "militaryTechs")
     WidgetPromoteSoldier.super.onExit(self)
 end
 function WidgetPromoteSoldier:SoldierImage()
@@ -74,7 +71,7 @@ function WidgetPromoteSoldier:CreateSoldierBox(isGray)
         scale = 0.8,
     }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
     function soldier_box:SetSoldierIcon(isNext)
-        local current_star = City:GetSoldierManager():GetStarBySoldierType(soldier_type)
+        local current_star = User:SoldierStarByName(soldier_type)
         local star = isNext and current_star+1 or current_star
         self:removeChild(self.soldier_icon, true)
 
@@ -106,6 +103,7 @@ function WidgetPromoteSoldier:UpgradeButtons()
             listener = function ()
                 local upgrade_listener = function()
                     NetManager:getInstantUpgradeSoldierStarPromise(self.soldier_type)
+                    self:LeftButtonClicked()
                 end
 
                 local results = self:IsAbleToUpgradeNow()
@@ -151,7 +149,7 @@ function WidgetPromoteSoldier:UpgradeButtons()
                 else
                     local dialog =  self:PopNotSatisfyDialog(upgrade_listener,results)
                     local need_gem = self:GetUpgradeGems()
-                    if need_gem > User:GetGemResource():GetValue() then
+                    if need_gem > User:GetGemValue() then
                         dialog:CreateOKButton({
                             listener =  function ()
                                 UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
@@ -190,27 +188,28 @@ function WidgetPromoteSoldier:UpgradeButtons()
 
 end
 function WidgetPromoteSoldier:UpgradeRequirement()
+    local User = User
     local body = self.body
     local size = body:getContentSize()
     local level_up_config = self:GetNextLevelConfig()
     if not level_up_config then
         return
     end
-    local current_coin = City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local current_coin = User:GetResValueByType("coin")
 
-    local tech_points = City:GetSoldierManager():GetTechPointsByType(self:GetSoldierMapToBuilding())
+    local tech_points = User:GetTechPoints(self:GetSoldierMapToBuilding())
     local requirements = {
         {
             resource_type = "building_queue",
-            isVisible = City:GetSoldierManager():GetUpgradingMilitaryTechNum(self.building_type)>0,
-            isSatisfy = not  City:GetSoldierManager():IsUpgradingMilitaryTech(self.building_type),
+            isVisible = User:GetMilitaryTechEventsNumber(self.building_type)>0,
+            isSatisfy = not User:HasMilitaryTechEventBy(self.building_type),
             icon="hammer_33x40.png",
-            description= string.format( _("升级队列已满:%d/1"), 1-City:GetSoldierManager():GetUpgradingMilitaryTechNum(self.building_type) )
+            description= string.format( _("升级队列已满:%d/1"), 1-User:GetMilitaryTechEventsNumber(self.building_type) )
         },
         {
             resource_type = Localize.fight_reward.coin,
             isVisible = level_up_config.upgradeCoinNeed>0,
-            isSatisfy = current_coin>level_up_config.upgradeCoinNeed,
+            isSatisfy = current_coin >= level_up_config.upgradeCoinNeed,
             icon=UILib.resource.coin,
             description=current_coin..'/'..level_up_config.upgradeCoinNeed
         },
@@ -252,21 +251,21 @@ function WidgetPromoteSoldier:UpgradeFinishRefresh()
     self.current_soldier:SetSoldierIcon(false)
     self.next_soldier:SetSoldierIcon(true)
 end
-function WidgetPromoteSoldier:OnResourceChanged()
-    self:UpgradeRequirement()
-end
-function WidgetPromoteSoldier:OnSoliderStarCountChanged(soldier_manager,changed_map)
-    for i,v in ipairs(changed_map) do
-        if v == self.soldier_type then
-            if City:GetSoldierManager():GetSoldierMaxStar() == City:GetSoldierManager():GetStarBySoldierType(v) then
-                self:LeftButtonClicked()
-            else
-                self:UpgradeFinishRefresh()
+function WidgetPromoteSoldier:OnUserDataChanged_soldierStars(userData, deltaData)
+    local ok, value = deltaData("soldierStars")
+    if ok then
+        for soldier_name,star in ipairs(value) do
+            if soldier_name == self.soldier_type then
+                if UtilsForSoldier.soldierStarMax == star then
+                    self:LeftButtonClicked()
+                else
+                    self:UpgradeFinishRefresh()
+                end
             end
         end
     end
 end
-function WidgetPromoteSoldier:OnMilitaryTechsDataChanged( soldier_manager,changed_map )
+function WidgetPromoteSoldier:OnUserDataChanged_militaryTechs(userData, deltaData)
     self:UpgradeRequirement()
 end
 function WidgetPromoteSoldier:PopNotSatisfyDialog(upgrade_listener,results)
@@ -283,28 +282,28 @@ function WidgetPromoteSoldier:GetInstantUpgradeGems()
 end
 function WidgetPromoteSoldier:GetUpgradeGems()
     local config = self:GetNextLevelConfig()
-    local current_coin = City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local current_coin = User:GetResValueByType("coin")
     -- 正在升级的军事科技剩余升级时间
-    local left_time = City:GetSoldierManager():GetUpgradingMitiTaryTechLeftTimeByCurrentTime(self.building_type)
+    local left_time = User:GetShortMilitaryTechEventTime(self.building_type)
     return DataUtils:buyResource({coin = config.upgradeCoinNeed}, {coin=current_coin}) + DataUtils:getGemByTimeInterval(left_time)
 
 end
 function WidgetPromoteSoldier:IsAbleToUpgradeNow()
     local level_up_config = self:GetNextLevelConfig()
 
-    local tech_points = City:GetSoldierManager():GetTechPointsByType(self:GetSoldierMapToBuilding())
+    local tech_points = User:GetTechPoints(self:GetSoldierMapToBuilding())
     local results = {}
     if tech_points<level_up_config.upgradeTechPointNeed then
         table.insert(results, _("科技点未达到要求"))
     end
-    if self:GetInstantUpgradeGems() > User:GetGemResource():GetValue() then
+    if self:GetInstantUpgradeGems() > User:GetGemValue() then
         table.insert(results, _("金龙币不足"))
     end
     return results
 end
 function WidgetPromoteSoldier:IsAbleToUpgradeFirst()
     local level_up_config = self:GetNextLevelConfig()
-    local tech_points = City:GetSoldierManager():GetTechPointsByType(self:GetSoldierMapToBuilding())
+    local tech_points = User:GetTechPoints(self:GetSoldierMapToBuilding())
     local results = {}
     if tech_points<level_up_config.upgradeTechPointNeed then
         table.insert(results, _("科技点未达到要求"))
@@ -313,9 +312,9 @@ function WidgetPromoteSoldier:IsAbleToUpgradeFirst()
 end
 function WidgetPromoteSoldier:IsAbleToUpgradeSecond()
     local level_up_config = self:GetNextLevelConfig()
-    local current_coin = City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local current_coin = User:GetResValueByType("coin")
     local results = {}
-    if City:GetSoldierManager():IsUpgradingMilitaryTech(self.building_type) then
+    if User:HasMilitaryTechEventBy(self.building_type) then
         table.insert(results, _("升级军事科技队列被占用"))
     end
     if current_coin<level_up_config.upgradeCoinNeed then
@@ -326,7 +325,8 @@ function WidgetPromoteSoldier:IsAbleToUpgradeSecond()
     return results
 end
 function WidgetPromoteSoldier:GetNextLevelConfig()
-    return NORMAL[self.soldier_type.."_"..(City:GetSoldierManager():GetStarBySoldierType(self.soldier_type)+1)]
+
+    return NORMAL[self.soldier_type.."_"..(User:SoldierStarByName(self.soldier_type) + 1)]
 end
 return WidgetPromoteSoldier
 

@@ -13,6 +13,7 @@ function FullScreenPopDialogUI:Init(listener)
     -- bg
     local bg = display.newSprite("back_ground_608x350.png", display.cx, display.top - 480)
     self:addTouchAbleChild(bg)
+    self.body = bg
     local size = bg:getContentSize()
     -- title bg
     local title_bg =display.newSprite("title_blue_600x56.png", size.width/2, size.height+10):addTo(bg)
@@ -63,7 +64,12 @@ function FullScreenPopDialogUI:SetTitle(title)
     self.title:setString(title)
     return self
 end
-
+function FullScreenPopDialogUI:HideTipBg()
+    self.tip_bg:hide()
+end
+function FullScreenPopDialogUI:GetBody()
+    return self.body
+end
 function FullScreenPopDialogUI:SetPopMessage(message)
     local message_label = UIKit:ttfLabel({
         text = message,
@@ -104,7 +110,7 @@ function FullScreenPopDialogUI:CreateOKButton(params)
                     listener()
                 end
             end
-        end):align(display.CENTER, params.x or display.cx+200, params.y or display.top-610):addTo(self)
+        end):align(display.CENTER, params.x or display.cx+190, params.y or display.top-610):addTo(self)
     self.ok_button = ok_button
     return self
 end

@@ -15,7 +15,7 @@ function GameUIAlliancePalaceEnter:GetUITitle()
 end
 
 function GameUIAlliancePalaceEnter:GetBuildingImage()
-	return UILib.alliance_building.palace
+	return self.isMyAlliance and UILib.alliance_building.palace or UILib.other_alliance_building.palace
 end
 
 function GameUIAlliancePalaceEnter:GetBuildImageInfomation(sprite)

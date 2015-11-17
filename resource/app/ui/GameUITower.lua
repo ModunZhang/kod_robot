@@ -27,21 +27,12 @@ function GameUITower:OnMoveInStage()
     end):pos(window.cx, window.bottom + 34)
 
     self:InitInfo()
-    self.building:AddUpgradeListener(self)
 end
 function GameUITower:onExit()
-    self.building:RemoveUpgradeListener(self)
     GameUITower.super.onExit(self)
 end
-
-
-
-function GameUITower:OnBuildingUpgradingBegin()
-end
-function GameUITower:OnBuildingUpgradeFinished()
+function GameUITower:OnUserDataChanged_buildingEvents()
     self.infos:CreateInfoItems(self:GetInfos())
-end
-function GameUITower:OnBuildingUpgrading()
 end
 function GameUITower:CreateBetweenBgAndTitle()
     GameUITower.super.CreateBetweenBgAndTitle(self)

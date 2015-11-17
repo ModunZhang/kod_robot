@@ -3,10 +3,32 @@ local ipairs = ipairs
 local insert = table.insert
 local tonumber = tonumber
 local split = string.split
+local find = string.find
+local format = string.format
+local gsub = string.gsub
 local null = json.null
+
+local deltameta = {}
+deltameta.__call = function(root, indexstr, value)
+    for i,key in ipairs(split(indexstr, ".")) do
+        root = root[key]
+        if not root then
+            return false
+        end
+    end
+    if value then
+        return root == value
+    end
+    return true, root
+end
+
+
 return function(base, delta)
     local edit = {}
     for _,v in ipairs(delta) do
+        if type(v) == "string" and GameUtils then
+            GameUtils:UploadErrors(v)
+        end
         local origin_key,value = unpack(v)
         local is_json_null = value == null
         local keys = split(origin_key, ".")
@@ -61,10 +83,12 @@ return function(base, delta)
                             tmp.edit = tmp.edit or {}
                             insert(tmp.edit, value)
                             curRoot[k] = value
+                            tmp[k] = value
                         else
                             tmp.add = tmp.add or {}
                             insert(tmp.add, value)
                             curRoot[k] = value
+                            tmp[k] = value
                         end
                     else
                         tmp[k] = value
@@ -74,5 +98,12 @@ return function(base, delta)
             end
         end
     end
-    return edit
+    return setmetatable(edit, deltameta)
 end
+
+
+
+
+
+
+

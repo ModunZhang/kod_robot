@@ -18,12 +18,20 @@ function CityScene:onEnter()
     self:PlayBackgroundMusic()
     self:GotoLogicPointInstant(5, 4)
     self:GetSceneLayer():ZoomTo(0.8)
+    self:RefreshStrenth()
 
     --  cc.ui.UIPushButton.new({normal = "lock_btn.png",pressed = "lock_btn.png"})
     -- :addTo(self, 1000000):pos(display.cx, display.cy + 300)
     -- :onButtonClicked(function()
     --     app:ReloadGame()
     -- end)
+end
+function CityScene:RefreshStrenth()
+    local limit = self.city:GetUser():GetResProduction("stamina").limit
+    local value = self.city:GetUser():GetResValueByType("stamina")
+    local ratio = value / limit
+    ratio = ratio > 1 and 1 or ratio
+    self:GetSceneLayer():GetAirship():SetBattery(ratio)
 end
 function CityScene:onExit()
     self:stopAllActions()
@@ -69,8 +77,8 @@ function CityScene:PlayBackgroundMusic()
     -- end, 113 + 30)
 end
 function CityScene:ChangeTerrain()
-    -- self:GetSceneLayer():ChangeTerrain()
-    -- self:PlayEffectIf()
+-- self:GetSceneLayer():ChangeTerrain()
+-- self:PlayEffectIf()
 end
 function CityScene:EnterEditMode()
     self:GetSceneLayer():EnterEditMode()
@@ -154,9 +162,7 @@ end
 
 function CityScene:onEnterTransitionFinish()
     CityScene.super.onEnterTransitionFinish(self)
-    self:GetScreenLayer():performWithDelay(function()
-        self:PlayEffectIf()
-    end, math.random(3))
+    self:PlayEffectIf()
 end
 
 
@@ -164,55 +170,31 @@ local EFFECT_TAG = 12321
 function CityScene:PlayEffectIf()
     if math.floor(app.timer:GetServerTime()) % 2 == 1 then return end
     self:GetScreenLayer():removeAllChildren()
-    local terrain = self:GetCity():GetUser():Terrain()
+    local terrain = self:GetCity():GetUser().basicInfo.terrain
     if terrain == "iceField" then
-        local emitter = cc.ParticleRain:createWithTotalParticles(100)
-            :addTo(self:GetScreenLayer(), 1, EFFECT_TAG):pos(display.cx-80, display.height)
-        emitter:setLife(7)
-        emitter:setStartSize(10)
-        emitter:setStartSizeVar(10)
-        emitter:setRadialAccel(10)
-        emitter:setRadialAccelVar(50)
-        emitter:setRotationIsDir(true)
-        emitter:setStartSpinVar(1000)
-        emitter:setEndSpinVar(1000)
-        emitter:setStartColor(cc.c4f(1,1,1,0.8))
-        emitter:setStartColorVar(cc.c4f(0,0,0,0.2))
-        emitter:setEndColor(cc.c4f(1,1,1,0))
-        emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
-        emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("snow.png"))
-        emitter:updateWithNoTime()
+        local emitter = UIKit:CreateSnow():addTo(self:GetScreenLayer(), 1, EFFECT_TAG)
+            :pos(display.cx-80, display.height)
+        for i = 1, 1000 do
+            emitter:update(0.01)
+        end
     elseif terrain == "grassLand" then
-        local emitter = cc.ParticleRain:createWithTotalParticles(100)
-            :addTo(self:GetScreenLayer(), 1, EFFECT_TAG):pos(display.cx + 80, display.height)
-        emitter:setPosVar(cc.p(display.cx,0))
-        emitter:setGravity(cc.p(-10,-10))
-        emitter:setStartSize(30)
-        emitter:setStartSizeVar(30)
-        emitter:setEndSize(30)
-        emitter:setEndSizeVar(30)
-        emitter:setLife(0.5)
-        emitter:setSpeed(1800)
-        emitter:setSpeedVar(100)
-        emitter:setAngle(-100)
-        emitter:setAngleVar(0)
-        emitter:setRadialAccel(100)
-        emitter:setRadialAccelVar(0)
-        emitter:setTangentialAccel(0)
-        emitter:setTangentialAccelVar(0)
-        emitter:setRotationIsDir(false)
-        emitter:setStartSpin(10)
-        emitter:setEndSpin(10)
-        emitter:setStartColor(cc.c4f(1,1,1,0.9))
-        emitter:setStartColorVar(cc.c4f(0,0,0,0.1))
-        emitter:setEndColor(cc.c4f(1,1,1,0.5))
-        emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
-        emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("rain.png"))
-        emitter:updateWithNoTime()
+        self:performWithDelay(function()
+            local emitter = UIKit:CreateRain():addTo(self:GetScreenLayer(), 1, EFFECT_TAG)
+            :pos(display.cx + 80, display.height)
+        end, 1)
+    elseif terrain == "desert" then
+        local emitter = UIKit:CreateSand():addTo(self:GetScreenLayer(), 1, EFFECT_TAG)
+            :pos(0, display.cy)
+        for i = 1, 1000 do
+            emitter:update(0.01)
+        end
     end
 end
 
 return CityScene
+
+
+
 
 
 

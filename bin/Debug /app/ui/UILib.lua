@@ -13,7 +13,7 @@ local function getAniNameFromAnimationFiles(animation_files)
 end
 
 local PLAYER_ICON = {
-    [0] = "Icon_empireRise_128x128.png", -- 系统头像
+    [0] = "empireRise.png", -- 系统头像
     "player_icon_1.png",
     "player_icon_2.png",
     "player_icon_3.png",
@@ -389,13 +389,13 @@ local SOLDIER_IMAGES = {
 local SOLDIER_COLOR_BG_IMAGES = {
     wall = "blue_bg_128x128.png",
     ranger = "blue_bg_128x128.png",
-    catapult = "yellow_bg_128x128.png",
+    catapult = "blue_bg_128x128.png",
     lancer = "blue_bg_128x128.png",
     swordsman = "blue_bg_128x128.png",
-    sentinel = "blue_bg_128x128.png",
-    crossbowman = "blue_bg_128x128.png",
-    horseArcher = "blue_bg_128x128.png",
-    ballista = "yellow_bg_128x128.png",
+    sentinel = "red_bg_128x128.png",
+    crossbowman = "red_bg_128x128.png",
+    horseArcher = "red_bg_128x128.png",
+    ballista = "red_bg_128x128.png",
     skeletonWarrior = "green_bg_128x128.png",
     skeletonArcher = "green_bg_128x128.png",
     deathKnight = "green_bg_128x128.png",
@@ -505,40 +505,60 @@ local DRAGON_ANIMATIONS_FILES = {
 }
 local DECORATOR_IMAGE = {
     grassLand = {
-        decorate_lake_1 = "lake_1_grassLand.png",
-        decorate_lake_2 =  "lake_2_grassLand.png",
-        decorate_mountain_1 =  "hill_1_grassLand.png",
-        decorate_mountain_2 =  "hill_2_grassLand.png",
+        decorate_lake_1 = "lake_1_grassLand_new.png",
+        decorate_lake_2 =  "lake_2_grassLand_new.png",
+        decorate_mountain_1 =  "hill_1_grassLand_new.png",
+        decorate_mountain_2 =  "hill_2_grassLand_new.png",
         decorate_tree_1 =  "tree_1_grassLand.png",
         decorate_tree_2 =  "tree_2_grassLand.png",
         decorate_tree_3 =  "tree_3_grassLand.png",
         decorate_tree_4 =  "tree_4_grassLand.png",
+        decorate_tree_5 =  "crushed_airship.png",
+        decorate_tree_6 =  "warriors_tomb_80x72.png",
+        decorate_tree_7 =  "tree_3_grassLand.png",
+        decorate_tree_8 =  "tree_4_grassLand.png",
+        decorate_tree_9 =  "tree_1_grassLand.png",
     },
     iceField = {
-        decorate_lake_1 = "lake_1_iceField.png",
-        decorate_lake_2 =  "lake_2_iceField.png",
-        decorate_mountain_1 =  "hill_1_iceField.png",
-        decorate_mountain_2 =  "hill_2_iceField.png",
+        decorate_lake_1 = "lake_1_iceField_new.png",
+        decorate_lake_2 =  "lake_2_iceField_new.png",
+        decorate_mountain_1 =  "hill_1_iceField_new.png",
+        decorate_mountain_2 =  "hill_2_iceField_new.png",
         decorate_tree_1 =  "tree_1_iceField.png",
         decorate_tree_2 =  "tree_2_iceField.png",
         decorate_tree_3 =  "tree_3_iceField.png",
         decorate_tree_4 =  "tree_4_iceField.png",
+        decorate_tree_5 =  "crushed_airship.png",
+        decorate_tree_6 =  "warriors_tomb_80x72.png",
+        decorate_tree_7 =  "tree_3_iceField.png",
+        decorate_tree_8 =  "tree_4_iceField.png",
+        decorate_tree_9 =  "tree_1_iceField.png",
     },
     desert = {
-        decorate_lake_1 = "lake_1_desert.png",
-        decorate_lake_2 =  "lake_2_desert.png",
-        decorate_mountain_1 =  "hill_1_desert.png",
-        decorate_mountain_2 =  "hill_2_desert.png",
+        decorate_lake_1 = "lake_1_desert_new.png",
+        decorate_lake_2 =  "lake_2_desert_new.png",
+        decorate_mountain_1 =  "hill_1_desert_new.png",
+        decorate_mountain_2 =  "hill_2_desert_new.png",
         decorate_tree_1 =  "tree_1_desert.png",
         decorate_tree_2 =  "tree_2_desert.png",
         decorate_tree_3 =  "tree_3_desert.png",
         decorate_tree_4 =  "tree_4_desert.png",
+        decorate_tree_5 =  "crushed_airship.png",
+        decorate_tree_6 =  "warriors_tomb_80x72.png",
+        decorate_tree_7 =  "tree_3_desert.png",
+        decorate_tree_8 =  "tree_4_desert.png",
+        decorate_tree_9 =  "tree_1_desert.png",
     },
 }
 local DRAGON_HEAD = {
     blueDragon = "Dragon_blue_113x128.png",
     redDragon = "redDragon.png",
     greenDragon = "greenDragon.png"
+}
+local SMALL_DRAGON_HEAD = {
+    blueDragon = "blueDragon_40x40.png",
+    redDragon = "redDragon_40x40.png",
+    greenDragon = "greenDragon_40x40.png"
 }
 local BUFF = {
     masterOfDefender = "masterOfDefender_128x128.png",
@@ -734,43 +754,26 @@ local DRAGON_ANIMATIONS = getAniNameFromAnimationFiles(DRAGON_ANIMATIONS_FILES)
 
 local ALLIANCE_BUILDING = {
     palace = "alliance_palace.png",
-    shrine = "alliance_shrine.png",
+    shrine = "alliance_shrine_1.png",
     shop = "alliance_shop.png",
     orderHall = "alliance_orderHall.png",
-    moonGate = "alliance_moonGate.png",
+    watchTower = "alliance_watchTower.png",
+    bloodSpring = "alliance_bloodSpring.png",
 }
 local OTHER_ALLIANCE_BUILDING = setmetatable({
     palace = "other_palace.png",
     shop = "other_shop.png",
     orderHall = "other_orderHall.png",
+    bloodSpring = "alliance_bloodSpring.png",
 }, {__index = ALLIANCE_BUILDING})
 
 local DAILY_TASK_ICON = {
-    empireRise = "Icon_empireRise_128x128.png",
+    empireRise = "empireRise.png",
     conqueror = "Icon_conqueror_104x117.png",
     brotherClub = "Icon_brotherClub_122x124.png",
     growUp = "Icon_growUp_108x115.png"
 }
-local PVEDefine = import("..entity.PVEDefine")
 local SpriteConfig = import("..sprites.SpriteConfig")
-local PVE = {
-    [PVEDefine.START_AIRSHIP] = {"image", "pve_char.png", 1},
-    [PVEDefine.WOODCUTTER] = {"image", SpriteConfig["woodcutter"]:GetConfigByLevel(1).png},
-    [PVEDefine.QUARRIER] = {"image", SpriteConfig["quarrier"]:GetConfigByLevel(1).png},
-    [PVEDefine.MINER] = {"image", SpriteConfig["miner"]:GetConfigByLevel(1).png},
-    [PVEDefine.FARMER] = {"image", SpriteConfig["farmer"]:GetConfigByLevel(1).png},
-    [PVEDefine.CAMP] = {"animation", "yewaiyindi"},
-    [PVEDefine.CRASHED_AIRSHIP] = {"image", "crashed_airship_80x70.png"},
-    [PVEDefine.CONSTRUCTION_RUINS] = {"image", "ruin_1.png"},
-    [PVEDefine.KEEL] = {"image", "keel_189x86.png"},
-    [PVEDefine.WARRIORS_TOMB] = {"image", "warriors_tomb_80x72.png"},
-    [PVEDefine.OBELISK] = {"animation", "zhihuishi"},
-    [PVEDefine.ANCIENT_RUINS] = {"image", "alliance_shrine.png", 0.8},
-    [PVEDefine.ENTRANCE_DOOR] = {"image", ALLIANCE_BUILDING.moonGate},
-    [PVEDefine.TREE] = {"image", "tree_1_grassLand.png", 0.5, grassLand = "tree_1_grassLand.png", iceField = "tree_1_iceField.png", desert = "tree_1_desert.png"},
-    [PVEDefine.HILL] = {"image", "tree_1_grassLand.png", 0.5, grassLand = "hill_2_grassLand.png", iceField = "hill_2_iceField.png", desert = "hill_2_desert.png"},
-    [PVEDefine.LAKE] = {"image", "tree_1_grassLand.png", 0.5, grassLand = "lake_2_grassLand.png", iceField = "lake_2_iceField.png", desert = "lake_2_desert.png"},
-}
 local PVE_ANIMATION_FILES = {
     "animations/lanse.ExportJson",
     
@@ -933,7 +936,7 @@ local PRODUC_TIONTECHS_IMAGE = {
     beerSupply = "beerSupply_128x128.png",
     rescueTent = "rescueTent_128x128.png",
     colonization = "colonization_128x128.png",
-    negotiation = "negotiation_128x128.png",
+    recruitment = "negotiation_128x128.png",
     trap = "trap_128x128.png",
     hideout = "hideoud_128x128.png",
     logistics = "logistics_128x128.png",
@@ -1103,6 +1106,7 @@ return {
     black_soldier_color_bg_images = BLACK_SOLDIER_COLOR_BG_IMAGES,
     black_soldier_image = BLACK_SOLDIER_IMAGES,
     dragon_head  = DRAGON_HEAD,
+    small_dragon_head  = SMALL_DRAGON_HEAD,
     dragon_animations = DRAGON_ANIMATIONS,
     dragon_animations_files = DRAGON_ANIMATIONS_FILES,
     decorator_image = DECORATOR_IMAGE,
@@ -1116,7 +1120,6 @@ return {
     daily_task_icon = DAILY_TASK_ICON,
     building_animations = BUILDING_ANIMATIONS,
     building_animations_files = BUILDING_ANIMATIONS_FILES,
-    pve = PVE,
     loadUIAnimation = loadUIAnimation,
     loadBuildingAnimation = loadBuildingAnimation,
     unLoadBuildingAnimation = unLoadBuildingAnimation,

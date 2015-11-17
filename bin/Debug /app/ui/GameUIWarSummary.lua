@@ -4,7 +4,6 @@
 --
 local WidgetPopDialog = import("..widget.WidgetPopDialog")
 local WidgetAllianceHelper = import("..widget.WidgetAllianceHelper")
-local Flag = import("..entity.Flag")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 
@@ -19,7 +18,13 @@ function GameUIWarSummary:onEnter()
     self:DisableCloseBtn()
     self:DisableAutoClose()
     local alliance = Alliance_Manager:GetMyAlliance()
-    self:InitWarSummary(alliance:LastAllianceFightReport())
+      if alliance.allianceFightReports == nil then
+            NetManager:getAllianceFightReportsPromise(alliance._id):done(function ()
+                self:InitWarSummary(alliance:GetLastAllianceFightReports())
+            end)
+        else
+            self:InitWarSummary(alliance:GetLastAllianceFightReports())
+        end
 end
 function GameUIWarSummary:InitWarSummary(report)
     if not report then
@@ -28,14 +33,14 @@ function GameUIWarSummary:InitWarSummary(report)
     local alliance = Alliance_Manager:GetMyAlliance()
     -- 各项数据
     local win
-    if report.attackAllianceId == alliance:Id() then
+    if report.attackAllianceId == alliance._id then
         win = report.fightResult == "attackWin"
-    elseif report.defenceAllianceId == alliance:Id() then
+    elseif report.defenceAllianceId == alliance._id then
         win = report.fightResult == "defenceWin"
     end
     local fightTime = report.fightTime
-    local ourAlliance = report.attackAllianceId == alliance:Id() and report.attackAlliance or report.defenceAlliance
-    local enemyAlliance = report.attackAllianceId == alliance:Id() and report.defenceAlliance or report.attackAlliance
+    local ourAlliance = report.attackAllianceId == alliance._id and report.attackAlliance or report.defenceAlliance
+    local enemyAlliance = report.attackAllianceId == alliance._id and report.defenceAlliance or report.attackAlliance
     local killMax = report.killMax
 
     local content = self:GetBody()
@@ -96,11 +101,11 @@ function GameUIWarSummary:InitWarSummary(report)
         :addTo(fight_bg)
     -- 己方联盟旗帜
     local ui_helper = WidgetAllianceHelper.new()
-    local self_flag = ui_helper:CreateFlagContentSprite(Flag.new():DecodeFromJson(ourAlliance.flag)):scale(0.5)
+    local self_flag = ui_helper:CreateFlagContentSprite(ourAlliance.flag):scale(0.5)
     self_flag:align(display.CENTER, VS:getPositionX()-80, 10)
         :addTo(fight_bg)
     -- 敌方联盟旗帜
-    local enemy_flag = ui_helper:CreateFlagContentSprite(Flag.new():DecodeFromJson(enemyAlliance.flag)):scale(0.5)
+    local enemy_flag = ui_helper:CreateFlagContentSprite(enemyAlliance.flag):scale(0.5)
     enemy_flag:align(display.CENTER, VS:getPositionX()+20, 10)
         :addTo(fight_bg)
 
@@ -136,12 +141,12 @@ function GameUIWarSummary:InitWarSummary(report)
 
     local info_message = {
         {string.formatnumberthousands(ourAlliance.kill),_("总击杀"),string.formatnumberthousands(enemyAlliance.kill)},
-        {string.formatnumberthousands(ourAlliance.routCount),_("击溃城市"),string.formatnumberthousands(enemyAlliance.routCount)},
+        {string.formatnumberthousands(ourAlliance.routCount).."/"..string.formatnumberthousands(enemyAlliance.memberCount),_("击溃城市"),string.formatnumberthousands(enemyAlliance.routCount).."/"..string.formatnumberthousands(ourAlliance.memberCount)},
         {string.formatnumberthousands(ourAlliance.strikeCount),_("突袭次数"),string.formatnumberthousands(enemyAlliance.strikeCount)},
         {string.formatnumberthousands(ourAlliance.strikeSuccessCount),_("突袭成功"),string.formatnumberthousands(enemyAlliance.strikeSuccessCount)},
         {string.formatnumberthousands(ourAlliance.attackCount),_("进攻次数"),string.formatnumberthousands(enemyAlliance.attackCount)},
         {string.formatnumberthousands(ourAlliance.attackSuccessCount),_("进攻成功"),string.formatnumberthousands(enemyAlliance.attackSuccessCount)},
-        {killMax.allianceId == alliance:Id() and killMax.playerName ~= json.null and killMax.playerName or _("无"),_("头号杀手"),killMax.allianceId ~= alliance:Id() and killMax.playerName  ~= json.null and killMax.playerName or _("无")},
+        {killMax.allianceId == alliance._id and killMax.playerName ~= json.null and killMax.playerName or _("无"),_("头号杀手"),killMax.allianceId ~= alliance._id and killMax.playerName  ~= json.null and killMax.playerName or _("无")},
         {string.formatnumberthousands(ourAlliance.honour),_("荣耀值奖励"),string.formatnumberthousands(enemyAlliance.honour)},
     }
     local b_flag = true
@@ -164,13 +169,13 @@ function GameUIWarSummary:InitWarSummary(report)
             shadow= true
         })):onButtonClicked(function(event)
         if event.name == "CLICKED_EVENT" then
-            local scene_name = display.getRunningScene().__cname
-            alliance:SetLastAllianceFightReport(nil)
-            if scene_name == 'AllianceBattleScene' or scene_name == 'AllianceScene' then
-                app:EnterMyAllianceScene()
-            elseif scene_name == 'MyCityScene' then
+            -- local scene_name = display.getRunningScene().__cname
+            -- alliance:SetLastAllianceFightReport(nil)
+            -- if scene_name == 'AllianceBattleScene' or scene_name == 'AllianceScene' then
+            --     app:EnterMyAllianceScene()
+            -- elseif scene_name == 'MyCityScene' then
                 self:LeftButtonClicked()
-            end
+            -- end
         end
         end)
 end

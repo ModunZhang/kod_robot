@@ -60,7 +60,12 @@ end
 function GameUIDragonEyrieMain:OnBasicChanged(dragon)
     self:RefreshUI()
 end
-
+function GameUIDragonEyrieMain:OnUserDataChanged_buildings(userData, deltaData)
+    local ok,value = deltaData("buildings.location_4")
+    if ok then
+        self.hate_button:setButtonEnabled(self.building:CheckIfHateDragon())
+    end
+end
 -- function GameUIDragonEyrieMain:OnDragonEventChanged()
 --     local dragonEvent = self.dragon_manager:GetDragonEventByDragonType(self:GetCurrentDragon():Type())
 --     if dragonEvent then
@@ -113,25 +118,18 @@ function GameUIDragonEyrieMain:OnMoveInStage()
     self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventChanged)
     self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventRefresh)
     self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventTimer)
-    City:AddListenOnType(self,City.LISTEN_TYPE.UPGRADE_BUILDING)
+    User:AddListenOnType(self, "buildings")
     GameUIDragonEyrieMain.super.OnMoveInStage(self)
 end
 
-function GameUIDragonEyrieMain:OnUpgradingBegin()
-end
+-- if building:GetType() == self:GetBuilding():GetType() then
+--     if self.dragon_hp_recovery_count_label then
+--         local dragon_hp_recovery = self:GetBuilding():GetTotalHPRecoveryPerHour(self:GetCurrentDragon():Type())
+--         self.dragon_hp_recovery_count_label:setString(string.format("+%s/h",string.formatnumberthousands(dragon_hp_recovery)))
+--     end
+--     self.hate_button:setButtonEnabled(self.building:CheckIfHateDragon())
+-- end
 
-function GameUIDragonEyrieMain:OnUpgradingFinished(building)
-    if building:GetType() == self:GetBuilding():GetType() then
-        if self.dragon_hp_recovery_count_label then
-            local dragon_hp_recovery = self:GetBuilding():GetTotalHPRecoveryPerHour(self:GetCurrentDragon():Type())
-            self.dragon_hp_recovery_count_label:setString(string.format("+%s/h",string.formatnumberthousands(dragon_hp_recovery)))
-        end
-        self.hate_button:setButtonEnabled(self.building:CheckIfHateDragon())
-    end
-end
-
-function GameUIDragonEyrieMain:OnUpgrading()
-end
 
 function GameUIDragonEyrieMain:OnMoveOutStage()
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnHPChanged)
@@ -142,7 +140,7 @@ function GameUIDragonEyrieMain:OnMoveOutStage()
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventChanged)
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventRefresh)
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventTimer)
-    City:RemoveListenerOnType(self,City.LISTEN_TYPE.UPGRADE_BUILDING)
+    User:RemoveListenerOnType(self, "buildings")
     GameUIDragonEyrieMain.super.OnMoveOutStage(self)
 end
 
@@ -218,7 +216,7 @@ function GameUIDragonEyrieMain:RefreshUI()
             self.dragon_info:show()
             self.progress_content_hated:show()
             local dragon_hp_recovery = self:GetBuilding():GetTotalHPRecoveryPerHour(dragon:Type())
-            self.dragon_hp_recovery_count_label:setString(string.format("+%s/h",string.formatnumberthousands(dragon_hp_recovery)))
+            self.dragon_hp_recovery_count_label:setString(string.format("+%s/h", dragon:Status()~= "march" and string.formatnumberthousands(dragon_hp_recovery) or 0))
             self.dragon_hp_label:setString(string.formatnumberthousands(dragon:Hp()) .. "/" .. string.formatnumberthousands(dragon:GetMaxHP()))
             self.progress_hated:setPercentage(dragon:Hp()/dragon:GetMaxHP()*100)
             self.state_label:setString(Localize.dragon_status[dragon:Status()])
@@ -232,8 +230,8 @@ function GameUIDragonEyrieMain:RefreshUI()
         end
         self.draong_info_lv_label:setString("LV " .. dragon:Level() .. "/" .. dragon:GetMaxLevel())
         self.draong_info_xp_label:setString(string.formatnumberthousands(dragon:Exp()) .. "/" .. string.formatnumberthousands(dragon:GetMaxExp()))
-        self.expIcon:setPositionX(self.draong_info_xp_label:getPositionX() - self.draong_info_xp_label:getContentSize().width/2 - 10)
-        self.exp_add_button:setPositionX(self.draong_info_xp_label:getPositionX() + self.draong_info_xp_label:getContentSize().width/2 + 10)
+        -- self.expIcon:setPositionX(self.draong_info_xp_label:getPositionX() - self.draong_info_xp_label:getContentSize().width/2 - 10)
+        -- self.exp_add_button:setPositionX(self.draong_info_xp_label:getPositionX() + self.draong_info_xp_label:getContentSize().width/2 + 10)
     end
     self.nameLabel:setString(dragon:GetLocalizedName())
 end
@@ -294,6 +292,8 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
         self.draongContentNode = draongContentNode
         self.draongContentNode:SetScrollable(not self:IsDragonLock())
         dragonAnimateNode:addTo(self.dragonNode):pos(window.cx - 310,window.top_bottom - 576)
+        -- 阻挡滑动龙超出的区域
+        display.newLayer():addTo(self.dragonNode):pos(window.cx - 310,window.top_bottom - 676):size(620,100)
         --info
         local info_bg = display.newSprite("dragon_info_bg_290x92.png")
             :align(display.BOTTOM_CENTER, 309, 50)
@@ -317,12 +317,12 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
         local expIcon = display.newSprite("upgrade_experience_icon.png")
             :addTo(info_bg)
             :scale(0.7)
-            :align(display.BOTTOM_RIGHT, self.draong_info_xp_label:getPositionX() - self.draong_info_xp_label:getContentSize().width/2 - 10,10)
+            :align(display.BOTTOM_LEFT, 10,9)
         self.expIcon = expIcon
         local add_button = WidgetPushButton.new({normal = "add_btn_up_50x50.png",pressed = "add_btn_down_50x50.png"})
             :addTo(info_bg)
             :scale(0.8)
-            :align(display.LEFT_CENTER,self.draong_info_xp_label:getPositionX()+self.draong_info_xp_label:getContentSize().width/2+10,10 + expIcon:getCascadeBoundingBox().height/2)
+            :align(display.RIGHT_CENTER,info_bg:getContentSize().width - 10,9 + expIcon:getCascadeBoundingBox().height/2)
             :onButtonClicked(function()
                 self:OnDragonExpItemUseButtonClicked()
             end)
@@ -527,7 +527,7 @@ function GameUIDragonEyrieMain:CreateDragonHateNodeIf()
         --     color= 0x403c2f,
         --     align= cc.TEXT_ALIGNMENT_CENTER
         -- }):addTo(event_node):align(display.LEFT_CENTER, window.left + 60, 95)
-        -- local progress = WidgetProgress.new(UIKit:hex2c3b(0xffedae), "progress_bar_364x40_1.png", "progress_bar_364x40_2.png", {
+        -- local progress = WidgetProgress.new(0xffedae, "progress_bar_364x40_1.png", "progress_bar_364x40_2.png", {
         --     icon_bg = "back_ground_43x43.png",
         --     icon = "hourglass_30x38.png",
         --     bar_pos = {x = 0,y = 0}
@@ -590,7 +590,7 @@ function GameUIDragonEyrieMain:CreateDragonScrollNode()
             :addTo(v)
         v.dragon_image = dragon_image
         dragon_image.resolution = {dragon_image:getContentSize().width,dragon_image:getContentSize().height}
-        local dragon_armature = DragonSprite.new(display.getRunningScene():GetSceneLayer(),dragon:GetTerrain())
+        local dragon_armature = DragonSprite.new(display.getRunningScene():GetSceneLayer(),dragon:Type())
             :addTo(v)
             :pos(240,440)
             :hide():scale(0.9)
@@ -661,7 +661,7 @@ function GameUIDragonEyrieMain:ChangeDragon(direction)
 end
 function GameUIDragonEyrieMain:OnDragonHpItemUseButtonClicked()
     local widgetUseItems = WidgetUseItems.new():Create({
-        item_type = WidgetUseItems.USE_TYPE.DRAGON_HP,
+        item_name = "dragonHp_1",
         dragon = self:GetCurrentDragon()
     })
     widgetUseItems:AddToCurrentScene()
@@ -669,7 +669,7 @@ end
 
 function GameUIDragonEyrieMain:OnDragonExpItemUseButtonClicked()
     local widgetUseItems = WidgetUseItems.new():Create({
-        item_type = WidgetUseItems.USE_TYPE.DRAGON_EXP,
+        item_name = "dragonExp_1",
         dragon = self:GetCurrentDragon()
     })
     widgetUseItems:AddToCurrentScene()

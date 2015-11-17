@@ -3,7 +3,6 @@
 -- Date: 2014-09-13 10:30:04
 --
 local GameUIResource = UIKit:createUIClass("GameUIResource","GameUIUpgradeBuilding")
-local ResourceManager = import("..entity.ResourceManager")
 local WidgetInfoWithTitle = import("..widget.WidgetInfoWithTitle")
 local WidgetMoveHouse = import("..widget.WidgetMoveHouse")
 local UILib = import(".UILib")
@@ -59,9 +58,10 @@ function GameUIResource:CreateInfomation()
         :align(display.LEFT_TOP, window.left+48, iconBg:getPositionY()-iconBg:getContentSize().height+36)
         :addTo(infomationLayer)
     local lvLabel = UIKit:ttfLabel({
-        text = _("拥有").." "..ItemManager:GetItemByName("torch"):Count(),
-        size = 18,
-        color = 0xffedae,
+
+            text = _("拥有").." "..User:GetItemCount("torch"),
+            size = 18,
+            color = 0xffedae,
     }):addTo(lvBg):align(display.CENTER,lvBg:getContentSize().width/2,lvBg:getContentSize().height/2)
 
     local title_bg = display.newSprite("title_blue_430x30.png"):addTo(infomationLayer)
@@ -118,13 +118,14 @@ function GameUIResource:CreateInfomation()
         :onButtonClicked(function(event)
             self:ChaiButtonAction(event)
         end)
-    if ItemManager:GetItemByName("torch"):Count()>0 then
+    if User:GetItemCount("torch") > 0 then
         chaiButton:setButtonImage(cc.ui.UIPushButton.NORMAL, "red_btn_up_148x58.png", true)
         chaiButton:setButtonImage(cc.ui.UIPushButton.PRESSED, "red_btn_down_148x58.png", true)
         chaiButton:setButtonLabel("normal", UIKit:ttfLabel({
             text = _("拆除"),
             size = 22,
             color = 0xffedae,
+            shadow = true
         }))
     else
         chaiButton:setButtonImage(cc.ui.UIPushButton.NORMAL, "green_btn_up_148x58.png", true)
@@ -133,13 +134,14 @@ function GameUIResource:CreateInfomation()
             text = _("购买&拆除"),
             size = 18,
             color = 0xffedae,
+            shadow = true
         }))
             :setButtonLabelOffset(0, 14)
         local num_bg = display.newSprite("back_ground_122x20.png"):addTo(chaiButton):align(display.CENTER, -74, -40)
         -- gem icon
         local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(num_bg):align(display.CENTER, 20, num_bg:getContentSize().height/2):scale(0.5)
         local price = UIKit:ttfLabel({
-            text = string.formatnumberthousands(ItemManager:GetItemByName("torch"):Price()),
+            text = string.formatnumberthousands(UtilsForItem:GetItemInfoByName("torch").price),
             size = 18,
             color = 0xffd200,
         }):align(display.LEFT_CENTER, 50 , num_bg:getContentSize().height/2)
@@ -148,7 +150,6 @@ function GameUIResource:CreateInfomation()
 
 
     -- 移动小屋
-    local movingConstruction_item = ItemManager:GetItemByName("movingConstruction")
     local iconBg = display.newSprite("box_118x118.png")
         :align(display.LEFT_TOP, window.left+40, window.top - 260)
         :addTo(infomationLayer)
@@ -159,7 +160,7 @@ function GameUIResource:CreateInfomation()
         :align(display.LEFT_TOP, window.left+48, iconBg:getPositionY()-iconBg:getContentSize().height+36)
         :addTo(infomationLayer)
     local lvLabel = UIKit:ttfLabel({
-        text = _("拥有").." "..movingConstruction_item:Count(),
+        text = _("拥有").." "..User:GetItemCount("movingConstruction"),
         size = 18,
         color = 0xffedae,
     }):addTo(lvBg):align(display.CENTER,lvBg:getContentSize().width/2,lvBg:getContentSize().height/2)
@@ -188,24 +189,26 @@ function GameUIResource:CreateInfomation()
         :onButtonClicked(function(event)
             self:MoveButtonAction(event)
         end)
-    if movingConstruction_item:Count()>0 then
+    if User:GetItemCount("movingConstruction") > 0 then
         moveButton:setButtonLabel("normal", UIKit:ttfLabel({
             text = _("移动"),
             size = 22,
             color = 0xffedae,
+            shadow = true
         }))
     else
         moveButton:setButtonLabel("normal", UIKit:ttfLabel({
             text = _("购买&移动"),
             size = 18,
             color = 0xffedae,
+            shadow = true
         }))
             :setButtonLabelOffset(0, 14)
         local num_bg = display.newSprite("back_ground_122x20.png"):addTo(moveButton):align(display.CENTER, -74, -40)
         -- gem icon
         local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(num_bg):align(display.CENTER, 20, num_bg:getContentSize().height/2):scale(0.5)
         local price = UIKit:ttfLabel({
-            text = string.formatnumberthousands(movingConstruction_item:Price()),
+            text = string.formatnumberthousands(UtilsForItem:GetItemInfoByName("movingConstruction").price),
             size = 18,
             color = 0xffd200,
         }):align(display.LEFT_CENTER, 50 , num_bg:getContentSize().height/2)
@@ -222,23 +225,26 @@ function GameUIResource:CreateInfomation()
 
 
     self.listView = self.info:GetListView()
-
-    local resource = self.city.resource_manager:GetResourceByType(self.building:GetUpdateResourceType())
     local citizen = self.building:GetCitizen()
     self.firstValueLabel:setString(string.format('%d',citizen))
     local __,resource_title = self:GetTitleByType(self.building)
     self.secondLabel:setString(resource_title)
 
-    if ResourceManager.RESOURCE_TYPE.CITIZEN ==  self.building:GetUpdateResourceType() then
+    if "citizen" ==  self.building:GetResType() then
         self.secondValueLabel:setString(string.format("-%d",self.building:GetProductionLimit()))
         self.firstLable:setString(_("银币产量"))
         self.firstValueLabel:setString(string.format("-%d/h",self.building:GetProductionPerHour()))
     else
         local reduce = self.building:GetProductionPerHour()
-        local buffMap,__ = self.city.resource_manager:GetTotalBuffData(self.city)
-        local key = ResourceManager.RESOURCE_TYPE[self.building:GetUpdateResourceType()]
-        if buffMap[key] then
-            reduce = reduce * (1 + buffMap[key])
+        local buff_building = UtilsForBuilding:GetBuildingsBuff(User)
+        local buff_tech     = UtilsForTech:GetBuff(User)
+        local buff_item     = UtilsForItem:GetBuff(User)
+        local buff_vip      = User:GetVipBuff()
+        local buff_terrain  = User:GetTerrainResourceBuff()
+        local buff_total    = buff_building + buff_tech + buff_item + buff_vip + buff_terrain
+        local key = self.building:GetResType()
+        if buff_total[key] then
+            reduce = reduce * (1 + buff_total[key])
         end
         self.secondValueLabel:setString(string.format("-%d/h",reduce))
     end
@@ -283,13 +289,11 @@ function GameUIResource:GetDataSource()
     local dataSource = {{_("待建地基"),'x' .. #self.city:GetRuinsNotBeenOccupied()}}
     local decorators = self.city:GetDecoratorsByType(self.building:GetType())
     table.insert(dataSource,{_("可建造数量"),#decorators .. '/' .. self.city:GetMaxHouseCanBeBuilt(self.building:GetType())})
-    local resource = self.city.resource_manager:GetResourceByType(self.building:GetUpdateResourceType())
     local __,__,title = self:GetTitleByType(self.building)
-    table.insert(dataSource,{title,string.format("%d/h",resource:GetProductionPerHour())})
+    table.insert(dataSource,{title,string.format("%d/h", self.city:GetUser():GetResProduction(self.building:GetResType()).output)})
 
-    if self.building:GetUpdateResourceType() == ResourceManager.RESOURCE_TYPE.CITIZEN then
-        local coin_resource = self.city.resource_manager:GetCoinResource()
-        local desc = string.format("%d/h",coin_resource:GetProductionPerHour())
+    if self.building:GetResType() == "citizen" then
+        local desc = string.format("%d/h", self.city:GetUser():GetResProduction("coin").output)
         table.insert(dataSource,{_("当前产出银币"),desc})
     end
     local levelTable = {}
@@ -316,16 +320,16 @@ end
 
 
 function GameUIResource:GetTitleByType(building)
-    local type = building:GetUpdateResourceType()
-    if type == ResourceManager.RESOURCE_TYPE.WOOD then
+    local type_ = building:GetResType()
+    if type_ == "wood" then
         return _("木工小屋"),_("木材产量"),_("当前产出木材")
-    elseif type == ResourceManager.RESOURCE_TYPE.IRON then
+    elseif type_ == "iron" then
         return _("矿工小屋"),_("铁矿产量"),_("当前产出铁矿")
-    elseif type == ResourceManager.RESOURCE_TYPE.STONE then
+    elseif type_ == "stone" then
         return _("石匠小屋"),_("石料产量"),_("当前产出石料")
-    elseif type == ResourceManager.RESOURCE_TYPE.FOOD then
+    elseif type_ == "food" then
         return _("农夫小屋"),_("粮食产量"),_("当前产出粮食")
-    elseif type == ResourceManager.RESOURCE_TYPE.CITIZEN then
+    elseif type_ == "citizen" then
         return _("住宅"),_("城民上限"),_("当前城民增长")
     else
         assert(false)
@@ -344,7 +348,7 @@ function GameUIResource:ChaiButtonAction( event )
     end
     local tile = self.city:GetTileWhichBuildingBelongs(self.building)
     local house_location = tile:GetBuildingLocation(self.building)
-    local torch_count = ItemManager:GetItemByName("torch"):Count()
+    local torch_count = User:GetItemCount("torch")
     if torch_count<1 then
         UIKit:showMessageDialog(_("提示"),_("是否确认拆除?"),function ()
             NetManager:getBuyAndUseItemPromise("torch",{
@@ -379,17 +383,41 @@ function GameUIResource:MoveButtonAction( event )
     end
     local tile = self.city:GetTileWhichBuildingBelongs(self.building)
     local house_location = tile:GetBuildingLocation(self.building)
-    local movingConstruction = ItemManager:GetItemByName("movingConstruction")
-    local torch_count = movingConstruction:Count()
+    local item_info = UtilsForItem:GetItemInfoByName("movingConstruction")
+    local torch_count = User:GetItemCount("movingConstruction")
     local building = self.building
 
     if torch_count<1 then
         if app:GetGameDefautlt():IsOpenGemRemind() then
-            UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),string.formatnumberthousands(movingConstruction:Price())), function()
-                NetManager:getBuyItemPromise("movingConstruction",1)
-                WidgetMoveHouse.new(building)
-            end,true,true)
+            UIKit:showConfirmUseGemMessageDialog(_("提示"),
+                string.format(
+                    _("是否消费%s金龙币"),string.formatnumberthousands(item_info.price)
+                ),
+                function()
+                    if item_info.price > User:GetGemValue() then
+                        UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
+                            {
+                                listener = function ()
+                                    UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                                end,
+                                btn_name= _("前往商店")
+                            })
+                        return
+                    end
+                    NetManager:getBuyItemPromise("movingConstruction",1)
+                    WidgetMoveHouse.new(building)
+                end,true,true)
         else
+            if item_info.price > User:GetGemValue() then
+                UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
+                    {
+                        listener = function ()
+                            UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
+                        end,
+                        btn_name= _("前往商店")
+                    })
+                return
+            end
             NetManager:getBuyItemPromise("movingConstruction",1)
             WidgetMoveHouse.new(self.building)
         end
@@ -406,14 +434,10 @@ function GameUIResource:OnMoveOutStage()
     GameUIResource.super.OnMoveOutStage(self)
 end
 
-function GameUIResource:OnResourceChanged(resource_manager)
-    GameUIResource.super.OnResourceChanged(self,resource_manager)
-    -- if self.listView:getItems():count() < 2 then return end
-    local number = self.city.resource_manager:GetResourceByType(self.building:GetUpdateResourceType()):GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    -- print("update cout:",number)
-end
 
 return GameUIResource
+
+
 
 
 

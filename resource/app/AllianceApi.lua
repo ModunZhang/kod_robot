@@ -3,7 +3,9 @@
 -- Date: 2015-05-07 21:20:11
 --
 local AllianceApi = {}
-local Flag = import("app.entity.Flag")
+local intInit = GameDatas.AllianceInitData.intInit
+local moveLimit = GameDatas.AllianceMap.moveLimit
+local WidgetAllianceHelper = import("app.widget.WidgetAllianceHelper")
 
 function AllianceApi:CreateAlliance()
     if Alliance_Manager:GetMyAlliance():IsDefault() then
@@ -12,7 +14,7 @@ function AllianceApi:CreateAlliance()
         local tmp = {"desert","iceField","grassLand"}
         local terrian = tmp[random]
         print("创建联盟")
-        return NetManager:getCreateAlliancePromise(name,tag,"all",terrian,Flag:RandomFlag():EncodeToJson())
+        return NetManager:getCreateAlliancePromise(name,tag,"all",terrian,WidgetAllianceHelper.new():RandomFlagStr())
     end
 end
 function AllianceApi:JoinAlliance(id)
@@ -36,12 +38,15 @@ function AllianceApi:RequestToJoinAlliance()
                 print("chat.allianceTag=",chat.allianceTag)
                 if chat.allianceTag ~="" then
                     NetManager:getSearchAllianceByTagPromsie(chat.allianceTag):done(function ( response )
+                        if #response.msg.allianceDatas == 0 then
+                            return
+                        end
                         local data = response.msg.allianceDatas[1]
                         print("data.joinType ",data.joinType ~= "all",data.joinType )
                         if data.joinType ~= "all" then
-                            dump(User:RequestToAllianceEvents(),"User:RequestToAllianceEvents()")
+                            dump(User.requestToAllianceEvents,"User:RequestToAllianceEvents()")
                             local is_requested = false
-                            for i,v in ipairs(User:RequestToAllianceEvents()) do
+                            for i,v in ipairs(User.requestToAllianceEvents) do
                                 if v.id == data.id  then
                                     is_requested = true
                                 end
@@ -72,27 +77,25 @@ end
 function AllianceApi:CancelJoinAlliance()
     local alliance = Alliance_Manager:GetMyAlliance()
     if alliance:IsDefault() and math.random(100) < 5 then
-        for i,v in ipairs(User:RequestToAllianceEvents()) do
+        for i,v in ipairs(User.requestToAllianceEvents) do
             return NetManager:getCancelJoinAlliancePromise(v.id)
         end
     end
 end
 function AllianceApi:ApproveOrRejectJoinAllianceRequest()
     local alliance = Alliance_Manager:GetMyAlliance()
-    if not alliance:IsDefault() and alliance:GetSelf():CanHandleAllianceApply()then
-        NetManager:getJoinRequestEventsPromise(alliance:Id()):done(function ( response )
-            local joinRequestEvents = response.msg.joinRequestEvents
-            for i,v in ipairs(joinRequestEvents) do
-                if math.random(2) == 2 then
-                    print("getApproveJoinAllianceRequestPromise")
-                    NetManager:getApproveJoinAllianceRequestPromise(v.id)
-                else
-                    print("getRemoveJoinAllianceReqeustsPromise")
-                    NetManager:getRemoveJoinAllianceReqeustsPromise({v.id})
-                end
-                break
+    if not alliance:IsDefault() and alliance:GetSelf():CanHandleAllianceApply() and alliance.basicInfo.status ~= "prepare" and alliance.basicInfo.status ~= "fight" then
+        local joinRequestEvents = alliance.joinRequestEvents
+        for i,v in ipairs(joinRequestEvents) do
+            if math.random(2) == 2 then
+                print("getApproveJoinAllianceRequestPromise")
+                NetManager:getApproveJoinAllianceRequestPromise(v.id)
+            else
+                print("getRemoveJoinAllianceReqeustsPromise")
+                NetManager:getRemoveJoinAllianceReqeustsPromise({v.id})
             end
-        end)
+            break
+        end
     end
 end
 function AllianceApi:InviteToJoinAlliance()
@@ -121,8 +124,8 @@ function AllianceApi:InviteToJoinAlliance()
 end
 function AllianceApi:getQuitAlliancePromise()
     if not Alliance_Manager:GetMyAlliance():IsDefault() and
-        Alliance_Manager:GetMyAlliance():Status() ~= "prepare" and
-        Alliance_Manager:GetMyAlliance():Status() ~= "fight" then
+        Alliance_Manager:GetMyAlliance().basicInfo.status ~= "prepare" and
+        Alliance_Manager:GetMyAlliance().basicInfo.status ~= "fight" and not Alliance_Manager:HasToMyCityEvents() then
         if math.random(100) < 5 then
             local members = Alliance_Manager:GetMyAlliance():GetAllMembers()
             if LuaUtils:table_size(members) == 1 or not Alliance_Manager:GetMyAlliance():GetSelf():IsArchon() then
@@ -144,7 +147,7 @@ function AllianceApi:AllianceMemberApi()
         local member
         local me = alliance:GetSelf()
         while not member do
-            alliance:IteratorAllMembers(function ( id,v )
+            alliance:IteratorAllMembers(function ( v )
                 count = count + 1
                 if count == member_index then
                     if v:Id() == me:Id() then
@@ -155,41 +158,41 @@ function AllianceApi:AllianceMemberApi()
                 end
             end)
         end
-        local excute_fun = math.random(10)
-        if excute_fun ~= 1 then
-            -- 职位改变
-            local up_or_down = math.random(2)
-            if up_or_down == 1 then
-                -- 降级
-                local auth,title_can = me:CanDemotionMemberLevel(member:Title())
-                local isLow = member:IsTitleLowest()
-                if auth and title_can and not isLow then
-                    print("职位降级",member:Name(),member:TitleDegrade())
-                    return NetManager:getEditAllianceMemberTitlePromise(member:Id(), member:TitleDegrade())
-                end
-            else
-                -- 晋级
-                local auth,title_can = me:CanUpgradeMemberLevel(member:TitleUpgrade())
-                local isHighest = member:IsTitleHighest()
-                if auth and title_can and not isHighest then
-                    print("职位晋级",member:Name(),member:TitleUpgrade())
-                    return NetManager:getEditAllianceMemberTitlePromise(member:Id(), member:TitleUpgrade())
-                end
+        -- local excute_fun = math.random(10)
+        -- if excute_fun ~= 1 then
+        --     -- 职位改变
+        --     local up_or_down = math.random(2)
+        --     if up_or_down == 1 then
+        --         -- 降级
+        --         local auth,title_can = me:CanDemotionMemberLevel(member:Title())
+        --         local isLow = member:IsTitleLowest()
+        --         if auth and title_can and not isLow then
+        --             print("职位降级",member.name,member:TitleDegrade())
+        --             return NetManager:getEditAllianceMemberTitlePromise(member:Id(), member:TitleDegrade())
+        --         end
+        --     else
+        --         -- 晋级
+        --         local auth,title_can = me:CanUpgradeMemberLevel(member:TitleUpgrade())
+        --         local isHighest = member:IsTitleHighest()
+        --         if auth and title_can and not isHighest then
+        --             print("职位晋级",member.name,member:TitleUpgrade())
+        --             return NetManager:getEditAllianceMemberTitlePromise(member:Id(), member:TitleUpgrade())
+        --         end
 
-            end
-        else
+        --     end
+        -- else
             -- 踢出
             local auth,title_can = me:CanKickOutMember(member:Title())
-            if not title_can or not auth or alliance:Status() == "fight" then
+            if not title_can or not auth or alliance.basicInfo.status == "fight" then
                 return
             end
             return NetManager:getKickAllianceMemberOffPromise(member:Id())
-        end
+        -- end
     end
 end
 -- 联盟捐赠
 function AllianceApi:Contribute()
-    if not Alliance_Manager:GetMyAlliance():IsDefault() then
+    if not Alliance_Manager:GetMyAlliance():IsDefault() and Alliance_Manager:GetMyAlliance().basicInfo.status ~= "fight" and Alliance_Manager:GetMyAlliance().basicInfo.status ~= "prepare"  then
         local donate_types = {
             "wood",
             "stone",
@@ -198,18 +201,9 @@ function AllianceApi:Contribute()
             "coin",
             "gem",
         }
-        local ResourceManager = City:GetResourceManager()
-        local CON_TYPE = {
-            wood = ResourceManager.RESOURCE_TYPE.WOOD,
-            food = ResourceManager.RESOURCE_TYPE.FOOD,
-            iron = ResourceManager.RESOURCE_TYPE.IRON,
-            stone = ResourceManager.RESOURCE_TYPE.STONE,
-            coin = ResourceManager.RESOURCE_TYPE.COIN,
-            gem = ResourceManager.RESOURCE_TYPE.GEM,
-        }
         local r_type = donate_types[math.random(#donate_types)]
 
-        local donate_status = User:AllianceDonate()
+        local donate_status = User.allianceDonate
         local donate_level = donate_status[r_type]
         local donate
         for _,v in pairs(GameDatas.AllianceInitData.donate) do
@@ -220,9 +214,9 @@ function AllianceApi:Contribute()
         local count  = donate.count
         local r_count
         if r_type == "gem" then
-            r_count = User:GetGemResource():GetValue()
+            r_count = User:GetGemValue()
         else
-            r_count = City.resource_manager:GetResourceByType(CON_TYPE[r_type]):GetResourceValueByCurrentTime(app.timer:GetServerTime())
+            r_count = User:GetResValueByType(r_type)
         end
         if r_count < count then
             return
@@ -235,7 +229,6 @@ end
 function AllianceApi:UpgradeAllianceBuilding()
     if not Alliance_Manager:GetMyAlliance():IsDefault() then
         local alliance = Alliance_Manager:GetMyAlliance()
-        local alliance_map = alliance:GetAllianceMap()
         local building_names = {
             "orderHall",
             "palace",
@@ -243,12 +236,12 @@ function AllianceApi:UpgradeAllianceBuilding()
             "shrine",
         }
         local building_name = building_names[math.random(#building_names)]
-        local building = alliance_map:FindAllianceBuildingInfoByName(building_name)
+        local building = alliance:GetAllianceBuildingInfoByName(building_name)
         local building_config = GameDatas.AllianceBuilding[building.name]
         local now_c = building_config[building.level+1]
         if not alliance:GetSelf():CanUpgradeAllianceBuilding() then
             return
-        elseif alliance:Honour() < now_c.needHonour then
+        elseif alliance.basicInfo.honour < now_c.needHonour then
             return
         end
         print("升级联盟建筑:",building.name,"到",building.level+1)
@@ -273,7 +266,7 @@ function AllianceApi:UpgradeAllianceVillage()
         if village_level == #config then
             return
         end
-        if alliance:Honour () >= level_config.needHonour then
+        if alliance.basicInfo.honour >= level_config.needHonour then
             print("升级联盟村落:",village_type,to_level)
             return NetManager:getUpgradeAllianceVillagePromise(village_type)
         end
@@ -283,18 +276,18 @@ end
 function AllianceApi:EditAllianceInfo()
     local alliance = Alliance_Manager:GetMyAlliance()
     local me = alliance:GetSelf()
-    if not alliance:IsDefault()  and alliance:Status() ~= "fight" and alliance:Status() ~= "prepare" then
+    if not alliance:IsDefault()  and alliance.basicInfo.status ~= "fight" and alliance.basicInfo.status ~= "prepare" then
         local excute_fun = math.random(100)
         -- local excute_fun = 9
         if excute_fun <= 5 then
-            local need_honour =GameDatas.AllianceInitData.intInit.editAllianceTerrianHonour.value
-            if me:CanEditAlliance() and need_honour <= alliance:Honour() then
+            local need_honour = intInit.editAllianceTerrianHonour.value
+            if me:CanEditAlliance() and need_honour <= alliance.basicInfo.honour then
                 local terrains = {
                     "grassLand",
                     "desert",
                     "iceField",
                 }
-                local current_terrain = alliance:Terrain()
+                local current_terrain = alliance.basicInfo.terrain
                 local to_terrain = clone(current_terrain)
                 while to_terrain == current_terrain do
                     to_terrain = terrains[math.random(#terrains)]
@@ -304,12 +297,12 @@ function AllianceApi:EditAllianceInfo()
             end
         elseif excute_fun <= 10 then
             if me:CanEditAllianceJoinType() then
-                if alliance:JoinType() == "all" then
+                if alliance.basicInfo.joinType == "all" then
                     print("修改联盟加入type到:audit")
                     return NetManager:getEditAllianceJoinTypePromise("audit")
                 else
-                -- print("修改联盟加入type到:all")
-                -- return NetManager:getEditAllianceJoinTypePromise("all")
+                    print("修改联盟加入type到:all")
+                    return NetManager:getEditAllianceJoinTypePromise("all")
                 end
             end
         elseif excute_fun <= 15 then
@@ -320,21 +313,20 @@ function AllianceApi:EditAllianceInfo()
             if me:CanEditAllianceNotice() then
                 return NetManager:getEditAllianceDescriptionPromise("机器人联盟描述")
             end
-        elseif excute_fun <= 25 and me:CanEditAllianceMemeberTitle() then
-            local titles = alliance:Titles()
-            local title_keys = {
-                "supervisor",
-                "quartermaster",
-                "elite",
-                "member",
-                "archon",
-                "general",
-            }
-            local change_title = title_keys[math.random(#title_keys)]
-            print("修改联盟职位名称",change_title)
-            return NetManager:getEditAllianceTitleNamePromise(change_title,"机器人"..change_title)
+        -- elseif excute_fun <= 25 and me:CanEditAllianceMemeberTitle() then
+        --     local title_keys = {
+        --         "supervisor",
+        --         "quartermaster",
+        --         "elite",
+        --         "member",
+        --         "archon",
+        --         "general",
+        --     }
+        --     local change_title = title_keys[math.random(#title_keys)]
+        --     print("修改联盟职位名称",change_title)
+        --     return NetManager:getEditAllianceTitleNamePromise(change_title,"机器人"..change_title)
         elseif excute_fun <= 30 then
-            return NetManager:getItemLogsPromise(alliance:Id())
+            return NetManager:getItemLogsPromise(alliance._id)
         elseif excute_fun <= 35 then
             return NetManager:getNearedAllianceInfosPromise()
         end
@@ -343,19 +335,19 @@ end
 -- 发忠诚值给联盟成员
 function AllianceApi:GiveLoyalty()
     local alliance = Alliance_Manager:GetMyAlliance()
-    if not alliance:IsDefault() and alliance:GetSelf():IsArchon() and alliance:Honour() > 0 then
+    if not alliance:IsDefault() and alliance:GetSelf():IsArchon() and alliance.basicInfo.honour > 0 then
         local members = alliance:GetAllMembers()
         local member_index = math.random(LuaUtils:table_size(members))
         local count = 0
         local member
-        alliance:IteratorAllMembers(function ( id,v )
+        alliance:IteratorAllMembers(function ( v )
             count = count + 1
             if count == member_index then
                 member = v
             end
         end)
-        local loyalty_value = math.random(alliance:Honour())
-        print("奖励",member:Name(),loyalty_value,"忠诚值")
+        local loyalty_value = math.random(alliance.basicInfo.honour)
+        print("奖励",member.name,loyalty_value,"忠诚值")
         return NetManager:getGiveLoyaltyToAllianceMemberPromise(member:Id(),loyalty_value)
     end
 end
@@ -364,39 +356,49 @@ function AllianceApi:RequestSpeedUp()
     if not alliance:IsDefault() then
         -- 城市建筑升级
         local can_request = {}
-        City:IteratorCanUpgradeBuildings(function ( building )
-            -- 正在升级
-            if building:IsUpgrading() then
-                local eventType = building:EventType()
-                -- 可以免费加速则不申请联盟协助加速
-                if not building:IsAbleToFreeSpeedUpByTime(app.timer:GetServerTime()) then
-                    -- 是否已经申请过联盟加速
-                    local isRequested = alliance:HasBeenRequestedToHelpSpeedup(building:UniqueUpgradingKey())
-                    if not isRequested then
-                        table.insert(can_request, building)
-                    end
+        local buildingEvents = User.buildingEvents
+        local houseEvents = User.houseEvents
+        for i,event in ipairs(buildingEvents) do
+            local leftTime = UtilsForEvent:GetEventInfo(event)
+            if leftTime < DataUtils:getFreeSpeedUpLimitTime() then
+                -- 是否已经申请过联盟加速
+                local isRequested = User:IsRequestHelped(event.id)
+                if not isRequested then
+                    event.EventType = "buildingEvents"
+                    table.insert(can_request, event)
                 end
             end
-        end)
+        end
+        for i,event in ipairs(houseEvents) do
+            local leftTime = UtilsForEvent:GetEventInfo(event)
+            if leftTime < DataUtils:getFreeSpeedUpLimitTime() then
+                -- 是否已经申请过联盟加速
+                local isRequested = User:IsRequestHelped(event.id)
+                if not isRequested then
+                    event.EventType = "houseEvents"
+                    table.insert(can_request, event)
+                end
+            end
+        end
+
         if #can_request > 0 then
             -- 随机一个申请
-            local building = can_request[math.random(#can_request)]
-            return NetManager:getRequestAllianceToSpeedUpPromise(building:EventType(),building:UniqueUpgradingKey())
+            local event = can_request[math.random(#can_request)]
+            return NetManager:getRequestAllianceToSpeedUpPromise(event.EventType,event.id)
         end
 
         -- 军事科技
-        local soldier_manager = City:GetSoldierManager()
         local can_request = {}
-        soldier_manager:IteratorMilitaryTechEvents(function ( event )
+        for _,event in pairs(User.militaryTechEvents) do
             if DataUtils:getFreeSpeedUpLimitTime() < event:GetTime() then
                 -- 是否已经申请过联盟加速
-                local isRequested = alliance
-                    :HasBeenRequestedToHelpSpeedup(event:Id())
+                local isRequested = User:IsRequestHelped(event:Id())
                 if not isRequested then
                     table.insert(can_request, event)
                 end
             end
-        end)
+        end
+
         if #can_request > 0 then
             -- 随机一个申请
             local event = can_request[math.random(#can_request)]
@@ -405,16 +407,15 @@ function AllianceApi:RequestSpeedUp()
 
         -- 士兵晋升
         local can_request = {}
-        soldier_manager:IteratorSoldierStarEvents(function ( event )
+        for _,event in pairs(User.soldierStarEvents) do
             if DataUtils:getFreeSpeedUpLimitTime() < event:GetTime() then
                 -- 是否已经申请过联盟加速
-                local isRequested = alliance
-                    :HasBeenRequestedToHelpSpeedup(event:Id())
+                local isRequested = User:IsRequestHelped(event:Id())
                 if not isRequested then
                     table.insert(can_request, event)
                 end
             end
-        end)
+        end
         if #can_request > 0 then
             -- 随机一个申请
             local event = can_request[math.random(#can_request)]
@@ -423,16 +424,15 @@ function AllianceApi:RequestSpeedUp()
 
         -- 生产科技
         local can_request = {}
-        City:IteratorProductionTechEvents(function ( event )
+        for _,event in ipairs(User.productionTechEvents) do
             if DataUtils:getFreeSpeedUpLimitTime() < event:GetTime() then
                 -- 是否已经申请过联盟加速
-                local isRequested = alliance
-                    :HasBeenRequestedToHelpSpeedup(event:Id())
+                local isRequested = User:IsRequestHelped(event:Id())
                 if not isRequested then
                     table.insert(can_request, event)
                 end
             end
-        end)
+        end
         if #can_request > 0 then
             -- 随机一个申请
             local event = can_request[math.random(#can_request)]
@@ -448,7 +448,7 @@ function AllianceApi:HelpSpeedUp()
         local help_events = alliance:GetCouldShowHelpEvents()
         local can_help = {}
         for k,event in pairs(help_events) do
-            if User:Id() ~= event:GetPlayerData():Id() then
+            if User:Id() ~= event.playerData.id then
                 table.insert(can_help, event)
             end
         end
@@ -458,7 +458,7 @@ function AllianceApi:HelpSpeedUp()
                 return NetManager:getHelpAllAllianceMemberSpeedUpPromise()
             else
                 local event = can_help[math.random(#can_help)]
-                return NetManager:getHelpAllianceMemberSpeedUpPromise(event:Id())
+                return NetManager:getHelpAllianceMemberSpeedUpPromise(event.id)
             end
         end
 
@@ -466,9 +466,11 @@ function AllianceApi:HelpSpeedUp()
 end
 function AllianceApi:AllianceOtherApi()
     local alliance = Alliance_Manager:GetMyAlliance()
+    print("alliance:IsDefault()=",alliance:IsDefault())
     if not alliance:IsDefault() then
         local member = alliance:GetSelf()
-        local random = math.random(100)
+        -- local random = math.random(100)
+        local random = 12
         -- 发联盟邮件
         if member:CanSendAllianceMail() and random < 5 then
             return NetManager:getSendAllianceMailPromise("机器人联盟邮件", "机器人联盟邮件")
@@ -481,15 +483,48 @@ function AllianceApi:AllianceOtherApi()
             end
             return NetManager:getPlayerWallInfoPromise(member:Id())
         elseif random < 15 then
-            if alliance:Status() == 'fight' then
+            if alliance.basicInfo.status == 'fight' or alliance.basicInfo.status == 'prepare' then
                 return
             end
-            if alliance:GetAllianceBelvedere():HasEvents() then
+            if #alliance:GetMyMarchEvents() > 0 then
                 return
             end
-            local locationX = math.random(24)
-            local locationY = math.random(24)
-            local can_move = alliance:GetAllianceMap():CanMoveBuilding(alliance:GetAllianceMap():GetMapObjectsByType("member")[alliance:GetSelf():MapId()], locationX, locationY)
+            local locationX = math.random(29)
+            local locationY = math.random(29)
+            local mapObjects = alliance.mapObjects
+            local can_move = true
+            print("locationX==",locationX,"locationY",locationY)
+            for i,v in ipairs(mapObjects) do
+                if v.location.x == locationX and v.location.y == locationY then
+                    can_move = false
+                    break
+                end
+            end
+            local terrainStyle = alliance.basicInfo.terrainStyle
+            print("terrainStyle===",terrainStyle)
+            local terrainStyle_map = GameDatas.AllianceMap["allianceMap_"..terrainStyle]
+            local buildingName = GameDatas.AllianceMap.buildingName
+            for i,v in ipairs(terrainStyle_map) do
+                if v.x == locationX and v.y == locationY then
+                    can_move = false
+                    break
+                end
+                local sizeInfo = buildingName[v.name]
+                if sizeInfo.width > 1 then
+                    for i=1,sizeInfo.width do
+                        for j=1,sizeInfo.height do
+                            print("大装饰计算移动坐标是否合理x=",(v.x - i),"y=",(v.y - j))
+                            if (v.x - i + 1) == locationX and (v.y - j + 1) == locationY then
+                                can_move = false
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+            if #UtilsForEvent:GetAllMyMarchEvents() > 0 then
+                can_move = false
+            end
             if can_move then
                 print("移动自己城市",locationX,locationY)
                 return NetManager:getBuyAndUseItemPromise("moveTheCity",{
@@ -507,7 +542,7 @@ function AllianceApi:ShopStock()
     local alliance = Alliance_Manager:GetMyAlliance()
     if not alliance:IsDefault() then
 
-        local shop = alliance:GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+        local shop = alliance:GetAllianceBuildingInfoByName("shop")
         local shop_config = GameDatas.AllianceBuilding.shop
         -- 所有解锁的可进货道具
         local unlock_items = {}
@@ -517,19 +552,21 @@ function AllianceApi:ShopStock()
                 unlock_items[v] = true
             end
         end
-        local super_items = alliance:GetItemsManager():GetAllSuperItems()
+        local super_items = UtilsForItem:GetAdvanceItems()
         local stock_items = {}
         for i=1,#super_items do
             local super_item = super_items[i]
-            if unlock_items[super_item:Name()] then
+            if unlock_items[super_item.name] then
                 table.insert(stock_items,super_item)
             end
         end
-
+        if #stock_items < 1 then
+            return
+        end
         local item = stock_items[math.random(#stock_items)]
-        if item:IsAdvancedItem() and  alliance:GetSelf():CanAddAdvancedItemsToAllianceShop() and alliance:Honour() >= item:BuyPriceInAlliance() then
-            print("联盟商店进货：",item:Name())
-            return NetManager:getAddAllianceItemPromise(item:Name(),1)
+        if item.isAdvancedItem and  alliance:GetSelf():CanAddAdvancedItemsToAllianceShop() and alliance.basicInfo.honour >= item.buyPriceInAlliance then
+            print("联盟商店进货：",item.name)
+            return NetManager:getAddAllianceItemPromise(item.name,1)
         end
     end
 end
@@ -537,23 +574,23 @@ function AllianceApi:BuyAllianceItem()
     local alliance = Alliance_Manager:GetMyAlliance()
     if not alliance:IsDefault() then
 
-        local shop = alliance:GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+        local shop = alliance:GetAllianceBuildingInfoByName("shop")
         local shop_config = GameDatas.AllianceBuilding.shop
         -- 所有解锁的道具
         local unlock_items = {}
         for i=1,shop.level do
             local unlock = string.split(shop_config[i].itemsUnlock, ",")
             for i,v in ipairs(unlock) do
-                table.insert(unlock_items, alliance:GetItemsManager():GetItemByName(v))
+                table.insert(unlock_items, UtilsForItem:GetItemInfoByName(v))
             end
         end
         local item = unlock_items[math.random(#unlock_items)]
-        if item:IsAdvancedItem() and not alliance:GetSelf():CanBuyAdvancedItemsFromAllianceShop() then
+        if item.isAdvancedItem and not alliance:GetSelf():CanBuyAdvancedItemsFromAllianceShop() then
             return
         end
-        if User:Loyalty() >= item:SellPriceInAlliance() and item:Count() > 0 then
-            print("购买联盟商店道具：",item:Name())
-            return NetManager:getBuyAllianceItemPromise(item:Name(),1)
+        if User:Loyalty() >= item.sellPriceInAlliance and alliance:GetItemCount(item.name) > 0 then
+            print("购买联盟商店道具：",item.name)
+            return NetManager:getBuyAllianceItemPromise(item.name,1)
         else
             return self:Contribute()
         end
@@ -561,7 +598,7 @@ function AllianceApi:BuyAllianceItem()
 end
 -- 获取其他玩家重置送的礼物
 function AllianceApi:GetGift()
-    local gifts = User:GetIapGifts()
+    local gifts = User.iapGifts
     if not LuaUtils:table_empty(gifts) then
         for k,data in pairs(gifts) do
             print("获取其他玩家重置送的礼物",data:Id())
@@ -572,9 +609,48 @@ end
 -- 获取首次加入联盟奖励
 function AllianceApi:FirstJoinAllianceReward()
     local alliance = Alliance_Manager:GetMyAlliance()
-    if not User:GetCountInfo().firstJoinAllianceRewardGeted and not alliance:IsDefault() then
+    if not User.countInfo.firstJoinAllianceRewardGeted and not alliance:IsDefault() then
         return NetManager:getFirstJoinAllianceRewardPromise()
     end
+end
+-- 迁移联盟
+function AllianceApi:MoveAlliance()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() then
+        local mapIndex = math.random(0,35 * 35 - 1)
+        if mapIndex == alliance.mapIndex then
+            return
+        end
+        local canMove = alliance.basicInfo.status ~= "prepare" and  alliance.basicInfo.status ~= "fight"
+        if not canMove then
+            return
+        end
+        local time = intInit.allianceMoveColdMinutes.value * 60 + alliance.basicInfo.allianceMoveTime/1000.0 - app.timer:GetServerTime()
+        local canMove = alliance.basicInfo.allianceMoveTime == 0 or time <= 0
+        if not canMove then
+            return
+        end
+        local palaceLevel = alliance:GetAllianceBuildingInfoByName("palace").level
+        print("DataUtils:getMapRoundByMapIndex(mapIndex)",DataUtils:getMapRoundByMapIndex(mapIndex))
+        local canMove1 = palaceLevel >= moveLimit[DataUtils:getMapRoundByMapIndex(mapIndex)].needPalaceLevel
+        if not canMove1 then
+            return
+        end
+        local canMove1 = alliance:GetSelf():CanMoveAlliance()
+        if not canMove1 then
+            return
+        end
+        return NetManager:getEnterMapIndexPromise(mapIndex):done(function ( response )
+            NetManager:getLeaveMapIndexPromise(mapIndex)
+            local allianceData = response.msg.allianceData
+            if not allianceData or allianceData == json.null then
+                return NetManager:getMoveAlliancePromise(mapIndex)
+            end
+        end)
+    end
+end
+local function setRun()
+    app:setRun()
 end
 local function setRun()
     app:setRun()
@@ -661,7 +737,6 @@ local function JoinAlliance()
         setRun()
     end
 end
-
 local function RequestSpeedUp()
     local p = AllianceApi:RequestSpeedUp()
     if p then
@@ -782,13 +857,20 @@ local function CancelJoinAlliance()
         setRun()
     end
 end
-
+local function MoveAlliance()
+    local p = AllianceApi:MoveAlliance()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 
 return {
-    setRun,
+    -- setRun,
     JoinAlliance,
     ApproveOrRejectJoinAllianceRequest,
-    InviteToJoinAlliance,
+    -- InviteToJoinAlliance,
     CancelJoinAlliance,
     RequestSpeedUp,
     HelpSpeedUp,
@@ -804,7 +886,13 @@ return {
     BuyAllianceItem,
     GetGift,
     FirstJoinAllianceReward,
+    MoveAlliance
 }
+
+
+
+
+
 
 
 

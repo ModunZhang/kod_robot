@@ -206,8 +206,8 @@ function GameUIPResourceBuilding:RebuildPart()
         },
         {
             _("金龙币"),
-            string.format("%d/"..intInit.switchProductionBuilding.value,City:GetUser():GetGemResource():GetValue()),
-            City:GetUser():GetGemResource():GetValue()>need_gems and "yes_40x40.png" or "no_40x40.png"
+            string.format("%d/"..intInit.switchProductionBuilding.value,City:GetUser():GetGemValue()),
+            City:GetUser():GetGemValue()>need_gems and "yes_40x40.png" or "no_40x40.png"
         },
     }
     -- bg
@@ -240,7 +240,7 @@ end
 function GameUIPResourceBuilding:CheckSwitch(switch_to_building_type)
     local current_building = self.building
     local city = current_building:BelongCity()
-    if city:GetUser():GetGemResource():GetValue()<intInit.switchProductionBuilding.value then
+    if city:GetUser():GetGemValue()<intInit.switchProductionBuilding.value then
         UIKit:showMessageDialog(_("提示"),_("金龙币不足"))
             :CreateOKButton(
                 {

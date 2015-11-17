@@ -12,7 +12,17 @@ function FteScene:onEnter()
     app:GetAudioManager():PlayGameMusicOnSceneEnter("MyCityScene",false)
 end
 function FteScene:onEnterTransitionFinish()
-    display.newSprite("fte_background.jpg"):addTo(self):pos(display.cx, display.cy)
+    display.newSprite("fte_background.jpg"):addTo(self):align(display.BOTTOM_CENTER, display.cx, 0)
+
+    local emitter = cc.ParticleSystemQuad:create("particles/FireWall.plist"):addTo(self):pos(display.cx, 0)
+    emitter:setPositionType(2)
+    emitter:setPosVar(cc.p(display.width,0))
+    for i = 1, 1000 do
+        emitter:update(0.1)
+    end
+
+
+
     printLog("Info", "Check MessageDialog :%s",self.__cname)
     local message = UIKit:getMessageDialogWillShow()
     if message then
@@ -44,6 +54,7 @@ function FteScene:onEnterTransitionFinish()
         if GLOBAL_FTE then
             app:EnterMyCityFteScene()
         else
+            app:EnterUserMode()
             app:EnterMyCityScene()
         end
     end)

@@ -1,12 +1,14 @@
+local Alliance = import("..entity.Alliance")
 local UILib = import("..ui.UILib")
 local Sprite = import(".Sprite")
 local WithInfoSprite = class("WithInfoSprite", Sprite)
 
 
-function WithInfoSprite:ctor(city_layer, entity, is_my_alliance)
+function WithInfoSprite:ctor(city_layer, entity, is_my_alliance, alliance)
     self:setNodeEventEnabled(true)
     self.is_my_alliance = is_my_alliance
-    local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
+    self.alliance = alliance
+    local x, y = city_layer:GetLogicMap():ConvertToMapPosition(Alliance:GetLogicPositionWithMapObj(entity))
     WithInfoSprite.super.ctor(self, city_layer, entity, x, y)
 end
 function WithInfoSprite:onExit()
@@ -21,7 +23,7 @@ function WithInfoSprite:RefreshSprite()
         self.info = nil
     end
     local map_layer = self:GetMapLayer()
-    local x,y = map_layer:GetLogicMap():ConvertToMapPosition(self:GetEntity():GetLogicPosition())
+    local x,y = map_layer:GetLogicMap():ConvertToMapPosition(Alliance:GetLogicPositionWithMapObj(self:GetEntity()))
     self.info = display.newNode():addTo(map_layer:GetInfoNode()):pos(x, y - 50):scale(0.8):zorder(x * y)
 
     local banners = self.is_my_alliance and UILib.my_city_banner or UILib.enemy_city_banner
@@ -47,6 +49,19 @@ end
 function WithInfoSprite:GetInfo()
 	assert(false)
 end
+function WithInfoSprite:GetLogicPosition()
+    return Alliance:GetLogicPositionWithMapObj(self:GetEntity())
+end
+function WithInfoSprite:GetMidLogicPosition()
+    return Alliance:GetMidLogicPositionWithMapObj(self:GetEntity())
+end
+function WithInfoSprite:GetSize()
+    return Alliance:GetSizeWithMapObj(self:GetEntity())
+end
+function WithInfoSprite:IsContainPoint(x, y)
+    return Alliance:IsContainPointWithMapObj(self:GetEntity(), x, y)
+end
+
 
 
 ---

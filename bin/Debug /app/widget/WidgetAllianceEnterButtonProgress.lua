@@ -10,11 +10,10 @@ function WidgetAllianceEnterButtonProgress:ctor()
     self:setTouchEnabled(true)
     self:setNodeEventEnabled(true)
     self:setRotationSkewY(180)
-    local my_allaince = Alliance_Manager:GetMyAlliance()
-    local status = my_allaince:Status()
-    if status == "prepare" then
-        local statusStartTime = math.floor(my_allaince:StatusStartTime()/1000)
-        local statusFinishTime = math.floor(my_allaince:StatusFinishTime()/1000)
+    local basicInfo = Alliance_Manager:GetMyAlliance().basicInfo
+    if basicInfo.status == "prepare" then
+        local statusStartTime = math.floor(basicInfo.statusStartTime/1000)
+        local statusFinishTime = math.floor(basicInfo.statusFinishTime/1000)
 
         local percent = math.floor((statusFinishTime-app.timer:GetServerTime())/(statusFinishTime-statusStartTime)*100)
         self.time_bg = display.newSprite("tmp_back_ground_104x24.png"):align(display.CENTER, 58, 14)
@@ -35,11 +34,10 @@ function WidgetAllianceEnterButtonProgress:ctor()
 end
 function WidgetAllianceEnterButtonProgress:OnTimer()
     local current_time = app.timer:GetServerTime()
-    local my_allaince = Alliance_Manager:GetMyAlliance()
-    local status = my_allaince:Status()
-    if status == "prepare" then
-        local statusStartTime = math.floor(my_allaince:StatusStartTime()/1000)
-        local statusFinishTime = math.floor(my_allaince:StatusFinishTime()/1000)
+    local basicInfo = Alliance_Manager:GetMyAlliance().basicInfo
+    if basicInfo.status == "prepare" then
+        local statusStartTime = math.floor(basicInfo.statusStartTime/1000)
+        local statusFinishTime = math.floor(basicInfo.statusFinishTime/1000)
 
         local percent = math.floor((statusFinishTime-current_time)/(statusFinishTime-statusStartTime)*100)
         self:setPercentage(percent)

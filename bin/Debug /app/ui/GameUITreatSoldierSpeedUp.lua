@@ -2,50 +2,51 @@
 -- Author: Kenny Dai
 -- Date: 2015-02-11 11:33:52
 --
-local WidgetSpeedUp = import("..widget.WidgetSpeedUp")
-local SoldierManager = import("..entity.SoldierManager")
 local Localize = import("..utils.Localize")
+local WidgetSpeedUp = import("..widget.WidgetSpeedUp")
 local GameUITreatSoldierSpeedUp = class("GameUITreatSoldierSpeedUp",WidgetSpeedUp)
 local GameUtils = GameUtils
 
-function GameUITreatSoldierSpeedUp:ctor(building)
+function GameUITreatSoldierSpeedUp:ctor()
     GameUITreatSoldierSpeedUp.super.ctor(self)
-    self.building = building
-    self:SetAccBtnsGroup(self:GetEventType(),building:GetTreatEvent():Id())
+    local event = User.treatSoldierEvents[1]
+    if not event then
+        self:LeftButtonClicked()
+        return
+    end
+    self:SetAccBtnsGroup(self:GetEventType(), event.id)
     self:SetAccTips(_("治疗伤兵不能免费加速"))
-    self:SetUpgradeTip(string.format(_("正在治愈%d人口的伤兵"),self:GetTreatCount()))
-    self:SetProgressInfo(GameUtils:formatTimeStyle1(building:GetTreatEvent():LeftTime(app.timer:GetServerTime())),building:GetTreatEvent():Percent(app.timer:GetServerTime()))
-    building:AddHospitalListener(self)
+    local treat_count = 0
+    for i,v in ipairs(event.soldiers) do
+        treat_count = treat_count + v.count
+    end
+    self:SetUpgradeTip(string.format(_("正在治愈%d人口的伤兵"), treat_count))
+    scheduleAt(self, function()
+        local event = User.treatSoldierEvents[1]
+        if not event then 
+            self:LeftButtonClicked()
+            return 
+        end
+        local time, percent = UtilsForEvent:GetEventInfo(event)
+        self:SetProgressInfo(GameUtils:formatTimeStyle1(time), percent)
+    end)
+    User:AddListenOnType(self, "treatSoldierEvents")
 end
-
 function GameUITreatSoldierSpeedUp:GetEventType()
     return "treatSoldierEvents"
 end
 function GameUITreatSoldierSpeedUp:onCleanup()
-    self.building:RemoveHospitalListener(self)
+    User:RemoveListenerOnType(self, "treatSoldierEvents")
     GameUITreatSoldierSpeedUp.super.onCleanup(self)
 end
 
 function GameUITreatSoldierSpeedUp:CheckCanSpeedUpFree()
 	return false
 end
-function GameUITreatSoldierSpeedUp:OnBeginTreat(hospital, event)
-    self:OnTreating(hospital, event, app.timer:GetServerTime())
-end
-function GameUITreatSoldierSpeedUp:GetTreatCount()
-    local treat_count = 0
-    local soldiers = self.building:GetTreatEvent():GetTreatInfo()
-    for k,v in pairs(soldiers) do
-        treat_count = treat_count + v.count
+function GameUITreatSoldierSpeedUp:OnUserDataChanged_treatSoldierEvents(userData, deltaData)
+    if deltaData("treatSoldierEvents.remove") then
+        self:LeftButtonClicked()
     end
-    return treat_count
-end
-function GameUITreatSoldierSpeedUp:OnTreating(hospital, event, current_time)
-    self:SetProgressInfo(GameUtils:formatTimeStyle1(hospital:GetTreatEvent():LeftTime(current_time)),hospital:GetTreatEvent():Percent(current_time))
-end
-
-function GameUITreatSoldierSpeedUp:OnEndTreat(hospital, event, soldiers, current_time)
-    self:LeftButtonClicked()
 end
 return GameUITreatSoldierSpeedUp
 

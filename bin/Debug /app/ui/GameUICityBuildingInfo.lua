@@ -20,7 +20,7 @@ local building_details_map = {
     },
     ["watchTower"] = {
         {90,            130,        300},
-        {_("等级"), _("战斗力"),_("瞭望塔效果")},
+        {_("等级"), _("战斗力"),_("巨石阵效果")},
         {"level",   "power"},
     },
     ["warehouse"] = {
@@ -300,7 +300,7 @@ function GameUICityBuildingInfo:CreateDetails()
         end
         if parent.building_name == "watchTower" then
             local watchTower = GameDatas.ClientInitGame.watchTower
-            table.insert(details, string.format(Localize.building_description["watchTower_"..idx],watchTower[idx].waringMinute))
+            table.insert(details, Localize.building_description["watchTower_"..idx])
         elseif parent.building_name == "warehouse" then
             local value = parent.config[idx][parent.attrs[3]]/10
             if tolua.type(value) == "number" then

@@ -2,23 +2,19 @@ local zz = import("..particles.zz")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local AcademySprite = class("AcademySprite", FunctionUpgradingSprite)
 
-function AcademySprite:OnProductionTechnologyEventDataChanged(changed_map)
-    changed_map = changed_map or {}
-    if next(changed_map.remove or {}) then
+function AcademySprite:OnUserDataChanged_productionTechEvents(userData, deltaDate)
+    if deltaDate("productionTechEvents.remove") then
         app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
     end
 end
 
 
 
-
 local EMPTY_TAG = 11400
 function AcademySprite:ctor(city_layer, entity, city)
     AcademySprite.super.ctor(self, city_layer, entity, city)
-    city:AddListenOnType(self, city.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
-    display.newNode():addTo(self):schedule(function()
-        self:CheckEvent()
-    end, 1)
+    city:GetUser():AddListenOnType(self, "productionTechEvents")
+    scheduleAt(self, function() self:CheckEvent() end)
 end
 function AcademySprite:RefreshSprite()
     AcademySprite.super.RefreshSprite(self)
@@ -26,7 +22,7 @@ function AcademySprite:RefreshSprite()
 end
 function AcademySprite:CheckEvent()
     if self:GetEntity():IsUnlocked() then
-        if self:GetEntity():BelongCity():HaveProductionTechEvent() then
+        if self:GetEntity():BelongCity():GetUser():HasProductionTechEvent() then
             self:PlayWorkingAnimation()
         else
             self:StopAni()

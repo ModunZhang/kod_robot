@@ -1,10 +1,5 @@
 local buffTypes = GameDatas.Items.buffTypes
 
-buffTypes["masterOfDefender"] = {
-	["type"] = "masterOfDefender",
-	["effect1"] = 0.200000,
-	["effect2"] = 0.200000
-}
 buffTypes["quarterMaster"] = {
 	["type"] = "quarterMaster",
 	["effect1"] = 0.250000

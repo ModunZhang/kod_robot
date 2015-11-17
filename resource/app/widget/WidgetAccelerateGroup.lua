@@ -39,8 +39,8 @@ function WidgetAccelerateGroup:ctor(eventType,eventId)
         local cost_bg = display.newScale9Sprite("back_ground_166x84.png", width/2-220 + gap_x*math.mod(i-1,4), 160-gap_y*math.floor((i-1)/4),cc.size(106,28),cc.rect(15,10,136,64)):addTo(self)
 
         local speedUp_item_name = "speedup_"..i
-        local speedUp_item = ItemManager:GetItemByName(speedUp_item_name)
-        local speedUp_item_num = speedUp_item:Count()
+        local item_info = UtilsForItem:GetItemInfoByName(speedUp_item_name)
+        local speedUp_item_num = User:GetItemCount(speedUp_item_name)
         local cost_text = ""
         local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(cost_bg):align(display.CENTER, 16, cost_bg:getContentSize().height/2-2):scale(0.6)
 
@@ -48,7 +48,7 @@ function WidgetAccelerateGroup:ctor(eventType,eventId)
             cost_text = string.format( _("拥有%d"), speedUp_item_num )
             gem_icon:hide()
         else
-            cost_text = speedUp_item:Price()
+            cost_text = item_info.price
             gem_icon:show()
         end
         table.insert(self.gem_images, gem_icon)
@@ -107,7 +107,7 @@ function WidgetAccelerateGroup:ctor(eventType,eventId)
                         eventId = eventId
                     }})
                 else
-                    if speedUp_item:Price() > User:GetGemResource():GetValue() then
+                    if item_info.price > User:GetGemValue() then
                         UIKit:showMessageDialog(_("主人"),_("金龙币不足"))
                             :CreateOKButton(
                                 {
@@ -140,20 +140,21 @@ function WidgetAccelerateGroup:ResetAccButtons()
     end
 end
 function WidgetAccelerateGroup:onExit()
-    ItemManager:RemoveListenerOnType(self,ItemManager.LISTEN_TYPE.ITEM_CHANGED)
+    User:RemoveListenerOnType(self, "items")
 end
 function WidgetAccelerateGroup:onEnter()
-    ItemManager:AddListenOnType(self,ItemManager.LISTEN_TYPE.ITEM_CHANGED)
+    User:AddListenOnType(self, "items")
 end
-function WidgetAccelerateGroup:OnItemsChanged( changed_map )
+function WidgetAccelerateGroup:OnUserDataChanged_items()
     for i=1,8 do
-        local speed_item = ItemManager:GetItemByName("speedup_"..i)
-        local count = speed_item:Count()
+        local item_name = "speedup_"..i
+        local item_info = UtilsForItem:GetItemInfoByName(item_name)
+        local count = User:GetItemCount(item_name)
         if count>0 then
             self.own_labels[i]:setString( string.format( _("拥有%d"), count ) )
             self.gem_images[i]:hide()
         else
-            self.own_labels[i]:setString(speed_item:Price())
+            self.own_labels[i]:setString(item_info.price)
             self.gem_images[i]:show()
         end
     end

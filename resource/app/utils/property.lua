@@ -16,18 +16,20 @@ return function(object, property_name, initial, property_type)
         return
     end
     assert(type(property_name) == "string")
+    -- 初始化
     object.__proterties__ = object.__proterties__ or {}
     object.__proterties_value__ = object.__proterties_value__ or {}
+    object[property_name] = initial or nil
+    object.__proterties__[property_name] = true
+    object.__proterties_value__[property_name] = object[property_name]
+
     local head = string.upper(string.sub(property_name, 1, 1))
+    if head == "_" then return end
     local tail = string.sub(property_name, 2, #property_name)
     local get_name = string.format("%s%s", head, tail)
     local set_name = string.format("Set%s", get_name)
     assert(not object[get_name], "取值函数重复了!"..property_name)
     assert(not object[set_name], "设置函数重复了!"..property_name)
-    -- 初始化
-    object[property_name] = initial or nil
-    object.__proterties__[property_name] = true
-    object.__proterties_value__[property_name] = object[property_name]
 
     property_type = property_type or "all"
     -- 生成取值函数
@@ -49,6 +51,7 @@ return function(object, property_name, initial, property_type)
         end
     end
 end
+
 
 
 

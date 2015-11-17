@@ -9,7 +9,7 @@ stoneMason[1] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1000
+	["buildTime"] = 2028
 }
 stoneMason[2] = {
 	["level"] = 2,
@@ -20,7 +20,7 @@ stoneMason[2] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1200
+	["buildTime"] = 2055
 }
 stoneMason[3] = {
 	["level"] = 3,
@@ -31,7 +31,7 @@ stoneMason[3] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1400
+	["buildTime"] = 2083
 }
 stoneMason[4] = {
 	["level"] = 4,
@@ -42,7 +42,7 @@ stoneMason[4] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1600
+	["buildTime"] = 2110
 }
 stoneMason[5] = {
 	["level"] = 5,
@@ -53,7 +53,7 @@ stoneMason[5] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1800
+	["buildTime"] = 2138
 }
 stoneMason[6] = {
 	["level"] = 6,
@@ -64,7 +64,7 @@ stoneMason[6] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 2000
+	["buildTime"] = 2166
 }
 stoneMason[7] = {
 	["level"] = 7,
@@ -119,7 +119,7 @@ stoneMason[11] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4208
+	["buildTime"] = 4760
 }
 stoneMason[12] = {
 	["level"] = 12,
@@ -130,7 +130,7 @@ stoneMason[12] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4760
+	["buildTime"] = 5588
 }
 stoneMason[13] = {
 	["level"] = 13,
@@ -141,7 +141,7 @@ stoneMason[13] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 5312
+	["buildTime"] = 6471
 }
 stoneMason[14] = {
 	["level"] = 14,
@@ -152,7 +152,7 @@ stoneMason[14] = {
 	["tools"] = 1,
 	["tiles"] = 1,
 	["pulley"] = 1,
-	["buildTime"] = 8624
+	["buildTime"] = 11274
 }
 stoneMason[15] = {
 	["level"] = 15,
@@ -163,7 +163,7 @@ stoneMason[15] = {
 	["tools"] = 2,
 	["tiles"] = 2,
 	["pulley"] = 2,
-	["buildTime"] = 11936
+	["buildTime"] = 16407
 }
 stoneMason[16] = {
 	["level"] = 16,
@@ -174,7 +174,7 @@ stoneMason[16] = {
 	["tools"] = 4,
 	["tiles"] = 4,
 	["pulley"] = 4,
-	["buildTime"] = 15248
+	["buildTime"] = 21872
 }
 stoneMason[17] = {
 	["level"] = 17,
@@ -185,7 +185,7 @@ stoneMason[17] = {
 	["tools"] = 8,
 	["tiles"] = 8,
 	["pulley"] = 8,
-	["buildTime"] = 18560
+	["buildTime"] = 27668
 }
 stoneMason[18] = {
 	["level"] = 18,
@@ -196,7 +196,7 @@ stoneMason[18] = {
 	["tools"] = 12,
 	["tiles"] = 12,
 	["pulley"] = 12,
-	["buildTime"] = 21872
+	["buildTime"] = 33795
 }
 stoneMason[19] = {
 	["level"] = 19,
@@ -207,7 +207,7 @@ stoneMason[19] = {
 	["tools"] = 16,
 	["tiles"] = 16,
 	["pulley"] = 16,
-	["buildTime"] = 25184
+	["buildTime"] = 40254
 }
 stoneMason[20] = {
 	["level"] = 20,
@@ -218,7 +218,7 @@ stoneMason[20] = {
 	["tools"] = 20,
 	["tiles"] = 20,
 	["pulley"] = 20,
-	["buildTime"] = 28496
+	["buildTime"] = 47043
 }
 stoneMason[21] = {
 	["level"] = 21,
@@ -229,7 +229,7 @@ stoneMason[21] = {
 	["tools"] = 28,
 	["tiles"] = 28,
 	["pulley"] = 28,
-	["buildTime"] = 31808
+	["buildTime"] = 54164
 }
 stoneMason[22] = {
 	["level"] = 22,
@@ -240,7 +240,7 @@ stoneMason[22] = {
 	["tools"] = 36,
 	["tiles"] = 36,
 	["pulley"] = 36,
-	["buildTime"] = 35120
+	["buildTime"] = 61616
 }
 stoneMason[23] = {
 	["level"] = 23,
@@ -251,7 +251,7 @@ stoneMason[23] = {
 	["tools"] = 44,
 	["tiles"] = 44,
 	["pulley"] = 44,
-	["buildTime"] = 38432
+	["buildTime"] = 68306
 }
 stoneMason[24] = {
 	["level"] = 24,
@@ -262,7 +262,7 @@ stoneMason[24] = {
 	["tools"] = 52,
 	["tiles"] = 52,
 	["pulley"] = 52,
-	["buildTime"] = 41744
+	["buildTime"] = 75129
 }
 stoneMason[25] = {
 	["level"] = 25,
@@ -273,7 +273,7 @@ stoneMason[25] = {
 	["tools"] = 60,
 	["tiles"] = 60,
 	["pulley"] = 60,
-	["buildTime"] = 45056
+	["buildTime"] = 81654
 }
 stoneMason[26] = {
 	["level"] = 26,
@@ -284,7 +284,7 @@ stoneMason[26] = {
 	["tools"] = 68,
 	["tiles"] = 68,
 	["pulley"] = 68,
-	["buildTime"] = 48368
+	["buildTime"] = 88244
 }
 stoneMason[27] = {
 	["level"] = 27,
@@ -295,7 +295,7 @@ stoneMason[27] = {
 	["tools"] = 76,
 	["tiles"] = 76,
 	["pulley"] = 76,
-	["buildTime"] = 51680
+	["buildTime"] = 94902
 }
 stoneMason[28] = {
 	["level"] = 28,
@@ -306,7 +306,7 @@ stoneMason[28] = {
 	["tools"] = 84,
 	["tiles"] = 84,
 	["pulley"] = 84,
-	["buildTime"] = 54992
+	["buildTime"] = 101625
 }
 stoneMason[29] = {
 	["level"] = 29,
@@ -317,7 +317,7 @@ stoneMason[29] = {
 	["tools"] = 100,
 	["tiles"] = 100,
 	["pulley"] = 100,
-	["buildTime"] = 61616
+	["buildTime"] = 114674
 }
 stoneMason[30] = {
 	["level"] = 30,
@@ -328,7 +328,7 @@ stoneMason[30] = {
 	["tools"] = 116,
 	["tiles"] = 116,
 	["pulley"] = 116,
-	["buildTime"] = 68240
+	["buildTime"] = 127856
 }
 stoneMason[31] = {
 	["level"] = 31,
@@ -339,7 +339,7 @@ stoneMason[31] = {
 	["tools"] = 132,
 	["tiles"] = 132,
 	["pulley"] = 132,
-	["buildTime"] = 74864
+	["buildTime"] = 141170
 }
 stoneMason[32] = {
 	["level"] = 32,
@@ -350,7 +350,7 @@ stoneMason[32] = {
 	["tools"] = 148,
 	["tiles"] = 148,
 	["pulley"] = 148,
-	["buildTime"] = 81488
+	["buildTime"] = 154617
 }
 stoneMason[33] = {
 	["level"] = 33,
@@ -361,7 +361,7 @@ stoneMason[33] = {
 	["tools"] = 180,
 	["tiles"] = 180,
 	["pulley"] = 180,
-	["buildTime"] = 88112
+	["buildTime"] = 168196
 }
 stoneMason[34] = {
 	["level"] = 34,
@@ -372,7 +372,7 @@ stoneMason[34] = {
 	["tools"] = 212,
 	["tiles"] = 212,
 	["pulley"] = 212,
-	["buildTime"] = 94736
+	["buildTime"] = 181908
 }
 stoneMason[35] = {
 	["level"] = 35,
@@ -383,7 +383,7 @@ stoneMason[35] = {
 	["tools"] = 244,
 	["tiles"] = 244,
 	["pulley"] = 244,
-	["buildTime"] = 101360
+	["buildTime"] = 195752
 }
 stoneMason[36] = {
 	["level"] = 36,
@@ -394,7 +394,7 @@ stoneMason[36] = {
 	["tools"] = 276,
 	["tiles"] = 276,
 	["pulley"] = 276,
-	["buildTime"] = 107984
+	["buildTime"] = 209729
 }
 stoneMason[37] = {
 	["level"] = 37,
@@ -405,7 +405,7 @@ stoneMason[37] = {
 	["tools"] = 340,
 	["tiles"] = 340,
 	["pulley"] = 340,
-	["buildTime"] = 114608
+	["buildTime"] = 223838
 }
 stoneMason[38] = {
 	["level"] = 38,
@@ -416,7 +416,7 @@ stoneMason[38] = {
 	["tools"] = 404,
 	["tiles"] = 404,
 	["pulley"] = 404,
-	["buildTime"] = 121232
+	["buildTime"] = 238079
 }
 stoneMason[39] = {
 	["level"] = 39,
@@ -427,7 +427,7 @@ stoneMason[39] = {
 	["tools"] = 468,
 	["tiles"] = 468,
 	["pulley"] = 468,
-	["buildTime"] = 127856
+	["buildTime"] = 252453
 }
 stoneMason[40] = {
 	["level"] = 40,
@@ -438,5 +438,5 @@ stoneMason[40] = {
 	["tools"] = 532,
 	["tiles"] = 532,
 	["pulley"] = 532,
-	["buildTime"] = 134480
+	["buildTime"] = 266960
 }

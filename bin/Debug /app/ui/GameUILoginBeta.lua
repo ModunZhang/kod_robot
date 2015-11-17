@@ -7,7 +7,7 @@ local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local UIListView = import(".UIListView")
 local Localize = import("..utils.Localize")
-local LOCAL_RESOURCES_PERCENT = 60
+local LOCAL_RESOURCES_PERCENT = 100
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 
 function GameUILoginBeta:ctor()
@@ -33,11 +33,15 @@ function GameUILoginBeta:ctor()
         {image = "animations/ui_animation_0.pvr.ccz",list = "animations/ui_animation_0.plist"},
         {image = "animations/ui_animation_1.pvr.ccz",list = "animations/ui_animation_1.plist"},
         {image = "animations/ui_animation_2.pvr.ccz",list = "animations/ui_animation_2.plist"},
-        {image = "ui_png_bg.pvr.ccz",list = "ui_png_bg.plist"},
-        {image = "ui_png_button.pvr.ccz",list = "ui_png_button.plist"},
+        {image = "ui_png_bg0.pvr.ccz",list = "ui_png_bg0.plist"},
+        {image = "ui_png_bg1.pvr.ccz",list = "ui_png_bg1.plist"},
+        {image = "ui_png_button0.pvr.ccz",list = "ui_png_button0.plist"},
+        {image = "ui_png_button1.pvr.ccz",list = "ui_png_button1.plist"},
         {image = "ui_png.pvr.ccz",list = "ui_png.plist"},
         {image = "ui_pvr_0.pvr.ccz",list = "ui_pvr_0.plist"},
         {image = "ui_pvr_1.pvr.ccz",list = "ui_pvr_1.plist"},
+
+
     -- {image = "emoji.png",list = "emoji.plist"},
 
 
@@ -97,14 +101,14 @@ function GameUILoginBeta:createTips()
     local LOGIN_TIPS = {
         _("提示：预留一定的空闲城民，兵营将他们训练成士兵"),
         _("登录提示帮助2"),
-        _("登录提示帮助3"),
+        -- _("登录提示帮助3"),
         _("登录提示帮助4"),
         _("登录提示帮助5"),
-        _("登录提示帮助6"),
+        -- _("登录提示帮助6"),
         _("登录提示帮助7"),
         _("登录提示帮助8"),
         _("登录提示帮助9"),
-        _("登录提示帮助10"),
+        -- _("登录提示帮助10"),
     }
     math.randomseed(tostring(os.time()):reverse():sub(1, 6))
     local random = math.random(1,#LOGIN_TIPS)
@@ -172,7 +176,17 @@ function GameUILoginBeta:startGame()
     display.getRunningScene().startGame = true
     local sp = cc.Spawn:create(cc.ScaleTo:create(1,1.5),cc.FadeOut:create(1))
     local seq = transition.sequence({sp,cc.CallFunc:create(function()
-        self:connectLogicServer()
+        if app:GetGameDefautlt():IsPassedSplash() then
+            self:loginAction()
+        else
+            self.verLabel:fadeOut(0.5)
+            self.user_agreement_label:fadeOut(0.5)
+            self.user_agreement_button:hide()
+            self:RunFte(function()
+                self.passed_splash = true
+                self:loginAction()
+            end)
+        end
     end)})
     self.star_game_sprite:runAction(seq)
 end
@@ -186,6 +200,7 @@ function GameUILoginBeta:createUserAgreement()
         color = UIKit:hex2c3b(0x2a575d),
     }):addTo(self.ui_layer,2)
         :align(display.LEFT_BOTTOM,display.left+2,display.bottom)
+    self.user_agreement_label = user_agreement_label
     local button = WidgetPushButton.new()
         :addTo(self.ui_layer,2):align(display.LEFT_BOTTOM, display.left+2,display.bottom)
         :onButtonClicked(function(event)
@@ -198,6 +213,7 @@ function GameUILoginBeta:createUserAgreement()
         end)
     button:setContentSize(user_agreement_label:getContentSize())
     button:setTouchSwallowEnabled(true)
+    self.user_agreement_button = button
 end
 function GameUILoginBeta:OpenUserAgreement()
     local dialog = UIKit:newWidgetUI("WidgetPopDialog",770,_("用户协议"),display.top-130):addTo(self.ui_layer,2)
@@ -261,7 +277,7 @@ function GameUILoginBeta:createVerLabel()
 end
 
 function GameUILoginBeta:showVersion()
-    if  CONFIG_IS_DEBUG or device.platform == 'mac' then
+    if CONFIG_IS_NOT_UPDATE or device.platform == 'mac' then
         local __debugVer = require("debug_version")
         self.verLabel:setString("测试"..string.format(_("版本%s(%s)"), ext.getAppVersion(), __debugVer))
         -- app.client_tag = __debugVer
@@ -282,7 +298,39 @@ end
 --------------------------------------------------------------------------------------------------------------
 function GameUILoginBeta:OnMoveInStage()
     self:showVersion()
-    if CONFIG_IS_DEBUG or device.platform == 'mac' then
+    self:GetServerInfo(function()
+        self:LoadServerInfo()
+    end)
+end
+function GameUILoginBeta:GetServerInfo(callback)
+    self:setProgressText(_("正在获取服务器信息..."))
+    GameUtils:GetServerInfo({env = CONFIG_IS_DEBUG and "development" or "production", version = ext.getAppVersion()}, function(success, content)
+        if success then
+            self:setProgressText(_("获取服务器信息成功"))
+            dump(content)
+            local ip, port = unpack(string.split(content.data.gateServer, ":"))
+            NetManager.m_gateServer.host = ip
+            NetManager.m_gateServer.port = tonumber(port)
+
+            local ip, port = unpack(string.split(content.data.updateServer, ":"))
+            NetManager.m_updateServer.host = ip
+            NetManager.m_updateServer.port = tonumber(port)
+            if callback then
+                callback()
+            end
+        else
+            self:performWithDelay(function()
+                self:showError(_("获取服务器信息失败!"),function()
+                    self:GetServerInfo(function()
+                        self:LoadServerInfo()
+                    end)
+                end)
+            end, 3)
+        end
+    end)
+end
+function GameUILoginBeta:LoadServerInfo()
+    if CONFIG_IS_NOT_UPDATE or device.platform == 'mac' then
         if not app.client_tag then
             NetManager:getUpdateFileList(function(success, msg)
                 if not success then
@@ -293,10 +341,6 @@ function GameUILoginBeta:OnMoveInStage()
                 end
                 local serverFileList = json.decode(msg)
                 app.client_tag = serverFileList.tag
-                --注意这里debug模式和mac上再次重写了ext.getAppVersion
-                ext.getAppVersion = function()
-                    return serverFileList.appVersion
-                end
             end)
         end
         self:loadLocalResources()
@@ -332,7 +376,14 @@ end
 function GameUILoginBeta:__loadToTextureCache(config,shouldLogin)
     display.addSpriteFrames(DEBUG_GET_ANIMATION_PATH(config.list),DEBUG_GET_ANIMATION_PATH(config.image),function()
         self:setProgressPercent(self.progress_num + self.local_resources_percent_per)
-        if shouldLogin then self:loginAction() end
+        if shouldLogin then
+            -- self:loginAction()
+            self:performWithDelay(function()
+                self.progress_bar:hide()
+                self.tips_ui:hide()
+                self:showStartState()
+            end, 0.5)
+        end
     end)
 end
 
@@ -352,13 +403,14 @@ function GameUILoginBeta:setProgressPercent(num,animac)
 end
 
 function GameUILoginBeta:loginAction()
-    self:setProgressText(_("连接网关服务器...."))
+    -- self:setProgressText(_("连接网关服务器...."))
+    UIKit:WaitForNet(5)
     self:connectGateServer()
 end
 
 function GameUILoginBeta:connectGateServer()
     NetManager:getConnectGateServerPromise():done(function()
-        self:setProgressPercent(80)
+        -- self:setProgressPercent(80)
         self:getLogicServerInfo()
     end):catch(function(err)
         GameUtils:PingBaidu(function(success)
@@ -372,12 +424,7 @@ function GameUILoginBeta:connectGateServer()
 end
 function GameUILoginBeta:getLogicServerInfo()
     NetManager:getLogicServerInfoPromise():done(function()
-        self:setProgressPercent(100)
-        self:performWithDelay(function()
-            self.progress_bar:hide()
-            self.tips_ui:hide()
-            self:showStartState()
-        end, 0.5)
+        self:connectLogicServer()
     end):catch(function(err)
         local content, title = err:reason()
         local need_restart = false
@@ -412,7 +459,6 @@ end
 
 
 function GameUILoginBeta:connectLogicServer()
-    UIKit:WaitForNet()
     NetManager:getConnectLogicServerPromise():done(function()
         self:login()
     end):catch(function(err)
@@ -421,17 +467,18 @@ function GameUILoginBeta:connectLogicServer()
                 self:connectLogicServer()
             end,1)
         end)
-        UIKit:NoWaitForNet()
     end)
 
 end
 function GameUILoginBeta:login()
+    local debug_info = debug.traceback("", 2)
     NetManager:getLoginPromise():done(function(response)
         local userData = DataManager:getUserData()
         ext.market_sdk.onPlayerLogin(userData._id, userData.basicInfo.name, userData.logicServerId)
         ext.market_sdk.onPlayerLevelUp(User:GetPlayerLevelByExp(userData.basicInfo.levelExp))
 
         self:performWithDelay(function()
+            self.enter_next_scene = true
             if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
                 app:EnterFteScene()
             else
@@ -459,6 +506,9 @@ function GameUILoginBeta:login()
             local code = content.code
             if UIKit:getErrorCodeKey(content.code) == 'playerAlreadyLogin' then
                 content = _("玩家已经登录")
+                if checktable(ext.market_sdk) and ext.market_sdk.onPlayerEvent then
+                    ext.market_sdk.onPlayerEvent("LUA_ERROR_LOGIN", debug_info)
+                end
             else
                 content = UIKit:getErrorCodeData(code).message
             end
@@ -472,6 +522,7 @@ function GameUILoginBeta:login()
 end
 
 function GameUILoginBeta:showError(msg,cb)
+    UIKit:NoWaitForNet()
     msg = msg or ""
     UIKit:showKeyMessageDialog(_("提示"),msg, function()
         if cb then cb() end
@@ -502,34 +553,36 @@ function GameUILoginBeta:loadServerJson()
         self:donwLoadFilesWithFileList()
     end)
 end
+-- 1.0 --> 100 1.01 --> 110 1.0.1 --> 101
+function GameUILoginBeta:GetVersionWeight(ver)
+    ver = tostring(ver)
+    local verInfo = string.split(ver,'.')
+    local ret,flag = 0,1
+    for index=3,1,-1 do
+        local current = verInfo[index] or '0'
+        current = tonumber(current) * flag
+        ret = ret + current
+        flag = flag * 10
+    end
+    return ret
+end
 
 function GameUILoginBeta:donwLoadFilesWithFileList()
     self.m_totalSize = 0
     self.m_currentSize = 0
     local localFileList = json.decode(self.m_localJson)
     local serverFileList = json.decode(self.m_serverJson)
-    local localAppVersion = tonumber(ext.getAppVersion())
-    local serverMinAppVersion = tonumber(serverFileList.appMinVersion)
-    local serverAppVersion = tonumber(serverFileList.appVersion)
-    if localAppVersion < serverMinAppVersion then
+    local localAppVersion = self:GetVersionWeight(ext.getAppVersion())
+    local serverMinAppVersion = self:GetVersionWeight(serverFileList.appMinVersion)
+    local serverAppVersion = self:GetVersionWeight(serverFileList.appVersion)
+    if localAppVersion < serverMinAppVersion or
+        (ext.getAppVersion() == '1.01' and serverFileList.appVersion == '1.1.1') then
         device.showAlert(_("错误"), _("游戏版本过低,请更新!"), { _("确定") }, function(event)
-            if CONFIG_IS_DEBUG then
-                device.openURL("https://batcat.sinaapp.com/ad_hoc/build-index.html")
-            else
-                device.openURL(CONFIG_APP_URL[device.platform])
-            end
+            device.openURL(CONFIG_APP_URL[device.platform])
             self:loadServerJson()
         end)
         return
     end
-
-    if localAppVersion > serverAppVersion then
-        device.showAlert(_("错误"), _("服务器正在部署,请稍候!"), { _("确定") }, function(event)
-            self:loadServerJson()
-        end)
-        return
-    end
-
 
     local updateFileList = {}
     for k, v in pairs(serverFileList.files) do
@@ -573,7 +626,7 @@ function GameUILoginBeta:downloadFiles(files)
             self:downloadFiles(files)
         end, function(total, current)
             fileTotal = total
-            current = current
+            current = current or 0
             local currentPercent = (self.m_currentSize + current) / self.m_totalSize * 100
             if (percent ~= currentPercent) then
                 percent = currentPercent
@@ -605,7 +658,7 @@ end
 local check = import("..fte.check")
 local mockData = import("..fte.mockData")
 function GameUILoginBeta:checkFte()
-    if check("ALL") then
+    if check("ALL") or check("BuildHouseAt_8_3") then
         app:EnterUserMode()
         return
     end
@@ -649,8 +702,8 @@ function GameUILoginBeta:checkFte()
     if check("GetSoldier") then
         mockData.GetSoldier()
     end
-    if check("FightWithNpc1") then
-        mockData.FightWithNpc(1)
+    if check("FightWithNpc1_1") then
+        mockData.FightWithNpc("1_1")
     end
     if check("UpgradeBuildingTo_keep_3") then
         mockData.UpgradeBuildingTo("keep", 3)
@@ -698,11 +751,11 @@ function GameUILoginBeta:checkFte()
     if check("FinishUpgradingBuilding_materialDepot_1") then
         mockData.FinishUpgradingBuilding("materialDepot",1)
     end
-    if check("FightWithNpc2") then
-        mockData.FightWithNpc(2)
+    if check("FightWithNpc1_2") then
+        mockData.FightWithNpc("1_2")
     end
-    if check("FightWithNpc3") then
-        mockData.FightWithNpc(3)
+    if check("FightWithNpc1_3") then
+        mockData.FightWithNpc("1_3")
     end
     if check("InstantRecruitSoldier_skeletonWarrior") then
         mockData.InstantRecruitSoldier("skeletonWarrior", 1)
@@ -719,6 +772,12 @@ end
 
 
 return GameUILoginBeta
+
+
+
+
+
+
 
 
 

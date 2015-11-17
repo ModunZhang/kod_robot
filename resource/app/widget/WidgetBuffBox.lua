@@ -26,8 +26,9 @@ function WidgetBuffBox:ctor(params)
         :addTo(self)
         :align(display.CENTER, width/2, height/2+15)
         :onButtonClicked(function ( event )
-            WidgetUseItems.new():Create({item_type = WidgetUseItems.USE_TYPE.BUFF,item_name = buff_type.."_1"})
-                :AddToCurrentScene()
+            WidgetUseItems.new():Create({
+                item_name = buff_type.."_1"
+            }):AddToCurrentScene()
         end)
     -- buff icon
     local buff_icon = display.newSprite(UILib.buff[buff_type],0,12,{class=cc.FilteredSpriteWithOne})
@@ -51,9 +52,9 @@ function WidgetBuffBox:ctor(params)
             size = 20,
         }):align(display.CENTER, info_bg:getContentSize().width/2 ,info_bg:getContentSize().height/2)
         :addTo(info_bg)
-    self:IsActived(ItemManager:IsBuffActived( buff_type ))
+    self:SetActived(User:IsItemEventActive(buff_type))
 end
-function WidgetBuffBox:IsActived(isActive)
+function WidgetBuffBox:SetActived(isActive, time)
     if not isActive then
         local my_filter = filter
         local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
@@ -63,7 +64,7 @@ function WidgetBuffBox:IsActived(isActive)
         self.buff_icon:clearFilter()
         self.buff_active:show()
     end
-    self:SetInfo(isActive and GameUtils:formatTimeStyle1(ItemManager:GetItemEventByType(self.buff_type):GetTime()) or _("未激活"),UIKit:hex2c4b(isActive and 0x007c23 or 0x403c2f))
+    self:SetInfo(isActive and GameUtils:formatTimeStyle1(time) or _("未激活"),UIKit:hex2c4b(isActive and 0x007c23 or 0x403c2f))
 end
 function WidgetBuffBox:SetInfo(info,color)
     self.info_label:setString(info)
@@ -72,17 +73,10 @@ function WidgetBuffBox:SetInfo(info,color)
     end
     return self
 end
-function WidgetBuffBox:OnItemEventTimer( item_event_new )
-    if self.buff_type == item_event_new:Type() then
-        local time = item_event_new:GetTime()
-        self:IsActived(time > 0)
-    end
-end
 function WidgetBuffBox:onEnter()
-    ItemManager:AddListenOnType(self,ItemManager.LISTEN_TYPE.OnItemEventTimer)
-end
-function WidgetBuffBox:onExit()
-    ItemManager:RemoveListenerOnType(self,ItemManager.LISTEN_TYPE.OnItemEventTimer)
+    self:scheduleAt(function()
+        self:SetActived(User:IsItemEventActive(self.buff_type))
+    end)
 end
 return WidgetBuffBox
 

@@ -7,13 +7,14 @@
 local EmojiUtil = class("EmojiUtil")
 
 --[[
-	将表情化标签转换成富文本语法
-	chatmsg : "[1FED]hello world..."
-	
-	-- dest: {'{\"type\":\"text\", \"value\":\"%s\"}','{\"type\":\"text\", \"value\":\"%s\"}','{\"type\":\"text\", \"value\":\"%s\"}'}
-	local func_handler_dest = function(dest)
-		table.insert(dest,1,'{\"type\":\"text\", \"value\":\"first\"}')
-	end
+    将表情化标签转换成富文本语法
+    将战报分享转化为富文本语法
+    chatmsg : "[1FED]hello world..."
+    
+    -- dest: {'{\"type\":\"text\", \"value\":\"%s\"}','{\"type\":\"text\", \"value\":\"%s\"}','{\"type\":\"text\", \"value\":\"%s\"}'}
+    local func_handler_dest = function(dest)
+        table.insert(dest,1,'{\"type\":\"text\", \"value\":\"first\"}')
+    end
 --]]
 function EmojiUtil:ConvertEmojiToRichText(chatmsg,func_handler_dest)
     chatmsg = chatmsg or ""
@@ -41,14 +42,32 @@ function EmojiUtil:ConvertEmojiToRichText(chatmsg,func_handler_dest)
     for i,v in ipairs(dest) do
         local result,count = string.gsub(v,"%[([%P]+)%]", "%1")
         if count == 0 or string.len(string.trim(result)) == 0 then
-            dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"}', v)
-        else
-        	local key = string.format('%s.png', string.upper(result))
-        	if plist_texture_data[key] then
-            	dest[i] = string.format('{\"type\":\"image\", \"value\":\"%s\"}', key)
+            -- 处理战报分享
+            local r_s ,r_e = string.find(result,"<report>.+<report>")
+            if r_s and r_e then
+                local report = string.sub(result,r_s+8,r_e-8)
+                local r_msg = string.split(report,",")
+                local msg_value , reportId ,userId = ""
+                for __,r in ipairs(r_msg) do
+                    if string.find(r,"reportName") then
+                        msg_value =  "[" ..string.split(r,":")[2] .. "]"
+                    elseif string.find(r,"userId") then
+                        userId = string.split(r,":")[2]
+                    elseif string.find(r,"reportId") then
+                        reportId = string.split(r,":")[2]
+                    end
+                end
+                dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\",\"color\":0xd64600,\"url\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\"}',string.sub(result,1,r_s - 1), msg_value,"report:"..userId..":"..reportId,string.sub(result,r_e+1))
             else
-            	dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"}', v)
-        	end
+                dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"}', v)
+            end
+        else
+            local key = string.format('%s.png', string.upper(result))
+            if plist_texture_data[key] then
+                dest[i] = string.format('{\"type\":\"image\", \"value\":\"%s\"}', key)
+            else
+                dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"}', v)
+            end
         end
     end
     if func_handler_dest and type(func_handler_dest) == 'function' then
@@ -66,6 +85,22 @@ end
 function EmojiUtil:RemoveAllEmojiTag(str)
     return string.gsub(str, "%[[%P]+%]","")
 end
+--系统消息只支持纯文本
+function EmojiUtil:FormatSystemChat(msg,opt)
+    if msg then
+        msg = string.gsub(msg,"\n","\\n")
+        msg = string.gsub(msg,"'","\'")
+        msg = string.gsub(msg,'"',"''")
+        msg = string.gsub(msg,'\\','\\\\')
+        if opt then
+            return string.format('[{\"type\":\"text\", \"value\":\"%s\",\"color\":0x00b835}]',msg)
+        else
+            return string.format('[{\"type\":\"text\", \"value\":\"%s\",\"color\":0x245f00}]',msg)
+        end
+    end
+    return ""
+end
+
 -- end
 --------------------------------------------------------------------------------------------------
 
@@ -98,17 +133,13 @@ function ChatManager:GetGameDefault()
     return self.gameDefault
 end
 
-function ChatManager:sortMessage_(t)
-    return t
-end
-
 function ChatManager:__checkIsBlocked(msg)
-    if msg.id == User:Id() then
-        msg.name = User:Name()
-        msg.icon = User:Icon()
+    if msg.id == User._id then
+        msg.name = User.basicInfo.name
+        msg.icon = User.basicInfo.icon
         local alliacne = Alliance_Manager:GetMyAlliance()
         if not alliacne:IsDefault() then
-            msg.allianceTag = alliacne:Tag()
+            msg.allianceTag = alliacne.basicInfo.tag
         end
     end
     return self._blockedIdList_[msg.id] ~= nil
@@ -185,7 +216,7 @@ function ChatManager:setChannelReadStatus(channel,status)
     self.channelReadStatus[channel] = status
 end
 function ChatManager:pushMsgToQueue_(msg)
-	self:setChannelReadStatus(msg.channel,true)
+    self:setChannelReadStatus(msg.channel,true)
     table.insert(self.push_buff_queue,1,msg)
     if #self.push_buff_queue >= SIZE_MUST_PUSH then
         self:__checkNotifyIf()
@@ -254,14 +285,18 @@ end
 
 function ChatManager:__formatLastMessage(chat)
     if not chat then return ""  end
-    if chat.id == User:Id() then
-        chat.name = User:Name()
+    if chat.id == User._id then
+        chat.name = User.basicInfo.name
     end
-    local chat_text = string.format(" : %s",chat.text)
-    local result = self:GetEmojiUtil():ConvertEmojiToRichText(chat_text,function(json_table)
-        table.insert(json_table,1,string.format('{\"type\":\"text\", \"value\":\"%s\",\"color\":0x00b4cf}', chat.name))
-    end)
-    return result
+    if string.lower(chat.id) == 'system' then
+        return self:GetEmojiUtil():FormatSystemChat(string.format("%s : %s",chat.name,chat.text),true)
+    else
+        local chat_text = string.format(" : %s",chat.text)
+        local result = self:GetEmojiUtil():ConvertEmojiToRichText(chat_text,function(json_table)
+            table.insert(json_table,1,string.format('{\"type\":\"text\", \"value\":\"%s\",\"color\":0x00b4cf}', chat.name))
+        end)
+        return result
+    end
 end
 
 function ChatManager:FetchLastChannelMessage()
@@ -293,7 +328,7 @@ function ChatManager:FetchChatWhenReLogined()
     local alliance = Alliance_Manager:GetMyAlliance()
     if not alliance:IsDefault() then
         self:FetchAllChatMessageFromServer('alliance')
-        local status = alliance:Status()
+        local status = alliance.basicInfo.status
         if status ~= 'prepare' and status ~= 'fight' then
             self:emptyChannel_('allianceFight')
         else
@@ -360,5 +395,27 @@ function ChatManager:__flush()
     self:GetGameDefault():flush()
 end
 
+function ChatManager:FetMessageFirstStartGame()
+    if not self:isChannelInited('global') then
+        self:FetchAllChatMessageFromServer('global')
+    end
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if not alliance:IsDefault() then
+        if not self:isChannelInited("alliance") then
+            self:FetchAllChatMessageFromServer('alliance')
+        end
+        if not self:isChannelInited("allianceFight") then
+            local status = alliance.basicInfo.status
+            if status ~= 'prepare' and status ~= 'fight' then
+                self:emptyChannel_('allianceFight')
+            else
+                self:FetchAllChatMessageFromServer('allianceFight')
+            end
+        end
+    end
+end
+
 return ChatManager
+
+
 

@@ -3,7 +3,6 @@ local promise = import('..utils.promise')
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPopDialog= import("..widget.WidgetPopDialog")
-local WidgetUseItems= import("..widget.WidgetUseItems")
 local Localize = import("..utils.Localize")
 local SpriteConfig = import("..sprites.SpriteConfig")
 local window = import('..utils.window')
@@ -12,7 +11,7 @@ local GameUIKeep = UIKit:createUIClass('GameUIKeep',"GameUIUpgradeBuilding")
 local sharedSpriteFrameCache = cc.SpriteFrameCache:getInstance()
 local building_config_map = {
     ["keep"] = {scale = 0.25, offset = {x = 75, y = 74}},
-    ["watchTower"] = {scale = 0.4, offset = {x = 80, y = 70}},
+    -- ["watchTower"] = {scale = 0.4, offset = {x = 80, y = 70}},
     ["warehouse"] = {scale = 0.5, offset = {x = 65, y = 70}},
     ["dragonEyrie"] = {scale = 0.35, offset = {x = 65, y = 70}},
     ["toolShop"] = {scale = 0.5, offset = {x = 75, y = 70}},
@@ -33,7 +32,51 @@ local building_config_map = {
     ["stable"] = {scale = 0.46, offset = {x = 70, y = 74}},
     ["workshop"] = {scale = 0.46, offset = {x = 70, y = 74}},
 }
-
+-- 地形buff
+local buff_info = {
+    {
+        {
+            _("木材产量"), "+"..intInit.grassLandWoodAddPercent.value.."%"
+        },
+        {
+            _("铁矿产量"), "+"..intInit.grassLandIronAddPercent.value.."%"
+        },
+        {
+            _("石料产量"), "+"..intInit.grassLandStoneAddPercent.value.."%"
+        },
+        {
+            _("粮食产量"), "+"..intInit.grassLandFoodAddPercent.value.."%"
+        },
+    },
+    {
+        {
+            _("步兵攻击"), "+"..intInit.desertAttackAddPercent.value.."%"
+        },
+        {
+            _("弓手攻击"), "+"..intInit.desertAttackAddPercent.value.."%"
+        },
+        {
+            _("骑兵攻击"), "+"..intInit.desertAttackAddPercent.value.."%"
+        },
+        {
+            _("攻城器械攻击"), "+"..intInit.desertAttackAddPercent.value.."%"
+        },
+    },
+    {
+        {
+            _("步兵生命值"), "+"..intInit.iceFieldDefenceAddPercent.value.."%"
+        },
+        {
+            _("弓手生命值"), "+"..intInit.iceFieldDefenceAddPercent.value.."%"
+        },
+        {
+            _("骑兵生命值"), "+"..intInit.iceFieldDefenceAddPercent.value.."%"
+        },
+        {
+            _("攻城器械生命值"), "+"..intInit.iceFieldDefenceAddPercent.value.."%"
+        },
+    },
+}
 function GameUIKeep:ctor(city,building,default_tab)
     GameUIKeep.super.ctor(self,city,_("城堡"),building,default_tab)
 end
@@ -51,7 +94,6 @@ function GameUIKeep:OnMoveInStage()
                 self:CreateCanBeUnlockedBuildingBG()
                 self:CreateCanBeUnlockedBuildingListView()
                 self:CreateCityBasicInfo()
-                self.city:AddListenOnType(self, City.LISTEN_TYPE.CITY_NAME)
             end
             self.info_layer:setVisible(true)
         else
@@ -64,47 +106,76 @@ function GameUIKeep:OnMoveInStage()
 end
 
 function GameUIKeep:onExit()
-    self.city:RemoveListenerOnType(self, City.LISTEN_TYPE.CITY_NAME)
     GameUIKeep.super.onExit(self)
 end
 
 function GameUIKeep:CreateCityBasicInfo()
     -- 建筑图片 放置区域左右边框
-    local left_frame = display.newSprite("alliance_item_flag_box_126X126.png")
-        :align(display.LEFT_CENTER, display.cx-268,display.top-175)
+    local terrain = User.basicInfo.terrain
+    local terrain_box = display.newSprite("box_132x132_1.png"):align(display.LEFT_CENTER, display.cx-268,display.top-175)
         :addTo(self.info_layer)
-        :scale(136/126)
+    box_size = terrain_box:getContentSize()
+    if terrain == "grassLand" then
+        display.newSprite("icon_grass_132x132.png")
+            :align(display.CENTER, box_size.width/2,box_size.height/2):addTo(terrain_box)
+    elseif terrain == "iceField" then
+        display.newSprite("icon_icefield_132x132.png")
+            :align(display.CENTER, box_size.width/2,box_size.height/2):addTo(terrain_box)
+    else
+        display.newSprite("icon_desert_132x132.png")
+            :align(display.CENTER, box_size.width/2,box_size.height/2):addTo(terrain_box)
+    end
 
     local building_cp = building_config_map[self.building:GetType()]
     local build_png = SpriteConfig[self.building:GetType()]:GetConfigByLevel(self.building:GetLevel()).png
     local building_image = display.newSprite(build_png, 0, 0)
-        :addTo(left_frame):pos(building_cp.offset.x, building_cp.offset.y)
+        :addTo(terrain_box):pos(building_cp.offset.x, building_cp.offset.y)
         :scale(building_cp.scale)
 
     local city_postion = "0,0"
     if not Alliance_Manager:GetMyAlliance():IsDefault() then
         local alliance = Alliance_Manager:GetMyAlliance()
-        local mapObject = alliance:GetAllianceMap():FindMapObjectById(alliance:GetSelf():MapId())
-        local x, y = mapObject:GetLogicPosition()
-        city_postion = x..","..y
+        local mapObject = alliance:FindMapObjectById(alliance:GetSelf():MapId())
+        city_postion = mapObject.location.x..","..mapObject.location.y
     end
-    self:CreateLineItem({
-        title_1 =  _("城市坐标"),
-        title_2 =  "("..city_postion..")",
-    }):align(display.LEFT_CENTER, display.cx-120, display.top-160)
-        :addTo(self.info_layer)
     -- 修改地形
     self:CreateLineItem({
         title_1 =  _("城市地形"),
-        title_2 =  Localize.terrain[User:Terrain()],
+        title_2 =  Localize.terrain[terrain],
         button_label =  _("修改"),
         listener =  function ()
             self:CreateChangeTerrainWindow()
         end,
-    }):align(display.LEFT_CENTER, display.cx-120, display.top-240)
+    }):align(display.LEFT_CENTER, display.cx-120, display.top-160)
         :addTo(self.info_layer)
-end
 
+    for i,v in ipairs(self:GetTerrainBuff()) do
+        local label_1 = UIKit:ttfLabel({
+            text = v[1],
+            size = 20,
+            color = 0x615b44
+        }):align(display.LEFT_CENTER, display.cx-120 + (i % 2 == 0 and 200 or 0), display.top-185 - (i > 2 and 40 or 0))
+            :addTo(self.info_layer)
+        UIKit:ttfLabel({
+            text = v[2],
+            size = 20,
+            color = 0x403c2f
+        }):align(display.LEFT_CENTER, label_1:getPositionX() + label_1:getContentSize().width + 10,label_1:getPositionY())
+            :addTo(self.info_layer)
+    end
+end
+function GameUIKeep:GetTerrainBuff(terrain)
+    local terrain = terrain or User.basicInfo.terrain
+    local target_info
+    if terrain == "grassLand" then
+        target_info = buff_info[1]
+    elseif terrain == "iceField" then
+        target_info = buff_info[3]
+    else
+        target_info = buff_info[2]
+    end
+    return target_info
+end
 function GameUIKeep:CreateLineItem(params)
     -- 分割线
     local line = display.newSprite("dividing_line.png")
@@ -137,6 +208,7 @@ function GameUIKeep:CreateLineItem(params)
                 text = params.button_label,
                 size = 20,
                 color = 0xffedae,
+                shadow = true,
             }))
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
@@ -186,7 +258,7 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
     local buildings = GameDatas.Buildings.buildings
     local unlock_index = 1
     for i,v in ipairs(buildings) do
-        if v.location<21 then
+        if v.location<21 and v.location ~= 2 then
             local unlock_building = City:GetBuildingByLocationId(v.location)
             local tile = City:GetTileByLocationId(v.location)
 
@@ -279,40 +351,51 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
     end
     self.building_listview:reload()
 end
+function GameUIKeep:GetListItem(index,effects)
+    local bg = display.newScale9Sprite(string.format("back_ground_548x40_%d.png", index % 2 == 0 and 1 or 2)):size(550,40)
+    UIKit:ttfLabel({
+        text = effects[1],
+        size = 20,
+        color = 0x615b44,
+        align = cc.ui.UILabel.TEXT_ALIGN_LEFT,
+    }):addTo(bg):align(display.LEFT_CENTER,10,20)
+    UIKit:ttfLabel({
+        text = effects[2],
+        size = 20,
+        color = 0x403c2f,
+        align = cc.ui.UILabel.TEXT_ALIGN_LEFT,
+    }):addTo(bg):align(display.RIGHT_CENTER,540,20)
 
-function GameUIKeep:CreateModifyCityNameWindow()
-    WidgetUseItems.new():Create({item_type = WidgetUseItems.USE_TYPE.CHANGE_CITY_NAME}):AddToCurrentScene()
+    return bg
 end
-
 function GameUIKeep:CreateChangeTerrainWindow()
-    local layer = WidgetPopDialog.new(450,_("城市地形修改")):addTo(self,201)
+    local layer = WidgetPopDialog.new(606,_("城市地形修改")):addTo(self,201)
     local body = layer:GetBody()
 
-    local bg1 = display.newScale9Sprite("back_ground_104x132.png",x,y,cc.size(580,264),cc.rect(10,10,84,112))
-        :addTo(body):align(display.CENTER,304, 294)
+    local bg1 = display.newScale9Sprite("back_ground_104x132.png",x,y,cc.size(580,206),cc.rect(10,10,84,112))
+        :addTo(body):align(display.TOP_CENTER,304, body:getContentSize().height - 20)
 
-    self.terrain_eff_label = cc.ui.UILabel.new({
-        size = 18,
-        font = UIKit:getFontFilePath(),
-        align = cc.ui.TEXT_ALIGN_LEFT,
-        color = UIKit:hex2c3b(0x514d3e)
-    }):addTo(bg1):align(display.CENTER,304,30)
-
-
+    -- 地形buff效果
+    local list,list_node = UIKit:commonListView_1({
+        viewRect = cc.rect(0, 0, 550, 160),
+        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
+    })
+    list.touchNode_:setTouchEnabled(false)
+    list_node:addTo(body):pos(20, body:getContentSize().height - 440)
     -- 草地
     local grass_box = display.newSprite("box_132x132_1.png")
-        :align(display.CENTER, 110, 180):addTo(bg1)
+        :align(display.CENTER, 110, 130):addTo(bg1)
     local box_size = grass_box:getContentSize()
     local grass = display.newSprite("icon_grass_132x132.png")
         :align(display.CENTER, box_size.width/2,box_size.height/2):addTo(grass_box)
     -- 沙漠
     local icefield_box = display.newSprite("box_132x132_1.png")
-        :align(display.CENTER, 295, 180):addTo(bg1)
+        :align(display.CENTER, 295, 130):addTo(bg1)
     local icefield = display.newSprite("icon_icefield_132x132.png")
         :align(display.CENTER, box_size.width/2,box_size.height/2):addTo(icefield_box)
     -- 雪地
     local desert_box = display.newSprite("box_132x132_1.png")
-        :align(display.CENTER, 482, 180):addTo(bg1)
+        :align(display.CENTER, 482, 130):addTo(bg1)
     local desert = display.newSprite("icon_desert_132x132.png")
         :align(display.CENTER, box_size.width/2,box_size.height/2):addTo(desert_box)
 
@@ -323,7 +406,6 @@ function GameUIKeep:CreateChangeTerrainWindow()
         on = "checkbox_selectd.png",
         on_pressed = "checkbox_selectd.png",
         on_disabled = "checkbox_selectd.png",
-
     }
     local group = cc.ui.UICheckBoxButtonGroup.new(display.LEFT_TO_RIGHT):addButton(cc.ui.UICheckBoxButton.new(checkbox_image)
         :align(display.LEFT_CENTER))
@@ -333,28 +415,29 @@ function GameUIKeep:CreateChangeTerrainWindow()
             :align(display.LEFT_CENTER))
         :setButtonsLayoutMargin(0, 130, 0, 0)
         :onButtonSelectChanged(function(event)
-            -- self.selected_rebuild_to_building = rebuild_list[event.selected]
-            local t_name = {
-                {
-                    _("草地"),
-                    _("绿龙"),
-                },
-                {
-                    _("雪地"),
-                    _("蓝龙"),
-                },
-                {
-                    _("沙漠"),
-                    _("红龙"),
-                },
-            }
-            self.terrain_eff_label:setString(string.format(_("提升%d%% %s的生命回复速度和额外的力量"),intInit.dragonStrengthTerrainAddPercent.value,t_name[event.selected][2]))
-
+            local selected = event.selected
+            local terrain 
+            if selected == 1 then
+                terrain = "grassLand"
+            elseif selected == 2 then
+                terrain = "iceField"
+            elseif selected == 3 then
+                terrain = "desert"
+            end
+            list:removeAllItems()
+            for i,v in ipairs(self:GetTerrainBuff(terrain)) do
+                local item = list:newItem()
+                local content = self:GetListItem(i,v)
+                item:addContent(content)
+                item:setItemSize(600,40)
+                list:addItem(item)
+            end
+            list:reload()
         end)
-        :align(display.CENTER, 80 , 50)
+        :align(display.CENTER, 80 , 5)
         :addTo(bg1)
 
-    local terrain = User:Terrain()
+    local terrain = User.basicInfo.terrain
     local default_index = 0
     if terrain == "grassLand" then
         default_index = 1
@@ -421,7 +504,7 @@ function GameUIKeep:CreateChangeTerrainWindow()
         :addTo(bg2):align(display.CENTER, 480, 45)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                if User:GetGemResource():GetValue()<intInit.changeTerrainNeedGemCount.value then
+                if User:GetGemValue()<intInit.changeTerrainNeedGemCount.value then
                     UIKit:showMessageDialog(_("提示"),_("金龙币不足"))
                         :CreateOKButton(
                             {
@@ -510,6 +593,12 @@ end
 
 
 return GameUIKeep
+
+
+
+
+
+
 
 
 

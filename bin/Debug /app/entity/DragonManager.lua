@@ -16,7 +16,7 @@ local config_intInit = GameDatas.PlayerInitData.intInit
 
 DragonManager.LISTEN_TYPE = Enum("OnHPChanged","OnBasicChanged","OnDragonHatched",
     -- "OnDragonEventChanged","OnDragonEventTimer",
-    "OnDefencedDragonChanged",
+    -- "OnDefencedDragonChanged",
     "OnDragonDeathEventChanged","OnDragonDeathEventTimer","OnDragonDeathEventRefresh")
 
 
@@ -59,6 +59,7 @@ function DragonManager:IsHateEnable()
             return true
         end
     end
+    return false
 end
 function DragonManager:GetHatedCount()
     local count = 0
@@ -186,80 +187,8 @@ end
 
 function DragonManager:OnUserDataChanged(user_data, current_time, deltaData,hp_recovery_perHour)
     self:RefreshDragonData(user_data.dragons,current_time,hp_recovery_perHour,deltaData)
-    -- self:RefreshDragonEvents(user_data,deltaData)
     self:RefreshDragonDeathEvents(user_data,deltaData)
 end
-
--- function DragonManager:HaveDragonHateEvent()
---     return not LuaUtils:table_empty(self.dragon_events)
--- end
-
--- function DragonManager:GetDragonEventByDragonType(dragon_type)
---     return self.dragon_events[dragon_type]
--- end
-
--- function DragonManager:RefreshDragonEvents(user_data,deltaData)
---     if not user_data.dragonHatchEvents then return end
---     local is_fully_update = deltaData == nil
---     local is_delta_update = not is_fully_update and deltaData.dragonHatchEvents ~= nil
---     if is_fully_update then
---         self.dragon_events = {}
---         for _,v in ipairs(user_data.dragonHatchEvents) do
---             if not self.dragon_events[v.dragonType] then
---                 local dragonEvent = DragonEvent.new()
---                 dragonEvent:UpdateData(v)
---                 self.dragon_events[dragonEvent:DragonType()] = dragonEvent
---                 dragonEvent:AddObserver(self)
---             end
---         end
---     end
---     if is_delta_update then
---         local changed_map = GameUtils:Handler_DeltaData_Func(
---             deltaData.dragonHatchEvents
---             ,function(event_data)
---                 local dragonEvent = DragonEvent.new()
---                 dragonEvent:UpdateData(event_data)
---                 self.dragon_events[dragonEvent:DragonType()] = dragonEvent
---                 dragonEvent:AddObserver(self)
---                 return dragonEvent
---             end
---             ,function(event_data)
---                 if self.dragon_events[event_data.dragonType] then
---                     local dragonEvent = self.dragon_events[event_data.dragonType]
---                     dragonEvent:UpdateData(event_data)
---                 end
---             end
---             ,function(event_data)
---                 if self.dragon_events[event_data.dragonType] then
---                     local dragonEvent = self.dragon_events[event_data.dragonType]
---                     dragonEvent:Reset()
---                     self.dragon_events[event_data.dragonType] = nil
---                     dragonEvent = DragonEvent.new()
---                     dragonEvent:UpdateData(event_data)
-
---                     GameGlobalUI:showTips(_("提示"),string.format(_("孵化%s完成"),Localize.dragon[event_data.dragonType]))
-
---                     return dragonEvent
---                 end
---             end
---         )
---         self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDragonEventChanged,function(listener)
---             listener.OnDragonEventChanged(listener,GameUtils:pack_event_table(changed_map))
---         end)
---     end
--- end
-
--- function DragonManager:IteratorDragonEvents(func)
---     for _,dragonEvent in pairs(self.dragon_events) do
---         func(dragonEvent)
---     end
--- end
-
--- function DragonManager:OnDragonEventTimer(dragonEvent)
---     self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDragonEventTimer,function(listener)
---         listener.OnDragonEventTimer(listener,dragonEvent)
---     end)
--- end
 
 --复活事件
 function DragonManager:RefreshDragonDeathEvents(user_data,deltaData)
@@ -356,6 +285,13 @@ function DragonManager:RefreshDragonData( dragons,resource_refresh_time,hp_recov
                 local isDefenced = dragon:IsDefenced()
                 local old_star = dragon:Star()
                 dragon:Update(v) -- include UpdateEquipmetsAndSkills
+                --[[  
+                    dannyhe:修复龙血刷新界面bug,如果不是血的字段更新，这里会设置被为最初的值
+                --]]
+                self:checkHPRecoveryIf_(dragon,v.hpRefreshTime/1000,hp_recovery_perHour)
+                local reallyHp = self:GetCurrentHPValueByDragonType(dragon:Type(),app.timer:GetServerTime())
+                if reallyHp > 0 then dragon:SetHp(reallyHp) end
+
                 local star_chaned =  dragon:Star() > old_star
                 if not need_notify_defence then
                     need_notify_defence = isDefenced ~= dragon:IsDefenced()
@@ -374,12 +310,11 @@ function DragonManager:RefreshDragonData( dragons,resource_refresh_time,hp_recov
                     end)
                 end
             end
-            self:checkHPRecoveryIf_(dragon,resource_refresh_time,hp_recovery_perHour)
         end
         if need_notify_defence then
-            self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDefencedDragonChanged,function(listener)
-                listener.OnDefencedDragonChanged(listener,self:GetDefenceDragon())
-            end)
+            -- self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDefencedDragonChanged,function(listener)
+            --     listener.OnDefencedDragonChanged(listener,self:GetDefenceDragon())
+            -- end)
             if DragonManager.defence_callback then
                 DragonManager.defence_callback()
                 DragonManager.defence_callback = nil
@@ -392,7 +327,7 @@ end
 
 function DragonManager:checkHPRecoveryIf_(dragon,resource_refresh_time,hp_recovery_perHour)
     --龙死了 并且 龙还在血量恢复队列中 从队列中移除这条龙
-    if dragon:Ishated() and dragon:IsDead() and self:GetHPResource(dragon:Type())  then
+    if dragon:Ishated() and self:GetHPResource(dragon:Type()) and (dragon:IsDead() or dragon:Status() == 'march') then
         self:RemoveHPResource(dragon:Type())
     end
     local tmp_resource = self:GetHPResource(dragon:Type())
@@ -429,18 +364,18 @@ function DragonManager:GetHPResource(dragon_type)
     return self.dragons_hp[dragon_type]
 end
 
-function DragonManager:GetCurrentHPValueByDragonType(dragon_type)
+function DragonManager:GetCurrentHPValueByDragonType(dragon_type,current_time)
     if not self:GetHPResource(dragon_type) then
         return -1
     end
-    return self:GetHPResource(dragon_type):GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    return self:GetHPResource(dragon_type):GetResourceValueByCurrentTime(current_time)
 end
 
 function DragonManager:UpdateHPResourceByTime(current_time)
     for dragonType, v in pairs(self.dragons_hp) do
         local dragon = self:GetDragon(dragonType)
         if dragon then
-            dragon:SetHp(self:GetCurrentHPValueByDragonType(dragonType))
+            dragon:SetHp(self:GetCurrentHPValueByDragonType(dragonType,current_time))
         end
     end
 end
@@ -448,9 +383,6 @@ end
 function DragonManager:OnTimer(current_time)
     self:UpdateHPResourceByTime(current_time)
     self:OnHPChanged()
-    -- self:IteratorDragonEvents(function(dragonEvent)
-    --     dragonEvent:OnTimer(current_time)
-    -- end)
     self:IteratorDragonDeathEvents(function(dragonDeathEvent)
         dragonDeathEvent:OnTimer(current_time)
     end)
@@ -461,21 +393,6 @@ function DragonManager:OnHPChanged()
         listener.OnHPChanged(listener)
     end)
 end
-
--- function DragonManager:GetHateNeedMinutes(dragonType)
---     if self:NoDragonHated() then return 0 end
---     return config_intInit['playerHatchDragonNeedMinutes']['value']
--- end
-
--- function DragonManager:NoDragonHated()
---     for __,dragon in pairs(self:GetDragons()) do
---         if dragon:Ishated() then
---             return false
---         end
---     end
---     return true
--- end
-
 --新手引导
 DragonManager.promise_callbacks = {}
 function DragonManager:PromiseOfFinishEquipementDragon()

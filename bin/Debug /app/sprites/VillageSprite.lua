@@ -3,11 +3,11 @@ local SpriteConfig = import(".SpriteConfig")
 local WithInfoSprite = import(".WithInfoSprite")
 local VillageSprite = class("VillageSprite", WithInfoSprite)
 
-function VillageSprite:ctor(city_layer, entity, is_my_alliance)
-    VillageSprite.super.ctor(self, city_layer, entity, is_my_alliance)
+function VillageSprite:ctor(...)
+    VillageSprite.super.ctor(self, ...)
 end
 function VillageSprite:GetSpriteFile()
-    local village_info = self:GetEntity():GetAllianceVillageInfo()
+    local village_info = self:GetBuildingInfo()
     local config = SpriteConfig[village_info.name]:GetConfigByLevel(village_info.level)
 	return config.png, config.scale
 end
@@ -15,7 +15,10 @@ function VillageSprite:GetSpriteOffset()
 	return self:GetLogicMap():ConvertToLocalPosition(0, 0)
 end
 function VillageSprite:GetInfo()
-    return self:GetEntity():GetAllianceVillageInfo().level, Localize.village_name[self:GetEntity():GetName()]
+    return self:GetBuildingInfo().level, Localize.village_name[self:GetEntity().name]
+end
+function VillageSprite:GetBuildingInfo()
+    return self.alliance:FindAllianceVillagesInfoByObject(self:GetEntity())
 end
 
 

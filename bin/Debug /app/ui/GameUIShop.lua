@@ -4,7 +4,6 @@
 --
 local cocos_promise = import("..utils.cocos_promise")
 local Alliance = import("..entity.Alliance")
-local Flag = import("..entity.Flag")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local promise = import("..utils.promise")
 local window = import("..utils.window")
@@ -37,7 +36,7 @@ function GameUIShop:onEnter()
         :addTo(content)
         :align(display.CENTER, window.left + 320, window.top - 500)
         :onButtonClicked(function()
-            local current = self.shop_city:GetUser():GetGemResource():GetValue() + add_gem
+            local current = self.shop_city:GetUser():GetGemValue() + add_gem
             -- NetManager:sendMsg("gem "..current, NOT_HANDLE)
             cocos_promise.promiseWithCatchError(NetManager:getSendGlobalMsgPromise("resources gem "..current))
         end)
@@ -115,13 +114,11 @@ function GameUIShop:onEnter()
         end)
 
 
-    -- print(Alliance_Manager:GetMyAlliance():JoinType())
     local join_btn = WidgetPushButton.new(
         {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
         {scale9 = false}
     ):setButtonLabel(cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = string.format("联盟类型到%s", Alliance_Manager:GetMyAlliance():JoinType() == "all" and "审核" or "直接"),
         size = 20,
         font = UIKit:getFontFilePath(),
         color = UIKit:hex2c3b(0xfff3c7)}))
@@ -184,58 +181,9 @@ function GameUIShop:onEnter()
         end)
 
 
-    WidgetPushButton.new(
-        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
-        {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "创建联盟1",
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(content)
-        :align(display.CENTER, window.left + 140, window.top - 400)
-        :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getCreateAlliancePromise("1", "111", "all", "grassLand", Flag:RandomFlag():EncodeToJson())
-                :done(function(result)
-                    dump(result)
-                end))
-        end)
+    
 
-    WidgetPushButton.new(
-        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
-        {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "立即加入联盟1",
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(content)
-        :align(display.CENTER, window.left + 320, window.top - 400)
-        :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getFetchCanDirectJoinAlliancesPromise("1"):next(function(result)
-                -- dump(result)
-                return NetManager:getJoinAllianceDirectlyPromise(Alliance:DecodeFromJsonData(result.alliances[1]):Id())
-            end))
-        end)
-
-    WidgetPushButton.new(
-        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
-        {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "请求加入联盟1",
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(content)
-        :align(display.CENTER, window.left + 500, window.top - 400)
-        :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getSearchAllianceByTagPromsie("1"):next(function(result)
-                return NetManager:getRequestToJoinAlliancePromise(Alliance:DecodeFromJsonData(result.alliances[1]):Id())
-            end))
-        end)
+   
 
 
     WidgetPushButton.new(
@@ -254,54 +202,8 @@ function GameUIShop:onEnter()
         end)
 
 
-    WidgetPushButton.new(
-        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
-        {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "创建联盟2",
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(content)
-        :align(display.CENTER, window.left + 140, window.top - 600)
-        :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getCreateAlliancePromise("2", "222", "all", "grassLand", Flag:RandomFlag():EncodeToJson()))
-        end)
+  
 
-    WidgetPushButton.new(
-        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
-        {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "立即加入联盟2",
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(content)
-        :align(display.CENTER, window.left + 320, window.top - 600)
-        :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getSearchAllianceByTagPromsie("2"):next(function(result)
-                return NetManager:getJoinAllianceDirectlyPromise(Alliance:DecodeFromJsonData(result.alliances[1]):Id())
-            end))
-        end)
-
-    WidgetPushButton.new(
-        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
-        {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "请求加入联盟2",
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(content)
-        :align(display.CENTER, window.left + 500, window.top - 600)
-        :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getSearchAllianceByTagPromsie("2"):next(function(result)
-                return NetManager:getRequestToJoinAlliancePromise(Alliance:DecodeFromJsonData(result.alliances[1]):Id())
-            end))
-        end)
 
 
     WidgetPushButton.new(
@@ -351,7 +253,7 @@ function GameUIShop:onEnter()
         :align(display.CENTER, window.left + 500, window.top - 700)
         :onButtonClicked(function(event)
             local memberid
-            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function(_, v)
+            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function(v)
                 if v:Id() ~= User:Id() then
                     memberid = v:Id()
                     return true
@@ -376,7 +278,7 @@ function GameUIShop:onEnter()
         :align(display.CENTER, window.left + 140, window.top - 800)
         :onButtonClicked(function(event)
             local member
-            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function(_, v)
+            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function(v)
                 if v:Id() ~= User:Id() then
                     member = v
                     return true
@@ -404,7 +306,7 @@ function GameUIShop:onEnter()
         :align(display.CENTER, window.left + 320, window.top - 800)
         :onButtonClicked(function(event)
             local member
-            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function(_, v)
+            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function(v)
                 if v:Id() ~= User:Id() then
                     member = v
                     return true
@@ -432,7 +334,7 @@ function GameUIShop:onEnter()
         :align(display.CENTER, window.left + 500, window.top - 800)
         :onButtonClicked(function(event)
             local member
-            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function(_, v)
+            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function(v)
                 if v:Id() ~= User:Id() then
                     member = v
                     return true
@@ -511,9 +413,7 @@ function GameUIShop:onEnter()
         :addTo(content)
         :align(display.CENTER, window.left + 140, window.top - 1000)
         :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getAgreeJoinAllianceInvitePromise(User:InviteToAllianceEvents()[1].id):next(function(ee)
-                dump(ee)
-            end))
+            
         end)
 
 
@@ -529,11 +429,7 @@ function GameUIShop:onEnter()
         :addTo(content)
         :align(display.CENTER, window.left + 320, window.top - 1000)
         :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getCancelJoinAlliancePromise(
-                User:RequestToAllianceEvents()[1].id
-            ):next(function(ee)
-                dump(ee)
-            end))
+            
         end)
 
     WidgetPushButton.new(
@@ -548,9 +444,7 @@ function GameUIShop:onEnter()
         :addTo(content)
         :align(display.CENTER, window.left + 500, window.top - 1000)
         :onButtonClicked(function(event)
-            cocos_promise.promiseWithCatchError(NetManager:getDisagreeJoinAllianceInvitePromise(
-                User:InviteToAllianceEvents()[1].id
-            ))
+            
         end)
 
     WidgetPushButton.new(
@@ -640,122 +534,8 @@ function GameUIShop:onEnter()
             NetManager:getSendGlobalMsgPromise("allianceperception "..500)
         end)
 
-    WidgetPushButton.new(
-        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
-        {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "构建月门战测试环境1",
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(content)
-        :align(display.CENTER, window.left + 500, window.top - 1200)
-        :onButtonClicked(function(event)
-            -- 重置玩家和联盟数据
-            cocos_promise.promiseWithCatchError(
-                -- 增加金龙币
-                NetManager:getSendGlobalMsgPromise("gem "..1000000)
-                    -- 升级城堡到4级
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(1)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(1)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(1)
-                    end)
-                    -- 解锁军帐
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(8)
-                    end)
-                    -- 解锁兵营
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(7)
-                    end)
-                    -- 招募士兵
-                    :next(function()
-                        return NetManager:getInstantRecruitNormalSoldierPromise("swordsman", 20, cb)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantRecruitNormalSoldierPromise("ranger", 20, cb)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantRecruitNormalSoldierPromise("catapult", 5, cb)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantRecruitNormalSoldierPromise("lancer", 5, cb)
-                    end)
-                    -- 孵化龙
-                    :next(function()
-                        return NetManager:getSendGlobalMsgPromise("dragonstar redDragon 3 ")
-                    end)
-                    -- 创建联盟
-                    :next(function()
-                        return NetManager:getCreateAlliancePromise("jordan", "aj23", "all",  "grassLand", Flag:RandomFlag():EncodeToJson())
-                    end)
-            )
-        end)
+   
 
-    WidgetPushButton.new(
-        {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
-        {scale9 = false}
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = "构建月门战测试环境2",
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
-        :addTo(content)
-        :align(display.CENTER, window.left + 140, window.top - 1300)
-        :onButtonClicked(function(event)
-            -- 重置玩家和联盟数据
-            cocos_promise.promiseWithCatchError(
-                -- 增加金龙币
-                NetManager:getSendGlobalMsgPromise("gem "..1000000)
-                    -- 升级城堡到4级
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(1)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(1)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(1)
-                    end)
-                    -- 解锁军帐
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(8)
-                    end)
-                    -- 解锁兵营
-                    :next(function()
-                        return NetManager:getInstantUpgradeBuildingByLocationPromise(7)
-                    end)
-                    -- 招募士兵
-                    :next(function()
-                        return NetManager:getInstantRecruitNormalSoldierPromise("swordsman", 20, cb)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantRecruitNormalSoldierPromise("ranger", 20, cb)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantRecruitNormalSoldierPromise("catapult", 5, cb)
-                    end)
-                    :next(function()
-                        return NetManager:getInstantRecruitNormalSoldierPromise("lancer", 5, cb)
-                    end)
-                    -- 孵化龙
-                    :next(function()
-                        return NetManager:getSendGlobalMsgPromise("dragonstar blueDragon 3 ")
-                    end)
-
-                    -- 创建联盟
-                    :next(function()
-                        return NetManager:getCreateAlliancePromise("iverson", "ai3", "all",  "grassLand", Flag:RandomFlag():EncodeToJson())
-                    end)
-            )
-        end)
 
     WidgetPushButton.new(
         {normal = "green_btn_up_148x76.png", pressed = "green_btn_down_148x76.png"},
@@ -959,7 +739,7 @@ function GameUIShop:onEnter()
         :onButtonClicked(function(event)
             local alliance = Alliance_Manager:GetMyAlliance()
             if not alliance:IsDefault() then 
-                device.showAlert("提示",alliance:Id(),{_("确定")})
+                device.showAlert("提示",alliance.id,{_("确定")})
             end
         end)
 

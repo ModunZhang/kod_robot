@@ -421,6 +421,7 @@ end
 
 
 local intInit = GameDatas.PlayerInitData.intInit
+local alliancemap_buff = GameDatas.AllianceMap.buff
 function Dragon:TotalStrength(terrain)
 	local strength = self:Strength()
 	local terrainBuff = self:GetTerrain() == terrain and (intInit.dragonStrengthTerrainAddPercent.value / 100) or 0
@@ -432,7 +433,13 @@ function Dragon:TotalStrength(terrain)
 			strength = strength + strength_add
 		end
 	end
-	return strength
+	local alliance_buff = 0
+	if not Alliance_Manager:GetMyAlliance():IsDefault() then
+		local map_round = DataUtils:getMapRoundByMapIndex(Alliance_Manager:GetMyAlliance().mapIndex)
+		alliance_buff = (alliancemap_buff[map_round].dragonStrengthAddPercent / 100)
+	end
+	-- 
+	return math.floor(strength * (alliance_buff + 1.0))
 end
 
 function Dragon:__getDragonStrengthBuff()
@@ -477,8 +484,8 @@ function Dragon:__getDragonLeadershipBuff()
 	if skill then
 		effect  = effect + skill:GetEffect()
 	end
-	if ItemManager:IsBuffActived("troopSizeBonus") then
-		effect = effect + ItemManager:GetBuffEffect("troopSizeBonus")
+	if User:IsItemEventActive("troopSizeBonus") then
+		effect = effect + UtilsForItem:GetItemBuff("troopSizeBonus")
 	end
 	local eq_buffs = self:GetAllEquipmentBuffEffect()
 	table.foreachi(eq_buffs,function(__,buffData)

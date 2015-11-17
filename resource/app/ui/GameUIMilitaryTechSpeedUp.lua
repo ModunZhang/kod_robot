@@ -3,64 +3,72 @@
 -- Date: 2015-02-11 09:05:01
 --
 local WidgetSpeedUp = import("..widget.WidgetSpeedUp")
-local SoldierManager = import("..entity.SoldierManager")
 local GameUIMilitaryTechSpeedUp = class("GameUIMilitaryTechSpeedUp",WidgetSpeedUp)
 local GameUtils = GameUtils
 
 function GameUIMilitaryTechSpeedUp:ctor(event)
+    local User = User
     GameUIMilitaryTechSpeedUp.super.ctor(self)
     self.militaryEvent = event
-    self:SetAccBtnsGroup(self:GetEvent():GetEventType(),event:Id())
-    self:SetUpgradeTip(event:GetLocalizeDesc())
-    self:SetProgressInfo(GameUtils:formatTimeStyle1(event:GetTime()),event:Percent())
+    self:SetAccBtnsGroup(User:EventType(event),event.id)
+    local str
+    if User:IsSoldierStarEvent(event) then
+        str = UtilsForEvent:GetMilitaryTechEventLocalize(event.name, User:SoldierStarByName(event.name))
+    else
+        str = UtilsForEvent:GetMilitaryTechEventLocalize(event.name, User:GetMilitaryTechLevel(event.name))
+    end
+    self:SetUpgradeTip(str)
+    local time, percent = UtilsForEvent:GetEventInfo(event)
+    self:SetProgressInfo(GameUtils:formatTimeStyle1(time), percent)
     self:CheckCanSpeedUpFree()
     self:OnFreeButtonClicked(handler(self, self.FreeSpeedUpAction))
 
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.OnSoldierStarEventsTimer)
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.OnMilitaryTechEventsTimer)
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+    User:AddListenOnType(self, "soldierStarEvents")
+    User:AddListenOnType(self, "militaryTechEvents")
+    scheduleAt(self, function()
+        if self.progress then
+            local time, percent = UtilsForEvent:GetEventInfo(self:GetEvent())
+            self:SetProgressInfo(GameUtils:formatTimeStyle1(time), percent)
+            self:CheckCanSpeedUpFree()
+        end
+    end)
 end
 
 function GameUIMilitaryTechSpeedUp:FreeSpeedUpAction()
-    if self:GetEvent():GetTime() > 2 then
-        NetManager:getFreeSpeedUpPromise(self:GetEvent():GetEventType(),self:GetEvent():Id())
+    local time, percent = UtilsForEvent:GetEventInfo(self:GetEvent())
+    if time > 2 then
+        NetManager:getFreeSpeedUpPromise(User:EventType(self:GetEvent()),self:GetEvent().id)
     end
 end
 
 function GameUIMilitaryTechSpeedUp:onCleanup()
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.OnSoldierStarEventsTimer)
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.OnMilitaryTechEventsTimer)
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+    User:RemoveListenerOnType(self, "soldierStarEvents")
+    User:RemoveListenerOnType(self, "militaryTechEvents")
     GameUIMilitaryTechSpeedUp.super.onCleanup(self)
 end
-
-function GameUIMilitaryTechSpeedUp:OnMilitaryTechEventsTimer(event)
-    if self.progress and event:Id() == self.militaryEvent:Id() then
-        self:SetProgressInfo(GameUtils:formatTimeStyle1(event:GetTime()),event:Percent())
-        self:CheckCanSpeedUpFree()
+function GameUIMilitaryTechSpeedUp:OnUserDataChanged_militaryTechEvents(userData, deltaData)
+    local ok, value = deltaData("militaryTechEvents.edit")
+    if ok then
+        self.militaryEvent = User:GetEventById(self.militaryEvent.id)
     end
-end
-function GameUIMilitaryTechSpeedUp:OnSoldierStarEventsTimer(event)
-    if self.progress and event:Id() == self.militaryEvent:Id() then
-        self:SetProgressInfo(GameUtils:formatTimeStyle1(event:GetTime()),event:Percent())
-        self:CheckCanSpeedUpFree()
-    end
-end
-function GameUIMilitaryTechSpeedUp:OnMilitaryTechEventsChanged(soldier_manager,changed_map)
-    if changed_map[3] then
-        for i,v in ipairs(changed_map[3]) do
-            if v:Id() ==  self.militaryEvent:Id() then
+    local ok, value = deltaData("militaryTechEvents.remove")
+    if ok then
+        for i,v in ipairs(value) do
+            if v.id ==  self.militaryEvent.id then
                 self:LeftButtonClicked()
             end
         end
     end
 end
-function GameUIMilitaryTechSpeedUp:OnSoldierStarEventsChanged(soldier_manager,changed_map)
-    if changed_map[3] then
-        for i,v in ipairs(changed_map[3]) do
-            if v:Id() ==  self.militaryEvent:Id() then
+function GameUIMilitaryTechSpeedUp:OnUserDataChanged_soldierStarEvents(userData, deltaData)
+    local ok, value = deltaData("soldierStarEvents.edit")
+    if ok then
+        self.militaryEvent = User:GetEventById(self.militaryEvent.id)
+    end
+    local ok, value = deltaData("soldierStarEvents.remove")
+    if ok then
+        for i,v in ipairs(value) do
+            if v.id ==  self.militaryEvent.id then
                 self:LeftButtonClicked()
             end
         end
@@ -71,7 +79,8 @@ function GameUIMilitaryTechSpeedUp:GetEvent()
 end
 
 function GameUIMilitaryTechSpeedUp:CheckCanSpeedUpFree()
-    self:SetFreeButtonEnabled(self:GetEvent():GetTime() <= DataUtils:getFreeSpeedUpLimitTime())
+    local time, percent = UtilsForEvent:GetEventInfo(self:GetEvent())
+    self:SetFreeButtonEnabled(time <= DataUtils:getFreeSpeedUpLimitTime())
 end
 
 return GameUIMilitaryTechSpeedUp

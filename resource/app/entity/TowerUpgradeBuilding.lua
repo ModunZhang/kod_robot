@@ -44,16 +44,6 @@ end
 function TowerUpgradeBuilding:RemoveUpgradeListener(listener)
     self.real_entity:RemoveUpgradeListener(listener)
 end
-
-----
-
-
-
-
--- function TowerUpgradeBuilding:IsEfficiency()
---     return self:IsVisible() 
---     -- and not (self.w == 1 and self.h == 1 and abs(self.x - ex) + abs(self.y - ey) == 1)
--- end
 function TowerUpgradeBuilding:IsVisible()
     return (self:GetOrient() ~= Orient.NEG_X and
         self:GetOrient() ~= Orient.NEG_Y and
@@ -63,25 +53,6 @@ end
 function TowerUpgradeBuilding:GetSubOrient()
     return self.sub_orient
 end
--- function TowerUpgradeBuilding:UniqueKey()
---     return string.format("%s_%d", self:GetType(), self:TowerId())
--- end
--- function TowerUpgradeBuilding:CopyValueFrom(building)
---     TowerUpgradeBuilding.super.CopyValueFrom(self, building)
---     self.tower_id = building.tower_id
---     self.w = building.w
---     self.h = building.h
--- end
--- function TowerUpgradeBuilding:TowerId()
---     return self.tower_id
--- end
--- function TowerUpgradeBuilding:SetTowerId(tower_id)
---     self.tower_id = tower_id
---     return self
--- end
--- function TowerUpgradeBuilding:IsUnlocked()
---     return self.tower_id
--- end
 function TowerUpgradeBuilding:GetGlobalRegion()
     local start_x, end_x, start_y, end_y = TowerUpgradeBuilding.super.GetGlobalRegion(self)
     if self.orient ~= Orient.NONE then
@@ -90,31 +61,7 @@ function TowerUpgradeBuilding:GetGlobalRegion()
         return start_x - 1, end_x + 1, start_y - 1, end_y + 1
     end
 end
--- local function get_tower_event_by_location(tower_events, tower_id)
---     for _, event in pairs(tower_events) do
---         if event.location == tower_id then
---             return event
---         end
---     end
--- end
--- function TowerUpgradeBuilding:OnUserDataChanged(user_data, current_time)
---     if self.tower_id and user_data.towerEvents then
---         local level = self:GetLevel()
---         local tower_events = user_data.towerEvents
---         local event = get_tower_event_by_location(tower_events, self.tower_id)
---         local finishTime = event == nil and 0 or event.finishTime / 1000
---         local tower_info = user_data.towers["location_"..self.tower_id]
---         self:OnEvent(event)
---         self:OnHandle(tower_info.level, finishTime)
---     end
--- end
--- 获取对各兵种攻击力
--- function TowerUpgradeBuilding:GetAtk()
---     local config = self.config_building_function[self:GetType()]
---     local level = self.level
---     local c = config[level]
---     return c.infantry,c.archer,c.cavalry,c.siege
--- end
+
 
 return TowerUpgradeBuilding
 

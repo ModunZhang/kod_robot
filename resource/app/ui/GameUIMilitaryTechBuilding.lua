@@ -5,7 +5,6 @@
 
 local Localize = import("..utils.Localize")
 local window = import("..utils.window")
-local SoldierManager = import("..entity.SoldierManager")
 local WidgetMilitaryTechnologyStatus = import("..widget.WidgetMilitaryTechnologyStatus")
 local WidgetMilitaryTechnology = import("..widget.WidgetMilitaryTechnology")
 local WidgetPromoteSoliderList = import("..widget.WidgetPromoteSoliderList")
@@ -67,10 +66,10 @@ function GameUIMilitaryTechBuilding:OnMoveInStage()
             end
         end
     end):pos(window.cx, window.bottom + 34)
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_DATA_CHANGED)
+    User:AddListenOnType(self, "militaryTechs")
 end
 function GameUIMilitaryTechBuilding:onExit()
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_DATA_CHANGED)
+    User:RemoveListenerOnType(self, "militaryTechs")
     GameUIMilitaryTechBuilding.super.onExit(self)
 end
 function GameUIMilitaryTechBuilding:CreateBetweenBgAndTitle()
@@ -100,7 +99,7 @@ function GameUIMilitaryTechBuilding:InitTech()
 
     -- 科技点数
     self.tech_point_label = UIKit:ttfLabel({
-        text = City:GetSoldierManager():GetTechPointsByType(self.building:GetType()),
+        text = User:GetTechPoints(self.building:GetType()),
         size = 22,
         color = 0x403c2f,
     }):align(display.RIGHT_CENTER, tech_point_bg:getContentSize().width-30 , tech_point_bg:getContentSize().height/2)
@@ -109,9 +108,10 @@ end
 function GameUIMilitaryTechBuilding:InitPromote()
     self.promote_list = WidgetPromoteSoliderList.new(self.building):addTo(self.promote_layer):align(display.BOTTOM_CENTER, window.cx, window.bottom_top+20)
 end
-function GameUIMilitaryTechBuilding:OnMilitaryTechsDataChanged(soldier_manager,changed_map)
+function GameUIMilitaryTechBuilding:OnUserDataChanged_militaryTechs(userData, deltaData)
+    local User = self.city:GetUser()
     if self.tech_point_label then
-        self.tech_point_label:setString(soldier_manager:GetTechPointsByType(self.building:GetType()))
+        self.tech_point_label:setString(User:GetTechPoints(self.building:GetType()))
     end
 end
 return GameUIMilitaryTechBuilding

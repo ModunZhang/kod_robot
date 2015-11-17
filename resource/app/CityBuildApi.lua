@@ -14,7 +14,7 @@ end
 -- 个人名字修改
 function CityBuildApi:SetUserName()
     local name = "机器人"..device.getOpenUDID()
-    if User:Name() ~= name then
+    if User.basicInfo.name ~= name then
         return NetManager:getBuyAndUseItemPromise("changePlayerName",{["changePlayerName"] = {
             ["playerName"] = name
         }})
@@ -92,7 +92,8 @@ local house_type = {
 function CityBuildApi:BuildHouseByType(type_)
     if City:GetLeftBuildingCountsByType(type_) > 0 then
         local need_citizen = BuildingRegister[type_].new({building_type = type_, level = 1, finishTime = 0}):GetCitizen()
-        local citizen = City:GetResourceManager():GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
+        -- local citizen = City:GetResourceManager():GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
+        local citizen = User:GetResValueByType("citizen")
         if need_citizen <= citizen then
             for i,v in ipairs(City:GetRuinsNotBeenOccupied()) do
                 local tile = City:GetTileWhichBuildingBelongs(v)
@@ -110,32 +111,30 @@ function CityBuildApi:BuildRandomHouse()
 end
 
 function CityBuildApi:SpeedUpBuildingEvents()
-    local can_upgrade = {}
-    City:IteratorCanUpgradeBuildings(function (building )
-        if building:UniqueUpgradingKey() then
-            table.insert(can_upgrade, building)
+    local houseEvents,buildingEvents = User.houseEvents ,User.buildingEvents
 
-        end
-    end)
-    if #can_upgrade > 0 then
-        -- 加速建筑升级
-        -- 随机找一个加速
-        local u_building = can_upgrade[math.random(#can_upgrade)]
-        local eventType = u_building:EventType()
-        local eventId = u_building:UniqueUpgradingKey()
-        -- 免费加速
-        if u_building:IsAbleToFreeSpeedUpByTime(app.timer:GetServerTime()) and u_building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 60 then
-            print("免费加速",u_building:GetType())
-            return NetManager:getFreeSpeedUpPromise(eventType,eventId)
-        else
-            -- 随机使用事件加速道具
-            local speedUp_item_name = "speedup_"..math.random(8)
-            print("使用"..speedUp_item_name.."加速"..u_building:GetType()..","..u_building:EventType().." ,id:",u_building:UniqueUpgradingKey())
-            return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
-                eventType = eventType,
-                eventId = eventId
-            }})
-        end
+    local eventType,eventId,event
+    if #buildingEvents > 0 then
+        eventType,eventId,event = "buildingEvents", buildingEvents[1].id,buildingEvents[1]
+    elseif #houseEvents > 0 then
+        eventType,eventId,event = "houseEvents", houseEvents[1].id , houseEvents[1]
+    end
+    if not eventType then
+        return
+    end
+    local time, percent = UtilsForEvent:GetEventInfo(event)
+
+    if DataUtils:getFreeSpeedUpLimitTime() > time and time > 60 then
+        print("免费加速 建筑升级")
+        return NetManager:getFreeSpeedUpPromise(eventType,eventId)
+    else
+        -- 随机使用事件加速道具
+        local speedUp_item_name = "speedup_"..math.random(8)
+        print("使用"..speedUp_item_name.."加速, ,id:",eventId)
+        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+            eventType = eventType,
+            eventId = eventId
+        }})
     end
 end
 
@@ -189,6 +188,7 @@ return {
     Recommend,
     SpeedUpBuildingEvents,
 }
+
 
 
 

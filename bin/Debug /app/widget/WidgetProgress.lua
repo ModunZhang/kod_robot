@@ -5,7 +5,7 @@ function WidgetProgress:ctor(label_color, bg, bar, params)
     params = params or { }
     params.has_icon = params.has_icon == nil and true or false
     params.has_bg = params.has_bg == nil and true or false
-    local bar_pos = params.bar_pos or {x = -4, y = 1}
+    local bar_pos = params.bar_pos or {x = 0, y = 0}
     local progress_bg = cc.ui.UIImage.new(bg or "progress_bar_364x40_1.png")
         :addTo(self):align(display.LEFT_BOTTOM)
     self.progress_timer = display.newProgressTimer(bar or "progress_bar_364x40_2.png", display.PROGRESS_TIMER_BAR)
@@ -14,12 +14,11 @@ function WidgetProgress:ctor(label_color, bg, bar, params)
     self.progress_timer:setMidpoint(cc.p(0,0))
 
     local size = self.progress_timer:getContentSize()
-    self.progress_label = cc.ui.UILabel.new({
+    self.progress_label = UIKit:ttfLabel({
         text = "",
         size = params.label_size or 18,
-        font = UIKit:getFontFilePath(),
-        align = cc.ui.TEXT_ALIGN_RIGHT,
-        color = label_color or UIKit:hex2c3b(0xfdfac2)
+        color = label_color or 0xfdfac2,
+        shadow = true,
     }):addTo(self.progress_timer):align(display.LEFT_CENTER, 35, size.height / 2)
 
     if params.has_icon then

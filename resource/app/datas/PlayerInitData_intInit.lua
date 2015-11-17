@@ -17,12 +17,12 @@ intInit["materialsPerCart"] = {
 }
 intInit["productionTechnologyMaxLevel"] = {
 	["type"] = "productionTechnologyMaxLevel",
-	["value"] = 30,
+	["value"] = 60,
 	["desc"] = "生产科技最高等级"
 }
 intInit["militaryTechnologyMaxLevel"] = {
 	["type"] = "militaryTechnologyMaxLevel",
-	["value"] = 15,
+	["value"] = 60,
 	["desc"] = "军事科技最高等级"
 }
 intInit["buildingMaxLevel"] = {
@@ -67,7 +67,7 @@ intInit["dragonMarchSpeed"] = {
 }
 intInit["playerLevelupRewardsHours"] = {
 	["type"] = "playerLevelupRewardsHours",
-	["value"] = 72,
+	["value"] = 96,
 	["desc"] = "新手冲级奖励时间"
 }
 intInit["switchProductionBuilding"] = {
@@ -102,7 +102,7 @@ intInit["playerHatchDragonNeedMinutes"] = {
 }
 intInit["changeTerrainNeedGemCount"] = {
 	["type"] = "changeTerrainNeedGemCount",
-	["value"] = 200,
+	["value"] = 500,
 	["desc"] = "修改玩家地形所需宝石数量"
 }
 intInit["giftExpireHours"] = {
@@ -125,11 +125,6 @@ intInit["loyaltyCountPerHelp"] = {
 	["value"] = 100,
 	["desc"] = "每次帮助获取多少点忠诚值"
 }
-intInit["specialSoldierRecruitAbleDays"] = {
-	["type"] = "specialSoldierRecruitAbleDays",
-	["value"] = 256,
-	["desc"] = "特殊兵种在每周几可招募"
-}
 intInit["unlockPlayerSecondMarchQueue"] = {
 	["type"] = "unlockPlayerSecondMarchQueue",
 	["value"] = 1500,
@@ -142,16 +137,56 @@ intInit["playerResourceProtectPercent"] = {
 }
 intInit["dragonStrengthTerrainAddPercent"] = {
 	["type"] = "dragonStrengthTerrainAddPercent",
-	["value"] = 20,
+	["value"] = 10,
 	["desc"] = "龙在相应地形下的力量加成比例"
-}
-intInit["dragonHpRecoverTerrainAddPercent"] = {
-	["type"] = "dragonHpRecoverTerrainAddPercent",
-	["value"] = 20,
-	["desc"] = "龙在相应地形下的hp回复加成比例"
 }
 intInit["activePlayerNeedHouses"] = {
 	["type"] = "activePlayerNeedHouses",
 	["value"] = 72,
 	["desc"] = "定义活跃用户最后登录时间和当前时间的差值"
+}
+intInit["eachHouseInitCount"] = {
+	["type"] = "eachHouseInitCount",
+	["value"] = 3,
+	["desc"] = "玩家初始小屋数量"
+}
+intInit["resourceCollectPerSecond"] = {
+	["type"] = "resourceCollectPerSecond",
+	["value"] = 100,
+	["desc"] = "普通资源每秒采集量"
+}
+intInit["coinCollectPerSecond"] = {
+	["type"] = "coinCollectPerSecond",
+	["value"] = 50,
+	["desc"] = "银币每秒采集量"
+}
+intInit["grassLandWoodAddPercent"] = {
+	["type"] = "grassLandWoodAddPercent",
+	["value"] = 6,
+	["desc"] = "草地木材加成百分比"
+}
+intInit["grassLandStoneAddPercent"] = {
+	["type"] = "grassLandStoneAddPercent",
+	["value"] = 6,
+	["desc"] = "草地石材加成百分比"
+}
+intInit["grassLandIronAddPercent"] = {
+	["type"] = "grassLandIronAddPercent",
+	["value"] = 6,
+	["desc"] = "草地铁矿加成百分比"
+}
+intInit["grassLandFoodAddPercent"] = {
+	["type"] = "grassLandFoodAddPercent",
+	["value"] = 12,
+	["desc"] = "草地粮食加成百分比"
+}
+intInit["desertAttackAddPercent"] = {
+	["type"] = "desertAttackAddPercent",
+	["value"] = 3,
+	["desc"] = "沙漠攻击力加成百分比"
+}
+intInit["iceFieldDefenceAddPercent"] = {
+	["type"] = "iceFieldDefenceAddPercent",
+	["value"] = 6,
+	["desc"] = "雪地防御力加成百分比"
 }

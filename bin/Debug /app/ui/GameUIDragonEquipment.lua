@@ -15,7 +15,6 @@ local Localize = import("..utils.Localize")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local DragonManager = import("..entity.DragonManager")
 local GameUIDragonEyrieDetail = import(".GameUIDragonEyrieDetail")
-local MaterialManager = import("..entity.MaterialManager")
 local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local WidgetMakeEquip = import("..widget.WidgetMakeEquip")
 
@@ -26,16 +25,16 @@ function GameUIDragonEquipment:ctor(building,dragon,equipment_obj)
     self.building = building
     self.dragon_manager = building:GetDragonManager()
     self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
-    City:GetMaterialManager():AddObserver(self)
+    User:AddListenOnType(self, "dragonEquipments")
 end
 
 function GameUIDragonEquipment:OnMoveOutStage()
-    City:GetMaterialManager():RemoveObserver(self)
+    User:RemoveListenerOnType(self, "dragonEquipments")
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
     GameUIDragonEquipment.super.OnMoveOutStage(self)
 end
 
-function GameUIDragonEquipment:OnMaterialsChanged()
+function GameUIDragonEquipment:OnUserDataChanged_dragonEquipments()
     if self.tab_buttons:GetSelectedButtonTag() == 'info' then
         self:RefreshInfoUI()
     else
@@ -414,7 +413,7 @@ function GameUIDragonEquipment:GetEquipment()
 end
 
 function GameUIDragonEquipment:GetCurrentEquipmentCount()
-    local player_equipments = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.EQUIPMENT)
+    local player_equipments = User.dragonEquipments
     local equipment = self:GetEquipment()
     local eq_name = equipment:IsLoaded() and equipment:Name() or equipment:GetCanLoadConfig().name
     return player_equipments[eq_name] or 0
@@ -444,7 +443,7 @@ end
 
 function GameUIDragonEquipment:GetPlayerEquipments()
     local t = {}
-    local player_equipments = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.EQUIPMENT)
+    local player_equipments = User.dragonEquipments
     local r = LuaUtils:table_filter(player_equipments,function(equipment,count)
         return count > 0
     end)

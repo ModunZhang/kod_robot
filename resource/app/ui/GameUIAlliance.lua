@@ -9,6 +9,7 @@ local UIListView = import(".UIListView")
 local WidgetBackGroundTabButtons = import("..widget.WidgetBackGroundTabButtons")
 local GameUIAlliance = UIKit:createUIClass("GameUIAlliance","GameUIWithCommonHeader")
 local WidgetPushButton = import("..widget.WidgetPushButton")
+local WidgetNumberTips = import("..widget.WidgetNumberTips")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 local contentWidth = window.width - 80
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
@@ -20,7 +21,6 @@ local Alliance_Manager = Alliance_Manager
 local User = User
 local Alliance = import("..entity.Alliance")
 local WidgetAllianceHelper = import("..widget.WidgetAllianceHelper")
-local Flag = import("..entity.Flag")
 local GameUIWriteMail = import('.GameUIWriteMail')
 local UILib = import(".UILib")
 local UICheckBoxButton = import(".UICheckBoxButton")
@@ -36,10 +36,10 @@ function GameUIAlliance:ctor(default_tab)
     self.default_tab = default_tab or "join"
 end
 
-function GameUIAlliance:OnAllianceBasicChanged(alliance, changed_map)
+function GameUIAlliance:OnAllianceDataChanged_basicInfo(alliance, deltaData)
     if Alliance_Manager:GetMyAlliance():IsDefault() then return end
     if self.tab_buttons:GetSelectedButtonTag() == 'overview' then
-        if changed_map.flag then
+        if deltaData("basicInfo.flag") then
             self:RefreshFlag()
         else
             self:RefreshOverViewUI()
@@ -50,34 +50,40 @@ function GameUIAlliance:OnAllianceBasicChanged(alliance, changed_map)
     end
 end
 
-function GameUIAlliance:OnJoinEventsChanged(alliance)
-
+function GameUIAlliance:OnAllianceDataChanged_joinRequestEvents(alliance)
+    if Alliance_Manager:GetMyAlliance():GetSelf():IsTitleEqualOrGreaterThan("quartermaster") then
+        local num = #alliance.joinRequestEvents or 0
+        self.tab_buttons:SetButtonTipNumber("infomation",num)
+        if self.join_request_count then
+            self.join_request_count:SetNumber(num)
+        end
+    end
 end
 
-function GameUIAlliance:OnEventsChanged(alliance)
+function GameUIAlliance:OnAllianceDataChanged_events(alliance)
     if self.tab_buttons:GetSelectedButtonTag() == 'overview' then
         self:RefreshEventListView()
     end
 end
 
-function GameUIAlliance:OnMemberChanged(alliance)
+function GameUIAlliance:OnAllianceDataChanged_members(alliance)
     if self.tab_buttons:GetSelectedButtonTag() == 'overview' then
         self:RefreshOverViewUI()
     end
 end
 
-function GameUIAlliance:OnOperation(alliance,operation_type)
+function GameUIAlliance:OnAllianceDataChanged_operation(alliance,operation_type)
     self:RefreshMainUI()
 end
 
 function GameUIAlliance:AddListenerOfMyAlliance()
     local myAlliance = Alliance_Manager:GetMyAlliance()
-    myAlliance:AddListenOnType(self, Alliance.LISTEN_TYPE.BASIC)
     -- join or quit
-    myAlliance:AddListenOnType(self, Alliance.LISTEN_TYPE.OPERATION)
-    myAlliance:AddListenOnType(self, Alliance.LISTEN_TYPE.MEMBER)
-    myAlliance:AddListenOnType(self, Alliance.LISTEN_TYPE.EVENTS)
-    myAlliance:AddListenOnType(self, Alliance.LISTEN_TYPE.JOIN_EVENTS)
+    myAlliance:AddListenOnType(self, "operation")
+    myAlliance:AddListenOnType(self, "basicInfo")
+    myAlliance:AddListenOnType(self, "members")
+    myAlliance:AddListenOnType(self, "events")
+    myAlliance:AddListenOnType(self, "joinRequestEvents")
 end
 
 function GameUIAlliance:Reset()
@@ -95,6 +101,9 @@ end
 function GameUIAlliance:OnMoveInStage()
     GameUIAlliance.super.OnMoveInStage(self)
     self:RefreshMainUI()
+    if not User.countInfo.firstJoinAllianceRewardGeted and not Alliance_Manager:GetMyAlliance():IsDefault() then
+        UIKit:newGameUI("GameUIAllianceJoinTips"):AddToCurrentScene(true)
+    end
     self:AddListenerOfMyAlliance()
 end
 
@@ -118,12 +127,11 @@ function GameUIAlliance:OnMoveOutStage()
         UIKit:NoWaitForNet()
     end
     local myAlliance = Alliance_Manager:GetMyAlliance()
-    myAlliance:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.BASIC)
-    -- join or quit
-    myAlliance:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.OPERATION)
-    myAlliance:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.MEMBER)
-    myAlliance:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.EVENTS)
-    myAlliance:RemoveListenerOnType(self, Alliance.LISTEN_TYPE.JOIN_EVENTS)
+    myAlliance:RemoveListenerOnType(self, "operation")
+    myAlliance:RemoveListenerOnType(self, "basicInfo")
+    myAlliance:RemoveListenerOnType(self, "members")
+    myAlliance:RemoveListenerOnType(self, "events")
+    myAlliance:RemoveListenerOnType(self, "joinRequestEvents")
     GameUIAlliance.super.OnMoveOutStage(self)
 end
 
@@ -316,7 +324,7 @@ function GameUIAlliance:RefreshJoinListContent(alliance,content,idx)
     if content.flag_sprite then
         content.flag_sprite:removeSelf()
     end
-    local flag_sprite = self.alliance_ui_helper:CreateFlagWithRhombusTerrain(terrain,Flag.new():DecodeFromJson(flag_info))
+    local flag_sprite = self.alliance_ui_helper:CreateFlagWithRhombusTerrain(terrain,flag_info)
     flag_sprite:addTo(content.flag_box):pos(50,40)
     content.flag_sprite = flag_sprite
     if content.flag_button then
@@ -360,12 +368,12 @@ function GameUIAlliance:OnJoinListActionButtonClicked(idx)
             UIKit:showMessageDialog(_("提示"),
                 _("联盟人数已达最大"))
             return
-        end
-        NetManager:getJoinAllianceDirectlyPromise(alliance.id):fail(function()
-            self:SearchAllianAction(self.editbox_tag_search:getText())
-        end):done(function()
+    end
+    NetManager:getJoinAllianceDirectlyPromise(alliance.id):fail(function()
+        self:SearchAllianAction(self.editbox_tag_search:getText())
+    end):done(function()
         GameGlobalUI:showTips(_("提示"),string.format(_("加入%s联盟成功!"),alliance.name))
-        end)
+    end)
     else
         NetManager:getRequestToJoinAlliancePromise(alliance.id):done(function()
             UIKit:showMessageDialog(_("申请成功"),
@@ -413,7 +421,7 @@ function GameUIAlliance:GetJoinListItemContent()
         text = "14/50", --count of members
         size = 20,
         color = 0x403c2f
-    }):addTo(info_bg):align(display.LEFT_TOP,70, memberTitleLabel:getPositionY())
+    }):addTo(info_bg):align(display.LEFT_TOP,110, memberTitleLabel:getPositionY())
 
 
     local fightingTitleLabel = UIKit:ttfLabel({
@@ -506,7 +514,7 @@ function GameUIAlliance:NoAllianceTabEvent_inviteIf()
 end
 
 function GameUIAlliance:RefreshInvateListView()
-    local list = User:InviteToAllianceEvents()
+    local list = User.inviteToAllianceEvents
     self.invateListView:removeAllItems()
     for i,v in ipairs(list) do
         local item = self:getCommonListItem_(self.COMMON_LIST_ITEM_TYPE.INVATE,v)
@@ -539,7 +547,7 @@ function GameUIAlliance:NoAllianceTabEvent_applyIf()
 end
 
 function GameUIAlliance:RefreshApplyListView()
-    local list = User:RequestToAllianceEvents()
+    local list = User.requestToAllianceEvents
     self.applyListView:removeAllItems()
     for i,v in ipairs(list) do
         local item = self:getCommonListItem_(self.COMMON_LIST_ITEM_TYPE.APPLY,v)
@@ -578,7 +586,7 @@ function GameUIAlliance:getCommonListItem_(listType,alliance)
         :addTo(bg)
         :align(display.LEFT_TOP, 6, bg:getContentSize().height - 10)
 
-    local flag_sprite = self.alliance_ui_helper:CreateFlagWithRhombusTerrain(terrain,Flag.new():DecodeFromJson(flag_info))
+    local flag_sprite = self.alliance_ui_helper:CreateFlagWithRhombusTerrain(terrain,flag_info)
     flag_sprite:addTo(flag_box)
     flag_sprite:pos(50,40)
     display.newSprite("info_26x26.png"):align(display.LEFT_BOTTOM, 0, 0):addTo(flag_box):scale(0.7)
@@ -769,6 +777,9 @@ function GameUIAlliance:CreateHaveAlliaceUI()
             end
         end
     ):pos(window.cx, window.bottom + 34)
+    if Alliance_Manager:GetMyAlliance():GetSelf():IsTitleEqualOrGreaterThan("quartermaster") then
+        self.tab_buttons:SetButtonTipNumber("infomation",#Alliance_Manager:GetMyAlliance().joinRequestEvents or 0)
+    end
 end
 
 --总览
@@ -799,12 +810,11 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
         size = 22,
         color = 0xffedae,
     }):addTo(events_title):align(display.CENTER,events_title:getContentSize().width/2,events_title:getContentSize().height/2)
-
     local headerBg  = WidgetUIBackGround.new({height=376,isFrame="yes"}):addTo(overviewNode,-1)
         :pos(16,events_title:getPositionY()+events_title:getContentSize().height+10)
     local titileBar = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(438,30), cc.rect(10,10,410,10))
         :addTo(headerBg):align(display.TOP_RIGHT, headerBg:getContentSize().width - 10, headerBg:getContentSize().height - 20)
-    local language_sprite = display.newSprite(string.format("%s",UILib.alliance_language_frame[Alliance_Manager:GetMyAlliance():DefaultLanguage()]))
+    local language_sprite = display.newSprite(string.format("%s",UILib.alliance_language_frame[Alliance_Manager:GetMyAlliance().basicInfo.language]))
         :align(display.RIGHT_CENTER, 410,15)
         :addTo(titileBar)
         :scale(0.5)
@@ -812,13 +822,14 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
     local flag_box = display.newScale9Sprite("alliance_item_flag_box_126X126.png"):size(134,134)
         :align(display.TOP_LEFT,20, headerBg:getContentSize().height - 20):addTo(headerBg)
     self.flag_box = flag_box
+
     self.ui_overview.nameLabel = UIKit:ttfLabel({
-        text = string.format("[%s] %s",Alliance_Manager:GetMyAlliance():Tag(),Alliance_Manager:GetMyAlliance():Name()),
+        text = string.format("[%s] %s",Alliance_Manager:GetMyAlliance().basicInfo.tag,Alliance_Manager:GetMyAlliance().basicInfo.name),
         size = 24,
         color = 0xffedae,
     }):align(display.LEFT_CENTER,10,17):addTo(titileBar)
 
-    self.ui_overview.my_alliance_flag = self.alliance_ui_helper:CreateFlagWithRhombusTerrain(Alliance_Manager:GetMyAlliance():Terrain(),Alliance_Manager:GetMyAlliance():Flag())
+    self.ui_overview.my_alliance_flag = self.alliance_ui_helper:CreateFlagWithRhombusTerrain(Alliance_Manager:GetMyAlliance().basicInfo.terrain,Alliance_Manager:GetMyAlliance().basicInfo.flag)
         :addTo(flag_box)
         :pos(70,50):scale(1.5)
     display.newSprite("info_26x26.png"):align(display.LEFT_BOTTOM, 0, 0):addTo(flag_box)
@@ -840,12 +851,6 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
     self:RefreshNoticeView()
 
     local notice_button = WidgetPushButton.new({normal = "alliance_notice_button_normal_310x36.png",pressed = "alliance_notice_button_highlight_310x36.png"})
-        :setButtonLabel('normal',UIKit:ttfLabel({
-            text = _("联盟公告"),
-            size = 22,
-            color = 0xffedae,
-        })
-        )
         :onButtonClicked(function(event)
             if not Alliance_Manager:GetMyAlliance():GetSelf():CanEditAllianceNotice() then
                 UIKit:showMessageDialog(_("提示"), _("您没有此操作权限"), function()end)
@@ -857,7 +862,14 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
         :setButtonLabelOffset(0,4)
         :addTo(notice_bg)
         :align(display.TOP_CENTER,292,181)
-    display.newSprite("alliance_notice_icon_26x26.png"):addTo(notice_button):pos(70,-18)
+    local btn_label = UIKit:ttfLabel({
+        text = _("联盟公告"),
+        size = 22,
+        color = 0xffedae,
+    }):addTo(notice_button)
+    btn_label:align(display.LEFT_CENTER, -(btn_label:getContentSize().width + 26)/2,-18)
+
+    display.newSprite("alliance_notice_icon_26x26.png"):addTo(notice_button):align(display.LEFT_CENTER,btn_label:getContentSize().width + btn_label:getPositionX(),-18)
 
 
     local line_2 = display.newSprite("dividing_line.png")
@@ -908,7 +920,7 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
     }):addTo(headerBg)
         :align(display.LEFT_BOTTOM,tagLabel:getPositionX(),line_0:getPositionY() + 2)
     local languageLabelVal = UIKit:ttfLabel({
-        text = string.formatnumberthousands(Alliance_Manager:GetMyAlliance():Power()),
+        text = string.formatnumberthousands(Alliance_Manager:GetMyAlliance().basicInfo.power),
         size = 20,
         color = 0x403c2f,
     })
@@ -920,7 +932,7 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
 end
 
 function GameUIAlliance:RefreshNoticeView()
-    local notice_str = Alliance_Manager:GetMyAlliance():Notice() 
+    local notice_str = Alliance_Manager:GetMyAlliance().notice
     if notice_str == json.null or string.len(notice_str) == 0 then
         notice_str = _("未设置联盟公告")
     end
@@ -947,26 +959,26 @@ function GameUIAlliance:GetEventItemByIndexAndEvent()
     local content = display.newNode():size(520,84)
     local bg0 = display.newScale9Sprite("back_ground_548x40_1.png",0,0,cc.size(520,84),cc.rect(10,10,528,20)):addTo(content):align(display.LEFT_BOTTOM, 0, 0)
     local bg1 = display.newScale9Sprite("back_ground_548x40_2.png",0,0,cc.size(520,84),cc.rect(10,10,528,20)):addTo(content):align(display.LEFT_BOTTOM, 0, 0)
-    local normal = display.newScale9Sprite("title_blue_430x30.png",0,0,cc.size(222,30),cc.rect(20,10,390,10)):addTo(content):align(display.LEFT_TOP, 0,70)
-    local important = display.newSprite("alliance_event_type_green_222x30.png"):addTo(content):align(display.LEFT_TOP, 0,70)
-    local war = display.newScale9Sprite("title_red_166x30.png",0,0,cc.size(222,30),cc.rect(20,10,126,10)):addTo(content):align(display.LEFT_TOP, 0,70)
+    local normal = display.newScale9Sprite("title_blue_430x30.png",0,0,cc.size(222,30),cc.rect(20,10,390,10)):addTo(content):align(display.LEFT_TOP, 0,77)
+    local important = display.newSprite("alliance_event_type_green_222x30.png"):addTo(content):align(display.LEFT_TOP, 0,77)
+    local war = display.newScale9Sprite("title_red_166x30.png",0,0,cc.size(222,30),cc.rect(20,10,126,10)):addTo(content):align(display.LEFT_TOP, 0,77)
     local title_label = UIKit:ttfLabel({
         text = "title",
         size = 20,
         color = 0xffedae
-    }):addTo(content):align(display.LEFT_CENTER,10,55)
+    }):addTo(content):align(display.LEFT_CENTER,10,62)
     local time_label = UIKit:ttfLabel({
         text = "time",
         size = 18,
         color = 0x615b44
-    }):addTo(content):align(display.LEFT_BOTTOM,10, 5)
+    }):addTo(content):align(display.LEFT_BOTTOM,10, 10)
     local content_label = UIKit:ttfLabel({
         text = "content",
         size = 20,
         color = 0x403c2f,
-        dimensions = cc.size(280, 60)
-    }):align(display.LEFT_CENTER,0,0)
-    content_label:pos(normal:getPositionX()+normal:getContentSize().width + 10,42):addTo(content)
+        dimensions = cc.size(280, 0)
+    }):align(display.TOP_LEFT,0,0)
+    content_label:pos(normal:getPositionX()+normal:getContentSize().width + 10,76):addTo(content)
     content.bg0 = bg0
     content.bg1 = bg1
     content.normal = normal
@@ -1012,7 +1024,7 @@ function GameUIAlliance:GetEventContent(event)
             end
         elseif 'terrain' == event_type then
             if Localize.terrain[v] then
-                v = Localize.terrain[v] 
+                v = Localize.terrain[v]
             end
         elseif 'upgrade' == event_type then
             if Localize.building_name[v] then
@@ -1041,7 +1053,7 @@ function GameUIAlliance:RefreshFlag()
         if self.ui_overview.my_alliance_flag then
             local x,y = self.ui_overview.my_alliance_flag:getPosition()
             self.ui_overview.my_alliance_flag:removeFromParent()
-            self.ui_overview.my_alliance_flag = self.alliance_ui_helper:CreateFlagWithRhombusTerrain(Alliance_Manager:GetMyAlliance():Terrain(),Alliance_Manager:GetMyAlliance():Flag())
+            self.ui_overview.my_alliance_flag = self.alliance_ui_helper:CreateFlagWithRhombusTerrain(Alliance_Manager:GetMyAlliance().basicInfo.terrain,Alliance_Manager:GetMyAlliance().basicInfo.flag)
                 :addTo(self.flag_box)
                 :pos(x,y)
                 :scale(1.5)
@@ -1053,11 +1065,11 @@ function GameUIAlliance:RefreshOverViewUI()
     if self.ui_overview and self.tab_buttons:GetSelectedButtonTag() == 'overview'  then
         local alliance_data = Alliance_Manager:GetMyAlliance()
         local m_count,m_online,m_maxCount = alliance_data:GetMembersCountInfo()
-        self.ui_overview.nameLabel:setString(string.format("[%s] %s",alliance_data:Tag(),alliance_data:Name()))
+        self.ui_overview.nameLabel:setString(string.format("[%s] %s",alliance_data.basicInfo.tag,alliance_data.basicInfo.name))
         self.ui_overview.memberCountLabel:setString(string.format("%s/%s",m_count,m_maxCount))
         self.ui_overview.online_count_label:setString(m_online)
-        self.ui_overview.powerLabel:setString(string.formatnumberthousands(alliance_data:Power()))
-        self.ui_overview.language_sprite:setTexture(UILib.alliance_language_frame[alliance_data:DefaultLanguage()])
+        self.ui_overview.powerLabel:setString(string.formatnumberthousands(alliance_data.basicInfo.power))
+        self.ui_overview.language_sprite:setTexture(UILib.alliance_language_frame[alliance_data.basicInfo.language])
         self:RefreshNoticeView()
     end
 end
@@ -1094,7 +1106,7 @@ function GameUIAlliance:EventListViewsourceDelegate(listView, tag, idx)
 end
 function GameUIAlliance:OnAllianceSettingButtonClicked(event)
     local my_alliance = Alliance_Manager:GetMyAlliance()
-    local my_alliance_status = my_alliance:Status()
+    local my_alliance_status = my_alliance.basicInfo.status
     if (my_alliance_status == 'prepare' or my_alliance_status == 'fight') then
         UIKit:showMessageDialog(_("提示"), _("联盟对战期不能修改联盟信息"), function()end)
         return
@@ -1422,8 +1434,8 @@ function GameUIAlliance:filterMemberList(title)
     end
     if need_sort  then
         table.sort( result, function(a,b)
-            if a.data_type == b.data_type then 
-                return a.data.power > b.data.power 
+            if a.data_type == b.data_type then
+                return a.data.power > b.data.power
             else
                 return a.data_type < b.data_type
             end
@@ -1532,12 +1544,12 @@ function GameUIAlliance:HaveAlliaceUI_infomationIf()
             :setButtonLabel(UIKit:ttfLabel({text = _("允许玩家立即加入联盟"),size = 20,color = 0x615b44}))
             :setButtonLabelOffset(40, 0)
             :align(display.LEFT_CENTER)
-            :setButtonSelected(Alliance_Manager:GetMyAlliance():JoinType() == "all"))
+            :setButtonSelected(Alliance_Manager:GetMyAlliance().basicInfo.joinType == "all"))
         :addButton(UICheckBoxButton.new(checkbox_image)
             :setButtonLabel(UIKit:ttfLabel({text = _("玩家仅能通过申请或者邀请的方式加入"),size = 20,color = 0x615b44}))
             :setButtonLabelOffset(40, 0)
             :align(display.LEFT_CENTER)
-            :setButtonSelected(Alliance_Manager:GetMyAlliance():JoinType() ~= "all"))
+            :setButtonSelected(Alliance_Manager:GetMyAlliance().basicInfo.joinType ~= "all"))
         :onButtonSelectChanged(handler(self, self.OnAllianceJoinTypeButtonClicked))
         :addTo(informationNode)
         :setButtonsLayoutMargin(26,0,0,0)
@@ -1575,6 +1587,10 @@ function GameUIAlliance:HaveAlliaceUI_infomationIf()
             :setButtonLabel("normal",UIKit:ttfLabel({text = button_texts[i],size = 18,color = 0xffedae}))
             :setButtonLabelOffset(0, -30)
         display.newSprite(button_imags[i]):addTo(button):pos(66,59)
+        if i == 3 and Alliance_Manager:GetMyAlliance():GetSelf():IsTitleEqualOrGreaterThan("quartermaster") then
+            self.join_request_count = WidgetNumberTips.new():addTo(button):pos(118,88)
+            self.join_request_count:SetNumber(#Alliance_Manager:GetMyAlliance().joinRequestEvents or 0)
+        end
     end
     self:RefreshDescView()
     return self.informationNode
@@ -1594,7 +1610,7 @@ function GameUIAlliance:IsOperateButtonEnable(index)
 end
 
 function GameUIAlliance:SelectJoinType()
-    if Alliance_Manager:GetMyAlliance():JoinType() == "all" then
+    if Alliance_Manager:GetMyAlliance().basicInfo.joinType == "all" then
         self.joinTypeButton:sureSelectedButtonIndex(1,true)
     else
         self.joinTypeButton:sureSelectedButtonIndex(2,true)
@@ -1602,7 +1618,7 @@ function GameUIAlliance:SelectJoinType()
 end
 
 function GameUIAlliance:RefreshDescView()
-    local describe_str = Alliance_Manager:GetMyAlliance():Describe()
+    local describe_str = Alliance_Manager:GetMyAlliance().desc
     if describe_str == json.null or string.len(describe_str) == 0 then
         describe_str = _("未设置联盟描述")
     end
@@ -1648,14 +1664,22 @@ function GameUIAlliance:OnInfoButtonClicked(tag)
             UIKit:showMessageDialog(_("提示"),_("仅当联盟成员为空时,盟主才能退出联盟"), function()end)
             return
         end
-        if Alliance_Manager:GetMyAlliance():Status() == "fight" or Alliance_Manager:GetMyAlliance():Status() == "prepare" then
+        if Alliance_Manager:GetMyAlliance().basicInfo.status == "fight" or Alliance_Manager:GetMyAlliance().basicInfo.status == "prepare" then
             UIKit:showMessageDialog(_("提示"),_("联盟正在战争准备期或战争期,不能退出联盟"), function()end)
+            return
+        end
+        if #Alliance_Manager:GetMyBeAttackingEvent() > 0 then
+            UIKit:showMessageDialog(_("提示"),_("你即将被攻打，不能退出联盟"))
             return
         end
         UIKit:showMessageDialog(_("退出联盟"),
             _("您必须在没有部队在外行军的情况下，才可以退出联盟。退出联盟会损失当前未打开的联盟礼物。"),
             function()
-                NetManager:getQuitAlliancePromise():done()
+                NetManager:getQuitAlliancePromise():done(function ()
+                    if display.getRunningScene().__cname ~= "MyCityScene" then
+                        app:EnterMyCityScene()
+                    end
+                end)
             end)
     elseif tag == 2 then
         self:CreateInvateUI()
@@ -1730,6 +1754,8 @@ end
 
 
 return GameUIAlliance
+
+
 
 
 

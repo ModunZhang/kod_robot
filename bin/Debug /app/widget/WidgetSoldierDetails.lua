@@ -32,7 +32,7 @@ end
 local WidgetSoldierDetails = class("WidgetSoldierDetails", WidgetPopDialog)
 
 function WidgetSoldierDetails:ctor(soldier_type,soldier_level)
-    self.soldier_count = City:GetSoldierManager():GetCountBySoldierType(soldier_type)
+    self.soldier_count = User.soldiers[soldier_type]
     local height =  500
     WidgetSoldierDetails.super.ctor(self,height,_("兵种详情"),window.top-200)
     self.soldier_type = soldier_type
@@ -199,7 +199,7 @@ function WidgetSoldierDetails:GetSoldierFieldWithBuff(field)
     local sf = self.s_buff_field
     if sf[field] then
         if field ~= 'consumeFoodPerHour' then
-            return  " +" .. sf[field]
+            return  " +" .. math.floor(sf[field])
         else
             return " -" .. sf[field]
         end

@@ -18,7 +18,7 @@ function AllianceBelvedere:ctor(alliance)
 end
 
 function AllianceBelvedere:GetMarchLimit()
-	return User:MarchQueue()
+	return User.basicInfo.marchQueue
 end
 
 function AllianceBelvedere:IsReachEventLimit()
@@ -74,9 +74,9 @@ function AllianceBelvedere:GetMyEvents()
 		return villageEvent:GetPlayerRole() == villageEvent.EVENT_PLAYER_ROLE.Me
 	end)
 	self:Handler2BelvedereEntity(my_events,village_ing,BelvedereEntity.ENTITY_TYPE.COLLECT)
-	local helpToTroops = City:GetHelpToTroops()
+	-- local helpToTroops = City:GetHelpToTroops()
+	assert(false)
 	self:Handler2BelvedereEntity(my_events,helpToTroops,BelvedereEntity.ENTITY_TYPE.HELPTO)
-	local shrine_Event = self:GetAlliance():GetAllianceShrine():GetSelfJoinedShrineEvent()
 	self:Handler2BelvedereEntity(my_events,{shrine_Event},BelvedereEntity.ENTITY_TYPE.SHIRNE)
 	--所有正在进行的返回行军
 	local marching_out_return_events = LuaUtils:table_filteri(self:GetAlliance():GetAttackMarchReturnEvents(),function(_,marchAttackEvent)
@@ -259,16 +259,6 @@ function AllianceBelvedere:OnVillageEventTimer(villageEvent,left_resource)
 	if not self:GetAlliance():IsMyAlliance() then return end
 	if villageEvent:GetPlayerRole() ~= villageEvent.EVENT_PLAYER_ROLE.Me then return end
 	self:CallEventsChangedListeners(AllianceBelvedere.LISTEN_TYPE.OnVillageEventTimer,{villageEvent,left_resource})
-end
-
-function AllianceBelvedere:OnShrineEventsChanged(changed_map)
-	if self:GetAlliance():IsMyAlliance() then
-		self:NotifyMarchDataChanged()
-	end
-end
-
-function AllianceBelvedere:OnShrineEventsRefresh()
-	self:OnShrineEventsChanged()
 end
 
 function AllianceBelvedere:OnFightEventTimerChanged(fightEvent)

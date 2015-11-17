@@ -5,7 +5,6 @@ local AllianceDecoratorSprite = import("..sprites.AllianceDecoratorSprite")
 local AllianceBuildingSprite = import("..sprites.AllianceBuildingSprite")
 local memberMeta = import("..entity.memberMeta")
 local Alliance = import("..entity.Alliance")
-local AllianceMap = import("..entity.AllianceMap")
 local Observer = import("..entity.Observer")
 local NormalMapAnchorBottomLeftReverseY = import("..map.NormalMapAnchorBottomLeftReverseY")
 local AllianceView = class("AllianceView", function()
@@ -65,13 +64,9 @@ function AllianceView:ctor(layer, alliance, logic_base_x, logic_base_y)
     self:InitAlliance()
 end
 function AllianceView:onEnter()
-    self:GetAlliance():GetAllianceMap():AddListenOnType(self, AllianceMap.LISTEN_TYPE.BUILDING)
-    self:GetAlliance():GetAllianceMap():AddListenOnType(self, AllianceMap.LISTEN_TYPE.BUILDING_INFO)
     self:GetAlliance():AddListenOnType(self, Alliance.LISTEN_TYPE.MEMBER)
 end
 function AllianceView:onExit()
-    self:GetAlliance():GetAllianceMap():RemoveListenerOnType(self, AllianceMap.LISTEN_TYPE.BUILDING)
-    self:GetAlliance():GetAllianceMap():RemoveListenerOnType(self, AllianceMap.LISTEN_TYPE.BUILDING_INFO)
     self:GetAlliance():RemoveListenerOnType(self, Alliance.LISTEN_TYPE.MEMBER)
 end
 function AllianceView:ChangeTerrain()
@@ -81,7 +76,7 @@ function AllianceView:ChangeTerrain()
     end)
 end
 function AllianceView:Terrain()
-    return self.alliance:Terrain()
+    return self.alliance.basicInfo.terrain
 end
 function AllianceView:RandomSeed()
     return 1985423439857
@@ -108,7 +103,7 @@ local terrain_map = {
 }
 local Alliance_Manager = Alliance_Manager
 function AllianceView:InitAlliance()
-    self.is_my_alliance = Alliance_Manager:GetMyAlliance():Id() == self.alliance:Id()
+    self.is_my_alliance = Alliance_Manager:GetMyAlliance().id == self.alliance.id
     local background = self:GetLayer():GetBackGround()
     local array = terrain_map[self:Terrain()]
     math.randomseed(12345)
@@ -122,7 +117,7 @@ function AllianceView:InitAlliance()
             display.newSprite(array[random(#array)]):addTo(background, 1000):pos(x, y)
         end
     end
-    self:RefreshBuildings(self:GetAlliance():GetAllianceMap())
+    self:RefreshBuildings(self:GetAlliance())
 end
 function AllianceView:GetBuildingNode()
     return self.layer:GetBuildingNode()
@@ -152,9 +147,6 @@ end
 function AllianceView:GetMapObjectById(id)
     return self.objects[id]
 end
-function AllianceView:GetMapObjects()
-    return self.objects
-end
 function AllianceView:OnMemberChanged(alliance)
     for _,v in pairs(alliance:GetAllMembers()) do
         local entity = self.objects[v.mapId]
@@ -164,7 +156,7 @@ function AllianceView:OnMemberChanged(alliance)
     end
 end
 function AllianceView:OnBuildingInfoChange()
-    for _,v in ipairs(self:GetAlliance():GetAllianceMap():GetAllBuildingsInfo()) do
+    for _,v in ipairs(self:GetAlliance().buildings) do
         local entity = self.objects[v.id]
         if entity then
             entity:RefreshInfo()
@@ -174,10 +166,10 @@ end
 function AllianceView:OnBuildingFullUpdate(allianceMap)
     self:RefreshBuildings(allianceMap)
 end
-function AllianceView:RefreshBuildings(alliance_map)
+function AllianceView:RefreshBuildings()
     self:IteratorAllianceObjects(function(_,v) v:removeFromParent() end)
     self.objects = {}
-    alliance_map:IteratorAllObjects(function(_, entity)
+    self.alliance:IteratorAllObjects(function(_, entity)
         self:CreateObject(entity)
     end)
     self.layer:RefreshAllVillageEvents()
@@ -203,7 +195,7 @@ function AllianceView:OnBuildingDeltaUpdate(allianceMap, deltaMapObjects, old_mo
     -- 修改位置
     for index,_ in pairs(deltaMapObjects) do
         if type(index) == "number" then
-            self:RefreshEntity(allianceMap:GetMapObjects()[index])
+            -- self:RefreshEntity(allianceMap:GetMapObjects()[index])
         end
     end
     self.layer:RefreshAllVillageEvents()
@@ -211,7 +203,7 @@ end
 function AllianceView:GenerateMonsters(t)
     local entity = table.remove(t, 1)
     if entity then
-        if not self.objects[entity:Id()] then
+        if not self.objects[entity.id] then
             self.monster_refresh:performWithDelay(function()
                 self:GenerateMonsters(t)
             end, 0.5)
@@ -219,34 +211,34 @@ function AllianceView:GenerateMonsters(t)
     end
 end
 function AllianceView:RefreshEntity(entity)
-    if self.objects[entity:Id()] then
-        self.objects[entity:Id()]:removeFromParent()
+    if self.objects[entity.id] then
+        self.objects[entity.id]:removeFromParent()
     end
     self:CreateObject(entity)
 end
 function AllianceView:CreateObject(entity)
-    local type_ = entity:GetType()
+    local type_ = Alliance:GetMapObjectType(entity)
     local object
     if type_ == "building" then
-        object = AllianceBuildingSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
+        object = AllianceBuildingSprite.new(self, entity, self.is_my_alliance, self.alliance):addTo(self:GetBuildingNode())
     elseif type_ == "member" then
-        object = CitySprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
+        object = CitySprite.new(self, entity, self.is_my_alliance, self.alliance):addTo(self:GetBuildingNode())
     elseif type_ == "village" then
-        object = VillageSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
+        object = VillageSprite.new(self, entity, self.is_my_alliance, self.alliance):addTo(self:GetBuildingNode())
     elseif type_ == "monster" then
-        object = MonsterSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
+        object = MonsterSprite.new(self, entity, self.is_my_alliance, self.alliance):addTo(self:GetBuildingNode())
     elseif type_ == "decorate" then
-        object = AllianceDecoratorSprite.new(self, entity, self.is_my_alliance):addTo(self:GetBuildingNode())
+        object = AllianceDecoratorSprite.new(self, entity, self.is_my_alliance, self.alliance):addTo(self:GetBuildingNode())
     else
         assert(object)
     end
-    self.objects[entity:Id()] = object
+    self.objects[entity.id] = object
     return object
 end
 function AllianceView:RemoveEntity(entity)
-    if self.objects[entity:Id()] then
-        self.objects[entity:Id()]:removeFromParent()
-        self.objects[entity:Id()] = nil
+    if self.objects[entity.id] then
+        self.objects[entity.id]:removeFromParent()
+        self.objects[entity.id] = nil
     end
 end
 function AllianceView:IteratorAllianceObjects(func)

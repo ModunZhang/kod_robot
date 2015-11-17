@@ -144,7 +144,7 @@ function GameUISettingAccount:RefreshUI()
 			if ext.gamecenter.gc_bind == true then
 				self.gamecenter_bind_state_label:setString(_("当前状态:已绑定"))
 				local __,gcId = ext.gamecenter.getPlayerNameAndId()
-				if gcId == User:GcId() then
+				if gcId == User.gcId then
 					self.gamecenter_tips_label:setString(_("当前账号已经和当前GameCenter账号绑定，请保管好你的GameCenter账号"))
 					self.gamecenter_tips_label:setColor(UIKit:hex2c3b(0x008b0a))
 					self.gamecenter_force_change_button:hide()

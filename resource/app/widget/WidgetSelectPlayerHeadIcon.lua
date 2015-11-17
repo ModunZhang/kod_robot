@@ -59,7 +59,7 @@ function WidgetSelectPlayerHeadIcon:AddIconOption(icon_key,icon)
     }):align(display.LEFT_CENTER,130,40)
         :addTo(content)
 
-    if User:Icon() ~= icon_key then
+    if User.basicInfo.icon ~= icon_key then
         WidgetPushButton.new(
             {normal = "yellow_btn_up_148x58.png", pressed = "yellow_btn_down_148x58.png"},
             {scale9 = false},
@@ -98,15 +98,15 @@ function WidgetSelectPlayerHeadIcon:CheckUnlock(icon_key)
         return true
     end
     if icon_key == 7 then -- 刺客
-        return User:Kill() >= 1000000
+        return User.basicInfo.kill >= 1000000
     elseif icon_key == 8 then -- 将军
-        return User:Power() >= 1000000
+        return User.basicInfo.power >= 1000000
     elseif icon_key == 9 then -- 术士
         return User:GetVipLevel() == 10
     elseif icon_key == 10 then -- 贵妇
         return City:GetFirstBuildingByType("keep"):GetLevel() >= 40
     elseif icon_key == 11 then -- 旧神
-        return User:GetPVEDatabase():GetMapByIndex(23):IsComplete()
+        return User:IsAllPassed()
     end
 end
 

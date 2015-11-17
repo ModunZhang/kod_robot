@@ -2,11 +2,12 @@
 -- Author: Danny He
 -- Date: 2014-12-29 17:09:39
 --
+local Alliance = import("..entity.Alliance")
+local UILib = import(".UILib")
+local Localize = import("..utils.Localize")
 local GameUIAllianceDecorateEnter = UIKit:createUIClass("GameUIAllianceDecorateEnter","GameUIAllianceEnterBase")
 local buildingName = GameDatas.AllianceInitData.buildingName
-local UILib = import(".UILib")
 local DECORATOR_IMAGE = UILib.decorator_image
-local Localize = import("..utils.Localize")
 
 function GameUIAllianceDecorateEnter:GetUIHeight()
 	return 242
@@ -16,8 +17,8 @@ function GameUIAllianceDecorateEnter:GetHonourLabelText()
     return GameUtils:formatNumber(self:GetMoveNeedHonour())
 end
 function GameUIAllianceDecorateEnter:GetMoveNeedHonour()
-    if buildingName[self:GetBuilding():GetName()] then
-        return buildingName[self:GetBuilding():GetName()].moveNeedHonour 
+    if buildingName[self:GetBuilding().name] then
+        return buildingName[self:GetBuilding().name].moveNeedHonour 
     end
     return 0
 end
@@ -29,7 +30,7 @@ end
 
 
 function GameUIAllianceDecorateEnter:GetUITitle()
-    local name = self:GetBuilding():GetName()
+    local name = self:GetBuilding().name
     local __,__,key = string.find(name,"(.+)_%d")
     return Localize.alliance_decorate_name[key]
 end
@@ -39,7 +40,7 @@ function GameUIAllianceDecorateEnter:GetBuildImageSprite()
 end
 
 function GameUIAllianceDecorateEnter:GetBuildingImage()
-    return DECORATOR_IMAGE[self:GetTerrain()][self:GetBuilding():GetName()]
+    return DECORATOR_IMAGE[self:GetTerrain()][self:GetBuilding().name]
 end
 
 function GameUIAllianceDecorateEnter:GetBuildImageInfomation(sprite)
@@ -56,8 +57,7 @@ function GameUIAllianceDecorateEnter:GetBuildingDesc()
 end
 
 function GameUIAllianceDecorateEnter:GetLocation()
-    local building = self:GetBuilding()
-    local x,y = building:GetMidLogicPosition()
+    local x,y = Alliance:GetLogicPositionWithMapObj(self:GetBuilding())
     return string.format("%d,%d",x,y)
 end
 
@@ -66,7 +66,8 @@ function GameUIAllianceDecorateEnter:GetBuildingInfo()
         {_("坐标"),0x615b44},
         {self:GetLocation(),0x403c2f},
     }
-    local w,h = self:GetBuilding():GetSize()
+    
+    local w,h = Alliance:GetSizeWithMapObj(self:GetBuilding())
     local occupy_str = string.format("%d x %d",w,h)
     local occupy = {
         {_("占地"),0x615b44},
@@ -80,14 +81,14 @@ function GameUIAllianceDecorateEnter:GetEnterButtons()
     local current_scene = display.getRunningScene()
     if current_scene.__cname == "AllianceScene" and current_scene.LoadEditModeWithAllianceObj then
     	local chai_button = self:BuildOneButton("icon_move_player_city.png",_("移动")):onButtonClicked(function()
-            if self:GetMyAlliance():Status() == 'fight' then
+            if self:GetMyAlliance().basicInfo.status == 'fight' then
                 UIKit:showMessageDialog(nil, _("战争期不能移动"),function()end)
                 return
             end
     		local alliacne =  self:GetMyAlliance()
             local isEqualOrGreater = alliacne:GetSelf():CanEditAllianceObject()
             if isEqualOrGreater then
-                if self:GetMyAlliance():Honour() < self:GetMoveNeedHonour() then 
+                if self:GetMyAlliance().basicInfo.honour < self:GetMoveNeedHonour() then 
                     UIKit:showMessageDialog(nil, _("联盟荣耀值不足"),function()end)
                     return 
                 end

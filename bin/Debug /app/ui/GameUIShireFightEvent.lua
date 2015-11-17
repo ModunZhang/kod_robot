@@ -8,75 +8,59 @@ local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local window = import("..utils.window")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local UIListView = import(".UIListView")
-local AllianceShrine = import("..entity.AllianceShrine")
 local Alliance = import("..entity.Alliance")
 local Dragon_head_image = import(".UILib").dragon_head
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 local GameUtils = GameUtils
-function GameUIShireFightEvent:ctor(fight_event,allianceShrine)
+function GameUIShireFightEvent:ctor(fight_event)
     GameUIShireFightEvent.super.ctor(self,790,_("事件详情"),window.top - 50)
     self.fight_event = fight_event
-    self.allianceShrine_ = allianceShrine
-    self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnFightEventTimerChanged)
-    self:GetAllianceShrine():GetAlliance():AddListenOnType(self,Alliance.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
-    self:GetAllianceShrine():GetAlliance():AddListenOnType(self,Alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged)
-    self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
-    self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
-    self.event_bind_to_label = {}
 end
 
 function GameUIShireFightEvent:onEnter()
     GameUIShireFightEvent.super.onEnter(self)
     self:BuildUI()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    alliance:AddListenOnType(self, "shrineEvents")
+    alliance:AddListenOnType(self, "marchEvents")
+    scheduleAt(self, function()
+        local time = UtilsForShrine:GetEventTime(self:GetFightEvent())
+            self.time_label:setString(string.format(_("派兵时间 %s"),GameUtils:formatTimeStyle1(time)))
+        for i,v in ipairs(self.info_list:getItems()) do
+            local event = v.event
+            if event then
+                local time = UtilsForEvent:GetEventInfo(event)
+                v.time_label:setString(GameUtils:formatTimeStyle1(time) .. "后到达")
+            end
+        end
+    end)
+end
+function GameUIShireFightEvent:onCleanup()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    alliance:RemoveListenerOnType(self, "shrineEvents")
+    alliance:RemoveListenerOnType(self, "marchEvents")
+    GameUIShireFightEvent.super.onCleanup(self)
 end
 
-function GameUIShireFightEvent:OnFightEventTimerChanged(event)
-    if event:Id() == self:GetFightEvent():Id() then
-        self.time_label:setString(string.format(_("派兵时间 %s"),GameUtils:formatTimeStyle1(event:GetTime())))
-    end
-end
 
-function GameUIShireFightEvent:OnAttackMarchEventDataChanged(change_map)
-    if change_map.added or change_map.removed then
-        self.popultaion_label:setString(#self:GetFightEvent():PlayerTroops())
-        self:RefreshListView()
-    end
+function GameUIShireFightEvent:OnAllianceDataChanged_marchEvents(alliance, deltaData)
+    self:RefreshListView()
 end
-
-function GameUIShireFightEvent:OnShrineEventsChanged(change_map)
-    if change_map.removed then
-        local id_ = self:GetFightEvent():Id()
-        for _,v in ipairs(change_map.removed) do
-            if id_ == v:Id() then
+function GameUIShireFightEvent:OnAllianceDataChanged_shrineEvents(alliance, deltaData)
+    local ok, value = deltaData("shrineEvents.remove")
+    if ok then
+        local id_ = self:GetFightEvent().id
+        for _,v in ipairs(value) do
+            if id_ == v.id then
                 self:LeftButtonClicked()
                 break
             end
         end
     end
-end
-
-function GameUIShireFightEvent:OnShrineEventsRefresh()
-    local id_ = self:GetFightEvent():Id()
-    local event = self:GetAllianceShrine():GetShrineEventById(id_)
-    if not event then
-        self:LeftButtonClicked()
+    if deltaData("shrineEvents.playerTroops") then
+        self.popultaion_label:setString(#self:GetFightEvent().playerTroops)
+        self:RefreshListView()
     end
-end
-
-function GameUIShireFightEvent:OnAttackMarchEventTimerChanged(event)
-    if self.event_bind_to_label[event:Id()] then
-        self.event_bind_to_label[event:Id()]:setString(GameUtils:formatTimeStyle1(event:GetTime()) .. "后到达")
-    end
-end
-
-function GameUIShireFightEvent:onCleanup()
-    self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnFightEventTimerChanged)
-    self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
-    self:GetAllianceShrine():RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
-    self:GetAllianceShrine():GetAlliance():RemoveListenerOnType(self,Alliance.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
-    self:GetAllianceShrine():GetAlliance():RemoveListenerOnType(self,Alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged)
-    self.event_bind_to_label = nil
-    GameUIShireFightEvent.super.onCleanup(self)
 end
 
 function GameUIShireFightEvent:GetAllianceShrine()
@@ -119,16 +103,16 @@ function GameUIShireFightEvent:BuildUI()
         :align(display.LEFT_TOP, 20, 650)
         :addTo(background):scale(0.7)
     display.newSprite("hourglass_30x38.png"):align(display.CENTER, 22, 22):addTo(icon_bg)
-
+    local time = UtilsForShrine:GetEventTime(self:GetFightEvent())
     self.time_label = UIKit:ttfLabel({
-        text =  string.format(_("派兵时间 %s"),GameUtils:formatTimeStyle1(self:GetFightEvent():GetTime())),
+        text =  string.format(_("派兵时间 %s"),GameUtils:formatTimeStyle1(time)),
         size = 22,
         color = 0x403c2f
     }):align(display.LEFT_TOP,icon_bg:getPositionX()+icon_bg:getContentSize().width*0.7+10,icon_bg:getPositionY()):addTo(background)
 
     local population_icon = display.newSprite("res_citizen_88x82.png"):scale(0.35):align(display.RIGHT_TOP,550,icon_bg:getPositionY()+2):addTo(background)
     self.popultaion_label = UIKit:ttfLabel({
-        text = #self:GetFightEvent():PlayerTroops(),
+        text = #self:GetFightEvent().playerTroops,
         size = 22,
         color = 0x403c2f
     }):align(display.LEFT_TOP, population_icon:getPositionX()+5,population_icon:getPositionY()-3):addTo(background)
@@ -139,14 +123,14 @@ end
 function GameUIShireFightEvent:RefreshListView()
     self.info_list:removeAllItems()
 
-    for i,v in ipairs(self:GetFightEvent():PlayerTroops()) do
+    for i,v in ipairs(self:GetFightEvent().playerTroops) do
         local item = self:GetListItem(true,v)
         self.info_list:addItem(item)
     end
-
-    -- dump(self:GetAllianceShrine():GetAlliance():GetAttackMarchEvents("shrine"))
-    for i,v in ipairs(self:GetAllianceShrine():GetAlliance():GetAttackMarchEvents("shrine")) do
-        if v:DefenceShrineData().shrineEventId == self:GetFightEvent():Id() then
+    local alliance = Alliance_Manager:GetMyAlliance()
+    for i,v in ipairs(alliance.marchEvents.attackMarchEvents) do
+        if v.marchType == "shrine" and
+        v.defenceShrineData.shrineEventId == self:GetFightEvent().id then
             local item = self:GetListItem(false,v)
             self.info_list:addItem(item)
         end
@@ -167,7 +151,7 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
         if arrived then
             member_id = obj.id
         else
-            member_id = obj:AttackPlayerData().id
+            member_id = obj.attackPlayerData.id
         end
         if member_id then
             UIKit:newGameUI('GameUIAllianceMemberInfo',true,member_id):AddToCurrentScene(true)
@@ -177,13 +161,13 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
     if arrived then
         playerName = obj.name
     else
-        playerName = obj:AttackPlayerData().name
+        playerName = obj.attackPlayerData.name
     end
     local dragon_image = ""
     if arrived then
         dragon_image = Dragon_head_image[obj.dragon.type]
     else
-        dragon_image = Dragon_head_image[obj:AttackPlayerData().dragon.type]
+        dragon_image = Dragon_head_image[obj.attackPlayerData.dragon.type]
     end
     display.newSprite(dragon_image):align(display.CENTER,63,68):addTo(icon)
     UIKit:ttfLabel({
@@ -198,7 +182,8 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
     display.newSprite("hourglass_30x38.png"):align(display.CENTER, 22, 22):addTo(icon_bg)
     local time_label_text = ""
     if not arrived then
-        time_label_text =  string.format("%s后到达",GameUtils:formatTimeStyle1(obj:GetTime()))
+        local time = UtilsForEvent:GetEventInfo(obj)
+        time_label_text = string.format("%s后到达",GameUtils:formatTimeStyle1(time))
     else
         time_label_text = _("驻扎中")
     end
@@ -207,9 +192,6 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
         color = 0x403c2f,
         size = 20
     }):align(display.LEFT_CENTER,icon:getPositionX()+icon:getContentSize().width+50, 35):addTo(content)
-    if not arrived then
-        self.event_bind_to_label[obj:Id()] = time_label
-    end
     local line_2 = display.newScale9Sprite("dividing_line.png",0,0,cc.size(400,2),cc.rect(10,2,382,2))
         :align(display.LEFT_BOTTOM, icon:getPositionX()+icon:getContentSize().width+10,70)
         :addTo(content)
@@ -221,9 +203,9 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
     }):align(display.LEFT_BOTTOM,line_2:getPositionX(),line_2:getPositionY() + 8):addTo(content)
     local location_x,location_y = 0,0
     if arrived then
-        location_x,location_y = obj.location.x,obj.location.y
+        location_x,location_y = obj.location.x, obj.location.y
     else
-        location_x,location_y = obj:FromLocation().x,obj:FromLocation().y
+        location_x,location_y = obj.fromAlliance.location.x,obj.fromAlliance.location.y
     end
 
     local power_val_label =  UIKit:ttfLabel({
@@ -239,12 +221,17 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
         size = 20,
         color = 0x615b44
     }):align(display.LEFT_BOTTOM,line_1:getPositionX(),line_1:getPositionY() + 8):addTo(content)
-    local city_name = arrived and obj.name or obj:AttackPlayerData().name
+    local city_name = arrived and obj.name or obj.attackPlayerData.name
     local dragon_val_label =  UIKit:ttfLabel({
         text = city_name,
         size = 20,
         color = 0x403c2f
     }):align(display.RIGHT_BOTTOM,line_1:getPositionX()+line_1:getContentSize().width,dragon_title_label:getPositionY()):addTo(content)
+
+    if not arrived then
+        item.event = obj
+        item.time_label = time_label
+    end
 
     item:addContent(content)
     item:setItemSize(568,190)
@@ -254,48 +241,51 @@ end
 function GameUIShireFightEvent:GetFightEvent()
     return self.fight_event
 end
-
-function GameUIShireFightEvent:GetAllianceShrineLocation()
-    local alliance_obj = self:GetAllianceShrine():GetShireObjectFromMap()
-    local location = alliance_obj.location
-    return location
-end
-
 function GameUIShireFightEvent:DispathSoliderButtonClicked()
-    if not self:GetAllianceShrine():CheckSelfCanDispathSoldiers() then
+    if not Alliance_Manager:GetMyAlliance():CanSendTroopToShrine(User._id) then
         UIKit:showMessageDialog(nil,_("你已经向圣地派遣了部队"))
         return
     end
-    local attack_func = function ()
-        UIKit:newGameUI("GameUIAllianceSendTroops",function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-            if type(self.GetFightEvent) ~= 'function' then gameuialliancesendtroops:LeftButtonClicked() end
-            if total_march_time >=  self:GetFightEvent():GetTime() then
-                UIKit:showMessageDialog(_("提示"),
-                    _("检测到你的行军时间大于圣地事件时间,可能部队未达到之前，圣地事件已结束。是否继续派兵?"),
-                    function()
-                        NetManager:getMarchToShrinePromose(self:GetFightEvent():Id(),dragonType,soldiers):done(function()
-                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+    local final_func = function ()
+        local attack_func = function ()
+            UIKit:newGameUI("GameUIAllianceSendTroops",function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                if type(self.GetFightEvent) ~= 'function' then gameuialliancesendtroops:LeftButtonClicked() end
+                if total_march_time >= UtilsForShrine:GetEventTime(self:GetFightEvent()) then
+                    UIKit:showMessageDialog(_("提示"),
+                        _("检测到你的行军时间大于圣地事件时间,可能部队未达到之前，圣地事件已结束。是否继续派兵?"),
+                        function()
+                            NetManager:getMarchToShrinePromose(self:GetFightEvent().id,dragonType,soldiers):done(function()
+                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                            end)
+                            gameuialliancesendtroops:LeftButtonClicked()
+                        end,
+                        function()
                         end)
-                        gameuialliancesendtroops:LeftButtonClicked()
-                    end,
-                    function()
+                else
+                    NetManager:getMarchToShrinePromose(self:GetFightEvent().id,dragonType,soldiers):done(function()
+                        app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
                     end)
-            else
-                NetManager:getMarchToShrinePromose(self:GetFightEvent():Id(),dragonType,soldiers):done(function()
-                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                end)
-                gameuialliancesendtroops:LeftButtonClicked()
-            end
-        end,{toLocation = self:GetAllianceShrineLocation(),targetIsMyAlliance = true,returnCloseAction = true}):AddToCurrentScene(true)
+                    gameuialliancesendtroops:LeftButtonClicked()
+                end
+            end,{toLocation = Alliance_Manager:GetMyAlliance():GetShrinePosition(), targetIsMyAlliance = true,returnCloseAction = true, targetAlliance = Alliance_Manager:GetMyAlliance()}):AddToCurrentScene(true)
+        end
+        UIKit:showSendTroopMessageDialog(attack_func, "dragonMaterials", _("龙"))
     end
-    UIKit:showSendTroopMessageDialog(attack_func,City:GetMaterialManager().MATERIAL_TYPE.DRAGON,_("龙"))
+    if Alliance_Manager:GetMyAlliance():GetSelf():IsProtected() then
+        UIKit:showMessageDialog(_("提示"),_("进攻该目标将失去保护状态，确定继续派兵?"),final_func)
+    else
+        final_func()
+    end
 end
-
+local shrineStage = GameDatas.AllianceInitData.shrineStage
 function GameUIShireFightEvent:InfomationButtonClicked()
-    UIKit:newGameUI("GameUIAllianceShrineDetail",self:GetFightEvent():Stage(),self:GetAllianceShrine()):AddToCurrentScene(true)
+    local stageInfo = shrineStage[self:GetFightEvent().stageName]
+    UIKit:newGameUI("GameUIAllianceShrineDetail", stageInfo, true):AddToCurrentScene(true)
 end
 
 return GameUIShireFightEvent
+
+
 
 
 

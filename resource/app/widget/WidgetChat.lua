@@ -1,6 +1,7 @@
 local ChatManager = import("..entity.ChatManager")
 local UIPageView = import("..ui.UIPageView")
 local RichText = import(".RichText")
+local Report = import("..entity.Report")
 local WidgetNumberTips = import(".WidgetNumberTips")
 local WidgetChangeMap = import(".WidgetChangeMap")
 local WidgetChat = class("WidgetChat", function()
@@ -26,7 +27,30 @@ function WidgetChat:RefreshChatMessage()
     local last_chat_messages = self.chatManager:FetchLastChannelMessage()
     for i,v in ipairs(self.chat_labels) do
         local rich_text = self.chat_labels[i]
-        rich_text:Text(last_chat_messages[i],1)
+        if string.find(last_chat_messages[i],"\"url\":\"report:") then
+            rich_text:Text(last_chat_messages[i],1,function ( url )
+                local info = string.split(url,":")
+                NetManager:getReportDetailPromise(info[2],info[3]):done(function ( response )
+                    local report = Report:DecodeFromJsonData(clone(response.msg.report))
+                    report:SetPlayerId(info[2])
+                    if report:Type() == "strikeCity" or report:Type()== "cityBeStriked"
+                        or report:Type() == "villageBeStriked" or report:Type()== "strikeVillage" then
+                        UIKit:newGameUI("GameUIStrikeReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackCity" or report:Type() == "attackVillage" then
+                        UIKit:newGameUI("GameUIWarReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "collectResource" then
+                        UIKit:newGameUI("GameUICollectReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackMonster" then
+                        UIKit:newGameUI("GameUIMonsterReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackShrine" then
+                        UIKit:newGameUI("GameUIShrineReportInMail", report):AddToCurrentScene(true)
+                    end
+                    app:GetAudioManager():PlayeEffectSoundWithKey("OPEN_MAIL")
+                end)
+            end)
+        else
+            rich_text:Text(last_chat_messages[i],1)
+        end
         if i % 2 == 0 then
             rich_text:align(display.LEFT_BOTTOM, 40, 0)
         else
@@ -96,6 +120,7 @@ function WidgetChat:ctor()
             elseif event.pageIdx == 3 then
                 UIKit:newGameUI('GameUIChatChannel',"allianceFight"):AddToCurrentScene(true)
             end
+            app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
         end
     end):addTo(self)
     pv:setTouchEnabled(true)
@@ -141,9 +166,12 @@ function WidgetChat:ctor()
                 UIKit:newGameUI('GameUIChatChannel',"global"):AddToCurrentScene(true)
             elseif 2 == pv:getCurPageIdx() then
                 UIKit:newGameUI('GameUIChatChannel',"alliance"):AddToCurrentScene(true)
+            elseif 3 == pv:getCurPageIdx() then
+                UIKit:newGameUI('GameUIChatChannel',"allianceFight"):AddToCurrentScene(true)
             end
         end)
     self:RefreshNewChatAni()
+    self:RefreshChatMessage()
 end
 -- 新消息提示动画
 function WidgetChat:CreateChatAni()
@@ -196,6 +224,7 @@ function WidgetChat:onExit()
 end
 
 return WidgetChat
+
 
 
 

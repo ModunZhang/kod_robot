@@ -47,12 +47,12 @@ intInit["allianceRevengeMaxMinutes"] = {
 }
 intInit["allianceRegionMapWidth"] = {
 	["type"] = "allianceRegionMapWidth",
-	["value"] = 25,
+	["value"] = 31,
 	["desc"] = "联盟地图宽度"
 }
 intInit["allianceRegionMapHeight"] = {
 	["type"] = "allianceRegionMapHeight",
-	["value"] = 25,
+	["value"] = 31,
 	["desc"] = "联盟地图高度"
 }
 intInit["citizenPerLeadership"] = {
@@ -77,7 +77,7 @@ intInit["allianceFightSuccessProtectMinutes"] = {
 }
 intInit["KilledCitizenPerDragonExp"] = {
 	["type"] = "KilledCitizenPerDragonExp",
-	["value"] = 1,
+	["value"] = 2,
 	["desc"] = "多少击杀积分获得一点龙经验"
 }
 intInit["KilledCitizenPerBlood"] = {
@@ -87,7 +87,7 @@ intInit["KilledCitizenPerBlood"] = {
 }
 intInit["KilledCitizenPerWallHp"] = {
 	["type"] = "KilledCitizenPerWallHp",
-	["value"] = 1,
+	["value"] = 5,
 	["desc"] = "损失一点城墙血量获得多少击杀积分"
 }
 intInit["villageRefreshMinutes"] = {
@@ -100,13 +100,28 @@ intInit["monsterRefreshMinutes"] = {
 	["value"] = 240,
 	["desc"] = "区域地图野怪多少分钟后刷新"
 }
-intInit["minMonsterCount"] = {
-	["type"] = "minMonsterCount",
-	["value"] = 20,
-	["desc"] = "联盟领地最少的野怪数量"
-}
 intInit["monstersPerPlayer"] = {
 	["type"] = "monstersPerPlayer",
-	["value"] = 4,
+	["value"] = 2,
 	["desc"] = "每个联盟玩家创建多少个野怪"
+}
+intInit["soldierFightWoundedPercent"] = {
+	["type"] = "soldierFightWoundedPercent",
+	["value"] = 30,
+	["desc"] = "士兵战斗受伤士兵基础百分比"
+}
+intInit["LootVillagePercent"] = {
+	["type"] = "LootVillagePercent",
+	["value"] = 20,
+	["desc"] = "掠夺敌方村落资源比例"
+}
+intInit["allianceMoveColdMinutes"] = {
+	["type"] = "allianceMoveColdMinutes",
+	["value"] = 360,
+	["desc"] = "移动联盟冷却时间"
+}
+intInit["bigMapLength"] = {
+	["type"] = "bigMapLength",
+	["value"] = 35,
+	["desc"] = "大地图的大小"
 }

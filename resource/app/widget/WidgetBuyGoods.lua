@@ -43,10 +43,10 @@ function WidgetBuyGoods:ctor(item)
     local buy_max = 0
     -- 高级道具有数量限制
     local super_item_count = math.huge
-    if item:IsAdvancedItem() then
-        super_item_count = item:Count()
+    if item.isAdvancedItem then
+        super_item_count = Alliance_Manager:GetMyAlliance():GetItemCount(item.name)
     end
-    buy_max =math.min(math.floor(Alliance_Manager:GetMyAlliance():GetSelf():Loyalty()/item:SellPriceInAlliance()),super_item_count)
+    buy_max =math.min(math.floor(Alliance_Manager:GetMyAlliance():GetSelf():Loyalty()/item.sellPriceInAlliance),super_item_count)
 
     local label_origin_x = 190
 
@@ -60,7 +60,7 @@ function WidgetBuyGoods:ctor(item)
     -- 道具图片
     local item_bg = display.newSprite("box_118x118.png"):addTo(back_ground):align(display.CENTER, 70, size.height-80)
     -- tool image
-    local goods_icon = display.newSprite(UILib.item[item:Name()]):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
+    local goods_icon = display.newSprite(UILib.item[item.name]):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
         :addTo(item_bg):scale(0.8)
     goods_icon:scale(100/goods_icon:getContentSize().width)
 
@@ -70,18 +70,18 @@ function WidgetBuyGoods:ctor(item)
     local title_bg = display.newScale9Sprite("title_blue_430x30.png",370,size.height-40,cc.size(458,30),cc.rect(15,10,400,10))
         :addTo(back_ground)
     local goods_name = UIKit:ttfLabel({
-        text = item:GetLocalizeName(),
+        text = UtilsForItem:GetItemLocalize(item.name),
         size = 24,
         color = 0xffedae,
     }):align(display.LEFT_CENTER,20, title_bg:getContentSize().height/2):addTo(title_bg)
     UIKit:ttfLabel({
-        text = item:IsAdvancedItem() and _("高级道具") or _("普通道具"),
+        text = item.isAdvancedItem and _("高级道具") or _("普通道具"),
         size = 20,
         color = 0xe8dfbc,
     }):align(display.RIGHT_CENTER,title_bg:getContentSize().width-40, title_bg:getContentSize().height/2):addTo(title_bg)
 
     local goods_desc = UIKit:ttfLabel({
-        text = item:GetLocalizeDesc(),
+        text = UtilsForItem:GetItemDesc(item.name),
         size = 20,
         color = 0x403c2f,
         dimensions = cc.size(400,0)
@@ -109,7 +109,7 @@ function WidgetBuyGoods:ctor(item)
         size = 20,
         color = 0x403c2f,
     }):addTo(back_ground):align(display.RIGHT_CENTER,dividing:getPositionX()-4,50)
-    local need_loyalty = item:SellPriceInAlliance() * slider:GetValue()
+    local need_loyalty = item.buyPriceInAlliance * slider:GetValue()
 
     self.need_loyalty_label = UIKit:ttfLabel({
         text = GameUtils:formatNumber(need_loyalty),
@@ -126,15 +126,20 @@ function WidgetBuyGoods:ctor(item)
         })
         :setButtonLabel(UIKit:commonButtonLable({text = _("购买")}))
         :onButtonClicked(function(event)
-            if item:IsAdvancedItem() and not Alliance_Manager:GetMyAlliance():GetSelf():CanBuyAdvancedItemsFromAllianceShop() then
+            if item.isAdvancedItem and not Alliance_Manager:GetMyAlliance():GetSelf():CanBuyAdvancedItemsFromAllianceShop() then
                 UIKit:showMessageDialog(_("主人"),_("购买需要精英或以上权限"))
                 return
             end
-            if slider:GetValue()<1 then
+            local but_count = slider:GetValue()
+            if but_count < 1 then
                 UIKit:showMessageDialog(_("主人"),_("请输入正确的购买数量"))
                 return
             end
-            NetManager:getBuyAllianceItemPromise(item:Name(),slider:GetValue()):done(function ( response )
+            if item.isAdvancedItem and but_count > Alliance_Manager:GetMyAlliance():GetItemCount(item.name) then
+                UIKit:showMessageDialog(_("主人"),_("道具数量不足"))
+                return
+            end
+            NetManager:getBuyAllianceItemPromise(item.name,but_count):done(function ( response )
                 GameGlobalUI:showTips(_("提示"),_("购买成功"))
                 return response
             end)
@@ -153,7 +158,7 @@ end
 
 function WidgetBuyGoods:OnCountChanged(count)
     local member = Alliance_Manager:GetMyAlliance():GetSelf()
-    local  need_loyalty = self.item:SellPriceInAlliance() * count
+    local  need_loyalty = self.item.sellPriceInAlliance * count
     self.loyalty_label:setString(GameUtils:formatNumber(member:Loyalty()))
     self.need_loyalty_label:setString(GameUtils:formatNumber(need_loyalty))
     self.loyalty_label:setColor(UIKit:hex2c4b(member:Loyalty()<need_loyalty and 0x7e0000 or 0x403c2f))

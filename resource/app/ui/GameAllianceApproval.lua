@@ -26,11 +26,11 @@ function GameAllianceApproval:onEnter()
     list:setDelegate(handler(self, self.sourceDelegate))
     list_node:addTo(self:GetBody()):pos(20,30)
     self.listView = list
-    NetManager:getJoinRequestEventsPromise(
-        Alliance_Manager:GetMyAlliance():Id()
-    ):done(function()
+    -- NetManager:getJoinRequestEventsPromise(
+    --     Alliance_Manager:GetMyAlliance().id
+    -- ):done(function()
         self:RefreshListView()
-    end)
+    -- end)
 end
 
 function GameAllianceApproval:RefreshListView()

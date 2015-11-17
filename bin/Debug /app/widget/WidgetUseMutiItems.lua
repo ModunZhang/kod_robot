@@ -8,8 +8,8 @@ local WidgetPushButton = import(".WidgetPushButton")
 local Localize_item = import("..utils.Localize_item")
 local WidgetUseMutiItems = class("WidgetUseMutiItems", WidgetPopDialog)
 
-function WidgetUseMutiItems:ctor(item)
-    WidgetUseMutiItems.super.ctor(self,282,Localize_item.item_name[item:Name()],display.top-298)
+function WidgetUseMutiItems:ctor(item_name)
+    WidgetUseMutiItems.super.ctor(self,282,Localize_item.item_name[item_name],display.top-298)
 
     local body = self:GetBody()
     local body_size = body:getContentSize()
@@ -26,7 +26,8 @@ function WidgetUseMutiItems:ctor(item)
         :addTo(slider_bg)
 
     -- slider
-    local slider = WidgetSliderWithInput.new({max = item:Count()})
+    
+    local slider = WidgetSliderWithInput.new({max = User:GetItemCount(item_name)})
         :addTo(slider_bg)
         :align(display.CENTER, slider_bg:getContentSize().width/2,  65)
         :OnSliderValueChanged(function(event)
@@ -44,8 +45,8 @@ function WidgetUseMutiItems:ctor(item)
         }))
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                NetManager:getUseItemPromise(item:Name(),{
-                    [item:Name()] = {count = slider:GetValue()}
+                NetManager:getUseItemPromise(item_name,{
+                    [item_name] = {count = slider:GetValue()}
                 }):done(function ()
                     self:LeftButtonClicked()
                 end)
@@ -53,6 +54,7 @@ function WidgetUseMutiItems:ctor(item)
         end):align(display.BOTTOM_CENTER, body_size.width/2,30):addTo(body)
     button:setButtonEnabled(slider:GetValue() ~= 0)
     self.button = button
+    slider:SetValue(User:GetItemCount(item_name))
 end
 
 return WidgetUseMutiItems

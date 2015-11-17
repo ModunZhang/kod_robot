@@ -55,7 +55,7 @@ function DaliyApi:DailyQuests()
 end
 -- 军事科技
 function DaliyApi:MilitaryTech()
-    local soldier_manager = City:GetSoldierManager()
+    -- local soldier_manager = City:GetSoldierManager()
     -- 训练场
     -- 猎手大厅
     -- 马厩
@@ -72,17 +72,17 @@ function DaliyApi:MilitaryTech()
             local building_index,building_name = map[1] , map[2]
             if app:IsBuildingUnLocked(building_index) then
                 -- 没有升级事件
-                if not soldier_manager:IsUpgradingMilitaryTech(building_name) then
+                if not User:HasMilitaryTechEventBy(building_name) then
                     -- 随机晋升士兵星级或者升级科技
                     local upgrade_soldier = math.random(10) < 4
                     if upgrade_soldier then
-                        local soldiers_star = soldier_manager:FindSoldierStarByBuildingType(building_name)
+                        local soldiers_star = User:GetBuildingSoldiersInfo(building_name)
                         for soldier_type,v in pairs(soldiers_star) do
                             -- 最大三星
-                            if v < soldier_manager:GetSoldierMaxStar() then
+                            if v < GameDatas.PlayerInitData.intInit.soldierMaxStar.value then
                                 -- 科技点是否满足
-                                local level_up_config =  GameDatas.Soldiers.normal[soldier_type.."_"..(soldier_manager:GetStarBySoldierType(soldier_type)+1)]
-                                local tech_points = soldier_manager:GetTechPointsByType(building_name)
+                                local level_up_config =  GameDatas.Soldiers.normal[soldier_type.."_"..(User:SoldierStarByName(soldier_type)+1)]
+                                local tech_points = User:GetTechPoints(building_name)
                                 if tech_points<level_up_config.upgradeTechPointNeed then
                                     return
                                 end
@@ -98,7 +98,7 @@ function DaliyApi:MilitaryTech()
                             end
                         end
                     else
-                        local techs = soldier_manager:FindMilitaryTechsByBuildingType(building_name)
+                        local techs = User:GetMilitaryTechsByBuilding(building_name)
                         local upgrade_tech = techs[math.random(#techs)]
                         local upgrade_tech_name = techs[math.random(#techs)]:Name()
                         if upgrade_tech:Level() < 15 then
@@ -116,7 +116,7 @@ function DaliyApi:MilitaryTech()
 
                 else
                     -- 加速军事科技升级
-                    local upgrading_tech = soldier_manager:GetUpgradingMilitaryTech(building_name)
+                    local upgrading_tech = User:GetMilitaryTechEventBy(building_name)
                     -- 随机使用事件加速道具
                     local speedUp_item_name = "speedup_"..math.random(8)
                     print("使用"..speedUp_item_name.."加速"..upgrading_tech:GetEventType().." ,id:",upgrading_tech:Id())
@@ -136,30 +136,28 @@ function DaliyApi:ToolShop()
     if not app:IsBuildingUnLocked(16) then
         return
     end
-    local tool_shop = City:GetBuildingByLocationId(16)
-    local technology_event = tool_shop:GetTechnologyEvent()
-    local building_event = tool_shop:GetBuildingEvent()
-    local current_time = app.timer:GetServerTime()
-    if technology_event:IsStored(current_time) then
-        return NetManager:getFetchMaterialsPromise(technology_event:Id())
-    elseif building_event:IsStored(current_time) then
-        return NetManager:getFetchMaterialsPromise(building_event:Id())
-    elseif not tool_shop:IsMakingAny(current_time) then
-        local make_which = math.random(2) == 2
-        if make_which then
+    if User:CanMakeMaterials() then
+        if User:IsStoreMaterials("buildingMaterials") then
+            return NetManager:getFetchMaterialsPromise(User:GetStoreMaterialsEvent("buildingMaterials").id)
+        elseif not User:IsMakingMaterials("buildingMaterials") then
             return NetManager:getMakeBuildingMaterialPromise()
-        else
+        end
+        if User:IsStoreMaterials("technologyMaterials") then
+            return NetManager:getFetchMaterialsPromise(User:GetStoreMaterialsEvent("technologyMaterials").id)
+        elseif not User:IsMakingMaterials("technologyMaterials") then
             return NetManager:getMakeTechnologyMaterialPromise()
         end
-    elseif technology_event:IsMaking(current_time) or building_event:IsMaking(current_time) then
-        local event = technology_event:IsMaking(current_time) and technology_event or building_event
-        -- 随机使用事件加速道具
-        local speedUp_item_name = "speedup_"..math.random(8)
-        print("使用"..speedUp_item_name.."加速材料制造 ,id:",event:Id())
-        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
-            eventType = "materialEvents",
-            eventId = event:Id()
-        }})
+    else
+        local materialsEvent = User:GetMakingMaterialsEvent()
+        if materialsEvent then
+            -- 随机使用事件加速道具
+            local speedUp_item_name = "speedup_"..math.random(8)
+            print("使用"..speedUp_item_name.."加速材料制造 ,id:",materialsEvent.id)
+            return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+                eventType = "materialEvents",
+                eventId = materialsEvent.id
+            }})
+        end
     end
 end
 -- 贸易行会
@@ -170,7 +168,7 @@ function DaliyApi:TradeGuild()
     end
     local city = City
     -- 检查是否有出售了的订单
-    local my_deals = User:GetTradeManager():GetMyDeals()
+    local my_deals = User:GetMyDeals()
     for k,v in pairs(my_deals) do
         if v.isSold then
             return NetManager:getGetMyItemSoldMoneyPromise(v.id)
@@ -211,17 +209,15 @@ function DaliyApi:TradeGuild()
         if is_sell then
             -- 出售物品
             local current_time = app.timer:GetServerTime()
-            local resource_manager = city:GetResourceManager()
-            local material_manager = city:GetMaterialManager()
-            local has_materials = material_manager:GetMaterialsByType(material_manager.MATERIAL_TYPE.BUILD)
-            local has_technology_materials = material_manager:GetMaterialsByType(material_manager.MATERIAL_TYPE.TECHNOLOGY)
+            local has_materials = User.buildingMaterials
+            local has_technology_materials = User.technologyMaterials
 
             local can_sell_values = {
                 resources =  {
-                    [1] = math.floor(resource_manager:GetWoodResource():GetResourceValueByCurrentTime(current_time)/1000),
-                    [2] = math.floor(resource_manager:GetStoneResource():GetResourceValueByCurrentTime(current_time)/1000),
-                    [3] = math.floor(resource_manager:GetIronResource():GetResourceValueByCurrentTime(current_time)/1000),
-                    [4] = math.floor(resource_manager:GetFoodResource():GetResourceValueByCurrentTime(current_time)/1000),
+                    [1] = math.floor(User:GetResValueByType("wood")/1000),
+                    [2] = math.floor(User:GetResValueByType("stone")/1000),
+                    [3] = math.floor(User:GetResValueByType("iron")/1000),
+                    [4] = math.floor(User:GetResValueByType("food")/1000),
                 },
                 buildingMaterials =  {
                     [1] = has_materials.blueprints,
@@ -238,7 +234,7 @@ function DaliyApi:TradeGuild()
             }
 
             -- 小车数量
-            local cart_num = resource_manager:GetCartResource():GetResourceValueByCurrentTime(current_time)
+            local cart_num = User:GetResValueByType("cart")
 
             local types = {
                 "resources",
@@ -267,15 +263,21 @@ function DaliyApi:TradeGuild()
                     max = 1000
                 },
                 material = {
-                    min = 1000,
-                    max = 5000
+                    min = 3000,
+                    max = 12000
+                },
+                martial_material = {
+                    min = 6000,
+                    max = 24000
                 }
             }
             local sell_price
             if sell_type == "resources" then
-                sell_price = math.random(100,100)
+                sell_price = math.random(100,1000)
+            elseif sell_type == "buildingMaterials" then
+                sell_price = math.random(3000,12000)
             else
-                sell_price = math.random(1000,5000)
+                sell_price = math.random(6000,24000)
             end
             print("贸易行会出售：",sell_type,sell_sub_type,"数量：",sell_count,"价格：",sell_price)
             return NetManager:getSellItemPromise(sell_type,sell_sub_type,sell_count,sell_price)
@@ -295,8 +297,10 @@ function DaliyApi:TradeGuild()
                 if #itemDocs > 0 then
                     -- 随机购买一个
                     local item = itemDocs[math.random(#itemDocs)]
-                    dump(item,"随机购买一个商品")
-                    NetManager:getBuySellItemPromise(item._id)
+                    if User:Id() ~= item.playerId then
+                        dump(item,"随机购买一个商品")
+                        NetManager:getBuySellItemPromise(item._id)
+                    end
                 end
             end)
         end
@@ -304,7 +308,7 @@ function DaliyApi:TradeGuild()
 end
 -- 日常奖励领取
 function DaliyApi:GetDaliyRewards()
-    local countInfo = User:GetCountInfo()
+    local countInfo = User.countInfo
     local real_index = countInfo.day60 % 30
     for index = 1,30 do
         if countInfo.day60 > countInfo.day60RewardsCount and real_index == index then
@@ -381,7 +385,7 @@ function DaliyApi:GetDaliyRewards()
     end
 
     -- 成就奖励
-    local tasks = User:GetTaskManager():GetFirstCompleteTasks()
+    local tasks = UtilsForTask:GetFirstCompleteTasks(User.growUpTasks)
     local i1, i2, i3 = unpack(tasks)
     if i1 then
         print("领取成就任务奖励",i1:TaskType(), i1.id)
@@ -442,6 +446,9 @@ return {
     TradeGuild,
     GetDaliyRewards,
 }
+
+
+
 
 
 

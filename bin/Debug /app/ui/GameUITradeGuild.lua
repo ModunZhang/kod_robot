@@ -6,8 +6,6 @@ local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetPopDialog = import("..widget.WidgetPopDialog")
 local WidgetInfo = import("..widget.WidgetInfo")
 local WidgetSliderWithInput = import("..widget.WidgetSliderWithInput")
-local MaterialManager = import("..entity.MaterialManager")
-local TradeManager = import("..entity.TradeManager")
 local UILib = import(".UILib")
 
 
@@ -46,7 +44,7 @@ end
 function GameUITradeGuild:ctor(city,building, default_tab)
     local bn = Localize.building_name
     GameUITradeGuild.super.ctor(self,city,bn[building:GetType()],building,default_tab)
-    self.trade_manager = User:GetTradeManager()
+    self.user = city:GetUser()
     self.max_sell_queue = self.building:GetMaxSellQueue()
 end
 
@@ -80,18 +78,22 @@ function GameUITradeGuild:OnMoveInStage()
             self:LoadMyGoodsPage()
         end
     end):pos(window.cx, window.bottom + 34)
-    self.tab_buttons:SetButtonTipNumber("myGoods",self.trade_manager:GetSoldDealsCount())
-    self.building:AddUpgradeListener(self)
-    self.trade_manager:AddListenOnType(self, TradeManager.LISTEN_TYPE.DEAL_CHANGED)
-    self.trade_manager:AddListenOnType(self, TradeManager.LISTEN_TYPE.MY_DEAL_REFRESH)
-    self.city:GetMaterialManager():AddObserver(self)
+    local User = self.user
+    self.tab_buttons:SetButtonTipNumber("myGoods",User:GetSoldDealsCount())
+    User:AddListenOnType(self, "deals")
+    User:AddListenOnType(self, "buildingMaterials")
+    User:AddListenOnType(self, "technologyMaterials")
+    User:AddListenOnType(self, "buildingEvents")
+    User:AddListenOnType(self, "buildings")
 end
 
 function GameUITradeGuild:onExit()
-    self.trade_manager:RemoveListenerOnType(self, TradeManager.LISTEN_TYPE.DEAL_CHANGED)
-    self.trade_manager:RemoveListenerOnType(self, TradeManager.LISTEN_TYPE.MY_DEAL_REFRESH)
-    self.building:RemoveUpgradeListener(self)
-    self.city:GetMaterialManager():RemoveObserver(self)
+    local User = self.user
+    User:RemoveListenerOnType(self, "deals")
+    User:RemoveListenerOnType(self, "buildingMaterials")
+    User:RemoveListenerOnType(self, "technologyMaterials")
+    User:RemoveListenerOnType(self, "buildingEvents")
+    User:RemoveListenerOnType(self, "buildings")
     GameUITradeGuild.super.onExit(self)
 end
 
@@ -195,6 +197,7 @@ function GameUITradeGuild:LoadResource(goods_details,goods_type)
 end
 function GameUITradeGuild:RefreshSellListView(goods_type,selected)
     local list_view = self:GetSellListViewByGoodsType(goods_type)
+    if not list_view then return end
     list_view:removeAllItems()
     NetManager:getGetSellItemsPromise(self:GetGoodsTypeMapToString(goods_type),goods_type[selected]):done(function(response)
         for k,v in pairs(response.msg.itemDocs) do
@@ -277,13 +280,13 @@ function GameUITradeGuild:CreateSellItemForListView(listView,goods)
                             listView:removeItem(item)
                         end)
                     end
-                    if City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())<goods.itemData.price*goods.itemData.count then
+                    if User:GetResValueByType("coin")<goods.itemData.price*goods.itemData.count then
                         UIKit:showMessageDialog(_("主人"),_("银币不足,是否使用金龙币补充"))
                             :CreateOKButtonWithPrice({
                                 listener = function ()
                                     buy_func()
                                 end,
-                                price = DataUtils:buyResource({coin = goods.itemData.price*goods.itemData.count}, {coin=City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())})
+                                price = DataUtils:buyResource({coin = goods.itemData.price*goods.itemData.count}, {coin=User:GetResValueByType("coin")})
                             })
                             :CreateCancelButton()
                         return
@@ -303,27 +306,27 @@ function GameUITradeGuild:GetGoodsIcon(listView,icon)
 end
 function GameUITradeGuild:GetGoodsDetailsByType(goods_type)
     if goods_type==RESOURCE_TYPE then
-        local manager = City:GetResourceManager()
+        local User = User
         return {
             {
                 UILib.resource.wood,
-                manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+                User:GetResValueByType("wood")
             },
             {
                 UILib.resource.stone,
-                manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+                User:GetResValueByType("stone")
             },
             {
                 UILib.resource.iron,
-                manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+                User:GetResValueByType("iron")
             },
             {
                 UILib.resource.food,
-                manager:GetFoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+                User:GetResValueByType("food")
             },
         }
     elseif goods_type==BUILD_MATERIAL_TYPE then
-        local build_materials = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)
+        local build_materials = User.buildingMaterials
         return {
             {
                 UILib.materials.blueprints,
@@ -343,7 +346,7 @@ function GameUITradeGuild:GetGoodsDetailsByType(goods_type)
             },
         }
     elseif goods_type==MARTIAL_MATERIAL_TYPE then
-        local technology_materials = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.TECHNOLOGY)
+        local technology_materials = User.technologyMaterials
         return {
             {
                 UILib.materials.trainingFigure,
@@ -460,7 +463,7 @@ function GameUITradeGuild:LoadMyGoodsPage()
         {
             width = 388,
             text_1 = _("数量"),
-            text_2 = City:GetResourceManager():GetCartResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()).. "/"..tradeGuild:GetMaxCart(),
+            text_2 = User:GetResValueByType("cart").. "/"..User:GetResProduction("cart").limit,
         }
     ):align(display.CENTER,window.cx +70 , window.top- 166)
         :addTo(layer)
@@ -482,6 +485,20 @@ function GameUITradeGuild:LoadMyGoodsPage()
     self.my_goods_listview = list_view
     -- 加载我的商品
     self:LoadMyGoodsList()
+
+    scheduleAt(layer, function()
+        if self.cart_num then
+            self.cart_num:SetValue(User:GetResValueByType("cart").. "/"..User:GetResProduction("cart").limit)
+        end
+        if self.resource_options then
+            local options =  self.resource_options
+            local resources = self:GetGoodsDetailsByType(RESOURCE_TYPE)
+            for i=1,4 do
+                local item = options:getButtonAtIndex(i)
+                item:SetValue(resources[i][2])
+            end
+        end
+    end)
 end
 function GameUITradeGuild:LoadMyGoodsList()
     if not self.my_goods_listview then
@@ -584,7 +601,7 @@ function GameUITradeGuild:CreateSellItem(list,index)
                 end
             end)
     else
-        if index<=self:GetUnlockedSellListNum() then
+        if index <= self:GetUnlockedSellListNum() then
             title_label:setString(_("空闲"))
             UIKit:ttfLabel(
                 {
@@ -631,7 +648,7 @@ function GameUITradeGuild:GetUnlockedSellListNum()
     return self.building:GetMaxSellQueue()
 end
 function GameUITradeGuild:GetOnSellGoods()
-    local my_deals = self.trade_manager:GetMyDeals()
+    local my_deals = User:GetMyDeals()
     local sell_goods = {}
     for k,v in pairs(my_deals) do
         table.insert(sell_goods,
@@ -732,12 +749,13 @@ function GameUITradeGuild:OpenSellDialog()
         local w,h = size.width,size.height
 
         -- 出售商品数量拖动条
+        local max_sell_num = math.min(User:GetResValueByType("cart"), math.floor(max_num/unit))
         self.sell_num_item = self:CreateSliderItem(
             {
                 title = _("出售"),
                 unit = unit == 1000 and "K" or "",
                 max = max_num,
-                min = min_num,
+                min = math.min(min_num,max_sell_num),
                 icon = goods_icon,
                 onSliderValueChanged = function ( value )
                     self:SetTotalPriceAndCartNum(value,self.sell_price_item:GetValue())
@@ -757,7 +775,7 @@ function GameUITradeGuild:OpenSellDialog()
                 end
             }
         ):align(display.TOP_CENTER,w/2,h-286):addTo(layer)
-        self.sell_num_item:SetValue(math.min(City:GetResourceManager():GetCartResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()),math.floor(max_num/unit)))
+        self.sell_num_item:SetValue(max_sell_num)
     end
     function body:LoadSellResource(goods_type)
         local goods_details = tradeGuildUI:GetGoodsDetailsByType(goods_type)
@@ -802,7 +820,7 @@ function GameUITradeGuild:OpenSellDialog()
         -- 已有小车数量
         self.own_cart_num_label = UIKit:ttfLabel(
             {
-                text = string.formatnumberthousands(City:GetResourceManager():GetCartResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())),
+                text = string.formatnumberthousands(User:GetResValueByType("cart")),
                 size = 20,
                 color = 0x403c2f
             }):align(display.LEFT_CENTER, temp_icon:getPositionX()+temp_icon:getContentSize().width*0.2 ,30)
@@ -855,7 +873,7 @@ function GameUITradeGuild:OpenSellDialog()
                     return
                 end
                 -- 判定小车是否足够
-                if self.sell_num_item:GetValue()>City:GetResourceManager():GetCartResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()) then
+                if self.sell_num_item:GetValue()>User:GetResValueByType("cart") then
                     UIKit:showMessageDialog(_("提示"),_("资源小车数量不足"), function()end)
                     return
                 end
@@ -926,7 +944,7 @@ function GameUITradeGuild:OpenSellDialog()
     function body:SetTotalPriceAndCartNum(goods_num,goods_unit_price)
         self.total_price_label:setString(string.formatnumberthousands(goods_num*goods_unit_price))
         self.cart_num_label:setString("/"..string.formatnumberthousands(goods_num))
-        local current_cart_num = City:GetResourceManager():GetCartResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+        local current_cart_num = User:GetResValueByType("cart")
         self.own_cart_num_label:setString(string.formatnumberthousands(current_cart_num))
         if current_cart_num<goods_num then
             self.own_cart_num_label:setColor(UIKit:hex2c4b(0x7e0000))
@@ -1042,13 +1060,10 @@ function GameUITradeGuild:OpenSellDialog()
     )
     body.drop_list:align(display.TOP_CENTER,window.cx,window.top-170):addTo(root)
 end
-
-function GameUITradeGuild:OnBuildingUpgradingBegin()
-end
-function GameUITradeGuild:OnBuildingUpgradeFinished()
+function GameUITradeGuild:OnUserDataChanged_buildingEvents(userData, deltaData)
     if self.cart_num and self.cart_recovery then
         local tradeGuild = City:GetFirstBuildingByType("tradeGuild")
-        self.cart_num:SetValue(City:GetResourceManager():GetCartResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()).. "/"..tradeGuild:GetMaxCart())
+        self.cart_num:SetValue(User:GetResValueByType("cart").. "/"..User:GetResProduction("cart").limit)
         self.cart_recovery:SetValue(tradeGuild:GetCartRecovery())
     end
     local queue_num = self.building:GetMaxSellQueue()
@@ -1056,45 +1071,42 @@ function GameUITradeGuild:OnBuildingUpgradeFinished()
         self:LoadMyGoodsList()
     end
 end
-function GameUITradeGuild:OnBuildingUpgrading()
-end
-function GameUITradeGuild:OnDealChanged(changed_map)
-    self.tab_buttons:SetButtonTipNumber("myGoods",self.trade_manager:GetSoldDealsCount())
-    self:LoadMyGoodsList()
-end
-function GameUITradeGuild:OnMyDealsRefresh(changed_map)
-    self.tab_buttons:SetButtonTipNumber("myGoods",self.trade_manager:GetSoldDealsCount())
-end
-function GameUITradeGuild:OnResourceChanged(resource_manager)
-    GameUITradeGuild.super.OnResourceChanged(self,resource_manager)
-    local tradeGuild = City:GetFirstBuildingByType("tradeGuild")
-    if self.cart_num then
-        self.cart_num:SetValue(resource_manager:GetCartResource():GetResourceValueByCurrentTime(app.timer:GetServerTime()).. "/"..tradeGuild:GetMaxCart())
+function GameUITradeGuild:OnUserDataChanged_buildings(userData, deltaData)
+    if self.cart_num and self.cart_recovery then
+        local tradeGuild = City:GetFirstBuildingByType("tradeGuild")
+        self.cart_num:SetValue(User:GetResValueByType("cart").. "/"..User:GetResProduction("cart").limit)
+        self.cart_recovery:SetValue(tradeGuild:GetCartRecovery())
     end
-    if self.resource_options then
-        local options =  self.resource_options
-        local resources = self:GetGoodsDetailsByType(RESOURCE_TYPE)
-        for i=1,4 do
-            local item = options:getButtonAtIndex(i)
-            item:SetValue(resources[i][2])
-        end
+    local queue_num = self.building:GetMaxSellQueue()
+    if queue_num>self.max_sell_queue then
+        self:LoadMyGoodsList()
     end
 end
-function GameUITradeGuild:OnMaterialsChanged(material_manager, material_type, changed)
-    if material_type == MaterialManager.MATERIAL_TYPE.BUILD then
+function GameUITradeGuild:OnUserDataChanged_deals(userData, deltaData)
+    local ok, value = deltaData("deals")
+    if ok then
+        self.tab_buttons:SetButtonTipNumber("myGoods",User:GetSoldDealsCount())
+        self:LoadMyGoodsList()
+    end
+end
+function GameUITradeGuild:OnUserDataChanged_buildingMaterials(userData, deltaData)
+    local ok, value = deltaData("buildingMaterials")
+    if ok then
         if self.build_material_options then
             local options =  self.build_material_options
-            for k,v in pairs(changed) do
-                local index = self:GetMaterialIndexByName(k)
-                options:getButtonAtIndex(index):SetValue(v.new)
+            for k,v in pairs(value) do
+                options:getButtonAtIndex(self:GetMaterialIndexByName(k)):SetValue(v)
             end
         end
-    elseif material_type == MaterialManager.MATERIAL_TYPE.TECHNOLOGY then
-        if self.martial_material_options then
+    end
+end
+function GameUITradeGuild:OnUserDataChanged_technologyMaterials(userData, deltaData)
+    local ok, value = deltaData("technologyMaterials")
+    if ok then
+         if self.martial_material_options then
             local options =  self.martial_material_options
-            for k,v in pairs(changed) do
-                local index = self:GetMaterialIndexByName(k)
-                options:getButtonAtIndex(index):SetValue(v.new)
+            for k,v in pairs(value) do
+                options:getButtonAtIndex(self:GetMaterialIndexByName(k)):SetValue(v)
             end
         end
     end

@@ -9,7 +9,7 @@ lumbermill[1] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1000
+	["buildTime"] = 2026
 }
 lumbermill[2] = {
 	["level"] = 2,
@@ -20,7 +20,7 @@ lumbermill[2] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1200
+	["buildTime"] = 2053
 }
 lumbermill[3] = {
 	["level"] = 3,
@@ -31,7 +31,7 @@ lumbermill[3] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1400
+	["buildTime"] = 2079
 }
 lumbermill[4] = {
 	["level"] = 4,
@@ -42,7 +42,7 @@ lumbermill[4] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1600
+	["buildTime"] = 2106
 }
 lumbermill[5] = {
 	["level"] = 5,
@@ -53,7 +53,7 @@ lumbermill[5] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1800
+	["buildTime"] = 2132
 }
 lumbermill[6] = {
 	["level"] = 6,
@@ -64,7 +64,7 @@ lumbermill[6] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 2000
+	["buildTime"] = 2158
 }
 lumbermill[7] = {
 	["level"] = 7,
@@ -119,7 +119,7 @@ lumbermill[11] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4112
+	["buildTime"] = 4640
 }
 lumbermill[12] = {
 	["level"] = 12,
@@ -130,7 +130,7 @@ lumbermill[12] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4640
+	["buildTime"] = 5432
 }
 lumbermill[13] = {
 	["level"] = 13,
@@ -141,7 +141,7 @@ lumbermill[13] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 5168
+	["buildTime"] = 6277
 }
 lumbermill[14] = {
 	["level"] = 14,
@@ -152,7 +152,7 @@ lumbermill[14] = {
 	["tools"] = 1,
 	["tiles"] = 1,
 	["pulley"] = 1,
-	["buildTime"] = 8336
+	["buildTime"] = 10870
 }
 lumbermill[15] = {
 	["level"] = 15,
@@ -163,7 +163,7 @@ lumbermill[15] = {
 	["tools"] = 2,
 	["tiles"] = 2,
 	["pulley"] = 2,
-	["buildTime"] = 11504
+	["buildTime"] = 15781
 }
 lumbermill[16] = {
 	["level"] = 16,
@@ -174,7 +174,7 @@ lumbermill[16] = {
 	["tools"] = 4,
 	["tiles"] = 4,
 	["pulley"] = 4,
-	["buildTime"] = 14672
+	["buildTime"] = 21008
 }
 lumbermill[17] = {
 	["level"] = 17,
@@ -185,7 +185,7 @@ lumbermill[17] = {
 	["tools"] = 8,
 	["tiles"] = 8,
 	["pulley"] = 8,
-	["buildTime"] = 17840
+	["buildTime"] = 26552
 }
 lumbermill[18] = {
 	["level"] = 18,
@@ -196,7 +196,7 @@ lumbermill[18] = {
 	["tools"] = 12,
 	["tiles"] = 12,
 	["pulley"] = 12,
-	["buildTime"] = 21008
+	["buildTime"] = 32413
 }
 lumbermill[19] = {
 	["level"] = 19,
@@ -207,7 +207,7 @@ lumbermill[19] = {
 	["tools"] = 16,
 	["tiles"] = 16,
 	["pulley"] = 16,
-	["buildTime"] = 24176
+	["buildTime"] = 38590
 }
 lumbermill[20] = {
 	["level"] = 20,
@@ -218,7 +218,7 @@ lumbermill[20] = {
 	["tools"] = 20,
 	["tiles"] = 20,
 	["pulley"] = 20,
-	["buildTime"] = 27344
+	["buildTime"] = 45085
 }
 lumbermill[21] = {
 	["level"] = 21,
@@ -229,7 +229,7 @@ lumbermill[21] = {
 	["tools"] = 28,
 	["tiles"] = 28,
 	["pulley"] = 28,
-	["buildTime"] = 30512
+	["buildTime"] = 51896
 }
 lumbermill[22] = {
 	["level"] = 22,
@@ -240,7 +240,7 @@ lumbermill[22] = {
 	["tools"] = 36,
 	["tiles"] = 36,
 	["pulley"] = 36,
-	["buildTime"] = 33680
+	["buildTime"] = 59024
 }
 lumbermill[23] = {
 	["level"] = 23,
@@ -251,7 +251,7 @@ lumbermill[23] = {
 	["tools"] = 44,
 	["tiles"] = 44,
 	["pulley"] = 44,
-	["buildTime"] = 36848
+	["buildTime"] = 65423
 }
 lumbermill[24] = {
 	["level"] = 24,
@@ -262,7 +262,7 @@ lumbermill[24] = {
 	["tools"] = 52,
 	["tiles"] = 52,
 	["pulley"] = 52,
-	["buildTime"] = 40016
+	["buildTime"] = 71949
 }
 lumbermill[25] = {
 	["level"] = 25,
@@ -273,7 +273,7 @@ lumbermill[25] = {
 	["tools"] = 60,
 	["tiles"] = 60,
 	["pulley"] = 60,
-	["buildTime"] = 43184
+	["buildTime"] = 78190
 }
 lumbermill[26] = {
 	["level"] = 26,
@@ -284,7 +284,7 @@ lumbermill[26] = {
 	["tools"] = 68,
 	["tiles"] = 68,
 	["pulley"] = 68,
-	["buildTime"] = 46352
+	["buildTime"] = 84495
 }
 lumbermill[27] = {
 	["level"] = 27,
@@ -295,7 +295,7 @@ lumbermill[27] = {
 	["tools"] = 76,
 	["tiles"] = 76,
 	["pulley"] = 76,
-	["buildTime"] = 49520
+	["buildTime"] = 90862
 }
 lumbermill[28] = {
 	["level"] = 28,
@@ -306,7 +306,7 @@ lumbermill[28] = {
 	["tools"] = 84,
 	["tiles"] = 84,
 	["pulley"] = 84,
-	["buildTime"] = 52688
+	["buildTime"] = 97293
 }
 lumbermill[29] = {
 	["level"] = 29,
@@ -317,7 +317,7 @@ lumbermill[29] = {
 	["tools"] = 100,
 	["tiles"] = 100,
 	["pulley"] = 100,
-	["buildTime"] = 59024
+	["buildTime"] = 109775
 }
 lumbermill[30] = {
 	["level"] = 30,
@@ -328,7 +328,7 @@ lumbermill[30] = {
 	["tools"] = 116,
 	["tiles"] = 116,
 	["pulley"] = 116,
-	["buildTime"] = 65360
+	["buildTime"] = 122384
 }
 lumbermill[31] = {
 	["level"] = 31,
@@ -339,7 +339,7 @@ lumbermill[31] = {
 	["tools"] = 132,
 	["tiles"] = 132,
 	["pulley"] = 132,
-	["buildTime"] = 71696
+	["buildTime"] = 135119
 }
 lumbermill[32] = {
 	["level"] = 32,
@@ -350,7 +350,7 @@ lumbermill[32] = {
 	["tools"] = 148,
 	["tiles"] = 148,
 	["pulley"] = 148,
-	["buildTime"] = 78032
+	["buildTime"] = 147981
 }
 lumbermill[33] = {
 	["level"] = 33,
@@ -361,7 +361,7 @@ lumbermill[33] = {
 	["tools"] = 180,
 	["tiles"] = 180,
 	["pulley"] = 180,
-	["buildTime"] = 84368
+	["buildTime"] = 160970
 }
 lumbermill[34] = {
 	["level"] = 34,
@@ -372,7 +372,7 @@ lumbermill[34] = {
 	["tools"] = 212,
 	["tiles"] = 212,
 	["pulley"] = 212,
-	["buildTime"] = 90704
+	["buildTime"] = 174086
 }
 lumbermill[35] = {
 	["level"] = 35,
@@ -383,7 +383,7 @@ lumbermill[35] = {
 	["tools"] = 244,
 	["tiles"] = 244,
 	["pulley"] = 244,
-	["buildTime"] = 97040
+	["buildTime"] = 187328
 }
 lumbermill[36] = {
 	["level"] = 36,
@@ -394,7 +394,7 @@ lumbermill[36] = {
 	["tools"] = 276,
 	["tiles"] = 276,
 	["pulley"] = 276,
-	["buildTime"] = 103376
+	["buildTime"] = 200697
 }
 lumbermill[37] = {
 	["level"] = 37,
@@ -405,7 +405,7 @@ lumbermill[37] = {
 	["tools"] = 340,
 	["tiles"] = 340,
 	["pulley"] = 340,
-	["buildTime"] = 109712
+	["buildTime"] = 214193
 }
 lumbermill[38] = {
 	["level"] = 38,
@@ -416,7 +416,7 @@ lumbermill[38] = {
 	["tools"] = 404,
 	["tiles"] = 404,
 	["pulley"] = 404,
-	["buildTime"] = 116048
+	["buildTime"] = 227815
 }
 lumbermill[39] = {
 	["level"] = 39,
@@ -427,7 +427,7 @@ lumbermill[39] = {
 	["tools"] = 468,
 	["tiles"] = 468,
 	["pulley"] = 468,
-	["buildTime"] = 122384
+	["buildTime"] = 241564
 }
 lumbermill[40] = {
 	["level"] = 40,
@@ -438,5 +438,5 @@ lumbermill[40] = {
 	["tools"] = 532,
 	["tiles"] = 532,
 	["pulley"] = 532,
-	["buildTime"] = 128720
+	["buildTime"] = 255440
 }

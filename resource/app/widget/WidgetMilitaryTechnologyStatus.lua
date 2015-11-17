@@ -8,7 +8,6 @@ local WidgetPushButton = import(".WidgetPushButton")
 local WidgetSpeedUp = import(".WidgetSpeedUp")
 local GameUIMilitaryTechSpeedUp = import("..ui.GameUIMilitaryTechSpeedUp")
 local Localize = import("..utils.Localize")
-local SoldierManager = import("..entity.SoldierManager")
 
 local WidgetMilitaryTechnologyStatus = class("WidgetMilitaryTechnologyStatus", function ()
     local node = display.newNode()
@@ -20,7 +19,6 @@ end)
 
 function WidgetMilitaryTechnologyStatus:ctor(building)
     self.building_type = building:GetType()
-    self.soldier_manager = City:GetSoldierManager()
     local width , height = 556,106
     -- 描述
     self.top_bg = display.newScale9Sprite("back_ground_398x97.png", 0, 0,cc.size(556,106),cc.rect(15,10,368,77))
@@ -55,7 +53,7 @@ function WidgetMilitaryTechnologyStatus:CreateUpgradingStatus()
     upgrading_node:setContentSize(cc.size(556,106))
     upgrading_node:addTo(self):align(display.CENTER)
     --进度条
-    local progress = WidgetProgress.new(UIKit:hex2c3b(0xffedae), nil, nil, {
+    local progress = WidgetProgress.new(0xffedae, nil, nil, {
         icon_bg = "back_ground_43x43.png",
         icon = "hourglass_30x38.png",
         bar_pos = {x = 0,y = 0}
@@ -69,16 +67,16 @@ function WidgetMilitaryTechnologyStatus:CreateUpgradingStatus()
         :addTo(upgrading_node)
 
     local upgrading_event
-    local soldier_manager = self.soldier_manager
-    if soldier_manager:IsUpgradingMilitaryTech(self.building_type) then
-        local military_tech_event = soldier_manager:GetLatestMilitaryTechEvents(self.building_type)
-        local soldier_star_event = soldier_manager:GetLatestSoldierStarEvents(self.building_type)
-        local tech_start_time = military_tech_event and military_tech_event:StartTime() or 0
-        local soldier_star_start_time = soldier_star_event and soldier_star_event:StartTime() or 0
-        upgrading_event = tech_start_time>soldier_star_start_time and military_tech_event or soldier_star_event
-        progress:SetProgressInfo(GameUtils:formatTimeStyle1(upgrading_event:GetTime()), upgrading_event:Percent(current_time))
+    local building_type = self.building_type
+    if User:HasMilitaryTechEventBy(building_type) then
+        upgrading_event = User:GetShortMilitaryTechEventBy(building_type)
+        local time, percent = UtilsForEvent:GetEventInfo(upgrading_event)
+        progress:SetProgressInfo(GameUtils:formatTimeStyle1(time), percent)
     end
-    local is_free = upgrading_event and upgrading_event:LeftTime()<= DataUtils:getFreeSpeedUpLimitTime()
+    local is_free = false
+    if upgrading_event then
+        is_free = UtilsForEvent:GetEventInfo(upgrading_event) <= DataUtils:getFreeSpeedUpLimitTime()
+    end
     local speed_up_btn = WidgetPushButton.new({normal = "green_btn_up_148x58.png",pressed = "green_btn_down_148x58.png"})
         :setButtonLabel(UIKit:ttfLabel({
             text = _("加速"),
@@ -86,7 +84,7 @@ function WidgetMilitaryTechnologyStatus:CreateUpgradingStatus()
             color = 0xffedae,
             shadow= true
         }))
-        :onButtonClicked(function (event)
+        :onButtonClicked(function (e)
             UIKit:newGameUI("GameUIMilitaryTechSpeedUp", self.event):AddToCurrentScene(true)
         end)
         :align(display.CENTER, 474, 44):addTo(upgrading_node)
@@ -98,9 +96,11 @@ function WidgetMilitaryTechnologyStatus:CreateUpgradingStatus()
             color = 0xffedae,
             shadow= true
         }))
-        :onButtonClicked(function (event)
-            if self.event:GetTime() > 2 then
-                NetManager:getFreeSpeedUpPromise(self.event:GetEventType(),self.event:Id())
+        :onButtonClicked(function (e)
+            local event = self.event
+            local time, percent = UtilsForEvent:GetEventInfo(event)
+            if time > 2 then
+                NetManager:getFreeSpeedUpPromise(User:EventType(event),self.event.id)
             end
         end)
         :align(display.CENTER, 474, 44):addTo(upgrading_node)
@@ -123,28 +123,22 @@ function WidgetMilitaryTechnologyStatus:CreateUpgradingStatus()
     return upgrading_node
 end
 function WidgetMilitaryTechnologyStatus:RefreshTop()
+    local User = User
     local building_type = self.building_type
-    local soldier_manager = self.soldier_manager
-    local military_tech_event = soldier_manager:GetLatestMilitaryTechEvents(building_type)
-    local soldier_star_event = soldier_manager:GetLatestSoldierStarEvents(building_type)
-    if soldier_manager:IsUpgradingMilitaryTech(building_type) then
-        local upgrade_node = self.upgrading_node
-        upgrade_node:setVisible(true)
+
+    if User:HasMilitaryTechEventBy(building_type) then
+        self.event = User:GetShortMilitaryTechEventBy(building_type)
+        local event = self.event
+        local upgrade_node = self.upgrading_node:show()
+        if User:IsMilitaryTechEvent(event) then
+            local str = UtilsForEvent:GetMilitaryTechEventLocalize(event.name, User:GetMilitaryTechLevel(event.name))
+            upgrade_node:SetUpgradeTip(str)
+        end
+        if User:IsSoldierStarEvent(event) then
+            local star = User:SoldierStarByName(event.name)
+            upgrade_node:SetUpgradeTip(string.format(_("晋升%s的星级 star %d"),Localize.soldier_name[event.name],star + 1))
+        end
         self.normal_node:setVisible(false)
-        local tech_start_time = military_tech_event and military_tech_event:StartTime() or 0
-        local soldier_star_start_time = soldier_star_event and soldier_star_event:StartTime() or 0
-        local event = tech_start_time>soldier_star_start_time and military_tech_event or soldier_star_event
-        self.event = event
-        if military_tech_event == event then
-            upgrade_node:SetUpgradeTip(military_tech_event:GetLocalizeDesc())
-            self.event.type = "militaryTechEvents"
-        end
-        if soldier_star_event == event then
-            local name = soldier_star_event:Name()
-            local star = soldier_manager:GetStarBySoldierType(name)
-            upgrade_node:SetUpgradeTip(string.format(_("晋升%s的星级 star %d"),Localize.soldier_name[name],star+1))
-            self.event.type = "soldierStarEvents"
-        end
     else
         self.normal_node:setVisible(true)
         self.upgrading_node:setVisible(false)
@@ -152,37 +146,32 @@ function WidgetMilitaryTechnologyStatus:RefreshTop()
     end
 end
 function WidgetMilitaryTechnologyStatus:onEnter()
-    local soldier_manager = self.soldier_manager
-    -- 添加到全局计时器中，以便显示各个阶段的时间
-    app.timer:AddListener(self)
-    soldier_manager:AddListenOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
-    soldier_manager:AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+    User:AddListenOnType(self, "militaryTechEvents")
+    User:AddListenOnType(self, "soldierStarEvents")
+    scheduleAt(self, function()
+        local event = User:GetShortMilitaryTechEventBy(self.building_type)
+        if event then
+            local time, percent = UtilsForEvent:GetEventInfo(event)
+            self.upgrading_node:SetProgressInfo(
+                GameUtils:formatTimeStyle1(time),
+                percent,
+                time <= DataUtils:getFreeSpeedUpLimitTime()
+            )
+        end
+    end)
 end
 function WidgetMilitaryTechnologyStatus:onExit()
-    local soldier_manager = self.soldier_manager
-    app.timer:RemoveListener(self)
-    soldier_manager:RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
-    soldier_manager:RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+    User:AddListenOnType(self, "soldierStarEvents")
+    User:AddListenOnType(self, "militaryTechEvents")
 end
-function WidgetMilitaryTechnologyStatus:OnTimer(current_time)
-    local building_type = self.building_type
-    local soldier_manager = self.soldier_manager
-    local military_tech_event = soldier_manager:GetLatestMilitaryTechEvents(building_type)
-    local soldier_star_event = soldier_manager:GetLatestSoldierStarEvents(building_type)
-    local tech_start_time = military_tech_event and military_tech_event:StartTime() or 0
-    local soldier_star_start_time = soldier_star_event and soldier_star_event:StartTime() or 0
-    local event = tech_start_time>soldier_star_start_time and military_tech_event or soldier_star_event
-    if event then
-        self.upgrading_node:SetProgressInfo(GameUtils:formatTimeStyle1(event:GetTime()), event:Percent(current_time),event:GetTime()<=DataUtils:getFreeSpeedUpLimitTime())
-    end
-end
-function WidgetMilitaryTechnologyStatus:OnMilitaryTechEventsChanged(soldier_manager,changed_map)
+function WidgetMilitaryTechnologyStatus:OnUserDataChanged_soldierStarEvents(userData, deltaData)
     self:RefreshTop()
 end
-function WidgetMilitaryTechnologyStatus:OnSoldierStarEventsChanged( soldier_manager,changed_map )
+function WidgetMilitaryTechnologyStatus:OnUserDataChanged_militaryTechEvents(userData, deltaData)
     self:RefreshTop()
 end
 return WidgetMilitaryTechnologyStatus
+
 
 
 

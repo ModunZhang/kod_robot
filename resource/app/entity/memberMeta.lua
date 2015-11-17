@@ -1,6 +1,7 @@
 local Enum = import("..utils.Enum")
 local property = import("..utils.property")
 local allianceRight = GameDatas.ClientInitGame.allianceRight
+local right = GameDatas.AllianceInitData.right
 local memberMeta = {}
 memberMeta.__index = memberMeta
 
@@ -241,6 +242,9 @@ function memberMeta:CanBuyAdvancedItemsFromAllianceShop()
 end
 function memberMeta:CanActivateAllianceRevenge()
     return allianceRight[self:Title()].CanActivateAllianceRevenge
+end
+function memberMeta:CanMoveAlliance()
+    return right[self:Title()].moveAlliance
 end
 
 return memberMeta

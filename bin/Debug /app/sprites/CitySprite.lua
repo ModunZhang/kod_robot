@@ -7,8 +7,8 @@ local CitySprite = class("CitySprite", WithInfoSprite)
 
 
 local timer = app.timer
-function CitySprite:ctor(city_layer, entity, is_my_alliance)
-    CitySprite.super.ctor(self, city_layer, entity, is_my_alliance)
+function CitySprite:ctor(...)
+    CitySprite.super.ctor(self, ...)
     self:CheckStatus()
 end
 function CitySprite:GetSpriteFile()
@@ -21,7 +21,7 @@ function CitySprite:GetConfig()
     else
         config = SpriteConfig["other_keep"]
     end
-    return config:GetConfigByLevel(self:GetEntity():GetAllianceMemberInfo():KeepLevel())
+    return config:GetConfigByLevel(self:GetMemberInfo():KeepLevel())
 end
 function CitySprite:GetSpriteOffset()
     return self:GetLogicMap():ConvertToLocalPosition(0, 0)
@@ -35,13 +35,12 @@ function CitySprite:RefreshInfo()
     self:CheckStatus()
 end
 function CitySprite:GetInfo()
-    local entity = self:GetEntity()
-    local info = entity:GetAllianceMemberInfo()
+    local info = self:GetMemberInfo()
     local banners = self.is_my_alliance and UILib.my_city_banner or UILib.enemy_city_banner
-    return info:KeepLevel(), string.format("[%s]%s", entity:GetAlliance():Tag(), info:Name()), banners[info:HelpedByTroopsCount()]
+    return info:KeepLevel(), string.format("[%s]%s", self.alliance.basicInfo.tag, info:Name()), banners[info:HelpedByTroopsCount()]
 end
 function CitySprite:CheckStatus()
-    local memberInfo = self:GetEntity():GetAllianceMemberInfo()
+    local memberInfo = self:GetMemberInfo()
     if memberInfo:IsProtected() then
         if self:getChildByTag(SMOKE_TAG) then
             self:removeChildByTag(SMOKE_TAG)
@@ -66,6 +65,9 @@ function CitySprite:CheckStatus()
             end
         end
     end
+end
+function CitySprite:GetMemberInfo()
+    return self.alliance:GetMemberByMapObjectsId(self:GetEntity().id)
 end
 
 

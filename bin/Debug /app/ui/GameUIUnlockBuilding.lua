@@ -7,7 +7,6 @@ local Localize = import("..utils.Localize")
 local window = import("..utils.window")
 local cocos_promise = import("..utils.cocos_promise")
 local promise = import("..utils.promise")
-local MaterialManager = import("..entity.MaterialManager")
 local SpriteConfig = import("..sprites.SpriteConfig")
 
 
@@ -20,17 +19,10 @@ function GameUIUnlockBuilding:ctor( city, tile )
     self.building = city:GetBuildingByLocationId(tile.location_id)
     self:setNodeEventEnabled(true)
     self:Init()
-    self.city:GetResourceManager():AddObserver(self)
-
     self.__type  = UIKit.UITYPE.BACKGROUND
-end
-function GameUIUnlockBuilding:OnResourceChanged(resource_manager)
-    self:SetUpgradeRequirementListview()
-end
-function GameUIUnlockBuilding:onEnter()
-end
-function GameUIUnlockBuilding:onExit()
-    self.city:GetResourceManager():RemoveObserver(self)
+    scheduleAt(self, function()
+        self:SetUpgradeRequirementListview()
+    end)
 end
 function GameUIUnlockBuilding:Init()
     -- bg
@@ -151,37 +143,40 @@ function GameUIUnlockBuilding:InitBuildingIntroduces()
     local title_bg = display.newScale9Sprite("title_blue_430x30.png", display.cx-110, display.top-214,cc.size(380,30),cc.rect(15,10,400,10))
         :align(display.LEFT_CENTER)
         :addTo(self)
-    self.building_name = UIKit:ttfLabel({
+    local bd = Localize.building_name
+    local building_name = UIKit:ttfLabel({
+        text = bd[self.building:GetType()],
         size = 24,
         color = 0xffedae
     }):align(display.LEFT_CENTER,20, 15):addTo(title_bg)
-    self.building_introduces = UIKit:ttfLabel({
-        size = 20,
-        dimensions = cc.size(380, 90),
-        color = 0x615b44
-    }):align(display.LEFT_CENTER,display.cx-110, display.top-280):addTo(self)
-    self:SetBuildingName()
-    self:SetBuildingIntroduces()
-end
-function GameUIUnlockBuilding:SetBuildingName()
-    local bd = Localize.building_name
-    self.building_name:setString(bd[self.building:GetType()])
-end
-function GameUIUnlockBuilding:SetBuildingIntroduces()
+
+    local list = UIListView.new{
+        -- bgColor = UIKit:hex2c4b(0x7a000000),
+        viewRect = cc.rect(26,20,360,104),
+        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
+    }:align(display.LEFT_CENTER,display.cx-116, display.top-354):addTo(self)
     local bd = Localize.building_description
-    self.building_introduces:setString(bd[self.building:GetType()])
+    local building_introduces = UIKit:ttfLabel({
+        text = bd[self.building:GetType()],
+        size = 20,
+        dimensions = cc.size(350, 0),
+        color = 0x615b44
+    })
+    local item = list:newItem()
+    item:setItemSize(building_introduces:getContentSize().width, building_introduces:getContentSize().height)
+    item:addContent(building_introduces)
+    list:addItem(item)
+    list:reload()
 end
-
-
 
 function GameUIUnlockBuilding:SetUpgradeRequirementListview()
-    local wood = City.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local iron = City.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local stone = City.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local population = City.resource_manager:GetCitizenResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local User = User
+    local wood = User:GetResValueByType("wood")
+    local iron = User:GetResValueByType("iron")
+    local stone = User:GetResValueByType("stone")
     local building = self.building
 
-    local has_materials =City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.BUILD)
+    local has_materials = User.buildingMaterials
     local pre_condition = building:IsBuildingUpgradeLegal()
     local requirements = {
         {
@@ -195,9 +190,9 @@ function GameUIUnlockBuilding:SetUpgradeRequirementListview()
         {
             resource_type = _("建造队列"),
             isVisible = true,
-            isSatisfy = #City:GetUpgradingBuildings()<City:BuildQueueCounts(),
+            isSatisfy = #City:GetUpgradingBuildings() < User.basicInfo.buildQueue,
             icon="hammer_33x40.png",
-            description=_("建造队列")..(City:BuildQueueCounts()-#City:GetUpgradingBuildings()).."/"..1
+            description=_("建造队列")..(User.basicInfo.buildQueue-#City:GetUpgradingBuildings()).."/"..1
         },
         {
             resource_type = _("木材"),
@@ -266,7 +261,7 @@ end
 function GameUIUnlockBuilding:PopNotSatisfyDialog(listener,can_not_update_type)
     local dialog = UIKit:showMessageDialog()
     local required_gems =self.building:getUpgradeRequiredGems()
-    local owen_gem = City:GetUser():GetGemResource():GetValue()
+    local owen_gem = City:GetUser():GetGemValue()
     if can_not_update_type==UpgradeBuilding.NOT_ABLE_TO_UPGRADE.RESOURCE_NOT_ENOUGH then
         dialog:CreateOKButtonWithPrice(
             {

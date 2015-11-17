@@ -9,7 +9,6 @@ local WidgetSoldierDetails = import('..widget.WidgetSoldierDetails')
 local WidgetUIBackGround = import('..widget.WidgetUIBackGround')
 local UIScrollView = import(".UIScrollView")
 local UILib = import(".UILib")
-local SoldierManager = import('..entity.SoldierManager')
 local Corps = import(".Corps")
 
 local GameUIHelpDefence = UIKit:createUIClass("GameUIHelpDefence", "GameUIWithCommonHeader")
@@ -67,7 +66,7 @@ function GameUIHelpDefence:OnMoveInStage()
     local soldiers = self.soldiers
     for i,soldier in ipairs(soldiers) do
         local soldier_level = soldier.star
-        local soldier_config = self.city:GetSoldierManager():GetSoldierConfig(soldier.name)
+        local soldier_config = self.city:GetUser():GetSoldierConfig(soldier.name)
         local soldier_number = soldier.count
         table.insert(soldier_show_table, {
             soldier_type = soldier.name,
@@ -98,7 +97,7 @@ function GameUIHelpDefence:CreateSoldierNode()
         iceField = "battle_bg_iceField_611x275.png",
         grassLand = "battle_bg_grass_611x275.png"
     }
-    local land_bg = land_image[User:Terrain()]
+    local land_bg = land_image[User.basicInfo.terrain]
     display.newSprite(land_bg)
         :align(display.LEFT_BOTTOM,window.cx-304, window.top_bottom-250):addTo(view)
     TroopShow.offset_x = 0
@@ -314,10 +313,6 @@ function GameUIHelpDefence:DragonPart()
     }):align(display.RIGHT_CENTER,416,60)
         :addTo(box_bg)
 
-    local equi = {}
-    for k,v in pairs(dragon.equipments) do
-        equi[v.type] = {name = v.name,star = v.star}
-    end
     -- 龙力量
     UIKit:ttfLabel({
         text = _("力量"),
@@ -326,7 +321,7 @@ function GameUIHelpDefence:DragonPart()
     }):align(display.LEFT_CENTER,10,30)
         :addTo(box_bg)
     local dragon_power = UIKit:ttfLabel({
-        text = string.formatnumberthousands(DataUtils:getDragonTotalStrengthFromJson(dragon.star,dragon.level,dragon.skills,equi)),
+        text = string.formatnumberthousands(DataUtils:getDragonTotalStrengthFromJson(dragon.star,dragon.level,dragon.skills,dragon.equipments)),
         size = 20,
         color = 0x514d3e,
     }):align(display.RIGHT_CENTER,416,30)

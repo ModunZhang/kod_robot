@@ -49,12 +49,18 @@ function WidgetAllianceTop:onEnter()
     self:CreateBtnsPageItem()
     self:CreateResourcesPageItem()
     pv:reload()
-    City:GetResourceManager():AddObserver(self)
-    City:GetResourceManager():OnResourceChanged()
     self.auto_change_page = scheduler.scheduleGlobal(handler(self, self.Change), 20.0, false)
+
+    scheduleAt(self, function()
+        local User = User
+        self.wood_label:setString(GameUtils:formatNumber(User:GetResValueByType("wood")))
+        self.food_label:setString(GameUtils:formatNumber(User:GetResValueByType("food")))
+        self.iron_label:setString(GameUtils:formatNumber(User:GetResValueByType("iron")))
+        self.stone_label:setString(GameUtils:formatNumber(User:GetResValueByType("stone")))
+        self.coin_label:setString(GameUtils:formatNumber(User:GetResValueByType("coin")))
+    end)
 end
 function WidgetAllianceTop:onExit()
-    City:GetResourceManager():RemoveObserver(self)
     if self.auto_change_page then
         scheduler.unscheduleGlobal(self.auto_change_page)
     end
@@ -128,7 +134,7 @@ function WidgetAllianceTop:CreateBtnsPageItem()
         :addTo(honour_btn)
     self.honour_label = UIKit:ttfLabel(
         {
-            text = GameUtils:formatNumber(alliance:Honour()),
+            text = GameUtils:formatNumber(alliance.basicInfo.honour),
             size = 18,
             color = 0xf5e8c4
         }):align(display.LEFT_CENTER, 0,-8)
@@ -188,7 +194,7 @@ function WidgetAllianceTop:CreateBtnsPageItem()
         :addTo(coordinate_btn)
     self.coordinate_label = UIKit:ttfLabel(
         {
-            text = "23,21",
+            text = "",
             size = 18,
             color = 0xf5e8c4
         }):align(display.LEFT_CENTER, -15, coordinate_btn:getContentSize().height/2-10)
@@ -236,19 +242,6 @@ function WidgetAllianceTop:CreateResourcesPageItem()
     end
 end
 
-function WidgetAllianceTop:OnResourceChanged(resource_manager)
-    local server_time = app.timer:GetServerTime()
-    local wood_number = resource_manager:GetWoodResource():GetResourceValueByCurrentTime(server_time)
-    local food_number = resource_manager:GetFoodResource():GetResourceValueByCurrentTime(server_time)
-    local iron_number = resource_manager:GetIronResource():GetResourceValueByCurrentTime(server_time)
-    local stone_number = resource_manager:GetStoneResource():GetResourceValueByCurrentTime(server_time)
-    local coin_number = resource_manager:GetCoinResource():GetResourceValueByCurrentTime(server_time)
-    self.wood_label:setString(GameUtils:formatNumber(wood_number))
-    self.food_label:setString(GameUtils:formatNumber(food_number))
-    self.iron_label:setString(GameUtils:formatNumber(iron_number))
-    self.stone_label:setString(GameUtils:formatNumber(stone_number))
-    self.coin_label:setString(GameUtils:formatNumber(coin_number))
-end
 function WidgetAllianceTop:UIAllianceContributeClose()
     self.auto_change_page = scheduler.scheduleGlobal(handler(self, self.Change), 20.0, false)
     self.uiAllianceContribute:RemoveIsOpenObserver(self)

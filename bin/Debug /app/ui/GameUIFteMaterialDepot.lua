@@ -1,7 +1,6 @@
 local GameUINpc = import("..ui.GameUINpc")
 local promise = import("..utils.promise")
 local cocos_promise = import("..utils.cocos_promise")
-local MaterialManager = import("..entity.MaterialManager")
 local GameUIFteMaterialDepot = UIKit:createUIClass("GameUIFteMaterialDepot", "GameUIMaterialDepot")
 function GameUIFteMaterialDepot:ctor(...)
     GameUIFteMaterialDepot.super.ctor(self,...)
@@ -13,7 +12,7 @@ end
 local mockData = import("..fte.mockData")
 local WidgetFteArrow = import("..widget.WidgetFteArrow")
 function GameUIFteMaterialDepot:Find()
-	return self.info_layer.material_box_table[MaterialManager.MATERIAL_TYPE.SOLDIER]["soulStone"]:GetButton()
+	return self.info_layer.material_box_table["soldierMaterials"]["soulStone"]:GetButton()
 end
 function GameUIFteMaterialDepot:PromiseOfFte()
 	self.info_layer.material_listview:getScrollNode():setTouchEnabled(false)
@@ -25,7 +24,7 @@ function GameUIFteMaterialDepot:PromiseOfFte()
         self:GetFteLayer():removeFromParent()
         self:GetFteLayer()
 
-        local ui = UIKit:newWidgetUI("WidgetMaterialDetails",MaterialManager.MATERIAL_TYPE.SOLDIER,"soulStone",0):AddToCurrentScene()
+        local ui = UIKit:newWidgetUI("WidgetMaterialDetails", "soldierMaterials","soulStone",0):AddToCurrentScene()
         ui.__type = UIKit.UITYPE.BACKGROUND
 
         ui:Find().button:removeEventListenersByEvent("CLICKED_EVENT")

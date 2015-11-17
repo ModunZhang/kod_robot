@@ -12,8 +12,8 @@ function WidgetInfoWithTitle:ctor(params)
     self.height = height
     self:setContentSize(cc.size(width,height))
     self.info_bg = display.newScale9Sprite("back_ground_540x64.png",0 , 0,cc.size(width - 8 ,height - 50),cc.rect(15,10,510,44))
-            :align(display.LEFT_BOTTOM)
-            :addTo(self)
+        :align(display.LEFT_BOTTOM)
+        :addTo(self)
     local title_bg = display.newSprite("alliance_evnets_title_548x50.png"):align(display.LEFT_TOP, -4, height):addTo(self.info_bg)
 
     UIKit:ttfLabel({
@@ -23,7 +23,7 @@ function WidgetInfoWithTitle:ctor(params)
     }):align(display.CENTER,title_bg:getContentSize().width/2, title_bg:getContentSize().height/2)
         :addTo(title_bg)
     self.info_listview = UIListView.new{
-        viewRect = cc.rect(9, 10, 524, height-66),
+        viewRect = cc.rect(9, 10, width -26, height-66),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }:addTo(self.info_bg)
 
@@ -44,7 +44,7 @@ function WidgetInfoWithTitle:CreateInfoItems(info_message)
     self.info_listview:removeAllItems()
     local meetFlag = true
 
-    local item_width, item_height = self.width-8,40
+    local item_width, item_height = self.width-10,40
     for k,v in pairs(info_message) do
         local item = self.info_listview:newItem()
         item:setItemSize(item_width, item_height)
@@ -59,11 +59,20 @@ function WidgetInfoWithTitle:CreateInfoItems(info_message)
             color = 0x615b44,
         }):align(display.LEFT_CENTER, 20, item_height/2):addTo(content)
 
-        local text_2 = UIKit:ttfLabel({
-            text = v[2],
-            size = 20,
-            color = 0x403c2f,
-        }):align(display.RIGHT_CENTER, item_width-20, item_height/2):addTo(content)
+        local text_2
+        if tolua.type(v[2]) == "table" then
+            text_2 = UIKit:ttfLabel({
+                text = v[2][1],
+                size = 20,
+                color = v[2][2],
+            }):align(display.RIGHT_CENTER, item_width-20, item_height/2):addTo(content)
+        else
+            text_2 = UIKit:ttfLabel({
+                text = v[2],
+                size = 20,
+                color = 0x403c2f,
+            }):align(display.RIGHT_CENTER, item_width-20, item_height/2):addTo(content)
+        end
 
         if v[3] then
             display.newSprite(v[3]):align(display.RIGHT_CENTER, item_width-15, item_height/2):addTo(content)
@@ -80,6 +89,7 @@ function WidgetInfoWithTitle:GetListView()
     return self.info_listview
 end
 return WidgetInfoWithTitle
+
 
 
 

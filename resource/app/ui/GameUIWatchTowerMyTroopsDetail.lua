@@ -21,16 +21,16 @@ local titles = {
     TECHNOLOGY = _("军事科技水平"),
     BUFF_EFFECT = _("战争增益"),
 }
-function GameUIWatchTowerMyTroopsDetail:ctor(entity)
+function GameUIWatchTowerMyTroopsDetail:ctor(event, eventType)
     GameUIWatchTowerMyTroopsDetail.super.ctor(self)
     self.dragon_manager = City:GetDragonEyrie():GetDragonManager()
-    self.entity = entity
-    self.data = clone(entity:WithObject())
+    self.event = event
+    self.eventType = eventType
+    self.data = nil
 end
 
 
 function GameUIWatchTowerMyTroopsDetail:GetDragon()
-
     local dragon_type = self:GetData().dragon.type
     return self.dragon_manager:GetDragon(dragon_type)
 end
@@ -64,7 +64,7 @@ function GameUIWatchTowerMyTroopsDetail:onEnter()
         viewRect = cc.rect(10, 12, 548,624),
         direction = UIScrollView.DIRECTION_VERTICAL,
     }:addTo(listBg)
-    if self:GetEntity():GetTypeStr() == 'HELPTO' then
+    if self.eventType == "helpToTroops" then
         self:RequestPlayerHelpedByTroops()
     else
         self:RefreshListView()
@@ -72,57 +72,45 @@ function GameUIWatchTowerMyTroopsDetail:onEnter()
 end
 
 function GameUIWatchTowerMyTroopsDetail:RequestPlayerHelpedByTroops()
-    NetManager:getHelpDefenceTroopDetailPromise(self:GetData().beHelpedPlayerData.id,User:Id()):done(function(response)
+    NetManager:getHelpDefenceTroopDetailPromise(self.event.beHelpedPlayerData.id, User._id):done(function(response)
         self.data = response.msg.troopDetail
         self:RefreshListView()
     end)
 end
 
 function GameUIWatchTowerMyTroopsDetail:GetData()
-    local type_str = self:GetEntity():GetTypeStr()
-    if	type_str == 'MARCH_OUT'
-        or type_str == 'MARCH_RETURN'
-        or type_str == 'STRIKE_OUT'
-        or type_str == 'STRIKE_RETURN' then
-
-        return self.data.attackPlayerData
-    elseif type_str == 'COLLECT' then
-        return self.data.playerData
-    elseif type_str == 'SHIRNE' then
-        for __,v in ipairs(self:GetEntity():WithObject().playerTroops) do
-            if v.id == User:Id() then
+    if self.eventType == "strikeMarchEvents"
+    or self.eventType == "strikeMarchReturnEvents"
+    or self.eventType == "attackMarchEvents"
+    or self.eventType == "attackMarchReturnEvents"
+    then
+        return self.event.attackPlayerData
+    elseif self.eventType == "villageEvents" then
+        return self.event.playerData
+    elseif self.eventType == "shrineEvents" then
+        for __,v in ipairs(self.event.playerTroops) do
+            if v.id == User._id then
                 self.data = clone(v)
                 break
             end
         end
         return self.data
-    else
+    elseif self.eventType == "helpToTroops" then
         return self.data
     end
-end
-
-function GameUIWatchTowerMyTroopsDetail:GetEntity()
-    return self.entity
-end
-
-function GameUIWatchTowerMyTroopsDetail:onCleanup()
-    self.data = nil
-    self.entity = nil
-    self.dragon_manager = nil
-    GameUIWatchTowerMyTroopsDetail.super.onCleanup(self)
 end
 
 function GameUIWatchTowerMyTroopsDetail:RefreshListView()
     self.listView:removeAllItems()
     local item = self:GetItem(self.ITEM_TYPE.DRAGON_INFO,self:GetData())
     self.listView:addItem(item)
-    local type_str = self:GetEntity():GetTypeStr()
     item = self:GetItem(self.ITEM_TYPE.SOLIDERS,self:GetData())
     self.listView:addItem(item)
     self.listView:reload()
 end
 
 function GameUIWatchTowerMyTroopsDetail:GetItem(ITEM_TYPE,item_data)
+    local User = User
     local item = self.listView:newItem()
     local height,sub_line = 0,0
     if ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO then
@@ -181,7 +169,7 @@ function GameUIWatchTowerMyTroopsDetail:GetItem(ITEM_TYPE,item_data)
             local y = 0
             for i,v in ipairs(item_data.soldiers) do
                 local name = Localize.soldier_name[v.name]
-                self:GetSubItem(ITEM_TYPE,i,{name,v.count,v.star or City:GetSoldierManager():GetStarBySoldierType(v.name)}):addTo(bg):align(display.LEFT_BOTTOM,0, y)
+                self:GetSubItem(ITEM_TYPE,i,{name,v.count,v.star or User:SoldierStarByName(v.name)}):addTo(bg):align(display.LEFT_BOTTOM,0, y)
                 y = y + 36
             end
         end

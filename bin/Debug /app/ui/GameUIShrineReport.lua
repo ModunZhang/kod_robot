@@ -39,7 +39,7 @@ function GameUIShrineReport:ctor(shrineReport)
     GameUIShrineReport.super.ctor(self,750,_("事件详情"),window.top - 82)
     self.shrineReport_ = shrineReport
     self:adapterFightDataToListView()
-    self.stageConfig = config_shrineStage[self:GetShrineReport():StageName()]
+    self.stageConfig = config_shrineStage[self:GetShrineReport().stageName]
 end
 
 function GameUIShrineReport:onEnter()
@@ -235,7 +235,7 @@ function GameUIShrineReport:fillFightItemContent(item_content,list_data,item,ite
 end
 function GameUIShrineReport:adapterFightDataToListView()
     local data_source = {}
-    for i,rounds in ipairs(self:GetShrineReport():FightDatas()) do
+    for i,rounds in ipairs(self:GetShrineReport().fightDatas) do
         table.insert(data_source,{type = 1,data = i,index = i})
         for j,r_data in ipairs(rounds.roundDatas) do
             local data = r_data
@@ -246,14 +246,14 @@ function GameUIShrineReport:adapterFightDataToListView()
         end
     end
     self.data_source = data_source
-    self.player_data_source = clone(self:GetShrineReport():PlayerDatas())
+    self.player_data_source = clone(self:GetShrineReport().playerDatas)
 end
 
 function GameUIShrineReport:OnRePlayClicked(idx)
     local list_data = self.data_source[idx]
     if list_data and list_data.type == 2 then
         local roundData = list_data.data
-        UIKit:newGameUI("GameUIReplayNew",self:GetShrineReport():GetFightReportObjectWithJson(roundData)):AddToCurrentScene(true)
+        UIKit:newGameUI("GameUIReplayNew", UtilsForShrine:GetFightReport(roundData)):AddToCurrentScene(true)
     end
 end
 
@@ -268,7 +268,7 @@ end
 function GameUIShrineReport:CreateIf_data_statistics()
     if self.data_statistics_node then return self.data_statistics_node end
     local data_statistics_node = display.newNode():addTo(self:GetBody())
-    local image = self:GetShrineReport():Star() > 0 and "report_victory_590x137.png" or "report_failure_590x137.png"
+    local image = self:GetShrineReport().star > 0 and "report_victory_590x137.png" or "report_failure_590x137.png"
     local logo = display.newSprite(image):align(display.LEFT_TOP, 20, 727):addTo(data_statistics_node)
     local layer = UIKit:shadowLayer():size(590,30):addTo(logo)
     logo:scale(0.96)
@@ -278,9 +278,13 @@ function GameUIShrineReport:CreateIf_data_statistics()
         size = 18,
         color = 0xffedae,
         shadow= true,
-    }):align(display.RIGHT_CENTER,honour_icon:getPositionX()-20,honour_icon:getPositionY()):addTo(layer)
+    }):align(display.
+    RIGHT_CENTER,honour_icon:getPositionX()-20,honour_icon:getPositionY()):addTo(layer)
+    local shrineStage = GameDatas.AllianceInitData.shrineStage
+    local key = string.format("star%dHonour", self:GetShrineReport().star)
+    
     UIKit:ttfLabel({
-        text = self:GetShrineReport():GetHonour() or 0,
+        text = shrineStage[self:GetShrineReport().stageName][key] or 0,
         size = 20,
         color = 0xffedae,
         shadow= true,
@@ -289,7 +293,7 @@ function GameUIShrineReport:CreateIf_data_statistics()
         max = 3,
         bg = "Stars_bar_bg.png",
         fill = "Stars_bar_highlight.png",
-        num = self:GetShrineReport():Star(),
+        num = self:GetShrineReport().star,
     }):addTo(logo):align(display.CENTER,295,120)
     self.data_statistics_node = data_statistics_node
     local viewRect = cc.rect(10,12,548,464)
@@ -447,6 +451,7 @@ function GameUIShrineReport:fillPlayerDataItemContent(content,list_data,item,idx
         local node = content[string.format("reward_bg%d",i)]
         if node and node.icon then
             if reward then
+                print("UIKit:GetItemImage(reward.type,reward.name)=",UIKit:GetItemImage(reward.type,reward.name),reward.type,reward.name)
                 node.icon:setTexture(UIKit:GetItemImage(reward.type,reward.name))
                 node.label:setString(string.format("x%d",reward.count))
                 node:show()

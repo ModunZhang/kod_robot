@@ -18,12 +18,13 @@ local ShrinePlayFightReport = class("ShrinePlayFightReport")
 local GameUIShrineReportInMail = UIKit:createUIClass("GameUIShrineReportInMail", "UIAutoClose")
 
 
-function GameUIShrineReportInMail:ctor(report)
+function GameUIShrineReportInMail:ctor(report,can_share)
     GameUIShrineReportInMail.super.ctor(self)
     self.body = WidgetUIBackGround.new({height=800}):align(display.TOP_CENTER,display.cx,display.top-100)
     self:addTouchAbleChild(self.body)
     self:setNodeEventEnabled(true)
     self.report = report
+    self.can_share = can_share
 end
 
 function GameUIShrineReportInMail:onEnter()
@@ -76,7 +77,7 @@ function GameUIShrineReportInMail:onEnter()
     local terrain = report:GetAttackTarget().terrain
     local war_result_label = UIKit:ttfLabel(
         {
-            text = string.format(_("战斗地形:%s(派出%s获得额外力量)"),Localize.terrain[terrain],terrain=="grassLand" and _("绿龙") or terrain=="desert" and _("红龙") or terrain=="iceField" and _("蓝龙")),
+            text = string.format(_("战斗地形:%s"),Localize.terrain[terrain]),
             size = 18,
             color = 0x615b44
         }):align(display.LEFT_CENTER, 20, rb_size.height-195)
@@ -99,45 +100,56 @@ function GameUIShrineReportInMail:onEnter()
 
 
 
-    -- 删除按钮
-    local delete_label = UIKit:ttfLabel({
-        text = _("删除"),
-        size = 20,
-        color = 0xfff3c7})
-    delete_label:enableShadow()
+    -- 分享战报按钮
+    if self.can_share then
+        -- 删除按钮
+        local delete_label = UIKit:ttfLabel({
+            text = _("删除"),
+            size = 20,
+            color = 0xfff3c7})
+        delete_label:enableShadow()
 
-    WidgetPushButton.new(
-        {normal = "red_btn_up_148x58.png", pressed = "red_btn_down_148x58.png"},
-        {scale9 = false}
-    ):setButtonLabel(delete_label)
-        :addTo(report_body):align(display.CENTER, 110, 40)
-        :onButtonClicked(function(event)
-            NetManager:getDeleteReportsPromise({report.id}):done(function ()
-                self:removeFromParent()
+        WidgetPushButton.new(
+            {normal = "red_btn_up_148x58.png", pressed = "red_btn_down_148x58.png"},
+            {scale9 = false}
+        ):setButtonLabel(delete_label)
+            :addTo(report_body):align(display.CENTER, 110, 40)
+            :onButtonClicked(function(event)
+                NetManager:getDeleteReportsPromise({report.id}):done(function ()
+                    self:removeFromParent()
+                end)
             end)
-        end)
-    -- 收藏按钮
-    local saved_button = UICheckBoxButton.new({
-        off = "mail_saved_button_normal.png",
-        off_pressed = "mail_saved_button_normal.png",
-        off_disabled = "mail_saved_button_normal.png",
-        on = "mail_saved_button_pressed.png",
-        on_pressed = "mail_saved_button_pressed.png",
-        on_disabled = "mail_saved_button_pressed.png",
-    }):onButtonStateChanged(function(event)
-        local target = event.target
-        if target:isButtonSelected() then
-            NetManager:getSaveReportPromise(report.id):fail(function(err)
-                target:setButtonSelected(false,true)
+        -- 收藏按钮
+        local saved_button = UICheckBoxButton.new({
+            off = "mail_saved_button_normal.png",
+            off_pressed = "mail_saved_button_normal.png",
+            off_disabled = "mail_saved_button_normal.png",
+            on = "mail_saved_button_pressed.png",
+            on_pressed = "mail_saved_button_pressed.png",
+            on_disabled = "mail_saved_button_pressed.png",
+        }):onButtonStateChanged(function(event)
+            local target = event.target
+            if target:isButtonSelected() then
+                NetManager:getSaveReportPromise(report.id):fail(function(err)
+                    target:setButtonSelected(false,true)
+                end)
+            else
+                NetManager:getUnSaveReportPromise(report.id):fail(function(err)
+                    target:setButtonSelected(true,true)
+                end)
+            end
+        end):addTo(report_body):pos(rb_size.width-48, 37)
+            :setButtonSelected(report:IsSaved(),true)
+        -- 分享战报按钮
+        local share_button = WidgetPushButton.new(
+            {normal = "tmp_blue_btn_up_64x56.png", pressed = "tmp_blue_btn_down_64x56.png"},
+            {scale9 = false}
+        ):addTo(report_body):align(display.CENTER, report_body:getContentSize().width-80, rb_size.height-186)
+            :onButtonClicked(function(event)
+                UIKit:newGameUI("GameUIShareReport", report):AddToCurrentScene()
             end)
-        else
-            NetManager:getUnSaveReportPromise(report.id):fail(function(err)
-                target:setButtonSelected(true,true)
-            end)
-        end
-    end):addTo(report_body):pos(rb_size.width-48, 37)
-        :setButtonSelected(report:IsSaved(),true)
-
+        display.newSprite("tmp_icon_share_24x34.png"):addTo(share_button)
+    end
 end
 
 function GameUIShrineReportInMail:GetBooty()
@@ -217,16 +229,16 @@ function GameUIShrineReportInMail:CreateWarStatisticsPart()
     local roundDatas = report:GetShrineRoundDatas()
 
     if LuaUtils:table_empty(roundDatas) then
-	    local war_s_label_item = self.details_view:newItem()
-	    war_s_label_item:setItemSize(540,40)
-	    local g = cc.ui.UIGroup.new()
-	    g:addWidget(UIKit:ttfLabel({
-	        text = _("由于你派兵过晚，未能成功参与本次圣地事件。") ,
-	        size = 22,
-	        color = 0x403c2f
-	    }):align(display.CENTER, 0, 0))
-	    war_s_label_item:addContent(g)
-	    self.details_view:addItem(war_s_label_item)
+        local war_s_label_item = self.details_view:newItem()
+        war_s_label_item:setItemSize(540,40)
+        local g = cc.ui.UIGroup.new()
+        g:addWidget(UIKit:ttfLabel({
+            text = _("由于你派兵过晚，未能成功参与本次圣地事件。") ,
+            size = 22,
+            color = 0x403c2f
+        }):align(display.CENTER, 0, 0))
+        war_s_label_item:addContent(g)
+        self.details_view:addItem(war_s_label_item)
     else
         for i,data in ipairs(roundDatas) do
             self:FightReportsData(i,data)
@@ -407,22 +419,22 @@ function GameUIShrineReportInMail:CreateArmyItem(title,troop,dragon,enemy_troop,
             {
                 bg_image = "back_ground_548x40_1.png",
                 title = _("部队"),
-                value = troopTotal,
+                value = string.formatnumberthousands(troopTotal),
             },
             {
                 bg_image = "back_ground_548x40_2.png",
                 title = _("存活"),
-                value = troopTotal-totalDamaged,
+                value = string.formatnumberthousands(troopTotal-totalDamaged),
             },
             {
                 bg_image = "back_ground_548x40_1.png",
                 title = _("伤兵"),
-                value = totalWounded,
+                value = string.formatnumberthousands(totalWounded),
             },
             {
                 bg_image = "back_ground_548x40_2.png",
                 title = _("被消灭"),
-                value = totalDamaged - totalWounded,
+                value = string.formatnumberthousands(totalDamaged - totalWounded),
                 color = 0x7e0000,
             },
             {
@@ -439,12 +451,12 @@ function GameUIShrineReportInMail:CreateArmyItem(title,troop,dragon,enemy_troop,
             dragon.expAdd and {
                 bg_image = "back_ground_548x40_1.png",
                 title = _("XP"),
-                value = "+"..dragon.expAdd ,
+                value = "+"..string.formatnumberthousands(dragon.expAdd) ,
             } or {},
             {
                 bg_image = "back_ground_548x40_2.png",
                 title = _("HP"),
-                value = dragon.hp.."/-"..dragon.hpDecreased,
+                value = string.formatnumberthousands(dragon.hp).."/-"..string.formatnumberthousands(dragon.hpDecreased),
             },
         }
     else
@@ -617,7 +629,7 @@ function GameUIShrineReportInMail:CreateSoldiersInfo(soldier,isSelf)
     local soldier_level = soldier.star
     local soldier_type = soldier.name
     local soldier_ui_config = isSelf and UILib.soldier_image[soldier_type][soldier_level] or UILib.black_soldier_image[soldier_type][soldier_level]
-    local color_bg = display.newSprite(UILib.soldier_color_bg_images[soldier_type])
+    local color_bg = display.newSprite(isSelf and UILib.soldier_color_bg_images[soldier_type] or UILib.black_soldier_color_bg_images[soldier_type])
         :scale(104/128)
         :align(display.LEFT_BOTTOM)
     local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER,color_bg:getContentSize().width/2,color_bg:getContentSize().height/2)
@@ -629,13 +641,13 @@ function GameUIShrineReportInMail:CreateSoldiersInfo(soldier,isSelf)
 
 
     UIKit:ttfLabel({
-        text = soldier.count,
+        text = string.formatnumberthousands(soldier.count),
         size = 18,
         color = 0x403c2f
     }):align(display.CENTER,soldier_head_bg:getContentSize().width/2, -14):addTo(soldier_head_bg)
         :scale(soldier_head_icon:getContentSize().height/104)
     UIKit:ttfLabel({
-        text = "-"..soldier.countDecreased ,
+        text = "-"..string.formatnumberthousands(soldier.countDecreased) ,
         size = 18,
         color = 0x980101
     }):align(display.CENTER,soldier_head_bg:getContentSize().width/2, -38):addTo(soldier_head_bg)
@@ -711,7 +723,7 @@ function ShrinePlayFightReport:formatOrderedAttackSoldiers()
         end
     end
     for index,v in ipairs(self.attackPlayerData.soldiers) do
-    	if not result[v.name] then
+        if not result[v.name] then
             result[v.name] = {name = v.name,star = v.star,count = v.count or 0,index = index}
         end
     end
@@ -730,7 +742,7 @@ function ShrinePlayFightReport:formatOrderedAttackSoldiers()
         end
     end
     for index,v in ipairs(self.defenceTroopData.soldiers) do
-    	if not result[v.name] then
+        if not result[v.name] then
             result[v.name] = {name = v.name,star = v.star,count = v.count or 0,index = index}
         end
     end
@@ -786,7 +798,7 @@ function ShrinePlayFightReport:GetAttackDragonLevel()
 end
 
 function ShrinePlayFightReport:GetAttackTargetTerrain()
-    return Alliance_Manager:GetMyAlliance():Terrain()
+    return Alliance_Manager:GetMyAlliance().basicInfo.terrain
 end
 
 function ShrinePlayFightReport:IsAttackCamp()
@@ -797,6 +809,7 @@ function ShrinePlayFightReport:GetDefenceDragonLevel()
 end
 
 return GameUIShrineReportInMail
+
 
 
 

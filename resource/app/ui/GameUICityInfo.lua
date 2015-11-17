@@ -72,7 +72,7 @@ function GameUICityInfo:CreateTop()
     local name_bg = display.newSprite("player_name_bg_168x30.png"):addTo(top_bg)
         :align(display.TOP_LEFT, ox, top_bg:getContentSize().height-10):setCascadeOpacityEnabled(true)
     self.name_label = cc.ui.UILabel.new({
-        text = self.user:Name(),
+        text = self.user.basicInfo.name,
         size = 18,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
@@ -93,7 +93,7 @@ function GameUICityInfo:CreateTop()
 
     -- 玩家战斗值数字
     self.power_label = UIKit:ttfLabel({
-        text = self.user:Power(),
+        text = string.formatnumberthousands(self.user.basicInfo.power),
         size = 20,
         color = 0xf3f0b6,
         shadow = true
@@ -139,7 +139,7 @@ function GameUICityInfo:CreateTop()
     local player_bg = display.newSprite("player_info_bg_120x120.png")
     :align(display.LEFT_BOTTOM, display.width>640 and 58 or 64, 10)
     :addTo(top_bg, 2):scale(110/120):setCascadeOpacityEnabled(true)
-    self.player_icon = UIKit:GetPlayerIconOnly(self.user:Icon())
+    self.player_icon = UIKit:GetPlayerIconOnly(self.user.basicInfo.icon)
     :addTo(player_bg):pos(60, 68):scale(0.78)
     self.exp = display.newProgressTimer("player_exp_bar_110x106.png", 
         display.PROGRESS_TIMER_RADIAL):addTo(player_bg):pos(55, 53)
@@ -147,7 +147,7 @@ function GameUICityInfo:CreateTop()
 
     local level_bg = display.newSprite("level_bg_72x19.png"):addTo(player_bg):pos(55, 18)
     self.level_label = UIKit:ttfLabel({
-        text = self.user:Level(),
+        text = self.user:GetLevel(),
         size = 14,
         color = 0xfff1cc,
         shadow = true,
@@ -163,7 +163,7 @@ function GameUICityInfo:CreateTop()
             --     UIKit:newGameUI('GameUIVip', City,"VIP"):AddToCurrentScene(true)
             -- end
         end)
-    local vip_btn_img = User:IsVIPActived() and "vip_bg_110x124.png" or "vip_bg_disable_110x124.png"
+    local vip_btn_img = self.user:IsVIPActived() and "vip_bg_110x124.png" or "vip_bg_disable_110x124.png"
     vip_btn:setButtonImage(cc.ui.UIPushButton.NORMAL, vip_btn_img, true)
     vip_btn:setButtonImage(cc.ui.UIPushButton.PRESSED, vip_btn_img, true)
     self.vip_level = display.newNode():addTo(vip_btn):pos(-3, 0):scale(0.8)

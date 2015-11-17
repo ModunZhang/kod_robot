@@ -81,7 +81,7 @@ function UIPageView:ctor(params)
     self.nBounce = params.nBounce or false -- 代国强 true 滑动不超出边界
     self.gap = params.gap or 20 -- 代国强 滑动距离设置
     self.speed_limit = params.speed_limit or 10 -- 代国强 滑动距离设置
-
+    self.continuous_touch = params.continuous_touch -- 代国强 是否能连续滑动
     self:setClippingRegion(self.viewRect_)
     -- self:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(...)
     --      self:update_(...)
@@ -387,7 +387,14 @@ function UIPageView:onTouch_(event)
         printInfo("UIPageView - touch didn't in viewRect")
         return false
     end
-
+    -- 是否不能连续滑动
+    if self.continuous_touch then
+        for i,v in ipairs(self.pages_) do
+            if v:getNumberOfRunningActions() > 0 then
+                return false
+            end
+        end
+    end
     if "began" == event.name then
         self.event__ = event
         self:stopAllTransition()
@@ -816,6 +823,7 @@ end
 
 
 return UIPageView
+
 
 
 

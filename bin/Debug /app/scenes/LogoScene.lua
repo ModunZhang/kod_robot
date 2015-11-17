@@ -2,12 +2,6 @@
 -- Author: dannyhe
 -- Date: 2014-08-05 17:34:54
 --
-require("app.ui.GameGlobalUIUtils")
-local UILib = import("app.ui.UILib")
-local GameUINpc = import("app.ui.GameUINpc")
-local WidgetFteArrow = import("app.widget.WidgetFteArrow")
-local WidgetFteMark = import("app.widget.WidgetFteMark")
-local WidgetDirectionSelect = import("app.widget.WidgetDirectionSelect")
 local LogoScene = class("LogoScene", function()
     return display.newScene("LogoScene")
 end)

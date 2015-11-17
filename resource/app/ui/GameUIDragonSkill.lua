@@ -181,7 +181,7 @@ end
 
 function GameUIDragonSkill:GetRequirements()
   local requirements = {}
-  local blood = City:GetResourceManager():GetBloodResource():GetValue()
+  local blood = User:GetResValueByType("blood")
   local cost = self.skill:GetBloodCost()
   table.insert(requirements,
   {
@@ -207,7 +207,7 @@ end
 
 function GameUIDragonSkill:CanUpgrade()
   local cost = self.skill:GetBloodCost()
-  local flag = City:GetResourceManager():GetBloodResource():GetValue() >= cost
+  local flag = User:GetResValueByType("blood") >= cost
   return flag and not self.skill:IsLocked()
 end
 

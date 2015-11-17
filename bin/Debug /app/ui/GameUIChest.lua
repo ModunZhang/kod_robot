@@ -8,9 +8,8 @@ local Localize_item = import("..utils.Localize_item")
 local window = import("..utils.window")
 local GameUIChest = UIKit:createUIClass("GameUIChest")
 
-function GameUIChest:ctor(item,awards,tips,ani)
+function GameUIChest:ctor(awards,tips,ani)
     GameUIChest.super.ctor(self)
-    self.item = item
     self.awards = awards
     self.tips = tips
     self.ani = ani

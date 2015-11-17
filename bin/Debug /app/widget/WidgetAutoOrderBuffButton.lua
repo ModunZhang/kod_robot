@@ -24,25 +24,24 @@ function WidgetAutoOrderBuffButton:ctor()
     local my_filter = filter
     local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
     grey_image:setFilter(filters)
-    grey_image:setVisible(not ItemManager:IsAnyItmeEventActive())
-    buff_button:opacity(ItemManager:IsAnyItmeEventActive() and 255 or 0)
+    grey_image:setVisible(not User:IsAnyItmeEventActive())
+    buff_button:opacity(User:IsAnyItmeEventActive() and 255 or 0)
 
     self.grey_image = grey_image
     self:setContentSize(buff_button:getCascadeBoundingBox().size)
     self:setAnchorPoint(cc.p(0.5,0.5))
 
-    self:OnItemEventChanged()
+    self:OnUserDataChanged_itemEvents()
 end
 
 function WidgetAutoOrderBuffButton:onEnter()
-    ItemManager:AddListenOnType(self,ItemManager.LISTEN_TYPE.ITEM_EVENT_CHANGED)
+    User:AddListenOnType(self, "itemEvents")
 end
-
 function WidgetAutoOrderBuffButton:onCleanup()
-    ItemManager:RemoveListenerOnType(self,ItemManager.LISTEN_TYPE.ITEM_EVENT_CHANGED)
+    User:RemoveListenerOnType(self, "itemEvents")
 end
-function WidgetAutoOrderBuffButton:OnItemEventChanged()
-    if ItemManager:IsAnyItmeEventActive() then
+function WidgetAutoOrderBuffButton:OnUserDataChanged_itemEvents()
+    if User:IsAnyItmeEventActive() then
         if not self.buff_button:getChildByTag(321) then
             fire_circle():addTo(self.buff_button, -1000, 321)
         end
@@ -51,8 +50,8 @@ function WidgetAutoOrderBuffButton:OnItemEventChanged()
             self.buff_button:removeChildByTag(321)
         end
     end
-    self.grey_image:setVisible(not ItemManager:IsAnyItmeEventActive())
-    self.buff_button:opacity(ItemManager:IsAnyItmeEventActive() and 255 or 0)
+    self.grey_image:setVisible(not User:IsAnyItmeEventActive())
+    self.buff_button:opacity(User:IsAnyItmeEventActive() and 255 or 0)
 end
 -- For WidgetAutoOrder
 function WidgetAutoOrderBuffButton:CheckVisible()

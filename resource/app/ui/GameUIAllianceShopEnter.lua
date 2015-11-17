@@ -15,7 +15,7 @@ function GameUIAllianceShopEnter:GetUITitle()
 end
 
 function GameUIAllianceShopEnter:GetBuildingImage()
-    return UILib.alliance_building.shop
+    return self.isMyAlliance and UILib.alliance_building.shop or UILib.other_alliance_building.shop
 end
 
 function GameUIAllianceShopEnter:GetBuildingType()
@@ -38,7 +38,7 @@ function GameUIAllianceShopEnter:GetBuildingInfo()
             {"50",0x403c2f},
         }
 
-        if Alliance_Manager:GetMyAlliance():GetItemsManager():IsNewGoodsCome() then
+        if Alliance_Manager:GetMyAlliance().isNewGoodsCome then
             local label_3 =
                 {
                     {_("有新的货物补充"),0x007c23}

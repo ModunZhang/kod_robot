@@ -6,16 +6,15 @@ local GameUIAllianceVillageEnter = UIKit:createUIClass("GameUIAllianceVillageEnt
 local Localize = import("..utils.Localize")
 local VillageEvent = import("..entity.VillageEvent")
 local GameUIStrikePlayer = import(".GameUIStrikePlayer")
-local WidgetAllianceEnterButtonProgress = import("..widget.WidgetAllianceEnterButtonProgress")
 local SpriteConfig = import("..sprites.SpriteConfig")
 local UILib = import(".UILib")
 local BelvedereEntity = import("..entity.BelvedereEntity")
 
-function GameUIAllianceVillageEnter:ctor(building,isMyAlliance,my_alliance,enemy_alliance)
-    GameUIAllianceVillageEnter.super.ctor(self,building,isMyAlliance,my_alliance)
-    self.enemy_alliance = enemy_alliance
-    self.village_info = building:GetAllianceVillageInfo()
-    self.map_id = building:Id()
+function GameUIAllianceVillageEnter:ctor(building,alliance)
+    GameUIAllianceVillageEnter.super.ctor(self,building,alliance)
+    -- self.enemy_alliance = enemy_alliance
+    -- self.village_info = alliance:FindAllianceVillagesInfoByObject(building)
+    -- self.map_id = building.id
 end
 
 
@@ -24,7 +23,7 @@ function GameUIAllianceVillageEnter:IsRuins()
 end
 
 function GameUIAllianceVillageEnter:GetVillageInfo()
-    return self.village_info
+    return self:GetFocusAlliance():GetAllianceVillageInfosById(self:GetBuilding().id)
 end
 
 function GameUIAllianceVillageEnter:GetProcessIconConfig()
@@ -40,7 +39,7 @@ end
 
 function GameUIAllianceVillageEnter:GetProcessIcon()
     local config = self:GetProcessIconConfig()
-    return unpack(config[self:GetBuilding():GetName()])
+    return unpack(config[self:GetBuilding().name])
 end
 
 function GameUIAllianceVillageEnter:HasEnemyAlliance()
@@ -52,14 +51,10 @@ function GameUIAllianceVillageEnter:GetEnemyAlliance()
 end
 
 function GameUIAllianceVillageEnter:GetBuildingInfoOriginalY()
-    if not self:IsRuins() then
-        return self.process_bar_bg:getPositionY() - self.process_bar_bg:getContentSize().height-40
-    else
-        return self.process_bar_bg:getPositionY() - self.process_bar_bg:getContentSize().height
-    end
+    return self.process_bar_bg:getPositionY() - self.process_bar_bg:getContentSize().height - 40
 end
 function GameUIAllianceVillageEnter:GetUIHeight()
-    return 311
+    return 290
 end
 
 function GameUIAllianceVillageEnter:GetProcessLabelText()
@@ -67,21 +62,15 @@ function GameUIAllianceVillageEnter:GetProcessLabelText()
 end
 
 function GameUIAllianceVillageEnter:FixedUI()
-    if self:IsRuins() then
-        self:GetDescLabel():hide()
-        self:GetLevelBg():hide()
-        self.process_bar_bg:hide()
-    else
-        self:GetDescLabel():hide()
-        self:GetLevelBg():show()
-        self.process_bar_bg:show()
-    end
+    self:GetDescLabel():hide()
+    self:GetLevelBg():show()
+    self.process_bar_bg:show()
     self:GetHonourIcon():hide()
     self:GetHonourLabel():hide()
 end
 
 function GameUIAllianceVillageEnter:GetUITitle()
-    return Localize.village_name[self:GetBuilding():GetName()]
+    return Localize.village_name[self:GetBuilding().name]
 end
 
 function GameUIAllianceVillageEnter:GetBuildImageSprite()
@@ -104,78 +93,69 @@ function GameUIAllianceVillageEnter:GetBuildingType()
 end
 
 function GameUIAllianceVillageEnter:GetBuildingDesc()
-    if self:IsRuins() then
-        return _("废弃的村落")
-    end
     return ""
 end
-
+function GameUIAllianceVillageEnter:InitBuildingInfo()
+    GameUIAllianceVillageEnter.super.InitBuildingInfo(self)
+end
 function GameUIAllianceVillageEnter:GetBuildingInfo()
-    if self:IsRuins() then
-        return {{
-            {_("坐标"),0x615b44},
-            {self:GetLocation(),0x403c2f},
-        }}
-    end
-
-    self:GetMyAlliance():RemoveListenerOnType(self,self:GetMyAlliance().LISTEN_TYPE.BASIC)
-    self:GetMyAlliance():AddListenOnType(self,self:GetMyAlliance().LISTEN_TYPE.BASIC)
-    self:GetMyAlliance():RemoveListenerOnType(self,self:GetMyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
-    self:GetMyAlliance():AddListenOnType(self,self:GetMyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
-    local alliance_map = self:GetMyAlliance():GetAllianceMap()
-    alliance_map:RemoveListenerOnType(self,alliance_map.LISTEN_TYPE.BUILDING)
-    alliance_map:AddListenOnType(self,alliance_map.LISTEN_TYPE.BUILDING)
-    if self:HasEnemyAlliance() then
-        local alliance_map = self:GetEnemyAlliance():GetAllianceMap()
-        alliance_map:RemoveListenerOnType(self,alliance_map.LISTEN_TYPE.BUILDING)
-        alliance_map:AddListenOnType(self,alliance_map.LISTEN_TYPE.BUILDING)
-        self:GetEnemyAlliance():RemoveListenerOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
-        self:GetEnemyAlliance():AddListenOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
-    end
     local location = {
         {_("坐标"),0x615b44},
         {self:GetLocation(),0x403c2f},
     }
     local labels = {}
     local village_id = self:GetVillageInfo().id
-    local villageEvent = self:GetMyAlliance():FindVillageEventByVillageId(village_id)
-    if not villageEvent  then --我方未占领
-        if self:HasEnemyAlliance() then
-            villageEvent = self:GetEnemyAlliance():FindVillageEventByVillageId(village_id)
-            if villageEvent then  --敌方联盟人占领
-                local occupy_label = {
-                    {_("占领者"),0x615b44},
-                    {villageEvent:PlayerData().name,0x403c2f}
-                }
-            local current_collect_label =  {
-                {_("当前采集"),0x615b44},
-                {villageEvent:CollectCount() .. "(" .. villageEvent:CollectPercent()  .. "%)",0x403c2f,900},
-            }
-            local end_time_label = {
-                {_("完成时间"),0x615b44},
-                {
-                    villageEvent:GetTime() == 0 and _("已完成") or GameUtils:formatTimeStyle1(villageEvent:GetTime()),
-                    0x403c2f,
-                    1000
-                },
-            }
-            labels = {location,occupy_label,current_collect_label,end_time_label}
-            local str = string.formatnumberthousands(self:GetVillageInfo().resource - villageEvent:CollectCount()) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
-            local percent = (self:GetVillageInfo().resource - villageEvent:CollectCount())/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
-            self:GetProgressTimer():setPercentage(percent*100)
-            self:GetProcessLabel():setString(str)
-            self:GetEnemyAlliance():AddListenOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventTimer)
-            else --没人占领
-                local no_one_label = {
-                    {_("占领者"),0x615b44},
-                    {_("无"),0x403c2f}
-                }
-            labels = {location,no_one_label}
-            local str = string.formatnumberthousands(self:GetVillageInfo().resource) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
-            local percent = self:GetVillageInfo().resource/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
-            self:GetProgressTimer():setPercentage(percent*100)
-            self:GetProcessLabel():setString(str)
+    local villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetMyAlliance(), village_id)
+    dump(villageEvent,"villageEvent")
+    if villageEvent then --我方占领
+        local startTime = villageEvent.startTime/1000.0
+        local finishTime = villageEvent.finishTime/1000.0
+        local collectTime = app.timer:GetServerTime() - startTime
+        local collectSpeed = villageEvent.villageData.collectTotal/(finishTime - startTime)
+        local collectCount = math.floor(collectSpeed * collectTime)
+        local occupy_label = {
+            {_("占领者"),0x615b44},
+            {villageEvent.playerData.name,0x403c2f}
+        }
+        local current_collect_label =  {
+            {_("当前采集"),0x615b44},
+            {collectCount .. "(" .. math.floor(collectCount/villageEvent.villageData.collectTotal * 100)  .. "%)",0x403c2f,900},
+        }
+        local end_time_label = {
+            {_("完成时间"),0x615b44},
+            {
+                villageEvent.finishTime/1000.0 <= app.timer:GetServerTime() and _("已完成") or GameUtils:formatTimeStyle1(math.ceil(finishTime - app.timer:GetServerTime())),
+                0x403c2f,
+                1000
+            },
+        }
+        labels = {location,occupy_label,current_collect_label,end_time_label}
+        local str = string.formatnumberthousands(self:GetVillageInfo().resource - collectCount) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
+        local percent = (self:GetVillageInfo().resource - collectCount)/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+        self:GetProgressTimer():setPercentage(percent*100)
+        self:GetProcessLabel():setString(str)
+        scheduleAt(self, function()
+            local villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetMyAlliance(), village_id)
+            if not villageEvent then
+                self:LeftButtonClicked()
+                return
             end
+            local collectTime = app.timer:GetServerTime() - startTime
+            local collectCount = math.floor(collectSpeed * collectTime)
+
+            local str = string.formatnumberthousands(self:GetVillageInfo().resource - collectCount) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
+            local percent = (self:GetVillageInfo().resource - collectCount)/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+            self:GetProgressTimer():setPercentage(percent*100)
+            self:GetProcessLabel():setString(str)
+            local label = self:GetInfoLabelByTag(900)
+            if label then
+                label:setString(string.formatnumberthousands(collectCount) .. "(" .. math.floor(collectCount/villageEvent.villageData.collectTotal * 100)  .. "%)")
+            end
+            local label = self:GetInfoLabelByTag(1000)
+            if label then
+                label:setString(GameUtils:formatTimeStyle1(math.ceil(finishTime - app.timer:GetServerTime())))
+            end
+        end)
     else --没人占领
         local no_one_label = {
             {_("占领者"),0x615b44},
@@ -187,35 +167,10 @@ function GameUIAllianceVillageEnter:GetBuildingInfo()
     self:GetProgressTimer():setPercentage(percent*100)
     self:GetProcessLabel():setString(str)
     end
-    else --我方占领
-        local occupy_label = {
-            {_("占领者"),0x615b44},
-            {villageEvent:PlayerData().name,0x403c2f}
-        }
-    local current_collect_label =  {
-        {_("当前采集"),0x615b44},
-        {villageEvent:CollectCount() .. "(" .. villageEvent:CollectPercent()  .. "%)",0x403c2f,900},
-    }
-    local end_time_label = {
-        {_("完成时间"),0x615b44},
-        {
-            villageEvent:GetTime() == 0 and _("已完成") or GameUtils:formatTimeStyle1(villageEvent:GetTime()),
-            0x403c2f,
-            1000
-        },
-    }
-    labels = {location,occupy_label,current_collect_label,end_time_label}
-    local str = string.formatnumberthousands(self:GetVillageInfo().resource - villageEvent:CollectCount()) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
-    local percent = (self:GetVillageInfo().resource - villageEvent:CollectCount())/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
-    self:GetProgressTimer():setPercentage(percent*100)
-    self:GetProcessLabel():setString(str)
-    self:GetMyAlliance():AddListenOnType(self,self:GetMyAlliance().LISTEN_TYPE.OnVillageEventTimer)
-    end
     return labels
 end
 
 function GameUIAllianceVillageEnter:OnVillageEventTimer(village_event,left_resource)
-    if self:IsRuins() then return end
     if village_event:VillageData().id == self:GetVillageInfo().id then
         local str = string.formatnumberthousands(left_resource) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
         local percent = left_resource/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
@@ -232,30 +187,29 @@ function GameUIAllianceVillageEnter:OnVillageEventTimer(village_event,left_resou
     end
 end
 
-function GameUIAllianceVillageEnter:OnBuildingDeltaUpdate(alliance_map,mapObjects)
-    self:OnBuildingChange(alliance_map)
-end
+-- function GameUIAllianceVillageEnter:OnBuildingDeltaUpdate(alliance_map,mapObjects)
+--     self:OnBuildingChange(alliance_map)
+-- end
 
-function GameUIAllianceVillageEnter:OnBuildingFullUpdate(alliance_map)
-    self:OnBuildingChange(alliance_map)
-end
+-- function GameUIAllianceVillageEnter:OnBuildingFullUpdate(alliance_map)
+--     self:OnBuildingChange(alliance_map)
+-- end
 
-function GameUIAllianceVillageEnter:OnBuildingChange(alliance_map)
-    local has = false
-    alliance_map:IteratorVillages(function(__,v)
-        if v:Id()== self.map_id then
-            has = true
-        end
-    end)
-    if has then
-        self:RefreshUI()
-    else
-        self:LeftButtonClicked()
-    end
-end
+-- function GameUIAllianceVillageEnter:OnBuildingChange(alliance_map)
+--     local has = false
+--     self:GetAlliance():IteratorVillages(function(__,v)
+--         if v:Id()== self.map_id then
+--             has = true
+--         end
+--     end)
+--     if has then
+--         self:RefreshUI()
+--     else
+--         self:LeftButtonClicked()
+--     end
+-- end
 
 function GameUIAllianceVillageEnter:OnVillageEventsDataChanged(changed_map)
-    if self:IsRuins() then return end
     local hasHandler = false
     if changed_map.removed then
         for _,v in ipairs(changed_map.removed) do
@@ -276,7 +230,6 @@ function GameUIAllianceVillageEnter:OnVillageEventsDataChanged(changed_map)
 end
 
 function GameUIAllianceVillageEnter:GetLevelLabelText()
-    if self:IsRuins() then return "" end
     return _("等级") .. self:GetVillageInfo().level
 end
 --关闭了进攻和突袭的条件判断
@@ -285,183 +238,162 @@ function GameUIAllianceVillageEnter:CheckCanAttackVillage()
 end
 
 function GameUIAllianceVillageEnter:GetEnterButtons()
-    if self:IsRuins() then return {} end
     local buttons = {}
     local village_id = self:GetVillageInfo().id
-    local villageEvent = self:GetMyAlliance():FindVillageEventByVillageId(village_id)
-    local alliance_id = self:IsMyAlliance() and self:GetMyAlliance():Id() or self:GetEnemyAlliance():Id()
+    local villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetMyAlliance(), village_id)
+    local alliance_id = self:GetFocusAlliance()._id
     local checkMeIsProtectedWarinng = self:CheckMeIsProtectedWarinng()
-
-    if villageEvent then --我方占领
-        if villageEvent:GetPlayerRole() == villageEvent.EVENT_PLAYER_ROLE.Me then --自己占领
+    local focus_alliance = self:GetFocusAlliance()
+    if villageEvent and villageEvent.fromAlliance.id == self:GetMyAlliance()._id then --我方占领
+        if villageEvent.playerData.id == User:Id() then --自己占领
             local che_button = self:BuildOneButton("capture_38x56.png",_("撤军")):onButtonClicked(function()
-                NetManager:getRetreatFromVillagePromise(alliance_id,villageEvent:Id())
+                NetManager:getRetreatFromVillagePromise(villageEvent.id)
                 self:LeftButtonClicked()
             end)
-        local info_button = self:BuildOneButton("icon_info_56x56.png",_("部队")):onButtonClicked(function()
-            self:FindTroopShowInfoFromAllianceBelvedere()
-            self:LeftButtonClicked()
-        end)
-        buttons =  {che_button,info_button}
-    elseif villageEvent:GetPlayerRole() ==   villageEvent.EVENT_PLAYER_ROLE.Ally then --盟友占领
-        local isMyAlliance = self:IsMyAlliance()
-        local position = self:GetLogicPosition()
-        local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
-            UIKit:showMessageDialog(_("提示"), _("当前资源点已被盟友占领，你可能无法进行采集，仍要派兵吗？"), function ()
-                UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-                    if checkMeIsProtectedWarinng then
-                        UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
-                            NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                                gameuialliancesendtroops:LeftButtonClicked()
-                            end)
+            local info_button = self:BuildOneButton("icon_info_56x56.png",_("部队")):onButtonClicked(function()
+                self:FindTroopShowInfoFromAllianceBelvedere()
+                self:LeftButtonClicked()
+            end)
+            buttons =  {che_button,info_button}
+        else --盟友占领
+            local position = self:GetLogicPosition()
+            local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
+                local final_func = function ()
+                    local attack_func = function ()
+                        UIKit:showMessageDialog(_("提示"), _("当前资源点已被盟友占领，你可能无法进行采集，仍要派兵吗？"), function ()
+                            UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                                NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
+                                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                                    gameuialliancesendtroops:LeftButtonClicked()
+                                end)
+                            end,{targetAlliance = focus_alliance,toLocation = position,returnCloseAction = true}):AddToCurrentScene(true)
                         end)
-                    else
-                        NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                            gameuialliancesendtroops:LeftButtonClicked()
-                        end)
+                    end, function ()
                     end
-                end,{targetIsMyAlliance = isMyAlliance,toLocation = position,returnCloseAction = true}):AddToCurrentScene(true)
-            end)
-        end, function ()
-        end)
-    buttons = {attack_button}
-    end
-    else --我方未占领
-        if self:HasEnemyAlliance() then
-            villageEvent = self:GetEnemyAlliance():FindVillageEventByVillageId(village_id)
-            if villageEvent then -- 敌方占领
-                local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
-                    UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-                        if checkMeIsProtectedWarinng then
-                            UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
-                                NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                                    gameuialliancesendtroops:LeftButtonClicked()
-                                end)
-                            end)
-                        else
-                            NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                                gameuialliancesendtroops:LeftButtonClicked()
-                            end)
-                        end
-                    end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
-                    self:LeftButtonClicked()
-                end)
-            local strike_button = self:BuildOneButton("strike_66x62.png",_("突袭")):onButtonClicked(function()
-                UIKit:newGameUI("GameUIStrikePlayer",GameUIStrikePlayer.STRIKE_TYPE.VILLAGE,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),defenceAllianceId = alliance_id,defenceVillageId = village_id}):AddToCurrentScene(true)
-                self:LeftButtonClicked()
-            end)
-            buttons = {attack_button,strike_button}
-            if not self:IsMyAlliance() and self:GetMyAlliance():Status() == "prepare" then
-                local progress_1 = WidgetAllianceEnterButtonProgress.new()
-                    :pos(-68, -54)
-                    :addTo(attack_button)
-                local my_allaince_status = Alliance_Manager:GetMyAlliance():Status()
-                attack_button:setButtonEnabled(my_allaince_status == "fight")
-                local progress_2 = WidgetAllianceEnterButtonProgress.new()
-                    :pos(-68, -54)
-                    :addTo(strike_button)
-                strike_button:setButtonEnabled(my_allaince_status == "fight")
-            end
-            else -- 无人占领
-                local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
-                    UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-                        if checkMeIsProtectedWarinng then
-                            UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
-                                NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                                    gameuialliancesendtroops:LeftButtonClicked()
-                                end)
-                            end)
-                        else
-                            NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                                gameuialliancesendtroops:LeftButtonClicked()
-                            end)
-                        end
-                    end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
-                    self:LeftButtonClicked()
-                end)
-            if not self:IsMyAlliance() and self:GetMyAlliance():Status() == "prepare" then
-                local progress_1 = WidgetAllianceEnterButtonProgress.new()
-                    :pos(-68, -54)
-                    :addTo(attack_button)
-                local my_allaince_status = Alliance_Manager:GetMyAlliance():Status()
-                attack_button:setButtonEnabled(my_allaince_status == "fight")
-            end
-            buttons = {attack_button}
-            end
-    else -- 无人占领
-        local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
-            UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                    UIKit:showSendTroopMessageDialog(attack_func,"dragonMaterials",_("龙"))
+                end
                 if checkMeIsProtectedWarinng then
-                    UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),function()
-                        NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                            gameuialliancesendtroops:LeftButtonClicked()
-                        end)
+                    UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),final_func)
+                else
+                    final_func()
+                end
+            end)
+            buttons = {attack_button}
+        end
+    else --我方未占领
+        if villageEvent then -- 敌方占领
+            local attack_button = self:BuildOneButton("capture_38x56.png", _("占领")):onButtonClicked(function()
+                local toLocation = self:GetLogicPosition()
+
+                local final_func = function ()
+                    local attack_func = function ()
+                        UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                            NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
+                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                                gameuialliancesendtroops:LeftButtonClicked()
+                            end)
+                        end,{targetAlliance = focus_alliance,toLocation = toLocation,returnCloseAction = true}):AddToCurrentScene(true)
+                    end
+                    UIKit:showSendTroopMessageDialog(attack_func,"dragonMaterials",_("龙"))
+                end
+
+                if checkMeIsProtectedWarinng then
+                    UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),final_func)
+                else
+                    final_func()
+                end
+            end)
+            local strike_button = self:BuildOneButton("strike_66x62.png",_("突袭")):onButtonClicked(function()
+                local toLocation = self:GetLogicPosition()
+                if checkMeIsProtectedWarinng then
+                    UIKit:showMessageDialog(_("提示"),_("突袭村落将失去保护状态，确定继续派兵?"),function ()
+                        UIKit:newGameUI("GameUIStrikePlayer",GameUIStrikePlayer.STRIKE_TYPE.VILLAGE,{alliance = focus_alliance,toLocation = toLocation,defenceAllianceId = alliance_id,defenceVillageId = village_id}):AddToCurrentScene(true)
                     end)
                 else
-                    NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
-                        app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                        gameuialliancesendtroops:LeftButtonClicked()
-                    end)
+                    UIKit:newGameUI("GameUIStrikePlayer",GameUIStrikePlayer.STRIKE_TYPE.VILLAGE,{alliance = focus_alliance,toLocation = toLocation,defenceAllianceId = alliance_id,defenceVillageId = village_id}):AddToCurrentScene(true)
                 end
-            end,{targetIsMyAlliance = self:IsMyAlliance(),toLocation = self:GetLogicPosition(),returnCloseAction = true}):AddToCurrentScene(true)
-            self:LeftButtonClicked()
-        end)
-    if not self:IsMyAlliance() and self:GetMyAlliance():Status() == "prepare" then
-        local progress_1 = WidgetAllianceEnterButtonProgress.new()
-            :pos(-68, -54)
-            :addTo(attack_button)
-        local my_allaince_status = Alliance_Manager:GetMyAlliance():Status()
-        attack_button:setButtonEnabled(my_allaince_status == "fight")
-    end
-    buttons = {attack_button}
-    end
+            end)
+            buttons = {attack_button,strike_button}
+        else -- 无人占领
+            local attack_button = self:BuildOneButton("capture_38x56.png",_("占领")):onButtonClicked(function()
+                local toLocation = self:GetLogicPosition()
+
+                local final_func = function ()
+                    local attack_func = function ()
+                        UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                            NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
+                                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                                gameuialliancesendtroops:LeftButtonClicked()
+                            end)
+                        end,{targetAlliance = focus_alliance,toLocation = toLocation,returnCloseAction = true}):AddToCurrentScene(true)
+                    end
+                    UIKit:showSendTroopMessageDialog(attack_func, "dragonMaterials",_("龙"))
+                end
+
+
+                if checkMeIsProtectedWarinng then
+                    UIKit:showMessageDialog(_("提示"),_("进攻村落将失去保护状态，确定继续派兵?"),final_func)
+                else
+                    final_func()
+                end
+            end)
+            buttons = {attack_button}
+        end
     end
     return buttons
 end
 
-function GameUIAllianceVillageEnter:OnAllianceBasicChanged( alliance,changed_map )
-    if changed_map.status and not self:IsMyAlliance() then
-        self:GetEnterButtonByIndex(1):setButtonEnabled(changed_map.status.new == "fight")
-        if self:GetEnterButtonByIndex(2) then
-            self:GetEnterButtonByIndex(2):setButtonEnabled(changed_map.status.new == "fight")
-        end
-    end
+function GameUIAllianceVillageEnter:OnAllianceBasicChanged( alliance,deltaData )
+-- local ok, value = deltaData("basicInfo.status")
+-- if ok and not self:IsMyAlliance() then
+--     self:GetEnterButtonByIndex(1):setButtonEnabled(value == "fight")
+--     if self:GetEnterButtonByIndex(2) then
+--         self:GetEnterButtonByIndex(2):setButtonEnabled(value == "fight")
+--     end
+-- end
 end
 
 function GameUIAllianceVillageEnter:FindTroopShowInfoFromAllianceBelvedere()
     local village_id = self:GetVillageInfo().id
     local villageEvent = self:GetMyAlliance():FindVillageEventByVillageId(village_id)
     if villageEvent then
-        if villageEvent:GetPlayerRole() == villageEvent.EVENT_PLAYER_ROLE.Me then
-            local belvedereEntity = BelvedereEntity.new(villageEvent)
-            belvedereEntity:SetType(BelvedereEntity.ENTITY_TYPE.COLLECT)
-            UIKit:newGameUI("GameUIWatchTowerMyTroopsDetail",belvedereEntity):AddToCurrentScene(true)
+        if villageEvent.playerData.id == User:Id() then
+            UIKit:newGameUI("GameUIWatchTowerMyTroopsDetail", villageEvent, "villageEvents"):AddToCurrentScene(true)
         end
     end
 end
 
 function GameUIAllianceVillageEnter:OnMoveOutStage()
-    self:GetMyAlliance():RemoveListenerOnType(self,self:GetMyAlliance().LISTEN_TYPE.BASIC)
-    self:GetMyAlliance():RemoveListenerOnType(self,self:GetMyAlliance().LISTEN_TYPE.OnVillageEventTimer)
-    self:GetMyAlliance():RemoveListenerOnType(self,self:GetMyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
-    local alliance_map = self:GetMyAlliance():GetAllianceMap()
-    alliance_map:RemoveListenerOnType(self,alliance_map.LISTEN_TYPE.BUILDING)
+    -- self:GetMyAlliance():RemoveListenerOnType(self,self:GetMyAlliance().LISTEN_TYPE.BASIC)
+    -- self:GetMyAlliance():RemoveListenerOnType(self,self:GetMyAlliance().LISTEN_TYPE.OnVillageEventTimer)
+    -- self:GetMyAlliance():RemoveListenerOnType(self,self:GetMyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
+    -- local alliance_map = self:GetMyAlliance():GetAllianceMap()
+    -- alliance_map:RemoveListenerOnType(self,alliance_map.LISTEN_TYPE.BUILDING)
     if self:HasEnemyAlliance() then
-        local alliance_map = self:GetEnemyAlliance():GetAllianceMap()
-        alliance_map:RemoveListenerOnType(self,alliance_map.LISTEN_TYPE.BUILDING)
-        self:GetEnemyAlliance():RemoveListenerOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventTimer)
-        self:GetEnemyAlliance():RemoveListenerOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
+    -- local alliance_map = self:GetEnemyAlliance():GetAllianceMap()
+    -- alliance_map:RemoveListenerOnType(self,alliance_map.LISTEN_TYPE.BUILDING)
+    -- self:GetEnemyAlliance():RemoveListenerOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventTimer)
+    -- self:GetEnemyAlliance():RemoveListenerOnType(self,self:GetEnemyAlliance().LISTEN_TYPE.OnVillageEventsDataChanged)
     end
     GameUIAllianceVillageEnter.super.OnMoveOutStage(self)
 end
 return GameUIAllianceVillageEnter
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

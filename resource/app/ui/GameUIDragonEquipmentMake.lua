@@ -14,7 +14,6 @@ local Localize = import("..utils.Localize")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local DragonManager = import("..entity.DragonManager")
 local GameUIDragonEyrieDetail = import(".GameUIDragonEyrieDetail")
-local MaterialManager = import("..entity.MaterialManager")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetMakeEquip = import("..widget.WidgetMakeEquip")
 local WidgetRequirementListview = import("..widget.WidgetRequirementListview")
@@ -122,8 +121,7 @@ function GameUIDragonEquipmentMake:BuildUI()
 end
 
 function GameUIDragonEquipmentMake:GetMakeRequirement()
-	local material_manager = City:GetMaterialManager()
-	local materials = material_manager:GetMaterialsByType(MaterialManager.MATERIAL_TYPE.DRAGON)
+	local materials = User.dragonMaterials
 	local requirements = {}
 	local equip_config = EQUIPMENTS[self:GetEquipment():GetCanLoadConfig().name]
 	local matrials = LuaUtils:table_map(string.split(equip_config.materials, ","), function(k, v)
@@ -131,7 +129,7 @@ function GameUIDragonEquipmentMake:GetMakeRequirement()
     end)
 	local desc = ""
 	if self.blackSmith:IsUnlocked() then
-		desc = self.blackSmith:IsEquipmentEventEmpty() and "1/1" or "0/1"
+		desc = #User.dragonEquipmentEvents == 0 and "1/1" or "0/1"
 	else
 		desc = _("铁匠铺还未解锁")
 	end
@@ -139,12 +137,12 @@ function GameUIDragonEquipmentMake:GetMakeRequirement()
     {
         resource_type = "queue",
         isVisible = true,
-        isSatisfy = self.blackSmith:IsUnlocked() and self.blackSmith:IsEquipmentEventEmpty(),
+        isSatisfy = self.blackSmith:IsUnlocked() and #User.dragonEquipmentEvents == 0,
         icon="hammer_33x40.png",
         description= desc
     })
     local need_coin = equip_config.coin
-    local coin = City.resource_manager:GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local coin = User:GetResValueByType("coin")
     table.insert(requirements,
     {
         resource_type = "coin",
@@ -179,7 +177,7 @@ function GameUIDragonEquipmentMake:GetEquipment()
 end
 
 function GameUIDragonEquipmentMake:GetCurrentEquipmentCount()
-    local player_equipments = City:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.EQUIPMENT)
+    local player_equipments = User.dragonEquipments
     local equipment = self:GetEquipment()
     local eq_name = equipment:IsLoaded() and equipment:Name() or equipment:GetCanLoadConfig().name
     return player_equipments[eq_name] or 0

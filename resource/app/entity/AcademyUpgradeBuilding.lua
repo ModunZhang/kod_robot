@@ -10,8 +10,4 @@ end
 function AcademyUpgradeBuilding:GetAcademyNextLevelConfig()
     return self.config_building_function[self:GetType()][self:GetNextLevel()]
 end
-function AcademyUpgradeBuilding:InstantUpgradeTo(level)
-	AcademyUpgradeBuilding.super.InstantUpgradeTo(self,level)
-    City:FastUpdateAllTechsLockState()
-end
 return AcademyUpgradeBuilding

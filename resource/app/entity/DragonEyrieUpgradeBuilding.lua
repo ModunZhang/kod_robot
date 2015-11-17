@@ -5,7 +5,6 @@
 local config_function            = GameDatas.BuildingFunction.dragonEyrie
 local config_levelup             = GameDatas.BuildingLevelUp.dragonEyrie
 local config_intInit             = GameDatas.PlayerInitData.intInit
-local ResourceManager            = import(".ResourceManager")
 local UpgradeBuilding            = import(".UpgradeBuilding")
 local DragonEyrieUpgradeBuilding = class("DragonEyrieUpgradeBuilding", UpgradeBuilding)
 local DragonManager              = import(".DragonManager")
@@ -48,8 +47,8 @@ function DragonEyrieUpgradeBuilding:CheckIfHateDragon()
 end
 -- 解锁下一条龙的龙巢等级
 function DragonEyrieUpgradeBuilding:GetNextHateLevel()
-    local current_count = config_function[self:GetLevel()].dragonCount
-    for i=self:GetLevel() + 1,#config_function do
+    local current_count = self:GetDragonManager():GetHatedCount()
+    for i = 1,#config_function do
         if config_function[i].dragonCount > current_count then
             return i
         end
@@ -74,7 +73,7 @@ function DragonEyrieUpgradeBuilding:GetTotalHPRecoveryPerHourInfo()
     }
     local hprecoveryperhour = self:GetHPRecoveryPerHourWithoutBuff()
     local common_buff = DataUtils:GetDragonHpBuffTotal()
-    local terrain_buff = config_intInit['dragonHpRecoverTerrainAddPercent'].value / 100
+    -- local terrain_buff = config_intInit['dragonHpRecoverTerrainAddPercent'].value / 100
     local hprecoveryperhour_info = {
         redDragon = 0,
         greenDragon = 0,
@@ -82,11 +81,11 @@ function DragonEyrieUpgradeBuilding:GetTotalHPRecoveryPerHourInfo()
     }
 
     for dragon_type,terrain in pairs(terrains_info) do
-        if terrain == User:Terrain() then
-            hprecoveryperhour_info[dragon_type] =  math.floor(hprecoveryperhour * (1 + common_buff + terrain_buff))
-        else
-            hprecoveryperhour_info[dragon_type] =  math.floor(hprecoveryperhour * (1 + common_buff ))
-        end
+        hprecoveryperhour_info[dragon_type] =  math.floor(hprecoveryperhour * (1 + common_buff ))
+        -- if terrain == User.basicInfo.terrain then
+        -- else
+        --     hprecoveryperhour_info[dragon_type] =  math.floor(hprecoveryperhour * (1 + common_buff ))
+        -- end
     end
     return hprecoveryperhour_info
 end

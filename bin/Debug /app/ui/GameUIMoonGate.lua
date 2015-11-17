@@ -43,7 +43,7 @@ function GameUIMoonGate:InitKingCity()
 
     -- 根据玩家所在联盟地形，初始化时定位对应地形第一王城
     local x,y = 0,0
-    local terrain = Alliance_Manager:GetMyAlliance():Terrain()
+    local terrain = Alliance_Manager:GetMyAlliance().basicInfo.terrain
     if terrain=="grassLand" then
         x,y = biggest_wonder_grassLand.x,biggest_wonder_grassLand.y
     elseif terrain=="desert" then

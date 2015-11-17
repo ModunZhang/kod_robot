@@ -1,9 +1,7 @@
 local BuildingRegister = import("..entity.BuildingRegister")
 local City_ = import("..entity.City")
-local AllianceManager_ = import("..entity.AllianceManager")
 local User_ = import("..entity.User")
 local MailManager_ = import("..entity.MailManager")
-local ItemManager_ = import("..entity.ItemManager")
 local check = import("..fte.check")
 local initData = import("..fte.initData")
 
@@ -12,18 +10,16 @@ local timer = app.timer
 return function(userData)
     DataManager.user = userData
     timer:Clear()
-
     MailManager = MailManager_.new()
-    ItemManager = ItemManager_.new()
-    Alliance_Manager = AllianceManager_.new()
-    if GLOBAL_FTE then
-        DataManager:getFteData()._id                = userData._id
-        DataManager:getFteData().serverId           = userData.serverId
-        DataManager:getFteData().serverTime         = userData.serverTime
-        DataManager:getFteData().logicServerId      = userData.logicServerId
-        DataManager:getFteData().basicInfo.name     = userData.basicInfo.name
-        DataManager:getFteData().basicInfo.terrain  = userData.basicInfo.terrain
-        DataManager:getFteData().basicInfo.language = userData.basicInfo.language
+    if GLOBAL_FTE or userData.basicInfo.terrain == "__NONE__" then
+        local fteData = DataManager:getFteData()
+        fteData._id                = userData._id
+        fteData.serverId           = userData.serverId
+        fteData.serverTime         = userData.serverTime
+        fteData.logicServerId      = userData.logicServerId
+        fteData.basicInfo.name     = userData.basicInfo.name
+        fteData.basicInfo.terrain  = userData.basicInfo.terrain
+        fteData.basicInfo.language = userData.basicInfo.language
         User = User_.new(initData._id)
         City = City_.new(User):InitWithJsonData(initData)
         DataManager:setFteUserDeltaData()
@@ -33,18 +29,8 @@ return function(userData)
         DataManager:setUserData(userData)
     end
 
-    timer:AddListener(User)
     timer:AddListener(City)
-    timer:AddListener(ItemManager)
-    timer:AddListener(Alliance_Manager)
     timer:Start()
-
-    if ext.gamecenter.isGameCenterEnabled() and not ext.gamecenter.isAuthenticated() then
-         ext.gamecenter.authenticate(false)
-    end
-    if device.platform ~= 'mac' then
-        app:getStore():updateTransactionStates()
-    end
 end
 
 

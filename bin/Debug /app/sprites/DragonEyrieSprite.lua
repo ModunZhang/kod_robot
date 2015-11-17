@@ -5,42 +5,30 @@ local DragonManager = import("..entity.DragonManager")
 local DRAGON_ZORDER = 1
 
 
+function DragonEyrieSprite:OnUserDataChanged_dragons(userData, deltaData)
+	self:ReloadSpriteCaseDragonDefencedChanged(userData:GetDefenceDragonType())
+end
+
 function DragonEyrieSprite:ctor(...)
     DragonEyrieSprite.super.ctor(self, ...)
-    local dragon_manget = self:GetEntity():BelongCity():GetDragonEyrie():GetDragonManager()
-    dragon_manget:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDefencedDragonChanged)
-    self:ReloadSpriteCaseDragonDefencedChanged(dragon_manget:GetDefenceDragon())
+    local User = self:GetEntity():BelongCity():GetUser()
+    self:ReloadSpriteCaseDragonDefencedChanged(User:GetDefenceDragonType())
+    User:AddListenOnType(self, "dragons")
 end
-
-function DragonEyrieSprite:ReloadSpriteCauseTerrainChanged()
-end
-
-function DragonEyrieSprite:ReloadSpriteCaseDragonDefencedChanged(dragon)
-	if self.dragon_sprite and not dragon then
+function DragonEyrieSprite:ReloadSpriteCaseDragonDefencedChanged(dragonType)
+	if self.dragon_sprite and not dragonType then
 		self.dragon_sprite:removeSelf()
 		self.dragon_sprite = nil
-	elseif dragon then
+	elseif dragonType then
 		if not self.dragon_sprite then
 		    local x, y = self:GetSpriteOffset()
-		    self.dragon_sprite = DragonSprite.new(self:GetMapLayer(),dragon:GetTerrain()):addTo(self, DRAGON_ZORDER):scale(0.5):pos(x+20, y+100)
+		    self.dragon_sprite = DragonSprite.new(self:GetMapLayer(),dragonType)
+		    			 :addTo(self, DRAGON_ZORDER):scale(0.5):pos(x+20, y+100)
 		else
-			self.dragon_sprite:ReloadSpriteCauseTerrainChanged(dragon:GetTerrain())
+			self.dragon_sprite:ReloadSpriteCauseTerrainChanged(dragonType)
 		end
 	end
 end
-
-function DragonEyrieSprite:OnDefencedDragonChanged(dragon)
-	self:ReloadSpriteCaseDragonDefencedChanged(dragon)
-end
-
-
-function DragonEyrieSprite:onCleanup()
-	self:GetEntity():BelongCity():GetDragonEyrie():GetDragonManager():RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDefencedDragonChanged)
-	if DragonEyrieSprite.super.onCleanup then
-		DragonEyrieSprite.super.onCleanup(self)
-	end
-end
-
 return DragonEyrieSprite
 
 

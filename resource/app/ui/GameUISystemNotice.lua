@@ -13,7 +13,6 @@ function GameUISystemNotice:ctor(delegate,notice_type,notice_content)
     self.delegate = delegate
 end
 function GameUISystemNotice:onEnter()
-    GameUISystemNotice.super.onEnter(self)
     local back = display.newSprite("back_ground_366x66.png"):addTo(self):pos(display.cx,display.top - 200)
 	back:opacity(0)
 	self.back = back
@@ -32,7 +31,6 @@ function GameUISystemNotice:showNotice(notice_type,notice_content)
 	self.notice_label:setColor(UIKit:hex2c4b(notice_type == "warning" and 0xff5400 or 0xffedae))
 	local back = self.back
     local time_scale = self.notice_label:getContentSize().width/366
-    print("time_scale=",time_scale)
     transition.fadeTo(back, {opacity = 255, time = 2,
         onComplete = function()
             transition.moveTo(self.notice_label, {x = -self.notice_label:getContentSize().width, y = back:getContentSize().height/2, time = 6 * (time_scale > 1 and time_scale or 1),

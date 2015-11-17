@@ -79,9 +79,11 @@ function TouchJudgment:OnTouchMove(pre_x, pre_y, x, y)
         end
     end
     if not find then
-        table.insert(self.one_touch_array, {x = x, y = y, time = self.time})
-        if #self.one_touch_array > 3 then
-            table.remove(self.one_touch_array, 1)
+        if pre_x ~= x and pre_y ~= y then -- fix difference move event
+            table.insert(self.one_touch_array, {x = x, y = y, time = self.time})
+            if #self.one_touch_array > 3 then
+                table.remove(self.one_touch_array, 1)
+            end
         end
     end
     self.touch_handle:OnTouchMove(pre_x, pre_y, x, y)
@@ -95,15 +97,18 @@ function TouchJudgment:OnTouchMove(pre_x, pre_y, x, y)
 end
 function TouchJudgment:OnTouchEnd(pre_x, pre_y, x, y)
     self:OnTouchOver(pre_x, pre_y, x, y)
-    self.touch_handle:OnTouchEnd(pre_x, pre_y, x, y, self.speed)
+    local is_click = false
     if self.one_touch_begin then
         local begin_x, begin_y = self.one_touch_begin.x, self.one_touch_begin.y
         local dx = x - begin_x
         local dy = y - begin_y
         if math.sqrt(dx * dx + dy * dy) < move_judgment_distance then
-            self.touch_handle:OnTouchClicked(pre_x, pre_y, x, y)
+            is_click = true
         end
-    else
+    end
+    self.touch_handle:OnTouchEnd(pre_x, pre_y, x, y, self.speed, is_click)
+    if is_click then
+        self.touch_handle:OnTouchClicked(pre_x, pre_y, x, y)
     end
 end
 function TouchJudgment:OnTouchCancelled(pre_x, pre_y, x, y)

@@ -7,7 +7,6 @@ local window = import("..utils.window")
 local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetSoldierPromoteDetails = import(".WidgetSoldierPromoteDetails")
 local WidgetPushButton = import(".WidgetPushButton")
-local SoldierManager = import("..entity.SoldierManager")
 local Localize = import("..utils.Localize")
 local UILib = import("..ui.UILib")
 
@@ -25,8 +24,7 @@ end)
 
 function WidgetPromoteSoliderList:ctor(building)
     self.building = building
-
-    local soldiers_star = City:GetSoldierManager():FindSoldierStarByBuildingType(self.building:GetType())
+    local soldiers_star = User:GetBuildingSoldiersInfo(self.building:GetType())
     self.items_list = {}
     self.boxes = {}
     for k,v in ipairs(soldiers_star) do
@@ -86,6 +84,15 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
         end
     end
 
+    -- 打开晋级详情信息
+    WidgetPushButton.new()
+        :addTo(soldier_box)
+        :align(display.CENTER, soldier_box:getContentSize().width/2 ,soldier_box:getContentSize().height/2)
+        :onButtonClicked(function(event)
+            if index > 1 then
+                UIKit:newWidgetUI("WidgetSoldierPromoteDetails",soldier_type,index - 1 ,self.building,true):AddToCurrentScene()
+            end
+        end):setContentSize(soldier_box:getContentSize())
     local label = UIKit:ttfLabel({
         text = "",
         size = 22,
@@ -97,7 +104,7 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
     elseif status == "lock" then
         label:setString(_("未解锁"))
     elseif status == "toUnlock" then
-        if City:GetSoldierManager():GetPromotingSoldierName(self.building:GetType()) == soldier_type then
+        if User:GetPromotionName(self.building:GetType()) == soldier_type then
             label:setString(_("正在晋级"))
             label:setColor(UIKit:hex2c4b(0x007c23))
         else
@@ -108,17 +115,18 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
                 :setButtonLabel(UIKit:ttfLabel({
                     text = _("研发"),
                     size = 24,
-                    color = 0xfff3c7
+                    color = 0xfff3c7,
+                    shadow = true
                 }))
                 :onButtonClicked(function(event)
                     UIKit:newWidgetUI("WidgetSoldierPromoteDetails",soldier_type,star,self.building):AddToCurrentScene()
                 end)
         end
     end
-    local blue_bg = display.newSprite("back_ground_121x122.png", soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
+    local blue_bg = display.newSprite(UILib.soldier_color_bg_images[soldier_type], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
     local soldier_icon = display.newSprite(UILib.soldier_image[soldier_type][index], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
     soldier_icon:scale(124/math.max(soldier_icon:getContentSize().width,soldier_icon:getContentSize().height))
-    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_icon):align(display.BOTTOM_CENTER,soldier_icon:getContentSize().width/2-16, 0)
+    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_icon):align(display.BOTTOM_CENTER,soldier_icon:getContentSize().width/2-10, 3)
     StarBar.new({
         max = 3,
         bg = "Stars_bar_bg.png",
@@ -128,12 +136,16 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
         direction = StarBar.DIRECTION_HORIZONTAL,
         scale = 0.8,
     }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
+    display.newSprite("i_icon_20x20.png"):addTo(soldier_star_bg):align(display.LEFT_CENTER,5, 11)
+
     if status ~= "unlock" then
         local my_filter = filter
         local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
         blue_bg:setFilter(filters)
         soldier_icon:setFilter(filters)
     end
+    display.newSprite("box_soldier_128x128.png"):addTo(soldier_box):align(display.CENTER, soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2)
+
     local parent = self
     function soldier_box:Refresh(star)
         local status
@@ -160,7 +172,7 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
         end
         if status == "toUnlock" then
 
-            if City:GetSoldierManager():GetPromotingSoldierName(parent.building:GetType()) == soldier_type then
+            if User:GetPromotionName(parent.building:GetType()) == soldier_type then
                 label:setString("正在晋级")
                 label:setColor(UIKit:hex2c4b(0x007c23))
                 if self.button then
@@ -174,7 +186,8 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
                     :setButtonLabel(UIKit:ttfLabel({
                         text = _("研发"),
                         size = 24,
-                        color = 0xfff3c7
+                        color = 0xfff3c7,
+                        shadow = true
                     }))
                     :onButtonClicked(function(event)
                         UIKit:newWidgetUI("WidgetSoldierPromoteDetails",soldier_type,star,parent.building):AddToCurrentScene()
@@ -197,40 +210,52 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
     return soldier_box
 end
 function WidgetPromoteSoliderList:onEnter()
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+    User:AddListenOnType(self, "soldierStars")
+    User:AddListenOnType(self, "soldierStarEvents")
 end
 function WidgetPromoteSoliderList:onExit()
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+    User:RemoveListenerOnType(self, "soldierStars")
+    User:RemoveListenerOnType(self, "soldierStarEvents")
 end
-function WidgetPromoteSoliderList:OnSoliderStarCountChanged(soldier_manager,changed_map)
-    for i,v in ipairs(changed_map) do
-        for _,box in ipairs(self.boxes) do
-            if v == box:GetSoldierType() then
-                box:Refresh(City:GetSoldierManager():GetStarBySoldierType(v))
+function WidgetPromoteSoliderList:OnUserDataChanged_soldierStars(userData, deltaData)
+    local ok, value = deltaData("soldierStars")
+    if ok then
+        for soldier_name,star in pairs(value) do
+            for _,box in ipairs(self.boxes) do
+                if soldier_name == box:GetSoldierType() then
+                    box:Refresh(star)
+                end
             end
         end
     end
 end
-function WidgetPromoteSoliderList:OnSoldierStarEventsChanged(soldier_manager,changed_map)
-    for i,v in ipairs(changed_map[1]) do
-        for _,box in ipairs(self.boxes) do
-            if v.name == box:GetSoldierType() then
-                box:Refresh(City:GetSoldierManager():GetStarBySoldierType(v.name))
+function WidgetPromoteSoliderList:OnUserDataChanged_soldierStarEvents(userData, deltaData)
+    local User = User
+    local ok, value = deltaData("soldierStarEvents.add")
+    if ok then
+        for _,v in ipairs(value) do
+            for _,box in ipairs(self.boxes) do
+                if v.name == box:GetSoldierType() then
+                    box:Refresh(User:SoldierStarByName(v.name))
+                end
             end
         end
     end
-    for i,v in ipairs(changed_map[3]) do
-        for _,box in ipairs(self.boxes) do
-            if v.name == box:GetSoldierType() then
-                box:Refresh(City:GetSoldierManager():GetStarBySoldierType(v.name))
+    local ok, value = deltaData("soldierStarEvents.remove")
+    if ok then
+        for _,v in ipairs(value) do
+            for _,box in ipairs(self.boxes) do
+                if v.name == box:GetSoldierType() then
+                    box:Refresh(User:SoldierStarByName(v.name))
+                end
             end
         end
     end
 end
 
 return WidgetPromoteSoliderList
+
+
 
 
 

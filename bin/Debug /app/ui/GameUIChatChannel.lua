@@ -13,11 +13,16 @@ local GameUIWriteMail            = import('.GameUIWriteMail')
 local WidgetUIBackGround         = import("..widget.WidgetUIBackGround")
 local WidgetPushButton           = import("..widget.WidgetPushButton")
 local WidgetChatSendPushButton   = import("..widget.WidgetChatSendPushButton")
+local Report                     = import("..entity.Report")
+
 
 local LISTVIEW_WIDTH    = 556
 local PLAYERMENU_ZORDER = 201
 local BASE_CELL_HEIGHT  = 82
 local CELL_FIX_WIDTH    = 484
+
+local NAME_COLOR_SYSTEM = UIKit:hex2c3b(0x245f00) 
+local NAME_COLOR_NORMAL = UIKit:hex2c3b(0x005e6c) 
 
 function GameUIChatChannel:ctor(default_tag)
     GameUIChatChannel.super.ctor(self,City,_("聊天"))
@@ -98,7 +103,7 @@ function GameUIChatChannel:CreateTextFieldBody()
                     UIKit:showMessageDialog(_("提示"),_("加入联盟后开放此功能!"),function()end)
                     return
                 elseif self._channelType == 'allianceFight' then
-                    local status = my_alliance:Status()
+                    local status = my_alliance.basicInfo.status
                     if status ~= 'prepare' and status ~= 'fight' then
                         UIKit:showMessageDialog(_("提示"),_("联盟未处于战争状态，不能使用此聊天频道!"),function()end)
                         return
@@ -112,7 +117,9 @@ function GameUIChatChannel:CreateTextFieldBody()
             end
             editbox:setText('')
             self:GetChatManager():SendChat(self._channelType,msg,function()
-                self.sendChatButton:StartTimer()
+                if self.sendChatButton then
+                    self.sendChatButton:StartTimer()
+                end
             end)
         end
     end
@@ -140,7 +147,7 @@ function GameUIChatChannel:CreateTextFieldBody()
                 UIKit:showMessageDialog(_("提示"),_("加入联盟后开放此功能!"),function()end)
                 return
             elseif self._channelType == 'allianceFight' then
-                local status = my_alliance:Status()
+                local status = my_alliance.basicInfo.status
                 if status ~= 'prepare' and status ~= 'fight' then
                     UIKit:showMessageDialog(_("提示"),_("联盟未处于战争状态，不能使用此聊天频道!"),function()end)
                     return
@@ -228,11 +235,11 @@ end
 function GameUIChatChannel:ShowTipsIf()
     local my_alliance = Alliance_Manager:GetMyAlliance()
     if my_alliance:IsDefault() then
-        if self._channelType == 'alliance' then
+        if self._channelType == 'alliance' or self._channelType == 'allianceFight' then
             UIKit:showMessageDialog(_("提示"),_("加入联盟后开放此功能!"),function()end)
         end
     elseif self._channelType == 'allianceFight' then
-        local status = my_alliance:Status()
+        local status = my_alliance.basicInfo.status
         if status ~= 'prepare' and status ~= 'fight' then
             UIKit:showMessageDialog(_("提示"),_("联盟未处于战争状态，不能使用此聊天频道!"),function()end)
         end
@@ -250,9 +257,18 @@ function GameUIChatChannel:GetChatItemCell()
     local content = display.newNode()
     local other_content = display.newNode()
     local bottom = display.newScale9Sprite("chat_bubble_bottom_484x14.png"):addTo(other_content):align(display.RIGHT_BOTTOM,LISTVIEW_WIDTH, 0)
-    local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png"):addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH, 14)
-    local header = display.newScale9Sprite("chat_bubble_header_484x38.png"):addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH,34)
+    local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png"):addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH, 12)
+    local header = display.newScale9Sprite("chat_bubble_header_484x38.png"):addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH,32)
     local chat_icon = self:GetChatIcon():addTo(other_content):align(display.LEFT_TOP, 3, 72)
+    local system_label = UIKit:ttfLabel({
+        text = _("官方"),
+        size = 14,
+        color= 0xe2d9b8,
+        align = cc.TEXT_ALIGNMENT_CENTER,
+    })
+    local system_flag = display.newScale9Sprite("chat_system_flag_42x20.png",nil,nil,cc.size(system_label:getContentSize().width + 12,20),cc.rect(6,6,30,8))
+        :align(display.LEFT_BOTTOM, 7, 15):addTo(header)
+    system_label:addTo(system_flag):align(display.CENTER, system_flag:getContentSize().width/2,10)
     local from_label = UIKit:ttfLabel({
         text = "[ P/L ] SkinnMart",
         size = 18,
@@ -272,15 +288,22 @@ function GameUIChatChannel:GetChatItemCell()
         size = 14,
         color= 0x403c2f,
         align = cc.TEXT_ALIGNMENT_RIGHT,
-    }):align(display.BOTTOM_RIGHT, 450, 16):addTo(header)
+    }):align(display.BOTTOM_RIGHT, 440, 16):addTo(header)
 
-    local translation_sp = display.newSprite("chat_translation_45x43.png"):align(display.RIGHT_BOTTOM, 478,12):addTo(header):scale(25/45)
+    local translation_sp = WidgetPushButton.new({
+        normal = "tmp_brown_btn_up_36x24.png",
+        pressed= "tmp_brown_btn_down_36x24.png",
+    }):align(display.RIGHT_BOTTOM, 478,12):addTo(header)
+    display.newSprite("tmp_icon_translate_26x20.png"):addTo(translation_sp):pos(-18,12)
+    -- display.newSprite("chat_translation_45x43.png"):align(display.RIGHT_BOTTOM, 478,12):addTo(header):scale(25/45)
 
     local content_label = RichText.new({width = 430,size = 22,color = 0x403c2f})
     content_label:Text("")
     content_label:align(display.LEFT_BOTTOM, 10, 0):addTo(middle)
 
     -- set var
+    other_content.system_flag = system_flag
+    other_content.system_flag_with = system_flag:getContentSize().width
     other_content.content_label = content_label
     other_content.time_label = time_label
     other_content.translation_sp = translation_sp
@@ -297,8 +320,8 @@ function GameUIChatChannel:GetChatItemCell()
     -- mine
     local mine_content = display.newNode()
     local bottom = display.newScale9Sprite("chat_bubble_bottom_484x14.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 0)
-    local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 14)
-    local header = display.newScale9Sprite("chat_bubble_header_484x38.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0,34)
+    local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 12)
+    local header = display.newScale9Sprite("chat_bubble_header_484x38.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 32)
     local chat_icon = self:GetChatIcon():addTo(mine_content):align(display.RIGHT_TOP, LISTVIEW_WIDTH - 3, 72)
 
     local from_label = UIKit:ttfLabel({
@@ -367,7 +390,7 @@ function GameUIChatChannel:RefreshListView()
             -- UIKit:showMessageDialog(_("提示"),_("加入联盟后开放此功能!"),function()end)
             self.dataSource_ = {}
         elseif self._channelType == 'allianceFight' then
-            local status = my_alliance:Status()
+            local status = my_alliance.basicInfo.status
             if status ~= 'prepare' and status ~= 'fight' then
                 self.dataSource_ = {}
                 -- UIKit:showMessageDialog(_("提示"),_("联盟未处于战争状态，不能使用此聊天频道!"),function()end)
@@ -432,6 +455,18 @@ function GameUIChatChannel:HandleCellUIData(mainContent,chat,update_time)
     local vipLabel = currentContent.vip_label
     local name_title = chat.allianceTag == "" and chat.name or string.format("[ %s ] %s",chat.allianceTag,chat.name)
     titleLabel:setString(name_title)
+    if not isSelf then 
+        local system_flag = currentContent.system_flag
+        if string.lower(chat.id) == 'system' and system_flag then
+            system_flag:show()
+            titleLabel:pos(17 + currentContent.system_flag_with, 15)
+            titleLabel:setColor(NAME_COLOR_SYSTEM)
+        else
+            system_flag:hide()
+            titleLabel:setColor(NAME_COLOR_NORMAL)
+            titleLabel:pos(7, 15)
+        end
+    end
     if chat.vipActive then
         vipLabel:setString('VIP ' .. DataUtils:getPlayerVIPLevel(chat.vip))
         vipLabel:setPositionX(titleLabel:getPositionX() + titleLabel:getContentSize().width + 15)
@@ -451,8 +486,36 @@ function GameUIChatChannel:HandleCellUIData(mainContent,chat,update_time)
     if chat._translate_ and chat._translateMode_ then
         labelText = chat._translate_
     end
-    labelText = self:GetChatManager():GetEmojiUtil():ConvertEmojiToRichText(labelText)
-    content_label:Text(labelText) -- 聊天信息
+    if string.lower(chat.id) == 'system' then
+        labelText = self:GetChatManager():GetEmojiUtil():FormatSystemChat(labelText)
+        content_label:Text(labelText) -- 聊天信息
+    else
+        labelText = self:GetChatManager():GetEmojiUtil():ConvertEmojiToRichText(labelText)
+        if string.find(labelText,"\"url\":\"report:") then
+            content_label:Text(labelText,nil,function ( url )
+                local info = string.split(url,":")
+                NetManager:getReportDetailPromise(info[2],info[3]):done(function ( response )
+                    local report = Report:DecodeFromJsonData(clone(response.msg.report))
+                    report:SetPlayerId(info[2])
+                    if report:Type() == "strikeCity" or report:Type()== "cityBeStriked"
+                        or report:Type() == "villageBeStriked" or report:Type()== "strikeVillage" then
+                        UIKit:newGameUI("GameUIStrikeReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackCity" or report:Type() == "attackVillage" then
+                        UIKit:newGameUI("GameUIWarReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "collectResource" then
+                        UIKit:newGameUI("GameUICollectReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackMonster" then
+                        UIKit:newGameUI("GameUIMonsterReport", report):AddToCurrentScene(true)
+                    elseif report:Type() == "attackShrine" then
+                        UIKit:newGameUI("GameUIShrineReportInMail", report):AddToCurrentScene(true)
+                    end
+                    app:GetAudioManager():PlayeEffectSoundWithKey("OPEN_MAIL")
+                end)
+            end)
+        else
+            content_label:Text(labelText) -- 聊天信息
+        end
+    end
     content_label:align(display.LEFT_BOTTOM, 10, 0)
     if not isSelf then
         --重新布局
@@ -460,7 +523,7 @@ function GameUIChatChannel:HandleCellUIData(mainContent,chat,update_time)
             local height = content_label:getCascadeBoundingBox().height or 0
             height = math.max(height,20)
             middle:setContentSize(cc.size(CELL_FIX_WIDTH,height))
-            header:align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH, bottom:getContentSize().height+middle:getContentSize().height)
+            header:align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH, bottom:getContentSize().height+middle:getContentSize().height - 2)
             local fix_height = height - 20
             palyerIcon:align(display.LEFT_TOP,3, bottom:getContentSize().height+middle:getContentSize().height + header:getContentSize().height)
             local final_height = BASE_CELL_HEIGHT + fix_height
@@ -476,7 +539,7 @@ function GameUIChatChannel:HandleCellUIData(mainContent,chat,update_time)
         height = math.max(height,20)
         local fix_height = height - 20
         middle:setContentSize(cc.size(CELL_FIX_WIDTH,height))
-        header:align(display.LEFT_BOTTOM, 0, bottom:getContentSize().height+middle:getContentSize().height)
+        header:align(display.LEFT_BOTTOM, 0, bottom:getContentSize().height+middle:getContentSize().height - 2)
         palyerIcon:align(display.RIGHT_TOP,LISTVIEW_WIDTH - 3,bottom:getContentSize().height+middle:getContentSize().height + header:getContentSize().height)
         local final_height = BASE_CELL_HEIGHT + fix_height
         mainContent.other_content:size(LISTVIEW_WIDTH,final_height)
@@ -518,11 +581,18 @@ function GameUIChatChannel:listviewListener(event)
                 if string.utf8len(final_chat_msg) == 0 then
                     return
                 end
+                if string.find(chat.text,"<report>.+<report>") then
+                    return
+                end
                 GameUtils:Translate(final_chat_msg,function(result,errText)
                     if result then
                         chat._translate_ = result
                         chat._translateMode_ = true
-                        contentLable:Text(self:GetChatManager():GetEmojiUtil():ConvertEmojiToRichText(chat._translate_)) -- 聊天信息
+                        if string.lower(chat.id) == 'system' then
+                            contentLable:Text(self:GetChatManager():GetEmojiUtil():FormatSystemChat(chat._translate_))
+                        else
+                            contentLable:Text(self:GetChatManager():GetEmojiUtil():ConvertEmojiToRichText(chat._translate_)) -- 聊天信息
+                        end
                         contentLable:align(display.LEFT_BOTTOM, 10, 0)
                         local height = item:getContent().adjustFunc()
                         item:setItemSize(LISTVIEW_WIDTH,BASE_CELL_HEIGHT + height)
@@ -533,11 +603,19 @@ function GameUIChatChannel:listviewListener(event)
             else
                 if chat._translateMode_ then
                     chat._translateMode_ = false
-                    contentLable:Text(self:GetChatManager():GetEmojiUtil():ConvertEmojiToRichText(chat.text)) -- 聊天信息
+                    if string.lower(chat.id) == 'system' then
+                        contentLable:Text(self:GetChatManager():GetEmojiUtil():FormatSystemChat(chat.text))
+                    else
+                        contentLable:Text(self:GetChatManager():GetEmojiUtil():ConvertEmojiToRichText(chat.text)) -- 聊天信息
+                    end
                     contentLable:align(display.LEFT_BOTTOM, 10, 0)
                 else
                     chat._translateMode_ = true
-                    contentLable:Text(self:GetChatManager():GetEmojiUtil():ConvertEmojiToRichText(chat._translate_)) -- 聊天信息
+                    if string.lower(chat.id) == 'system' then
+                        contentLable:Text(self:GetChatManager():GetEmojiUtil():FormatSystemChat(chat._translate_))
+                    else
+                        contentLable:Text(self:GetChatManager():GetEmojiUtil():ConvertEmojiToRichText(chat._translate_)) -- 聊天信息
+                    end
                     contentLable:align(display.LEFT_BOTTOM, 10, 0)
                 end
                 local height = item:getContent().adjustFunc()
@@ -546,6 +624,9 @@ function GameUIChatChannel:listviewListener(event)
             return
         end
         if not listView:isItemFullyInViewRect(event.itemPos) then
+            return
+        end
+        if string.lower(chat.id) == 'system' then
             return
         end
         self:CreatePlayerMenu(event,chat)
@@ -601,7 +682,7 @@ function GameUIChatChannel:CreatePlayerMenu(event,chat)
             if layer.item then layer.item:removeSelf() end
         elseif msg == 'buttonCallback' then
             if data == 'playerInfo' then
-                UIKit:newGameUI("GameUIAllianceMemberInfo",false,chat.id):AddToCurrentScene(true)
+                UIKit:newGameUI("GameUIAllianceMemberInfo",false,chat.id,nil,chat.serverId):AddToCurrentScene(true)
             elseif data == 'sendMail' then
                 local mail = GameUIWriteMail.new(GameUIWriteMail.SEND_TYPE.PERSONAL_MAIL,{
                     id = chat.id,
@@ -625,13 +706,17 @@ function GameUIChatChannel:CreatePlayerMenu(event,chat)
             elseif data == 'allianceInfo' then
                 if not is_invate_action then
                     if chat.allianceId and string.len(chat.allianceId) > 0 then
-                        UIKit:newGameUI("GameUIAllianceInfo",chat.allianceId):AddToCurrentScene(true)
+                        UIKit:newGameUI("GameUIAllianceInfo",chat.allianceId,nil,chat.serverId):AddToCurrentScene(true)
                     end
                 else
                     if my_alliance:GetSelf():CanInvatePlayer() then
-                        NetManager:getInviteToJoinAlliancePromise(chat.id):done(function()
-                            UIKit:showMessageDialog(_("提示"), _("邀请发送成功"), function()end)
-                        end)
+                        if User.serverId ~= chat.serverId then
+                            UIKit:showMessageDialog(_("提示"), _("不能邀请其他服务器的玩家"), function()end)
+                        else
+                            NetManager:getInviteToJoinAlliancePromise(chat.id):done(function()
+                                UIKit:showMessageDialog(_("提示"), _("邀请发送成功"), function()end)
+                            end)
+                        end
                     else
                         UIKit:showMessageDialog(_("提示"), _("您没有此操作权限"), function()end)
                     end
@@ -670,4 +755,6 @@ function GameUIChatChannel:LeftButtonClicked()
 end
 
 return GameUIChatChannel
+
+
 

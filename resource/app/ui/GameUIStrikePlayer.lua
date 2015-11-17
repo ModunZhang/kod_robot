@@ -47,7 +47,7 @@ function GameUIStrikePlayer:ReloadDragon()
 		x = 307
 	end
 	self.dragon_sprite:setPositionX(x)
-	self.dragon_sprite:ReloadSpriteCauseTerrainChanged(dragon:GetTerrain())
+	self.dragon_sprite:ReloadSpriteCauseTerrainChanged(dragon:Type())
 end
 
 function GameUIStrikePlayer:OnMoveInStage()
@@ -61,16 +61,11 @@ end
 
 function GameUIStrikePlayer:GetMarchTime()
 	local from_alliance = Alliance_Manager:GetMyAlliance()
-	local mapObject = from_alliance:GetAllianceMap():FindMapObjectById(from_alliance:GetSelf():MapId())
+	local mapObject = from_alliance:FindMapObjectById(from_alliance:GetSelf():MapId())
     local fromLocation = mapObject.location
-	local target_alliance
-	if self.params.targetIsMyAlliance then
-		target_alliance = from_alliance
-	else
-		target_alliance = Alliance_Manager:GetEnemyAlliance()
-	end
+	
 	local toLocation = self.params.toLocation or cc.p(0,0)
-	local time = DataUtils:getPlayerDragonMarchTime(from_alliance,fromLocation,target_alliance,toLocation)
+	local time = DataUtils:getPlayerDragonMarchTime(from_alliance,fromLocation,self.params.alliance,toLocation)
 	return GameUtils:formatTimeStyle1(time)
 end
 
@@ -91,7 +86,7 @@ function GameUIStrikePlayer:BuildUI()
             x = 307
             y = 200
     end
-    self.dragon_sprite = DragonSprite.new(display.getRunningScene():GetSceneLayer(),self:GetDragon():GetTerrain()):addTo(clipNode):align(display.CENTER, x,y):scale(0.7)
+    self.dragon_sprite = DragonSprite.new(display.getRunningScene():GetSceneLayer(),self:GetDragon():Type()):addTo(clipNode):align(display.CENTER, x,y):scale(0.7)
 	self.list_view = UIListView.new ({
         viewRect = cc.rect(window.left+40,window.bottom + 85,window.width-80,475),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
@@ -113,14 +108,21 @@ function GameUIStrikePlayer:BuildUI()
 			local dragon = self:GetDragonManager():GetDragon(select_DragonType)
 
 			local alliance = Alliance_Manager:GetMyAlliance()
-			if alliance:GetAllianceBelvedere():IsReachEventLimit() then
-				UIKit:showMessageDialogWithParams({
-        			content = _("没有空闲的行军队列"),
-        			ok_callback = function()
-        				UIKit:newGameUI('GameUIWathTowerRegion',City,'march'):AddToCurrentScene(true)
-        			end,
-        			ok_string = _("前往解锁")
-    			})
+			if alliance:IsReachEventLimit() then
+				if User.basicInfo.marchQueue < 2 then
+					UIKit:showMessageDialogWithParams({
+	        			content = _("没有空闲的行军队列"),
+	        			ok_callback = function()
+	        				UIKit:newGameUI('GameUIWathTowerRegion',City,'march'):AddToCurrentScene(true)
+	        			end,
+	        			ok_string = _("前往解锁")
+	    			})
+				else
+					UIKit:showMessageDialogWithParams({
+	        			content = _("没有空闲的行军队列"),
+	        			ok_string = _("确定"),
+	    			})
+				end
     			return
 			end
 
@@ -239,13 +241,13 @@ function GameUIStrikePlayer:SendDataToServerRealy()
 	if self.strike_type == self.STRIKE_TYPE.CITY then
 		if self.params.targetIsProtected then
 			UIKit:showMessageDialog(_("提示"),_("目标城市已被击溃并进入保护期，可能无法发生战斗，你是否继续突袭?"), function()
-                NetManager:getStrikePlayerCityPromise(self:GetSelectDragonType(),self.params.memberId):done(function()
+                NetManager:getStrikePlayerCityPromise(self:GetSelectDragonType(),self.params.memberId,self.params.alliance._id):done(function()
 					app:GetAudioManager():PlayeEffectSoundWithKey("DRAGON_STRIKE")
 					self:LeftButtonClicked()
 				end)
             end,function()end)
         else
-        	NetManager:getStrikePlayerCityPromise(self:GetSelectDragonType(),self.params.memberId):done(function()
+        	NetManager:getStrikePlayerCityPromise(self:GetSelectDragonType(),self.params.memberId,self.params.alliance._id):done(function()
 				app:GetAudioManager():PlayeEffectSoundWithKey("DRAGON_STRIKE")
 				self:LeftButtonClicked()
 			end)
@@ -261,14 +263,14 @@ end
 function GameUIStrikePlayer:SendDataToServer()
 	local alliance = Alliance_Manager:GetMyAlliance()
 	local me = alliance:GetSelf()
-    if me:IsProtected() then
-    	local str = self.strike_type == self.STRIKE_TYPE.CITY and _("突袭玩家城市将失去保护状态，确定继续派兵?") or _("突袭村落将失去保护状态，确定继续派兵?")
-		 UIKit:showMessageDialog(_("提示"),str,function()
-		 	self:SendDataToServerRealy()
-		 end)
-	else
+ --    if me:IsProtected() then
+ --    	local str = self.strike_type == self.STRIKE_TYPE.CITY and _("突袭玩家城市将失去保护状态，确定继续派兵?") or _("突袭村落将失去保护状态，确定继续派兵?")
+	-- 	 UIKit:showMessageDialog(_("提示"),str,function()
+	-- 	 	self:SendDataToServerRealy()
+	-- 	 end)
+	-- else
 		self:SendDataToServerRealy()
-    end
+    -- end
 end
 
 function GameUIStrikePlayer:OnStrikeButtonClicked()

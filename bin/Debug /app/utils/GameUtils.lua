@@ -13,6 +13,17 @@ local tonumber = tonumber
 local round = function(v)
     return floor(v + 0.5)
 end
+local function clamp(a,b,x)
+    return x < a and a or (x > b and b or x)
+end
+function GameUtils:GetCurrentProduction(value,refreshTime,limit,output,currentTime)
+    local trv = value + (currentTime - refreshTime) * output * 0.00027777777777778 --[[ 1 / 3600 = 0.00027777777777778]]
+    return floor(clamp(
+        0, 
+        output >= 0 and ((value >= limit and trv >= limit) and value or limit) or math.huge, 
+        trv
+        ))
+end
 function GameUtils:formatTimeStyle1(time)
     local seconds = floor(time) % 60
     time = time / 60
@@ -275,13 +286,66 @@ function GameUtils:PingBaidu(callback)
     local request = network.createHTTPRequest(function(event)
         if event.name == "completed" then
             callback(true)
-        elseif eventName == "failed" then
+        elseif event.name == "failed" then
             callback(false)
         end
     end, "http://www.baidu.com", "GET")
     request:setTimeout(180)
     request:start()
 end
+
+function GameUtils:GetServerInfo(param, callback)
+    local request = network.createHTTPRequest(function(event)
+        if event.name == "completed" then
+            callback(true, json.decode(event.request:getResponseData()))
+        elseif event.name == "failed" then
+            callback(false)
+        end
+    end, 
+    string.format("http://gate.batcatstudio.com/dragonfall/query-entry?env=%s&version=%s", string.urlencode(param.env), string.urlencode(param.version)), "GET")
+    request:setTimeout(180)
+    request:start()
+end
+
+function GameUtils:UploadErrors(error)
+    local url = "gm.batcatstudio.com/errors/create"
+    local requestGet = network.createHTTPRequest(function(event)
+        local ok = (event.name == "completed")
+        local request = event.request
+
+        if not ok then
+            -- 请求失败，显示错误代码和错误消息
+            -- print(request:getErrorCode(), request:getErrorMessage())
+            return
+        end
+
+        local code = request:getResponseStatusCode()
+        if code ~= 200 then
+            -- 请求结束，但没有返回 200 响应代码
+            -- print(code)
+            return
+        end
+        -- 请求成功，显示服务端返回的内容
+        local requestPost = network.createHTTPRequest(function(event)
+            local ok = (event.name == "completed")
+            local request = event.request
+
+            if not ok then
+                -- 请求失败，显示错误代码和错误消息
+                print(request:getErrorCode(), request:getErrorMessage())
+                return
+            end
+        end, url, "POST")
+        requestPost:setCookieString(network.makeCookieString(network.parseCookie(request:getCookieString())))
+        requestPost:addPOSTValue("_csrf", json.decode(request:getResponseString()).token)
+        requestPost:addPOSTValue("deviceId", device.getOpenUDID())
+        requestPost:addPOSTValue("stack", error)
+        requestPost:start()
+    end, url, "GET")
+    requestGet:start()
+end
+
+
 
 --ver 2.2.4
 --TODO:return po文件对应的语言代码！
@@ -307,12 +371,12 @@ end
 local apple_lang_map = {
     ['zh-Hans'] = 'cn',
     ['zh-Hant'] = 'tw',
-    ['en'] = 'en',
+    -- ['en'] = 'en',
 }
 local lang_map = {
     cn = { po = 'zh_CN', code = 'cn' },
     tw = { po = 'zh_TW', code = 'tw' },
-    en = { po = 'en', code = 'en' },
+    -- en = { po = 'en', code = 'en' },
 }
 function GameUtils:GetAppleLanguageCode()
     local code = ext.getDeviceLanguage()

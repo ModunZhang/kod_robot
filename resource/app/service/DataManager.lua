@@ -42,42 +42,43 @@ function DataManager:getFteData()
     return initData
 end
 
-function DataManager:setEnemyAllianceData(enemyAllianceData,deltaData)
-    self.enemyAllianceData = enemyAllianceData
-    if GLOBAL_FTE then return end
-    if not Alliance_Manager then
+function DataManager:OnUserDataChanged(userData, timer, deltaData)
+    if not User or not City or not Alliance_Manager or not MailManager then
         print(debug.traceback("", 2))
         assert(false)
     end
-    LuaUtils:TimeCollect(function()
-        Alliance_Manager:OnEnemyAllianceDataChanged(enemyAllianceData,app.timer:GetServerTime(),deltaData)
-    end, "DataManager:setEnemyAllianceData")
-end
-
-function DataManager:getEnemyAllianceData()
-    return self.enemyAllianceData
-end
-
-function DataManager:OnUserDataChanged(userData,timer, deltaData)
-    if not User or not ItemManager or not City or not Alliance_Manager or not MailManager then
-        print(debug.traceback("", 2))
-        assert(false)
+    -- 代国强 ， 收到全数据推送时，关闭所有需要关闭的UI，避免UI表现和真实数据不一致，引起bug
+    if deltaData == nil then
+        UIKit:closeAllUI()
     end
     LuaUtils:TimeCollect(function()
-        User:OnUserDataChanged(userData, timer, deltaData)
+        User:OnUserDataChanged(userData, deltaData)
+        if not deltaData then
+            User:RefreshOutput()
+            User:GeneralLocalPush()
+        end
     end, "User:OnUserDataChanged")
-    LuaUtils:TimeCollect(function()
-        ItemManager:OnUserDataChanged(userData, timer, deltaData)
-    end, "ItemManager:OnUserDataChanged")
+
     LuaUtils:TimeCollect(function()
         City:OnUserDataChanged(userData, timer, deltaData)
     end, "City:OnUserDataChanged")
+    
+    User:OnDeltaDataChanged(deltaData)
+
     LuaUtils:TimeCollect(function()
         Alliance_Manager:OnUserDataChanged(userData, timer, deltaData)
     end, "Alliance_Manager:OnUserDataChanged")
+    
     LuaUtils:TimeCollect(function()
         MailManager:OnUserDataChanged(userData, timer, deltaData)
     end, "MailManager:OnUserDataChanged")
+
+    if userData and not deltaData then
+        local scene_name = display.getRunningScene().__cname
+        if scene_name == "MyCityScene" then
+            app:EnterMyCityScene()
+        end
+    end
 end
 
 

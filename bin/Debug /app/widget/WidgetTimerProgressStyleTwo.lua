@@ -27,18 +27,13 @@ function WidgetTimerProgressStyleTwo:ctor(height,title)
         {
             disabled = {name = "GRAY", params = {0.2, 0.3, 0.5, 0.1}}
         }
-    ):setButtonLabel(cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+    ):setButtonLabel(UIKit:ttfLabel({
         text = _("加速"),
         size = 24,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)}))
+        color = 0xfff3c7,
+        shadow = true}))
         :addTo(back_ground_351x96, 2)
         :align(display.CENTER, 608 - 90, 70)
-    -- self:SetButtonImages({normal = "purple_btn_up_148x58.png",
-    --             pressed = "purple_btn_down_148x58.png",
-    --             disabled = "purple_btn_up_148x58.png",
-    --         })
     back_ground_351x96:addTo(self)
     self.back_ground = back_ground_351x96
 end

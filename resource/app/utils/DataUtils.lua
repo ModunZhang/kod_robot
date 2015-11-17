@@ -6,6 +6,7 @@ local items = GameDatas.Items
 local normal_soldier = GameDatas.Soldiers.normal
 local special_soldier = GameDatas.Soldiers.special
 local soldier_vs = GameDatas.ClientInitGame.soldier_vs
+local buff = GameDatas.AllianceMap.buff
 local Localize = import("..utils.Localize")
 
 DataUtils = {}
@@ -22,6 +23,27 @@ local tonumber = tonumber
 local round = function(v)
     return floor(v + 0.5)
 end
+
+--[[
+坐标换算
+]]
+local intInit = GameDatas.AllianceInitData.intInit
+local bigMapLength_value = intInit.bigMapLength.value
+local MAP_LEGNTH_WIDTH = bigMapLength_value
+local MAP_LEGNTH_HEIGHT = bigMapLength_value
+local ALLIANCE_WIDTH, ALLIANCE_HEIGHT = intInit.allianceRegionMapWidth.value, intInit.allianceRegionMapHeight.value
+function DataUtils:GetAbsolutePosition(mapIndex, x, y)
+    local lx, ly = mapIndex % MAP_LEGNTH_WIDTH, math.floor(mapIndex / MAP_LEGNTH_WIDTH)
+    return lx * ALLIANCE_WIDTH + x, ly * ALLIANCE_HEIGHT + y
+end
+function DataUtils:GetAlliancePosition(x, y)
+    local mapIndex = math.floor(x / ALLIANCE_WIDTH) + math.floor(y / ALLIANCE_HEIGHT) * MAP_LEGNTH_WIDTH
+    return mapIndex, x % ALLIANCE_WIDTH, y % ALLIANCE_HEIGHT
+end
+--[[
+end
+]]
+
 
 --[[
   获取建筑升级时,需要的资源和道具
@@ -62,8 +84,9 @@ function DataUtils:buyResource(need, has)
         if config and required > 0 then
             local currentBuy = 0
             if key == "citizen" then
-                local freeCitizenLimit = City:GetResourceManager():GetCitizenResource():GetValueLimit()
-                while required > 0 do
+                local freeCitizenLimit = User:GetResProduction("citizen").limit
+                assert(freeCitizenLimit ~= 0)
+                while required > 0 and freeCitizenLimit ~= 0 do
                     local requiredPercent = required / freeCitizenLimit
                     for i=#config,1,-1 do
                         item = config[i]
@@ -150,7 +173,7 @@ function DataUtils:getDragonTotalStrengthFromJson(star,level,skills,equipments)
     for body,equipemt in pairs(equipments) do
         if equipemt.name ~= "" then
             local config = self:getDragonEquipmentConfig(equipemt.name)
-            local attribute = self:getDragonEquipmentAttribute(body,config.maxStar,equipemt.star)
+            local attribute = self:getDragonEquipmentAttribute(equipemt.type,config.maxStar,equipemt.star)
             strength = attribute and (strength + attribute.strength) or strength
         end
     end
@@ -164,17 +187,17 @@ function DataUtils:getTotalVitalityFromJson(star,level,skills,equipments)
     for body,equipemt in pairs(equipments) do
         if equipemt.name ~= "" then
             local config = self:getDragonEquipmentConfig(equipemt.name)
-            local attribute = self:getDragonEquipmentAttribute(body,config.maxStar,equipemt.star)
+            local attribute = self:getDragonEquipmentAttribute(equipemt.type,config.maxStar,equipemt.star)
             vitality = attribute and (vitality + attribute.vitality) or vitality
         end
     end
     return vitality
 end
 
-function DataUtils:getDragonSkillEffect(skillName,level)
+function DataUtils:getDragonSkillEffect(level)
     level = checkint(level)
-    if config_dragonSkill[skillName] then
-        return level * config_dragonSkill[skillName].effectPerLevel
+    if config_dragonSkill[level] then
+        return config_dragonSkill[level].effect
     end
     return 0
 end
@@ -197,7 +220,7 @@ end
 function DataUtils:__getDragonStrengthBuff(skills)
     for __,v in pairs(skills) do
         if v.name == 'dragonBreath' then
-            return self:getDragonSkillEffect(v.name,v.level)
+            return self:getDragonSkillEffect(v.level)
         end
     end
     return 0
@@ -206,7 +229,7 @@ end
 function DataUtils:__getDragonVitalityBuff(skills)
     for __,v in pairs(skills) do
         if v.name == 'dragonBlood' then
-            return self:getDragonSkillEffect(v.name,v.level)
+            return self:getDragonSkillEffect(v.level)
         end
     end
     return 0
@@ -214,7 +237,7 @@ end
 --如果有道具加龙属性 这里就还未完成
 function DataUtils:getDragonMaxHp(star,level,skills,equipments)
     local vitality = self:getTotalVitalityFromJson(star,level,skills,equipments)
-    return vitality * 2
+    return vitality * 4
 end
 -- 通过buff名获得士兵属性字段
 function DataUtils:getSoldierBuffFieldFromKey(key)
@@ -230,11 +253,15 @@ end
 function DataUtils:getAllSoldierBuffValue(solider_config)
     local result = {}
     local soldier_type = solider_config.type
-    local item_buff = ItemManager:GetAllSoldierBuffData()
-    local military_technology_buff = City:GetSoldierManager():GetAllMilitaryBuffData()
+    local item_buff = UtilsForItem:GetAllSoldierBuffData(User)
+    local military_technology_buff = User:GetMilitaryBuff()
     table.insertto(item_buff,military_technology_buff)
     local vip_buff = self:getAllSoldierVipBuffValue()
     table.insertto(item_buff,vip_buff)
+    local terrain_attack_buff = User:GetTerrainAttackBuff()
+    table.insertto(item_buff,terrain_attack_buff)
+    local terrain_defence_buff = User:GetTerrainDefenceBuff()
+    table.insertto(item_buff,terrain_defence_buff)
     for __,v in ipairs(item_buff) do
         local effect_soldier,buff_field,buff_value = unpack(v)
         if effect_soldier == soldier_type or effect_soldier == '*' then
@@ -286,12 +313,8 @@ end
 --获取建筑时间的buff
 --buildingTime:升级或建造原来的时间
 function DataUtils:getBuildingBuff(buildingTime)
-    local tech = City:FindTechByName('crane')
-    if tech and tech:Level() > 0 then
-        return DataUtils:getBuffEfffectTime(buildingTime, tech:GetBuffEffectVal())
-    else
-        return 0
-    end
+    local tech_effect = UtilsForTech:GetEffect("crane", User.productionTechs["crane"])
+    return DataUtils:getBuffEfffectTime(buildingTime, tech_effect)
 end
 
 local AllianceInitData = GameDatas.AllianceInitData
@@ -305,55 +328,79 @@ function DataUtils:getDistance(width,height)
 end
 
 function DataUtils:getAllianceLocationDistance(fromAllianceDoc, fromLocation, toAllianceDoc, toLocation)
-    local width,height = 0,0
-    if fromAllianceDoc == toAllianceDoc then
-        width = math.abs(fromLocation.x - toLocation.x)
-        height =  math.abs(fromLocation.y - toLocation.y)
-        return DataUtils:getDistance(width,height)
+    local getMapIndexLocation = function(mapIndex)
+        return {
+            x = mapIndex % bigMapLength_value,
+            y = math.floor(mapIndex / bigMapLength_value)
+        }
     end
-    if fromAllianceDoc:GetAllianceFight()['attackAllianceId'] == fromAllianceDoc:Id() then
-        local allianceMergeStyle = fromAllianceDoc:GetAllianceFight()['mergeStyle']
-        if allianceMergeStyle == 'left' then
-            width = AllianceMapSize.width - fromLocation.x + toLocation.x
-            height= math.abs(fromLocation.y - toLocation.y)
-            return DataUtils:getDistance(width,height)
-        elseif allianceMergeStyle == 'right' then
-            width = AllianceMapSize.width - toLocation.x + fromLocation.x
-            height= math.abs(fromLocation.y - toLocation.y)
-            return DataUtils:getDistance(width,height)
-        elseif allianceMergeStyle == 'top' then
-            width = math.abs(fromLocation.x - toLocation.x)
-            height= AllianceMapSize.height - fromLocation.y + toLocation.y
-            return DataUtils:getDistance(width,height)
-        elseif allianceMergeStyle == 'bottom' then
-            width = math.abs(fromLocation.x - toLocation.x)
-            height= AllianceMapSize.height - toLocation.y + fromLocation.y
-            return DataUtils:getDistance(width,height)
-        else
-            return 0
-        end
-    else
-        local allianceMergeStyle = fromAllianceDoc:GetAllianceFight()['mergeStyle']
-        if allianceMergeStyle == 'left' then
-            width = AllianceMapSize.width - toLocation.x + fromLocation.x
-            height = math.abs(fromLocation.y - toLocation.y)
-            return DataUtils:getDistance(width,height)
-        elseif allianceMergeStyle == 'right' then
-            width = AllianceMapSize.width - fromLocation.x + toLocation.x
-            height = math.abs(fromLocation.y - toLocation.y)
-            return DataUtils:getDistance(width,height)
-        elseif allianceMergeStyle == 'top' then
-            width = math.abs(fromLocation.x - toLocation.x)
-            height = AllianceMapSize.height - toLocation.y + fromLocation.y
-            return DataUtils:getDistance(width,height)
-        elseif allianceMergeStyle == 'bottom' then
-            width = math.abs(fromLocation.x - toLocation.x)
-            height = AllianceMapSize.height - fromLocation.y + toLocation.y
-            return DataUtils:getDistance(width,height)
-        else
-            return 0
-        end
-    end
+
+    local fromMapIndexLocation = getMapIndexLocation(fromAllianceDoc.mapIndex)
+    local toMapIndexLocation = getMapIndexLocation(toAllianceDoc.mapIndex)
+
+    local fromLocation_change = {
+        x = fromLocation.x + (fromMapIndexLocation.x * AllianceMapSize.width),
+        y = fromLocation.y + (fromMapIndexLocation.y * AllianceMapSize.height)
+    }
+    local toLocation_change = {
+        x = toLocation.x + (toMapIndexLocation.x * AllianceMapSize.width),
+        y = toLocation.y + (toMapIndexLocation.y * AllianceMapSize.height)
+    }
+
+    local width = math.abs(fromLocation_change.x - toLocation_change.x)
+    local height = math.abs(fromLocation_change.y - toLocation_change.y)
+
+    return DataUtils:getDistance(width,height)
+
+        -- local width,height = 0,0
+        -- if fromAllianceDoc == toAllianceDoc then
+        --     width = math.abs(fromLocation.x - toLocation.x)
+        --     height =  math.abs(fromLocation.y - toLocation.y)
+        --     return DataUtils:getDistance(width,height)
+        -- end
+        -- if fromAllianceDoc:GetAllianceFight()['attackAllianceId'] == fromAllianceDoc._id then
+        --     local allianceMergeStyle = fromAllianceDoc:GetAllianceFight()['mergeStyle']
+        --     if allianceMergeStyle == 'left' then
+        --         width = AllianceMapSize.width - fromLocation.x + toLocation.x
+        --         height= math.abs(fromLocation.y - toLocation.y)
+        --         return DataUtils:getDistance(width,height)
+        --     elseif allianceMergeStyle == 'right' then
+        --         width = AllianceMapSize.width - toLocation.x + fromLocation.x
+        --         height= math.abs(fromLocation.y - toLocation.y)
+        --         return DataUtils:getDistance(width,height)
+        --     elseif allianceMergeStyle == 'top' then
+        --         width = math.abs(fromLocation.x - toLocation.x)
+        --         height= AllianceMapSize.height - fromLocation.y + toLocation.y
+        --         return DataUtils:getDistance(width,height)
+        --     elseif allianceMergeStyle == 'bottom' then
+        --         width = math.abs(fromLocation.x - toLocation.x)
+        --         height= AllianceMapSize.height - toLocation.y + fromLocation.y
+        --         return DataUtils:getDistance(width,height)
+        --     else
+        --         return 0
+        --     end
+        -- else
+        --     local allianceMergeStyle = fromAllianceDoc:GetAllianceFight()['mergeStyle']
+        --     if allianceMergeStyle == 'left' then
+        --         width = AllianceMapSize.width - toLocation.x + fromLocation.x
+        --         height = math.abs(fromLocation.y - toLocation.y)
+        --         return DataUtils:getDistance(width,height)
+        --     elseif allianceMergeStyle == 'right' then
+        --         width = AllianceMapSize.width - fromLocation.x + toLocation.x
+        --         height = math.abs(fromLocation.y - toLocation.y)
+        --         return DataUtils:getDistance(width,height)
+        --     elseif allianceMergeStyle == 'top' then
+        --         width = math.abs(fromLocation.x - toLocation.x)
+        --         height = AllianceMapSize.height - toLocation.y + fromLocation.y
+        --         return DataUtils:getDistance(width,height)
+        --     elseif allianceMergeStyle == 'bottom' then
+        --         width = math.abs(fromLocation.x - toLocation.x)
+        --         height = AllianceMapSize.height - fromLocation.y + toLocation.y
+        --         return DataUtils:getDistance(width,height)
+        --     else
+        --         return 0
+        --     end
+        -- end
 end
 --[[
     -->
@@ -373,11 +420,13 @@ end
 
 function DataUtils:getPlayerMarchTimeBuffEffectValue()
     local effect = 0
-    if ItemManager:IsBuffActived("marchSpeedBonus") then
-        effect = effect + ItemManager:GetBuffEffect("marchSpeedBonus")
+    if User:IsItemEventActive("marchSpeedBonus") then
+        effect = effect + UtilsForItem:GetItemBuff("marchSpeedBonus")
     end
-    --vip buffer
+    -- vip buffer
     effect = effect + User:GetVIPMarchSpeedAdd()
+    -- 联盟行军buff
+    effect = effect + buff[self:getMapRoundByMapIndex(Alliance_Manager:GetMyAlliance().mapIndex)].marchSpeedAddPercent / 100
     return effect
 end
 --获取攻击行军的buff时间
@@ -449,7 +498,7 @@ function DataUtils:GetPlayerNextOnlineTimePoint()
 end
 
 function DataUtils:getPlayerOnlineTimeSecondes()
-    local countInfo = User:GetCountInfo()
+    local countInfo = User.countInfo
     local onlineTime = countInfo.todayOnLineTime + (NetManager:getServerTime() - countInfo.lastLoginTime)
     return math.floor(onlineTime / 1000)
 end
@@ -470,8 +519,8 @@ end
 --龙的生命值恢复buff
 function DataUtils:GetDragonHpBuffTotal()
     local effect = 0
-    if ItemManager:IsBuffActived("dragonHpBonus") then
-        effect = effect + ItemManager:GetBuffEffect("dragonHpBonus")
+    if User:IsItemEventActive("dragonHpBonus") then
+        effect = effect + UtilsForItem:GetItemBuff("dragonHpBonus")
     end
     effect = effect + User:GetVIPDragonHpRecoveryAdd()
     return effect
@@ -492,7 +541,7 @@ function DataUtils:getItemsPrice( items )
     local total_price = 0
     for k,v in pairs(items) do
         local tag_item = Items.buff[k] or Items.resource[k] or Items.special[k] or Items.speedup[k]
-        total_price = total_price + tag_item.price
+        total_price = total_price + tag_item.price * v
     end
     return total_price
 end
@@ -507,7 +556,6 @@ end
 --联盟名称随机
 local config_clientinitgame = GameDatas.ClientInitGame
 function DataUtils:__getRandomAllianceNameAndTag()
-    -- math.randomseed(User:GetCountInfo().registerTime or os.time())
     local __categore = math.random(1,5)
     local name = ""
     local tag = ""
@@ -566,34 +614,35 @@ function DataUtils:randomAllianceNameTag()
 end
 -- 获取特殊兵种招募状态，返回true 招募进行中；返回时间，下次招募开始时间
 function DataUtils:GetNextRecruitTime()
-    local can_re_time = PlayerInitData.intInit.specialSoldierRecruitAbleDays.value..""
-    local days = {}
-    for i=1,string.len(can_re_time) do
-        table.insert(days, tonumber(string.sub(can_re_time,i,i)))
-    end
-    -- local current_day = 3
-    local current_day = tonumber(os.date("!%w", app.timer:GetServerTime()))
-    local next_day = 7
-    for i,v in ipairs(days) do
-        v = v == 7 and 0 or v
-        if v==current_day then
-            return true
-        else
-            if current_day<v then
-                next_day = math.min(next_day,v)
-            end
-        end
-    end
+    -- local can_re_time = PlayerInitData.intInit.specialSoldierRecruitAbleDays.value..""
+    -- local days = {}
+    -- for i=1,string.len(can_re_time) do
+    --     table.insert(days, tonumber(string.sub(can_re_time,i,i)))
+    -- end
+    -- -- local current_day = 3
+    -- local current_day = tonumber(os.date("!%w", app.timer:GetServerTime()))
+    -- local next_day = 7
+    -- for i,v in ipairs(days) do
+    --     v = v == 7 and 0 or v
+    --     if v==current_day then
+    --         return true
+    --     else
+    --         if current_day<v then
+    --             next_day = math.min(next_day,v)
+    --         end
+    --     end
+    -- end
 
-    local year = os.date('!%Y', app.timer:GetServerTime())
-    local month = os.date('!%m', app.timer:GetServerTime())
-    local day = os.date('!%d', app.timer:GetServerTime())
-    local hour = os.date('!%H', app.timer:GetServerTime())
-    local min = os.date('!%M', app.timer:GetServerTime())
-    local sec = os.date('!%S', app.timer:GetServerTime())
+    -- local year = os.date('!%Y', app.timer:GetServerTime())
+    -- local month = os.date('!%m', app.timer:GetServerTime())
+    -- local day = os.date('!%d', app.timer:GetServerTime())
+    -- local hour = os.date('!%H', app.timer:GetServerTime())
+    -- local min = os.date('!%M', app.timer:GetServerTime())
+    -- local sec = os.date('!%S', app.timer:GetServerTime())
 
-    local next_time = (next_day-current_day) * 24 * 60 * 60 - hour * 60 * 60 - min * 60 - sec
-    return next_time
+    -- local next_time = (next_day-current_day) * 24 * 60 * 60 - hour * 60 * 60 - min * 60 - sec
+    -- return next_time
+    return true
 end
 function DataUtils:GetDragonSkillUnLockStar(skillName)
     for __,v in ipairs(config_dragonStar) do
@@ -651,8 +700,8 @@ local function getPlayerSoldierAtkBuff(soldierName, soldierStar, dragon, terrain
     local soldierType = getSoldiersConfig(soldierName, soldierStar).type
 
     local eventType = soldierType.."AtkBonus"
-    if ItemManager:IsBuffActived(eventType) then
-        local effect1 = ItemManager:GetBuffEffect(eventType)
+    if User:IsItemEventActive(eventType) then
+        local effect1 = UtilsForItem:GetItemBuff(eventType)
         itemBuff = effect1
     end
 
@@ -683,8 +732,8 @@ local function getPlayerSoldierHpBuff(soldierName, soldierStar, dragon, terrain,
     local skillBuff = 0
     local equipmentBuff = 0
 
-    if ItemManager:IsBuffActived("unitHpBonus") then
-        local effect1 = ItemManager:GetBuffEffect("unitHpBonus")
+    if User:IsItemEventActive("unitHpBonus") then
+        local effect1 = UtilsForItem:GetItemBuff("unitHpBonus")
         itemBuff = effect1
     end
 
@@ -709,19 +758,18 @@ local function getPlayerSoldierHpBuff(soldierName, soldierStar, dragon, terrain,
 end
 local function createPlayerSoldiersForFight(soldiers, dragon, terrain, is_dragon_win)
     return LuaUtils:table_map(soldiers, function(k, soldier)
-        local soldier_man = City:GetSoldierManager()
-        -----
-        local config = getSoldiersConfig(soldier.name, soldier.star)
-        local atkBuff = getPlayerSoldierAtkBuff(soldier.name, soldier.star, dragon, terrain, is_dragon_win)
+        -- local soldier_man = City:GetSoldierManager()
+        -- local config = getSoldiersConfig(soldier.name, soldier.star)
+        -- local atkBuff = getPlayerSoldierAtkBuff(soldier.name, soldier.star, dragon, terrain, is_dragon_win)
         -- var atkWallBuff = self.getDragonAtkWallBuff(dragon)
-        local hpBuff = getPlayerSoldierHpBuff(soldier.name, soldier.star, dragon, terrain, is_dragon_win)
-        local techBuffToInfantry = soldier_man:GetMilitaryTechsByName(config.type.."_".."infantry"):GetAtkEff()
-        local techBuffToArcher = soldier_man:GetMilitaryTechsByName(config.type.."_".."archer"):GetAtkEff()
-        local techBuffToCavalry = soldier_man:GetMilitaryTechsByName(config.type.."_".."cavalry"):GetAtkEff()
-        local techBuffToSiege = soldier_man:GetMilitaryTechsByName(config.type.."_".."siege"):GetAtkEff()
-        local techBuffHpAdd = soldier_man:GetMilitaryTechsByName(config.type.."_".."hpAdd"):GetAtkEff()
-        local vipAttackBuff = User:GetVIPSoldierAttackPowerAdd()
-        local vipHpBuff = User:GetVIPSoldierHpAdd()
+        -- local hpBuff = getPlayerSoldierHpBuff(soldier.name, soldier.star, dragon, terrain, is_dragon_win)
+        -- local techBuffToInfantry = soldier_man:GetMilitaryTechsByName(config.type.."_".."infantry"):GetAtkEff()
+        -- local techBuffToArcher = soldier_man:GetMilitaryTechsByName(config.type.."_".."archer"):GetAtkEff()
+        -- local techBuffToCavalry = soldier_man:GetMilitaryTechsByName(config.type.."_".."cavalry"):GetAtkEff()
+        -- local techBuffToSiege = soldier_man:GetMilitaryTechsByName(config.type.."_".."siege"):GetAtkEff()
+        -- local techBuffHpAdd = soldier_man:GetMilitaryTechsByName(config.type.."_".."hpAdd"):GetAtkEff()
+        -- local vipAttackBuff = User:GetVIPSoldierAttackPowerAdd()
+        -- local vipHpBuff = User:GetVIPSoldierHpAdd()
         -- dump(hpBuff, "hpBuff")
         -- dump(vipHpBuff, "vipHpBuff")
         -- dump(atkBuff, "atkBuff")
@@ -753,8 +801,8 @@ end
 local function getPlayerDragonExpAdd(dragon)
     local itemBuff = 0
     local vipBuff = User:GetVIPDragonExpAdd()
-    if ItemManager:IsBuffActived("dragonExpBonus") then
-        local effect1 = ItemManager:GetBuffEffect("dragonExpBonus")
+    if User:IsItemEventActive("dragonExpBonus") then
+        local effect1 = UtilsForItem:GetItemBuff("dragonExpBonus")
         itemBuff = effect1
     end
     return itemBuff + vipBuff
@@ -1065,7 +1113,7 @@ function DataUtils:DoBattle(attacker, defencer, terrain, enemy_name)
     function report:IsPveBattle()
     end
     function report:GetFightAttackName()
-        return User:Name()
+        return User.basicInfo.name
     end
     function report:GetFightDefenceName()
         return enemy_name
@@ -1130,14 +1178,13 @@ local function getBuildingBuffForResourceProtectPercent(resourceName)
     end
     return protectPercent
 end
-local function getPlayerItemBuffForResourceLootPercentSubtract()
-    local itemBuff = 0
-    local eventType = "masterOfDefender"
-    if ItemManager:IsBuffActived( eventType ) then
-        itemBuff = items.buffTypes.masterOfDefender.effect2
-    end
-    return itemBuff
-end
+-- local function getPlayerItemBuffForResourceLootPercentSubtract()
+--     local itemBuff = 0
+--     if User:IsItemEventActive("masterOfDefender") then
+--         itemBuff = items.buffTypes.masterOfDefender.effect2
+--     end
+--     return itemBuff
+-- end
 local function getPlayerVipForResourceLootPercentSubtract()
     local vipBuffAddPercent = 0
     if User:IsVIPActived() then
@@ -1148,13 +1195,104 @@ end
 function DataUtils:GetResourceProtectPercent( resource_name )
     local basePercent = PlayerInitData.intInit.playerResourceProtectPercent.value / 100
     local buildingBuffAddPercent = getBuildingBuffForResourceProtectPercent(resource_name)
-    local itemBuffAddPercent = getPlayerItemBuffForResourceLootPercentSubtract(defencePlayerDoc)
+    -- local itemBuffAddPercent = getPlayerItemBuffForResourceLootPercentSubtract(defencePlayerDoc)
     local vipBuffAddPercent = getPlayerVipForResourceLootPercentSubtract()
-    local finalPercent = basePercent + buildingBuffAddPercent + itemBuffAddPercent + vipBuffAddPercent
+    local tech_effect = UtilsForTech:GetEffect("hideout", User.productionTechs["hideout"])
+    local finalPercent = basePercent + buildingBuffAddPercent + vipBuffAddPercent + tech_effect
     finalPercent = finalPercent > 0.9 and 0.9 or finalPercent < 0.1 and 0.1 or finalPercent
     return finalPercent
 end
+--根据MapIndex获取MapRound
+function DataUtils:getMapRoundByMapIndex( mapIndex )
+    local bigMapLength = bigMapLength_value
+    local roundMax = math.floor(bigMapLength / 2)
+    local locationX = mapIndex % bigMapLength
+    local locationY = math.floor(mapIndex / bigMapLength)
+    local locations = {}
+    for i=0,roundMax do
+        local location = {}
+        local width = bigMapLength - (i * 2);
+        local height = bigMapLength - (i * 2);
+
+        local x = i
+        local y = i
+        local from = {x = x, y =y}
+        local to = {x = x + width - 1, y = y}
+        table.insert(location, {from = from, to = to})
+
+        x = i
+        y = height - 1 + i
+        if x ~= y then
+            from = {x = x, y = y}
+            to = {x = x + width - 1, y = y}
+            table.insert(location, {from = from, to = to})
+        end
+
+        if i ~= roundMax then
+            x = i
+            y = i + 1
+            from = {x = x, y = y}
+            to = {x = x, y = y + height - 2 - 1}
+            table.insert(location, {from = from, to = to})
+
+            x = width - 1 + i
+            y = i + 1
+            if x ~= y then
+                from = {x = x, y = y}
+                to = {x = x, y = y + height - 2 - 1}
+                table.insert(location, {from = from, to = to})
+            end
+        end
+        table.insert(locations, location)
+    end
+    local theRound = nil
+    for round,location in ipairs(locations) do
+        for i,v in ipairs(location) do
+            if v.from.x <= locationX and v.from.y <= locationY and v.to.x >= locationX and v.to.y >= locationY then
+                theRound = round - 1 
+            end
+        end
+    end
+    return theRound and (roundMax - theRound)
+end
+--根据MapIndex获取对应buff增益数量
+function DataUtils:getMapBuffNumByMapIndex( mapIndex )
+        local map_round = self:getMapRoundByMapIndex(mapIndex)
+        local buff_1 = buff[map_round]
+        local buff_num = 0
+        for i,v in pairs(buff_1) do
+            if i ~="monsterLevel" and i ~= "round" and v > 0 then
+                buff_num = buff_num + 1
+            end
+        end
+        return buff_num
+end
+
+function DataUtils:GetAllianceMapBuffByRound(round)
+    local aliance_buff = buff[round]
+    local buff_info = {}
+
+    for i,v in ipairs({"monsterLevel","villageAddPercent","dragonExpAddPercent","bloodAddPercent","marchSpeedAddPercent","dragonStrengthAddPercent","loyaltyAddPercent","honourAddPercent"}) do
+        if v =="monsterLevel" then
+            local levels = string.split(aliance_buff[v],"_")
+            table.insert(buff_info, {
+                {Localize.alliance_buff[v],0x403c2f},
+                {string.format("Lv%s~Lv%s",levels[1],levels[2]),0x288400}
+            })
+        else
+            table.insert(buff_info, {
+                {Localize.alliance_buff[v],0x403c2f},
+                {(aliance_buff[v] > 0 and "+" or "")..aliance_buff[v].."%",aliance_buff[v] > 0 and 0x288400 or 0xe34724}
+            })
+        end
+    end
+    return buff_info
+end
+
 return DataUtils
+
+
+
 
 
 

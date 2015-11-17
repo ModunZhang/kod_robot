@@ -14,6 +14,13 @@ local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton
 local config_stringInit = GameDatas.PlayerInitData.stringInit
 local Localize_item = import("..utils.Localize_item")
 
+
+
+function GameUIDailyMissionInfo:OnUserDataChanged_dailyTasks()
+    self:RefreshListUI()
+end
+
+
 function GameUIDailyMissionInfo:ctor(key_of_daily)
     GameUIDailyMissionInfo.super.ctor(self)
     self.key_of_daily = key_of_daily
@@ -40,7 +47,7 @@ end
 
 function GameUIDailyMissionInfo:onEnter()
     GameUIDailyMissionInfo.super.onEnter(self)
-    User:AddListenOnType(self,User.LISTEN_TYPE.DAILY_TASKS)
+    User:AddListenOnType(self, "dailyTasks")
     self:BuildUI()
 end
 
@@ -285,8 +292,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
                 func = function()
                     local dragon_type = City:GetDragonEyrie():GetDragonManager():GetCanFightPowerfulDragonType()
                     if #dragon_type > 0 then
-                        local _,_,index = City:GetUser():GetPVEDatabase():GetCharPosition()
-                        app:EnterPVEScene(index)
+                        app:EnterPVEScene(City:GetUser():GetLatestPveIndex())
                     else
                         GameGlobalUI:showTips(_("错误"),_("需要一条空闲状态的魔龙才能探险"))
                         return false
@@ -317,7 +323,7 @@ function GameUIDailyMissionInfo:GetMissionConfig()
                         GameGlobalUI:showTips(_("错误"),_("你还未加入联盟"))
                         return false
                     end
-                    local building = Alliance_Manager:GetMyAlliance():GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+                    local building = Alliance_Manager:GetMyAlliance():FindAllianceBuildingInfoByName("shop")
                     UIKit:newGameUI("GameUIAllianceShop",City,"goods",building):AddToCurrentScene(true)
                     return false
                 end
@@ -394,14 +400,8 @@ function GameUIDailyMissionInfo:GetMissionConfig()
     }
     return config
 end
-
-
-function GameUIDailyMissionInfo:OnDailyTasksChanged()
-    self:RefreshListUI()
-end
-
 function GameUIDailyMissionInfo:onExit()
-    User:RemoveListenerOnType(self,User.LISTEN_TYPE.DAILY_TASKS)
+    User:RemoveListenerOnType(self, "dailyTasks")
     GameUIDailyMissionInfo.super.onExit(self)
 end
 

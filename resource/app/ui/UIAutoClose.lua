@@ -6,7 +6,9 @@ local UIAutoClose = class('UIAutoClose', GameUIBase)
 local BODY_TAG = 2101
 function UIAutoClose:ctor(params)
     UIAutoClose.super.ctor(self,params)
-    local node = display.newColorLayer(UIKit:hex2c4b(0x7a000000))
+    params = params or {}
+    local node = display.newColorLayer(params.color or UIKit:hex2c4b(0x7a000000))
+    self.colorbackgound = node
     node:setNodeEventEnabled(true)
     local is_began_out = false
     node:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)

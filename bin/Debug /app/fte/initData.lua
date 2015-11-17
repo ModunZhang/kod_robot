@@ -46,7 +46,7 @@ return {
             index = 13,
             level = 0
         },
-        negotiation = {
+        recruitment = {
             index = 16,
             level = 0
         },
@@ -132,21 +132,9 @@ return {
         swordsman = 1
     },
     pve = {
-        rewardedFloors = { },
-        floors = { 
-            {
-                level = 1,
-                fogs = "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-                objects = "[[9,12,0]]"
-            }
-        },
-        location = {
-            z = 1,
-            y = 12,
-            x = 12
-        },
-        totalStep = 0
+        {rewarded = {}, sections= {}}
     },
+    pveFights = {},
     dailyQuests = {
         quests = { },
         refreshTime = 0
@@ -468,12 +456,6 @@ return {
             type = "warehouse",
             houses = { },
             location = 3,
-            level = 1
-        },
-        location_2 = {
-            type = "watchTower",
-            houses = { },
-            location = 2,
             level = 1
         },
         location_1 = {

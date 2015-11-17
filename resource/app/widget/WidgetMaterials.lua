@@ -3,7 +3,6 @@ local window = import("..utils.window")
 local WidgetMaterialBox = import("..widget.WidgetMaterialBox")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetMaterialDetails = import("..widget.WidgetMaterialDetails")
-local MaterialManager = import("..entity.MaterialManager")
 local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local BUILDING_MATERIALS = {
     "blueprints" ,
@@ -65,15 +64,9 @@ function WidgetMaterials:ctor(city,building)
     self:setNodeEventEnabled(true)
     self.city = city
     self.building = building
-    city:GetMaterialManager():AddObserver(self)
 end
-
-function WidgetMaterials:onExit()
-    self.city:GetMaterialManager():RemoveObserver(self)
-    self.building:RemoveUpgradeListener(self)
-end
-
 function WidgetMaterials:onEnter()
+    local User = self.city:GetUser()
     local list,list_node = UIKit:commonListView({
         viewRect = cc.rect(0, 0,568, 675),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
@@ -81,44 +74,46 @@ function WidgetMaterials:onEnter()
     list_node:align(display.BOTTOM_CENTER, window.cx, window.bottom_top+20):addTo(self)
     self.material_listview = list
     self:CreateSelectButton()
-    self.building:AddUpgradeListener(self)
+    User:AddListenOnType(self, "dragonMaterials")
+    User:AddListenOnType(self, "buildings")
+    User:AddListenOnType(self, "soldierMaterials")
+    User:AddListenOnType(self, "buildingMaterials")
+    User:AddListenOnType(self, "technologyMaterials")
+    User:AddListenOnType(self, "buildingEvents")
 end
-function WidgetMaterials:OnBuildingUpgradingBegin()
+function WidgetMaterials:onExit()
+    local User = self.city:GetUser()
+    User:RemoveListenerOnType(self, "dragonMaterials")
+    User:RemoveListenerOnType(self, "buildings")
+    User:RemoveListenerOnType(self, "soldierMaterials")
+    User:RemoveListenerOnType(self, "buildingMaterials")
+    User:RemoveListenerOnType(self, "technologyMaterials")
+    User:RemoveListenerOnType(self, "buildingEvents")
 end
-function WidgetMaterials:OnBuildingUpgradeFinished(building)
-    for i,v in pairs(self.material_box_table) do
-        local material_map = self.city:GetMaterialManager():GetMaterialMap()[i]
-        for k,m in pairs(v) do
-            m:SetNumber(string.formatnumberthousands(material_map[k]).."/"..string.formatnumberthousands(building:GetMaxMaterial()))
-        end
-    end
-end
-function WidgetMaterials:OnBuildingUpgrading()
-end
-function WidgetMaterials:CreateItemWithListView(material_type,materials,notClean)
+function WidgetMaterials:CreateItemWithListView(material_key,materials,notClean)
     local list_view = self.material_listview
     if not notClean then
         list_view:removeAllItems()
         self.material_box_table = {}
     end
-    local material_map = self.city:GetMaterialManager():GetMaterialMap()[material_type]
+    local material_map = self.city:GetUser()[material_key]
     local rect = list_view:getViewRect()
     local origin_x = - rect.width / 2
     local unit_width ,unit_height = 130 , 166
     local gap_x = (568 - unit_width * 4) / 3
     local row_item = display.newNode()
     local row_count = 0
-    self.material_box_table[material_type]={}
+    self.material_box_table[material_key]={}
     local change_line_count = 3
     for i,material_name in ipairs(materials) do
         if string.find(material_name,"redSoul") or string.find(material_name,"blueSoul") or string.find(material_name,"greenSoul") then
             change_line_count = 2
         end
-        local material_box = WidgetMaterialBox.new(material_type,material_name,function ()
-            self:OpenMaterialDetails(material_type,material_name,material_map[material_name].."/"..self.building:GetMaxMaterial())
+        local material_box = WidgetMaterialBox.new(material_key,material_name,function ()
+            self:OpenMaterialDetails(material_key,material_name,material_map[material_name].."/"..self.building:GetMaxMaterial())
         end,true):addTo(row_item):SetNumber(string.formatnumberthousands(material_map[material_name]).."/"..string.formatnumberthousands(self.building:GetMaxMaterial()))
             :pos(origin_x + (unit_width + gap_x) * row_count , -unit_height/2)
-        self.material_box_table[material_type][material_name] = material_box
+        self.material_box_table[material_key][material_name] = material_box
         row_count = row_count + 1
         if row_count > change_line_count or i == #materials then
             local item = list_view:newItem()
@@ -138,22 +133,22 @@ function WidgetMaterials:SelectOneTypeMaterials(m_type)
         self:CreateItemWithListView(m_type,material_1)
     end
     if material_2 then
-        self:CreateItemWithListView(MaterialManager.MATERIAL_TYPE.TECHNOLOGY,material_2,true)
+        self:CreateItemWithListView("technologyMaterials",material_2,true)
     end
 end
 function WidgetMaterials:GetMateriasl( m_type )
-    if m_type == MaterialManager.MATERIAL_TYPE.BUILD then
+    if m_type == "buildingMaterials" then
         return BUILDING_MATERIALS,TECHNOLOGY_MATERIALS
     end
-    if m_type == MaterialManager.MATERIAL_TYPE.DRAGON then
+    if m_type == "dragonMaterials" then
         return DRAGON_MATERIALS
     end
-    if m_type == MaterialManager.MATERIAL_TYPE.SOLDIER then
+    if m_type == "soldierMaterials" then
         return SOLDIER_METARIALS
     end
 end
-function WidgetMaterials:OpenMaterialDetails(material_type,material_name,num)
-UIKit:newWidgetUI("WidgetMaterialDetails",material_type,material_name,num):AddToCurrentScene()
+function WidgetMaterials:OpenMaterialDetails(material_key,material_name,num)
+    UIKit:newWidgetUI("WidgetMaterialDetails",material_key,material_name,num):AddToCurrentScene()
 end
 function WidgetMaterials:CreateSelectButton()
     self.dropList = WidgetRoundTabButtons.new(
@@ -164,30 +159,82 @@ function WidgetMaterials:CreateSelectButton()
         },
         function(tag)
             if tag == '1' then
-                self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.SOLDIER)
+                self:SelectOneTypeMaterials("soldierMaterials")
             end
             if tag == '2' then
-                self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.BUILD)
+                self:SelectOneTypeMaterials("buildingMaterials")
             end
             if tag == '3' then
-                self:SelectOneTypeMaterials(MaterialManager.MATERIAL_TYPE.DRAGON)
+                self:SelectOneTypeMaterials("dragonMaterials")
             end
         end
     )
     self.dropList:align(display.TOP_CENTER,window.cx,window.top-86):addTo(self,2)
 
 end
-
-
-function WidgetMaterials:OnMaterialsChanged(material_manager,material_type,changed_table)
-    for k,v in pairs(changed_table) do
-        if self.material_box_table[material_type] and self.material_box_table[material_type][k] then
-            self.material_box_table[material_type][k]:SetNumber(string.formatnumberthousands(v.new).."/"..string.formatnumberthousands(self.building:GetMaxMaterial()))
+function WidgetMaterials:OnUserDataChanged_buildingEvents()
+    local User = self.city:GetUser()
+    local max = self.city:GetFirstBuildingByType("materialDepot"):GetMaxMaterial()
+    for material_key,v in pairs(self.material_box_table) do
+        local material_map = User[material_key]
+        for k,m in pairs(v) do
+            m:SetNumber(
+                string.formatnumberthousands(material_map[k])
+                .."/"..
+                string.formatnumberthousands(max))
+        end
+    end
+end
+function WidgetMaterials:OnUserDataChanged_buildings(userData, deltaData)
+    local ok,value = deltaData("buildings.location_8")
+    if ok then
+        local User = self.city:GetUser()
+        local max = self.city:GetFirstBuildingByType("materialDepot"):GetMaxMaterial()
+        for material_key,v in pairs(self.material_box_table) do
+            local material_map = User[material_key]
+            for k,m in pairs(v) do
+                m:SetNumber(
+                    string.formatnumberthousands(material_map[k])
+                    .."/"..
+                    string.formatnumberthousands(max))
+            end
+        end
+    end
+end
+function WidgetMaterials:OnUserDataChanged_dragonMaterials(userData, deltaData)
+    self:OnMaterialChangedByKey("dragonMaterials", deltaData("dragonMaterials"))
+end
+function WidgetMaterials:OnUserDataChanged_soldierMaterials(userData, deltaData)
+    self:OnMaterialChangedByKey("soldierMaterials", deltaData("soldierMaterials"))
+end
+function WidgetMaterials:OnUserDataChanged_buildingMaterials(userData, deltaData)
+    self:OnMaterialChangedByKey("buildingMaterials", deltaData("buildingMaterials"))
+end
+function WidgetMaterials:OnUserDataChanged_technologyMaterials(userData, deltaData)
+    self:OnMaterialChangedByKey("technologyMaterials", deltaData("technologyMaterials"))
+end
+function WidgetMaterials:OnMaterialChangedByKey(material_key, ok, value)
+    if ok then
+        for k,v in pairs(value) do
+            if self.material_box_table[material_key] and
+                self.material_box_table[material_key][k] then
+                self.material_box_table[material_key][k]:SetNumber(
+                    string.formatnumberthousands(v)
+                    .."/"..
+                    string.formatnumberthousands(self.building:GetMaxMaterial())
+                )
+            end
         end
     end
 end
 
+
+
+
 return WidgetMaterials
+
+
+
 
 
 

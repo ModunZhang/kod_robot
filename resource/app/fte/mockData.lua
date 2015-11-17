@@ -212,7 +212,7 @@ local function UpgradeBuildingTo(type, level)
             {
                 id = 1,
                 startTime = start_time,
-                finishTime = start_time + buildTime * 1000,
+                finishTime = start_time + (buildTime-5) * 1000,
                 location = location_id,
             }
         }
@@ -329,19 +329,34 @@ end
 
 
 
-local function FightWithNpc(floor)
-    mock{
-        {"pve.floors.0",
-            {
-                level = 1,
-                fogs = "0000000000000000000000000000000000m|10W|300|700{F00yV00u|00m|10W|300|700000000000000000000000000000000000",
-                objects = string.format("[[9,12,%d]]", floor)
-            }
-        },
-        {"pve.location.x", 9}
-    }
+local function FightWithNpc(pve_name)
+    local dragon_str = string.format("dragons.%s", get_dragon_type())
+    if pve_name == "1_1" then
+        mock{
+            {"items.3", {name = "foodClass_2", count = 1}},
+            {"pve.0", {sections = {3}, rewarded = {}}},
+            {"pveFights.0", {sectionName = pve_name, count = 1}},
+            {dragon_str..".exp", 32},
+        }
+    elseif pve_name == "1_2" then
+        mock{
+            {"items.3", {name = "foodClass_2", count = 2}},
+            {"pve.0.sections.1", 3},
+            {"pveFights.1", {sectionName = pve_name, count = 1}},
+            {dragon_str..".exp", 70},
+        }
+    elseif pve_name == "1_3" then
+        mock{
+            {"pve.0.sections.2", 3},
+            {"pveFights.2", {sectionName = pve_name, count = 1}},
+            {dragon_str..".exp", 42},
+            {dragon_str..".level", 2},
+        }
+    else
+        assert(false)
+    end
 
-    if floor > 2 then
+    if pve_name == "1_3" then
         mock{
             {"soldierMaterials.magicBox", 1},
             {"soldierMaterials.deathHand", 1},
@@ -350,10 +365,10 @@ local function FightWithNpc(floor)
         }
     end
 
-    local key = string.format("FightWithNpc%d", floor)
+    local key = string.format("FightWithNpc%s", pve_name)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("探索pve:"..floor, "empty")
+        ext.market_sdk.onPlayerEvent("探索pve:"..pve_name, "empty")
     end
 end
 

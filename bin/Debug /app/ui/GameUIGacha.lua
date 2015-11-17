@@ -21,10 +21,16 @@ end
 
 function GameUIGacha:CreateBetweenBgAndTitle()
     GameUIGacha.super.CreateBetweenBgAndTitle(self)
-
     self.ordinary_layer = display.newLayer():addTo(self:GetView())
-
     self.deluxe_layer = display.newLayer():addTo(self:GetView())
+    scheduleAt(self, function()
+        if self.ordinary_layer.current_casinoToken_label then
+            self.ordinary_layer.current_casinoToken_label:setString(string.formatnumberthousands(User:GetResValueByType("casinoToken")))
+        end
+        if self.deluxe_layer.current_casinoToken_label then
+            self.deluxe_layer.current_casinoToken_label:setString(string.formatnumberthousands(User:GetResValueByType("casinoToken")))
+        end
+    end)
 end
 
 function GameUIGacha:OnMoveInStage()
@@ -58,7 +64,7 @@ function GameUIGacha:OnMoveInStage()
         end
     end):pos(window.cx, window.bottom + 34)
 
-    User:AddListenOnType(self,User.LISTEN_TYPE.COUNT_INFO)
+    User:AddListenOnType(self, "countInfo")
 end
 function GameUIGacha:onExit()
     if self.OrdinaryGachaPool then
@@ -67,7 +73,7 @@ function GameUIGacha:onExit()
     if self.DeluxeGachaPool then
         self.DeluxeGachaPool:Destory()
     end
-    User:RemoveListenerOnType(self,User.LISTEN_TYPE.COUNT_INFO)
+    User:RemoveListenerOnType(self, "countInfo")
     GameUIGacha.super.onExit(self)
 end
 
@@ -111,7 +117,7 @@ function GameUIGacha:CreateGachaPool(layer)
         :align(display.CENTER, 120,122):scale(0.3)
     local city = self.city
     layer.current_casinoToken_label = UIKit:ttfLabel({
-        text = string.formatnumberthousands(city:GetResourceManager():GetCasinoTokenResource():GetValue()),
+        text = string.formatnumberthousands(User:GetResValueByType("casinoToken")),
         size = 18,
         color = 0xffd200,
     }):addTo(draw_thing_bg):align(display.LEFT_CENTER,140,118)
@@ -299,6 +305,7 @@ function GameUIGacha:CreateGachaPool(layer)
         end
         layer:EnAbleButton(false)
         local terminal_point
+        print("item_name=",item_name,"count=",item[2])
         for i,item in ipairs(items) do
             if item:GetGachaItemName() == item_name and item:GetGachaItemCount()== self.current_gacha_item_count then
                 terminal_point = i
@@ -427,13 +434,12 @@ function GameUIGacha:InitOrdinary()
         :setButtonLabelOffset(0,20)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                if User:GetOddFreeNormalGachaCount()<1 and self.city:GetResourceManager():GetCasinoTokenResource():GetValue()<intInit.casinoTokenNeededPerNormalGacha.value then
+                if User:GetOddFreeNormalGachaCount()<1 and User:GetResValueByType("casinoToken")<intInit.casinoTokenNeededPerNormalGacha.value then
                     WidgetUseItems.new():Create({
-                        item_type = WidgetUseItems.USE_TYPE.RESOURCE,
                         item_name = "casinoTokenClass_1"
                     }):AddToCurrentScene()
                 else
-                    local clone_items = clone(ItemManager:GetItems())
+                    local clone_items = clone(User.items)
                     NetManager:getNormalGachaPromise():done(function(response)
                         if response.msg.playerData then
                             local data = response.msg.playerData
@@ -442,7 +448,7 @@ function GameUIGacha:InitOrdinary()
                                 local key = string.split(v[1], ".")[1]
                                 if key == "items" then
                                     items[1] = v[2].name
-                                    local count = clone_items[v[2].name]:Count() > 0 and v[2].count - clone_items[v[2].name]:Count() or v[2].count
+                                    local count = UtilsForItem:GetItemCount(clone_items, v[2].name) > 0 and v[2].count - UtilsForItem:GetItemCount(clone_items, v[2].name) or v[2].count
                                     items[2] = count
                                 end
                             end
@@ -525,9 +531,8 @@ function GameUIGacha:InitDeluxe()
         :setButtonLabelOffset(0,20)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                if self.city:GetResourceManager():GetCasinoTokenResource():GetValue()<intInit.casinoTokenNeededPerAdvancedGacha.value then
+                if User:GetResValueByType("casinoToken")<intInit.casinoTokenNeededPerAdvancedGacha.value then
                     WidgetUseItems.new():Create({
-                        item_type = WidgetUseItems.USE_TYPE.RESOURCE,
                         item_name = "casinoTokenClass_1"
                     }):AddToCurrentScene()
                 else
@@ -572,17 +577,8 @@ function GameUIGacha:InitDeluxe()
         button:setButtonEnabled(enabled)
     end
 end
-function GameUIGacha:OnResourceChanged(resource_manager)
-    GameUIGacha.super.OnResourceChanged(self,resource_manager)
-    if self.ordinary_layer.current_casinoToken_label then
-        self.ordinary_layer.current_casinoToken_label:setString(string.formatnumberthousands(resource_manager:GetCasinoTokenResource():GetValue()))
-    end
-    if self.deluxe_layer.current_casinoToken_label then
-        self.deluxe_layer.current_casinoToken_label:setString(string.formatnumberthousands(resource_manager:GetCasinoTokenResource():GetValue()))
-    end
-end
 
-function GameUIGacha:OnCountInfoChanged()
+function GameUIGacha:OnUserDataChanged_countInfo()
     if User:GetOddFreeNormalGachaCount()>0 then
         local button = self.normal_gacha_button
         button:setButtonLabel(UIKit:commonButtonLable({

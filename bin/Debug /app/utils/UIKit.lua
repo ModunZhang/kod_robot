@@ -253,8 +253,6 @@ function UIKit:getImageByBuildingType( building_type ,level)
         return "keep_1.png"
     elseif building_type=="dragonEyrie" then
         return "dragonEyrie.png"
-    elseif building_type=="watchTower" then
-        return "watchTower_445x638.png"
     elseif building_type=="warehouse" then
         return "warehouse_498x468.png"
     elseif building_type=="toolShop" then
@@ -325,8 +323,8 @@ function UIKit:getImageByBuildingType( building_type ,level)
         else
             return "miner_3_326x307.png"
         end
-    elseif building_type=="moonGate" then
-        return UILib.alliance_building.moonGate
+    elseif building_type=="watchTower" then
+        return UILib.alliance_building.watchTower
     elseif building_type=="orderHall" then
         return UILib.alliance_building.orderHall
     elseif building_type=="palace" then
@@ -394,6 +392,23 @@ function UIKit:GetPlayerIconOnly(key,isOnline)
         return isOnline and display.newSprite(UILib.player_icon[1]) or self:getDiscolorrationSprite(UILib.player_icon[1])
     end
     return isOnline and display.newSprite(self:GetPlayerIconImage(key)) or self:getDiscolorrationSprite(self:GetPlayerIconImage(key))
+end
+-- 带背景框的龙头像
+function UIKit:GetDragonHeadWithFrame(dragonType)
+    local dragon_bg = display.newSprite("dragon_bg_114x114.png")
+    local dragon_img = display.newSprite(UILib.dragon_head[dragonType])
+        :align(display.CENTER, dragon_bg:getContentSize().width/2, dragon_bg:getContentSize().height/2+5)
+        :addTo(dragon_bg)
+    function dragon_bg:setDragonImg(dragonType)
+        if UILib.dragon_head[dragonType] then
+            dragon_img:setTexture(UILib.dragon_head[dragonType])
+            dragon_img:show()
+        else
+            dragon_bg:setTexture(dragonType)
+            dragon_img:hide()
+        end
+    end
+    return dragon_bg
 end
 --TODO:将这个函数替换成CreateBoxPanel9来实现
 function UIKit:CreateBoxPanel(height)
@@ -509,23 +524,30 @@ function UIKit:createLineItem(params)
     -- 分割线
     local line = display.newScale9Sprite("dividing_line.png",0,0,cc.size(params.width,2),cc.rect(10,2,382,2))
     local line_size = line:getContentSize()
-    self:ttfLabel(
+    local text_1 = params.text_1
+    local text_2 = params.text_2
+    local is_one_table = tolua.type(text_1) == "table"
+    local is_two_table = tolua.type(text_2) == "table"
+    local title_lable = self:ttfLabel(
         {
-            text = params.text_1,
+            text = is_one_table and text_1[1] or text_1,
             size = 20,
-            color = 0x615b44
+            color = is_one_table and text_1[2] or 0x615b44
         }):align(display.LEFT_BOTTOM, 0, 4)
         :addTo(line)
     local value_label = self:ttfLabel(
         {
-            text = params.text_2,
+            text = is_two_table and text_2[1] or text_2,
             size = 22,
-            color = 0x403c2f
+            color = is_two_table and text_2[2] or 0x403c2f
         }):align(display.RIGHT_BOTTOM, line_size.width, 4)
         :addTo(line)
 
-    function line:SetValue(value)
+    function line:SetValue(value,title)
         value_label:setString(value)
+        if title then
+            title_lable:setString(title)
+        end
     end
     return line
 end
@@ -708,17 +730,64 @@ function UIKit:showMessageDialogWithParams(params)
     return dialog
 end
 -- 可能得到材料的派兵行为检查
-function UIKit:showSendTroopMessageDialog(attack_func,material_type,effect_str)
-    if City:GetMaterialManager():CheckOutOfRangeByType(material_type) then
+function UIKit:showSendTroopMessageDialog(attack_func,material_name,effect_str,isNotEffection)
+    -- 特殊提示，医院爆满，特殊兵种材料爆满
+    local is_hospital_overhead = City:GetFirstBuildingByType("hospital"):IsWoundedSoldierOverhead()
+    local is_material_overhead = User:IsMaterialOutOfRange(material_name)
+    -- 
+    if is_material_overhead and not isNotEffection or is_hospital_overhead then
         local dialog = self:showMessageDialogWithParams({
             title = _("提示"),
-            content = _(string.format(_("当前材料库房中的%s材料已满，你可能无法获得此次战斗所得的材料奖励。是否仍要派兵？"),effect_str)),
             ok_callback = attack_func,
             ok_btn_images = {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},
             ok_string = _("强行派兵"),
             cancel_callback = function () end,
             cancel_btn_images = {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"}
         })
+        dialog:HideTipBg()
+        local body = dialog:GetBody()
+        local hospital_bg = WidgetUIBackGround.new({width = 332 ,height = 96},WidgetUIBackGround.STYLE_TYPE.STYLE_5):addTo(body):pos(236,220)
+        display.newSprite("hospital.png"):addTo(hospital_bg):align(display.LEFT_CENTER, 16, hospital_bg:getContentSize().height/2):scale(0.35)
+        self:ttfLabel({
+            text = _("医院"),
+            size = 20,
+            color = 0x403c2f
+        }):align(display.LEFT_CENTER, 110, 65)
+            :addTo(hospital_bg)
+        local label_1
+        if is_hospital_overhead then
+            display.newSprite("icon_warning_22x42.png"):addTo(hospital_bg):align(display.CENTER, 75, hospital_bg:getContentSize().height/2 + 15)
+            label_1 = _("爆满,将无法接纳伤兵")
+        else
+            label_1 = _("正常")
+        end
+        self:ttfLabel({
+            text = label_1,
+            size = 18,
+            color = is_hospital_overhead and 0x7e0000 or 0x007c23
+        }):align(display.LEFT_CENTER, 110, 30)
+            :addTo(hospital_bg)
+        local materialDepot_bg = WidgetUIBackGround.new({width = 332 ,height = 96},WidgetUIBackGround.STYLE_TYPE.STYLE_5):addTo(body):pos(236,100)
+        display.newSprite("materialDepot.png"):addTo(materialDepot_bg):align(display.LEFT_CENTER, 16, materialDepot_bg:getContentSize().height/2):scale(0.35)
+        self:ttfLabel({
+            text = _("材料库房"),
+            size = 20,
+            color = 0x403c2f
+        }):align(display.LEFT_CENTER, 110, 65)
+            :addTo(materialDepot_bg)
+        local label_1
+        if is_material_overhead then
+            display.newSprite("icon_warning_22x42.png"):addTo(materialDepot_bg):align(display.CENTER, 75, materialDepot_bg:getContentSize().height/2 + 15)
+            label_1 = string.format(_("%s材料已满"),effect_str)
+        else
+            label_1 = _("正常")
+        end
+        self:ttfLabel({
+            text = label_1,
+            size = 18,
+            color = is_material_overhead and 0x7e0000 or 0x007c23
+        }):align(display.LEFT_CENTER, 110, 30)
+            :addTo(materialDepot_bg)
     else
         attack_func()
     end
@@ -849,10 +918,10 @@ function UIKit:GotoPreconditionBuilding(jump_building)
     end)
 end
 -- 暂时只有宝箱
-function UIKit:PlayUseItemAni(items,awards,message)
-    if string.find(items:Name(),"dragonChest") or string.find(items:Name(),"chest") then
+function UIKit:PlayUseItemAni(item_name,awards,message)
+    if string.find(item_name,"dragonChest") 
+        or string.find(item_name,"chest") then
         local ani = ""
-        local item_name = items:Name()
         if item_name == "dragonChest_1" then
             ani = "lanse"
         elseif item_name == "dragonChest_2" then
@@ -869,7 +938,7 @@ function UIKit:PlayUseItemAni(items,awards,message)
             ani = "jin_box"
         end
         if ani then
-            self:newGameUI("GameUIChest", items,awards,message,ani):AddToCurrentScene():setLocalZOrder(10000)
+            self:newGameUI("GameUIChest",awards,message,ani):AddToCurrentScene():setLocalZOrder(10000)
         end
     end
 end
@@ -899,15 +968,16 @@ function UIKit:getIapPackageName(productId)
     return Localize.iap_package_name[productId]
 end
 
-function UIKit:addTipsToNode( node,tips , include_node)
+function UIKit:addTipsToNode( node,tips , include_node ,tip_dimensions)
     node:setTouchEnabled(true)
     node:setTouchSwallowEnabled(false)
     local tips_bg
     if not include_node:getChildByTag(9090) then
-        tips_bg = display.newScale9Sprite("back_ground_240x73.png",0,0,cc.size(240,73),cc.rect(10,10,220,53))
+        tips_bg = display.newScale9Sprite("back_ground_240x73.png",0,0,cc.size(240,73),cc.rect(20,20,200,33))
             :addTo(include_node):align(display.BOTTOM_CENTER)
         tips_bg:setTag(9090)
-        local text_1 = UIKit:ttfLabel({text = tips,size = 20 ,color = 0xfff2b3})
+        dump(tip_dimensions,"tip_dimensions")
+        local text_1 = UIKit:ttfLabel({text = tips,size = 20 ,color = 0xfff2b3,dimensions = tip_dimensions})
             :addTo(tips_bg)
         tips_bg:size(text_1:getContentSize().width+20,text_1:getContentSize().height+40)
         local t_size = tips_bg:getContentSize()
@@ -955,7 +1025,7 @@ function UIKit:GetItemImage(reward_type,item_key)
         return UILib.item[item_key]
     elseif reward_type == 'dragonMaterials' then
         return UILib.dragon_material_pic_map[item_key]
-    elseif reward_type == 'allianceInfo' then
+    elseif reward_type == 'allianceData' then
         if item_key == 'loyalty' then
             return "loyalty_128x128.png"
         end
@@ -970,7 +1040,7 @@ function UIKit:ShakeAction(is_forever, delay)
     is_forever = is_forever or true
     delay = delay or 0
     local t = 0.025
-    local r = 5
+    local r = 8
     local shake_list = {
         cc.RotateBy:create(t, r),
         cc.RotateBy:create(t, -r),
@@ -1002,6 +1072,97 @@ function UIKit:ButtonAddScaleAction(button)
     return button
 end
 
+
+local soldier_config = {
+    ["swordsman"] = {
+        {"heihua_bubing_2", 4},
+        {"heihua_bubing_2", 4},
+        {"heihua_bubing_3", 4},
+    },
+    ["ranger"] = {
+        {"heihua_gongjianshou_2", 4},
+        {"heihua_gongjianshou_2", 4},
+        {"heihua_gongjianshou_3", 4},
+    },
+    ["lancer"] = {
+        {"heihua_qibing_2", 2},
+        {"heihua_qibing_2", 2},
+        {"heihua_qibing_3", 2},
+    },
+    ["catapult"] = {
+        {"heihua_toushiche_2", 1},
+        {"heihua_toushiche_2", 1},
+        {"heihua_toushiche_3", 1},
+    },
+
+    -----
+    ["sentinel"] = {
+        {"heihua_shaobing_2", 4},
+        {"heihua_shaobing_2", 4},
+        {"heihua_shaobing_3", 4},
+    },
+    ["crossbowman"] = {
+        {"heihua_nugongshou_2", 4},
+        {"heihua_nugongshou_2", 4},
+        {"heihua_nugongshou_3", 4},
+    },
+    ["horseArcher"] = {
+        {"heihua_youqibing_2", 2},
+        {"heihua_youqibing_2", 2},
+        {"heihua_youqibing_3", 2},
+    },
+    ["ballista"] = {
+        {"heihua_nuche_2", 1},
+        {"heihua_nuche_2", 1},
+        {"heihua_nuche_3", 1},
+    },
+
+
+    ["skeletonWarrior"] = {
+        {"kulouyongshi", 4},
+        {"kulouyongshi", 4},
+        {"kulouyongshi", 4},
+    },
+    ["skeletonArcher"] = {
+        {"kulousheshou", 4},
+        {"kulousheshou", 4},
+        {"kulousheshou", 4},
+    },
+    ["deathKnight"] = {
+        {"siwangqishi", 2},
+        {"siwangqishi", 2},
+        {"siwangqishi", 2},
+    },
+    ["meatWagon"] = {
+        {"jiaorouche", 1},
+        {"jiaorouche", 1},
+        {"jiaorouche", 1},
+    },
+}
+local position_map = {
+    [1] = {
+        {x = 0, y = -10}
+    },
+    [2] = {
+        {x = -10, y = -10},
+        {x = 10, y = -30},
+    },
+    [4] = {
+        {x = 0, y = 0},
+        {x = -25, y = -15},
+        {x = 25, y = -15},
+        {x = 0, y = -30},
+    }
+}
+function UIKit:CreateMonster(name)
+    local soldier_name, star = unpack(string.split(name, '_'))
+    local ani,count = unpack(soldier_config[soldier_name][tonumber(star)])
+    local node = display.newNode()
+    for _,v in ipairs(position_map[count]) do
+        UIKit:CreateIdle45Ani(ani):pos(v.x, v.y):addTo(node)
+    end
+    return node
+end
 ---
 local soldier_animap = {
     -- 普通兵种
@@ -1184,9 +1345,11 @@ function UIKit:CreateDragonFlyNeg45Ani(ani)
     return createAniWithConfig(ani, dragon_fly_neg_45_ani[ani], "flying_-45")
 end
 function UIKit:CreateSoldierMove45Ani(ani)
+    print(ani, soldier_move_45_ani[ani])
     return createAniWithConfig(ani, soldier_move_45_ani[ani], "move_45")
 end
 function UIKit:CreateSoldierMoveNeg45Ani(ani)
+    print(ani, soldier_move_neg_45_ani[ani])
     return createAniWithConfig(ani, soldier_move_neg_45_ani[ani], "move_-45")
 end
 function UIKit:GetSoldierMoveAniConfig(ani, act)
@@ -1197,6 +1360,162 @@ function UIKit:GetSoldierMoveAniConfig(ani, act)
     else
         assert(false)
     end
+end
+local function GetDirIndexByDegree(degree)
+    local index = math.floor(degree / 45) + 4
+    if index < 0 or index > 8 then return 1 end
+    return index
+end
+local dragon_dir_map = {
+    [0] = {"flying_45", -1}, -- x-,y+
+    {"flying_45", -1}, -- x-,y+
+    {"flying_-45", -1}, -- x-
+
+    {"flying_-45", -1}, -- x-,y-
+    {"flying_-45", 1}, -- y+
+    {"flying_-45", 1}, -- x+,y+
+
+    {"flying_45", 1}, -- x+
+    {"flying_45", 1}, -- x+,y-
+    {"flying_45", 1}, -- y-
+}
+function UIKit:CreateDragonByDegree(degree, s, dragonType)
+    local node = display.newNode():scale(s or 1)
+    local ani_name, scalex = unpack(dragon_dir_map[GetDirIndexByDegree(degree)])
+    local dragon_ani = UILib.dragon_animations[dragonType or "redDragon"][1]
+    if ani_name == "flying_45" then
+        UIKit:CreateDragonFly45Ani(dragon_ani):addTo(node):setScaleX(scalex)
+    elseif ani_name == "flying_-45" then
+        UIKit:CreateDragonFlyNeg45Ani(dragon_ani):addTo(node):setScaleX(scalex)
+    end
+    return node
+end
+local soldier_dir_map = {
+    [0] = {"move_45", - 1}, -- x-,y+
+    {"move_45", - 1}, -- x-,y+
+    {"move_-45", - 1}, -- x-
+
+    {"move_-45", - 1}, -- x-,y-
+    {"move_-45", 1}, -- y+
+    {"move_-45", 1}, -- x+,y+
+
+    {"move_45", 1}, -- x+
+    {"move_45", 1}, -- x+,y-
+    {"move_45", 1}, -- y-
+}
+local soldier_config = {
+    ----
+    ["swordsman"] = {
+        count = 4,
+        {"bubing_1"},
+        {"bubing_2"},
+        {"bubing_3"},
+    },
+    ["ranger"] = {
+        count = 4,
+        {"gongjianshou_1"},
+        {"gongjianshou_2"},
+        {"gongjianshou_3"},
+    },
+    ["lancer"] = {
+        count = 2,
+        {"qibing_1"},
+        {"qibing_2"},
+        {"qibing_3"},
+    },
+    ["catapult"] = {
+        count = 1,
+        {  "toushiche"},
+        {"toushiche_2"},
+        {"toushiche_3"},
+    },
+
+    -----
+    ["sentinel"] = {
+        count = 4,
+        {"shaobing_1"},
+        {"shaobing_2"},
+        {"shaobing_3"},
+    },
+    ["crossbowman"] = {
+        count = 4,
+        {"nugongshou_1"},
+        {"nugongshou_2"},
+        {"nugongshou_3"},
+    },
+    ["horseArcher"] = {
+        count = 2,
+        {"youqibing_1"},
+        {"youqibing_2"},
+        {"youqibing_3"},
+    },
+    ["ballista"] = {
+        count = 1,
+        {"nuche_1"},
+        {"nuche_2"},
+        {"nuche_3"},
+    },
+    ----
+    ["skeletonWarrior"] = {
+        count = 4,
+        {"kulouyongshi"},
+        {"kulouyongshi"},
+        {"kulouyongshi"},
+    },
+    ["skeletonArcher"] = {
+        count = 4,
+        {"kulousheshou"},
+        {"kulousheshou"},
+        {"kulousheshou"},
+    },
+    ["deathKnight"] = {
+        count = 2,
+        {"siwangqishi"},
+        {"siwangqishi"},
+        {"siwangqishi"},
+    },
+    ["meatWagon"] = {
+        count = 1,
+        {"jiaorouche"},
+        {"jiaorouche"},
+        {"jiaorouche"},
+    },
+}
+local len = 30
+local location_map = {
+    [1] = {
+        {0, 0},
+    },
+    [2] = {
+        {0, len * 0.5},
+        {0, - len * 0.5},
+    },
+    [4] = {
+        {len * 0.5, len * 0.5},
+        {- len * 0.5, len * 0.5},
+        {len * 0.5, - len * 0.5},
+        {- len * 0.5, - len * 0.5},
+    },
+}
+local normal = GameDatas.Soldiers.normal
+local special = GameDatas.Soldiers.special
+function UIKit:CreateMoveSoldiers(degree, soldier, s)
+    local star = special[soldier.name] and 1 or (soldier.star or 1)
+    local config = soldier_config[soldier.name]
+    local soldier_ani_name = unpack(config[star])
+    local action_name, scalex = unpack(soldier_dir_map[GetDirIndexByDegree(degree)])
+    local create_function
+    if action_name == "move_45" then
+        create_function = UIKit.CreateSoldierMove45Ani
+    elseif action_name == "move_-45" then
+        create_function = UIKit.CreateSoldierMoveNeg45Ani
+    end
+    local node = display.newNode():scale(s or 1)
+    for _,v in ipairs(location_map[config.count]) do
+        create_function(UIKit, soldier_ani_name):addTo(node)
+        :pos(unpack(v)):setScaleX(scalex)
+    end
+    return node
 end
 function UIKit:CreateNameBanner(name, dragon_type)
     local node = display.newNode()
@@ -1215,13 +1534,260 @@ function UIKit:CreateNameBanner(name, dragon_type)
                 shaderName = "banner",
             })
         ))
-    local dragon_bg = display.newSprite("dragon_bg_114x114.png")
-        :addTo(node, 2):scale(0.3):pos(-size.width/2-20, 0)
-    display.newSprite(UILib.dragon_head[dragon_type or "redDragon"])
-        :align(display.CENTER, dragon_bg:getContentSize().width/2, dragon_bg:getContentSize().height/2+5)
+    local dragon_bg = display.newSprite("back_ground_43x43_1.png")
+        :addTo(node, 2):pos(-size.width/2-21, 0)
+    display.newSprite(UILib.small_dragon_head[dragon_type or "redDragon"])
+        :align(display.CENTER, dragon_bg:getContentSize().width/2, dragon_bg:getContentSize().height/2)
         :addTo(dragon_bg)
     return node
 end
+
+-- 创建vip等级经验条
+function UIKit:CreateVipExpBar()
+    local VIP_MAX_LEVEL = 10
+    local  head_width = 35 -- 两头经验圈宽度
+    local  mid_width = 34 -- 中间各个经验圈宽度
+    local  level_width = 26 -- 各个等级间的进度条的宽度
+
+    local ExpBar = display.newNode()
+    function ExpBar:AddLevelBar(level,bar)
+        self.level_bar = self.level_bar or {}
+        self.level_bar["level_bar_"..level] = bar
+    end
+
+    function ExpBar:AddLevelExpBar(level,exp_bar)
+        self.exp_bar = self.exp_bar or {}
+        self.exp_bar["exp_bar_"..level] = exp_bar
+    end
+    function ExpBar:AddLevelImage(level,image)
+        self.level_images = self.level_images or {}
+        self.level_images["level_image_"..level] = image
+    end
+    function ExpBar:CreateTip(image,level)
+        local tip = display.newSprite(image)
+        cc.ui.UILabel.new({
+            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+            text = _("VIP"..level),
+            size = 18,
+            font = UIKit:getFontFilePath(),
+            color = UIKit:hex2c3b(0xffedae)}):addTo(tip):align(display.CENTER, tip:getContentSize().width/2, 50)
+        cc.ui.UILabel.new({
+            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+            text = User:GetSpecialVipLevelExp(level),
+            size = 16,
+            font = UIKit:getFontFilePath(),
+            color = UIKit:hex2c3b(0xffedae)}):addTo(tip):align(display.CENTER, tip:getContentSize().width/2, 25)
+        return tip
+    end
+    --[[
+        设置经验条等级
+        @param level 达到等级
+        @param per 下一级升级当前百分比
+    ]]
+    function ExpBar:LightLevelBar(level,per,exp , hide_tips)
+        -- if level<1 then
+        --     return
+        -- end
+        for i=1,level do
+            -- self.level_images["level_image_"..i]:setVisible(true)
+            self.level_bar["level_bar_"..i]:setVisible(true)
+            if self.exp_bar["exp_bar_"..i-1] then
+                self.exp_bar["exp_bar_"..i-1]:setPercentage(100)
+            end
+        end
+        if per and level ~=VIP_MAX_LEVEL then
+            self.exp_bar["exp_bar_"..level]:setPercentage(per)
+        end
+        if not self.tip_1 and not hide_tips then
+            self.tip_1 = self:CreateTip("vip_level_tip_bg_1.png",level):addTo(self):scale(0.9)
+
+            if level<VIP_MAX_LEVEL then
+                self.tip_2 = self:CreateTip("vip_level_tip_bg_2.png",level+1):addTo(self):scale(0.9)
+            end
+        end
+        local x = self.level_bar["level_bar_"..level]:getParent():getPosition()
+        -- 由于两头的圈使用的图片宽度为单数，所以锚点都设置在了左边中心而不是中间圈那样的锚点在中心，此时需要tip框中心找到其中心位置
+        x = x + ((level == 1 or level == VIP_MAX_LEVEL) and 17 or 0)
+        if not hide_tips then
+            self.tip_1:align(display.BOTTOM_CENTER, x, 20)
+            if level<VIP_MAX_LEVEL then
+                local x = self.level_bar["level_bar_"..level+1]:getParent():getPosition()
+                x = x + ((level+1) == VIP_MAX_LEVEL and 17 or 0)
+                self.tip_2:align(display.BOTTOM_CENTER, x, 20)
+            else
+                self:removeChild(self.tip_2)
+            end
+        end
+        -- 添加vip经验 指针
+        if level<VIP_MAX_LEVEL then
+            x = x + (per and math.floor(level_width*per/100+head_width/2) or 0)
+            if not self.vip_exp_point then
+                self.vip_exp_point = display.newSprite("vip_point.png"):addTo(self)
+                cc.ui.UILabel.new({
+                    UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+                    text = exp,
+                    size = 14,
+                    font = UIKit:getFontFilePath(),
+                    color = UIKit:hex2c3b(0x403c2f)}):addTo(self.vip_exp_point):align(display.LEFT_CENTER, 24, 10)
+            end
+            self.vip_exp_point:align(display.TOP_CENTER, x, -20)
+        else
+            if self.vip_exp_point then
+                self:removeChild(self.vip_exp_point)
+            end
+        end
+
+    end
+
+    local function createProgressTimer()
+        local progressFill = display.newSprite("vip_lv_bar_6.png")
+        local ProgressTimer = cc.ProgressTimer:create(progressFill)
+        ProgressTimer:setType(display.PROGRESS_TIMER_BAR)
+        ProgressTimer:setBarChangeRate(cc.p(1,0))
+        ProgressTimer:setMidpoint(cc.p(0,0))
+        return ProgressTimer
+    end
+    local current_x = 0
+    for i=1,VIP_MAX_LEVEL do
+        local lv_bg
+        if i==1 then
+            lv_bg = display.newSprite("vip_lv_bar_1.png"):addTo(ExpBar):align(display.LEFT_CENTER, 0, 0)
+            ExpBar:AddLevelBar(i,display.newSprite("vip_lv_bar_3.png"):addTo(lv_bg)
+                :align(display.CENTER, lv_bg:getContentSize().width/2+1, lv_bg:getContentSize().height/2))
+            current_x = current_x + head_width
+            local exp = display.newSprite("vip_lv_bar_5.png"):addTo(ExpBar):align(display.CENTER, current_x+level_width/2, 0)
+            local ProgressTimer = createProgressTimer():align(display.LEFT_CENTER, 0, exp:getContentSize().height/2):addTo(exp)
+            ExpBar:AddLevelExpBar(i,ProgressTimer)
+            current_x = current_x + level_width
+        elseif i>1 and i<VIP_MAX_LEVEL then
+            lv_bg = display.newSprite("vip_lv_bar_2.png"):addTo(ExpBar):align(display.CENTER, current_x+mid_width/2, 0)
+            local light = display.newSprite("vip_lv_bar_4.png"):addTo(lv_bg)
+                :align(display.CENTER, lv_bg:getContentSize().width/2, lv_bg:getContentSize().height/2)
+            light:setVisible(false)
+            ExpBar:AddLevelBar(i,light)
+            current_x = current_x + mid_width
+            local exp = display.newSprite("vip_lv_bar_5.png"):addTo(ExpBar):align(display.CENTER, current_x+level_width/2, 0)
+            local ProgressTimer = createProgressTimer():align(display.LEFT_CENTER, 0, exp:getContentSize().height/2):addTo(exp)
+            ExpBar:AddLevelExpBar(i,ProgressTimer)
+
+            current_x = current_x + level_width
+        elseif i==VIP_MAX_LEVEL then
+            lv_bg = display.newSprite("vip_lv_bar_1.png"):addTo(ExpBar):align(display.LEFT_CENTER, current_x, 0)
+            lv_bg:setFlippedX(true)
+            local light = display.newSprite("vip_lv_bar_3.png"):addTo(lv_bg,1,i)
+                :align(display.CENTER, lv_bg:getContentSize().width/2-1, lv_bg:getContentSize().height/2)
+            light:setVisible(false)
+            ExpBar:AddLevelBar(i,light)
+            light:setFlippedX(true)
+        end
+        local level_image = display.newSprite(string.format("vip_%d.png",i)):addTo(lv_bg,1,i*100)
+            :align(display.CENTER, lv_bg:getContentSize().width/2, lv_bg:getContentSize().height/2)
+            :scale(0.5)
+        ExpBar:AddLevelImage(i,level_image)
+    end
+    return ExpBar
+end
+
+
+function UIKit:CreateArrow(param, func)
+    local arrow = display.newSprite(param.circle or "arrow_circle_mine.png")
+    arrow.btn = cc.ui.UIPushButton.new({
+        normal = param.up or "arrow_up_mine.png",
+        pressed = param.down or "arrow_down_mine.png",
+    }):addTo(arrow):pos(96/2, 102/2 - 4)
+    :onButtonClicked(function()
+        if type(func) == "function" then
+            func()
+        end
+    end)
+    arrow.icon = display.newSprite(param.icon or "arrow_icon_mine.png")
+    :addTo(arrow):pos(96/2, 102/2 - 4)
+    return arrow
+end
+
+
+
+
+function UIKit:CreateRain()
+    local emitter = cc.ParticleRain:createWithTotalParticles(100)
+    emitter:setPosVar(cc.p(display.cx,0))
+    emitter:setGravity(cc.p(-10,-10))
+    emitter:setStartSize(30)
+    emitter:setStartSizeVar(30)
+    emitter:setEndSize(30)
+    emitter:setEndSizeVar(30)
+    emitter:setLife(0.5)
+    emitter:setSpeed(1800)
+    emitter:setSpeedVar(100)
+    emitter:setAngle(-100)
+    emitter:setAngleVar(0)
+    emitter:setRadialAccel(100)
+    emitter:setRadialAccelVar(0)
+    emitter:setTangentialAccel(0)
+    emitter:setTangentialAccelVar(0)
+    emitter:setRotationIsDir(false)
+    emitter:setStartSpin(10)
+    emitter:setEndSpin(10)
+    emitter:setStartColor(cc.c4f(1,1,1,0.9))
+    emitter:setStartColorVar(cc.c4f(0,0,0,0.1))
+    emitter:setEndColor(cc.c4f(1,1,1,0.5))
+    emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
+    emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("rain.png"))
+    emitter:updateWithNoTime()
+    return emitter
+end
+function UIKit:CreateSnow()
+    local emitter = cc.ParticleRain:createWithTotalParticles(100)
+    emitter:setLife(7)
+    emitter:setStartSize(10)
+    emitter:setStartSizeVar(10)
+    emitter:setRadialAccel(10)
+    emitter:setRadialAccelVar(50)
+    emitter:setRotationIsDir(true)
+    emitter:setStartSpinVar(1000)
+    emitter:setEndSpinVar(1000)
+    emitter:setStartColor(cc.c4f(1,1,1,0.8))
+    emitter:setStartColorVar(cc.c4f(0,0,0,0.2))
+    emitter:setEndColor(cc.c4f(1,1,1,0))
+    emitter:setEmissionRate(emitter:getTotalParticles() / emitter:getLife())
+    emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("snow.png"))
+    emitter:updateWithNoTime()
+    return emitter
+end
+function UIKit:CreateSand()
+    local emitter = cc.ParticleSystemQuad:createWithTotalParticles(50)
+    emitter:setDuration(-1)
+    emitter:setPositionType(2)
+    emitter:setAngle(20)
+    emitter:setPosVar(cc.p(0, display.height - 200))
+    emitter:setGravity(cc.p(0, -100))
+    emitter:setRotationIsDir(true)
+    emitter:setEmitterMode(0)
+    emitter:setLife(10)
+    emitter:setLifeVar(5)
+    emitter:setStartSize(450)
+    emitter:setStartSizeVar(150)
+    emitter:setEndSize(450)
+    emitter:setEndSizeVar(150)
+    emitter:setSpeed(1100)
+    emitter:setSpeedVar(100)
+    emitter:setStartSpinVar(90)
+    emitter:setEndSpinVar(-1)
+    emitter:setTangentialAccelVar(200)
+    emitter:setEmissionRate(100)
+    emitter:setStartColor(cc.c4f(1))
+    emitter:setEndColor(cc.c4f(0))
+    emitter:setBlendAdditive(true)
+    emitter:setBlendFunc(gl.ONE, gl.ONE_MINUS_SRC_COLOR)
+    emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage("sand.png"))
+    emitter:schedule(function()
+        emitter:setLife(15)
+        emitter:setEmissionRate(50 + math.random(100))
+    end, 2 + math.random(3))
+    return emitter
+end
+
+
 
 
 

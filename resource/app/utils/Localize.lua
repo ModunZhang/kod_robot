@@ -196,6 +196,24 @@ local SERVER_ERRORS = {
     [694] = _("野怪不存在"),
     [695] = _("不能购买自己出售的商品"),
     [696] = _("孵化条件不满足"),
+    [697] = _("关卡未解锁"),
+    [698] = _("还不能领取PvE星级奖励"),
+    [699] = _("Pve星级奖励已经领取"),
+    [700] = _("当前关卡已达最大战斗次数"),
+    [701] = _("玩家体力值不足"),
+    [702] = _("当前PvE关卡还不能被扫荡"),
+    [703] = _("此邮件未包含奖励信息"),
+    [704] = _("此邮件的奖励已经领取"),
+    [705] = _("玩家被禁言"),
+    [706] = _("不能观察自己的联盟"),
+    [707] = _("没有空闲的地图区域"),
+    [708] = _("玩家未观察此地块"),
+    [709] = _("当前还不能移动联盟"),
+    [710] = _("不能移动到目标地块"),
+    [711] = _("玩家将被攻打,不能退出联盟"),
+    [712] = _("您有商品正在出售,不能切换服务器"),
+    [713] = _("联盟宫殿等级过低,不能移动联盟"),
+    [714] = _("联盟数量已达最大,不能创建新联盟"),
 }
 
 local MATERIALS_DESC_MAP = {
@@ -512,46 +530,46 @@ local BUILDING_DESCRIPTION = {
     ["power"] = _("战斗力"),
 
     ["watchTower"] = _("瞭望塔显示部队在联盟领地上的行军情况，同时也能预警敌方部队来袭，并提供相关信息"),
-    ["watchTower_1"] = _("显示己方领地上的行军事件及其路线，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_2"] = _("提供来袭部队的玩家名称，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_3"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_4"] = _("显示敌方的所有行军事件及其路线，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_5"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_6"] = _("提供来袭部队的龙的类型，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_7"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_8"] = _("可以在敌方领地，查看敌方玩家的城市布局(不能点击建筑)，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_9"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_10"] = _("提供详情按钮，可以查看敌军的详细信息：龙的等级和星级，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_11"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_12"] = _("可以查看敌军的详细信息：显示龙的当前HP和HP上限，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_13"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_14"] = _("可以查看敌军的详细信息：显示敌方部队的兵种名称，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_15"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_16"] = _("可以查看敌军的详细信息：显示龙的力量，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_17"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_18"] = _("可以查看敌军的详细信息: 显示敌方部队的兵种名称，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_19"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_20"] = _("可以查看敌军的详细信息：显示龙的已装备的装备及其星级，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_21"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_22"] = _("可以查看敌军的详细信息：显示敌方部队的星级和模糊数量，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_23"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_24"] = _("可以在敌方领地，查看其他联盟领地的玩家的城市建筑具体等级，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_25"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_26"] = _("显示敌方激活的战争增益，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_27"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_28"] = _("可以查看敌军的详细信息：显示龙的技能等级，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_29"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_30"] = _("可以查看敌军的详细信息：显示敌方部队的具体数量，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_31"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_32"] = _("可以查看敌方城市中得协防部队的详细信息：龙的详细信息，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_33"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_34"] = _("可以查看敌方城市中得协防部队的详细信息：显示敌方部队的兵种名称，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_35"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_36"] = _("可以查看敌方城市中得协防部队的详细信息：龙的装备情况和龙的力量，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_37"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_38"] = _("可以查看敌军的详细信息：显示敌方部队的星级和模糊数量，预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_39"] = _("预警%.1f分钟内的敌方行军事件"),
-    ["watchTower_40"] = _("可以查看敌军的详细信息：显示龙的技能等级，预警%.1f分钟内的敌方行军事件"),
+    ["watchTower_1"] = _("提供来袭部队的玩家名称，来袭部队的出发点和目的地，剩余行军时间"),
+    ["watchTower_2"] = _("提供来袭部队的龙的类型，等级和星级"),
+    ["watchTower_3"] = _("可以查看其他玩家的城市布局"),
+    ["watchTower_4"] = _("提供详情按钮，提供：龙的当前生命值和生命值上限，龙的力量"),
+    ["watchTower_5"] = _("提供详情按钮，提供：显示兵种的名称，排序"),
+    ["watchTower_6"] = _("提供详情按钮，提供：显示兵种的星级"),
+    ["watchTower_7"] = _("提供详情按钮，提供：显示兵种的模糊数量"),
+    ["watchTower_8"] = _("提供详情按钮，提供：显示龙的装备及其星级"),
+    ["watchTower_9"] = _("提供详情按钮，提供：显示龙的技能等级"),
+    ["watchTower_10"] = _("提供详情按钮，提供：显示敌方军事科技水平和战争增益"),
+    ["watchTower_11"] = _("提供详情按钮，提供：显示敌方单位的具体数量"),
+    ["watchTower_12"] = _("可以查看其他玩家的城市的具体建筑等级"),
+    ["watchTower_13"] = _("可以查看目标城市协防部队的详细信息：龙的类型，等级和星级"),
+    ["watchTower_14"] = _("可以查看目标城市协防部队的详细信息：龙的力量，当前生命值和生命值上限"),
+    ["watchTower_15"] = _("可以查看目标城市协防部队的详细信息：显示兵种的名称，排序"),
+    ["watchTower_16"] = _("可以查看目标城市协防部队的详细信息：显示兵种的星级"),
+    ["watchTower_17"] = _("可以查看目标城市协防部队的详细信息：显示兵种的模糊数量"),
+    ["watchTower_18"] = _("可以查看目标城市协防部队的详细信息：显示龙的装备及其星级"),
+    ["watchTower_19"] = _("可以查看目标城市协防部队的详细信息：显示龙的技能等级"),
+    ["watchTower_20"] = _("可以查看目标城市协防部队的详细信息：显示敌方单位的具体数量"),
+    -- ["watchTower_21"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_22"] = _("可以查看敌军的详细信息：显示敌方部队的星级和模糊数量，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_23"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_24"] = _("可以在敌方领地，查看其他联盟领地的玩家的城市建筑具体等级，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_25"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_26"] = _("显示敌方激活的战争增益，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_27"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_28"] = _("可以查看敌军的详细信息：显示龙的技能等级，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_29"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_30"] = _("可以查看敌军的详细信息：显示敌方部队的具体数量，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_31"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_32"] = _("可以查看敌方城市中得协防部队的详细信息：龙的详细信息，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_33"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_34"] = _("可以查看敌方城市中得协防部队的详细信息：显示敌方部队的兵种名称，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_35"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_36"] = _("可以查看敌方城市中得协防部队的详细信息：龙的装备情况和龙的力量，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_37"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_38"] = _("可以查看敌军的详细信息：显示敌方部队的星级和模糊数量，预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_39"] = _("预警%.1f分钟内的敌方行军事件"),
+    -- ["watchTower_40"] = _("可以查看敌军的详细信息：显示龙的技能等级，预警%.1f分钟内的敌方行军事件"),
 
 
     ["academy"] = _("学院提供的众多科技。研发科技能够提升城市的资源产出效率和防御能力，学院等级越高研发速度越快"),
@@ -653,7 +671,7 @@ local BUILDING_DESCRIPTION = {
 
     ["shop"] = _("联盟商店能够提供部分商城售卖的道具，联盟成员可以通过忠诚值来兑换。部分高级道具需要花费荣耀值购买后，才能兑换。提升建筑等级能解锁更多高级道具。"),
     ["orderHall"] = _("秩序大厅管理着联盟领地上的村落，并可以消耗荣耀值提升村落的等级。建筑等级越高，定期刷新的村落越多。"),
-    ["moonGate"] = _("月门是通往王城的传送门，占领王城后，联盟每天可以获得大量的荣耀值。升级月门可以提升参加王城争夺战的部队数量。"),
+    ["watchTower"] = _("巨石阵能够预警即将遭受攻击的己方玩家。巨石阵等级越高，能够提供的进攻部队的信息越详细。"),
     ["shrine"] = _("圣地消耗感知力预知联盟将要发生的危机，解决这些危机能够获得丰厚奖励。提升圣地等级能够提升感知力上限和恢复速度。"),
     ["palace"] = _("联盟宫殿是联盟的核心建筑,联盟盟主可以在这里给忠诚的拥护者颁发奖励.建筑等级越高,联盟的成员就越多。"),
 }
@@ -695,7 +713,6 @@ local SHRINE_DESC = {
 
 local BUILDING_NAME = {
     ["keep"] = _("城堡"),
-    ["watchTower"] = _("瞭望塔"),
     ["academy"] = _("学院"),
     ["trainingGround"] = _("训练营地"),
     ["hunterHall"] = _("猎手大厅"),
@@ -725,8 +742,8 @@ local BUILDING_NAME = {
     ["miner"] = _("矿工小屋"),
     ["shop"] = _("联盟商店"),
     ["orderHall"] = _("秩序大厅"),
-    ["moonGate"] = _("月门"),
     ["shrine"] = _("圣地"),
+    ["watchTower"] = _("巨石阵"),
     ["palace"] = _("联盟宫殿"),
 }
 local ALLIANCE_TITLE = {
@@ -758,7 +775,7 @@ local ALLIANCE_EVENTS = {
     request = _("一个玩家申请加入我们的联盟"),
     notice = _("一个新的联盟公告发布"),
     desc = _("一个新的联盟宣言发布"),
-    handover = _("成为了新的盟主！（原盟主：%s）"),
+    handover = _("将盟主移交给了%s！"),
     tools = _("向联盟商店补充了一批新的高级道具"),
     upgrade = _("%s 升级到 %s"),
     name = _("最近更改联盟的名称为%s"),
@@ -772,6 +789,14 @@ local ALLIANCE_EVENTS = {
     fight = _("开启了联盟战"),
     buildingUpgrade = _("升级了%s"),
     villageUpgrade = _("升级了%s"),
+    moveAlliance = _("迁移了联盟"),
+}
+local ALLIANCE_NOTICE = {
+    attackVillage = _("%s正在前往占领Lv%d %s"),
+    attackMonster = _("%s正在前往攻打Lv%d %s"),
+    strikePlayer = _("%s向%s发起了侦察"),
+    attackPlayer = _("%s向%s发起了进攻"),
+    helpDefence = _("%s正在前往协防%s"),
 }
 
 local SOLDIER_CATEGORY = {
@@ -921,7 +946,7 @@ local PRODUCTIONTECHNOLOGY_NAME = {
     reinforcing = _("钢筋加固"),
     rescueTent = _("急救帐篷"),
     colonization = _("殖民地"),
-    negotiation = _("谈判技巧"),
+    recruitment = _("募兵术"),
     stoneCarving = _("石雕技巧"),
     ironSmelting = _("冶炼技巧"),
     seniorTower = _("高级箭塔"),
@@ -941,40 +966,40 @@ local PRODUCTIONTECHNOLOGY_BUFFER = {
     fastFix = _("增加城墙维修速度"),
     reinforcing = _("增加城墙的单位血量防御值"),
     rescueTent = _("增加医院的伤兵容量"),
-    colonization = _("增加占领村落时采集资源的速度"),
-    negotiation = _("增加劝降敌军的几率"),
+    colonization = _("增加村落的资源采集速度"),
+    recruitment = _("减少招募普通士兵资源消耗"),
     stoneCarving = _("增加石料产量"),
     ironSmelting = _("增加铁矿产量"),
     seniorTower = _("增加防御箭塔的攻击力"),
-    trap = _("增加监狱的抓捕士兵的上限"),
+    trap = _("增加敌方攻城后的返程时间"),
     hideout = _("增加资源保护比例"),
-    logistics = _("增加马车的资源和材料容量的上限"),
+    logistics = _("提示资源小车数量上限"),
     forestation = _("增加木材产量"),
     cropResearch = _("增加粮食产量"),
     beerSupply = _("住宅城民上限加成"),
-    healingAgent = _("增加治愈伤兵速度"),
+    healingAgent = _("减少治愈伤兵的时间"),
     sketching = _("增加生产材料速度"),
-    mintedCoin = _("提升市政厅获得银币产量"),
+    mintedCoin = _("提升银币产量"),
 }
 local PRODUCTIONTECHNOLOGY_BUFFER_COMPLETE = {
-    crane = _("增加建筑速度完成"),
-    fastFix = _("增加城墙维修速度完成"),
-    reinforcing = _("增加城墙的单位血量防御值完成"),
-    rescueTent = _("增加医院的伤兵容量完成"),
-    colonization = _("增加占领村落时采集资源的速度完成"),
-    negotiation = _("增加劝降敌军的几率完成"),
-    stoneCarving = _("增加石料产量完成"),
-    ironSmelting = _("增加铁矿产量完成"),
-    seniorTower = _("增加防御箭塔的攻击力完成"),
-    trap = _("增加监狱的抓捕士兵的上限完成"),
-    hideout = _("增加资源保护比例完成"),
-    logistics = _("增加马车的资源和材料容量的上限完成"),
-    forestation = _("增加木材产量完成"),
-    cropResearch = _("增加粮食产量完成"),
-    beerSupply = _("住宅城民上限加成完成"),
-    healingAgent = _("增加治愈伤兵速度完成"),
-    sketching = _("增加生产材料速度完成"),
-    mintedCoin = _("提升市政厅获得银币产量完成"),
+    crane = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.crane),
+    fastFix = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.fastFix),
+    reinforcing = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.reinforcing),
+    rescueTent = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.rescueTent),
+    colonization = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.colonization),
+    recruitment = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.recruitment),
+    stoneCarving = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.stoneCarving),
+    ironSmelting = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.ironSmelting),
+    seniorTower = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.seniorTower),
+    trap = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.trap),
+    hideout = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.hideout),
+    logistics = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.logistics),
+    forestation = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.forestation),
+    cropResearch = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.cropResearch),
+    beerSupply = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.beerSupply),
+    healingAgent = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.healingAgent),
+    sketching = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.sketching),
+    mintedCoin = string.format(_("研发%s完成"),PRODUCTIONTECHNOLOGY_NAME.mintedCoin),
 }
 local WONDER_NAME = {
     highcastle = _("高庭"),
@@ -1035,6 +1060,19 @@ local MAILS = {
     __archon = _("盟主"),
     __elite = _("精英"),
     __allianceMembers = _("联盟所有成员"),
+    __woodVillage = _("木材村落"),
+    __ironVillage = _("铁矿村落"),
+    __foodVillage = _("粮食村落"),
+    __coinVillage = _("硬币村落"),
+    __stoneVillage= _("矿石村落"),
+    __swordsman = _("剑士"),
+    __sentinel = _("哨兵"),
+    __ranger = _("弓箭手"),
+    __crossbowman = _("弩弓手"),
+    __lancer = _("枪骑兵"),
+    __horseArcher = _("弓骑兵"),
+    __catapult = _("投石车"),
+    __ballista = _("弩车"),
 }
 
 local  getBuildingLocalizedKeyByBuildingType = function(name)
@@ -1114,10 +1152,11 @@ local SELENAQUESTION_TIPS = {
 
 local ALLIANCE_BUILDINGS = {
     shop = _("联盟商店"),
-    moonGate = _("月门"),
+    watchTower = _("巨石阵"),
     shrine = _("圣地"),
     orderHall = _("秩序大厅"),
-    palace = _("联盟宫殿")
+    palace = _("联盟宫殿"),
+    bloodSpring = _("血泉"),
 }
 
 local IAP_PACKAGE_NAME = {}
@@ -1126,6 +1165,14 @@ IAP_PACKAGE_NAME["com.dragonfall.5500dragoncoins"] = _("探险家礼包")
 IAP_PACKAGE_NAME["com.dragonfall.12000dragoncoins"] = _("铁血军团礼包")
 IAP_PACKAGE_NAME["com.dragonfall.35000dragoncoins"] = _("帝国荣耀礼包")
 IAP_PACKAGE_NAME["com.dragonfall.80000dragoncoins"] = _("龙族王朝礼包")
+
+local VIP_IAP_PACKAGE_NAME = {}
+VIP_IAP_PACKAGE_NAME["com.dragonfall.2500dragoncoins"] = _("新手")
+VIP_IAP_PACKAGE_NAME["com.dragonfall.5500dragoncoins"] = _("探险家")
+VIP_IAP_PACKAGE_NAME["com.dragonfall.12000dragoncoins"] = _("铁血军团")
+VIP_IAP_PACKAGE_NAME["com.dragonfall.35000dragoncoins"] = _("帝国荣耀")
+VIP_IAP_PACKAGE_NAME["com.dragonfall.80000dragoncoins"] = _("龙族王朝")
+
 
 
 local DAILY_QUESTS_NAME = {
@@ -1197,6 +1244,22 @@ local SERVER_NAME = {
     master = _("大师级"),
 }
 
+local PERIOD_TYPE = {
+    peace = _("和平期"),
+    prepare = _("准备期"),
+    fight = _("战争期"),
+    protect = _("保护期"),
+}
+local ALLIANCE_BUFF = {
+    ["villageAddPercent"] = _("村落采集速度"),
+    ["loyaltyAddPercent"] = _("圣地战玩家获得忠诚值"),
+    ["honourAddPercent"] = _("圣地战联盟获得荣耀值"),
+    ["dragonExpAddPercent"] = _("巨龙经验值"),
+    ["bloodAddPercent"] = _("英雄之血"),
+    ["marchSpeedAddPercent"] = _("行军速度"),
+    ["dragonStrengthAddPercent"] = _("巨龙力量"),
+    ["monsterLevel"] = _("野怪等级"),
+}
 local TERRAIN_FUNCTION = {
     grassLand = _("草地产出绿龙材料，更容易培养绿龙"),
     desert= _("沙漠产出红龙材料,更容易培养红龙"),
@@ -1221,6 +1284,7 @@ return {
     building_name = BUILDING_NAME,
     alliance_title = ALLIANCE_TITLE,
     alliance_events = ALLIANCE_EVENTS,
+    alliance_notice = ALLIANCE_NOTICE,
     soldier_name = SOLDIER_NAME,
     soldier_material = SOLDIER_MATERIAL,
     soldier_category = SOLDIER_CATEGORY,
@@ -1256,6 +1320,7 @@ return {
     selenaquestion_tips = SELENAQUESTION_TIPS,
     alliance_buildings = ALLIANCE_BUILDINGS,
     iap_package_name = IAP_PACKAGE_NAME,
+    vip_iap_package_name = VIP_IAP_PACKAGE_NAME,
     daily_quests_name = DAILY_QUESTS_NAME,
     player_icon = PLAYER_ICON,
     player_icon_unlock = PLAYER_ICON_UNLOCK,
@@ -1271,6 +1336,8 @@ return {
     server_errors = SERVER_ERRORS,
     terrain_function = TERRAIN_FUNCTION,
     user_agreement = USER_AGREEMENT,
+    period_type = PERIOD_TYPE,
+    alliance_buff = ALLIANCE_BUFF,
 }
 
 

@@ -48,10 +48,10 @@ function WidgetShrineRewardsInfo:CreateInfoItems(shrineStage)
         }):addTo(content):align(display.LEFT_CENTER,90,item_height/2)
 
         local x = {
-        item_width - 50,
-        item_width - 130,
-        item_width - 230,
-    }
+            item_width - 50,
+            item_width - 130,
+            item_width - 260,
+        }
         local y = item_height/2
         for i,v in ipairs(data[2]) do
             local item = display.newScale9Sprite("box_118x118.png"):scale(0.3)
@@ -69,11 +69,15 @@ function WidgetShrineRewardsInfo:CreateInfoItems(shrineStage)
                 end
                 UIKit:addTipsToNode(item,_("忠诚值"),self)
             end
-            UIKit:ttfLabel({
+            local value_label = UIKit:ttfLabel({
                 text = "x" .. GameUtils:formatNumber(v.count),
                 size = 18,
                 color = 0x403c2f
             }):addTo(content):align(display.LEFT_CENTER,x[i] + 10,y)
+            if i == 3 then
+                value_label:setPositionX(x[2] - value_label:getContentSize().width - 50)
+                item:setPositionX(value_label:getPositionX() - 10)
+            end
         end
         meetFlag =  not meetFlag
         item:addContent(content)
@@ -82,14 +86,18 @@ function WidgetShrineRewardsInfo:CreateInfoItems(shrineStage)
     self.info_listview:reload()
 end
 function WidgetShrineRewardsInfo:GetListData(shrineStage)
-    local terrain = Alliance_Manager:GetMyAlliance():Terrain()
+    local terrain = Alliance_Manager:GetMyAlliance().basicInfo.terrain
     local data = {}
-    data[1] = {string.formatnumberthousands(shrineStage:GoldKill()),shrineStage:GoldRewards(terrain)}
-    data[2] = {string.formatnumberthousands(shrineStage:SilverKill()),shrineStage:SilverRewards(terrain)}
-    data[3] = {string.formatnumberthousands(shrineStage:BronzeKill()),shrineStage:BronzeRewards(terrain)}
+    data[1] = {string.formatnumberthousands(shrineStage.playerKill_3),
+               UtilsForShrine:FormatShrineRewards(shrineStage, 3, terrain)}
+    data[2] = {string.formatnumberthousands(shrineStage.playerKill_2),
+               UtilsForShrine:FormatShrineRewards(shrineStage, 2, terrain)}
+    data[3] = {string.formatnumberthousands(shrineStage.playerKill_1),
+               UtilsForShrine:FormatShrineRewards(shrineStage, 1, terrain)}
     return data
 end
 return WidgetShrineRewardsInfo
+
 
 
 

@@ -69,7 +69,7 @@ dwelling[6] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 350,
+	["buildTime"] = 338,
 	["citizen"] = 0
 }
 dwelling[7] = {
@@ -129,7 +129,7 @@ dwelling[11] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1670,
+	["buildTime"] = 2030,
 	["citizen"] = 0
 }
 dwelling[12] = {
@@ -141,7 +141,7 @@ dwelling[12] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 2030,
+	["buildTime"] = 2570,
 	["citizen"] = 0
 }
 dwelling[13] = {
@@ -153,7 +153,7 @@ dwelling[13] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 2390,
+	["buildTime"] = 3146,
 	["citizen"] = 0
 }
 dwelling[14] = {
@@ -165,7 +165,7 @@ dwelling[14] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4550,
+	["buildTime"] = 6278,
 	["citizen"] = 0
 }
 dwelling[15] = {
@@ -177,7 +177,7 @@ dwelling[15] = {
 	["tools"] = 1,
 	["tiles"] = 1,
 	["pulley"] = 1,
-	["buildTime"] = 6710,
+	["buildTime"] = 9626,
 	["citizen"] = 0
 }
 dwelling[16] = {
@@ -189,7 +189,7 @@ dwelling[16] = {
 	["tools"] = 2,
 	["tiles"] = 2,
 	["pulley"] = 2,
-	["buildTime"] = 8870,
+	["buildTime"] = 13190,
 	["citizen"] = 0
 }
 dwelling[17] = {
@@ -201,7 +201,7 @@ dwelling[17] = {
 	["tools"] = 4,
 	["tiles"] = 4,
 	["pulley"] = 4,
-	["buildTime"] = 11030,
+	["buildTime"] = 16970,
 	["citizen"] = 0
 }
 dwelling[18] = {
@@ -213,7 +213,7 @@ dwelling[18] = {
 	["tools"] = 6,
 	["tiles"] = 6,
 	["pulley"] = 6,
-	["buildTime"] = 13190,
+	["buildTime"] = 20966,
 	["citizen"] = 0
 }
 dwelling[19] = {
@@ -225,7 +225,7 @@ dwelling[19] = {
 	["tools"] = 10,
 	["tiles"] = 10,
 	["pulley"] = 10,
-	["buildTime"] = 15350,
+	["buildTime"] = 25178,
 	["citizen"] = 0
 }
 dwelling[20] = {
@@ -237,7 +237,7 @@ dwelling[20] = {
 	["tools"] = 14,
 	["tiles"] = 14,
 	["pulley"] = 14,
-	["buildTime"] = 17510,
+	["buildTime"] = 29606,
 	["citizen"] = 0
 }
 dwelling[21] = {
@@ -249,7 +249,7 @@ dwelling[21] = {
 	["tools"] = 18,
 	["tiles"] = 18,
 	["pulley"] = 18,
-	["buildTime"] = 19670,
+	["buildTime"] = 34250,
 	["citizen"] = 0
 }
 dwelling[22] = {
@@ -261,7 +261,7 @@ dwelling[22] = {
 	["tools"] = 22,
 	["tiles"] = 22,
 	["pulley"] = 22,
-	["buildTime"] = 21830,
+	["buildTime"] = 39110,
 	["citizen"] = 0
 }
 dwelling[23] = {
@@ -273,7 +273,7 @@ dwelling[23] = {
 	["tools"] = 26,
 	["tiles"] = 26,
 	["pulley"] = 26,
-	["buildTime"] = 23990,
+	["buildTime"] = 43473,
 	["citizen"] = 0
 }
 dwelling[24] = {
@@ -285,7 +285,7 @@ dwelling[24] = {
 	["tools"] = 30,
 	["tiles"] = 30,
 	["pulley"] = 30,
-	["buildTime"] = 26150,
+	["buildTime"] = 47923,
 	["citizen"] = 0
 }
 dwelling[25] = {
@@ -297,7 +297,7 @@ dwelling[25] = {
 	["tools"] = 40,
 	["tiles"] = 40,
 	["pulley"] = 40,
-	["buildTime"] = 28310,
+	["buildTime"] = 52178,
 	["citizen"] = 0
 }
 dwelling[26] = {
@@ -309,7 +309,7 @@ dwelling[26] = {
 	["tools"] = 50,
 	["tiles"] = 50,
 	["pulley"] = 50,
-	["buildTime"] = 30470,
+	["buildTime"] = 56476,
 	["citizen"] = 0
 }
 dwelling[27] = {
@@ -321,7 +321,7 @@ dwelling[27] = {
 	["tools"] = 60,
 	["tiles"] = 60,
 	["pulley"] = 60,
-	["buildTime"] = 32630,
+	["buildTime"] = 60818,
 	["citizen"] = 0
 }
 dwelling[28] = {
@@ -333,7 +333,7 @@ dwelling[28] = {
 	["tools"] = 70,
 	["tiles"] = 70,
 	["pulley"] = 70,
-	["buildTime"] = 34790,
+	["buildTime"] = 65203,
 	["citizen"] = 0
 }
 dwelling[29] = {
@@ -345,7 +345,7 @@ dwelling[29] = {
 	["tools"] = 90,
 	["tiles"] = 90,
 	["pulley"] = 90,
-	["buildTime"] = 39110,
+	["buildTime"] = 73713,
 	["citizen"] = 0
 }
 dwelling[30] = {
@@ -357,7 +357,7 @@ dwelling[30] = {
 	["tools"] = 110,
 	["tiles"] = 110,
 	["pulley"] = 110,
-	["buildTime"] = 43430,
+	["buildTime"] = 82310,
 	["citizen"] = 0
 }
 dwelling[31] = {
@@ -369,7 +369,7 @@ dwelling[31] = {
 	["tools"] = 130,
 	["tiles"] = 130,
 	["pulley"] = 130,
-	["buildTime"] = 47750,
+	["buildTime"] = 90993,
 	["citizen"] = 0
 }
 dwelling[32] = {
@@ -381,7 +381,7 @@ dwelling[32] = {
 	["tools"] = 150,
 	["tiles"] = 150,
 	["pulley"] = 150,
-	["buildTime"] = 52070,
+	["buildTime"] = 99763,
 	["citizen"] = 0
 }
 dwelling[33] = {
@@ -393,7 +393,7 @@ dwelling[33] = {
 	["tools"] = 180,
 	["tiles"] = 180,
 	["pulley"] = 180,
-	["buildTime"] = 56390,
+	["buildTime"] = 108619,
 	["citizen"] = 0
 }
 dwelling[34] = {
@@ -405,7 +405,7 @@ dwelling[34] = {
 	["tools"] = 210,
 	["tiles"] = 210,
 	["pulley"] = 210,
-	["buildTime"] = 60710,
+	["buildTime"] = 117561,
 	["citizen"] = 0
 }
 dwelling[35] = {
@@ -417,7 +417,7 @@ dwelling[35] = {
 	["tools"] = 240,
 	["tiles"] = 240,
 	["pulley"] = 240,
-	["buildTime"] = 65030,
+	["buildTime"] = 126590,
 	["citizen"] = 0
 }
 dwelling[36] = {
@@ -429,7 +429,7 @@ dwelling[36] = {
 	["tools"] = 270,
 	["tiles"] = 270,
 	["pulley"] = 270,
-	["buildTime"] = 69350,
+	["buildTime"] = 135705,
 	["citizen"] = 0
 }
 dwelling[37] = {
@@ -441,7 +441,7 @@ dwelling[37] = {
 	["tools"] = 310,
 	["tiles"] = 310,
 	["pulley"] = 310,
-	["buildTime"] = 73670,
+	["buildTime"] = 144907,
 	["citizen"] = 0
 }
 dwelling[38] = {
@@ -453,7 +453,7 @@ dwelling[38] = {
 	["tools"] = 350,
 	["tiles"] = 350,
 	["pulley"] = 350,
-	["buildTime"] = 77990,
+	["buildTime"] = 154195,
 	["citizen"] = 0
 }
 dwelling[39] = {
@@ -465,7 +465,7 @@ dwelling[39] = {
 	["tools"] = 390,
 	["tiles"] = 390,
 	["pulley"] = 390,
-	["buildTime"] = 82310,
+	["buildTime"] = 163569,
 	["citizen"] = 0
 }
 dwelling[40] = {
@@ -477,6 +477,6 @@ dwelling[40] = {
 	["tools"] = 430,
 	["tiles"] = 430,
 	["pulley"] = 430,
-	["buildTime"] = 86630,
+	["buildTime"] = 173030,
 	["citizen"] = 0
 }

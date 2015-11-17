@@ -6,7 +6,6 @@ local window = import("..utils.window")
 local WidgetSoldierBox = import("..widget.WidgetSoldierBox")
 local WidgetSoldierDetails = import('..widget.WidgetSoldierDetails')
 local WidgetUIBackGround = import('..widget.WidgetUIBackGround')
-local SoldierManager = import('..entity.SoldierManager')
 
 local GameUISquare = UIKit:createUIClass("GameUISquare", "GameUIWithCommonHeader")
 
@@ -19,16 +18,17 @@ end
 function GameUISquare:OnMoveInStage()
     GameUISquare.super.OnMoveInStage(self)
     self:CreateSoldierUI()
-    self.city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
-    self.city:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+    local User = self.city:GetUser()
+    User:AddListenOnType(self, "soldiers")
+    User:AddListenOnType(self, "soldierStarEvents")
 end
 function GameUISquare:onExit()
-    self.city:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
-    self.city:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
+    User:RemoveListenerOnType(self, "soldiers")
+    User:RemoveListenerOnType(self, "soldierStarEvents")
     GameUISquare.super.onExit(self)
 end
 function GameUISquare:CreateSoldierUI()
-    local soldier_manager = self.city:GetSoldierManager()
+    local User = self.city:GetUser()
     local view = self:GetView()
     if self.soldier_map then
         for k,v in pairs(self.soldier_map) do
@@ -50,8 +50,9 @@ function GameUISquare:CreateSoldierUI()
         "sentinel", "crossbowman", "horseArcher", "ballista",
         "skeletonWarrior", "skeletonArcher", "deathKnight", "meatWagon"
     }) do
-        local soldier_star =  soldier_manager:GetStarBySoldierType(soldier_name)
-        local soldier_num =  soldier_manager:GetSoldierMap()[soldier_name]
+    
+        local soldier_star = User:SoldierStarByName(soldier_name)
+        local soldier_num =  User.soldiers[soldier_name]
         if soldier_num > 0 then
             self.soldier_map[soldier_name] = WidgetSoldierBox.new(nil, function()
                 WidgetSoldierDetails.new(soldier_name, soldier_star):addTo(self)
@@ -61,7 +62,7 @@ function GameUISquare:CreateSoldierUI()
                 :SetNumber(soldier_num)
             add_count = add_count + 1
 
-            total_citizen = total_citizen + soldier_manager:GetSoldierConfig(soldier_name).citizen * soldier_num
+            total_citizen = total_citizen + User:GetSoldierConfig(soldier_name).citizen * soldier_num
         end
     end
 
@@ -89,10 +90,10 @@ function GameUISquare:CreateSoldierUI()
         :addTo(bg)
         :scale(0.4)
 end
-function GameUISquare:OnSoliderCountChanged( soldier_manager,changed_map )
+function GameUISquare:OnUserDataChanged_soldiers()
     self:CreateSoldierUI()
 end
-function GameUISquare:OnSoldierStarEventsChanged()
+function GameUISquare:OnUserDataChanged_soldierStarEvents()
     self:CreateSoldierUI()
 end
 return GameUISquare

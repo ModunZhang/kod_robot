@@ -107,7 +107,17 @@ local function handle_next_failed(p, err)
         end
         dump(err)
         err = err or ""
-        assert(false, "你应该捕获这个错误!" .. err)
+        if type(err) == "table" then
+            local t = {}
+            for k,v in pairs(err) do
+                if type(v) == "string" then
+                    table.insert(t, string.format("%s=%s", k, v))
+                end
+            end
+            assert(false, "你应该捕获这个错误!" ..  table.concat(t,";"))
+        else
+            assert(false, "你应该捕获这个错误!" .. err)
+        end
     else
         next_promise.state_ = REJECTED
     end

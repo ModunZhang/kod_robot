@@ -144,39 +144,100 @@ function WidgetAllianceHelper:GetColorShaderParams(color_index)
 end
 
 --创建旗帜
-function WidgetAllianceHelper:CreateFlagContentSprite(obj_flag)
+local count_config = {
+    backstyle=10,
+    colors=12,
+    graphics=20,
+}
+local random_back_backstyle_key = {}
+local random_back_color_1_key = {}
+local random_back_color_2_key = {}
+local random_graphics_key = {}
+local random_front_color_key = {}
+function WidgetAllianceHelper:RandomFlagStr()
+	math.randomseed(tostring(os.time()):reverse():sub(1, 10))
+    random = math.random
+   
+    local form = random(count_config.backstyle)
+    if LuaUtils:table_size(random_back_backstyle_key) >= count_config.backstyle then random_back_backstyle_key = {} end
+    while random_back_backstyle_key[form] do
+        form = random(count_config.backstyle)
+    end
+    random_back_backstyle_key[form] = true
+
+    local color1 = random(0,count_config.colors - 1) + 1
+    if LuaUtils:table_size(random_back_color_1_key) >= count_config.colors then random_back_color_1_key = {} end
+    while random_back_color_1_key[color1] do
+        color1 = random(count_config.colors) 
+    end
+    random_back_color_1_key[color1] = true
+
+    local color2 = random(count_config.colors)
+    if LuaUtils:table_size(random_back_color_2_key) >= count_config.colors then random_back_color_2_key = {} end
+    while random_back_color_2_key[color2] do
+        color2 = random(count_config.colors)
+    end
+    random_back_color_2_key[color2] = true
+
+    local graphic = random(count_config.graphics)
+    if LuaUtils:table_size(random_graphics_key) >= count_config.graphics then random_graphics_key = {} end
+    while random_graphics_key[graphic] do
+        graphic = random(count_config.graphics)
+    end
+    random_graphics_key[graphic] = true
+
+    local graphic_color = random(0,count_config.colors - 2) + 2
+    if LuaUtils:table_size(random_front_color_key) >= count_config.colors then random_front_color_key = {} end
+    while random_front_color_key[graphic_color] do
+        graphic_color = random(count_config.colors)
+    end
+    random_front_color_key[graphic_color] = true
+
+	return string.format("%d,%d,%d,%d,%d", form, color1, color2, graphic, graphic_color)
+end
+function WidgetAllianceHelper:GetFlagArray(flag_str)
+	local form, color1, color2, graphic, graphic_color = unpack(string.split(flag_str, ","))
+	return tonumber(form), tonumber(color1), tonumber(color2), tonumber(graphic), tonumber(graphic_color)
+end
+function WidgetAllianceHelper:GetFlagStr(...)
+    for i,v in ipairs{...} do
+        assert(tonumber(v), v)
+    end
+    return string.format("%s,%s,%s,%s,%s", ...)
+end
+function WidgetAllianceHelper:CreateFlagContentSprite(flagstr)
 	local box_bounding = display.newSprite("alliance_flag_box_119x139.png")
 	local size = box_bounding:getContentSize()
     local box = display.newNode()
     --body
-    local body_node = self:CreateFlagBody(obj_flag,size)
+    local body_node = self:CreateFlagBody(flagstr,size)
     body_node:addTo(box,self.FLAG_ZORDER.BODY,self.FLAG_TAG.BODY)
     --graphic
-    local graphic_node = self:CreateFlagGraphic(obj_flag,size)
+    local graphic_node = self:CreateFlagGraphic(flagstr,size)
     graphic_node:addTo(box,self.FLAG_ZORDER.GRAPHIC,self.FLAG_TAG.GRAPHIC)
    	box_bounding:addTo(box,self.FLAG_ZORDER.FLAG_BOX,self.FLAG_TAG.FLAG_BOX):align(display.LEFT_BOTTOM, 0, 0)
 
    	local this = self
-   	function box:SetFlag(flag)
-   		local color_1,color_2 = flag:GetBackColors()
-   		body_node:getChildByTag(1):setFilter(filter.newFilter("CUSTOM", this:GetColorFilter(color_1)))
-   		local is_visible = flag:GetBackStyle() > 1
+   	function box:SetFlag(flagstr)
+   		local form, color1, color2, graphic, graphic_color = this:GetFlagArray(flagstr)
+   		body_node:getChildByTag(1):setFilter(filter.newFilter("CUSTOM", this:GetColorFilter(color1)))
+   		local is_visible = form > 1
    		local color2_sprite = body_node:getChildByTag(2)
    		if color2_sprite then
    			if is_visible then
-   				color2_sprite:setTexture(this:GetColor2Image(flag))
-   				color2_sprite:setFilter(filter.newFilter("CUSTOM", this:GetColorFilter(color_2)))
+   				color2_sprite:setTexture(this:GetColor2Image(form))
+   				color2_sprite:setFilter(filter.newFilter("CUSTOM", this:GetColorFilter(color2)))
    			end
    			color2_sprite:setVisible(is_visible)
    		else
    			if is_visible then
-   				local content = this:CreateColorSprite(this:GetColor2Image(flag),color_2)
+   				local content = this:CreateColorSprite(this:GetColor2Image(form),color2)
     			:addTo(body_node,0,2)
         		:pos(size.width/2,size.height/2)
    			end
    		end
    		-- 
-   		local filename, color = this:GetFlagGraphic(flag)
+   		local filename, color = this:GetFlagGraphic(flagstr)
    		graphic_node:setTexture(filename)
    		graphic_node:setColor(color)
    	end
@@ -184,37 +245,38 @@ function WidgetAllianceHelper:CreateFlagContentSprite(obj_flag)
 end
 
 --旗帜背景
-function WidgetAllianceHelper:CreateFlagBody(obj_flag,box_bounding)
+function WidgetAllianceHelper:CreateFlagBody(flagstr,box_bounding)
 	local body_node = display.newNode() 
-	local color_1,color_2 = obj_flag:GetBackColors()
-	local bg = self:CreateColorSprite("alliance_flag_body_106x126_1.png",color_1)
+	local form, color1, color2, graphic, graphic_color = self:GetFlagArray(flagstr)
+	local bg = self:CreateColorSprite("alliance_flag_body_106x126_1.png",color1)
 		:addTo(body_node,0,1)
         :pos(box_bounding.width/2,box_bounding.height/2)
-   	if obj_flag:GetBackStyle() > 1 then
-    	local content = self:CreateColorSprite(self:GetColor2Image(obj_flag),color_2)
+   	if form > 1 then
+    	local content = self:CreateColorSprite(self:GetColor2Image(form),color2)
     		:addTo(body_node,0,2)
         	:pos(box_bounding.width/2,box_bounding.height/2)
     end
 	return body_node
 end
-function WidgetAllianceHelper:GetColor2Image(obj_flag)
-	return string.format("alliance_flag_body_106x126_%d.png",obj_flag:GetBackStyle())
+function WidgetAllianceHelper:GetColor2Image(form)
+	return string.format("alliance_flag_body_106x126_%d.png", form)
 end
 --旗帜图案
-function WidgetAllianceHelper:CreateFlagGraphic(obj_flag,box_bounding)
-	local filename, color = self:GetFlagGraphic(obj_flag)
+function WidgetAllianceHelper:CreateFlagGraphic(flagstr,box_bounding)
+	local filename, color = self:GetFlagGraphic(flagstr)
 	local sprite = display.newSprite(filename)
 				:pos(box_bounding.width/2,box_bounding.height/2)
 	sprite:setColor(color)
 	return sprite
 end
-function WidgetAllianceHelper:GetFlagGraphic(obj_flag)
-	local filename = self:GetGraphicImageNameByIndex(obj_flag:GetFrontStyle())
-	local color = UIKit:hex2c3b(self:GetColorByIndex(obj_flag:GetFrontColor()))
+function WidgetAllianceHelper:GetFlagGraphic(flagstr)
+	local form, color1, color2, graphic, graphic_color = self:GetFlagArray(flagstr)
+	local filename = self:GetGraphicImageNameByIndex(graphic)
+	local color = UIKit:hex2c3b(self:GetColorByIndex(graphic_color))
 	return filename, color
 end
 --带地形(矩形)的旗帜
-function WidgetAllianceHelper:CreateFlagWithRectangleTerrain(terrain_info,obj_flag)
+function WidgetAllianceHelper:CreateFlagWithRectangleTerrain(terrain_info,flagstr)
 	if type(terrain_info) == 'string' then terrain_info = self:GetTerrainIndex(terrain_info) end
 	local terrain_file = self:GetRectangleTerrainImageByIndex(terrain_info)
 	local node = display.newNode()
@@ -230,7 +292,7 @@ function WidgetAllianceHelper:CreateFlagWithRectangleTerrain(terrain_info,obj_fl
         :addTo(node)
         :align(display.RIGHT_BOTTOM, terrain_sprite:getPositionX()+35, terrain_sprite:getPositionY()-80)
         :scale(0.9)
-    local flag_node = self:CreateFlagContentSprite(obj_flag):addTo(node)
+    local flag_node = self:CreateFlagContentSprite(flagstr):addTo(node)
         :align(display.RIGHT_BOTTOM, terrain_sprite:getPositionX() - 55, terrain_sprite:getPositionY()-45)
         :scale(0.9)
     local box = display.newSprite("rectangle_terrain_box_216x282.png")
@@ -240,7 +302,7 @@ function WidgetAllianceHelper:CreateFlagWithRectangleTerrain(terrain_info,obj_fl
     return node,terrain_sprite,flag_node
 end
 --带地形(菱形)的旗帜
-function WidgetAllianceHelper:CreateFlagWithRhombusTerrain(terrain_info,obj_flag)
+function WidgetAllianceHelper:CreateFlagWithRhombusTerrain(terrain_info,flagstr)
     if type(terrain_info) == 'string' then terrain_info = self:GetTerrainIndex(terrain_info)  end
     local node = display.newNode()
     local terrain = self:GetRhombusTerrainImageByIndex(terrain_info)
@@ -254,7 +316,7 @@ function WidgetAllianceHelper:CreateFlagWithRhombusTerrain(terrain_info,obj_flag
         :addTo(node)
         :align(display.RIGHT_BOTTOM, terrain_sprite:getPositionX()+14, terrain_sprite:getPositionY()-14)
         :scale(0.4)
-    local flag_node = self:CreateFlagContentSprite(obj_flag):addTo(node)
+    local flag_node = self:CreateFlagContentSprite(flagstr):addTo(node)
         :align(display.RIGHT_BOTTOM, terrain_sprite:getPositionX() - 26, terrain_sprite:getPositionY())
         :scale(0.4)
 

@@ -13,7 +13,7 @@ function GameUIAllianceLoyalty:ctor()
         :align(display.CENTER,self.body:getContentSize().width/2,60)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                local building = Alliance_Manager:GetMyAlliance():GetAllianceMap():FindAllianceBuildingInfoByName("shop")
+                local building = Alliance_Manager:GetMyAlliance():FindAllianceBuildingInfoByName("shop")
                 UIKit:newGameUI('GameUIAllianceShop',City,"goods",building):AddToCurrentScene(true)
                 self:removeFromParent(true)
             end

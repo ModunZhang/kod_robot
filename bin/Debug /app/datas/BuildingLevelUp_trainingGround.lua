@@ -9,7 +9,7 @@ trainingGround[1] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 3000
+	["buildTime"] = 5043
 }
 trainingGround[2] = {
 	["level"] = 2,
@@ -20,7 +20,7 @@ trainingGround[2] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 3400
+	["buildTime"] = 5086
 }
 trainingGround[3] = {
 	["level"] = 3,
@@ -31,7 +31,7 @@ trainingGround[3] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 3800
+	["buildTime"] = 5130
 }
 trainingGround[4] = {
 	["level"] = 4,
@@ -42,7 +42,7 @@ trainingGround[4] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4200
+	["buildTime"] = 5173
 }
 trainingGround[5] = {
 	["level"] = 5,
@@ -53,7 +53,7 @@ trainingGround[5] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4600
+	["buildTime"] = 5216
 }
 trainingGround[6] = {
 	["level"] = 6,
@@ -64,7 +64,7 @@ trainingGround[6] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 5000
+	["buildTime"] = 5259
 }
 trainingGround[7] = {
 	["level"] = 7,
@@ -119,7 +119,7 @@ trainingGround[11] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 8456
+	["buildTime"] = 9320
 }
 trainingGround[12] = {
 	["level"] = 12,
@@ -130,7 +130,7 @@ trainingGround[12] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 9320
+	["buildTime"] = 10616
 }
 trainingGround[13] = {
 	["level"] = 13,
@@ -141,7 +141,7 @@ trainingGround[13] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 10184
+	["buildTime"] = 11998
 }
 trainingGround[14] = {
 	["level"] = 14,
@@ -152,7 +152,7 @@ trainingGround[14] = {
 	["tools"] = 1,
 	["tiles"] = 1,
 	["pulley"] = 1,
-	["buildTime"] = 15368
+	["buildTime"] = 19515
 }
 trainingGround[15] = {
 	["level"] = 15,
@@ -163,7 +163,7 @@ trainingGround[15] = {
 	["tools"] = 2,
 	["tiles"] = 2,
 	["pulley"] = 2,
-	["buildTime"] = 20552
+	["buildTime"] = 27550
 }
 trainingGround[16] = {
 	["level"] = 16,
@@ -174,7 +174,7 @@ trainingGround[16] = {
 	["tools"] = 4,
 	["tiles"] = 4,
 	["pulley"] = 4,
-	["buildTime"] = 25736
+	["buildTime"] = 36104
 }
 trainingGround[17] = {
 	["level"] = 17,
@@ -185,7 +185,7 @@ trainingGround[17] = {
 	["tools"] = 8,
 	["tiles"] = 8,
 	["pulley"] = 8,
-	["buildTime"] = 30920
+	["buildTime"] = 45176
 }
 trainingGround[18] = {
 	["level"] = 18,
@@ -196,7 +196,7 @@ trainingGround[18] = {
 	["tools"] = 12,
 	["tiles"] = 12,
 	["pulley"] = 12,
-	["buildTime"] = 36104
+	["buildTime"] = 54766
 }
 trainingGround[19] = {
 	["level"] = 19,
@@ -207,7 +207,7 @@ trainingGround[19] = {
 	["tools"] = 16,
 	["tiles"] = 16,
 	["pulley"] = 16,
-	["buildTime"] = 41288
+	["buildTime"] = 64875
 }
 trainingGround[20] = {
 	["level"] = 20,
@@ -218,7 +218,7 @@ trainingGround[20] = {
 	["tools"] = 20,
 	["tiles"] = 20,
 	["pulley"] = 20,
-	["buildTime"] = 46472
+	["buildTime"] = 75502
 }
 trainingGround[21] = {
 	["level"] = 21,
@@ -229,7 +229,7 @@ trainingGround[21] = {
 	["tools"] = 28,
 	["tiles"] = 28,
 	["pulley"] = 28,
-	["buildTime"] = 51656
+	["buildTime"] = 86648
 }
 trainingGround[22] = {
 	["level"] = 22,
@@ -240,7 +240,7 @@ trainingGround[22] = {
 	["tools"] = 36,
 	["tiles"] = 36,
 	["pulley"] = 36,
-	["buildTime"] = 56840
+	["buildTime"] = 98312
 }
 trainingGround[23] = {
 	["level"] = 23,
@@ -251,7 +251,7 @@ trainingGround[23] = {
 	["tools"] = 44,
 	["tiles"] = 44,
 	["pulley"] = 44,
-	["buildTime"] = 62024
+	["buildTime"] = 108784
 }
 trainingGround[24] = {
 	["level"] = 24,
@@ -262,7 +262,7 @@ trainingGround[24] = {
 	["tools"] = 52,
 	["tiles"] = 52,
 	["pulley"] = 52,
-	["buildTime"] = 67208
+	["buildTime"] = 119463
 }
 trainingGround[25] = {
 	["level"] = 25,
@@ -273,7 +273,7 @@ trainingGround[25] = {
 	["tools"] = 68,
 	["tiles"] = 68,
 	["pulley"] = 68,
-	["buildTime"] = 72392
+	["buildTime"] = 129675
 }
 trainingGround[26] = {
 	["level"] = 26,
@@ -284,7 +284,7 @@ trainingGround[26] = {
 	["tools"] = 84,
 	["tiles"] = 84,
 	["pulley"] = 84,
-	["buildTime"] = 77576
+	["buildTime"] = 139991
 }
 trainingGround[27] = {
 	["level"] = 27,
@@ -295,7 +295,7 @@ trainingGround[27] = {
 	["tools"] = 100,
 	["tiles"] = 100,
 	["pulley"] = 100,
-	["buildTime"] = 82760
+	["buildTime"] = 150411
 }
 trainingGround[28] = {
 	["level"] = 28,
@@ -306,7 +306,7 @@ trainingGround[28] = {
 	["tools"] = 116,
 	["tiles"] = 116,
 	["pulley"] = 116,
-	["buildTime"] = 87944
+	["buildTime"] = 160935
 }
 trainingGround[29] = {
 	["level"] = 29,
@@ -317,7 +317,7 @@ trainingGround[29] = {
 	["tools"] = 132,
 	["tiles"] = 132,
 	["pulley"] = 132,
-	["buildTime"] = 98312
+	["buildTime"] = 181360
 }
 trainingGround[30] = {
 	["level"] = 30,
@@ -328,7 +328,7 @@ trainingGround[30] = {
 	["tools"] = 164,
 	["tiles"] = 164,
 	["pulley"] = 164,
-	["buildTime"] = 108680
+	["buildTime"] = 201992
 }
 trainingGround[31] = {
 	["level"] = 31,
@@ -339,7 +339,7 @@ trainingGround[31] = {
 	["tools"] = 196,
 	["tiles"] = 196,
 	["pulley"] = 196,
-	["buildTime"] = 119048
+	["buildTime"] = 222832
 }
 trainingGround[32] = {
 	["level"] = 32,
@@ -350,7 +350,7 @@ trainingGround[32] = {
 	["tools"] = 228,
 	["tiles"] = 228,
 	["pulley"] = 228,
-	["buildTime"] = 129416
+	["buildTime"] = 243879
 }
 trainingGround[33] = {
 	["level"] = 33,
@@ -361,7 +361,7 @@ trainingGround[33] = {
 	["tools"] = 292,
 	["tiles"] = 292,
 	["pulley"] = 292,
-	["buildTime"] = 139784
+	["buildTime"] = 265133
 }
 trainingGround[34] = {
 	["level"] = 34,
@@ -372,7 +372,7 @@ trainingGround[34] = {
 	["tools"] = 356,
 	["tiles"] = 356,
 	["pulley"] = 356,
-	["buildTime"] = 150152
+	["buildTime"] = 286595
 }
 trainingGround[35] = {
 	["level"] = 35,
@@ -383,7 +383,7 @@ trainingGround[35] = {
 	["tools"] = 420,
 	["tiles"] = 420,
 	["pulley"] = 420,
-	["buildTime"] = 160520
+	["buildTime"] = 308264
 }
 trainingGround[36] = {
 	["level"] = 36,
@@ -394,7 +394,7 @@ trainingGround[36] = {
 	["tools"] = 484,
 	["tiles"] = 484,
 	["pulley"] = 484,
-	["buildTime"] = 170888
+	["buildTime"] = 330140
 }
 trainingGround[37] = {
 	["level"] = 37,
@@ -405,7 +405,7 @@ trainingGround[37] = {
 	["tools"] = 612,
 	["tiles"] = 612,
 	["pulley"] = 612,
-	["buildTime"] = 181256
+	["buildTime"] = 352224
 }
 trainingGround[38] = {
 	["level"] = 38,
@@ -416,7 +416,7 @@ trainingGround[38] = {
 	["tools"] = 740,
 	["tiles"] = 740,
 	["pulley"] = 740,
-	["buildTime"] = 191624
+	["buildTime"] = 374516
 }
 trainingGround[39] = {
 	["level"] = 39,
@@ -427,7 +427,7 @@ trainingGround[39] = {
 	["tools"] = 868,
 	["tiles"] = 868,
 	["pulley"] = 868,
-	["buildTime"] = 201992
+	["buildTime"] = 397014
 }
 trainingGround[40] = {
 	["level"] = 40,
@@ -438,5 +438,5 @@ trainingGround[40] = {
 	["tools"] = 1000,
 	["tiles"] = 1000,
 	["pulley"] = 1000,
-	["buildTime"] = 212360
+	["buildTime"] = 419720
 }

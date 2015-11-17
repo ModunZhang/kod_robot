@@ -42,32 +42,28 @@ function WidgetAutoOrderAwardButton:SetTimeInfo(time)
 end
 
 function WidgetAutoOrderAwardButton:onEnter()
-	local countInfo = User:GetCountInfo()
+	local countInfo = User.countInfo
     local onlineTime = (countInfo.todayOnLineTime - countInfo.lastLoginTime)/1000
 	self.online_time = onlineTime
 	self.can_receive_num = WidgetNumberTips.new():addTo(self):pos(24,-24):hide()
-	app.timer:AddListener(self)
-end
 
-function WidgetAutoOrderAwardButton:onCleanup()
-	app.timer:RemoveListener(self)
-end
-
-function WidgetAutoOrderAwardButton:OnTimer(dt)
-	if not self.can_get and self.timePoint then
-		local time = self.online_time + dt
-		local diff_time = config_online[self.timePoint].onLineMinutes * 60 - time
-		if  math.floor(diff_time) > 0 then
-			self:SetTimeInfo(diff_time)
+	scheduleAt(self, function()
+		local dt = app.timer:GetServerTime()
+		if not self.can_get and self.timePoint then
+			local time = self.online_time + dt
+			local diff_time = config_online[self.timePoint].onLineMinutes * 60 - time
+			if  math.floor(diff_time) > 0 then
+				self:SetTimeInfo(diff_time)
+			else
+				self:CheckState()
+				self:SetTimeInfo(diff_time)
+			end
+			self.can_receive_num:hide()
 		else
-			self:CheckState()
-			self:SetTimeInfo(diff_time)
+			self.can_receive_num:show()
+			self.can_receive_num:SetNumber(self:GetCanReceiveOnLineNum())
 		end
-		self.can_receive_num:hide()
-	else
-		self.can_receive_num:show()
-		self.can_receive_num:SetNumber(self:GetCanReceiveOnLineNum())
-	end
+	end)
 end
 function WidgetAutoOrderAwardButton:GetCanReceiveOnLineNum()
     local on_line_time = DataUtils:getPlayerOnlineTimeMinutes()
@@ -82,7 +78,7 @@ function WidgetAutoOrderAwardButton:GetCanReceiveOnLineNum()
     return count
 end
 function WidgetAutoOrderAwardButton:IsTimePointRewarded(timepoint)
-    local countInfo = User:GetCountInfo()
+    local countInfo = User.countInfo
     for __,v in ipairs(countInfo.todayOnLineTimeRewards) do
         if v == timepoint then
             return true
@@ -124,7 +120,7 @@ end
 
 -- For WidgetAutoOrder
 function WidgetAutoOrderAwardButton:CheckVisible()
-	local countInfo = User:GetCountInfo()
+	local countInfo = User.countInfo
     local onlineTime = (countInfo.todayOnLineTime - countInfo.lastLoginTime)/1000
     print("CheckVisible------>",onlineTime)
 	self.online_time = onlineTime
@@ -133,7 +129,7 @@ function WidgetAutoOrderAwardButton:CheckVisible()
 end
 
 function WidgetAutoOrderAwardButton:GetElementSize()
-	return {width = 68, height = 100}
+	return {width = 68, height = 120}
 end
 -- For Data
 function WidgetAutoOrderAwardButton:GetNextTimePoint()
@@ -169,7 +165,7 @@ function WidgetAutoOrderAwardButton:CheckState()
 end
 
 function WidgetAutoOrderAwardButton:IsTimePointRewarded(timepoint)
-	local countInfo = User:GetCountInfo()
+	local countInfo = User.countInfo
 	for __,v in ipairs(countInfo.todayOnLineTimeRewards) do
 		if v == timepoint then
 			return true

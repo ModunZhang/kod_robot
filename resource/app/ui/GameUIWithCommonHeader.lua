@@ -8,8 +8,6 @@ function GameUIWithCommonHeader:ctor(city, title)
     GameUIWithCommonHeader.super.ctor(self,{type = UIKit.UITYPE.WIDGET})
     self.title = title
     self.city = city
-
-
     self:BlurRenderScene()
 end
 
@@ -75,7 +73,7 @@ function GameUIWithCommonHeader:DisableAutoClose(disable)
 end
 function GameUIWithCommonHeader:onExit()
     if self.__gem_label then
-        self.city:GetResourceManager():RemoveObserver(self)
+        self.city:GetUser():RemoveListenerOnType(self, "resources")
     end
     GameUIWithCommonHeader.super.onExit(self)
 end
@@ -105,7 +103,7 @@ end
 function GameUIWithCommonHeader:OnMoveInStage()
     GameUIWithCommonHeader.super.OnMoveInStage(self)
     if self.__gem_label then
-        self.city:GetResourceManager():AddObserver(self)
+        self.city:GetUser():AddListenOnType(self, "resources")
     end
 end
 
@@ -200,7 +198,7 @@ function GameUIWithCommonHeader:CreateShopButton(on_clicked)
     light_gem():addTo(gem_icon, 1022):pos(62/2, 61/2)
 
     local gem_label = UIKit:ttfLabel({
-        text = ""..string.formatnumberthousands(City:GetUser():GetGemResource():GetValue()),
+        text = ""..string.formatnumberthousands(City:GetUser():GetGemValue()),
         size = 20,
         color = 0xffd200,
         shadow = true
@@ -213,9 +211,6 @@ function GameUIWithCommonHeader:CreateBetweenBgAndTitle()
     print("->创建backgroud和title之间的中间层显示")
 end
 
-function GameUIWithCommonHeader:OnResourceChanged(resource_manager)
-    self:GetGemLabel():setString(string.formatnumberthousands(self.city:GetUser():GetGemResource():GetValue()))
-end
 
 function GameUIWithCommonHeader:CreateTabButtons(param, func)
     return WidgetBackGroundTabButtons.new(param,
@@ -223,7 +218,13 @@ function GameUIWithCommonHeader:CreateTabButtons(param, func)
         :addTo(self:GetView(),2)
 end
 
-
+--
+function GameUIWithCommonHeader:OnUserDataChanged_resources(userData, deltaData)
+    local ok, value = deltaData("resources.gem")
+    if ok then
+        self:GetGemLabel():setString(string.formatnumberthousands(value))
+    end
+end
 
 -- fte
 local WidgetFteArrow = import("..widget.WidgetFteArrow")

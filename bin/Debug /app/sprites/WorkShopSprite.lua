@@ -2,10 +2,10 @@ local smoke = import("..particles.smoke")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local WorkShopSprite = class("WorkShopSprite", FunctionUpgradingSprite)
 
-function WorkShopSprite:OnMilitaryTechEventsChanged()
+function WorkShopSprite:OnUserDataChanged_soldierStarEvents()
     self:DoAni()
 end
-function WorkShopSprite:OnSoldierStarEventsChanged()
+function WorkShopSprite:OnUserDataChanged_militaryTechEvents()
     self:DoAni()
 end
 
@@ -14,8 +14,9 @@ end
 local WORK_TAG = 11201
 function WorkShopSprite:ctor(city_layer, entity, city)
     WorkShopSprite.super.ctor(self, city_layer, entity, city)
-    city:GetSoldierManager():AddListenOnType(self, city:GetSoldierManager().LISTEN_TYPE.SOLDIER_STAR_EVENTS_CHANGED)
-    city:GetSoldierManager():AddListenOnType(self, city:GetSoldierManager().LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
+    local User = city:GetUser()
+    User:AddListenOnType(self, "soldierStarEvents")
+    User:AddListenOnType(self, "militaryTechEvents")
 end
 function WorkShopSprite:RefreshSprite()
     WorkShopSprite.super.RefreshSprite(self)
@@ -23,7 +24,7 @@ function WorkShopSprite:RefreshSprite()
 end
 function WorkShopSprite:DoAni()
     if self:GetEntity():IsUnlocked() then
-        if self:GetEntity():BelongCity():GetSoldierManager():IsUpgradingMilitaryTech("workshop") then
+        if self:GetEntity():BelongCity():GetUser():HasMilitaryTechEventBy("workshop") then
             self:PlayWorkAnimation()
         else
             self:removeChildByTag(WORK_TAG)

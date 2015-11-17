@@ -80,7 +80,7 @@ function WidgetDropItem:CreateRewardsPanel(task)
     local content = self:GetContent()
 
     local extend = (#task:GetRewards() - 4)
-    content:size(572, 304 + (extend > 0 and extend or 0) * 40)
+    content:size(572, 250 + (extend > 0 and extend or 0) * 40)
 
     local size = content:getContentSize()
     local desc = UIKit:ttfLabel({
@@ -92,12 +92,12 @@ function WidgetDropItem:CreateRewardsPanel(task)
     }):align(display.LEFT_TOP, 40, size.height - 30):addTo(content)
 
     local under_y = 20
-    local base_under_line = size.height - 110 - under_y
+    local base_under_line = size.height - 60 - under_y
     UIKit:ttfLabel({
         text = _("任务奖励"),
         size = 20,
         color = 0x403c2f,
-    }):align(display.CENTER, 572/2, size.height - 100):addTo(content)
+    }):align(display.CENTER, 572/2, size.height - 50):addTo(content)
 
     display.newScale9Sprite("dividing_line.png",0,0,cc.size(550,2),cc.rect(10,2,382,2)):align(display.CENTER, 572/2, base_under_line):addTo(content)
 

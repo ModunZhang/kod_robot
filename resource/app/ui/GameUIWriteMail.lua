@@ -97,13 +97,13 @@ function GameUIWriteMail:ctor(send_type,contacts)
         :addTo(write_mail):align(display.CENTER, write_mail:getContentSize().width-120, 40)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                self:SendMail(contacts and contacts.id, self.editbox_subject:getText(), self.textView:getText())
+                self:SendMail(contacts and contacts.id, contacts and contacts.name,self.editbox_subject:getText(), self.textView:getText())
             end
         end)
     textView:setRectTrackedNode(self.send_button)
 
 end
-function GameUIWriteMail:SendMail(addressee,title,content)
+function GameUIWriteMail:SendMail(addressee,name,title,content)
     if not title or string.trim(title)=="" then
         UIKit:showMessageDialog(_("主人"),_("请填写邮件主题"))
         return

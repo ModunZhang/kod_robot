@@ -2,8 +2,6 @@ local GameUtils = GameUtils
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetSliderWithInput = import("..widget.WidgetSliderWithInput")
 local WidgetSoldierDetails = import("..widget.WidgetSoldierDetails")
-local HospitalUpgradeBuilding = import("..entity.HospitalUpgradeBuilding")
-local SoldierManager = import("..entity.SoldierManager")
 local UILib = import("..ui.UILib")
 local StarBar = import("..ui.StarBar")
 local WidgetSlider = import("..widget.WidgetSlider")
@@ -22,7 +20,8 @@ local WidgetTreatSoldier = class("WidgetTreatSoldier", function(...)
 end)
 local NORMAL = GameDatas.Soldiers.normal
 local SPECIAL = GameDatas.Soldiers.special
-
+local app = app
+local timer = app.timer
 local SOLDIER_CATEGORY_MAP = {
     ["swordsman"] = "infantry",
     ["sentinel"] = "infantry",
@@ -260,13 +259,12 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
             end
             if self.count<1 then
                 UIKit:showMessageDialog(_("主人"),_("请设置要治愈的伤兵数"))
-            elseif self.treat_now_gems > City:GetUser():GetGemResource():GetValue() then
+            elseif self.treat_now_gems > City:GetUser():GetGemValue() then
                 UIKit:showMessageDialog(_("主人"),_("金龙币不足"))
                     :CreateOKButton(
                         {
                             listener = function ()
                                 UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
-                                City:GetResourceManager():RemoveObserver(self)
                                 self:getParent():LeftButtonClicked()
                             end,
                             btn_name= _("前往商店")
@@ -312,55 +310,53 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         :align(display.CENTER, size.width - 120, 110)
         :setButtonLabel(UIKit:ttfLabel({
             text = _("治愈"),
-            size = 27,
+            size = 24,
             color = 0xfff3c7,
             shadow = true
 
         }))
         :onButtonClicked(function(event)
-            local hospital = City:GetFirstBuildingByType("hospital")
             local soldiers = {{name=self.soldier_type, count=self.count}}
             local treat_fun = function ()
                 NetManager:getTreatSoldiersPromise(soldiers)
                 app:GetAudioManager():PlayeEffectSoundWithKey("TREATE_SOLDIER")
                 self:button_clicked()
             end
-            local isAbleToTreat =hospital:IsAbleToTreat(soldiers)
+            local isAbleToTreat, reason = User:CanTreat(soldiers)
             if self.count<1 then
                 UIKit:showMessageDialog(_("主人"),_("请设置要治愈的伤兵数"))
-            elseif City:GetUser():GetGemResource():GetValue()< hospital:GetTreatGems(soldiers) then
+            elseif City:GetUser():GetGemValue()< User:GetNormalTreatGems(soldiers) then
                 UIKit:showMessageDialog(_("主人"),_("没有足够的金龙币补充资源"))
                     :CreateOKButton(
                         {
                             listener = function ()
                                 UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
-                                City:GetResourceManager():RemoveObserver(self)
                                 self:getParent():LeftButtonClicked()
                             end,
                             btn_name= _("前往商店")
                         }
                     )
-            elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.TREATING_AND_LACK_RESOURCE then
+            elseif reason == "treating_and_lack_resource" then
                 UIKit:showMessageDialog(_("主人"),_("正在治愈，资源不足"))
                     :CreateOKButtonWithPrice(
                         {
                             listener = treat_fun,
-                            price = hospital:GetTreatGems(soldiers)
+                            price = User:GetNormalTreatGems(soldiers)
                         }
                     )
                     :CreateCancelButton()
-            elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.LACK_RESOURCE then
+            elseif reason == "lack_resource" then
                 UIKit:showMessageDialog(_("主人"),_("资源不足，是否花费金龙币补足"))
                     :CreateOKButtonWithPrice({
                         listener = treat_fun,
-                        price = hospital:GetTreatGems(soldiers)
+                        price = User:GetNormalTreatGems(soldiers)
                     })
                     :CreateCancelButton()
-            elseif isAbleToTreat==HospitalUpgradeBuilding.CAN_NOT_TREAT.TREATING then
+            elseif reason == "treating" then
                 UIKit:showMessageDialog(_("主人"),_("正在治愈，是否花费魔法石立即完成"))
                     :CreateOKButtonWithPrice({
                         listener = treat_fun,
-                        price = hospital:GetTreatGems(soldiers)
+                        price = User:GetNormalTreatGems(soldiers)
                     })
                     :CreateCancelButton()
             else
@@ -385,7 +381,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
     }):addTo(button, 2)
         :align(display.CENTER, center, -50)
 
-    cc.ui.UILabel.new({
+    self.buff_treat_time = cc.ui.UILabel.new({
         text = "(-00:00:00)",
         size = 18,
         font = UIKit:getFontFilePath(),
@@ -396,7 +392,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
 
     self.back_ground = back_ground
     local res_map = {}
-    res_map.treatCoin = City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    res_map.treatCoin = User:GetResValueByType("coin")
     for k, v in pairs(self.res_map) do
         local total = res_map[k]
         v.total:setString(GameUtils:formatNumber(total))
@@ -406,12 +402,24 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
     self:OnCountChanged(self:GetMaxTreatNum())
 end
 function WidgetTreatSoldier:onEnter()
-    City:GetResourceManager():AddObserver(self)
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
+    scheduleAt(self, function()
+        local server_time = timer:GetServerTime()
+        local res_map = {}
+        res_map.treatCoin = User:GetResValueByType("coin")
+        for k, v in pairs(self.res_map) do
+            local total = res_map[k]
+            v.total:setString(GameUtils:formatNumber(total))
+        end
+        self.res_total_map = res_map
+        if not self.isSet then
+            self.slider_input:SetValue(self:GetMaxTreatNum())
+            self.isSet = true
+        end
+    end)
+    User:AddListenOnType(self, "soldierStars")
 end
 function WidgetTreatSoldier:onExit()
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_STAR_CHANGED)
-    City:GetResourceManager():RemoveObserver(self)
+    User:RemoveListenerOnType(self, "soldierStars")
 end
 function WidgetTreatSoldier:SetSoldier(soldier_type, star)
     local soldier_config, soldier_ui_config = self:GetConfigBySoldierTypeAndStar(soldier_type, star)
@@ -447,21 +455,24 @@ function WidgetTreatSoldier:SetSoldier(soldier_type, star)
 end
 function WidgetTreatSoldier:GetMaxTreatNum()
     local soldier_config = self.soldier_config
-    local total = City:GetResourceManager():GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
+    local total = User:GetResValueByType("coin")
     local temp_max = math.floor(total / soldier_config.treatCoin)
     local max_count = math.min(self.treat_max,temp_max)
     return max_count
 end
-function WidgetTreatSoldier:OnSoliderStarCountChanged(soldier_manager,star_changed_map)
-    for i,v in pairs(star_changed_map) do
-        if v == self.soldier_type then
-            self.star =  soldier_manager:GetStarBySoldierType(v)
-            local soldier_config, soldier_ui_config = self:GetConfigBySoldierTypeAndStar(v, self.star)
-            self.soldier:setButtonImage(cc.ui.UIPushButton.NORMAL, soldier_ui_config, true)
-            self.soldier:setButtonImage(cc.ui.UIPushButton.PRESSED, soldier_ui_config, true)
-            self.soldier_star:setNum(self.star)
-            self.soldier_config = soldier_config
-            self.soldier_ui_config = soldier_ui_config
+function WidgetTreatSoldier:OnUserDataChanged_soldierStars(userData, deltaData)
+    local ok, value = deltaData("soldierStars")
+    if ok then
+        for soldier_name,star in pairs(value) do
+            if soldier_name == self.soldier_type then
+                self.star =  star
+                local soldier_config, soldier_ui_config = self:GetConfigBySoldierTypeAndStar(soldier_name, self.star)
+                self.soldier:setButtonImage(cc.ui.UIPushButton.NORMAL, soldier_ui_config, true)
+                self.soldier:setButtonImage(cc.ui.UIPushButton.PRESSED, soldier_ui_config, true)
+                self.soldier_star:setNum(self.star)
+                self.soldier_config = soldier_config
+                self.soldier_ui_config = soldier_ui_config
+            end
         end
     end
 end
@@ -474,22 +485,6 @@ end
 function WidgetTreatSoldier:align(anchorPoint, x, y)
     self.back_ground:align(anchorPoint, x, y)
     return self
-end
-local app = app
-local timer = app.timer
-function WidgetTreatSoldier:OnResourceChanged(resource_manager)
-    local server_time = timer:GetServerTime()
-    local res_map = {}
-    res_map.treatCoin = resource_manager:GetCoinResource():GetResourceValueByCurrentTime(server_time)
-    for k, v in pairs(self.res_map) do
-        local total = res_map[k]
-        v.total:setString(GameUtils:formatNumber(total))
-    end
-    self.res_total_map = res_map
-    if not self.isSet then
-        self.slider_input:SetValue(self:GetMaxTreatNum())
-        self.isSet = true
-    end
 end
 function WidgetTreatSoldier:OnInstantButtonClicked(func)
     self.instant_button_clicked = func
@@ -509,6 +504,7 @@ function WidgetTreatSoldier:OnCountChanged(count)
     local total_time = soldier_config.treatTime * count
     self.upkeep:setString(string.format("%s%d/".._("小时"), count > 0 and "-" or "", soldier_config.consumeFoodPerHour * count))
     self.treat_time:setString(GameUtils:formatTimeStyle1(total_time))
+    self.buff_treat_time:setString("(-"..GameUtils:formatTimeStyle1(User:GetTechReduceTreatTime(total_time))..")")
 
     local total_map = self.res_total_map == nil and {} or self.res_total_map
     local current_res_map = {}

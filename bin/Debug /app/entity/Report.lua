@@ -29,6 +29,9 @@ function Report:DecodeFromJsonData(json_data)
     report:SetData(json_data[json_data.type])
     return report
 end
+function Report:SetPlayerId( player_id )
+    self.player_id = player_id
+end
 function Report:Update( json_data )
     self:SetIsRead(json_data.isRead)
     self:SetIsSaved(json_data.isSaved)
@@ -392,7 +395,7 @@ function Report:GetReportTitle()
     elseif report_type=="attackVillage" then
         local result = self:GetReportResult()
         if data.attackPlayerData.id == self.player_id then
-            return result and _("进攻村落成功") or _("进攻村落失败")
+            return result and _("占领村落成功") or _("占领村落失败")
         elseif data.defencePlayerData and data.defencePlayerData.id == self.player_id then
             return result and _("防守村落成功") or _("防守村落失败")
         end
@@ -408,10 +411,10 @@ end
 function Report:IsFromMe()
     local data = self:GetData()
     local report_type = self.type
-    if report_type == "strikeCity"
-        or report_type=="strikeVillage"
-        or report_type=="attackVillage" then
+    if report_type == "strikeCity" then
         return true
+    elseif report_type=="strikeVillage" or report_type=="attackVillage" then
+        return data.attackPlayerData.id == self.player_id
     elseif report_type=="villageBeStriked"
         or report_type=="cityBeStriked" then
         return false
@@ -644,6 +647,8 @@ function Report:GetReportResult()
                 end
             end
             return my_round[#my_round].isWin
+        else
+            return true
         end
     elseif data.defencePlayerData and data.defencePlayerData.id == self.player_id then
         -- 完全没有战斗数据,表示防守玩家城墙血量为零，且没有驻防

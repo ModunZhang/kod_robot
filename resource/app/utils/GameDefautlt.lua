@@ -49,6 +49,9 @@ function GameDefautlt:setTableForKey(key,t)
     local jsonString = json.encode(t)
     self:setStringForKey(key,jsonString)
 end
+function GameDefautlt:IsPassedSplash()
+    return self:getStringForKey("PASS_SPLASH") == "yes"
+end
 -- 消费金龙币提醒
 function GameDefautlt:IsOpenGemRemind()
     return self:getStringForKey("USE_GEM_TIPS") ~= "no"

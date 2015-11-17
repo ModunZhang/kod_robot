@@ -7,7 +7,6 @@ local UIListView = import(".UIListView")
 local WidgetSlider = import("..widget.WidgetSlider")
 local WidgetSelectDragon = import("..widget.WidgetSelectDragon")
 local WidgetInput = import("..widget.WidgetInput")
-local SoldierManager = import("..entity.SoldierManager")
 
 local Corps = import(".Corps")
 local UILib = import(".UILib")
@@ -59,17 +58,18 @@ function GameUIAllianceSendTroops:GetMyAlliance()
     return Alliance_Manager:GetMyAlliance()
 end
 
-function GameUIAllianceSendTroops:GetEnemyAlliance()
-    return Alliance_Manager:GetEnemyAlliance()
-end
+-- function GameUIAllianceSendTroops:GetEnemyAlliance()
+--     return Alliance_Manager:GetEnemyAlliance()
+-- end
 
 function GameUIAllianceSendTroops:GetMarchTime(soldier_show_table)
-    local mapObject = self:GetMyAlliance():GetAllianceMap():FindMapObjectById(self:GetMyAlliance():GetSelf():MapId())
+    local mapObject = self:GetMyAlliance():FindMapObjectById(self:GetMyAlliance():GetSelf():MapId())
     local fromLocation = mapObject.location
-    local target_alliance = self.targetIsMyAlliance and self:GetMyAlliance() or self:GetEnemyAlliance()
+    local target_alliance = self.targetAlliance
     local time = DataUtils:getPlayerSoldiersMarchTime(soldier_show_table,self:GetMyAlliance(),fromLocation,target_alliance,self.toLocation)
     local buffTime = DataUtils:getPlayerMarchTimeBuffTime(time)
     return time,buffTime
+    -- return 0,0
 end
 
 function GameUIAllianceSendTroops:RefreshMarchTimeAndBuff(soldier_show_table)
@@ -84,8 +84,8 @@ function GameUIAllianceSendTroops:ctor(march_callback,params)
     self.isPVE = type(params.isPVE) == 'boolean' and params.isPVE or false
     self.returnCloseAction = type(params.returnCloseAction) == 'boolean' and params.returnCloseAction or false
     self.toLocation = params.toLocation or cc.p(0,0)
-    self.targetIsMyAlliance = params.targetIsMyAlliance
-    self.terrain = User:Terrain()
+    self.targetAlliance = params.targetAlliance
+    self.terrain = User.basicInfo.terrain
     GameUIAllianceSendTroops.super.ctor(self,City,_("准备进攻"))
     local manager = ccs.ArmatureDataManager:getInstance()
     for _, anis in pairs(UILib.soldier_animation_files) do
@@ -94,7 +94,6 @@ function GameUIAllianceSendTroops:ctor(march_callback,params)
         end
     end
     self.alliance = Alliance_Manager:GetMyAlliance()
-    self.soldier_manager = City:GetSoldierManager()
     self.dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
     self.soldiers_table = {}
     self.march_callback = march_callback
@@ -193,14 +192,14 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                 if not self.dragon:IsFree() and not self.dragon:IsDefenced() then
                     UIKit:showMessageDialog(_("提示"),_("龙未处于空闲状态"))
                     return
-                elseif self.dragon:Hp()<1 then
+                elseif self.dragon:IsDead() then
                     UIKit:showMessageDialog(_("提示"),_("选择的龙已经死亡")):CreateCancelButton(
                             {
                                 listener = function ()
                                     UIKit:newGameUI("GameUIDragonEyrieMain", City, City:GetFirstBuildingByType("dragonEyrie"), "dragon", false, self.dragon:Type()):AddToCurrentScene(true)
                                     self:LeftButtonClicked()
                                 end,
-                                btn_name= _("查看"),
+                                btn_name= _("复活"),
                                 btn_images = {normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"}
                             }
                         )
@@ -211,13 +210,14 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                 elseif #soldiers == 0 then
                     UIKit:showMessageDialog(_("提示"),_("请选择要派遣的部队"))
                     return
-                elseif self.alliance:GetAllianceBelvedere():IsReachEventLimit() then
+                elseif self.alliance:IsReachEventLimit() then
                     local dialog = UIKit:showMessageDialog(_("提示"),_("没有空闲的行军队列"))
-                    if self.alliance:GetAllianceBelvedere():GetMarchLimit() < 2 then
+                    if User.basicInfo.marchQueue < 2 then
                         dialog:CreateOKButton(
                             {
                                 listener = function ()
-                                    UIKit:newGameUI('GameUIWathTowerRegion',City,'march'):AddToCurrentScene(true)
+                                    UIKit:newGameUI("GameUIWatchTower", City, "march"):AddToCurrentScene(true)
+                                    -- UIKit:newGameUI('GameUIWathTowerRegion',City,'march'):AddToCurrentScene(true)
                                     self:LeftButtonClicked()
                                 end,
                                 btn_name= _("前往解锁")
@@ -226,6 +226,7 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                     end
                     return
                 end
+                print("self.alliance:IsReachEventLimit()=",self.alliance:IsReachEventLimit(),User.basicInfo.marchQueue)
                 if self.dragon:IsDefenced() then
                     NetManager:getCancelDefenceDragonPromise():done(function()
                         self:CallFuncMarch_Callback(dragonType,soldiers)
@@ -253,7 +254,7 @@ function GameUIAllianceSendTroops:OnMoveInStage()
             color = 0x068329
         }):align(display.LEFT_CENTER,window.cx+20,window.top-920):addTo(self:GetView())
     end
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
+    User:AddListenOnType(self, "soldiers")
 end
 
 function GameUIAllianceSendTroops:CallFuncMarch_Callback(dragonType,soldiers)
@@ -306,7 +307,7 @@ function GameUIAllianceSendTroops:SelectDragonPart()
         :addTo(box_bg)
     -- 龙活力
     self.dragon_vitality = UIKit:ttfLabel({
-        text = _("生命值")..dragon:Hp().."/"..dragon:GetMaxHP(),
+        text = _("生命值")..string.formatnumberthousands(dragon:Hp()).."/"..string.formatnumberthousands(dragon:GetMaxHP()),
         size = 20,
         color = 0x615b44,
     }):align(display.LEFT_CENTER,20,30)
@@ -329,7 +330,7 @@ end
 function GameUIAllianceSendTroops:RefreashDragon(dragon)
     self.dragon_img:setTexture(UILib.dragon_head[dragon:Type()])
     self.dragon_name:setString(Localize.dragon[dragon:Type()].."（LV "..dragon:Level().."）")
-    self.dragon_vitality:setString(_("生命值")..dragon:Hp().."/"..dragon:GetMaxHP())
+    self.dragon_vitality:setString(_("生命值")..string.formatnumberthousands(dragon:Hp()).."/"..string.formatnumberthousands(dragon:GetMaxHP()))
     self.dragon = dragon
     self:RefreashSoldierShow()
 end
@@ -413,7 +414,7 @@ function GameUIAllianceSendTroops:SelectSoldiers()
                     }
                     UIKit:newWidgetUI("WidgetInput", p):AddToCurrentScene()
                 end
-            end):align(display.CENTER,  420,90):addTo(content)
+            end):align(display.CENTER,  380,90):addTo(content)
         local btn_text = UIKit:ttfLabel({
             text = 0,
             size = 22,
@@ -447,11 +448,11 @@ function GameUIAllianceSendTroops:SelectSoldiers()
 
 
         local soldier_total_count = UIKit:ttfLabel({
-            text = string.format("/ %d", item.max_soldier),
+            text = string.format("/ %s", string.formatnumberthousands(item.max_soldier)),
             size = 20,
             color = 0x403c2f
         }):addTo(content)
-            :align(display.LEFT_CENTER, 480,90)
+            :align(display.LEFT_CENTER, 440,90)
 
         -- 士兵头像
         local soldier_ui_config = UILib.soldier_image[name][star]
@@ -484,7 +485,7 @@ function GameUIAllianceSendTroops:SelectSoldiers()
         function item:SetMaxSoldier(max_soldier)
             self.max_soldier = max_soldier
             slider:SetMax(max_soldier)
-            soldier_total_count:setString(string.format("/ %d", self.max_soldier))
+            soldier_total_count:setString(string.format("/ %s", string.formatnumberthousands(self.max_soldier)))
         end
 
         function item:GetSoldierInfo()
@@ -496,7 +497,7 @@ function GameUIAllianceSendTroops:SelectSoldiers()
         end
         return item
     end
-    local sm = self.soldier_manager
+    local User = User
     local soldiers = {}
     local soldier_map = {
         "swordsman",
@@ -516,11 +517,11 @@ function GameUIAllianceSendTroops:SelectSoldiers()
     -- "paladin",
     -- "steamTank",
     }
-    local map_s = sm:GetSoldierMap()
+    local map_s = User.soldiers
     for _,name in pairs(soldier_map) do
         local soldier_num = map_s[name]
         if soldier_num>0 then
-            table.insert(soldiers, {name = name,level = sm:GetStarBySoldierType(name), max_num = soldier_num})
+            table.insert(soldiers, {name = name,level = User:SoldierStarByName(name), max_num = soldier_num})
         end
     end
     for k,v in pairs(soldiers) do
@@ -771,19 +772,21 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
 
     return TroopShow
 end
-function GameUIAllianceSendTroops:OnSoliderCountChanged( soldier_manager,changed_map )
-    for i,soldier_type in ipairs(changed_map) do
-        for _,item in pairs(self.soldiers_table) do
-            local item_type = item:GetSoldierInfo()
-            if soldier_type == item_type then
-                item:SetMaxSoldier(City:GetSoldierManager():GetCountBySoldierType(item_type))
+function GameUIAllianceSendTroops:OnUserDataChanged_soldiers(userData, deltaData)
+    local ok, value = deltaData("soldiers")
+    if ok then
+        for i,soldier_type in ipairs(value) do
+            for _,item in pairs(self.soldiers_table) do
+                local item_type = item:GetSoldierInfo()
+                if soldier_type == item_type then
+                    item:SetMaxSoldier(User.soldiers[item_type])
+                end
             end
         end
     end
 end
 function GameUIAllianceSendTroops:onExit()
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
-
+    User:RemoveListenerOnType(self, "soldiers")
     GameUIAllianceSendTroops.super.onExit(self)
 end
 

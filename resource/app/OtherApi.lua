@@ -9,7 +9,7 @@ local intInit = GameDatas.PlayerInitData.intInit
 -- 个人修改地形
 function OtherApi:SetCityTerrain()
     local rand = math.random(3)
-    local current_t = User:Terrain()
+    local current_t = User.basicInfo.terrain
     if rand == 1 and current_t ~= "grassLand" then
         return NetManager:getChangeToGrassPromise()
     elseif rand == 2 and current_t ~= "desert" then
@@ -28,15 +28,15 @@ function OtherApi:SetPlayerIcon()
         can_set = true
     end
     if icon_key == 7 then -- 刺客
-        can_set = User:Kill() >= 1000000
+        can_set = User.basicInfo.kill >= 1000000
     elseif icon_key == 8 then -- 将军
-        can_set = User:Power() >= 1000000
+        can_set = User.basicInfo.power >= 1000000
     elseif icon_key == 9 then -- 术士
         can_set = User:GetVipLevel() == 10
     elseif icon_key == 10 then -- 贵妇
         can_set = City:GetFirstBuildingByType("keep"):GetLevel() >= 40
     elseif icon_key == 11 then -- 旧神
-        can_set = User:GetPVEDatabase():GetMapByIndex(3):IsComplete()
+        can_set = User:IsAllPassed()
     end
     if can_set then
         return NetManager:getSetPlayerIconPromise(icon_key)
@@ -51,7 +51,7 @@ function OtherApi:SwitchBuilding()
         return
     end
     local current_building = City:GetBuildingByLocationId(location_id)
-    if City:GetUser():GetGemResource():GetValue() < intInit.switchProductionBuilding.value then
+    if User:GetGemValue() < intInit.switchProductionBuilding.value then
         return
     elseif (City:GetMaxHouseCanBeBuilt(current_building:GetHouseType())-current_building:GetMaxHouseNum())<#City:GetBuildingByType(current_building:GetHouseType()) then
         return
@@ -107,11 +107,11 @@ function OtherApi:Gacha()
     local normal_gacha = math.random(2) == 2
     if normal_gacha then
         if User:GetOddFreeNormalGachaCount() > 0
-            or City:GetResourceManager():GetCasinoTokenResource():GetValue() >= intInit.casinoTokenNeededPerNormalGacha.value then
+            or User:GetResValueByType("casinoToken") >= intInit.casinoTokenNeededPerNormalGacha.value then
             return NetManager:getNormalGachaPromise()
         end
     else
-        if City:GetResourceManager():GetCasinoTokenResource():GetValue() >= intInit.casinoTokenNeededPerAdvancedGacha.value then
+        if User:GetResValueByType("casinoToken") >= intInit.casinoTokenNeededPerAdvancedGacha.value then
             return NetManager:getAdvancedGachaPromise()
         end
     end
@@ -143,9 +143,10 @@ function OtherApi:MailApi()
             local send_count = math.random(Alliance_Manager:GetMyAlliance():GetMembersCount())
             local count = 1
             local memberId
-            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function ( id,member )
-                if count == send_count and id ~= User:Id() then
-                    memberId = id
+            Alliance_Manager:GetMyAlliance():IteratorAllMembers(function ( member )
+                if count == send_count and member.id ~= User:Id() then
+                    memberId = member.id
+                    return true
                 end
             end)
             if not memberId then
@@ -254,21 +255,21 @@ function OtherApi:Items()
         local item_index = math.random(4)
         local items
         if item_index == 1 then
-            items = ItemManager:GetSpecialItems()
+            items = UtilsForItem:GetBuffItemsInfo()
         elseif item_index == 2 then
-            items = ItemManager:GetBuffItems()
+            items = UtilsForItem:GetResourcetItemsInfo()
         elseif item_index == 3 then
-            items = ItemManager:GetResourcetItems()
+            items = UtilsForItem:GetSpeedUpItemsInfo()
         elseif item_index == 4 then
-            items = ItemManager:GetSpeedUpItems()
+            items = UtilsForItem:GetSpecialItemsInfo()
         end
         local buy_index = math.random(LuaUtils:table_size(items))
         local count = 0
         for k,v in pairs(items) do
             count = count + 1
             if count == buy_index then
-                print("购买一个道具：",v:Name())
-                return NetManager:getBuyItemPromise(v:Name(),1)
+                print("购买一个道具：",v.name)
+                return NetManager:getBuyItemPromise(v.name,1)
             end
         end
     end
@@ -308,7 +309,7 @@ function OtherApi:Chat()
     local alliance = Alliance_Manager:GetMyAlliance()
     local channel
     if not alliance:IsDefault() then
-        if alliance:Status() == "fight" then
+        if alliance.basicInfo.status == "fight" then
             channel = channels[math.random(3)]
         else
             channel = channels[math.random(2)]
@@ -317,7 +318,7 @@ function OtherApi:Chat()
         channel = channels[math.random(1)]
     end
     if math.random(10) < 3 then
-        return NetManager:getSendChatPromise(channel,"我是"..User:Name())
+        return NetManager:getSendChatPromise(channel,"我是"..User.basicInfo.name)
     end
 end
 local function setRun()
@@ -394,7 +395,7 @@ end
 return {
     setRun,
     SetCityTerrain,
-    SwitchBuilding,
+    -- SwitchBuilding,
     SetPlayerIcon,
     MailApi,
     Gacha,

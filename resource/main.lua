@@ -79,6 +79,8 @@ UIKit = {
         return {}
     end,
     showKeyMessageDialog = function() return {} end,
+    closeAllUI = function() return {} end,
+    showMessageDialogWithParams = function() return {} end,
 }
 device = { getOpenUDID = function() return GlobalDeviceId end,
     platform = "mac" }
@@ -110,7 +112,8 @@ local GameGlobalUIUtils = GameGlobalUI
 
 function GameGlobalUIUtils:showTips()
 end
-
+function GameGlobalUIUtils:showNotice()
+end
 
 
 require("app.MyApp").new():run()

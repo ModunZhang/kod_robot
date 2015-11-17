@@ -13,7 +13,7 @@ stages["1_2"] = {
 stages["1_3"] = {
 	["stageName"] = "1_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:36,soldierMaterials:deathHand:36,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:36,soldierMaterials:deathHand:36,items:foodBonus_1:1"
 }
 stages["1_4"] = {
 	["stageName"] = "1_4",
@@ -33,7 +33,7 @@ stages["2_2"] = {
 stages["2_3"] = {
 	["stageName"] = "2_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:102,soldierMaterials:magicBox:102,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:102,soldierMaterials:magicBox:102,items:foodBonus_1:1"
 }
 stages["2_4"] = {
 	["stageName"] = "2_4",
@@ -53,7 +53,7 @@ stages["3_2"] = {
 stages["3_3"] = {
 	["stageName"] = "3_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:magicBox:170,soldierMaterials:deathHand:170,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:magicBox:170,soldierMaterials:deathHand:170,items:foodBonus_1:1"
 }
 stages["3_4"] = {
 	["stageName"] = "3_4",
@@ -73,7 +73,7 @@ stages["4_2"] = {
 stages["4_3"] = {
 	["stageName"] = "4_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:240,soldierMaterials:deathHand:240,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:240,soldierMaterials:deathHand:240,items:foodBonus_1:1"
 }
 stages["4_4"] = {
 	["stageName"] = "4_4",
@@ -93,7 +93,7 @@ stages["5_2"] = {
 stages["5_3"] = {
 	["stageName"] = "5_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:310,soldierMaterials:magicBox:310,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:310,soldierMaterials:magicBox:310,items:foodBonus_1:1"
 }
 stages["5_4"] = {
 	["stageName"] = "5_4",
@@ -113,7 +113,7 @@ stages["6_2"] = {
 stages["6_3"] = {
 	["stageName"] = "6_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:magicBox:370,soldierMaterials:deathHand:370,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:magicBox:370,soldierMaterials:deathHand:370,items:foodBonus_1:1"
 }
 stages["6_4"] = {
 	["stageName"] = "6_4",
@@ -133,7 +133,7 @@ stages["7_2"] = {
 stages["7_3"] = {
 	["stageName"] = "7_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:440,soldierMaterials:deathHand:440,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:440,soldierMaterials:deathHand:440,items:foodBonus_1:1"
 }
 stages["7_4"] = {
 	["stageName"] = "7_4",
@@ -153,7 +153,7 @@ stages["8_2"] = {
 stages["8_3"] = {
 	["stageName"] = "8_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:500,soldierMaterials:magicBox:500,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:500,soldierMaterials:magicBox:500,items:foodBonus_1:1"
 }
 stages["8_4"] = {
 	["stageName"] = "8_4",
@@ -173,7 +173,7 @@ stages["9_2"] = {
 stages["9_3"] = {
 	["stageName"] = "9_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:magicBox:570,soldierMaterials:deathHand:570,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:magicBox:570,soldierMaterials:deathHand:570,items:foodBonus_1:1"
 }
 stages["9_4"] = {
 	["stageName"] = "9_4",
@@ -193,7 +193,7 @@ stages["10_2"] = {
 stages["10_3"] = {
 	["stageName"] = "10_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:640,soldierMaterials:deathHand:640,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:640,soldierMaterials:deathHand:640,items:foodBonus_1:1"
 }
 stages["10_4"] = {
 	["stageName"] = "10_4",
@@ -213,7 +213,7 @@ stages["11_2"] = {
 stages["11_3"] = {
 	["stageName"] = "11_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:700,soldierMaterials:magicBox:700,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:700,soldierMaterials:magicBox:700,items:foodBonus_1:1"
 }
 stages["11_4"] = {
 	["stageName"] = "11_4",
@@ -233,7 +233,7 @@ stages["12_2"] = {
 stages["12_3"] = {
 	["stageName"] = "12_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:magicBox:770,soldierMaterials:deathHand:770,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:magicBox:770,soldierMaterials:deathHand:770,items:foodBonus_1:1"
 }
 stages["12_4"] = {
 	["stageName"] = "12_4",
@@ -253,7 +253,7 @@ stages["13_2"] = {
 stages["13_3"] = {
 	["stageName"] = "13_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:840,soldierMaterials:deathHand:840,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:840,soldierMaterials:deathHand:840,items:foodBonus_1:1"
 }
 stages["13_4"] = {
 	["stageName"] = "13_4",
@@ -273,7 +273,7 @@ stages["14_2"] = {
 stages["14_3"] = {
 	["stageName"] = "14_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:900,soldierMaterials:magicBox:900,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:900,soldierMaterials:magicBox:900,items:foodBonus_1:1"
 }
 stages["14_4"] = {
 	["stageName"] = "14_4",
@@ -293,7 +293,7 @@ stages["15_2"] = {
 stages["15_3"] = {
 	["stageName"] = "15_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:magicBox:970,soldierMaterials:deathHand:970,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:magicBox:970,soldierMaterials:deathHand:970,items:foodBonus_1:1"
 }
 stages["15_4"] = {
 	["stageName"] = "15_4",
@@ -313,7 +313,7 @@ stages["16_2"] = {
 stages["16_3"] = {
 	["stageName"] = "16_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:1030,soldierMaterials:deathHand:1030,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:1030,soldierMaterials:deathHand:1030,items:foodBonus_1:1"
 }
 stages["16_4"] = {
 	["stageName"] = "16_4",
@@ -333,7 +333,7 @@ stages["17_2"] = {
 stages["17_3"] = {
 	["stageName"] = "17_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:1100,soldierMaterials:magicBox:1100,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:1100,soldierMaterials:magicBox:1100,items:foodBonus_1:1"
 }
 stages["17_4"] = {
 	["stageName"] = "17_4",
@@ -353,7 +353,7 @@ stages["18_2"] = {
 stages["18_3"] = {
 	["stageName"] = "18_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:magicBox:1170,soldierMaterials:deathHand:1170,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:magicBox:1170,soldierMaterials:deathHand:1170,items:foodBonus_1:1"
 }
 stages["18_4"] = {
 	["stageName"] = "18_4",
@@ -373,7 +373,7 @@ stages["19_2"] = {
 stages["19_3"] = {
 	["stageName"] = "19_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:1230,soldierMaterials:deathHand:1230,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:1230,soldierMaterials:deathHand:1230,items:foodBonus_1:1"
 }
 stages["19_4"] = {
 	["stageName"] = "19_4",
@@ -393,7 +393,7 @@ stages["20_2"] = {
 stages["20_3"] = {
 	["stageName"] = "20_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:1300,soldierMaterials:magicBox:1300,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:1300,soldierMaterials:magicBox:1300,items:foodBonus_1:1"
 }
 stages["20_4"] = {
 	["stageName"] = "20_4",
@@ -413,7 +413,7 @@ stages["21_2"] = {
 stages["21_3"] = {
 	["stageName"] = "21_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:magicBox:1360,soldierMaterials:deathHand:1360,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:magicBox:1360,soldierMaterials:deathHand:1360,items:foodBonus_1:1"
 }
 stages["21_4"] = {
 	["stageName"] = "21_4",
@@ -433,7 +433,7 @@ stages["22_2"] = {
 stages["22_3"] = {
 	["stageName"] = "22_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:1430,soldierMaterials:deathHand:1430,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:1430,soldierMaterials:deathHand:1430,items:foodBonus_1:1"
 }
 stages["22_4"] = {
 	["stageName"] = "22_4",
@@ -453,7 +453,7 @@ stages["23_2"] = {
 stages["23_3"] = {
 	["stageName"] = "23_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:heroBones:1500,soldierMaterials:magicBox:1500,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:heroBones:1500,soldierMaterials:magicBox:1500,items:foodBonus_1:1"
 }
 stages["23_4"] = {
 	["stageName"] = "23_4",
@@ -473,7 +473,7 @@ stages["24_2"] = {
 stages["24_3"] = {
 	["stageName"] = "24_3",
 	["needStar"] = "45.0",
-	["rewards"] = "soldierMaterials:magicBox:1560,soldierMaterials:deathHand:1560,items:foodBous_1:1"
+	["rewards"] = "soldierMaterials:magicBox:1560,soldierMaterials:deathHand:1560,items:foodBonus_1:1"
 }
 stages["24_4"] = {
 	["stageName"] = "24_4",

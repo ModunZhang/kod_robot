@@ -1,5 +1,6 @@
 local WidgetNumberTips = import(".WidgetNumberTips")
 local WidgetChangeMap = import(".WidgetChangeMap")
+local fire_var = import("app.particles.fire_var")
 local WidgetHomeBottom = class("WidgetHomeBottom", function()
     local bottom_bg = display.newSprite("bottom_bg_768x136.png")
     if display.width >640 then
@@ -17,8 +18,8 @@ local ALLIANCE_TAG = 222
 function WidgetHomeBottom:MailUnreadChanged(...)
     self.mail_count:SetNumber(MailManager:GetUnReadMailsNum()+MailManager:GetUnReadReportsNum())
 end
-function WidgetHomeBottom:OnTaskChanged()
-    self.task_count:SetNumber(self.city:GetUser():GetTaskManager():GetCompleteTaskCount())
+function WidgetHomeBottom:OnUserDataChanged_growUpTasks()
+    self.task_count:SetNumber(UtilsForTask:GetCompleteTaskCount(self.city:GetUser().growUpTasks))
 end
 function WidgetHomeBottom:ctor(city)
     self.city = city
@@ -60,6 +61,16 @@ function WidgetHomeBottom:ctor(city)
         elseif i == 4 then
             self.alliance_btn = button
             self.alliance_btn:setLocalZOrder(9)
+            local alliance = Alliance_Manager:GetMyAlliance()
+            if not alliance:IsDefault() and
+                alliance:GetSelf():IsTitleEqualOrGreaterThan("quartermaster") then
+                self.join_request_count = WidgetNumberTips.new():addTo(self):pos(x+20, first_row+20)
+                self.join_request_count:setLocalZOrder(11)
+                self.join_request_count:SetNumber(#Alliance_Manager:GetMyAlliance().joinRequestEvents or 0)
+            end
+            if not User.countInfo.firstJoinAllianceRewardGeted then
+                fire_var():addTo(self.alliance_btn, -1000, 321)
+            end
         end
     end
     display.newNode():addTo(self):schedule(function()
@@ -69,21 +80,30 @@ end
 function WidgetHomeBottom:onEnter()
     local user = self.city:GetUser()
     MailManager:AddListenOnType(self,MailManager.LISTEN_TYPE.UNREAD_MAILS_CHANGED)
-    user:AddListenOnType(self, user.LISTEN_TYPE.TASK)
+    user:AddListenOnType(self, "growUpTasks")
+    user:AddListenOnType(self, "countInfo")
+    Alliance_Manager:GetMyAlliance():AddListenOnType(self, "joinRequestEvents")
 
-    self:OnTaskChanged()
+    self:OnUserDataChanged_growUpTasks()
     self:MailUnreadChanged()
 end
 function WidgetHomeBottom:onExit()
     local user = self.city:GetUser()
     MailManager:RemoveListenerOnType(self,MailManager.LISTEN_TYPE.UNREAD_MAILS_CHANGED)
-    user:RemoveListenerOnType(self, user.LISTEN_TYPE.TASK)
+    user:RemoveListenerOnType(self, "growUpTasks")
+    user:RemoveListenerOnType(self, "countInfo")
+    Alliance_Manager:GetMyAlliance():RemoveListenerOnType(self, "joinRequestEvents")
 end
 function WidgetHomeBottom:OnBottomButtonClicked(event)
     local tag = event.target:getTag()
     if not tag then return end
     if tag == 4 then -- tag 4 = alliance button
-        UIKit:newGameUI('GameUIAlliance'):AddToCurrentScene(true)
+        local alliance = Alliance_Manager:GetMyAlliance()
+        if alliance:IsDefault() and not User.countInfo.firstJoinAllianceRewardGeted then
+            UIKit:newGameUI("GameUIAllianceJoinTips"):AddToCurrentScene(true)
+        else
+            UIKit:newGameUI('GameUIAlliance'):AddToCurrentScene(true)
+        end
         self.alliance_btn:removeChildByTag(ALLIANCE_TAG)
     elseif tag == 3 then
         UIKit:newGameUI('GameUIMail',self.city):AddToCurrentScene(true)
@@ -96,14 +116,22 @@ function WidgetHomeBottom:OnBottomButtonClicked(event)
     end
 end
 function WidgetHomeBottom:TipsOnTaskCount()
-    if self.task_count:getNumberOfRunningActions() > 0 or 
+    if self.task_count:getNumberOfRunningActions() > 0 or
         not self.task_count:isVisible() then
         return
     end
     self.task_count:runAction(cc.JumpBy:create(1, cc.p(0,0), 30, 3))
 end
-
-
+function WidgetHomeBottom:OnUserDataChanged_countInfo(userData, deltaData)
+    if User.countInfo.firstJoinAllianceRewardGeted then
+        self.alliance_btn:removeChildByTag(321, cleanup)
+    end
+end
+function WidgetHomeBottom:OnAllianceDataChanged_joinRequestEvents(alliance,deltaData)
+    if self.join_request_count then
+        self.join_request_count:SetNumber(#alliance.joinRequestEvents or 0)
+    end
+end
 -- fte
 local WidgetFteArrow = import(".WidgetFteArrow")
 local WidgetFteMark = import(".WidgetFteMark")
@@ -123,6 +151,8 @@ end
 
 
 return WidgetHomeBottom
+
+
 
 
 

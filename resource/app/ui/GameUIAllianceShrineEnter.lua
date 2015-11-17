@@ -9,35 +9,39 @@ local Localize = import("..utils.Localize")
 
 function GameUIAllianceShrineEnter:ctor(building,isMyAlliance,alliance,enemy_alliance)
 	GameUIAllianceShrineEnter.super.ctor(self,building,isMyAlliance,alliance,enemy_alliance)
-	self.building = building:GetAllianceBuildingInfo()
+	-- if isMyAlliance then
+	-- 	self.building = alliance:FindAllianceBuildingInfoByObjects(building)
+	-- else
+	-- 	self.building = enemy_alliance:FindAllianceBuildingInfoByObjects(building)
+	-- end
 end
 
-function GameUIAllianceShrineEnter:GetLocation()
-	local mapObject
-	if self:IsMyAlliance() then
-		mapObject = self:GetMyAlliance():GetAllianceMap():FindMapObjectById(self:GetBuilding().id)
-	else
-		mapObject = self:GetEnemyAlliance():GetAllianceMap():FindMapObjectById(self:GetBuilding().id)
-	end
-	return mapObject.location.x .. "," .. mapObject.location.y
-end
+-- function GameUIAllianceShrineEnter:GetLocation()
+-- 	local mapObject
+-- 	if self:IsMyAlliance() then
+-- 		mapObject = self:GetMyAlliance():FindMapObjectById(self:GetBuilding().id)
+-- 	else
+-- 		mapObject = self:GetEnemyAlliance():FindMapObjectById(self:GetBuilding().id)
+-- 	end
+-- 	return mapObject.location.x .. "," .. mapObject.location.y
+-- end
 
 function GameUIAllianceShrineEnter:GetLogicPosition()
 	local mapObject
 	if self:IsMyAlliance() then
-		mapObject = self:GetMyAlliance():GetAllianceMap():FindMapObjectById(self:GetBuilding().id)
+		mapObject = self:GetMyAlliance():FindMapObjectById(self:GetBuilding().id)
 	else
-		mapObject = self:GetEnemyAlliance():GetAllianceMap():FindMapObjectById(self:GetBuilding().id)
+		mapObject = self:GetEnemyAlliance():FindMapObjectById(self:GetBuilding().id)
 	end
-	return {x = mapObject.location.x,y = mapObject.location.y}
+	return mapObject.location
 end
 
 function GameUIAllianceShrineEnter:GetMapObject()
 	local mapObject
 	if self:IsMyAlliance() then
-		mapObject = self:GetMyAlliance():GetAllianceMap():FindMapObjectById(self:GetBuilding().id)
+		mapObject = self:GetMyAlliance():FindMapObjectById(self:GetBuilding().id)
 	else
-		mapObject = self:GetEnemyAlliance():GetAllianceMap():FindMapObjectById(self:GetBuilding().id)
+		mapObject = self:GetEnemyAlliance():FindMapObjectById(self:GetBuilding().id)
 	end
 	return mapObject
 end
@@ -59,7 +63,7 @@ function GameUIAllianceShrineEnter:GetUITitle()
 end
 
 function GameUIAllianceShrineEnter:GetBuildingImage()
-	return UILib.alliance_building.shrine
+	return {UILib.alliance_building.shrine,"alliance_shrine_2.png"}
 end
 
 function GameUIAllianceShrineEnter:GetBuildImageSprite()
@@ -86,13 +90,13 @@ function GameUIAllianceShrineEnter:FixedUI()
 end
 
 function GameUIAllianceShrineEnter:GetTroopsInfo()
-	local events = self:GetMyAlliance():GetAllianceShrine():GetShrineEvents()
+	local events = self:GetMyAlliance():GetShrineEventsBySeq()
 	local event_count = 0
 	local total_count = 0
 	local running_event_names = {}
 	for __,event in ipairs(events) do
 		event_count = event_count + 1
-		total_count = total_count + #event:PlayerTroops()
+		total_count = total_count + #event.playerTroops
 	end
 	if event_count > 0 then
 		return event_count,total_count
@@ -137,14 +141,14 @@ function GameUIAllianceShrineEnter:GetReallyButtons()
 	local current_scene = display.getRunningScene()
 	if self:AllianceBuildingMoveIsOpen() and  current_scene.__cname == "AllianceScene" then
 		local move_building_button = self:BuildOneButton("icon_move_alliance_building.png",_("移动")):onButtonClicked(function()
-			if self:GetMyAlliance():Status() == 'fight' then
+			if self:GetMyAlliance().basicInfo.status == 'fight' then
             	UIKit:showMessageDialog(nil, _("战争期不能移动"),function()end)
             	return
         	end
 			local alliacne =  self:GetMyAlliance()
             local isEqualOrGreater = alliacne:GetSelf():CanEditAllianceObject()
             if isEqualOrGreater then
-				if self:GetMyAlliance():Honour() < self:GetMoveNeedHonour() then 
+				if self:GetMyAlliance().basicInfo.honour < self:GetMoveNeedHonour() then 
                     UIKit:showMessageDialog(nil, _("联盟荣耀值不足"),function()end)
                     return 
                 end

@@ -26,7 +26,6 @@ end
 function GameUITips:onCleanup()
     GameUITips.super.onCleanup(self)
     cc.Director:getInstance():getTextureCache():removeTextureForKey("region_tips_556x344.jpg")
-    cc.Director:getInstance():getTextureCache():removeTextureForKey("pve_tips_554x340.jpg")
 end
 
 function GameUITips:BuildUI()
@@ -52,7 +51,7 @@ function GameUITips:BuildUI()
     self.tab_buttons = WidgetRoundTabButtons.new({
         {tag = "city",label = _("城市"),default = self.default_tab == "city"},
         {tag = "region",label = _("区域地图"),default = self.default_tab == "region"},
-        {tag = "pve",label = _("探险地图"),default = self.default_tab == "pve"},
+        -- {tag = "pve",label = _("探险地图"),default = self.default_tab == "pve"},
     }, function(tag)
         self:OnTabButtonClicked(tag)
     end,1):align(display.CENTER_BOTTOM,304,15):addTo(bg)
@@ -191,9 +190,6 @@ function GameUITips:CreateUIIf_pve()
         return self.pve_node
     end
     local node = display.newNode():size(608,747):addTo(self.bg)
-    display.newSprite("pve_tips_554x340.jpg")
-        :align(display.CENTER_TOP, 305, self.bg:getContentSize().height - 30)
-        :addTo(node)
 
 
     local tips_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 263})

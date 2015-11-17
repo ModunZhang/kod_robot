@@ -6,7 +6,6 @@ local GameUIOtherAllianceHome = UIKit:createUIClass("GameUIOtherAllianceHome", "
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local window = import("..utils.window")
 local Alliance = import("..entity.Alliance")
-local Flag = import("..entity.Flag")
 local WidgetChangeMap = import("..widget.WidgetChangeMap")
 
 
@@ -14,7 +13,7 @@ function GameUIOtherAllianceHome:OnSceneMove(logic_x, logic_y, alliance_view)
     local coordinate_str = string.format("%d, %d", logic_x, logic_y)
     local is_mine
     if alliance_view then
-        is_mine = alliance_view:GetAlliance():Id() == self.alliance:Id() and "["..self.alliance:Tag().."]" or "["..Alliance_Manager:GetEnemyAlliance():Tag().."]"
+        is_mine = alliance_view:GetAlliance().id == self.alliance.id and "["..self.alliance.basicInfo.tag.."]" or "["..Alliance_Manager:GetEnemyAlliance().basicInfo.tag.."]"
     else
         is_mine = _("坐标")
     end

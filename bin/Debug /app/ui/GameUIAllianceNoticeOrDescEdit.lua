@@ -41,9 +41,9 @@ function GameUIAllianceNoticeOrDescEdit:OnMoveInStage()
 
     local text = ""
     if self.isNotice_ then
-    	text = Alliance_Manager:GetMyAlliance():Notice()
+    	text = Alliance_Manager:GetMyAlliance().notice
     else
-    	text = Alliance_Manager:GetMyAlliance():Describe()
+    	text = Alliance_Manager:GetMyAlliance().desc
     end
     if text == json.null or string.len(text) == 0 then
     	text = ""

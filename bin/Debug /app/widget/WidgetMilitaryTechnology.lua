@@ -3,45 +3,37 @@
 -- Date: 2015-01-17 10:33:17
 --
 local window = import("..utils.window")
-local WidgetProgress = import(".WidgetProgress")
 local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetPushButton = import(".WidgetPushButton")
-local SoldierManager = import("..entity.SoldierManager")
 local Localize = import("..utils.Localize")
 
-local function create_line_item(icon,text_1,text_2,text_3)
-    local line = display.newScale9Sprite("dividing_line.png",0,0,cc.size(384,2),cc.rect(10,2,382,2))
+local function create_line_item(icon,text_1,text_2)
+    local line = display.newScale9Sprite("dividing_line.png",0,0,cc.size(258,2),cc.rect(10,2,382,2))
     local icon = display.newSprite(icon):addTo(line,2):align(display.LEFT_BOTTOM, 0, 2)
-    icon:scale(32/icon:getContentSize().width)
-    local text1 = UIKit:ttfLabel({
-        text = text_1,
-        size = 20,
-        color = 0x615b44,
-    }):align(display.LEFT_BOTTOM, 40 , 2)
-        :addTo(line)
-    local green_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.BOTTOM_CENTER, 320 , 6):addTo(line)
-    if text_2 == "" then
+    icon:scale(32/math.max(icon:getContentSize().width,icon:getContentSize().height))
+    local green_icon = display.newSprite("teach_upgrade_icon_15x17.png"):align(display.BOTTOM_CENTER, 182 , 6):addTo(line)
+    if text_1 == "" then
         green_icon:hide()
     end
-    local text2 = UIKit:ttfLabel({
-        text = text_2,
+    local text1 = UIKit:ttfLabel({
+        text = text_1,
         size = 22,
         color = 0x403c2f,
     }):align(display.RIGHT_BOTTOM, green_icon:getPositionX() - 20 , 2)
         :addTo(line)
-    local text3 = UIKit:ttfLabel({
-        text = text_3,
+    local text2 = UIKit:ttfLabel({
+        text = text_2,
         size = 22,
         color = 0x403c2f,
     }):align(display.LEFT_BOTTOM, green_icon:getPositionX() + 16 , 2)
         :addTo(line)
 
-    function line:SetText(text_2,text_3)
-        text3:setString(text_3)
-        if text_2 then
-            text2:setString(text_2)
+    function line:SetText(text_1,text_2)
+        text2:setString(text_2)
+        if text_1 then
+            text1:setString(text_1)
         else
-            text2:setString("")
+            text1:setString("")
             green_icon:hide()
         end
     end
@@ -61,17 +53,17 @@ end)
 
 function WidgetMilitaryTechnology:ctor(building)
     self.building = building
-
-    local techs = City:GetSoldierManager():FindMilitaryTechsByBuildingType(self.building:GetType())
+    local techs = User:GetMilitaryTechsByBuilding(self.building:GetType())
     self.items_list = {}
     for k,v in pairs(techs) do
-        self.items_list[v:Name()] =  self:CreateItem(v)
+        local name, tech = unpack(v)
+        self.items_list[name] =  self:CreateItem(name, tech)
     end
     self:VisibleUpgradeButton()
     self.listview:reload()
 end
 
-function WidgetMilitaryTechnology:CreateItem(tech)
+function WidgetMilitaryTechnology:CreateItem(name, tech)
     local list = self.listview
     local item = list:newItem()
     local item_width,item_height = 568,150
@@ -81,16 +73,22 @@ function WidgetMilitaryTechnology:CreateItem(tech)
     local content = WidgetUIBackGround.new({width = item_width,height = item_height},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
     item:addContent(content)
 
-    local title_bg = display.newScale9Sprite("title_blue_430x30.png",item_width/2,item_height-25,cc.size(550,30),cc.rect(15,10,400,10))
-        :addTo(content)
+
+    local icon_box = display.newSprite("alliance_item_flag_box_126X126.png"):align(display.LEFT_CENTER, 10, item_height/2):addTo(content)
+    local icon_bg = display.newSprite("technology_bg_normal_142x142.png"):align(display.CENTER, icon_box:getContentSize().width/2, icon_box:getContentSize().height/2):addTo(icon_box):scale(0.8)
+    display.newSprite(UtilsForTech:GetMiliTechIcon(name))
+        :align(display.CENTER, icon_bg:getContentSize().width/2, icon_bg:getContentSize().height/2):addTo(icon_bg)
+
+    local title_bg = display.newScale9Sprite("title_blue_430x30.png",item_width - 10,item_height-25,cc.size(412,30),cc.rect(15,10,400,10))
+        :addTo(content):align(display.RIGHT_CENTER)
     local temp = UIKit:ttfLabel({
-        text = tech:GetTechLocalize() ,
+        text = UtilsForTech:GetTechLocalize(name),
         size = 22,
         color = 0xffedae,
     }):align(display.LEFT_CENTER, 20 , title_bg:getContentSize().height/2)
         :addTo(title_bg)
     local tech_level = UIKit:ttfLabel({
-        text = string.format("Lv%d",tech:Level()) ,
+        text = string.format("Lv%d", tech.level) ,
         size = 22,
         color = 0xffedae,
     }):align(display.LEFT_CENTER, temp:getPositionX()+temp:getContentSize().width+20 , title_bg:getContentSize().height/2)
@@ -103,65 +101,89 @@ function WidgetMilitaryTechnology:CreateItem(tech)
             color = 0xffedae,
             shadow = true
         })):onButtonClicked(function (event)
-        UIKit:newWidgetUI("WidgetUpgradeMilitaryTech", tech):AddToCurrentScene()
+        UIKit:newWidgetUI("WidgetUpgradeMilitaryTech", name, tech):AddToCurrentScene()
         end)
         :align(display.CENTER, item_width-90, 44):addTo(content)
 
-    local soldiers = string.split(tech:Name(), "_")
+    local soldiers = string.split(name, "_")
     local soldier_category = Localize.soldier_category
-    local line1 = create_line_item("battle_33x33.png",tech:GetTechLocalize(),tech:IsMaxLevel() and "" or (tech:GetAtkEff()*100).."%",(tech:GetNextLevlAtkEff()*100).."%"):addTo(content):align(display.LEFT_CENTER, 10, 60)
-    local line2 = create_line_item("bottom_icon_package_77x67.png",tech:GetTechCategory(),tech:IsMaxLevel() and "" or tech:GetTechPoint(),tech:GetNextLevlTechPoint()):addTo(content):align(display.LEFT_CENTER, 10, 20)
+
+    local line1 = create_line_item(soldiers[2] == "hpAdd"
+        and "tmp_icon_hp_18x28.png"
+        or "battle_33x33.png",
+        UtilsForTech:IsMaxLevel(name, tech)
+        and "" or (UtilsForTech:GetEffect(name, tech) * 100).."%",
+        (UtilsForTech:GetNextLevelEffect(name, tech) * 100).."%")
+        :addTo(content):align(display.LEFT_CENTER,
+        icon_box:getPositionX() + icon_box:getContentSize().width + 5,
+        60)
+    local line2 = create_line_item(
+        "bottom_icon_package_77x67.png",
+        UtilsForTech:IsMaxLevel(name, tech)
+        and "" or UtilsForTech:GetTechPoint(name, tech),
+        UtilsForTech:GetNextLevelTechPoint(name, tech)
+    ):addTo(content):align(display.LEFT_CENTER, line1:getPositionX(), 20)
 
     function item:LevelUpRefresh(tech)
-        tech_level:setString(string.format("Lv%d",tech:Level()))
-        if tech:IsMaxLevel() then
+        tech_level:setString(string.format("Lv%d",tech.level))
+        if UtilsForTech:IsMaxLevel(name, tech) then
             upgrade_btn:hide()
-            line1:SetText(nil,(tech:GetAtkEff()*100).."%")
-            line2:SetText(nil,tech:GetNextLevlTechPoint())
+            line1:SetText(nil,(UtilsForTech:GetEffect(name, tech) * 100).."%")
+            line2:SetText(nil, UtilsForTech:GetNextLevelTechPoint(name, tech))
         else
-            line1:SetText((tech:GetAtkEff()*100).."%",(tech:GetNextLevlAtkEff()*100).."%")
-            line2:SetText(tech:GetTechPoint(),tech:GetNextLevlTechPoint())
+            line1:SetText((UtilsForTech:GetEffect(name, tech) * 100).."%",
+                (UtilsForTech:GetNextLevelEffect(name, tech) * 100).."%")
+            line2:SetText(UtilsForTech:GetTechPoint(name, tech), UtilsForTech:GetNextLevelTechPoint(name, tech))
         end
     end
-    function item:GetTech()
-        return tech
+    function item:GetTechName()
+        return name
     end
     function item:SetUpgradeBtnVisible(visible)
-        upgrade_btn:setVisible(visible and not tech:IsMaxLevel())
+        upgrade_btn:setVisible(visible and not UtilsForTech:IsMaxLevel(name, tech))
     end
     return item
 end
 function WidgetMilitaryTechnology:onEnter()
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_DATA_CHANGED)
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
+    User:AddListenOnType(self, "militaryTechs")
+    User:AddListenOnType(self, "militaryTechEvents")
 end
 function WidgetMilitaryTechnology:onExit()
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_DATA_CHANGED)
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.MILITARY_TECHS_EVENTS_CHANGED)
+    User:RemoveListenerOnType(self, "militaryTechs")
+    User:RemoveListenerOnType(self, "militaryTechEvents")
 end
-function WidgetMilitaryTechnology:OnMilitaryTechsDataChanged(soldier_manager,changed_map)
-    for k,v in pairs(changed_map) do
-        if self.items_list[k] then
-            self.items_list[k]:LevelUpRefresh(v)
+function WidgetMilitaryTechnology:OnUserDataChanged_militaryTechs(userData, deltaData)
+    local ok, value = deltaData("militaryTechs")
+    if ok then
+        for k,v in pairs(value) do
+            if self.items_list[k] then
+                self.items_list[k]:LevelUpRefresh(v)
+            end
         end
     end
 end
-function WidgetMilitaryTechnology:OnMilitaryTechEventsChanged(soldier_manager,changed_map)
+function WidgetMilitaryTechnology:OnUserDataChanged_militaryTechEvents(userData, deltaData)
     self:VisibleUpgradeButton()
 end
 function WidgetMilitaryTechnology:VisibleUpgradeButton()
+    local User = User
     for i,v in pairs(self.items_list) do
         local visible = true
-        City:GetSoldierManager():IteratorMilitaryTechEvents(function (event)
-            if v:GetTech():Name() == event:Name() then
+        for _,event in pairs(User.militaryTechEvents) do
+            if v:GetTechName() == event.name then
                 visible = false
-                return
             end
-        end)
+        end
         v:SetUpgradeBtnVisible(visible)
     end
 end
 return WidgetMilitaryTechnology
+
+
+
+
+
+
 
 
 

@@ -14,8 +14,11 @@ function TradeGuildUpgradeBuilding:ctor(building_info)
 end
 
 function TradeGuildUpgradeBuilding:GetMaxCart()
-	if self:GetLevel() > 0 then
-		return config_function[self:GetEfficiencyLevel()].maxCart
+    local User = self:BelongCity():GetUser()
+    local tech = User.productionTechs["logistics"]
+    local tech_effect = UtilsForTech:GetEffect("logistics", tech)
+	if tech.level > 0 then
+        return math.ceil(config_function[self:GetEfficiencyLevel()].maxCart * (1 + tech_effect))
     end
     return 0
 end

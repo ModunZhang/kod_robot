@@ -10,11 +10,10 @@ local GameUIBuildingSpeedUp = import("..ui.GameUIBuildingSpeedUp")
 local GameUIHasBeenBuild = UIKit:createUIClass('GameUIHasBeenBuild', "GameUIWithCommonHeader")
 local sharedSpriteFrameCache = cc.SpriteFrameCache:getInstance()
 local NOT_ABLE_TO_UPGRADE = UpgradeBuilding.NOT_ABLE_TO_UPGRADE
-local timer = app.timer
 local UIKit = UIKit
 local building_config_map = {
     ["keep"] = {scale = 0.3, offset = {x = 80, y = 74}},
-    ["watchTower"] = {scale = 0.35, offset = {x = 90, y = 70}},
+    -- ["watchTower"] = {scale = 0.35, offset = {x = 90, y = 70}},
     ["warehouse"] = {scale = 0.5, offset = {x = 84, y = 70}},
     ["dragonEyrie"] = {scale = 0.35, offset = {x = 74, y = 70}},
     ["toolShop"] = {scale = 0.5, offset = {x = 80, y = 70}},
@@ -118,12 +117,17 @@ function Item:ctor(parent_ui)
         :onButtonClicked(function(event)
             local building = self.building
             if self.status == "free" then
-                if building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 2 then
-                    NetManager:getFreeSpeedUpPromise(building:EventType(), building:UniqueUpgradingKey())
+                local event = User:GetBuildingEventByLocation(self:GetCurrentLocation())
+                if event then
+                    local time = UtilsForEvent:GetEventInfo(event)
+                    if time > 2 then
+                        local eventType = event.location and "buildingEvents" or "houseEvents"
+                        NetManager:getFreeSpeedUpPromise(eventType, event.id)
+                    end
                 end
             elseif self.status == "instant" then
                 local city = building:BelongCity()
-                if building:getUpgradeNowNeedGems() > city:GetUser():GetGemResource():GetValue() then
+                if building:getUpgradeNowNeedGems() > city:GetUser():GetGemValue() then
                     local dialog = UIKit:showMessageDialog()
                     dialog:SetTitle(_("提示"))
                     dialog:SetPopMessage(UpgradeBuilding.NOT_ABLE_TO_UPGRADE.GEM_NOT_ENOUGH)
@@ -139,17 +143,29 @@ function Item:ctor(parent_ui)
                     return
                 end
                 local instant_build = function ()
-                    if city:IsFunctionBuilding(building) then
+                    if city:IsGate(building) then
+                        NetManager:getInstantUpgradeWallByLocationPromise():done(function()
+                            local ui = self.parent_ui
+                            ui:RefreshCurrentList(ui.tabs:GetSelectedButtonTag())
+                        end)
+                    elseif city:IsTower(building) then
+                        NetManager:getInstantUpgradeTowerPromise():done(function()
+                            local ui = self.parent_ui
+                            ui:RefreshCurrentList(ui.tabs:GetSelectedButtonTag())
+                        end)
+                    elseif city:IsFunctionBuilding(building) then
                         local location_id = city:GetLocationIdByBuilding(building)
-                        NetManager:getInstantUpgradeBuildingByLocationPromise(location_id)
+                        NetManager:getInstantUpgradeBuildingByLocationPromise(location_id):done(function()
+                            local ui = self.parent_ui
+                            ui:RefreshCurrentList(ui.tabs:GetSelectedButtonTag())
+                        end)
                     elseif city:IsHouse(building) then
                         local tile = city:GetTileWhichBuildingBelongs(building)
                         local house_location = tile:GetBuildingLocation(building)
-                        NetManager:getInstantUpgradeHouseByLocationPromise(tile.location_id, house_location)
-                    elseif city:IsGate(building) then
-                        NetManager:getInstantUpgradeWallByLocationPromise()
-                    elseif city:IsTower(building) then
-                        NetManager:getInstantUpgradeTowerPromise()
+                        NetManager:getInstantUpgradeHouseByLocationPromise(tile.location_id, house_location):done(function()
+                            local ui = self.parent_ui
+                            ui:RefreshCurrentList(ui.tabs:GetSelectedButtonTag())
+                        end)
                     end
                 end
                 if app:GetGameDefautlt():IsOpenGemRemind() then
@@ -177,21 +193,31 @@ function Item:ctor(parent_ui)
                     return
                 end
                 local city = building:BelongCity()
-                if city:IsFunctionBuilding(building) then
+                
+                if city:IsGate(building) then
+                    NetManager:getUpgradeWallByLocationPromise():done(function()
+                        self.parent_ui:RefreshAllItems()
+                    end)
+                elseif city:IsTower(building) then
+                    NetManager:getUpgradeTowerPromise():done(function()
+                        self.parent_ui:RefreshAllItems()
+                    end)
+                elseif city:IsFunctionBuilding(building) then
                     local location_id = city:GetLocationIdByBuilding(building)
-                    NetManager:getUpgradeBuildingByLocationPromise(location_id)
+                    NetManager:getUpgradeBuildingByLocationPromise(location_id):done(function()
+                        self.parent_ui:RefreshAllItems()
+                    end)
                 elseif city:IsHouse(building) then
                     local tile = city:GetTileWhichBuildingBelongs(building)
                     local house_location = tile:GetBuildingLocation(building)
 
-                    NetManager:getUpgradeHouseByLocationPromise(tile.location_id, house_location)
-                elseif city:IsGate(building) then
-                    NetManager:getUpgradeWallByLocationPromise()
-                elseif city:IsTower(building) then
-                    NetManager:getUpgradeTowerPromise()
+                    NetManager:getUpgradeHouseByLocationPromise(tile.location_id, house_location):done(function()
+                        self.parent_ui:RefreshAllItems()
+                    end)
                 end
             elseif self.status == "building" then
-                UIKit:newGameUI("GameUIBuildingSpeedUp", building):AddToCurrentScene(true)
+                local event = User:GetBuildingEventByLocation(self:GetCurrentLocation())
+                UIKit:newGameUI("GameUIBuildingSpeedUp", event):AddToCurrentScene(true)
             end
         end)
 
@@ -227,13 +253,16 @@ function Item:SetConditionLabel(label, color)
     end
     return self
 end
-function Item:UpdateByBuilding(building, current_time)
+function Item:UpdateByBuilding(building)
+    local User = building:BelongCity():GetUser()
     self.building = building
     repeat
-        if building:IsUpgrading() then
-            local can_free_speedUp = building:GetUpgradingLeftTimeByCurrentTime(current_time) <= DataUtils:getFreeSpeedUpLimitTime()
+        local event = User:GetBuildingEventByLocation(self:GetCurrentLocation())
+        if event then
+            local time, percent = UtilsForEvent:GetEventInfo(event)
+            local can_free_speedUp = time <= DataUtils:getFreeSpeedUpLimitTime()
             self:ChangeStatus(can_free_speedUp and "free" or "building")
-            self:UpdateProgress(building)
+            self.progress:SetProgressInfo(GameUtils:formatTimeStyle1(time), percent)
             break
         end
         if building:IsMaxLevel() then
@@ -255,16 +284,25 @@ function Item:UpdateByBuilding(building, current_time)
         end
     until true
 end
-function Item:UpdateProgress(building)
-    if building:IsUpgrading() then
-        local time = timer:GetServerTime()
-        local str = GameUtils:formatTimeStyle1(building:GetUpgradingLeftTimeByCurrentTime(time))
-        local percent = building:GetUpgradingPercentByCurrentTime(time)
-        self.progress:SetProgressInfo(str, percent)
+function Item:GetCurrentLocation()
+    if self.building:GetType() == "wall" then
+        return 21
+    elseif self.building:GetType() == "tower" then
+        return 22
+    end
+    local City = self.building:BelongCity()
+    local tile = City:GetTileWhichBuildingBelongs(self.building)
+    if City:IsFunctionBuilding(self.building) then
+        return tile.location_id
+    else
+        local houseLocation = tile:GetBuildingLocation(self.building)
+        return tile.location_id, houseLocation
     end
 end
 function Item:UpdateDesc(building)
-    if building:IsUpgrading() then
+    local User = building:BelongCity():GetUser()
+    local event = User:GetBuildingEventByLocation(self:GetCurrentLocation())
+    if event then
         if building:GetNextLevel() == 1 then
             self.desc_label:setString(building:IsHouse() and _("正在建造") or _("正在解锁"))
             self.desc_label:setPositionY(35)
@@ -280,7 +318,7 @@ function Item:UpdateDesc(building)
             self.desc_label:setString(_("可解锁建筑"))
             self.desc_label:setPositionY(35)
         else
-            self.desc_label:setString(string.format(_("升级到等级%d"), building:GetLevel(), building:GetNextLevel()))
+            self.desc_label:setString(string.format(_("升级到等级%d"), building:GetNextLevel()))
             self.desc_label:setPositionY(35)
         end
     end
@@ -344,44 +382,43 @@ function Item:ChangeStatus(status)
 end
 
 
+function GameUIHasBeenBuild:OnUserDataChanged_houseEvents(userData, deltaData)
+    if deltaData("houseEvents.remove") then
+        self:RefreshCurrentList(self.tabs:GetSelectedButtonTag())
+    end
+end
+function GameUIHasBeenBuild:OnUserDataChanged_buildingEvents(userData, deltaData)
+    if deltaData("buildingEvents.remove") then
+        self:RefreshCurrentList(self.tabs:GetSelectedButtonTag())
+    end
+end
+
 function GameUIHasBeenBuild:ctor(city)
     GameUIHasBeenBuild.super.ctor(self, city, _("建筑列表"))
     self.build_city = city
 end
 function GameUIHasBeenBuild:OnMoveInStage()
-    timer:AddListener(self)
-    self.build_city:AddListenOnType(self, self.build_city.LISTEN_TYPE.UPGRADE_BUILDING)
     GameUIHasBeenBuild.super.OnMoveInStage(self)
-
     self.queue = self:LoadBuildingQueue():addTo(self:GetView())
-    self:UpdateBuildingQueue(self.build_city)
-
     self.building_list_view = self:CreateListView()
-
     self:TabButtons()
+    self.build_city:GetUser():AddListenOnType(self, "houseEvents")
+    self.build_city:GetUser():AddListenOnType(self, "buildingEvents")
+    scheduleAt(self, function()
+        local City = self.build_city
+        self.queue:SetBuildingQueue(City:GetAvailableBuildQueueCounts(),
+            City:GetUser().basicInfo.buildQueue)
+        self:RefreshAllItems()
+    end)
 end
 function GameUIHasBeenBuild:onExit()
-    timer:RemoveListener(self)
-    self.build_city:RemoveListenerOnType(self, self.build_city.LISTEN_TYPE.UPGRADE_BUILDING)
+    self.build_city:GetUser():RemoveListenerOnType(self, "houseEvents")
+    self.build_city:GetUser():RemoveListenerOnType(self, "buildingEvents")
     GameUIHasBeenBuild.super.onExit(self)
 end
-function GameUIHasBeenBuild:OnTimer(time)
-    self:RefreshAllItems()
-end
-function GameUIHasBeenBuild:OnUpgradingBegin(building, current_time, city)
-    self:UpdateBuildingQueue(city)
-    self:RefreshAllItems()
-end
-function GameUIHasBeenBuild:OnUpgrading(building, current_time, city)
-end
-function GameUIHasBeenBuild:OnUpgradingFinished(building, city)
-    self:UpdateBuildingQueue(city)
-    self:RefreshCurrentList(self.tabs:GetSelectedButtonTag())
-end
 function GameUIHasBeenBuild:RefreshAllItems()
-    local time = timer:GetServerTime()
     for i,v in ipairs(self.building_list_view.items_) do
-        v:getContent():UpdateByBuilding(self.buildings[v.idx_], time)
+        v:getContent():UpdateByBuilding(self.buildings[v.idx_])
     end
 end
 function GameUIHasBeenBuild:LoadBuildingQueue()
@@ -397,7 +434,7 @@ function GameUIHasBeenBuild:LoadBuildingQueue()
         color = 0x615b44,
     }):addTo(back_ground, 2):align(display.LEFT_CENTER, 60, back_ground:getContentSize().height/2)
 
-    if City:BuildQueueCounts() < 2 then
+    if User.basicInfo.buildQueue < 2 then
         WidgetPushButton.new({normal = "add_btn_up_50x50.png",pressed = "add_btn_down_50x50.png"})
             :addTo(back_ground)
             :align(display.CENTER, back_ground:getContentSize().width - 25, back_ground:getContentSize().height/2)
@@ -415,9 +452,6 @@ function GameUIHasBeenBuild:LoadBuildingQueue()
     end
 
     return back_ground
-end
-function GameUIHasBeenBuild:UpdateBuildingQueue(city)
-    self.queue:SetBuildingQueue(city:GetAvailableBuildQueueCounts(), city:BuildQueueCounts())
 end
 function GameUIHasBeenBuild:TabButtons()
     self.tabs = self:CreateTabButtons({
@@ -443,6 +477,7 @@ function GameUIHasBeenBuild:RefreshCurrentList(tag)
         self.buildings = self.build_city:GetHousesWhichIsBuilded()
     end
     self.building_list_view:reload()
+    self:RefreshAllItems()
 end
 function GameUIHasBeenBuild:CreateListView()
     local list_view, listnode = UIKit:commonListView({
@@ -474,7 +509,7 @@ function GameUIHasBeenBuild:sourceDelegate(listView, tag, idx)
         end
         local building = self.buildings[idx]
         content:SetBuildingType(building:GetType(), building:GetLevel())
-        content:UpdateByBuilding(building, timer:GetServerTime())
+        content:UpdateByBuilding(building)
         local size = content:getContentSize()
         item:setItemSize(size.width, size.height)
         return item
@@ -483,6 +518,7 @@ end
 
 
 return GameUIHasBeenBuild
+
 
 
 

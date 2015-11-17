@@ -2,20 +2,19 @@ local UIListView = import('..ui.UIListView')
 local WidgetPushButton = import(".WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetMaterialBox = import("..widget.WidgetMaterialBox")
-local MaterialManager = import("..entity.MaterialManager")
 local UILib = import("..ui.UILib")
 local Localize = import("..utils.Localize")
 
 local WidgetMaterialDetails = UIKit:createUIClass("WidgetMaterialDetails", "UIAutoClose")
 
 
-function WidgetMaterialDetails:ctor(material_type,material_name)
+function WidgetMaterialDetails:ctor(material_key,material_name)
     WidgetMaterialDetails.super.ctor(self)
-    self:InitMaterialDetails(material_type,material_name)
+    self:InitMaterialDetails(material_key,material_name)
 end
 
-function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
-    local list_height = self:GetProduceHeight(material_type)
+function WidgetMaterialDetails:InitMaterialDetails(material_key,material_name)
+    local list_height = self:GetProduceHeight(material_key)
     self.body = WidgetUIBackGround.new({height=200 + list_height,isFrame="no"}):align(display.TOP_CENTER,display.cx,display.top-240)
     local bg = self.body
     self:addTouchAbleChild(bg)
@@ -40,7 +39,7 @@ function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
     local icon_bg = display.newSprite("box_118x118.png"):addTo(bg)
         :align(display.CENTER, 80, bg_height-80)
 
-    local material = cc.ui.UIImage.new(self:GetMaterialImage(material_type,material_name)):addTo(icon_bg)
+    local material = cc.ui.UIImage.new(self:GetMaterialImage(material_key,material_name)):addTo(icon_bg)
         :align(display.CENTER, icon_bg:getContentSize().width/2, icon_bg:getContentSize().height/2):scale(100/128)
 
     UIKit:ttfLabel({
@@ -69,7 +68,8 @@ function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
     })
     list_node:addTo(bg):align(display.BOTTOM_CENTER, bg_width/2, 20)
-    if material_type == MaterialManager.MATERIAL_TYPE.BUILD  or material_type == MaterialManager.MATERIAL_TYPE.TECHNOLOGY then
+    if material_key == "buildingMaterials" or 
+        material_key == "technologyMaterials" then
         self:CreateOriginItem(list,_("由工具作坊生产"),function ()
             if City:GetFirstBuildingByType("toolShop"):IsUnlocked() then
                 UIKit:newGameUI("GameUIToolShop", City, City:GetFirstBuildingByType("toolShop"),"manufacture"):AddToCurrentScene(true)
@@ -77,18 +77,18 @@ function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
                 UIKit:showMessageDialog(_("主人"),_("您还没有解锁工具作坊"))
             end
         end)
-    elseif material_type == MaterialManager.MATERIAL_TYPE.DRAGON  then
+    elseif material_key == "dragonMaterials" then
         self:CreateOriginItem(list,_("参加联盟圣地战"),function ()
             if not Alliance_Manager:GetMyAlliance():IsDefault() then
-                local buildings = Alliance_Manager:GetMyAlliance():GetAllianceMap():GetMapObjectsByType("building")
+                local buildings = Alliance_Manager:GetMyAlliance():GetMapObjectsByType("building")
                 for k,v in pairs(buildings) do
                     if v.name == "shrine" then
                         app:EnterMyAllianceScene({
                             x = v.location.x,
                             y = v.location.y,
-                            id = Alliance_Manager:GetMyAlliance():Id(),
+                            id = Alliance_Manager:GetMyAlliance().id,
                             callback = function (scene)
-                                UIKit:newGameUI("GameUIAllianceShrine",City,"fight_event",v:GetAllianceBuildingInfo()):AddToScene(scene, true)
+                                UIKit:newGameUI("GameUIAllianceShrine",City,"fight_event", Alliance_Manager:GetMyAlliance():FindAllianceBuildingInfoByObjects(v)):AddToScene(scene, true)
                             end
                         })
                     end
@@ -102,12 +102,12 @@ function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
         end)
         self:CreateOriginItem(list,_("联盟匹配战中击杀敌军掉落"),function ()
             if not Alliance_Manager:GetMyAlliance():IsDefault() then
-                local mapObject = Alliance_Manager:GetMyAlliance():GetAllianceMap():FindMapObjectById(Alliance_Manager:GetMyAlliance():GetSelf():MapId())
+                local mapObject = Alliance_Manager:GetMyAlliance():FindMapObjectById(Alliance_Manager:GetMyAlliance():GetSelf():MapId())
                 local location = mapObject.location
                 app:EnterMyAllianceScene({
                     x = location.x,
                     y = location.y,
-                    id = Alliance_Manager:GetMyAlliance():Id(),
+                    id = Alliance_Manager:GetMyAlliance().id,
                     callback = function (scene)
                         UIKit:newGameUI("GameUIAllianceBattle", City):AddToScene(scene,true)
                     end
@@ -117,14 +117,13 @@ function WidgetMaterialDetails:InitMaterialDetails(material_type,material_name)
             end
 
         end)
-    elseif material_type == MaterialManager.MATERIAL_TYPE.SOLDIER  then
+    elseif material_key == "soldierMaterials" then
         self:CreateOriginItem(list,_("前往飞艇探险"),function ()
             local city = City
             local dragon_manger = city:GetDragonEyrie():GetDragonManager()
             local dragon_type = dragon_manger:GetCanFightPowerfulDragonType()
             if #dragon_type > 0 or dragon_manger:GetDefenceDragon() then
-                local _,_,index = city:GetUser():GetPVEDatabase():GetCharPosition()
-                app:EnterPVEScene(index)
+                app:EnterPVEScene(city:GetUser():GetLatestPveIndex())
             else
                 UIKit:showMessageDialog(_("主人"),_("需要一条空闲状态的魔龙才能探险"))
             end
@@ -167,25 +166,27 @@ function WidgetMaterialDetails:CreateOriginItem(listView,label,callback)
     listView:addItem(item)
     self.flag = not self.flag
 end
-function WidgetMaterialDetails:GetMaterialImage(material_type,material_name)
+function WidgetMaterialDetails:GetMaterialImage(material_key,material_name)
     local metarial = ""
-    if material_type == MaterialManager.MATERIAL_TYPE.BUILD  or material_type == MaterialManager.MATERIAL_TYPE.TECHNOLOGY then
+    if material_key == "buildingMaterials" or 
+        material_key == "technologyMaterials" then
         metarial = "materials"
-    elseif material_type == MaterialManager.MATERIAL_TYPE.DRAGON  then
+    elseif material_key == "dragonMaterials"  then
         metarial = "dragon_material_pic_map"
-    elseif material_type == MaterialManager.MATERIAL_TYPE.SOLDIER  then
+    elseif material_key == "soldierMaterials"  then
         metarial = "soldier_metarial"
-    elseif material_type == MaterialManager.MATERIAL_TYPE.EQUIPMENT  then
+    elseif material_key == "dragonEquipments" then
         metarial = "equipment"
     end
     return UILib[metarial][material_name]
 end
-function WidgetMaterialDetails:GetProduceHeight(material_type)
-    if material_type == MaterialManager.MATERIAL_TYPE.BUILD  or material_type == MaterialManager.MATERIAL_TYPE.TECHNOLOGY then
+function WidgetMaterialDetails:GetProduceHeight(material_key)
+    if material_key == "buildingMaterials" or 
+        material_key == "technologyMaterials" then
         return 57
-    elseif material_type == MaterialManager.MATERIAL_TYPE.DRAGON  then
+    elseif material_key == "dragonMaterials" then
         return 57 * 3
-    elseif material_type == MaterialManager.MATERIAL_TYPE.SOLDIER  then
+    elseif material_key == "soldierMaterials" then
         return 57
     end
 end

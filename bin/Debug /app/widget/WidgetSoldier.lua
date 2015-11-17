@@ -17,8 +17,8 @@ function WidgetSoldier:ctor(soldierName, soldierStar, isPveSoldier)
     local size = self.soldier_png:getContentSize() 
     self.soldier_png:scale(128 / math.max(size.width, size.height))
 
-    local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png")
-    :addTo(self.soldier_png):align(display.CENTER,58,15)
+    self.soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png")
+    						:addTo(self.soldier_png):align(display.CENTER,58,15)
 	self.starbar = StarBar.new({
         max = 3,
         bg = "Stars_bar_bg.png",
@@ -36,6 +36,9 @@ function WidgetSoldier:SetSoldeir(soldierName, soldierStar, isPveSoldier)
 	local size = self.soldier_png:getContentSize() 
     self.soldier_png:scale(128 / math.max(size.width, size.height))
     self.starbar:setNum(soldierStar)
+
+    self.starbar:setVisible(soldierName ~= "wall")
+    self.soldier_star_bg:setVisible(soldierName ~= "wall")
     return self
 end
 function WidgetSoldier:GetBgAndPng(soldierName, soldierStar, isPveSoldier)

@@ -1,27 +1,14 @@
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetPopDialog = import("..widget.WidgetPopDialog")
-local UIListView = import(".UIListView")
 local Alliance = import("..entity.Alliance")
 local Observer = import("..entity.Observer")
 local window = import("..utils.window")
 
-local ResourceManager = import("..entity.ResourceManager")
-
-
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
-
-local CON_TYPE = {
-    wood = ResourceManager.RESOURCE_TYPE.WOOD,
-    food = ResourceManager.RESOURCE_TYPE.FOOD,
-    iron = ResourceManager.RESOURCE_TYPE.IRON,
-    stone = ResourceManager.RESOURCE_TYPE.STONE,
-    coin = ResourceManager.RESOURCE_TYPE.COIN,
-    gem = ResourceManager.RESOURCE_TYPE.GEM,
-}
 local GameUIAllianceContribute = class("GameUIAllianceContribute", WidgetPopDialog)
 
 function GameUIAllianceContribute:ctor()
-    GameUIAllianceContribute.super.ctor(self,626,_("联盟捐献"),window.top-200)
+    GameUIAllianceContribute.super.ctor(self,788,_("联盟捐献"),window.top-120)
     self:setNodeEventEnabled(true)
     -- 联盟主页滑动框需要监听捐赠ui是否开启来决定是否自动滚动
     self.observer = Observer.new()
@@ -31,8 +18,8 @@ function GameUIAllianceContribute:ctor()
 
     -- 捐赠能获得荣耀点
     local honour_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(138,34),cc.rect(15,10,136,64))
-        :align(display.LEFT_CENTER, 30, 75):addTo(self.body)
-    display.newSprite("honour_128x128.png"):align(display.CENTER, 30, 75):addTo(self.body):scale(42/128)
+        :align(display.LEFT_CENTER, 30, 235):addTo(self.body)
+    display.newSprite("honour_128x128.png"):align(display.CENTER, 30, 235):addTo(self.body):scale(42/128)
     self.donate_honour = UIKit:ttfLabel({
         text = "+0",
         size = 22,
@@ -41,8 +28,8 @@ function GameUIAllianceContribute:ctor()
         :addTo(honour_bg)
     -- 捐赠能获得忠诚
     local loyalty_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(138,34),cc.rect(15,10,136,64))
-        :align(display.LEFT_CENTER, 200, 75):addTo(self.body)
-    display.newSprite("loyalty_128x128.png"):align(display.CENTER, 205, 75):addTo(self.body):scale(46/128)
+        :align(display.LEFT_CENTER, 200, 235):addTo(self.body)
+    display.newSprite("loyalty_128x128.png"):align(display.CENTER, 205, 235):addTo(self.body):scale(46/128)
     self.donate_loyalty = UIKit:ttfLabel({
         text = "+0",
         size = 22,
@@ -54,19 +41,20 @@ function GameUIAllianceContribute:ctor()
         text = "",
         size = 20,
         color = 0x615b44,
-    }):align(display.LEFT_CENTER, 20,40)
+    }):align(display.LEFT_CENTER, 20,200)
         :addTo(self.body)
 
     local contribute_btn = WidgetPushButton.new({normal = "yellow_btn_up_186x66.png",pressed = "yellow_btn_down_186x66.png"})
-        :align(display.CENTER,500,60)
+        :align(display.CENTER,500,220)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
                 if self:IsAbleToContribute() then
                     local current_loyalty = User:Loyalty()
                     NetManager:getDonateToAlliancePromise(self.group:GetSelectedType()):done(function ( response )
                         for i,v in ipairs(response.msg.playerData) do
-                            if v[1] == "allianceInfo.loyalty" then
+                            if v[1] == "allianceData.loyalty" then
                                 GameGlobalUI:showTips(_("捐赠成功"),string.format(_("获得%s点忠诚值"),string.formatnumberthousands(v[2]-current_loyalty)))
+                                app:GetAudioManager():PlayeEffectSoundWithKey("USE_ITEM")
                             end
                         end
                     end)
@@ -80,6 +68,23 @@ function GameUIAllianceContribute:ctor()
             shadow = true
         }))
         :addTo(self.body)
+    local info = {
+        _("忠诚值是玩家自己的属性，退出联盟后依然保留"),
+        _("忠诚值可以在联盟商店中购买道具"),
+        _("向联盟捐赠资源可以增加忠诚值"),
+        _("帮助盟友加速科技研发和建筑升级可以增加忠诚值"),
+    }
+    local origin_y, gap_y = 160, 40
+    for i,v in ipairs(info) do
+        display.newSprite("icon_star_22x20.png"):align(display.CENTER, 40, origin_y - (i -1) * gap_y)
+            :addTo(self.body)
+        UIKit:ttfLabel({
+            text = v,
+            size = 18,
+            color = 0x615b44,
+        }):align(display.LEFT_CENTER, 60,origin_y - (i -1) * gap_y)
+            :addTo(self.body)
+    end
 
 end
 function GameUIAllianceContribute:AddIsOpenObserver( listener )
@@ -89,8 +94,18 @@ function GameUIAllianceContribute:RemoveIsOpenObserver( listener )
     self.observer:RemoveObserver(listener)
 end
 function GameUIAllianceContribute:onEnter()
-    City:GetResourceManager():AddObserver(self)
-    User:AddListenOnType(self, User.LISTEN_TYPE.ALLIANCE_DONATE)
+    User:AddListenOnType(self, "allianceDonate")
+    scheduleAt(self, function()
+        local User = User
+        self.group:RefreashAllOwn({
+            User:GetResValueByType("wood"),
+            User:GetResValueByType("stone"),
+            User:GetResValueByType("food"),
+            User:GetResValueByType("iron"),
+            User:GetResValueByType("coin"),
+            User:GetResValueByType("gem"),
+        })
+    end)
 end
 
 function GameUIAllianceContribute:onExit()
@@ -98,12 +113,11 @@ function GameUIAllianceContribute:onExit()
     self.observer:NotifyObservers(function ( listener )
         listener:UIAllianceContributeClose()
     end)
-    City:GetResourceManager():RemoveObserver(self)
-    User:RemoveListenerOnType(self, User.LISTEN_TYPE.ALLIANCE_DONATE)
+    User:RemoveListenerOnType(self, "allianceDonate")
 end
 function GameUIAllianceContribute:GetDonateValueByType(donate_type)
     if not donate_type then return end
-    local donate_status = User:AllianceDonate()
+    local donate_status = User.allianceDonate
     local donate_level = donate_status[donate_type]
     for _,donate in pairs(GameDatas.AllianceInitData.donate) do
         if donate.level==donate_level and donate_type == donate.type then
@@ -127,46 +141,40 @@ function GameUIAllianceContribute:RefreashEff()
 end
 
 function GameUIAllianceContribute:CreateContributeGroup()
+    local User = User
     local ui_self = self
-
     -- 透明背景框
     local group = WidgetUIBackGround.new({width = 568,height=490},WidgetUIBackGround.STYLE_TYPE.STYLE_6)
-        :align(display.CENTER,304, 355):addTo(self.body)
-    local wood = City.resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local stone = City.resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local food = City.resource_manager:GetFoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local iron = City.resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local coin = City.resource_manager:GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local gem = City:GetUser():GetGemResource():GetValue()
+        :align(display.CENTER,304, 515):addTo(self.body)
     local group_table = {
         {
             icon="res_wood_82x73.png",
-            own=wood,
+            own=User:GetResValueByType("wood"),
             donate=self:GetDonateValueByType("wood").count
         },
         {
             icon="res_stone_88x82.png",
-            own=stone,
+            own=User:GetResValueByType("stone"),
             donate=self:GetDonateValueByType("stone").count
         },
         {
             icon="res_food_91x74.png",
-            own=food,
+            own=User:GetResValueByType("food"),
             donate=self:GetDonateValueByType("food").count
         },
         {
             icon="res_iron_91x63.png",
-            own=iron,
+            own=User:GetResValueByType("iron"),
             donate=self:GetDonateValueByType("iron").count
         },
         {
             icon="res_coin_81x68.png",
-            own=coin,
+            own=User:GetResValueByType("coin"),
             donate=self:GetDonateValueByType("coin").count
         },
         {
             icon="gem_icon_62x61.png",
-            own=gem,
+            own=User:GetResValueByType("gem"),
             donate=self:GetDonateValueByType("gem").count
         },
     }
@@ -313,7 +321,7 @@ function GameUIAllianceContribute:CreateContributeItem(params)
     return item
 end
 function GameUIAllianceContribute:IsAbleToContribute()
-    local status = self.alliance:Status()
+    local status = self.alliance.basicInfo.status
     if status == "prepare" or status == "fight" then
         UIKit:showMessageDialog(_("提示"),_("联盟战期间不能进行捐赠"))
         return false
@@ -326,9 +334,9 @@ function GameUIAllianceContribute:IsAbleToContribute()
     local count  = self:GetDonateValueByType(r_type).count
     local r_count
     if r_type == "gem" then
-        r_count = User:GetGemResource():GetValue()
+        r_count = User:GetGemValue()
     else
-        r_count = City.resource_manager:GetResourceByType(CON_TYPE[r_type]):GetResourceValueByCurrentTime(app.timer:GetServerTime())
+        r_count = User:GetResValueByType(r_type)
     end
     if r_count<count then
         UIKit:showMessageDialog(_("提示"),_("选择捐赠的物资不足"))
@@ -336,25 +344,7 @@ function GameUIAllianceContribute:IsAbleToContribute()
     end
     return true
 end
-
-function GameUIAllianceContribute:OnResourceChanged(resource_manager)
-    local wood = resource_manager:GetWoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local stone = resource_manager:GetStoneResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local food = resource_manager:GetFoodResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local iron = resource_manager:GetIronResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local coin = resource_manager:GetCoinResource():GetResourceValueByCurrentTime(app.timer:GetServerTime())
-    local gem = City:GetUser():GetGemResource():GetValue()
-    local owns = {
-        wood,
-        stone,
-        food,
-        iron,
-        coin,
-        gem,
-    }
-    self.group:RefreashAllOwn(owns)
-end
-function GameUIAllianceContribute:OnAllianceDonateChanged()
+function GameUIAllianceContribute:OnUserDataChanged_allianceDonate()
     local donate = {
         self:GetDonateValueByType("wood").count,
         self:GetDonateValueByType("stone").count,
@@ -367,6 +357,7 @@ function GameUIAllianceContribute:OnAllianceDonateChanged()
     self:RefreashEff()
 end
 return GameUIAllianceContribute
+
 
 
 

@@ -48,9 +48,9 @@ function AllianceBattleScene:onEnter()
     -- end)
 end
 function AllianceBattleScene:GotoCurrentPosition()
-    local mapObject = self:GetAlliance():GetAllianceMap():FindMapObjectById(self:GetAlliance():GetSelf():MapId())
+    local mapObject = self:GetAlliance():FindMapObjectById(self:GetAlliance():GetSelf():MapId())
     local location = mapObject.location
-    self:GotoPosition(location.x,location.y,self:GetAlliance():Id())
+    self:GotoPosition(location.x,location.y,self:GetAlliance().id)
 end
 function AllianceBattleScene:GotoPosition(x,y,aid)
     local point = self:GetSceneLayer():ConvertLogicPositionToMapPosition(x,y,aid)
@@ -87,7 +87,6 @@ function AllianceBattleScene:onExit()
     AllianceBattleScene.super.onExit(self)
 end
 function AllianceBattleScene:CreateSceneLayer()
-    local pos = self:GetAlliance():FightPosition()
     local arrange = (pos == "top" or pos == "bottom") and MultiAllianceLayer.ARRANGE.V or MultiAllianceLayer.ARRANGE.H
     if pos == "top" or pos == "left" then
         return MultiAllianceLayer.new(self, arrange, self:GetAlliance(), self:GetEnemyAlliance())
@@ -138,10 +137,15 @@ function AllianceBattleScene:OpenUI(entity, isMyAlliance)
         self:EnterAllianceBuilding(entity, isMyAlliance)
     end
 end
-function AllianceBattleScene:OnAllianceBasicChanged(alliance,changed_map)
+function AllianceBattleScene:OnAllianceBasicChanged(alliance,deltaData)
 end
 function AllianceBattleScene:EnterAllianceBuilding(entity,isMyAlliance)
-    local building_info = entity:GetAllianceBuildingInfo()
+    local building_info
+    if isMyAlliance then
+        building_info = self:GetAlliance():FindAllianceBuildingInfoByObjects(entity)
+    else
+        building_info = self:GetEnemyAlliance():FindAllianceBuildingInfoByObjects(entity)
+    end
     local building_name = building_info.name
     local class_name = ""
     if building_name == 'shrine' then
@@ -162,6 +166,7 @@ function AllianceBattleScene:EnterAllianceBuilding(entity,isMyAlliance)
 end
 
 function AllianceBattleScene:EnterNotAllianceBuilding(entity,isMyAlliance)
+    local alliance = isMyAlliance and self:GetAlliance() or self:GetEnemyAlliance()
     local type_ = entity:GetType()
     local class_name = ""
     if type_ == 'none' then
@@ -178,11 +183,11 @@ function AllianceBattleScene:EnterNotAllianceBuilding(entity,isMyAlliance)
     elseif type_ == 'village' then
         app:GetAudioManager():PlayBuildingEffectByType("warehouse")
         class_name = "GameUIAllianceVillageEnter"
-        if not entity:GetAllianceVillageInfo() then -- 废墟
+        if not alliance:FindAllianceVillagesInfoByObject(entity) then -- 废墟
             class_name = "GameUIAllianceRuinsEnter"
         end
     elseif type_ == 'monster' then
-        if not entity:GetAllianceMonsterInfo() then
+        if not alliance:FindAllianceMonsterInfoByObject(entity) then
             return 
         end
         class_name = "GameUIAllianceMosterEnter"

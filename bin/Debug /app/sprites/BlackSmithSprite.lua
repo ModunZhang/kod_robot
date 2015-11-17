@@ -3,14 +3,8 @@ local smoke = import("..particles.smoke")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local BlackSmithSprite = class("BlackSmithSprite", FunctionUpgradingSprite)
 
-function BlackSmithSprite:OnBeginMakeEquipmentWithEvent()
+function BlackSmithSprite:OnUserDataChanged_dragonEquipmentEvents()
     self:DoAni()
-end
-function BlackSmithSprite:OnMakingEquipmentWithEvent()
-end
-function BlackSmithSprite:OnEndMakeEquipmentWithEvent()
-    self:DoAni()
-    app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
 end
 
 
@@ -18,7 +12,7 @@ local WORK_TAG = 11201
 local EMPTY_TAG = 11400
 function BlackSmithSprite:ctor(city_layer, entity, city)
     BlackSmithSprite.super.ctor(self, city_layer, entity, city)
-    entity:AddBlackSmithListener(self)
+    city:GetUser():AddListenOnType(self, "dragonEquipmentEvents")
 end
 function BlackSmithSprite:RefreshSprite()
     BlackSmithSprite.super.RefreshSprite(self)
@@ -26,7 +20,7 @@ function BlackSmithSprite:RefreshSprite()
 end
 function BlackSmithSprite:DoAni()
     if self:GetEntity():IsUnlocked() then
-        if self:GetEntity():IsMakingEquipment() then
+        if #self:GetEntity():BelongCity():GetUser().dragonEquipmentEvents > 0 then
             self:PlayWorkAnimation()
             self:removeChildByTag(EMPTY_TAG)
         else

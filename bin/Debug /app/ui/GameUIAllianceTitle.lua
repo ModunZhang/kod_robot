@@ -71,7 +71,7 @@ function GameUIAllianceTitle:BuildUI()
 	local widget_page = WidgetPages.new({
         page = #titles, -- 页数
         titles =  titles, -- 标题 type -> table
-        fixed_title_position = cc.p(110,15),
+        fixed_title_position = cc.p(110,20),
         cb = function (page)
         	self.title_ = self:GetTitleKeys(page)
           	self:RefreshListView(page)
@@ -83,13 +83,13 @@ function GameUIAllianceTitle:BuildUI()
     self.widget_page = widget_page
     if Alliance_Manager:GetMyAlliance():GetSelf():CanEditAllianceMemeberTitle() then
     	local label = widget_page.current_page_label
-    	display.newSprite("edit_alliance_title_icon_27x26.png")
-    		:align(display.RIGHT_CENTER, label:getPositionX()-label:getContentSize().width-10, 28):addTo(widget_page)
-    	WidgetPushTransparentButton.new(cc.rect(0,0,434,46))
-    		:addTo(widget_page):align(display.LEFT_BOTTOM, 60, 10)
-    		:onButtonClicked(function()
-    			self:CreateEditTitleUI()
-    		end)
+    	-- display.newSprite("edit_alliance_title_icon_27x26.png")
+    	-- 	:align(display.RIGHT_CENTER, label:getPositionX()-label:getContentSize().width-10, 32):addTo(widget_page)
+    	-- WidgetPushTransparentButton.new(cc.rect(0,0,434,46))
+    	-- 	:addTo(widget_page):align(display.LEFT_BOTTOM, 60, 10)
+    	-- 	:onButtonClicked(function()
+    	-- 		self:CreateEditTitleUI()
+    	-- 	end)
     end
     local listBg = display.newScale9Sprite("background_568x120.png", 0,0,cc.size(572,346),cc.rect(15,10,538,100))
 		:addTo(bg)
@@ -138,7 +138,7 @@ function GameUIAllianceTitle:CheckArchonLastLoginTimeGraterThen7Days()
 end
 
 function GameUIAllianceTitle:OnBuyAllianceArchonButtonClicked()
-    if config_intInit.buyArchonGem.value > User:GetGemResource():GetValue() then
+    if config_intInit.buyArchonGem.value > User:GetGemValue() then
         UIKit:showMessageDialog(nil, _("金龙币不足"), function()
         end)
     elseif Alliance_Manager:GetMyAlliance():GetSelf():IsArchon() then
@@ -202,10 +202,10 @@ end
 
 function GameUIAllianceTitle:CreateEditTitleUI()
     local layer = UIKit:shadowLayer()
-    local bg = WidgetUIBackGround.new({height=150}):addTo(layer):pos(window.left+20,window.cy-20)
+    local bg = WidgetUIBackGround.new({height=180}):addTo(layer):pos(window.left+20,window.cy-20)
     local title_bar = display.newSprite("title_blue_600x56.png")
         :addTo(bg)
-        :align(display.LEFT_BOTTOM, 0,150-15)
+        :align(display.LEFT_BOTTOM, 4,180-15)
 
     local closeButton = UIKit:closeButton()
         :addTo(title_bar)
@@ -219,16 +219,16 @@ function GameUIAllianceTitle:CreateEditTitleUI()
         color = 0xffedae
     }):addTo(title_bar):align(display.CENTER, 300, 26)
 
-    UIKit:ttfLabel({
+    local title_label = UIKit:ttfLabel({
         text = _("职位名称"),
         size = 20,
         color = 0x615b44
-    }):addTo(bg):align(display.LEFT_TOP, 20,150-40)
+    }):addTo(bg):align(display.LEFT_TOP, 20,150-20)
 
     local editbox = cc.ui.UIInput.new({
         UIInputType = 1,
         image = "input_box.png",
-        size = cc.size(422,40),
+        size = cc.size(608 - title_label:getContentSize().width - 50,40),
     })
     editbox:setFont(UIKit:getEditBoxFont(),18)
     editbox:setFontColor(cc.c3b(0,0,0))
@@ -237,7 +237,7 @@ function GameUIAllianceTitle:CreateEditTitleUI()
     editbox:setMaxLength(20)
     editbox:setPlaceholderFontColor(UIKit:hex2c3b(0xccc49e))
     editbox:setReturnType(cc.KEYBOARD_RETURNTYPE_DEFAULT)
-    editbox:align(display.RIGHT_TOP,588,120):addTo(bg)
+    editbox:align(display.RIGHT_TOP,588,140):addTo(bg)
     WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
             :setButtonLabel(
                 UIKit:commonButtonLable({
@@ -262,7 +262,7 @@ function GameUIAllianceTitle:CreateEditTitleUI()
 		 			layer:removeFromParent(true)
 		 		end)
             end)
-            :addTo(bg):align(display.RIGHT_BOTTOM,editbox:getPositionX(), 20)
+            :addTo(bg):align(display.RIGHT_BOTTOM,editbox:getPositionX(), 24)
     layer:addTo(self)
 end
 return GameUIAllianceTitle

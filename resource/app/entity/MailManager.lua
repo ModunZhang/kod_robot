@@ -7,6 +7,8 @@ MailManager.LISTEN_TYPE = Enum("MAILS_CHANGED","UNREAD_MAILS_CHANGED","REPORTS_C
 
 function MailManager:ctor()
     MailManager.super.ctor(self)
+    self.unread_mail = 0
+    self.unread_report = 0
     self.mails = nil
     self.savedMails = nil
     self.sendMails = nil
@@ -19,6 +21,8 @@ function MailManager:ctor()
     self.is_last_saved_report = false
 end
 function MailManager:Reset()
+    self.unread_mail = 0
+    self.unread_report = 0
     self.mails = nil
     self.savedMails = nil
     self.sendMails = nil
@@ -38,9 +42,12 @@ function MailManager:IncreaseUnReadMailsNum(num)
     end)
 end
 
-function MailManager:IncreaseUnReadReportNum(num)
+function MailManager:IncreaseUnReadReportNum(num,report)
     self.unread_report = self.unread_report + num
-    GameGlobalUI:showTips(_("提示"),_("你有一封新的邮件"))
+    if not report.GetReportTitle then
+        report = Report:DecodeFromJsonData(clone(report))
+    end
+    GameGlobalUI:showTips(_("你有一封新的战报"),report:Type() == "collectResource" and _("采集村落") or report:GetReportTitle(),3)
     self:NotifyListeneOnType(MailManager.LISTEN_TYPE.UNREAD_MAILS_CHANGED,function(listener)
         listener:MailUnreadChanged({report=self.unread_report})
     end)
@@ -576,7 +583,7 @@ function MailManager:OnNewReportsChanged( __reports )
                 local c_report = Report:DecodeFromJsonData(clone(data))
                 table.insert(add_reports, c_report)
                 table.insert(self.reports,1, c_report)
-                self:IncreaseUnReadReportNum(1)
+                self:IncreaseUnReadReportNum(1,c_report)
 
                 -- 由于当前 DataManager中的reports 最新这条是服务器的index,需要修正为客户端index
 
@@ -779,6 +786,7 @@ function MailManager:FetchSavedReportsFromServer(fromIndex)
     end)
 end
 return MailManager
+
 
 
 

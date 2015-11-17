@@ -2,50 +2,84 @@
 -- Author: Kenny Dai
 -- Date: 2015-02-11 11:13:18
 --
-local WidgetSpeedUp = import("..widget.WidgetSpeedUp")
-local SoldierManager = import("..entity.SoldierManager")
 local Localize = import("..utils.Localize")
+local WidgetSpeedUp = import("..widget.WidgetSpeedUp")
 local GameUIBuildingSpeedUp = class("GameUIBuildingSpeedUp",WidgetSpeedUp)
 local GameUtils = GameUtils
 local DataUtils = DataUtils
 local timer = app.timer
 
-function GameUIBuildingSpeedUp:ctor(building)
+function GameUIBuildingSpeedUp:ctor(event)
     GameUIBuildingSpeedUp.super.ctor(self)
-    self.building = building
-    self:SetAccBtnsGroup(building:EventType(),building:UniqueUpgradingKey())
-    self:SetUpgradeTip(string.format(_("正在升级 %s 到等级 %d"),Localize.getBuildingLocalizedKeyByBuildingType(building:GetType()),building:GetLevel()+1))
-    self:CheckCanSpeedUpFree()
+    local User = User
+    if not event then
+        self:LeftButtonClicked()
+        return
+    end
+    self.event = event
+    self.eventType = event.location and "buildingEvents" or "houseEvents"
+    self:SetAccBtnsGroup(self.eventType, event.id)
+    local building = User:GetBuildingByEvent(event)
+    self:SetUpgradeTip(string.format(_("正在升级 %s 到等级 %d"), Localize.building_name[building.type], building.level + 1))
     self:OnFreeButtonClicked(handler(self, self.FreeSpeedUpAction))
-    self:SetProgressInfo(GameUtils:formatTimeStyle1(building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime())),building:GetUpgradingPercentByCurrentTime(app.timer:GetServerTime()))
-    building:AddUpgradeListener(self)
+    scheduleAt(self, function()
+        local time, percent = UtilsForEvent:GetEventInfo(self.event)
+        self:SetFreeButtonEnabled(time <= DataUtils:getFreeSpeedUpLimitTime())
+        self:SetProgressInfo(GameUtils:formatTimeStyle1(time), percent)
+    end)
+
+    User:AddListenOnType(self, "houseEvents")
+    User:AddListenOnType(self, "buildingEvents")
 end
 function GameUIBuildingSpeedUp:FreeSpeedUpAction()
-    if self.building:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime()) > 2 then
-        local event_type = self.building:EventType()
-        local unique_key = self.building:UniqueUpgradingKey()
+    local time, percent = UtilsForEvent:GetEventInfo(self.event)
+    if time > 2 then
+        NetManager:getFreeSpeedUpPromise(self.eventType, self.event.id)
         self:LeftButtonClicked()
-        NetManager:getFreeSpeedUpPromise(event_type,unique_key)
     end
 end
 function GameUIBuildingSpeedUp:onExit()
-    self.building:RemoveUpgradeListener(self)
-    GameUIBuildingSpeedUp.super.onCleanup(self)
+    User:RemoveListenerOnType(self, "houseEvents")
+    User:RemoveListenerOnType(self, "buildingEvents")
     GameUIBuildingSpeedUp.super.onExit(self)
 end
-
-function GameUIBuildingSpeedUp:CheckCanSpeedUpFree()
-    self:SetFreeButtonEnabled(self.building:GetUpgradingLeftTimeByCurrentTime(timer:GetServerTime()) <= DataUtils:getFreeSpeedUpLimitTime())
+function GameUIBuildingSpeedUp:OnUserDataChanged_buildingEvents(userData, deltaData)
+    local ok, value = deltaData("buildingEvents.remove")
+    if ok then
+        for i,v in ipairs(value) do
+            if v.id == self.event.id then
+                self:LeftButtonClicked()
+                return
+            end
+        end
+    end
+    local ok, value = deltaData("buildingEvents.edit")
+    if ok then
+        for i,v in ipairs(value) do
+            if v.id == self.event.id then
+                self.event = v
+            end
+        end
+    end
 end
-function GameUIBuildingSpeedUp:OnBuildingUpgradingBegin( building, current_time )
-    self:SetProgressInfo(GameUtils:formatTimeStyle1(building:GetUpgradingLeftTimeByCurrentTime(current_time)),building:GetUpgradingPercentByCurrentTime(current_time))
-end
-function GameUIBuildingSpeedUp:OnBuildingUpgradeFinished( building )
-    self:LeftButtonClicked()
-end
-function GameUIBuildingSpeedUp:OnBuildingUpgrading( building, current_time )
-    self:CheckCanSpeedUpFree()
-    self:SetProgressInfo(GameUtils:formatTimeStyle1(building:GetUpgradingLeftTimeByCurrentTime(current_time)),math.floor(building:GetUpgradingPercentByCurrentTime(current_time)))
+function GameUIBuildingSpeedUp:OnUserDataChanged_houseEvents(userData, deltaData)
+    local ok, value = deltaData("houseEvents.remove")
+    if ok then
+        for i,v in ipairs(value) do
+            if v.id == self.event.id then
+                self:LeftButtonClicked()
+                return
+            end
+        end
+    end
+    local ok, value = deltaData("houseEvents.edit")
+    if ok then
+        for i,v in ipairs(value) do
+            if v.id == self.event.id then
+                self.event = v
+            end
+        end
+    end
 end
 return GameUIBuildingSpeedUp
 

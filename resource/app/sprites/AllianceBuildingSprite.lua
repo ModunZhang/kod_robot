@@ -5,53 +5,35 @@ local AllianceBuildingSprite = class("AllianceBuildingSprite", WithInfoSprite)
 
 local building_map = {
     palace = {UILib.alliance_building.palace, 1},
-    shrine = {UILib.alliance_building.shrine, 1},
+    shrine = {UILib.alliance_building.shrine, 1.2},
     shop = {UILib.alliance_building.shop, 1},
-    orderHall = {UILib.alliance_building.orderHall, 1},
-    moonGate = {UILib.alliance_building.moonGate, 1},
+    orderHall = {UILib.alliance_building.orderHall, 1.1},
+    moonGate = {UILib.alliance_building.moonGate, 1.2},
 }
 local other_building_map = {
     palace = {UILib.other_alliance_building.palace, 1},
-    shrine = {UILib.other_alliance_building.shrine, 1},
+    shrine = {UILib.other_alliance_building.shrine, 1.2},
     shop = {UILib.other_alliance_building.shop, 1},
-    orderHall = {UILib.other_alliance_building.orderHall, 1},
-    moonGate = {UILib.other_alliance_building.moonGate, 1},
+    orderHall = {UILib.other_alliance_building.orderHall, 1.1},
+    moonGate = {UILib.other_alliance_building.moonGate, 1.2},
 }
-function AllianceBuildingSprite:ctor(city_layer, entity, is_my_alliance)
-    AllianceBuildingSprite.super.ctor(self, city_layer, entity, is_my_alliance)   
-    self:CheckEventIf(true)
+function AllianceBuildingSprite:ctor(...)
+    AllianceBuildingSprite.super.ctor(self, ...)   
+    -- self:CheckEventIf(true)
 end
 function AllianceBuildingSprite:CheckEventIf(yesOrno)
-    local entity = self:GetEntity()
-    if not entity:GetAlliance():IsDefault() and 
-    entity:GetAllianceBuildingInfo().name == "shrine" then
-        local alliance_shirine = entity:GetAlliance():GetAllianceShrine()
-        if not alliance_shirine then return end
-        if yesOrno then
-            self:CheckEvent()
-            alliance_shirine:AddListenOnType(self,alliance_shirine.LISTEN_TYPE.OnShrineEventsChanged)
-            alliance_shirine:AddListenOnType(self,alliance_shirine.LISTEN_TYPE.OnShrineEventsRefresh)
-        else
-            alliance_shirine:RemoveListenerOnType(self,alliance_shirine.LISTEN_TYPE.OnShrineEventsChanged)
-            alliance_shirine:RemoveListenerOnType(self,alliance_shirine.LISTEN_TYPE.OnShrineEventsRefresh) 
-        end
+    if not self.alliance:IsDefault() and self:GetBuildingInfo().name == "shrine" then
     end
 end
-function AllianceBuildingSprite:OnShrineEventsChanged()
-    self:CheckEvent()
-end
-function AllianceBuildingSprite:OnShrineEventsRefresh()
-    self:CheckEvent()
-end
 function AllianceBuildingSprite:onExit()
-    self:CheckEventIf(false)
+    -- self:CheckEventIf(false)
     AllianceBuildingSprite.super.onExit(self)
 end
 function AllianceBuildingSprite:GetSpriteFile()
     if self.is_my_alliance then
-        return unpack(building_map[self:GetEntity():GetAllianceBuildingInfo().name])
+        return unpack(building_map[self:GetBuildingInfo().name])
     else
-        return unpack(other_building_map[self:GetEntity():GetAllianceBuildingInfo().name])
+        return unpack(other_building_map[self:GetBuildingInfo().name])
     end
 end
 function AllianceBuildingSprite:GetSpriteOffset()
@@ -62,28 +44,23 @@ function AllianceBuildingSprite:RefreshSprite()
     self:GetSprite():align(display.BOTTOM_CENTER)
 end
 function AllianceBuildingSprite:GetInfo()
-    local entity = self:GetEntity()
-    local info = entity:GetAllianceBuildingInfo()
-    return info.level, string.format("[%s]%s", entity:GetAlliance():Tag(), Localize.alliance_buildings[info.name])
+    local info = self:GetBuildingInfo()
+    return info.level, string.format("[%s]%s", self.alliance.basicInfo.tag, Localize.alliance_buildings[info.name])
 end
 
 
 
 local ANI_TAG = 110
 function AllianceBuildingSprite:CheckEvent()
-    if self:GetEntity():GetAllianceBuildingInfo().name == "shrine" then
-        if self:GetEntity():GetAllianceMap():GetAlliance():GetAllianceShrine():HaveEvent() then
-            local armature = self:getChildByTag(ANI_TAG)
-            if not armature then
-                self:PlayAni()
-            end
-        else
-            self:StopAni()
-        end
+    if self:GetBuildingInfo().name == "shrine" then
+        --     local armature = self:getChildByTag(ANI_TAG)
+        --     if not armature then
+        --         self:PlayAni()
+        --     end
     end
 end
 function AllianceBuildingSprite:PlayAni()
-    if self:GetEntity():GetAllianceBuildingInfo().name == "shrine" then
+    if self:GetBuildingInfo().name == "shrine" then
         local armature = ccs.Armature:create("shengdi")
             :addTo(self, 1, ANI_TAG):pos(self:GetSpriteOffset())
         local bone = armature:getBone("Layer1")
@@ -95,6 +72,9 @@ function AllianceBuildingSprite:PlayAni()
 end
 function AllianceBuildingSprite:StopAni()
     self:removeChildByTag(ANI_TAG)
+end
+function AllianceBuildingSprite:GetBuildingInfo()
+    return self.alliance:FindAllianceBuildingInfoByObjects(self:GetEntity())
 end
 
 

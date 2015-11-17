@@ -3,8 +3,14 @@ require("app.utils.GameUtils")
 require("app.utils.DataUtils")
 require("app.service.NetManager")
 require("app.service.DataManager")
+require("app.utils.UtilsForEvent")
+require("app.utils.UtilsForTask")
+require("app.utils.UtilsForItem")
+require("app.utils.UtilsForTech")
+require("app.utils.UtilsForSoldier")
+require("app.utils.UtilsForBuilding")
+require("app.utils.UtilsForShrine")
 local BuildingRegister = import("app.entity.BuildingRegister")
-local Flag = import("app.entity.Flag")
 local promise = import("app.utils.promise")
 local GameDefautlt = import("app.utils.GameDefautlt")
 local ChatManager = import("app.entity.ChatManager")
@@ -17,6 +23,62 @@ local AllianceApi = import(".AllianceApi")
 local AllianceFightApi = import(".AllianceFightApi")
 
 local intInit = GameDatas.PlayerInitData.intInit
+
+BUFF_META = {}
+function BUFF_META.__add(a, b)
+    local t1, t2
+    if getmetatable(a) == BUFF_META then
+        t1, t2 = a, b
+    elseif getmetatable(b) == BUFF_META then
+        t1, t2 = b, a
+    else
+        assert(false)
+    end
+    local t = {}
+    if type(t2) == "table" then
+        for k,v in pairs(t1) do
+            t[k] = v
+        end
+        for k,v in pairs(t2) do
+            t[k] = v + (t[k] or 0)
+        end
+    elseif type(t2) == "number" then
+        for k,v in pairs(t1) do
+            t[k] = v + t2
+        end
+    end
+    return setmetatable(t, BUFF_META)
+end
+function BUFF_META.__sub(a, b)
+    local t = {}
+    for k,v in pairs(a) do
+        t[k] = v - (b[k] or 0)
+    end
+    return setmetatable(t, BUFF_META)
+end
+function BUFF_META.__mul(a, b)
+    local t1, t2
+    if getmetatable(a) == BUFF_META then
+        t1, t2 = a, b
+    elseif getmetatable(b) == BUFF_META then
+        t1, t2 = b, a
+    else
+        assert(false)
+    end
+    local t = {}
+    if type(t2) == "table" then
+        for k,v in pairs(t1) do
+            t[k] = v * (t2[k] or 1)
+        end
+    elseif type(t2) == "number" then
+        for k,v in pairs(t1) do
+            t[k] = v * t2
+        end
+    end
+    return setmetatable(t, BUFF_META)
+end
+local AllianceManager_ = import(".entity.AllianceManager")
+Alliance_Manager = AllianceManager_.new()
 
 _ = function(...) return ... end
 local MyApp = class("MyApp")
@@ -96,8 +158,10 @@ function MyApp:run()
     end):next(function()
         return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
     end):next(function()
-        print("登录游戏成功!")
         return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
+    end):next(function()
+        print("登录游戏成功!")
+        return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
     end):catch(function(err)
         dump(err:reason())
         -- local content, title = err:reason()

@@ -8,7 +8,6 @@ local WidgetFteArrow = import("..widget.WidgetFteArrow")
 local WidgetGrowUpTask = import('..widget.WidgetGrowUpTask')
 local WidgetBackGroundTabButtons = import('..widget.WidgetBackGroundTabButtons')
 local window = import("..utils.window")
-local GrowUpTaskManager = import("..entity.GrowUpTaskManager")
 local Enum = import("..utils.Enum")
 local scheduler = import(cc.PACKAGE_NAME .. ".scheduler")
 local UIScrollView = import(".UIScrollView")
@@ -21,6 +20,26 @@ local GameUIDailyMissionInfo = import(".GameUIDailyMissionInfo")
 
 GameUIMission.MISSION_TYPE = Enum("achievement","daily")
 
+
+
+function GameUIMission:OnUserDataChanged_dailyTasks(userData, deltaData)
+    self:RefreshDisplayGreenPoint()
+    if not self:CurrentIsDailyMission() then return end
+    local changed_task_types = {}
+    for k,v in pairs(userData.dailyTasks) do
+        table.insert(changed_task_types, k)
+    end
+    for __,v in ipairs(changed_task_types) do
+        self:RefreshDailyList(v)
+    end
+end
+function GameUIMission:OnUserDataChanged_growUpTasks()
+    self:RefreshAchievementList()
+end
+
+
+
+
 function GameUIMission:ctor(city,mission_type, need_tips)
     GameUIMission.super.ctor(self,city, _("任务"))
     self.city = city
@@ -30,17 +49,14 @@ function GameUIMission:ctor(city,mission_type, need_tips)
 end
 function GameUIMission:OnMoveInStage()
     self:CreateTabButtons()
-    self.city:GetUser():AddListenOnType(self, self.city:GetUser().LISTEN_TYPE.TASK)
-    self.city:GetUser():AddListenOnType(self, self.city:GetUser().LISTEN_TYPE.DAILY_TASKS)
+    self.city:GetUser():AddListenOnType(self, "growUpTasks")
+    self.city:GetUser():AddListenOnType(self, "dailyTasks")
     GameUIMission.super.OnMoveInStage(self)
 end
 function GameUIMission:OnMoveOutStage()
-    self.city:GetUser():RemoveListenerOnType(self, self.city:GetUser().LISTEN_TYPE.TASK)
-    self.city:GetUser():RemoveListenerOnType(self, self.city:GetUser().LISTEN_TYPE.DAILY_TASKS)
+    self.city:GetUser():RemoveListenerOnType(self, "growUpTasks")
+    self.city:GetUser():RemoveListenerOnType(self, "dailyTasks")
     GameUIMission.super.OnMoveOutStage(self)
-end
-function GameUIMission:OnTaskChanged(user)
-    self:RefreshAchievementList()
 end
 function GameUIMission:CreateTabButtons()
     local tab_buttons = WidgetBackGroundTabButtons.new({
@@ -273,11 +289,11 @@ end
 function GameUIMission:GetAchievementMissionData(isFinish)
     isFinish = type(isFinish) == 'boolean' and isFinish or false
     if isFinish then
-        local tasks = self.city:GetUser():GetTaskManager():GetFirstCompleteTasks()
+        local tasks = UtilsForTask:GetFirstCompleteTasks(self.city:GetUser().growUpTasks)
         local i1, i2, i3 = unpack(tasks)
         return {i1, i2, i3}
     else
-        return self.city:GetUser():GetTaskManager():GetAvailableTasksGroup()
+        return UtilsForTask:GetAvailableTasksGroup(self.city:GetUser().growUpTasks)
     end
 end
 function GameUIMission:OnGetAchievementRewardButtonClicked(data)
@@ -442,13 +458,7 @@ function GameUIMission:RefreshDisplayGreenPoint()
     self.tab_buttons:SetButtonTipNumber("daily",count)
 end
 
-function GameUIMission:OnDailyTasksChanged(user,changed_task_types)
-    self:RefreshDisplayGreenPoint()
-    if not self:CurrentIsDailyMission() then return end
-    for __,v in ipairs(changed_task_types) do
-        self:RefreshDailyList(v)
-    end
-end
+
 
 
 function GameUIMission:dailyListviewListener(event)
@@ -483,7 +493,7 @@ function GameUIMission:PromiseOfFte()
         :addTo(self:GetFteLayer())
         :TurnRight():align(display.RIGHT_CENTER, r.x - 10, r.y + r.height/2)
 
-    return self.city:GetUser():GetTaskManager():PromiseOfGetCityBuildRewards():next(function()
+    return self.city:GetUser():PromiseOfGetCityBuildRewards():next(function()
         return self:PromsieOfExit("GameUIMission")
     end)
 end

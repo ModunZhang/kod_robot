@@ -8,10 +8,11 @@ local UILib = import(".UILib")
 
 local GameUIStrikeReport = UIKit:createUIClass("GameUIStrikeReport", "UIAutoClose")
 
-function GameUIStrikeReport:ctor(report)
+function GameUIStrikeReport:ctor(report,can_share)
     GameUIStrikeReport.super.ctor(self)
     self:setNodeEventEnabled(true)
     self.report = report
+    self.can_share = can_share
 end
 
 function GameUIStrikeReport:GetReportLevel()
@@ -72,7 +73,7 @@ function GameUIStrikeReport:onEnter()
     cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"})
         :onButtonClicked(function(event)
             self:removeFromParent()
-        end):align(display.CENTER, title:getContentSize().width-20, title:getContentSize().height-20)
+        end):align(display.CENTER, title:getContentSize().width-26, title:getContentSize().height-26)
         :addTo(title)
     -- 突袭结果图片
     local report_result_img
@@ -114,7 +115,7 @@ function GameUIStrikeReport:onEnter()
             font = UIKit:getFontFilePath(),
             size = 18,
             color = UIKit:hex2c3b(0x615b44)
-        }):align(display.RIGHT_CENTER, rb_size.width-20, rb_size.height-170)
+        }):align(display.RIGHT_CENTER, rb_size.width-100, rb_size.height-170)
         :addTo(report_body)
     -- 突袭战报详细内容展示
     self.details_view = UIListView.new{
@@ -124,7 +125,7 @@ function GameUIStrikeReport:onEnter()
     local terrain = report:GetStrikeTarget().terrain
     local war_result_label = UIKit:ttfLabel(
         {
-            text = string.format(_("战斗地形:%s(派出%s获得额外力量)"),Localize.terrain[terrain],terrain=="grassLand" and _("绿龙") or terrain=="desert" and _("红龙") or terrain=="iceField" and _("蓝龙")),
+            text = string.format(_("战斗地形:%s"),Localize.terrain[terrain]),
             size = 18,
             color = 0x615b44
         }):align(display.LEFT_CENTER, 20, rb_size.height-195)
@@ -140,46 +141,58 @@ function GameUIStrikeReport:onEnter()
 
     self.details_view:reload()
 
-    -- 删除按钮
-    local delete_label = cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-        text = _("删除"),
-        size = 20,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfff3c7)})
-    delete_label:enableShadow()
 
-    WidgetPushButton.new(
-        {normal = "red_btn_up_148x58.png", pressed = "red_btn_down_148x58.png"},
-        {scale9 = false}
-    ):setButtonLabel(delete_label)
-        :addTo(report_body):align(display.CENTER, 106, 40)
-        :onButtonClicked(function(event)
-            NetManager:getDeleteReportsPromise({report:Id()}):done(function ()
-                self:removeFromParent()
+    if self.can_share then
+        -- 删除按钮
+        local delete_label = cc.ui.UILabel.new({
+            UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+            text = _("删除"),
+            size = 20,
+            font = UIKit:getFontFilePath(),
+            color = UIKit:hex2c3b(0xfff3c7)})
+        delete_label:enableShadow()
+
+        WidgetPushButton.new(
+            {normal = "red_btn_up_148x58.png", pressed = "red_btn_down_148x58.png"},
+            {scale9 = false}
+        ):setButtonLabel(delete_label)
+            :addTo(report_body):align(display.CENTER, 106, 40)
+            :onButtonClicked(function(event)
+                NetManager:getDeleteReportsPromise({report:Id()}):done(function ()
+                    self:removeFromParent()
+                end)
             end)
-        end)
-    -- 收藏按钮
-    local saved_button = UICheckBoxButton.new({
-        off = "mail_saved_button_normal.png",
-        off_pressed = "mail_saved_button_normal.png",
-        off_disabled = "mail_saved_button_normal.png",
-        on = "mail_saved_button_pressed.png",
-        on_pressed = "mail_saved_button_pressed.png",
-        on_disabled = "mail_saved_button_pressed.png",
-    }):onButtonStateChanged(function(event)
-        local target = event.target
-        if target:isButtonSelected() then
-            NetManager:getSaveReportPromise(report:Id()):fail(function(err)
-                target:setButtonSelected(false,true)
+        -- 收藏按钮
+        local saved_button = UICheckBoxButton.new({
+            off = "mail_saved_button_normal.png",
+            off_pressed = "mail_saved_button_normal.png",
+            off_disabled = "mail_saved_button_normal.png",
+            on = "mail_saved_button_pressed.png",
+            on_pressed = "mail_saved_button_pressed.png",
+            on_disabled = "mail_saved_button_pressed.png",
+        }):onButtonStateChanged(function(event)
+            local target = event.target
+            if target:isButtonSelected() then
+                NetManager:getSaveReportPromise(report:Id()):fail(function(err)
+                    target:setButtonSelected(false,true)
+                end)
+            else
+                NetManager:getUnSaveReportPromise(report:Id()):fail(function(err)
+                    target:setButtonSelected(true,true)
+                end)
+            end
+        end):addTo(report_body):pos(rb_size.width-47, 37)
+            :setButtonSelected(report:IsSaved(),true)
+        -- 分享战报按钮
+        local share_button = WidgetPushButton.new(
+            {normal = "tmp_blue_btn_up_64x56.png", pressed = "tmp_blue_btn_down_64x56.png"},
+            {scale9 = false}
+        ):addTo(report_body):align(display.CENTER, report_body:getContentSize().width-60, rb_size.height-186)
+            :onButtonClicked(function(event)
+                UIKit:newGameUI("GameUIShareReport", report):AddToCurrentScene()
             end)
-        else
-            NetManager:getUnSaveReportPromise(report:Id()):fail(function(err)
-                target:setButtonSelected(true,true)
-            end)
-        end
-    end):addTo(report_body):pos(rb_size.width-47, 37)
-        :setButtonSelected(report:IsSaved(),true)
+        display.newSprite("tmp_icon_share_24x34.png"):addTo(share_button)
+    end
 end
 
 
@@ -390,7 +403,7 @@ function GameUIStrikeReport:CreateArmyItem(dragon,isSelf)
         {
             bg_image = "back_ground_548x40_2.png",
             title = "HP",
-            value = dragon.hp.."/-"..dragon.hpDecreased,
+            value = string.formatnumberthousands(dragon.hp).."/-"..string.formatnumberthousands(dragon.hpDecreased),
         },
     }
 
@@ -558,26 +571,6 @@ function GameUIStrikeReport:CreateEnemyTechnology()
     item:addContent(group)
     self.details_view:addItem(item)
 end
-function GameUIStrikeReport:GetTextEnemyTechnology()
-    return {
-        {
-            tech_type = _("步兵科技"),
-            value = "X "..100,
-        },
-        {
-            tech_type = _("弓箭手科技"),
-            value = "X "..100,
-        },
-        {
-            tech_type = _("骑兵科技"),
-            value = "X "..100,
-        },
-        {
-            tech_type = _("投石车科技"),
-            value = "X "..100,
-        },
-    }
-end
 function GameUIStrikeReport:CreateDragonSkills()
     local dragon = self.report:GetStrikeIntelligence().dragon
     if not dragon then
@@ -667,11 +660,11 @@ function GameUIStrikeReport:CreateGarrison()
                 local soldier_num = report_level<5 and self:GetProbableNum(r_parms.count) or r_parms.count
                 cc.ui.UILabel.new({
                     UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
-                    text = _("数量")..soldier_num,
+                    text = string.formatnumberthousands(soldier_num),
                     font = UIKit:getFontFilePath(),
                     size = 20,
                     color = UIKit:hex2c3b(0x403c2f)
-                }):align(display.RIGHT_CENTER,group_width-30,18):addTo(r_item_bg)
+                }):align(display.RIGHT_CENTER,group_width-20,18):addTo(r_item_bg)
                 StarBar.new({
                     max = 3,
                     bg = "Stars_bar_bg.png",
@@ -808,6 +801,8 @@ function GameUIStrikeReport:GetProbableNum(num)
 end
 
 return GameUIStrikeReport
+
+
 
 
 

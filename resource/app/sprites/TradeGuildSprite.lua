@@ -23,7 +23,7 @@ function TradeGuildSprite:DoAni()
 end
 function TradeGuildSprite:CheckTips()
     if not self:GetEntity():IsUnlocked() then return end
-    if self:GetEntity():BelongCity():GetUser():GetTradeManager():IsSoldOut() then
+    if self:GetEntity():BelongCity():GetUser():IsSoldOut() then
         if not self:getChildByTag(TIP_TAG) then
             local x,y = self:GetSpriteTopPosition()
             x = x - 20

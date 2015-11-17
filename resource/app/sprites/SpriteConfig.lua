@@ -248,33 +248,33 @@ create_building_config(
 -- village
 create_building_config(
     {"coinVillage"}
-    ,create_config(MIN_LEVEL, level(3), "dwelling_1.png", offset(0, 50), scale(1))
-    ,create_config(level(4), level(6), "dwelling_2.png", offset(0, 60), scale(0.85))
-    ,create_config(level(7), MAX_LEVEL, "dwelling_3.png", offset(0, 60), scale(0.85))
+    ,create_config(MIN_LEVEL, level(6), "dwelling_1.png", offset(0, 50), scale(1))
+    ,create_config(level(7), level(12), "dwelling_2.png", offset(0, 60), scale(0.85))
+    ,create_config(level(13), MAX_LEVEL, "dwelling_3.png", offset(0, 60), scale(0.85))
 )
 create_building_config(
     {"foodVillage"}
-    ,create_config(MIN_LEVEL, level(3), "farmer_1.png", offset(0, 50), scale(0.85))
-    ,create_config(level(4), level(6), "farmer_2.png", offset(0, 50), scale(0.85))
-    ,create_config(level(7), MAX_LEVEL, "farmer_3.png", offset(0, 50), scale(1))
+    ,create_config(MIN_LEVEL, level(6), "farmer_1.png", offset(0, 50), scale(0.85))
+    ,create_config(level(7), level(12), "farmer_2.png", offset(0, 50), scale(0.85))
+    ,create_config(level(13), MAX_LEVEL, "farmer_3.png", offset(0, 50), scale(1))
 )
 create_building_config(
     {"woodVillage"}
-    ,create_config(MIN_LEVEL, level(3), "woodcutter_1.png", offset(0, 50), scale(0.9))
-    ,create_config(level(4), level(6), "woodcutter_2.png", offset(0, 60), scale(0.9))
-    ,create_config(level(7), MAX_LEVEL, "woodcutter_3.png", offset(0, 70), scale(0.9))
+    ,create_config(MIN_LEVEL, level(6), "woodcutter_1.png", offset(0, 50), scale(0.9))
+    ,create_config(level(7), level(12), "woodcutter_2.png", offset(0, 60), scale(0.9))
+    ,create_config(level(13), MAX_LEVEL, "woodcutter_3.png", offset(0, 70), scale(0.9))
 )
 create_building_config(
     {"stoneVillage"}
-    ,create_config(MIN_LEVEL, level(3), "quarrier_1.png", offset(0, 50), scale(0.88))
-    ,create_config(level(4), level(6), "quarrier_2.png", offset(0, 60), scale(0.88))
-    ,create_config(level(7), MAX_LEVEL, "quarrier_3.png", offset(0, 70), scale(0.88))
+    ,create_config(MIN_LEVEL, level(6), "quarrier_1.png", offset(0, 50), scale(0.88))
+    ,create_config(level(7), level(12), "quarrier_2.png", offset(0, 60), scale(0.88))
+    ,create_config(level(13), MAX_LEVEL, "quarrier_3.png", offset(0, 70), scale(0.88))
 )
 create_building_config(
     {"ironVillage"}
-    ,create_config(MIN_LEVEL, level(3), "miner_1.png", offset(0, 50), scale(0.9))
-    ,create_config(level(4), level(6), "miner_2.png", offset(0, 50), scale(0.9))
-    ,create_config(level(7), MAX_LEVEL, "miner_3.png", offset(0, 50), scale(0.9))
+    ,create_config(MIN_LEVEL, level(6), "miner_1.png", offset(0, 50), scale(0.9))
+    ,create_config(level(7), level(12), "miner_2.png", offset(0, 50), scale(0.9))
+    ,create_config(level(13), MAX_LEVEL, "miner_3.png", offset(0, 50), scale(0.9))
 )
 
 return SpriteConfig

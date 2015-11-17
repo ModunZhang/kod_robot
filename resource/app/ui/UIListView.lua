@@ -111,6 +111,7 @@ function UIListView:ctor(params)
         self.needTips = true
     end
     self.isTipsStringShow = false
+    self:setNodeEventEnabled(true)
 end
 
 function UIListView:onCleanup()

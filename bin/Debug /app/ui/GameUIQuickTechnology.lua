@@ -36,10 +36,12 @@ local GameUITechnologySpeedUp = import(".GameUITechnologySpeedUp")
 
 function GameUIQuickTechnology:GetTechsData()
     local r = {}
-    City:IteratorTechs(function(index,tech)
-        table.insert(r, tech)
+    for tech_name,tech in pairs(User.productionTechs) do
+        table.insert(r, {tech_name, tech})
+    end
+    table.sort( r, function(a,b) 
+        return tonumber(a[2].index) <  tonumber(b[2].index) 
     end)
-    table.sort( r, function(a,b) return tonumber(a:Index()) <  tonumber(b:Index()) end)
     return r
 end
 
@@ -55,9 +57,11 @@ function GameUIQuickTechnology:ctor(city, tech_name)
         else
             x = (i % 3 - 1) * (142+46) + 71 + 20
         end
-        local need = data:UnlockBy() ~= data:Index() and data:UnlockBy() or nil
+        local tech_name, tech = unpack(data)
+        local config = UtilsForTech:GetProductionTechConfig(tech_name)
+        local need = config.unlockBy ~= tech.index and config.unlockBy or nil
         local treeNode = TreeNode.new(need,{x = x,y = y},data)
-        techNodes[data:Index()] = treeNode
+        techNodes[tech.index] = treeNode
         if i % 3 == 0 then
             y = y - (142+46)
         end
@@ -69,75 +73,60 @@ end
 function GameUIQuickTechnology:GetNodeForKey(key)
     return self.techNodes[key]
 end
-
-function GameUIQuickTechnology:onEnter()
-    GameUIQuickTechnology.super.onEnter(self)
-    City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_DATA_CHANGED)
-    City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
-    City:AddListenOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_TIMER)
-    City:AddListenOnType(self,City.LISTEN_TYPE.UPGRADE_BUILDING)
-end
-
-function GameUIQuickTechnology:OnProductionTechsDataChanged(changed_map)
-    for _,tech in ipairs(changed_map.edited or {}) do
-        local item = self:GetItemByTag(tech:Index())
-        if item and item.levelLabel then
-            item.levelLabel:setString("Lv " .. tech:Level())
-        end
-        if item and item.changeState then
-            item.changeState(tech:Enable())
-        end
-    end
-end
-
-function GameUIQuickTechnology:OnUpgradingBegin()
-end
-
-function GameUIQuickTechnology:OnUpgradingFinished(building)
-    if building:GetType() == self:GetBuilding():GetType() and self.technology_node then
-        City:FastUpdateAllTechsLockState()
-        City:IteratorTechs(function(__,tech)
-            local item = self:GetItemByTag(tech:Index())
-            if item and item.changeState then
-                item.changeState(tech:Enable())
+function GameUIQuickTechnology:OnMoveInStage()
+    GameUIQuickTechnology.super.OnMoveInStage(self)
+    self.technology_node = self:BuildTechnologyUI(window.height - 100):addTo(self:GetView()):pos(window.left,window.bottom+15)
+    User:AddListenOnType(self, "productionTechs")
+    User:AddListenOnType(self, "productionTechEvents")
+    User:AddListenOnType(self, "buildingEvents")
+    scheduleAt(self, function()
+        if self.time_label and self.time_label:isVisible() 
+            and User:HasProductionTechEvent() then
+            local event = User.productionTechEvents[1]
+            local time, percent = UtilsForEvent:GetEventInfo(event)
+            self.process_timer:setPercentage(percent)
+            self.time_label:setString(GameUtils:formatTimeStyle1(time))
+            if time > DataUtils:getFreeSpeedUpLimitTime() then
+                self.speedButton:show()
+                self.freeSpeedUpButton:hide()
+            else
+                self.speedButton:hide()
+                self.freeSpeedUpButton:show()
             end
-        end)
-    end
+        end
+    end)
 end
-
-function GameUIQuickTechnology:OnUpgrading()
-end
-
-function GameUIQuickTechnology:OnProductionTechnologyEventDataChanged(changed_map)
+function GameUIQuickTechnology:OnUserDataChanged_buildingEvents(userData, deltaData)
     self:CheckUIChanged()
 end
-
-function GameUIQuickTechnology:OnProductionTechnologyEventTimer(event)
-    if self.time_label and self.time_label:isVisible() then
-        self.process_timer:setPercentage(event:GetPercent())
-        self.time_label:setString(GameUtils:formatTimeStyle1(event:GetTime()))
-        if event:GetTime() > DataUtils:getFreeSpeedUpLimitTime() then
-            self.speedButton:show()
-            self.freeSpeedUpButton:hide()
-        else
-            self.speedButton:hide()
-            self.freeSpeedUpButton:show()
+function GameUIQuickTechnology:OnUserDataChanged_productionTechEvents(userData, deltaData)
+    self:CheckUIChanged()
+end
+function GameUIQuickTechnology:OnUserDataChanged_productionTechs(userData, deltaData)
+    local ok, value = deltaData("productionTechs")
+    if ok then
+        for tech_name,v in pairs(value) do
+            local tech = userData.productionTechs[tech_name]
+            local item = self:GetItemByTag(tech.index)
+            if item and item.levelLabel then
+                item.levelLabel:setString("Lv " .. tech.level)
+            end
+            if item and item.changeState then
+                item.changeState(User:IsTechEnable(tech_name, tech))
+            end
         end
     end
 end
 
 function GameUIQuickTechnology:OnMoveOutStage()
-    City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_DATA_CHANGED)
-    City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_CHANGED)
-    City:RemoveListenerOnType(self,City.LISTEN_TYPE.PRODUCTION_EVENT_TIMER)
-    City:RemoveListenerOnType(self,City.LISTEN_TYPE.UPGRADE_BUILDING)
     GameUIQuickTechnology.super.OnMoveOutStage(self)
+    User:RemoveListenerOnType(self, "productionTechs")
+    User:RemoveListenerOnType(self, "productionTechEvents")
+    User:RemoveListenerOnType(self, "buildingEvents")
 end
 
 function GameUIQuickTechnology:CreateBetweenBgAndTitle()
     GameUIQuickTechnology.super.CreateBetweenBgAndTitle(self)
-    self.technology_node = self:BuildTechnologyUI(window.height - 100):addTo(self:GetView()):pos(window.left,window.bottom+15)
-
 end
 
 function GameUIQuickTechnology:BuildTipsUI(technology_node,y)
@@ -190,9 +179,9 @@ function GameUIQuickTechnology:BuildTipsUI(technology_node,y)
         :addTo(tips_bg)
         :setButtonLabel("normal",UIKit:commonButtonLable({text = _("免费加速")}))
         :onButtonClicked(function()
-            if City:HaveProductionTechEvent() then
-                local event = City:GetProductionTechEventsArray()[1]
-                NetManager:getFreeSpeedUpPromise("productionTechEvents",event:Id()):done(function()
+            if User:HasProductionTechEvent() then
+                local event = User.productionTechEvents[1]
+                NetManager:getFreeSpeedUpPromise("productionTechEvents", event.id):done(function()
                     self:CheckUIChanged()
                 end)
             end
@@ -217,7 +206,7 @@ function GameUIQuickTechnology:BuildTechnologyUI(height)
 end
 
 function GameUIQuickTechnology:CheckUIChanged()
-    if City:HaveProductionTechEvent() then
+    if User:HasProductionTechEvent() then
         self.no_event_label_1:hide()
         self.no_event_label_2:hide()
         self.upgrade_label:show()
@@ -225,18 +214,21 @@ function GameUIQuickTechnology:CheckUIChanged()
         self.process_bg:show()
         self.time_label:show()
         self.speedButton:show()
-        local event = City:GetProductionTechEventsArray()[1]
+        local event = User.productionTechEvents[1]
         if event then
-            if event:GetTime() > DataUtils:getFreeSpeedUpLimitTime() then
+            local time, percent = UtilsForEvent:GetEventInfo(event)
+            if time > DataUtils:getFreeSpeedUpLimitTime() then
                 self.speedButton:show()
                 self.freeSpeedUpButton:hide()
             else
                 self.speedButton:hide()
                 self.freeSpeedUpButton:show()
             end
-            self.upgrade_label:setString(string.format(_("正在研发%s到 Level %d"),event:Entity():GetLocalizedName(),event:Entity():GetNextLevel()))
-            self.process_timer:setPercentage(event:GetPercent())
-            self.time_label:setString(GameUtils:formatTimeStyle1(event:GetTime()))
+            local str = UtilsForTech:GetTechLocalize(event.name)
+            local next_level = User.productionTechs[event.name].level + 1
+            self.upgrade_label:setString(string.format(_("正在研发%s到 Level %d"), str, next_level))
+            self.process_timer:setPercentage(percent)
+            self.time_label:setString(GameUtils:formatTimeStyle1(time))
         end
     else
         self.no_event_label_1:show()
@@ -272,13 +264,14 @@ function GameUIQuickTechnology:CreateScrollNode()
     return node
 end
 
-function GameUIQuickTechnology:GetItem(tech)
+function GameUIQuickTechnology:GetItem(data)
+    local tech_name, tech = unpack(data)
     local item = WidgetPushButton.new({normal = "technology_bg_normal_142x142.png"})
-    local icon_image = tech:GetImageName()
+    local icon_image = UtilsForTech:GetProductionTechImage(tech_name)
     item.enable_icon = display.newSprite(icon_image):addTo(item):scale(0.8)
     item.unable_icon = display.newFilteredSprite(icon_image,"GRAY", {0.2,0.5,0.1,0.1}):addTo(item):scale(0.8)
     local lv_bg = display.newSprite("technology_lv_bg_117x40.png"):align(display.BOTTOM_CENTER, 0, -51):addTo(item)
-    item.levelLabel = UIKit:ttfLabel({text = "LV " .. tech:Level() ,size = 22,color = 0xfff3c7}):align(display.CENTER_BOTTOM, 58, 0):addTo(lv_bg)
+    item.levelLabel = UIKit:ttfLabel({text = "LV " .. tech.level ,size = 22,color = 0xfff3c7}):align(display.CENTER_BOTTOM, 58, 0):addTo(lv_bg)
     item.lock_icon = display.newSprite("technology_lock_40x54.png"):align(display.BOTTOM_CENTER, 0, -55):addTo(item)
     item.changeState = function(enable)
         if enable then
@@ -293,17 +286,13 @@ function GameUIQuickTechnology:GetItem(tech)
             item.lock_icon:show()
         end
     end
-    item.changeState(tech:Enable())
+    item.changeState(User:IsTechEnable(tech_name, tech))
     item:onButtonClicked(function(event)
-        if not tech:IsOpen() then
-            UIKit:showMessageDialog(nil, _("该技能暂未开放！"))
-            return
-        end
         event.target:removeChildByTag(111)
         UIKit:newGameUI("GameUIUpgradeTechnology",tech):AddToCurrentScene(true)
     end)
-    item:setTag(tech:Index())
-    if self.need_tips_tech_name == tech:Name() then
+    item:setTag(tech.index)
+    if self.need_tips_tech_name == tech_name then
         WidgetFteArrow.new(_("点击科技"), 22 * 1.3):addTo(item, 10, 111)
         :TurnUp():align(display.TOP_CENTER, 0, -80):scale(0.7)
     end

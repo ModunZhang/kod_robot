@@ -37,15 +37,14 @@ function MapLayer:ctor(scene, min_scale, max_scale)
                 self:FinishMoveTo()
             end
         end
-        local target_scale = self.target_scale
-        if target_scale then
-            local start_scale, end_scale = unpack(target_scale)
+        if self.target_scale then
+            local start_scale, end_scale = unpack(self.target_scale)
             local dt = end_scale - start_scale
             local old_scale = self:getScale()
             local newscale = old_scale + 0.01 * (dt > 0 and 1 or -1)
             if (end_scale - newscale) * dt <= 0 then
                 self:ZoomTo(end_scale)
-                target_scale = nil
+                self.target_scale = nil
             else
                 self:ZoomTo(newscale)
             end

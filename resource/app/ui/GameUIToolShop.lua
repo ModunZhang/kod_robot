@@ -3,7 +3,7 @@
 -- Date: 2014-08-18 14:33:28
 --
 local window = import("..utils.window")
-local WidgetManufacture = import("..widget.WidgetManufacture")
+local WidgetManufactureNew = import("..widget.WidgetManufactureNew")
 local GameUIToolShop = UIKit:createUIClass("GameUIToolShop", "GameUIUpgradeBuilding")
 
 function GameUIToolShop:ctor(city, toolShop, default_tab)
@@ -32,7 +32,7 @@ function GameUIToolShop:TabButtons()
                 self.manufacture = nil
             end
         elseif tag == "manufacture" then
-            self.manufacture = WidgetManufacture.new(self.toolShop):addTo(self:GetView())
+            self.manufacture = WidgetManufactureNew.new(self.toolShop):addTo(self:GetView())
         end
     end):pos(window.cx, window.bottom + 34)
 end

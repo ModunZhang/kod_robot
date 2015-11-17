@@ -14,7 +14,7 @@ local UILib = import(".UILib")
 
 function GameUISettingServer:onEnter()
 	GameUISettingServer.super.onEnter(self)
-	self.current_code = User:ServerId()
+	self.current_code = User.serverId
 	self.server_code = self.current_code
 	self.HIGH_COLOR = UIKit:hex2c3b(0x970000)
 	self.LOW_COLOR = UIKit:hex2c3b(0x1d8a00)
@@ -50,7 +50,7 @@ function GameUISettingServer:BuildUI()
 				UIKit:showMessageDialog(_("错误"),_("你已加入联盟不能切换服务器，退出联盟后重试。"))
 				return 
 			end
-			if self.server_code ~= User:ServerId() then
+			if self.server_code ~= User.serverId then
 				NetManager:getSwitchServer(self.server_code)
 			end
 		end)

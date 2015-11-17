@@ -1,6 +1,5 @@
 local config_house_function = GameDatas.HouseFunction
 local config_house_levelup = GameDatas.HouseLevelUp
-local MaterialManager = import("..entity.MaterialManager")
 local UpgradeBuilding = import(".UpgradeBuilding")
 local ResourceUpgradeBuilding = class("ResourceUpgradeBuilding", UpgradeBuilding)
 
@@ -45,14 +44,13 @@ function ResourceUpgradeBuilding:GetNextLevelProductionPerHour()
     local current_config = config[self:GetNextLevel()]
     return current_config.production
 end
-function ResourceUpgradeBuilding:GetUpdateResourceType()
-    return nil
+function ResourceUpgradeBuilding:GetResType()
+    return ""
 end
 
 function ResourceUpgradeBuilding:IsAbleToUpgrade(isUpgradeNow)
     -- 升级是否使空闲城民小于0
-    local resource_manager = City:GetResourceManager()
-    local free_citizen_limit = resource_manager:GetCitizenResource():GetValueLimit()
+    local free_citizen_limit = self:BelongCity():GetUser():GetResProduction("citizen").limit
     local current_citizen = self:GetCitizen()
     local next_level_citizen = self:GetNextLevelLevelCitizen()
     if (next_level_citizen-current_citizen)>free_citizen_limit then

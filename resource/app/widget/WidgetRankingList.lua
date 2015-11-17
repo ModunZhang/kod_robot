@@ -1,16 +1,15 @@
 local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 local cocos_promise = import("..utils.cocos_promise")
 local window = import("..utils.window")
-local Flag = import("..entity.Flag")
 local UIListView = import("..ui.UIListView")
 local WidgetPushButton = import(".WidgetPushButton")
 local WidgetUIBackGround = import(".WidgetUIBackGround")
 local WidgetPopDialog = import(".WidgetPopDialog")
-local WidgetAllianceHelper = import(".WidgetAllianceHelper")
 local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
+local WidgetAllianceHelper = import(".WidgetAllianceHelper")
+local ui_helper = WidgetAllianceHelper.new()
 local WidgetRankingList = class("WidgetRankingList", WidgetPopDialog)
 
-local ui_helper = WidgetAllianceHelper.new()
 
 WidgetRankingList.lock = false
 WidgetRankingList.rank_data = {
@@ -172,7 +171,13 @@ end
 function WidgetRankingList:touchListener(event)
     local listView = event.listView
     if "clicked" == event.name then
-        -- print("async list view clicked idx:" .. event.itemPos)
+        local id = self.current_rank.datas[event.itemPos].id
+        app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
+        if self.type_ == "player" then
+            UIKit:newGameUI("GameUIAllianceMemberInfo",false,id,nil,DataManager:getUserData().serverId):AddToCurrentScene(true)
+        else
+            UIKit:newGameUI("GameUIAllianceInfo", id, nil, DataManager:getUserData().serverId):AddToCurrentScene(true)
+        end
     end
 end
 function WidgetRankingList:sourceDelegate(listView, tag, idx)
@@ -327,9 +332,9 @@ function WidgetRankingList:CreateAllianceContentByIndex(idx)
         self.tag:setString(string.format("(%s)", data.tag))
         self.value:setString(string.formatnumberthousands(data.value))
         if self.flag then
-            self.flag:SetFlag(Flag:DecodeFromJson(data.flag))
+            self.flag:SetFlag(data.flag)
         else
-            self.flag = ui_helper:CreateFlagContentSprite(Flag:DecodeFromJson(data.flag))
+            self.flag = ui_helper:CreateFlagContentSprite(data.flag)
                 :addTo(self):align(display.CENTER, 80, 5):scale(0.5)
         end
         return self

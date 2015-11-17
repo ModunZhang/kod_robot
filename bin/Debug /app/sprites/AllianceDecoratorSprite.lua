@@ -1,3 +1,4 @@
+local Alliance = import("..entity.Alliance")
 local Sprite = import(".Sprite")
 local UILib = import("..ui.UILib")
 local AllianceDecoratorSprite = class("AllianceDecoratorSprite", Sprite)
@@ -36,13 +37,13 @@ local decorator_map = {
 }
 
 function AllianceDecoratorSprite:ctor(city_layer, entity)
-    local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
+    local x, y = city_layer:GetLogicMap():ConvertToMapPosition(Alliance:GetLogicPositionWithMapObj(entity))
     AllianceDecoratorSprite.super.ctor(self, city_layer, entity, x, y)
     -- self:CreateBase()
 end
 function AllianceDecoratorSprite:GetSpriteFile()
     local terrain = self:GetMapLayer():Terrain()
-    local deco_name = self:GetEntity():GetName()
+    local deco_name = self:GetEntity().name
     return DECORATOR_IMAGE[terrain][deco_name], decorator_map[terrain][deco_name]
 end
 function AllianceDecoratorSprite:GetSpriteOffset()
@@ -52,7 +53,18 @@ end
 function AllianceDecoratorSprite:ReloadSpriteCauseTerrainChanged(terrain_type)
     self:RefreshSprite()
 end
-
+function AllianceDecoratorSprite:GetLogicPosition()
+    return Alliance:GetLogicPositionWithMapObj(self:GetEntity())
+end
+function AllianceDecoratorSprite:GetMidLogicPosition()
+    return Alliance:GetMidLogicPositionWithMapObj(self:GetEntity())
+end
+function AllianceDecoratorSprite:GetSize()
+    return Alliance:GetSizeWithMapObj(self:GetEntity())
+end
+function AllianceDecoratorSprite:IsContainPoint(x, y)
+    return Alliance:IsContainPointWithMapObj(self:GetEntity(), x, y)
+end
 
 
 ---- override

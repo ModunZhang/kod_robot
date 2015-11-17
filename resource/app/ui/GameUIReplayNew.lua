@@ -57,9 +57,9 @@ local function decode_battle_from_report(report)
         defender.soldierName = defender.soldierName or "wall"
         local defeatAll
         if attacker.soldierName ~= "wall" and defender.soldierName ~= "wall" --[[and #attacks ~= i]] then
-            defeatAll = (((attacker.morale - attacker.moraleDecreased) <= 20
+            defeatAll = (((attacker.morale - attacker.moraleDecreased) <= 0
                 or (attacker.soldierCount - attacker.soldierDamagedCount) <= 0) or not attacker.isWin)
-                and (((defender.morale - defender.moraleDecreased) <= 20
+                and (((defender.morale - defender.moraleDecreased) <= 0
                 or (defender.soldierCount - defender.soldierDamagedCount) <= 0) or not defender.isWin)
         end
         local left
@@ -95,6 +95,11 @@ local function decode_battle_from_report(report)
             }
         end
         defeat = attacker.isWin and "right" or "left"
+        if attacker.isWin then
+            right.decrease = defender.morale
+        else
+            left.decrease = attacker.morale
+        end
         table.insert(battle, {left = left, right = right, defeat = defeat, defeatAll = defeatAll})
         if defeatAll then
             defeat = nil
@@ -796,14 +801,13 @@ local report_ = {
 --     createTime = "1431351323688"
 -- }
 
--- -------------------
+-- -- -------------------
 -- local Report = import("..entity.Report")
 -- User = {
 --     Id = function() return 1 end
 -- }
-function GameUIReplayNew:ctor(report, callback)
+function GameUIReplayNew:ctor(report, callback, skipcallback)
     -- report = Report:DecodeFromJsonData(report1)
-    -- report = report_
     assert(report.GetFightAttackName)
     assert(report.GetFightDefenceName)
     assert(report.IsDragonFight)
@@ -816,7 +820,7 @@ function GameUIReplayNew:ctor(report, callback)
     assert(report.GetOrderedDefenceSoldiers)
     assert(report.GetReportResult)
     assert(report.GetAttackDragonLevel)
-    assert(report.GetAttackDragonLevel)
+    assert(report.GetDefenceDragonLevel)
     assert(report.GetAttackTargetTerrain)
     if report:IsDragonFight() then
         assert(report.IsAttackCamp)
@@ -831,6 +835,7 @@ function GameUIReplayNew:ctor(report, callback)
     self.defence_soldiers = soldiers
 
     self.callback = callback
+    self.skipcallback = skipcallback
 
     for _,v in ipairs(self:GetPreloadImages()) do
         display.addSpriteFrames(DEBUG_GET_ANIMATION_PATH(v.list),DEBUG_GET_ANIMATION_PATH(v.image))
@@ -846,7 +851,6 @@ function GameUIReplayNew:ctor(report, callback)
     self.round = 1
 end
 function GameUIReplayNew:OnMoveInStage()
-    app:GetAudioManager():PlayGameMusicOnSceneEnter("AllianceBattleScene",true)
     self.ui_map = self:BuildUI()
     self.ui_map.battle_background1:setTexture(string.format("back_ground_%s.png", self.report:GetAttackTargetTerrain()))
     self.ui_map.attackName:setString(self.report:GetFightAttackName())
@@ -892,9 +896,8 @@ end
 function GameUIReplayNew:onExit()
     GameUIReplayNew.super.onExit(self)
     if type(self.callback) == "function" then
-        self.callback()
+        self.callback(self)
     end
-    app:GetAudioManager():PlayGameMusicAutoCheckScene()
 end
 function GameUIReplayNew:GetOrderedAttackSoldiers()
     return self.report:GetOrderedAttackSoldiers()
@@ -926,6 +929,10 @@ function GameUIReplayNew:RefreshSoldierListView(list_view, soldiers, is_pve_sold
     end
 end
 function GameUIReplayNew:ShowResult()
+    if self.skipcallback then
+        self.skipcallback(self)
+        return
+    end
     if not self.result then
         self.result = ccs.Armature:create("win"):addTo(self, 10):align(display.CENTER, window.cx, window.cy + 250)
         if self.report:GetReportResult() then
@@ -991,6 +998,8 @@ function GameUIReplayNew:PlayDragonBattle()
         (not self.report:IsAttackCamp() and not attack_dragon.isWin)
     return self:PromiseOfDelay(0.5):next(function()
         return self.dragon_battle:PromsieOfFight():next(function()
+                return self:OnHandle("dragonFight")
+            end):next(function()
             return is_win and
                 self.dragon_battle:PromiseOfVictory() or
                 self.dragon_battle:PromiseOfDefeat()
@@ -1093,10 +1102,10 @@ function GameUIReplayNew:DecodeStateBySide(side, is_left)
     elseif state == "hurt" then
         action = BattleObject:Do():next(function(corps)
             if is_left then
-                return promise.any(corps:hit(), self:HurtSoldierLeft(corps))
+                return promise.any(corps:hit(), self:HurtSoldierLeft(corps, side.decrease))
                     :next(function() return corps end)
             else
-                return promise.any(corps:hit(), self:HurtSoldierRight(corps))
+                return promise.any(corps:hit(), self:HurtSoldierRight(corps, side.decrease))
                     :next(function() return corps end)
             end
         end):next(function(corps)
@@ -1113,6 +1122,8 @@ function GameUIReplayNew:DecodeStateBySide(side, is_left)
             elseif corps == self.right then
                 self.right = nil
                 self:SoldierDefeatRight()
+                corps:removeFromParent()
+                return self:OnHandle("rightDefeat")
             end
             corps:removeFromParent()
             return corps
@@ -1140,13 +1151,18 @@ function GameUIReplayNew:PromiseOfPlayDamage(count, x, y)
         :align(display.CENTER, x, y):runAction(speed)
     return p
 end
-function GameUIReplayNew:HurtSoldierLeft(corps)
+function GameUIReplayNew:HurtSoldierLeft(corps, decrease)
     local round = self:GetFightAttackSoldierByRound(self.round)
     local soldier = self:TopSoldierLeft()
     local soldierCount = round.soldierCount or round.wallHp
     local soldierDamagedCount = round.soldierDamagedCount or round.wallDamagedHp
-    local morale = round.morale or self.ui_map.soldier_morale_attack:GetPercent()
-    local moraleDecreased = round.moraleDecreased or 0
+    local morale = self.ui_map.soldier_morale_attack:GetPercent()
+    local moraleDecreased
+    if round.moraleDecreased then
+        moraleDecreased = decrease / self.ui_map.soldier_count_attack.count * 100
+    else
+        moraleDecreased = morale
+    end
     local x,y = corps:getPosition()
     return promise.all(
         self:PromiseOfPlayDamage(soldierDamagedCount, x, y),
@@ -1159,20 +1175,26 @@ function GameUIReplayNew:HurtSoldierLeft(corps)
             return promise.all(
                 self.ui_map.soldier_morale_attack:PromiseOfProgressTo(0.5, morale - moraleDecreased),
                 self:PormiseOfSchedule2(0.5, function(percent)
-                    local count = math.ceil(morale - moraleDecreased * percent)
+                    local count = math.round(morale - moraleDecreased * percent)
+                    count = count <= 0 and 0 or count
                     self.ui_map.soldier_morale_attack:SetText(count.."/"..100)
                 end)
             )
         end)
     )
 end
-function GameUIReplayNew:HurtSoldierRight(corps)
+function GameUIReplayNew:HurtSoldierRight(corps, decrease)
     local round = self:GetFightDefenceSoldierByRound(self.round)
     local soldier = self:TopSoldierRight()
     local soldierCount = round.soldierCount or round.wallHp
     local soldierDamagedCount = round.soldierDamagedCount or round.wallDamagedHp
-    local morale = round.morale or 100
-    local moraleDecreased = round.moraleDecreased or 0
+    local morale = self.ui_map.soldier_morale_defence:GetPercent()
+    local moraleDecreased = (decrease or 0) / self.ui_map.soldier_count_defence.count * 100
+    if round.wallHp then
+        if round.wallDamagedHp == round.wallHp then
+            moraleDecreased = morale
+        end
+    end
     local x,y = corps:getPosition()
     return promise.all(
         self:PromiseOfPlayDamage(soldierDamagedCount, x, y),
@@ -1185,7 +1207,8 @@ function GameUIReplayNew:HurtSoldierRight(corps)
             return promise.all(
                 self.ui_map.soldier_morale_defence:PromiseOfProgressTo(0.5, morale - moraleDecreased),
                 self:PormiseOfSchedule2(0.5, function(percent)
-                    local count = math.ceil(morale - moraleDecreased * percent)
+                    local count = math.round(morale - moraleDecreased * percent)
+                    count = count <= 0 and 0 or count
                     self.ui_map.soldier_morale_defence:SetText(count.."/"..100)
                 end)
             )
@@ -1200,7 +1223,7 @@ function GameUIReplayNew:EnterSoldiersLeft()
         :show():SetEnable(true)
     self.ui_map.soldier_count_attack
         :SetText(top_soldier.count.."/"..top_soldier.count)
-        :SetProgress(100):show()
+        :SetProgress(100):show().count = top_soldier.count
     self.ui_map.soldier_morale_attack
         :SetText("100/100")
         :SetProgress(100):show()
@@ -1218,7 +1241,7 @@ function GameUIReplayNew:EnterSoldiersRight()
 
     self.ui_map.soldier_count_defence
         :SetText(top_soldier.count.."/"..top_soldier.count)
-        :SetProgress(100):show()
+        :SetProgress(100):show().count = top_soldier.count
     self.ui_map.soldier_morale_defence
         :SetText("100/100")
         :SetProgress(100):show()
@@ -1479,6 +1502,7 @@ function GameUIReplayNew:BuildUI()
 
     local top = display.newSprite("back_ground_replay_1.png"):addTo(self, 1)
         :align(display.TOP_CENTER, display.cx, window.top)
+    ui_map.top = top
     local top_size = top:getContentSize()
 
     ui_map.attackName = UIKit:ttfLabel({
@@ -1643,7 +1667,7 @@ function GameUIReplayNew:BuildUI()
     ):addTo(bottom):align(display.CENTER, s1.width - 110, 50)
 
     ui_map.pass = cc.ui.UIPushButton.new(
-        {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},
+        {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png", disabled = 'gray_btn_148x58.png'},
         {scale9 = false}
     ):setButtonLabel(
         UIKit:ttfLabel({
@@ -1661,6 +1685,9 @@ function GameUIReplayNew:GetPreloadImages()
         {image = "animations/ui_animation_1.pvr.ccz",list = "animations/ui_animation_1.plist"},
         {image = "animations/ui_animation_2.pvr.ccz",list = "animations/ui_animation_2.plist"},
     }
+end
+function GameUIReplayNew:OnHandle()
+
 end
 
 

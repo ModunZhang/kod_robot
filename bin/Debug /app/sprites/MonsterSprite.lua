@@ -84,13 +84,13 @@ local position_map = {
         {x = 0, y = -30},
     }
 }
-function MonsterSprite:ctor(city_layer, entity, is_my_alliance)
+function MonsterSprite:ctor(city_layer, entity, is_my_alliance, alliance)
     -- 不加此行会报错
     self.entity = entity
-    MonsterSprite.super.ctor(self, city_layer, entity, false)
+    MonsterSprite.super.ctor(self, city_layer, entity, false, alliance)
 end
 function MonsterSprite:CreateSprite()
-    local soldier_type, star = unpack(string.split(self:GetEntity():GetAllianceMonsterInfo().name, '_'))
+    local soldier_type, star = unpack(string.split(self:GetBuildingInfo().name, '_'))
     local ani,count = unpack(soldier_config[soldier_type][tonumber(star)])
     local node = display.newNode()
     for _,v in ipairs(position_map[count]) do
@@ -99,7 +99,7 @@ function MonsterSprite:CreateSprite()
     return node
 end
 function MonsterSprite:GetInfo()
-    local info = self:GetEntity():GetAllianceMonsterInfo()
+    local info = self:GetBuildingInfo()
     local level = info.level
     local soldier_type = unpack(string.split(info.name, '_'))
     return level, Localize.soldier_name[soldier_type]
@@ -126,7 +126,9 @@ end
 function MonsterSprite:Unlock()
     self:GetSprite():removeChildByTag(LOCK_TAG)
 end
-
+function MonsterSprite:GetBuildingInfo()
+    return self.alliance:FindAllianceMonsterInfoByObject(self:GetEntity())
+end
 
 
 

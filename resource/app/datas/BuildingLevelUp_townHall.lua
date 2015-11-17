@@ -9,7 +9,7 @@ townHall[1] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 400
+	["buildTime"] = 1032
 }
 townHall[2] = {
 	["level"] = 2,
@@ -20,7 +20,7 @@ townHall[2] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 500
+	["buildTime"] = 1065
 }
 townHall[3] = {
 	["level"] = 3,
@@ -31,7 +31,7 @@ townHall[3] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 600
+	["buildTime"] = 1097
 }
 townHall[4] = {
 	["level"] = 4,
@@ -42,7 +42,7 @@ townHall[4] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 800
+	["buildTime"] = 1130
 }
 townHall[5] = {
 	["level"] = 5,
@@ -53,7 +53,7 @@ townHall[5] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1000
+	["buildTime"] = 1162
 }
 townHall[6] = {
 	["level"] = 6,
@@ -64,7 +64,7 @@ townHall[6] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1200
+	["buildTime"] = 1194
 }
 townHall[7] = {
 	["level"] = 7,
@@ -75,7 +75,7 @@ townHall[7] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 1400
+	["buildTime"] = 1324
 }
 townHall[8] = {
 	["level"] = 8,
@@ -119,7 +119,7 @@ townHall[11] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 3592
+	["buildTime"] = 4240
 }
 townHall[12] = {
 	["level"] = 12,
@@ -130,7 +130,7 @@ townHall[12] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4240
+	["buildTime"] = 5212
 }
 townHall[13] = {
 	["level"] = 13,
@@ -141,7 +141,7 @@ townHall[13] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 4888
+	["buildTime"] = 6249
 }
 townHall[14] = {
 	["level"] = 14,
@@ -152,7 +152,7 @@ townHall[14] = {
 	["tools"] = 1,
 	["tiles"] = 1,
 	["pulley"] = 1,
-	["buildTime"] = 8776
+	["buildTime"] = 11886
 }
 townHall[15] = {
 	["level"] = 15,
@@ -163,7 +163,7 @@ townHall[15] = {
 	["tools"] = 2,
 	["tiles"] = 2,
 	["pulley"] = 2,
-	["buildTime"] = 12664
+	["buildTime"] = 17913
 }
 townHall[16] = {
 	["level"] = 16,
@@ -174,7 +174,7 @@ townHall[16] = {
 	["tools"] = 4,
 	["tiles"] = 4,
 	["pulley"] = 4,
-	["buildTime"] = 16552
+	["buildTime"] = 24328
 }
 townHall[17] = {
 	["level"] = 17,
@@ -185,7 +185,7 @@ townHall[17] = {
 	["tools"] = 8,
 	["tiles"] = 8,
 	["pulley"] = 8,
-	["buildTime"] = 20440
+	["buildTime"] = 31132
 }
 townHall[18] = {
 	["level"] = 18,
@@ -196,7 +196,7 @@ townHall[18] = {
 	["tools"] = 12,
 	["tiles"] = 12,
 	["pulley"] = 12,
-	["buildTime"] = 24328
+	["buildTime"] = 38325
 }
 townHall[19] = {
 	["level"] = 19,
@@ -207,7 +207,7 @@ townHall[19] = {
 	["tools"] = 16,
 	["tiles"] = 16,
 	["pulley"] = 16,
-	["buildTime"] = 28216
+	["buildTime"] = 45906
 }
 townHall[20] = {
 	["level"] = 20,
@@ -218,7 +218,7 @@ townHall[20] = {
 	["tools"] = 20,
 	["tiles"] = 20,
 	["pulley"] = 20,
-	["buildTime"] = 32104
+	["buildTime"] = 53877
 }
 townHall[21] = {
 	["level"] = 21,
@@ -229,7 +229,7 @@ townHall[21] = {
 	["tools"] = 28,
 	["tiles"] = 28,
 	["pulley"] = 28,
-	["buildTime"] = 35992
+	["buildTime"] = 62236
 }
 townHall[22] = {
 	["level"] = 22,
@@ -240,7 +240,7 @@ townHall[22] = {
 	["tools"] = 36,
 	["tiles"] = 36,
 	["pulley"] = 36,
-	["buildTime"] = 39880
+	["buildTime"] = 70984
 }
 townHall[23] = {
 	["level"] = 23,
@@ -251,7 +251,7 @@ townHall[23] = {
 	["tools"] = 44,
 	["tiles"] = 44,
 	["pulley"] = 44,
-	["buildTime"] = 43768
+	["buildTime"] = 78838
 }
 townHall[24] = {
 	["level"] = 24,
@@ -262,7 +262,7 @@ townHall[24] = {
 	["tools"] = 52,
 	["tiles"] = 52,
 	["pulley"] = 52,
-	["buildTime"] = 47656
+	["buildTime"] = 86847
 }
 townHall[25] = {
 	["level"] = 25,
@@ -273,7 +273,7 @@ townHall[25] = {
 	["tools"] = 68,
 	["tiles"] = 68,
 	["pulley"] = 68,
-	["buildTime"] = 51544
+	["buildTime"] = 94506
 }
 townHall[26] = {
 	["level"] = 26,
@@ -284,7 +284,7 @@ townHall[26] = {
 	["tools"] = 84,
 	["tiles"] = 84,
 	["pulley"] = 84,
-	["buildTime"] = 55432
+	["buildTime"] = 102244
 }
 townHall[27] = {
 	["level"] = 27,
@@ -295,7 +295,7 @@ townHall[27] = {
 	["tools"] = 100,
 	["tiles"] = 100,
 	["pulley"] = 100,
-	["buildTime"] = 59320
+	["buildTime"] = 110058
 }
 townHall[28] = {
 	["level"] = 28,
@@ -306,7 +306,7 @@ townHall[28] = {
 	["tools"] = 116,
 	["tiles"] = 116,
 	["pulley"] = 116,
-	["buildTime"] = 63208
+	["buildTime"] = 117951
 }
 townHall[29] = {
 	["level"] = 29,
@@ -317,7 +317,7 @@ townHall[29] = {
 	["tools"] = 132,
 	["tiles"] = 132,
 	["pulley"] = 132,
-	["buildTime"] = 70984
+	["buildTime"] = 133270
 }
 townHall[30] = {
 	["level"] = 30,
@@ -328,7 +328,7 @@ townHall[30] = {
 	["tools"] = 164,
 	["tiles"] = 164,
 	["pulley"] = 164,
-	["buildTime"] = 78760
+	["buildTime"] = 148744
 }
 townHall[31] = {
 	["level"] = 31,
@@ -339,7 +339,7 @@ townHall[31] = {
 	["tools"] = 196,
 	["tiles"] = 196,
 	["pulley"] = 196,
-	["buildTime"] = 86536
+	["buildTime"] = 164374
 }
 townHall[32] = {
 	["level"] = 32,
@@ -350,7 +350,7 @@ townHall[32] = {
 	["tools"] = 228,
 	["tiles"] = 228,
 	["pulley"] = 228,
-	["buildTime"] = 94312
+	["buildTime"] = 180159
 }
 townHall[33] = {
 	["level"] = 33,
@@ -361,7 +361,7 @@ townHall[33] = {
 	["tools"] = 292,
 	["tiles"] = 292,
 	["pulley"] = 292,
-	["buildTime"] = 102088
+	["buildTime"] = 196100
 }
 townHall[34] = {
 	["level"] = 34,
@@ -372,7 +372,7 @@ townHall[34] = {
 	["tools"] = 356,
 	["tiles"] = 356,
 	["pulley"] = 356,
-	["buildTime"] = 109864
+	["buildTime"] = 212196
 }
 townHall[35] = {
 	["level"] = 35,
@@ -383,7 +383,7 @@ townHall[35] = {
 	["tools"] = 420,
 	["tiles"] = 420,
 	["pulley"] = 420,
-	["buildTime"] = 117640
+	["buildTime"] = 228448
 }
 townHall[36] = {
 	["level"] = 36,
@@ -394,7 +394,7 @@ townHall[36] = {
 	["tools"] = 484,
 	["tiles"] = 484,
 	["pulley"] = 484,
-	["buildTime"] = 125416
+	["buildTime"] = 244855
 }
 townHall[37] = {
 	["level"] = 37,
@@ -405,7 +405,7 @@ townHall[37] = {
 	["tools"] = 548,
 	["tiles"] = 548,
 	["pulley"] = 548,
-	["buildTime"] = 133192
+	["buildTime"] = 261418
 }
 townHall[38] = {
 	["level"] = 38,
@@ -416,7 +416,7 @@ townHall[38] = {
 	["tools"] = 612,
 	["tiles"] = 612,
 	["pulley"] = 612,
-	["buildTime"] = 140968
+	["buildTime"] = 278137
 }
 townHall[39] = {
 	["level"] = 39,
@@ -427,7 +427,7 @@ townHall[39] = {
 	["tools"] = 676,
 	["tiles"] = 676,
 	["pulley"] = 676,
-	["buildTime"] = 148744
+	["buildTime"] = 295011
 }
 townHall[40] = {
 	["level"] = 40,
@@ -438,5 +438,5 @@ townHall[40] = {
 	["tools"] = 740,
 	["tiles"] = 740,
 	["pulley"] = 740,
-	["buildTime"] = 156520
+	["buildTime"] = 312040
 }

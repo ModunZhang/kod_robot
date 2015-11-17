@@ -78,21 +78,19 @@ end
 
 function GameUIWathTowerRegion:AddOrRemoveListener(isAdd)
     if isAdd then
-        City:AddListenOnType(self,City.LISTEN_TYPE.HELPED_TO_TROOPS)
-        self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.CheckNotHaveTheEventIf)
-        self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnCommingDataChanged)
-        self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnMarchDataChanged)
-        self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
-        self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnVillageEventTimer)
-        self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnFightEventTimerChanged)
+        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.CheckNotHaveTheEventIf)
+        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnCommingDataChanged)
+        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnMarchDataChanged)
+        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
+        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnVillageEventTimer)
+        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnFightEventTimerChanged)
     else
-        City:RemoveListenerOnType(self,City.LISTEN_TYPE.HELPED_TO_TROOPS)
-        self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.CheckNotHaveTheEventIf)
-        self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnCommingDataChanged)
-        self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnMarchDataChanged)
-        self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
-        self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnVillageEventTimer)
-        self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnFightEventTimerChanged)
+        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.CheckNotHaveTheEventIf)
+        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnCommingDataChanged)
+        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnMarchDataChanged)
+        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
+        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnVillageEventTimer)
+        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnFightEventTimerChanged)
     end
 end
 
@@ -117,7 +115,7 @@ end
 
 
 function GameUIWathTowerRegion:RefreshMyEvents()
-    local my_events = self:GetAllianceBelvedere():GetMyEvents()
+    local my_events = {}
     for index = 1,2 do
         local item
         if index == 1 then
@@ -165,7 +163,7 @@ function GameUIWathTowerRegion:GetMyEventItemWithIndex(index,isOpen,entity)
         :addTo(bg)
         :align(display.LEFT_BOTTOM, 10, 19)
     if not isOpen then
-        local countInfo = User:GetCountInfo()
+        local countInfo = User.countInfo
         tile_label:setString(_("未解锁"))
         WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
             :setButtonLabel(
@@ -190,7 +188,7 @@ function GameUIWathTowerRegion:GetMyEventItemWithIndex(index,isOpen,entity)
             :setButtonLabelOffset(0, 16)
             :align(display.RIGHT_BOTTOM,310,18)
             :onButtonClicked(function(event)
-                if unlockPlayerSecondMarchQueue_price > User:GetGemResource():GetValue() then
+                if unlockPlayerSecondMarchQueue_price > User:GetGemValue() then
                     UIKit:showMessageDialog(_("提示"),_("金龙币不足"))
                         :CreateOKButton(
                             {
@@ -445,12 +443,12 @@ function GameUIWathTowerRegion:OnEventDetailButtonClicked(entity)
     local strEntityType = entity:GetType()
     if strEntityType == entity.ENTITY_TYPE.MARCH_OUT then
         if entity:WithObject():MarchType() == "helpDefence" then
-            NetManager:getHelpDefenceMarchEventDetailPromise(entity:WithObject():Id(),Alliance_Manager:GetMyAlliance():Id()):done(function(response)
+            NetManager:getHelpDefenceMarchEventDetailPromise(entity:WithObject():Id()):done(function(response)
                 UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.MARCH,response.msg.eventDetail,User:Id())
                     :AddToCurrentScene(true)
             end)
         else
-            local my_status = Alliance_Manager:GetMyAlliance():Status()
+            local my_status = Alliance_Manager:GetMyAlliance().basicInfo.status
             if my_status == "prepare" or  my_status == "fight" then
                 local __,alliance_id = entity:WithObject():FromLocation()
                 NetManager:getAttackMarchEventDetailPromise(entity:WithObject():Id(),alliance_id):done(function(response)
@@ -462,7 +460,7 @@ function GameUIWathTowerRegion:OnEventDetailButtonClicked(entity)
             end
         end
     elseif strEntityType == entity.ENTITY_TYPE.STRIKE_OUT then
-        local my_status = Alliance_Manager:GetMyAlliance():Status()
+        local my_status = Alliance_Manager:GetMyAlliance().basicInfo.status
         if my_status == "prepare" or  my_status == "fight" then
             local __,alliance_id = entity:WithObject():FromLocation()
             NetManager:getStrikeMarchEventDetailPromise(entity:WithObject():Id(),alliance_id):done(function(response)
@@ -513,9 +511,9 @@ function GameUIWathTowerRegion:CheckNotHaveTheEventIf(event)
     return self.march_timer_label[event:Id()] == nil
 end
 
-function GameUIWathTowerRegion:OnHelpToTroopsChanged(changed_map)
-    self:RefreshCurrentList()
-end
+-- function GameUIWathTowerRegion:OnHelpToTroopsChanged(changed_map)
+--     self:RefreshCurrentList()
+-- end
 
 function GameUIWathTowerRegion:OnCommingDataChanged()
     self:RefreshCurrentList()
@@ -599,7 +597,7 @@ function GameUIWathTowerRegion:CanViewEventDetail()
 end
 function GameUIWathTowerRegion:OnSpeedUpButtonClicked(entity)
     local widgetUseItems = WidgetUseItems.new():Create({
-        item_type = WidgetUseItems.USE_TYPE.WAR_SPEEDUP_CLASS,
+        item_name = "warSpeedupClass_1",
         event = entity
     })
     widgetUseItems:AddToCurrentScene()
@@ -627,7 +625,7 @@ function GameUIWathTowerRegion:OnRetreatButtonClicked(entity,cb)
         end)
     elseif entity:GetType() == entity.ENTITY_TYPE.MARCH_OUT  or entity:GetType() == entity.ENTITY_TYPE.STRIKE_OUT then
         local widgetUseItems = WidgetUseItems.new():Create({
-            item_type = WidgetUseItems.USE_TYPE.RETREAT_TROOP,
+            item_name = "retreatTroop",
             event = entity
         })
         widgetUseItems:AddToCurrentScene()

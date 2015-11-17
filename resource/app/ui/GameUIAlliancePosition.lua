@@ -8,52 +8,15 @@ local GameUIAlliancePosition = class("GameUIAlliancePosition",WidgetPopDialog)
 function GameUIAlliancePosition:ctor()
     -- 根据是否处于联盟战状态构建不同UI
     local my_alliance = Alliance_Manager:GetMyAlliance()
-    local enemy_alliance = Alliance_Manager:GetEnemyAlliance()
-    local isFight = my_alliance:Status() == "peace" or my_alliance:Status() == "protect"
-    local height = isFight and 258 or 386
+    local height = 258
     GameUIAlliancePosition.super.ctor(self,height,_("定位坐标"),window.top-200)
     local body = self.body
-    if isFight then
-        -- 联盟名字
-        UIKit:ttfLabel({
-            text = "["..my_alliance:Tag().."]"..my_alliance:Name(),
-            size = 20,
-            color = 0x514d3e,
-        }):align(display.CENTER, 304, 225):addTo(body)
-    else
-        local checkbox_image = {
-            off = "checkbox_unselected.png",
-            off_pressed = "checkbox_unselected.png",
-            off_disabled = "checkbox_unselected.png",
-            on = "checkbox_selectd.png",
-            on_pressed = "checkbox_selectd.png",
-            on_disabled = "checkbox_selectd.png",
-
-        }
-        local group = cc.ui.UICheckBoxButtonGroup.new(display.TOP_TO_BOTTOM)
-            :addButton(cc.ui.UICheckBoxButton.new(checkbox_image)
-                :setButtonLabel(UIKit:ttfLabel({
-                    text = "["..my_alliance:Tag().."]"..my_alliance:Name(),
-                    size = 20,
-                    color = 0x514d3e,
-                }))
-                :setButtonLabelOffset(50,0)
-                :align(display.LEFT_CENTER))
-            :addButton(cc.ui.UICheckBoxButton.new(checkbox_image)
-                :setButtonLabel(UIKit:ttfLabel({
-                    text = "["..enemy_alliance:Tag().."]"..enemy_alliance:Name(),
-                    size = 20,
-                    color = 0x514d3e,
-                }))
-                :setButtonLabelOffset(50,0)
-                :align(display.LEFT_CENTER))
-            :addTo(body)
-        group:setButtonsLayoutMargin(10, 0, 0, 0)
-            :setLayoutSize(100, 140)
-            :align(display.CENTER, 22 , height - 156)
-        group:getButtonAtIndex(1):setButtonSelected(true)
-        self.check_boxes = group
-    end
+    -- 联盟名字
+    UIKit:ttfLabel({
+        text = "["..my_alliance.basicInfo.tag.."]"..my_alliance.basicInfo.name,
+        size = 20,
+        color = 0x514d3e,
+    }):align(display.CENTER, 304, 225):addTo(body)
 
 
 
@@ -61,14 +24,15 @@ function GameUIAlliancePosition:ctor()
         :align(display.CENTER,304, 140):addTo(body)
 
     -- 最大坐标
-    local max = GameDatas.AllianceInitData.intInit.allianceRegionMapWidth.value
+    local max = GameDatas.AllianceInitData.intInit.bigMapLength.value * GameDatas.AllianceInitData.intInit.allianceRegionMapWidth.value
+              
     local min = 1
     local function edit(event, editbox)
         local text = tonumber(editbox:getText()) or min
         if event == "began" then
-            -- if min==text then
-            --     editbox:setText("1")
-            -- end
+        -- if min==text then
+        --     editbox:setText("1")
+        -- end
         elseif event == "changed" then
             if text then
                 if text > max then
@@ -94,7 +58,7 @@ function GameUIAlliancePosition:ctor()
         font = UIKit:getFontFilePath(),
         listener = edit
     })
-    editbox_x:setMaxLength(2)
+    editbox_x:setMaxLength(4)
     editbox_x:setFont(UIKit:getEditBoxFont(),22)
     editbox_x:setFontColor(cc.c3b(0,0,0))
     editbox_x:setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
@@ -115,7 +79,7 @@ function GameUIAlliancePosition:ctor()
         font = UIKit:getEditBoxFont(),
         listener = edit
     })
-    editbox_y:setMaxLength(2)
+    editbox_y:setMaxLength(4)
     editbox_y:setFont(UIKit:getFontFilePath(),22)
     editbox_y:setFontColor(cc.c3b(0,0,0))
     editbox_y:setInputMode(cc.EDITBOX_INPUT_MODE_NUMERIC)
@@ -135,17 +99,10 @@ function GameUIAlliancePosition:ctor()
                 end
                 local map_layer = display.getRunningScene():GetSceneLayer()
                 local alliance_id
-                if self.check_boxes then
-                    local select_index = self.check_boxes:getButtonAtIndex(1):isButtonSelected() and 1 or self.check_boxes:getButtonAtIndex(2):isButtonSelected() and 2
-                    if select_index == 1 then
-                        alliance_id = my_alliance:Id()
-                    else
-                        alliance_id = enemy_alliance:Id()
-                    end
-                end
-
-                local point = map_layer:ConvertLogicPositionToMapPosition(editbox_x:getText(),editbox_y:getText(),alliance_id)
+                local mapIndex , rx , ry = DataUtils:GetAlliancePosition(x, y)
+                local point = map_layer:RealPosition(mapIndex,rx,ry)
                 map_layer:GotoMapPositionInMiddle(point.x,point.y)
+
                 self:removeFromParent(true)
             end
         end)
@@ -167,6 +124,9 @@ function GameUIAlliancePosition:onExit()
 end
 
 return GameUIAlliancePosition
+
+
+
 
 
 

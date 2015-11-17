@@ -27,11 +27,9 @@ function GameUITownHall:OnMoveInStage()
     self:UpdateDwellingCondition()
 end
 function GameUITownHall:onExit()
-    app.timer:RemoveListener(self)
-    User:RemoveListenerOnType(self, User.LISTEN_TYPE.DALIY_QUEST_REFRESH)
-    User:RemoveListenerOnType(self, User.LISTEN_TYPE.NEW_DALIY_QUEST)
-    User:RemoveListenerOnType(self, User.LISTEN_TYPE.NEW_DALIY_QUEST_EVENT)
-    self.town_hall:RemoveUpgradeListener(self)
+    User:RemoveListenerOnType(self, "dailyQuests")
+    User:RemoveListenerOnType(self, "dailyQuestEvents")
+    User:RemoveListenerOnType(self, "buildingEvents")
     GameUITownHall.super.onExit(self)
 end
 
@@ -68,9 +66,6 @@ function GameUITownHall:CreateDwelling()
     self.admin_layer = admin_layer
 end
 function GameUITownHall:CreateAdministration()
-    -- 获取任务
-    local daily_quests = User:GetDailyQuests()
-
     self.quest_items = {}
     local admin_layer = self.admin_layer
 
@@ -105,14 +100,30 @@ function GameUITownHall:CreateAdministration()
     })
     listnode:align(display.BOTTOM_CENTER, layer_width/2, 20):addTo(admin_layer)
     self.quest_list_view = list_view
+    -- 获取任务
+    self:CreateAllQuests(User:GetDailyQuests())
+    User:AddListenOnType(self, "dailyQuests")
+    User:AddListenOnType(self, "dailyQuestEvents")
+    User:AddListenOnType(self, "buildingEvents")
 
-    self:CreateAllQuests(daily_quests)
-    -- 添加到全局计时器中
-    app.timer:AddListener(self)
-    User:AddListenOnType(self, User.LISTEN_TYPE.DALIY_QUEST_REFRESH)
-    User:AddListenOnType(self, User.LISTEN_TYPE.NEW_DALIY_QUEST)
-    User:AddListenOnType(self, User.LISTEN_TYPE.NEW_DALIY_QUEST_EVENT)
-    self.town_hall:AddUpgradeListener(self)
+    scheduleAt(self, function()
+        local current_time = app.timer:GetServerTime()
+        if self.refresh_time then
+            if (User:GetNextDailyQuestsRefreshTime()-current_time) <= 0 then
+                self:ResetQuest()
+            else
+                self.refresh_time:setString(GameUtils:formatTimeStyle1(User:GetNextDailyQuestsRefreshTime()-current_time))
+            end
+        end
+
+        for __,item in pairs(self.quest_items) do
+            local quest = item:GetQuest()
+            if quest and User:IsQuestStarted(quest) and not User:IsQuestFinished(quest) then
+                local show_time = quest.finishTime/1000-current_time <0 and 0 or quest.finishTime/1000-current_time
+                item:SetProgress(GameUtils:formatTimeStyle1(show_time), 100-(quest.finishTime-current_time*1000)/(quest.finishTime-quest.startTime)*100 )
+            end
+        end
+    end)
 end
 
 function GameUITownHall:CreateAllQuests(daily_quests)
@@ -160,7 +171,7 @@ function GameUITownHall:CreateQuestItem(quest,index)
     )
         :addTo(title_bg):align(display.RIGHT_CENTER, title_bg:getContentSize().width-10, title_bg:getContentSize().height/2)
         :onButtonClicked(function(event)
-            if intInit.dailyQuestAddStarNeedGemCount.value > User:GetGemResource():GetValue() then
+            if intInit.dailyQuestAddStarNeedGemCount.value > User:GetGemValue() then
                 UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
                     {
                         listener = function ()
@@ -203,7 +214,7 @@ function GameUITownHall:CreateQuestItem(quest,index)
         color = 0x403c2f,
     }):align(display.LEFT_CENTER,icon_bg:getPositionX()+ icon_bg:getContentSize().width - 40, icon_bg:getPositionY()-20):addTo(body)
 
-    local progress = WidgetProgress.new(UIKit:hex2c3b(0xffedae), "progress_bar_272x40_1.png", "progress_bar_272x40_2.png", {
+    local progress = WidgetProgress.new(0xffedae, "progress_bar_272x40_1.png", "progress_bar_272x40_2.png", {
         icon_bg = "back_ground_43x43.png",
         icon = "hourglass_30x38.png",
         bar_pos = {x = 0,y = 0}
@@ -250,7 +261,6 @@ function GameUITownHall:CreateQuestItem(quest,index)
                         GameGlobalUI:showTips(_("每日任务完成"),_("获得")..re_desc)
 
                     end)
-                    TownHallUI.isFinishedQuest = false
                 end)
             else
                 control_btn:setButtonImage(cc.ui.UIPushButton.NORMAL, "green_btn_up_148x58.png", true)
@@ -280,11 +290,11 @@ function GameUITownHall:CreateQuestItem(quest,index)
                     text  = _("开始")
                 })
             ):onButtonClicked(function(event)
-                if TownHallUI.isFinishedQuest then
+                if User:CouldGotDailyQuestReward() then
                     UIKit:showMessageDialog(_("主人"),_("请先领取已经完成的任务的奖励"))
                     return
                 end
-                if TownHallUI.started_quest_item then
+                if User:IsOnDailyQuestEvents() then
                     UIKit:showMessageDialog(_("主人"),_("已经有一个任务正在进行中"))
                     return
                 end
@@ -344,13 +354,6 @@ function GameUITownHall:CreateQuestItem(quest,index)
         self:SetReward(quest)
         self:SetStar(quest)
         need_time_label:setString(GameUtils:formatTimeStyle1(dailyQuestStar_config[quest.star].needMinutes*60))
-        if User:IsQuestStarted(quest) then
-            if User:IsQuestFinished(quest) then
-                TownHallUI.isFinishedQuest = true
-            else
-                TownHallUI.started_quest_item = self
-            end
-        end
     end
     item:Init(quest)
     item:SetStatus(quest)
@@ -392,7 +395,7 @@ function GameUITownHall:CreateDwellingLineItem(width,flag)
     }):addTo(node, 2):align(display.LEFT_CENTER, left + 10, 20)
 
     cc.ui.UILabel.new({
-        text = string.format("%s 5%% %s", _("增加"), _("城民增长")),
+        text = _("增加 5% 银币增长"),
         size = 20,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
@@ -416,26 +419,6 @@ function GameUITownHall:CreateDwellingLineItem(width,flag)
     end
     return node
 end
-
-function GameUITownHall:OnTimer(current_time)
-    if self.refresh_time then
-        if (User:GetNextDailyQuestsRefreshTime()-current_time) <= 0 then
-            self:ResetQuest()
-        else
-            self.refresh_time:setString(GameUtils:formatTimeStyle1(User:GetNextDailyQuestsRefreshTime()-current_time))
-        end
-    end
-
-    if self.started_quest_item and self.started_quest_item.GetQuest then
-        local quest = self.started_quest_item:GetQuest()
-        if User:IsQuestFinished(quest) then
-            self.started_quest_item = nil
-            return
-        end
-        local show_time = quest.finishTime/1000-current_time <0 and 0 or quest.finishTime/1000-current_time
-        self.started_quest_item:SetProgress(GameUtils:formatTimeStyle1(show_time), 100-(quest.finishTime-current_time*1000)/(quest.finishTime-quest.startTime)*100 )
-    end
-end
 function GameUITownHall:GetQuestItemById(questId)
     return self.quest_items[questId]
 end
@@ -447,32 +430,39 @@ end
 function GameUITownHall:ResetQuest()
     self.quest_items = {}
     self.quest_list_view:removeAllItems()
-    local daily_quests = User:GetDailyQuests()
-    self:CreateAllQuests(daily_quests)
+    self:CreateAllQuests(User:GetDailyQuests())
 end
-function GameUITownHall:OnDailyQuestsRefresh()
-    self:ResetQuest()
-end
-function GameUITownHall:OnNewDailyQuests(changed_map)
-    if changed_map.add then
-        for k,v in pairs(changed_map.add) do
+function GameUITownHall:OnUserDataChanged_dailyQuests(userData, deltaData)
+    if deltaData("dailyQuests.refreshTime") 
+        and deltaData("dailyQuests.quests") then
+        self:ResetQuest()
+    end
+
+    local ok, value = deltaData("dailyQuests.quests.add")
+    if ok then
+        for k,v in pairs(value) do
             self:CreateQuestItem(v)
         end
     end
-    if changed_map.edit then
-        for k,v in pairs(changed_map.edit) do
+
+    local ok, value = deltaData("dailyQuests.quests.edit")
+    if ok then
+        for k,v in pairs(value) do
             local quest_item = self:GetQuestItemById(v.id)
             quest_item:Init(v)
         end
     end
-    if changed_map.remove then
-        for k,v in pairs(changed_map.remove) do
+
+    local ok, value = deltaData("dailyQuests.quests.remove")
+    if ok then
+        for k,v in pairs(value) do
             self:RemoveQuestItemById(v.id)
         end
     end
 end
-function GameUITownHall:OnNewDailyQuestsEvent(changed_map)
-    if changed_map.add then
+function GameUITownHall:OnUserDataChanged_dailyQuestEvents(userData, deltaData)
+    local ok, value = deltaData("dailyQuestEvents.add")
+    if ok then
         self:performWithDelay(function ()
             local finished_quest_num = 0
             for k,v in pairs(self.quest_items) do
@@ -480,34 +470,33 @@ function GameUITownHall:OnNewDailyQuestsEvent(changed_map)
                     finished_quest_num = finished_quest_num + 1
                 end
             end
-            for k,v in pairs(changed_map.add) do
+            for k,v in pairs(value) do
                 self:CreateQuestItem(v,finished_quest_num+1)
             end
             self.quest_list_view:reload()
         end, 0.3)
     end
-    if changed_map.edit then
-        for k,v in pairs(changed_map.edit) do
+
+    local ok, value = deltaData("dailyQuestEvents.edit")
+    if ok then
+        for k,v in pairs(value) do
             local quest_item = self:GetQuestItemById(v.id)
             quest_item:Init(v)
             self.quest_items[v.id]:SetStatus(v)
         end
     end
-    if changed_map.remove then
-        for k,v in pairs(changed_map.remove) do
+
+    local ok, value = deltaData("dailyQuestEvents.remove")
+    if ok then
+        for k,v in pairs(value) do
             self:RemoveQuestItemById(v.id)
         end
     end
 end
-
-function GameUITownHall:OnBuildingUpgradingBegin()
-end
-function GameUITownHall:OnBuildingUpgradeFinished()
+function GameUITownHall:OnUserDataChanged_buildingEvents(userData, deltaData)
     for k,v in pairs(self.quest_items) do
         v:SetReward()
     end
-end
-function GameUITownHall:OnBuildingUpgrading()
 end
 
 return GameUITownHall

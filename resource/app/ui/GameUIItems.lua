@@ -11,8 +11,6 @@ local Localize = import("..utils.Localize")
 local UIListView = import(".UIListView")
 local Localize_item = import("..utils.Localize_item")
 local UILib = import("..ui.UILib")
-local Item = import("..entity.Item")
-local MaterialManager = import("..entity.MaterialManager")
 local WidgetUseItems = import("..widget.WidgetUseItems")
 
 local GameUIItems = UIKit:createUIClass("GameUIItems","GameUIWithCommonHeader")
@@ -57,8 +55,7 @@ function GameUIItems:OnMoveInStage()
             end
         end
     end):pos(window.cx, window.bottom + 34)
-
-    ItemManager:AddListenOnType(self,ItemManager.LISTEN_TYPE.ITEM_CHANGED)
+    self.city:GetUser():AddListenOnType(self, "items")
 end
 function GameUIItems:CreateBetweenBgAndTitle()
     GameUIItems.super.CreateBetweenBgAndTitle(self)
@@ -68,7 +65,7 @@ function GameUIItems:CreateBetweenBgAndTitle()
     self.myItems_layer = cc.Layer:create():addTo(self:GetView())
 end
 function GameUIItems:onExit()
-    ItemManager:RemoveListenerOnType(self,ItemManager.LISTEN_TYPE.ITEM_CHANGED)
+    self.city:GetUser():RemoveListenerOnType(self, "items")
     GameUIItems.super.onExit(self)
 end
 
@@ -133,10 +130,10 @@ function GameUIItems:sourceDelegate(listView, tag, idx)
         end
     end
 end
-function GameUIItems:FilterShopItems( items )
+function GameUIItems:FilterShopItems( items_info )
     local f_items = {}
-    for i,v in ipairs(items) do
-        if v:IsSell() then
+    for i,v in ipairs(items_info) do
+        if v.isSell then
             table.insert(f_items, v)
         end
     end
@@ -144,17 +141,18 @@ function GameUIItems:FilterShopItems( items )
 end
 function GameUIItems:GetShopItemByTag(tag)
     if tag == 'menu_1' then
-        return self:FilterShopItems(ItemManager:GetSpecialItems())
+        return self:FilterShopItems(UtilsForItem:GetSpecialItemsInfo())
     elseif tag == 'menu_2' then
-        return self:FilterShopItems(ItemManager:GetBuffItems())
+        return self:FilterShopItems(UtilsForItem:GetBuffItemsInfo())
     elseif tag == 'menu_3' then
-        return  self:FilterShopItems(ItemManager:GetResourcetItems())
+        return  self:FilterShopItems(UtilsForItem:GetResourcetItemsInfo())
     elseif tag == 'menu_4' then
-        return self:FilterShopItems(ItemManager:GetSpeedUpItems())
+        return self:FilterShopItems(UtilsForItem:GetSpeedUpItemsInfo())
     end
 end
 function GameUIItems:CreateShopContentByIndex( idx )
-    local items = self:GetShopItemByTag(self.shop_select_tag)[idx]
+    local User = self.city:GetUser()
+    local item_info = self:GetShopItemByTag(self.shop_select_tag)[idx]
 
     local item_width,item_height = 568,212
 
@@ -169,7 +167,7 @@ function GameUIItems:CreateShopContentByIndex( idx )
         :addTo(title_bg)
 
     local own_num = UIKit:ttfLabel({
-        text = _("拥有")..":"..string.formatnumberthousands(items:Count()),
+        text = _("拥有")..":"..string.formatnumberthousands(User:GetItemCount(item_info.name)),
         size = 22,
         color = 0x403c2f,
     }):align(display.LEFT_CENTER, 154 , 130)
@@ -187,29 +185,31 @@ function GameUIItems:CreateShopContentByIndex( idx )
         :addTo(desc_bg)
     local item_bg = display.newSprite("box_118x118.png"):addTo(content):align(display.TOP_CENTER,  70, item_height-10)
     local parent = self
-    function content:SetOwnCount( new_item )
-        own_num:setString(_("拥有")..":"..string.formatnumberthousands(new_item:Count()))
-        if not parent:IsItemCouldUseInShop(new_item) or new_item:Count()<1 then
+    function content:SetOwnCount( name_item )
+        local count = User:GetItemCount(name_item)
+        own_num:setString(_("拥有")..":"..string.formatnumberthousands(count))
+        if not parent:IsItemCouldUseInShop(name_item) or 
+            count < 1 then
             self.use_button:setButtonEnabled(false)
         else
             self.use_button:setButtonEnabled(true)
         end
     end
     function content:SetData( idx )
-        local items = parent:GetShopItemByTag(parent.shop_select_tag)[idx]
-        local item_iamge = UILib.item[items:Name()]
+        local item_info = parent:GetShopItemByTag(parent.shop_select_tag)[idx]
+        local item_iamge = UILib.item[item_info.name]
 
         if item_iamge then
             if self.item_icon then
                 item_bg:removeChild(self.item_icon, true)
             end
-            local item_icon = display.newSprite(UILib.item[items:Name()]):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
+            local item_icon = display.newSprite(UILib.item[item_info.name]):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
 
             item_icon:scale(100/item_icon:getContentSize().width)
             self.item_icon = item_icon
         end
-        desc:setString(items:GetLocalizeDesc())
-        item_name:setString(items:GetLocalizeName())
+        desc:setString(UtilsForItem:GetItemDesc(item_info.name))
+        item_name:setString(UtilsForItem:GetItemLocalize(item_info.name))
         if self.button then
             self:removeChild(self.button, true)
         end
@@ -223,7 +223,7 @@ function GameUIItems:CreateShopContentByIndex( idx )
             :setButtonLabelOffset(0, 16)
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
-                    if items:Price() > User:GetGemResource():GetValue() then
+                    if item_info.price > User:GetGemValue() then
                         UIKit:showMessageDialog(_("提示"),_("金龙币不足"))
                             :CreateOKButton(
                                 {
@@ -235,11 +235,11 @@ function GameUIItems:CreateShopContentByIndex( idx )
                             )
                     else
                         if app:GetGameDefautlt():IsOpenGemRemind() then
-                            UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),string.formatnumberthousands(items:Price())), function()
-                                NetManager:getBuyItemPromise(items:Name(),1)
+                            UIKit:showConfirmUseGemMessageDialog(_("提示"),string.format(_("是否消费%s金龙币"),string.formatnumberthousands(item_info.price)), function()
+                                NetManager:getBuyItemPromise(item_info.name,1)
                             end,true,true)
                         else
-                            NetManager:getBuyItemPromise(items:Name(),1)
+                            NetManager:getBuyItemPromise(item_info.name,1)
                         end
                     end
                 end
@@ -251,7 +251,7 @@ function GameUIItems:CreateShopContentByIndex( idx )
         -- gem icon
         local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(num_bg):align(display.CENTER, 20, num_bg:getContentSize().height/2):scale(0.6)
         local price = UIKit:ttfLabel({
-            text = string.formatnumberthousands(items:Price()),
+            text = string.formatnumberthousands(item_info.price),
             size = 18,
             color = 0xffd200,
         }):align(display.LEFT_CENTER, 50 , num_bg:getContentSize().height/2)
@@ -270,42 +270,43 @@ function GameUIItems:CreateShopContentByIndex( idx )
             }))
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
-                    parent:UseItemFunc(items)
+                    parent:UseItemFunc(item_info.name)
                 end
             end)
             :align(display.LEFT_BOTTOM, 14, 16)
             :addTo(self)
-        if not parent:IsItemCouldUseInShop(items) or items:Count()<1 then
+        if not parent:IsItemCouldUseInShop(item_info.name) 
+            or User:GetItemCount(item_info.name) < 1 then
             self.use_button:setButtonEnabled(false)
         end
-        self:SetOwnCount( items )
+        self:SetOwnCount( item_info.name )
     end
     return content
 end
-function GameUIItems:IsItemCouldUseInShop(items)
-    if items:Category()~=Item.CATEGORY.SPEEDUP
-        and items:Name()~="movingConstruction"
-        and items:Name()~="torch"
-        and items:Name()~="retreatTroop"
-        and items:Name()~="moveTheCity"
-        and items:Name()~="chestKey_2"
-        and items:Name()~="chestKey_3"
-        and items:Name()~="chestKey_4"
-        and items:Name()~="sweepScroll"
+function GameUIItems:IsItemCouldUseInShop(item_name)
+    if not UtilsForItem:IsSpeedUpItem(item_name)
+        and item_name ~= "movingConstruction"
+        and item_name ~= "torch"
+        and item_name ~= "retreatTroop"
+        and item_name ~= "moveTheCity"
+        and item_name ~= "chestKey_2"
+        and item_name ~= "chestKey_3"
+        and item_name ~= "chestKey_4"
+        and item_name ~= "sweepScroll"
     then
         return true
     end
 end
-function GameUIItems:IsItemCouldUseNow(items)
-    if items:Name()~="changePlayerName"
-        and items:Name()~="changeCityName"
-        and items:Name()~="dragonExp_1"
-        and items:Name()~="dragonExp_2"
-        and items:Name()~="dragonExp_3"
-        and items:Name()~="dragonHp_1"
-        and items:Name()~="dragonHp_2"
-        and items:Name()~="dragonHp_3"
-        and items:Name()~="sweepScroll"
+function GameUIItems:IsItemCouldUseNow(item_name)
+    if      item_name ~= "changePlayerName"
+        and item_name ~= "changeCityName"
+        and item_name ~= "dragonExp_1"
+        and item_name ~= "dragonExp_2"
+        and item_name ~= "dragonExp_3"
+        and item_name ~= "dragonHp_1"
+        and item_name ~= "dragonHp_2"
+        and item_name ~= "dragonHp_3"
+        and item_name ~= "sweepScroll"
     then
         return true
     end
@@ -340,10 +341,11 @@ function GameUIItems:ReloadMyItemsList( tag ,isRefresh)
         self.myItems_listview:reload()
     end
 end
-function GameUIItems:FilterMyItems( items )
+function GameUIItems:FilterMyItems( items_info )
+    local User = self.city:GetUser()
     local f_items = {}
-    for i,v in ipairs(items) do
-        if v:Count() > 0 then
+    for _,v in ipairs(items_info) do
+        if User:GetItemCount(v.name) > 0 then
             table.insert(f_items, v)
         end
     end
@@ -351,13 +353,13 @@ function GameUIItems:FilterMyItems( items )
 end
 function GameUIItems:GetMyItemByTag(tag)
     if tag == 'menu_1' then
-        return self:FilterMyItems(ItemManager:GetSpecialItems())
+        return self:FilterMyItems(UtilsForItem:GetSpecialItemsInfo())
     elseif tag == 'menu_2' then
-        return self:FilterMyItems(ItemManager:GetBuffItems())
+        return self:FilterMyItems(UtilsForItem:GetBuffItemsInfo())
     elseif tag == 'menu_3' then
-        return  self:FilterMyItems(ItemManager:GetResourcetItems())
+        return  self:FilterMyItems(UtilsForItem:GetResourcetItemsInfo())
     elseif tag == 'menu_4' then
-        return self:FilterMyItems(ItemManager:GetSpeedUpItems())
+        return self:FilterMyItems(UtilsForItem:GetSpeedUpItemsInfo())
     end
 end
 function GameUIItems:myItemSourceDelegate(listView, tag, idx)
@@ -391,7 +393,8 @@ function GameUIItems:myItemSourceDelegate(listView, tag, idx)
     end
 end
 function GameUIItems:CreateMyItemContentByIndex( idx )
-    local items = self:GetMyItemByTag(self.my_item_tag)[idx]
+    local User = self.city:GetUser()
+    local item_info = self:GetMyItemByTag(self.my_item_tag)[idx]
     local item_width,item_height = 568,164
 
     local content = WidgetUIBackGround.new({width = item_width,height=item_height},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
@@ -399,14 +402,14 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
     local title_bg = display.newScale9Sprite("title_blue_430x30.png",item_width/2+66,item_height-28,cc.size(428,30),cc.rect(15,10,400,10))
         :addTo(content)
     local item_name = UIKit:ttfLabel({
-        text = items:GetLocalizeName(),
+        text = UtilsForItem:GetItemLocalize(item_info.name),
         size = 22,
         color = 0xffedae,
     }):align(display.LEFT_CENTER, 16 , title_bg:getContentSize().height/2)
         :addTo(title_bg)
 
     local desc = UIKit:ttfLabel({
-        text = items:GetLocalizeDesc(),
+        text = UtilsForItem:GetItemDesc(item_info.name),
         size = 18,
         color = 0x615b44,
         dimensions = cc.size(260,0)
@@ -420,7 +423,7 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
 
 
     local own_num = UIKit:ttfLabel({
-        text = _("拥有")..string.formatnumberthousands(items:Count()),
+        text = _("拥有")..string.formatnumberthousands(User:GetItemCount(item_info.name)),
         size = 20,
         color = 0x403c2f,
     }):align(display.CENTER, num_bg:getContentSize().width/2 , num_bg:getContentSize().height/2)
@@ -433,24 +436,24 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
         own_num:setString(_("拥有")..string.formatnumberthousands(count))
     end
     function content:SetData( idx )
-        local items = parent:GetMyItemByTag(parent.my_item_tag)[idx]
-        self:SetOwnCount(string.formatnumberthousands(items:Count()))
-        local item_image =UILib.item[items:Name()]
+        local item_info = parent:GetMyItemByTag(parent.my_item_tag)[idx]
+        self:SetOwnCount(User:GetItemCount(item_info.name))
+        local item_image =UILib.item[item_info.name]
         if item_image then
             if self.item_icon then
                 item_bg:removeChild(self.item_icon, true)
             end
-            local item_icon = display.newSprite(UILib.item[items:Name()]):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
+            local item_icon = display.newSprite(UILib.item[item_info.name]):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2)
 
             item_icon:scale(100/item_icon:getContentSize().width)
             self.item_icon = item_icon
         end
-        desc:setString(items:GetLocalizeDesc())
-        item_name:setString(items:GetLocalizeName())
+        item_name:setString(UtilsForItem:GetItemLocalize(item_info.name))
+        desc:setString(UtilsForItem:GetItemDesc(item_info.name))
         if self.button then
             self:removeChild(self.button, true)
         end
-        if parent:IsItemCouldUseInShop(items) then
+        if parent:IsItemCouldUseInShop(item_info.name) then
             self.button = cc.ui.UIPushButton.new({normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"})
                 :setButtonLabel(UIKit:ttfLabel({
                     text = _("使用"),
@@ -460,7 +463,7 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
                 }))
                 :onButtonClicked(function(event)
                     if event.name == "CLICKED_EVENT" then
-                        parent:UseItemFunc(items)
+                        parent:UseItemFunc(item_info.name)
                     end
                 end)
                 :align(display.RIGHT_BOTTOM, item_width-10, 15)
@@ -469,44 +472,49 @@ function GameUIItems:CreateMyItemContentByIndex( idx )
     end
     return content
 end
-function GameUIItems:UseItemFunc( items )
-    if self:IsItemCouldUseNow(items) then
-        local name = items:Name()
+function GameUIItems:UseItemFunc( item_name )
+    local User = self.city:GetUser()
+    if self:IsItemCouldUseNow(item_name) then
         -- 使用巨龙宝箱会获得龙装备材料，需要提示
         local clone_dragon_materials
-        if string.find(name,"dragonChest") then
-            clone_dragon_materials = clone(self.city:GetMaterialManager():GetMaterialsByType(MaterialManager.MATERIAL_TYPE.DRAGON))
+        if string.find(item_name,"dragonChest") then
+            clone_dragon_materials = clone(User.dragonMaterials)
         end
         -- 木,铜,银,金宝箱
-        local clone_items
-        if string.find(name,"chest") then
+        if string.find(item_name,"chest") then
             -- 需要对应的钥匙
-            if name == "chest_2" then
-                if ItemManager:GetItemByName("chestKey_2"):Count() < 1 then
+            if item_name == "chest_2" then
+                if User:GetItemCount("chestKey_2") < 1 then
                     UIKit:showMessageDialog(_("主人"),_("开启铜宝箱需要铜钥匙"))
                     return
                 end
-            elseif name == "chest_3" then
-                if ItemManager:GetItemByName("chestKey_3"):Count() < 1 then
+            elseif item_name == "chest_3" then
+                if User:GetItemCount("chestKey_3") < 1 then
                     UIKit:showMessageDialog(_("主人"),_("开启银宝箱需要银钥匙"))
                     return
                 end
-            elseif name == "chest_4" then
-                if ItemManager:GetItemByName("chestKey_4"):Count() < 1 then
+            elseif item_name == "chest_4" then
+                if User:GetItemCount("chestKey_4") < 1 then
                     UIKit:showMessageDialog(_("主人"),_("开启金宝箱需要金钥匙"))
                     return
                 end
             end
-            clone_items = clone(ItemManager:GetItems())
         end
 
-        if items:Category() == items.CATEGORY.RESOURCE then
-            UIKit:newWidgetUI("WidgetUseMutiItems", items):AddToCurrentScene()
+        if UtilsForItem:IsResourceItem(item_name) then
+            if User:GetItemCount(item_name) > 1 then
+                UIKit:newWidgetUI("WidgetUseMutiItems", item_name):AddToCurrentScene()
+            else
+                NetManager:getUseItemPromise(item_name,{
+                    [item_name] = {count = User:GetItemCount(item_name)}
+                })
+            end
         else
-            NetManager:getUseItemPromise(items:Name(),{}):done(function (response)
+            local clone_items = clone(User.items)
+            NetManager:getUseItemPromise(item_name,{}):done(function (response)
                 local message = ""
                 local awards = {}
-                if string.find(name,"dragonChest") then
+                if string.find(item_name,"dragonChest") then
                     for i,v in ipairs(response.msg.playerData) do
                         if string.find(v[1],"dragonMaterials") then
                             local m_name = string.split(v[1], ".")[2]
@@ -516,12 +524,12 @@ function GameUIItems:UseItemFunc( items )
                         end
                     end
                     -- GameGlobalUI:showTips(_("获得"),message)
-                elseif string.find(name,"chest") then
-                    LuaUtils:outputTable("name", response)
+                elseif string.find(item_name,"chest") then
+                    LuaUtils:outputTable("item_name", response)
                     for i,v in ipairs(response.msg.playerData) do
                         if tolua.type(v[2]) == "table" then
                             local m_name = v[2].name
-                            local m_count = v[2].count - clone_items[v[2].name]:Count()
+                            local m_count = v[2].count - UtilsForItem:GetItemCount(clone_items, m_name)
                             message = message .. Localize_item.item_name[m_name].."x"..m_count.." "
                             table.insert(awards, {name = m_name, count = m_count})
                         end
@@ -529,46 +537,29 @@ function GameUIItems:UseItemFunc( items )
                     -- GameGlobalUI:showTips(_("获得"),message)
                 end
                 -- 提示统一动画播放之后提示
-                UIKit:PlayUseItemAni(items,awards,message)
+                UIKit:PlayUseItemAni(item_name,awards,message)
             end)
         end
 
     else
         local dialog = WidgetUseItems.new():Create({
-            item = items
+            item_name = item_name
         })
         if dialog then
             dialog:AddToCurrentScene()
         end
     end
 end
-function GameUIItems:OnItemsChanged( changed_map )
-    if changed_map[1] and #changed_map[1] > 0  then
-        if self.myItems_layer:isVisible() then
-            self:ReloadMyItemsList( self.my_item_tag , true)
-        end
-        if self.shop_layer:isVisible() then
-            self:ReloadShopList( self.shop_select_tag, true)
-        end
+function GameUIItems:OnUserDataChanged_items( userData, deltaData )
+    if self.myItems_layer:isVisible() then
+        self:ReloadMyItemsList( self.my_item_tag , true)
     end
-    if changed_map[2] and #changed_map[2] > 0 then
-        if self.myItems_layer:isVisible() then
-            self:ReloadMyItemsList( self.my_item_tag, true)
-        end
-        if self.shop_layer:isVisible() then
-            self:ReloadShopList( self.shop_select_tag, true)
-        end
-    end
-    if changed_map[3] and #changed_map[3] > 0 then
-        if self.myItems_layer:isVisible() then
-            self:ReloadMyItemsList( self.my_item_tag, true)
-        end
-        if self.shop_layer:isVisible() then
-            self:ReloadShopList( self.shop_select_tag, true)
-        end
+    if self.shop_layer:isVisible() then
+        self:ReloadShopList( self.shop_select_tag, true)
     end
 end
 return GameUIItems
+
 
 
 

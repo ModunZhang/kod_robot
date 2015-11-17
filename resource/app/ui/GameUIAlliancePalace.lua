@@ -4,7 +4,6 @@ local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetAllianceBuildingUpgrade = import("..widget.WidgetAllianceBuildingUpgrade")
 local GameUIAlliancePalace = UIKit:createUIClass('GameUIAlliancePalace', "GameUIAllianceBuilding")
 local UIListView = import(".UIListView")
-local Flag = import("..entity.Flag")
 local NetService = import('..service.NetService')
 local Alliance = import("..entity.Alliance")
 local WidgetInfoWithTitle = import("..widget.WidgetInfoWithTitle")
@@ -52,8 +51,8 @@ function GameUIAlliancePalace:OnMoveInStage()
     end):pos(window.cx, window.bottom + 34)
 
     local alliance = self.alliance
-    alliance:AddListenOnType(self,Alliance.LISTEN_TYPE.BASIC)
-    alliance:AddListenOnType(self,Alliance.LISTEN_TYPE.MEMBER)
+    alliance:AddListenOnType(self,"basicInfo")
+    alliance:AddListenOnType(self,"members")
 end
 function GameUIAlliancePalace:CreateBetweenBgAndTitle()
     GameUIAlliancePalace.super.CreateBetweenBgAndTitle(self)
@@ -75,8 +74,8 @@ function GameUIAlliancePalace:CreateBetweenBgAndTitle()
 end
 function GameUIAlliancePalace:onExit()
     local alliance = self.alliance
-    alliance:RemoveListenerOnType(self,Alliance.LISTEN_TYPE.BASIC)
-    alliance:RemoveListenerOnType(self,Alliance.LISTEN_TYPE.MEMBER)
+    alliance:RemoveListenerOnType(self,"basicInfo")
+    alliance:RemoveListenerOnType(self,"members")
     GameUIAlliancePalace.super.onExit(self)
 end
 
@@ -226,7 +225,7 @@ function GameUIAlliancePalace:OpenAwardDialog(member)
     -- 荣耀值
     local honour_icon = display.newSprite("honour_128x128.png"):align(display.CENTER,50,60):addTo(body):scale(42/128)
     local current_honour_label = UIKit:ttfLabel({
-        text = GameUtils:formatNumber(self.alliance:Honour()),
+        text = GameUtils:formatNumber(self.alliance.basicInfo.honour),
         size = 22,
         color = 0x403c2f,
     }):addTo(body):align(display.LEFT_CENTER,honour_icon:getPositionX()+20,honour_icon:getPositionY())
@@ -259,7 +258,7 @@ function GameUIAlliancePalace:OpenAwardDialog(member)
         :addTo(slider_bg)
 
     -- slider
-    local slider = WidgetSliderWithInput.new({max = self.alliance:Honour()})
+    local slider = WidgetSliderWithInput.new({max = self.alliance.basicInfo.honour})
         :addTo(slider_bg)
         :align(display.CENTER, slider_bg:getContentSize().width/2,  65)
         :OnSliderValueChanged(function(event)
@@ -328,7 +327,7 @@ function GameUIAlliancePalace:GetHonourNode(honour)
     display.newSprite("honour_128x128.png"):align(display.CENTER, 0, 0):addTo(node):scale(42/128)
     local honour_bg = display.newSprite("back_ground_114x36.png"):align(display.CENTER,80, 0):addTo(node)
     local honour_label = UIKit:ttfLabel({
-        text = GameUtils:formatNumber(honour or self.alliance:Honour()),
+        text = GameUtils:formatNumber(honour or self.alliance.basicInfo.honour),
         size = 20,
         color = 0x403c2f,
     }):addTo(honour_bg):align(display.CENTER,honour_bg:getContentSize().width/2,honour_bg:getContentSize().height/2)
@@ -434,7 +433,7 @@ function GameUIAlliancePalace:InitInfoPart()
         end)
         :align(display.CENTER, 57 , 90)
         :addTo(bg1)
-    self.select_terrian_index = self:MapTerrianToIndex(self.alliance:Terrain())
+    self.select_terrian_index = self:MapTerrianToIndex(self.alliance.basicInfo.terrain)
     group:getButtonAtIndex(self.select_terrian_index):setButtonSelected(true)
 
 
@@ -452,10 +451,12 @@ function GameUIAlliancePalace:InitInfoPart()
         }))
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
-                if need_honour>self.alliance:Honour() then
+                if need_honour > self.alliance.basicInfo.honour then
                     UIKit:showMessageDialog(_("提示"),_("联盟荣耀值不足"))
-                elseif self.alliance:Status() == "fight" then
+                elseif self.alliance.basicInfo.status == "fight" then
                     UIKit:showMessageDialog(_("提示"),_("战争期不能修改联盟地形"))
+                elseif self:MapIndexToTerrian(self.select_terrian_index) == self.alliance.basicInfo.terrain then
+                    UIKit:showMessageDialog(_("提示"),_("选择的新地形与当前地形相同"))
                 else
                     if self.alliance:GetSelf():CanEditAlliance() then
                         NetManager:getEditAllianceTerrianPromise(self:MapIndexToTerrian(self.select_terrian_index))
@@ -483,29 +484,29 @@ function GameUIAlliancePalace:InitInfoPart()
     }):addTo(layer)
         :align(display.BOTTOM_CENTER, window.cx, window.bottom_top+50)
 end
-function GameUIAlliancePalace:OnAllianceBasicChanged(alliance,changed_map)
-    if changed_map.honour then
-        local new = changed_map.honour.new
+function GameUIAlliancePalace:OnAllianceDataChanged_basicInfo(alliance,deltaData)
+    local ok, value = deltaData("basicInfo.honour")
+    if ok then
         if self.current_honour then
-            self.current_honour:RefreshHonour(new)
+            self.current_honour:RefreshHonour(value)
         end
     end
 end
-function GameUIAlliancePalace:OnMemberChanged(alliance,changed_map)
+function GameUIAlliancePalace:OnAllianceDataChanged_members(alliance,deltaData)
     self.sort_member = self:GetSortMembers()
-    if not changed_map then return end
-    if #changed_map[1]>0 then
+    if deltaData("members.add") then
         if self.award_menmber_listview then
             self.award_menmber_listview:asyncLoadWithCurrentPosition_()
         end
     end
-    if #changed_map[3]>0 then
+    if deltaData("members.remove") then
         if self.award_menmber_listview then
             self.award_menmber_listview:asyncLoadWithCurrentPosition_()
         end
     end
-    if changed_map[2] then
-        for k,v in pairs(changed_map[2]) do
+    if deltaData("members.edit") then
+    local ok, value = deltaData("members.edit")
+        for k,v in pairs(value) do
             if self.award_menmber_listview then
                 for i,listitem in ipairs(self.award_menmber_listview:getItems()) do
                     local content = listitem:getContent()

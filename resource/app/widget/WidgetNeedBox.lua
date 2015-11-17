@@ -76,12 +76,21 @@ function WidgetNeedBox:ctor()
         :align(display.CENTER, col4_x, row_y)
         :scale(0.8)
     self.time = cc.ui.UILabel.new({
-        size = 22,
+        size = 18,
         font = UIKit:getFontFilePath(),
         align = cc.ui.TEXT_ALIGN_RIGHT,
         color = UIKit:hex2c3b(0x403c2f)
     }):addTo(back_ground_556x56, 2)
-        :align(display.LEFT_CENTER, col4_x + label_relate_x, row_y + label_relate_y - 10)
+        :align(display.LEFT_CENTER, col4_x + label_relate_x, row_y + label_relate_y)
+
+    self.buff_reduce_time = cc.ui.UILabel.new({
+        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+        text = "(-00:00:00)",
+        font = UIKit:getFontFilePath(),
+        size = 18,
+        color = UIKit:hex2c3b(0x068329)
+    }):addTo(back_ground_556x56, 2)
+        :align(display.LEFT_CENTER, col4_x + label_relate_x - 5, row_y + label_relate_y - 20)
 end
 
 local GameUtils = GameUtils
@@ -90,6 +99,8 @@ function WidgetNeedBox:SetNeedNumber(wood, stone, iron, time)
     self.stone:SetCurrentAndNeed(unpack(stone))
     self.iron:SetCurrentAndNeed(unpack(iron))
     self.time:setString(GameUtils:formatTimeStyle1(time))
+    local effect = UtilsForTech:GetEffect("sketching", User.productionTechs["sketching"])
+    self.buff_reduce_time:setString("(-"..GameUtils:formatTimeStyle1(math.ceil(time *  effect))..")")
     return self
 end
 

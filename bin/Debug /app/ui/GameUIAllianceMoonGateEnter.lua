@@ -15,7 +15,7 @@ function GameUIAllianceMoonGateEnter:GetUITitle()
 end
 
 function GameUIAllianceMoonGateEnter:GetBuildingImage()
-    return UILib.alliance_building.moonGate
+    return self.isMyAlliance and UILib.alliance_building.moonGate or UILib.other_alliance_building.moonGate
 end
 
 function GameUIAllianceMoonGateEnter:GetBuildingType()

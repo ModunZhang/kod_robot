@@ -161,7 +161,6 @@ function BelvedereEntity:GetDestinationLocation()
 	elseif self:GetType() == self.ENTITY_TYPE.SHIRNE then
 		-- local location =  self:FindShrinePlayerTroops().location
 		-- return location.x .. "," .. location.y
-		local map_obj = Alliance_Manager:GetMyAlliance():GetAllianceShrine():GetShireObjectFromMap()
 		local x,y = map_obj:GetLogicPosition()
 		return string.format("%d,%d",x,y)
 	end
@@ -179,7 +178,6 @@ function BelvedereEntity:GetDestinationLocationNotString()
 	elseif self:GetType() == self.ENTITY_TYPE.HELPTO then
 		return self:WithObject().beHelpedPlayerData.location
 	elseif self:GetType() == self.ENTITY_TYPE.SHIRNE then
-		local map_obj = Alliance_Manager:GetMyAlliance():GetAllianceShrine():GetShireObjectFromMap()
 		local x,y = map_obj:GetLogicPosition()
 		return {x = x,y = y}
 	end

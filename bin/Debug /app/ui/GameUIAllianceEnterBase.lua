@@ -2,6 +2,7 @@
 -- Author: Danny He
 -- Date: 2014-12-29 11:34:54
 --
+local Alliance = import("..entity.Alliance")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPopDialog = import("..widget.WidgetPopDialog")
 local GameUIAllianceEnterBase = class("GameUIAllianceEnterBase",WidgetPopDialog)
@@ -11,22 +12,34 @@ local Localize = import("..utils.Localize")
 local WidgetUseItems = import("..widget.WidgetUseItems")
 
 -- building is allianceobject
-function GameUIAllianceEnterBase:ctor(building,isMyAlliance,my_alliance,enemy_alliance)
+function GameUIAllianceEnterBase:ctor(mapObj,alliance)
     GameUIAllianceEnterBase.super.ctor(self,self:GetUIHeight(),"",display.top-200)
-    self.building = building
-    self.my_alliance = my_alliance
-    self.isMyAlliance = isMyAlliance
-    self.enemy_alliance = enemy_alliance
+
+    self.my_alliance = Alliance_Manager:GetMyAlliance()
+    self.focus_alliance = alliance or self.my_alliance
+    self.mapObj = mapObj
+    self.isMyAlliance = mapObj.index == self.my_alliance:MapIndex()
+    self.building = self:GetMapObjectInfo() or mapObj
 end
 
 function GameUIAllianceEnterBase:IsMyAlliance()
     return self.isMyAlliance
 end
-
+function GameUIAllianceEnterBase:GetFocusAlliance()
+    return self.focus_alliance
+end
 function GameUIAllianceEnterBase:GetBuilding()
     return self.building
 end
-
+function GameUIAllianceEnterBase:GetMapObjectInfo()
+    for k,v in pairs(self.focus_alliance.mapObjects) do
+        local location = v.location
+        if location.x == self.mapObj.x and location.y == self.mapObj.y then
+            return v
+        end
+    end
+    return self.focus_alliance:GetAllianceBuildingInfoByName(self.mapObj.name)
+end
 function GameUIAllianceEnterBase:GetMyAlliance()
     return self.my_alliance
 end
@@ -74,20 +87,17 @@ function GameUIAllianceEnterBase:GetBuildingInfo()
 end
 
 function GameUIAllianceEnterBase:GetLogicPosition()
-    local building = self:GetBuilding()
-    local x,y = building:GetLogicPosition()
-    return {x = x , y = y}
+    return self:GetBuilding().location or {x = self:GetBuilding().x , y = self:GetBuilding().y}
 end
 
 function GameUIAllianceEnterBase:GetLocation()
-    local building = self:GetBuilding()
-    local x,y = building:GetLogicPosition()
+    local x,y = DataUtils:GetAbsolutePosition(self.focus_alliance.mapIndex, self.mapObj.x, self.mapObj.y)
     return x .. "," .. y
 end
 
 function GameUIAllianceEnterBase:GetTerrain()
     local alliance = self:IsMyAlliance() and self:GetMyAlliance() or self:GetEnemyAlliance()
-    return alliance:Terrain()
+    return alliance.basicInfo.terrain
 end
 
 function GameUIAllianceEnterBase:GetBuildImageSprite()
@@ -97,7 +107,7 @@ function GameUIAllianceEnterBase:GetBuildImageSprite()
         iceField = 480,
     }
     local x = postion[self:GetTerrain()]
-    local sprite = cc.Sprite:create("tmxmaps/terrain.png",cc.rect(x,0,480,480))
+    local sprite = cc.Sprite:create("tmxmaps/terrain1.png",cc.rect(x,0,480,480))
     sprite:setCascadeOpacityEnabled(true)
     return sprite
 end
@@ -113,7 +123,10 @@ end
 function GameUIAllianceEnterBase:IsShowBuildingBox()
     return true
 end
-
+-- 是否在对战的敌对联盟地图中
+function GameUIAllianceEnterBase:IsInFightAllianceMap()
+    return self:GetMyAlliance():GetEnemyAlliance() and self:GetMyAlliance():GetEnemyAlliance().alliance.id == self:GetFocusAlliance().id
+end
 function GameUIAllianceEnterBase:InitBuildingImage()
     local body = self:GetBody()
     if self:IsShowBuildingBox() then
@@ -121,11 +134,22 @@ function GameUIAllianceEnterBase:InitBuildingImage()
     end
     local sprite = self:GetBuildImageSprite()
     if not sprite then
-        local building_image = display.newSprite(self:GetBuildingImage())
-        local scale,x,y = self:GetBuildImageInfomation(building_image)
-        building_image:addTo(body):pos(x,y)
-        building_image:setAnchorPoint(cc.p(0.5,0.5))
-        building_image:setScale(scale)
+        local images = self:GetBuildingImage()
+        if tolua.type(images) ~= "table" then
+            local building_image = display.newSprite(images)
+            local scale,x,y = self:GetBuildImageInfomation(building_image)
+            building_image:addTo(body):pos(x,y)
+            building_image:setAnchorPoint(cc.p(0.5,0.5))
+            building_image:setScale(scale)
+        else
+            for i,image in ipairs(images) do
+                local building_image = display.newSprite(image)
+                local scale,x,y = self:GetBuildImageInfomation(building_image)
+                building_image:addTo(body):pos(x,y)
+                building_image:setAnchorPoint(cc.p(0.5,0.5))
+                building_image:setScale(scale)
+            end
+        end
     else
         local scale,x,y = self:GetBuildImageInfomation(sprite)
         sprite:setAnchorPoint(cc.p(0.5,0.5)):addTo(body):pos(x,y)
@@ -159,6 +183,7 @@ function GameUIAllianceEnterBase:GetLevelBg()
 end
 
 function GameUIAllianceEnterBase:GetLevelLabelText()
+    dump()
     return self:GetBuilding().level and _("等级") .. self:GetBuilding().level or ""
 end
 
@@ -294,13 +319,13 @@ end
 function GameUIAllianceEnterBase:GetEnterButtons()
     if self:IsMyAlliance() then
         local move_city_button = self:BuildOneButton("icon_move_player_city.png",_("迁移城市")):onButtonClicked(function()
-            if self:GetMyAlliance():Status() == 'fight' then
+            if self:GetMyAlliance().basicInfo.status == 'fight' then
                 UIKit:showMessageDialog(nil, _("战争期不能移动"),function()end)
                 return
             end
             local location = self:GetLogicPosition()
             WidgetUseItems.new():Create({
-                item_type = WidgetUseItems.USE_TYPE.MOVE_THE_CITY,
+                item_name = "moveTheCity",
                 locationX=location.x,
                 locationY=location.y
             }):AddToCurrentScene()

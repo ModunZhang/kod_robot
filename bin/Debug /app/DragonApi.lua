@@ -42,15 +42,15 @@ function DragonApi:MakeEquipment(force_equip_type)
         return
     end
     local black_smith = City:GetBuildingByLocationId(9)
-    if black_smith:IsMakingEquipment() then
+    if #User.dragonEquipmentEvents > 0 then
         -- 加速
         -- 随机使用事件加速道具
-        local making_event = black_smith:GetMakeEquipmentEvent()
+        local making_event = User.dragonEquipmentEvents[1]
         local speedUp_item_name = "speedup_"..math.random(8)
-        print("使用"..speedUp_item_name.."加速制造装备 ,id:",making_event:Id())
+        print("使用"..speedUp_item_name.."加速制造装备 ,id:",making_event.id)
         return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
             eventType = "dragonEquipmentEvents",
-            eventId = making_event:Id()
+            eventId = making_event.id
         }})
     else
         -- 制造装备
@@ -73,7 +73,6 @@ function DragonApi:MakeEquipment(force_equip_type)
         end
 
         local equip_config = EQUIPMENTS[equip_type]
-        local material_manager = city:GetMaterialManager()
         local matrials = LuaUtils:table_map(string.split(equip_config.materials, ","), function(k, v)
             return k, string.split(v, ":")
         end)
@@ -82,13 +81,22 @@ function DragonApi:MakeEquipment(force_equip_type)
             if not is_material_enough then
                 break
             end
-            material_manager:IteratorDragonMaterials(function (m_name,m_count)
+            for m_name,m_count in pairs(User.dragonEquipments) do
+                print("m_name,m_count=",m_name,m_count)
                 if m_name == v[1] then
                     if tonumber(v[2]) > m_count then
                         is_material_enough = false
                     end
                 end
-            end)
+            end
+            
+            -- material_manager:IteratorDragonMaterials(function (m_name,m_count)
+            --     if m_name == v[1] then
+            --         if tonumber(v[2]) > m_count then
+            --             is_material_enough = false
+            --         end
+            --     end
+            -- end)
         end
         if not is_material_enough  then
             return
@@ -116,10 +124,12 @@ function DragonApi:LoadEquipment()
         -- 没有装备完所有部位
         if not dragon:IsAllEquipmentsLoaded() then
             -- 当前已有的所有装备
-            local all_equipments = City:GetMaterialManager():GetEquipmentMaterias()
+            local all_equipments = User.dragonEquipments
+            dump(all_equipments,"all_equipments")
             for k,equi in pairs(dragon:Equipments()) do
                 -- 没有装备该部位
                 if not equi:IsLoaded() and not equi:IsLocked() then
+                    print("equi:GetCanLoadConfig().name=",equi:GetCanLoadConfig().name)
                     if all_equipments[equi:GetCanLoadConfig().name] > 0 then
                         print("装备龙装备",equi:Type(),equi:Body(),equi:GetCanLoadConfig().name)
                         return NetManager:getLoadDragonEquipmentPromise(equi:Type(),equi:Body(),equi:GetCanLoadConfig().name)
@@ -154,7 +164,7 @@ function DragonApi:ResetEqui()
         if not LuaUtils:table_empty(loaded_equi) then
             local reset_equi = loaded_equi[math.random(#loaded_equi)]
             -- 当前已有的所有装备
-            local all_equipments = City:GetMaterialManager():GetEquipmentMaterias()
+            local all_equipments = User.dragonEquipments
             if all_equipments[reset_equi:GetCanLoadConfig().name] > 0 then
                 print("重置装备属性",reset_equi:Type(),reset_equi:Body(),reset_equi:GetCanLoadConfig().name)
                 return NetManager:getResetDragonEquipmentPromise(reset_equi:Type(),reset_equi:Body())
@@ -183,7 +193,7 @@ function DragonApi:EnhanceDragonEquipment()
         if not LuaUtils:table_empty(loaded_equi) then
             local enhance_equi = loaded_equi[math.random(#loaded_equi)]
             -- 当前已有的所有装备
-            local all_equipments = City:GetMaterialManager():GetEquipmentMaterias()
+            local all_equipments = User.dragonEquipments
             -- 省事,直选一个装备强化，以避免使用过多装备强化，超出范围
             local equipments = {}
             for k,v in pairs(all_equipments) do
@@ -216,7 +226,7 @@ function DragonApi:DragonAddExp()
     end
 end
 function DragonApi:AddBlood()
-    local blood = City:GetResourceManager():GetBloodResource():GetValue()
+    local blood = User:GetResValueByType("blood")
     return NetManager:getBuyAndUseItemPromise("heroBlood_3",{})
 end
 function DragonApi:UpgradeDragonStar()
@@ -255,7 +265,7 @@ function DragonApi:UpgradeDragonDragonSkill()
         if not LuaUtils:table_empty(can_upgrade_skills) then
             local upgrade_skill = can_upgrade_skills[math.random(#can_upgrade_skills)]
 
-            local blood = City:GetResourceManager():GetBloodResource():GetValue()
+            local blood = User:GetResValueByType("blood")
             local cost = upgrade_skill:GetBloodCost()
             if blood < cost then
                 return self:AddBlood()

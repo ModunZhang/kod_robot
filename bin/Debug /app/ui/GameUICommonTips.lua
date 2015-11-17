@@ -53,7 +53,9 @@ end
 function GameUICommonTips:ResetDisplayTime()
 	self.display_time = 0
 end
-
+function GameUICommonTips:SetAutoCloseTime(autoClose)
+	self.autoClose = autoClose
+end
 function GameUICommonTips:onEnter()
 	self:createUI()
 end

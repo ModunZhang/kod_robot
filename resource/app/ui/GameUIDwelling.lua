@@ -3,7 +3,6 @@
 -- Date: 2014-08-18 14:33:28
 --
 local window = import("..utils.window")
--- local ResourceManager = import("..entity.ResourceManager")
 local GameUIResource = import(".GameUIResource")
 local WidgetCitizen = import("..widget.WidgetCitizen")
 local GameUIDwelling = class("GameUIDwelling", GameUIResource)

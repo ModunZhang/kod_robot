@@ -28,7 +28,6 @@ local house_map = setmetatable({
 function GameUIFteBuild:PromiseOfFte(house_type)
     self.base_list_view:getScrollNode():setTouchEnabled(false)
     self:GetFteLayer():SetTouchObject(self:Find(house_type))
-    self.OnUpgradingFinished = function() end
 
     local city = self.build_city
     

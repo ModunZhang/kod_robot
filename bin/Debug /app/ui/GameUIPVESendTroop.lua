@@ -11,7 +11,8 @@ local UIListView = import(".UIListView")
 local WidgetSlider = import("..widget.WidgetSlider")
 local WidgetSelectDragon = import("..widget.WidgetSelectDragon")
 local WidgetInput = import("..widget.WidgetInput")
-local SoldierManager = import("..entity.SoldierManager")
+local DragonManager = import("..entity.DragonManager")
+
 
 local UILib = import(".UILib")
 local window = import("..utils.window")
@@ -19,18 +20,17 @@ local normal = GameDatas.Soldiers.normal
 local SPECIAL = GameDatas.Soldiers.special
 
 local GameUIPVESendTroop = UIKit:createUIClass("GameUIPVESendTroop","GameUIWithCommonHeader")
-GameUIPVESendTroop.dragon = nil
+GameUIPVESendTroop.dragonType = nil
 
 function GameUIPVESendTroop:ctor(pve_soldiers,march_callback)
     GameUIPVESendTroop.super.ctor(self,City,_("准备进攻"))
     self.march_callback = march_callback
     self.pve_soldiers = pve_soldiers
-    self.soldier_manager = City:GetSoldierManager()
     self.dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
     self.soldiers_table = {}
     -- 默认选中最强的并且可以出战的龙,如果都不能出战，则默认最强龙
-    self.dragon = self.dragon or self.dragon_manager:GetDragon(self.dragon_manager:GetCanFightPowerfulDragonType()) or self.dragon_manager:GetDragon(self.dragon_manager:GetPowerfulDragonType())
-    GameUIPVESendTroop.dragon = self.dragon
+    self.dragon = self.dragon_manager:GetDragon(GameUIPVESendTroop.dragonType or self.dragon_manager:GetCanFightPowerfulDragonType()) or self.dragon_manager:GetDragon(self.dragon_manager:GetPowerfulDragonType())
+    GameUIPVESendTroop.dragonType = self.dragon:Type()
 end
 
 function GameUIPVESendTroop:OnMoveInStage()
@@ -121,8 +121,17 @@ function GameUIPVESendTroop:OnMoveInStage()
                 if not self.dragon:IsFree() and not self.dragon:IsDefenced() then
                     UIKit:showMessageDialog(_("主人"),_("龙未处于空闲状态"))
                     return
-                elseif self.dragon:Hp()<1 then
-                    UIKit:showMessageDialog(_("主人"),_("选择的龙已经死亡"))
+                elseif self.dragon:IsDead() then
+                    UIKit:showMessageDialog(_("提示"),_("选择的龙已经死亡")):CreateCancelButton(
+                        {
+                            listener = function ()
+                                UIKit:newGameUI("GameUIDragonEyrieMain", City, City:GetFirstBuildingByType("dragonEyrie"), "dragon", false, self.dragon:Type()):AddToCurrentScene(true)
+                                self:LeftButtonClicked()
+                            end,
+                            btn_name= _("复活"),
+                            btn_images = {normal = "blue_btn_up_148x58.png",pressed = "blue_btn_down_148x58.png"}
+                        }
+                    )
                     return
                 elseif #soldiers == 0 then
                     UIKit:showMessageDialog(_("主人"),_("请选择要派遣的部队"))
@@ -135,22 +144,17 @@ function GameUIPVESendTroop:OnMoveInStage()
                         break
                     end
                 end
-                if has_special_soldier then
-                    UIKit:showSendTroopMessageDialog(function ()
-                        self.march_callback(dragonType,soldiers)
-                        -- 确认派兵后关闭界面
-                        self:LeftButtonClicked()
-                    end,City:GetMaterialManager().MATERIAL_TYPE.SOLDIER,_("士兵"))
-                else
+                UIKit:showSendTroopMessageDialog(function ()
                     self.march_callback(dragonType,soldiers)
                     -- 确认派兵后关闭界面
                     self:LeftButtonClicked()
-                end
+                end, "soldierMaterials", _("士兵"), not has_special_soldier)
             end
         end):align(display.RIGHT_CENTER,window.right-50,window.top-910):addTo(self:GetView())
 
 
-    City:GetSoldierManager():AddListenOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
+    User:AddListenOnType(self, "soldiers")
+    City:GetDragonEyrie():GetDragonManager():AddListenOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
 
     GameUIPVESendTroop.super.OnMoveInStage(self)
 end
@@ -195,7 +199,7 @@ function GameUIPVESendTroop:SelectDragonPart()
         :addTo(box_bg)
     -- 龙活力
     self.dragon_vitality = UIKit:ttfLabel({
-        text = _("生命值")..dragon:Hp().."/"..dragon:GetMaxHP(),
+        text = _("生命值")..string.formatnumberthousands(dragon:Hp()).."/"..string.formatnumberthousands(dragon:GetMaxHP()),
         size = 20,
         color = 0x615b44,
     }):align(display.LEFT_CENTER,20,30)
@@ -218,9 +222,9 @@ end
 function GameUIPVESendTroop:RefreashDragon(dragon)
     self.dragon_img:setTexture(UILib.dragon_head[dragon:Type()])
     self.dragon_name:setString(Localize.dragon[dragon:Type()].."（LV ".. dragon:Level()..")")
-    self.dragon_vitality:setString(_("生命值")..dragon:Hp().."/"..dragon:GetMaxHP())
+    self.dragon_vitality:setString(_("生命值")..string.formatnumberthousands(dragon:Hp()).."/"..string.formatnumberthousands(dragon:GetMaxHP()))
     self.dragon = dragon
-    GameUIPVESendTroop.dragon = self.dragon
+    GameUIPVESendTroop.dragonType = self.dragon:Type()
 end
 
 function GameUIPVESendTroop:SelectDragon()
@@ -307,7 +311,7 @@ function GameUIPVESendTroop:SelectSoldiers()
                     }
                     UIKit:newWidgetUI("WidgetInput", p):AddToCurrentScene()
                 end
-            end):align(display.CENTER,  340,90):addTo(content)
+            end):align(display.CENTER,  380,90):addTo(content)
         local btn_text = UIKit:ttfLabel({
             text = 0,
             size = 22,
@@ -340,11 +344,11 @@ function GameUIPVESendTroop:SelectSoldiers()
 
 
         local soldier_total_count = UIKit:ttfLabel({
-            text = string.format("/ %d", item.max_soldier),
+            text = string.format("/ %s", string.formatnumberthousands(item.max_soldier)),
             size = 20,
             color = 0x403c2f
         }):addTo(content)
-            :align(display.LEFT_CENTER, 400,90)
+            :align(display.LEFT_CENTER, 440,90)
 
         -- 士兵头像
         local soldier_ui_config = UILib.soldier_image[name][star]
@@ -368,7 +372,7 @@ function GameUIPVESendTroop:SelectSoldiers()
         function item:SetMaxSoldier(max_soldier)
             self.max_soldier = max_soldier
             slider:SetMax(max_soldier)
-            soldier_total_count:setString(string.format("/ %d", self.max_soldier))
+            soldier_total_count:setString(string.format("/ %s", string.formatnumberthousands(self.max_soldier)))
         end
 
         function item:GetSoldierInfo()
@@ -380,7 +384,6 @@ function GameUIPVESendTroop:SelectSoldiers()
         end
         return item
     end
-    local sm = self.soldier_manager
     local soldiers = {}
     local soldier_map = {
         "swordsman",
@@ -395,16 +398,17 @@ function GameUIPVESendTroop:SelectSoldiers()
         "skeletonArcher",
         "deathKnight",
         "meatWagon",
-        "priest",
-        "demonHunter",
-        "paladin",
-        "steamTank",
+        -- "priest",
+        -- "demonHunter",
+        -- "paladin",
+        -- "steamTank",
     }
-    local map_s = sm:GetSoldierMap()
+    local User = User
+    local map_s = User.soldiers
     for _,name in pairs(soldier_map) do
         local soldier_num = map_s[name]
-        if soldier_num>0 then
-            table.insert(soldiers, {name = name,level = sm:GetStarBySoldierType(name), max_num = soldier_num})
+        if soldier_num > 0 then
+            table.insert(soldiers, {name = name,level = User:SoldierStarByName(name), max_num = soldier_num})
         end
     end
     for k,v in pairs(soldiers) do
@@ -500,7 +504,7 @@ function GameUIPVESendTroop:CreateTroopsShow()
     end
     function TroopsShow:SetCitizen(citizen)
         local info_bg =self.info_bg
-        local citizen_item = createInfoItem(_("部队容量"),citizen.."/"..parent.dragon:LeadCitizen())
+        local citizen_item = createInfoItem(_("部队容量"),string.formatnumberthousands(citizen).."/"..string.formatnumberthousands(parent.dragon:LeadCitizen()))
         citizen_item:align(display.CENTER,320,26)
             :addTo(info_bg)
         return self
@@ -532,8 +536,8 @@ function GameUIPVESendTroop:CreateTroopsShow()
                 local name = soldiers[i].name
                 local star = soldiers[i].star or 1
                 -- 士兵头像
-                local soldier_ui_config = UILib.black_soldier_image[name][star]
-                local color_bg = star > 1 and "red_bg_128x128.png" or "blue_bg_128x128.png"
+                local soldier_ui_config = UILib.soldier_image[name][star]
+                local color_bg = UILib.soldier_color_bg_images[name][star]
                 local soldier_color_bg = display.newSprite(color_bg):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
                 local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
                 local soldier_head_bg  = display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2,soldier_head_icon:getContentSize().height/2)
@@ -646,18 +650,25 @@ function GameUIPVESendTroop:CreateTroopsShow()
     TroopsShow:ShowOrRefreshTroops()
     return TroopsShow
 end
-function GameUIPVESendTroop:OnSoliderCountChanged( soldier_manager,changed_map )
-    for i,name in ipairs(changed_map) do
-        for _,item in pairs(self.soldiers_table) do
-            local item_type = item:GetSoldierInfo()
-            if name == item_type then
-                item:SetMaxSoldier(City:GetSoldierManager():GetCountBySoldierType(item_type))
+function GameUIPVESendTroop:OnUserDataChanged_soldiers(userData, deltaData)
+    local ok, value = deltaData("soldiers")
+    if ok then
+        for i,name in ipairs(value) do
+            for _,item in pairs(self.soldiers_table) do
+                local item_type = item:GetSoldierInfo()
+                if name == item_type then
+                    item:SetMaxSoldier(User.soldiers[item_type])
+                end
             end
         end
     end
 end
+function GameUIPVESendTroop:OnBasicChanged()
+    self:RefreashDragon(self.dragon)
+end
 function GameUIPVESendTroop:onExit()
-    City:GetSoldierManager():RemoveListenerOnType(self,SoldierManager.LISTEN_TYPE.SOLDIER_CHANGED)
+    User:RemoveListenerOnType(self, "soldiers")
+    City:GetDragonEyrie():GetDragonManager():RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
 
     GameUIPVESendTroop.super.onExit(self)
 end
@@ -696,6 +707,9 @@ end
 
 
 return GameUIPVESendTroop
+
+
+
 
 
 

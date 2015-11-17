@@ -119,7 +119,7 @@ dragonEyrie[11] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 5860
+	["buildTime"] = 7300
 }
 dragonEyrie[12] = {
 	["level"] = 12,
@@ -130,7 +130,7 @@ dragonEyrie[12] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 7300
+	["buildTime"] = 9460
 }
 dragonEyrie[13] = {
 	["level"] = 13,
@@ -141,7 +141,7 @@ dragonEyrie[13] = {
 	["tools"] = 0,
 	["tiles"] = 0,
 	["pulley"] = 0,
-	["buildTime"] = 8740
+	["buildTime"] = 11764
 }
 dragonEyrie[14] = {
 	["level"] = 14,
@@ -152,7 +152,7 @@ dragonEyrie[14] = {
 	["tools"] = 1,
 	["tiles"] = 1,
 	["pulley"] = 1,
-	["buildTime"] = 17380
+	["buildTime"] = 24292
 }
 dragonEyrie[15] = {
 	["level"] = 15,
@@ -163,7 +163,7 @@ dragonEyrie[15] = {
 	["tools"] = 2,
 	["tiles"] = 2,
 	["pulley"] = 2,
-	["buildTime"] = 26020
+	["buildTime"] = 37684
 }
 dragonEyrie[16] = {
 	["level"] = 16,
@@ -174,7 +174,7 @@ dragonEyrie[16] = {
 	["tools"] = 4,
 	["tiles"] = 4,
 	["pulley"] = 4,
-	["buildTime"] = 34660
+	["buildTime"] = 51940
 }
 dragonEyrie[17] = {
 	["level"] = 17,
@@ -185,7 +185,7 @@ dragonEyrie[17] = {
 	["tools"] = 8,
 	["tiles"] = 8,
 	["pulley"] = 8,
-	["buildTime"] = 43300
+	["buildTime"] = 67060
 }
 dragonEyrie[18] = {
 	["level"] = 18,
@@ -196,7 +196,7 @@ dragonEyrie[18] = {
 	["tools"] = 15,
 	["tiles"] = 15,
 	["pulley"] = 15,
-	["buildTime"] = 51940
+	["buildTime"] = 83044
 }
 dragonEyrie[19] = {
 	["level"] = 19,
@@ -207,7 +207,7 @@ dragonEyrie[19] = {
 	["tools"] = 20,
 	["tiles"] = 20,
 	["pulley"] = 20,
-	["buildTime"] = 60580
+	["buildTime"] = 99892
 }
 dragonEyrie[20] = {
 	["level"] = 20,
@@ -218,7 +218,7 @@ dragonEyrie[20] = {
 	["tools"] = 32,
 	["tiles"] = 32,
 	["pulley"] = 32,
-	["buildTime"] = 69220
+	["buildTime"] = 117604
 }
 dragonEyrie[21] = {
 	["level"] = 21,
@@ -229,7 +229,7 @@ dragonEyrie[21] = {
 	["tools"] = 48,
 	["tiles"] = 48,
 	["pulley"] = 48,
-	["buildTime"] = 77860
+	["buildTime"] = 136180
 }
 dragonEyrie[22] = {
 	["level"] = 22,
@@ -240,7 +240,7 @@ dragonEyrie[22] = {
 	["tools"] = 64,
 	["tiles"] = 64,
 	["pulley"] = 64,
-	["buildTime"] = 86500
+	["buildTime"] = 155620
 }
 dragonEyrie[23] = {
 	["level"] = 23,
@@ -251,7 +251,7 @@ dragonEyrie[23] = {
 	["tools"] = 80,
 	["tiles"] = 80,
 	["pulley"] = 80,
-	["buildTime"] = 95140
+	["buildTime"] = 173073
 }
 dragonEyrie[24] = {
 	["level"] = 24,
@@ -262,7 +262,7 @@ dragonEyrie[24] = {
 	["tools"] = 100,
 	["tiles"] = 100,
 	["pulley"] = 100,
-	["buildTime"] = 103780
+	["buildTime"] = 190871
 }
 dragonEyrie[25] = {
 	["level"] = 25,
@@ -273,7 +273,7 @@ dragonEyrie[25] = {
 	["tools"] = 140,
 	["tiles"] = 140,
 	["pulley"] = 140,
-	["buildTime"] = 112420
+	["buildTime"] = 207892
 }
 dragonEyrie[26] = {
 	["level"] = 26,
@@ -284,7 +284,7 @@ dragonEyrie[26] = {
 	["tools"] = 160,
 	["tiles"] = 160,
 	["pulley"] = 160,
-	["buildTime"] = 121060
+	["buildTime"] = 225086
 }
 dragonEyrie[27] = {
 	["level"] = 27,
@@ -295,7 +295,7 @@ dragonEyrie[27] = {
 	["tools"] = 180,
 	["tiles"] = 180,
 	["pulley"] = 180,
-	["buildTime"] = 129700
+	["buildTime"] = 242452
 }
 dragonEyrie[28] = {
 	["level"] = 28,
@@ -306,7 +306,7 @@ dragonEyrie[28] = {
 	["tools"] = 210,
 	["tiles"] = 210,
 	["pulley"] = 210,
-	["buildTime"] = 138340
+	["buildTime"] = 259991
 }
 dragonEyrie[29] = {
 	["level"] = 29,
@@ -317,7 +317,7 @@ dragonEyrie[29] = {
 	["tools"] = 320,
 	["tiles"] = 320,
 	["pulley"] = 320,
-	["buildTime"] = 155620
+	["buildTime"] = 294033
 }
 dragonEyrie[30] = {
 	["level"] = 30,
@@ -328,7 +328,7 @@ dragonEyrie[30] = {
 	["tools"] = 390,
 	["tiles"] = 390,
 	["pulley"] = 390,
-	["buildTime"] = 172900
+	["buildTime"] = 328420
 }
 dragonEyrie[31] = {
 	["level"] = 31,
@@ -339,7 +339,7 @@ dragonEyrie[31] = {
 	["tools"] = 450,
 	["tiles"] = 450,
 	["pulley"] = 450,
-	["buildTime"] = 190180
+	["buildTime"] = 363153
 }
 dragonEyrie[32] = {
 	["level"] = 32,
@@ -350,7 +350,7 @@ dragonEyrie[32] = {
 	["tools"] = 500,
 	["tiles"] = 500,
 	["pulley"] = 500,
-	["buildTime"] = 207460
+	["buildTime"] = 398231
 }
 dragonEyrie[33] = {
 	["level"] = 33,
@@ -361,7 +361,7 @@ dragonEyrie[33] = {
 	["tools"] = 680,
 	["tiles"] = 680,
 	["pulley"] = 680,
-	["buildTime"] = 224740
+	["buildTime"] = 433655
 }
 dragonEyrie[34] = {
 	["level"] = 34,
@@ -372,7 +372,7 @@ dragonEyrie[34] = {
 	["tools"] = 780,
 	["tiles"] = 780,
 	["pulley"] = 780,
-	["buildTime"] = 242020
+	["buildTime"] = 469425
 }
 dragonEyrie[35] = {
 	["level"] = 35,
@@ -383,7 +383,7 @@ dragonEyrie[35] = {
 	["tools"] = 900,
 	["tiles"] = 900,
 	["pulley"] = 900,
-	["buildTime"] = 259300
+	["buildTime"] = 505540
 }
 dragonEyrie[36] = {
 	["level"] = 36,
@@ -394,7 +394,7 @@ dragonEyrie[36] = {
 	["tools"] = 1020,
 	["tiles"] = 1020,
 	["pulley"] = 1020,
-	["buildTime"] = 276580
+	["buildTime"] = 542001
 }
 dragonEyrie[37] = {
 	["level"] = 37,
@@ -405,7 +405,7 @@ dragonEyrie[37] = {
 	["tools"] = 1280,
 	["tiles"] = 1280,
 	["pulley"] = 1280,
-	["buildTime"] = 293860
+	["buildTime"] = 578807
 }
 dragonEyrie[38] = {
 	["level"] = 38,
@@ -416,7 +416,7 @@ dragonEyrie[38] = {
 	["tools"] = 1540,
 	["tiles"] = 1540,
 	["pulley"] = 1540,
-	["buildTime"] = 311140
+	["buildTime"] = 615959
 }
 dragonEyrie[39] = {
 	["level"] = 39,
@@ -427,7 +427,7 @@ dragonEyrie[39] = {
 	["tools"] = 1800,
 	["tiles"] = 1800,
 	["pulley"] = 1800,
-	["buildTime"] = 328420
+	["buildTime"] = 653457
 }
 dragonEyrie[40] = {
 	["level"] = 40,
@@ -438,5 +438,5 @@ dragonEyrie[40] = {
 	["tools"] = 2060,
 	["tiles"] = 2060,
 	["pulley"] = 2060,
-	["buildTime"] = 345700
+	["buildTime"] = 691300
 }

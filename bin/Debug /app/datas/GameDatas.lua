@@ -45,6 +45,17 @@ require("app.datas.ClientInitGame_alliance_name_fixed")
 require("app.datas.ClientInitGame_pve_level")
 require("app.datas.ClientInitGame_pve_wanted")
 
+GameDatas.NoManMap = {
+	["noManMap_1"] = {},
+	["noManMap_2"] = {},
+	["noManMap_3"] = {},
+	["noManMap_4"] = {},
+}
+require("app.datas.NoManMap_noManMap_1")
+require("app.datas.NoManMap_noManMap_2")
+require("app.datas.NoManMap_noManMap_3")
+require("app.datas.NoManMap_noManMap_4")
+
 GameDatas.Activities = {
 	["day60"] = {},
 	["online"] = {},
@@ -59,13 +70,13 @@ require("app.datas.Activities_levelup")
 GameDatas.AllianceBuilding = {
 	["palace"] = {},
 	["shop"] = {},
-	["moonGate"] = {},
+	["watchTower"] = {},
 	["orderHall"] = {},
 	["shrine"] = {},
 }
 require("app.datas.AllianceBuilding_palace")
 require("app.datas.AllianceBuilding_shop")
-require("app.datas.AllianceBuilding_moonGate")
+require("app.datas.AllianceBuilding_watchTower")
 require("app.datas.AllianceBuilding_orderHall")
 require("app.datas.AllianceBuilding_shrine")
 
@@ -75,8 +86,6 @@ GameDatas.AllianceInitData = {
 	["right"] = {},
 	["donate"] = {},
 	["shrineStage"] = {},
-	["buildingName"] = {},
-	["buildings"] = {},
 	["fightRewards"] = {},
 	["monsters"] = {},
 }
@@ -85,10 +94,35 @@ require("app.datas.AllianceInitData_stringInit")
 require("app.datas.AllianceInitData_right")
 require("app.datas.AllianceInitData_donate")
 require("app.datas.AllianceInitData_shrineStage")
-require("app.datas.AllianceInitData_buildingName")
-require("app.datas.AllianceInitData_buildings")
 require("app.datas.AllianceInitData_fightRewards")
 require("app.datas.AllianceInitData_monsters")
+
+GameDatas.AllianceMap = {
+	["buildingName"] = {},
+	["terrainStyle"] = {},
+	["buff"] = {},
+	["moveLimit"] = {},
+	["bigRound"] = {},
+	["roundIndex"] = {},
+	["allianceMap_1"] = {},
+	["allianceMap_2"] = {},
+	["allianceMap_3"] = {},
+	["allianceMap_4"] = {},
+	["allianceMap_5"] = {},
+	["allianceMap_6"] = {},
+}
+require("app.datas.AllianceMap_buildingName")
+require("app.datas.AllianceMap_terrainStyle")
+require("app.datas.AllianceMap_buff")
+require("app.datas.AllianceMap_moveLimit")
+require("app.datas.AllianceMap_bigRound")
+require("app.datas.AllianceMap_roundIndex")
+require("app.datas.AllianceMap_allianceMap_1")
+require("app.datas.AllianceMap_allianceMap_2")
+require("app.datas.AllianceMap_allianceMap_3")
+require("app.datas.AllianceMap_allianceMap_4")
+require("app.datas.AllianceMap_allianceMap_5")
+require("app.datas.AllianceMap_allianceMap_6")
 
 GameDatas.AllianceVillage = {
 	["woodVillage"] = {},
@@ -106,7 +140,6 @@ require("app.datas.AllianceVillage_coinVillage")
 GameDatas.BuildingFunction = {
 	["keep"] = {},
 	["dragonEyrie"] = {},
-	["watchTower"] = {},
 	["wall"] = {},
 	["warehouse"] = {},
 	["tower"] = {},
@@ -129,7 +162,6 @@ GameDatas.BuildingFunction = {
 }
 require("app.datas.BuildingFunction_keep")
 require("app.datas.BuildingFunction_dragonEyrie")
-require("app.datas.BuildingFunction_watchTower")
 require("app.datas.BuildingFunction_wall")
 require("app.datas.BuildingFunction_warehouse")
 require("app.datas.BuildingFunction_tower")
@@ -153,7 +185,6 @@ require("app.datas.BuildingFunction_workshop")
 GameDatas.BuildingLevelUp = {
 	["keep"] = {},
 	["dragonEyrie"] = {},
-	["watchTower"] = {},
 	["wall"] = {},
 	["warehouse"] = {},
 	["tower"] = {},
@@ -176,7 +207,6 @@ GameDatas.BuildingLevelUp = {
 }
 require("app.datas.BuildingLevelUp_keep")
 require("app.datas.BuildingLevelUp_dragonEyrie")
-require("app.datas.BuildingLevelUp_watchTower")
 require("app.datas.BuildingLevelUp_wall")
 require("app.datas.BuildingLevelUp_warehouse")
 require("app.datas.BuildingLevelUp_tower")
@@ -421,35 +451,12 @@ GameDatas.PlayerInitData = {
 	["intInit"] = {},
 	["stringInit"] = {},
 	["resources"] = {},
-	["materials"] = {},
-	["soldierMaterials"] = {},
-	["dragonMaterials"] = {},
-	["houses"] = {},
 	["playerLevel"] = {},
 }
 require("app.datas.PlayerInitData_intInit")
 require("app.datas.PlayerInitData_stringInit")
 require("app.datas.PlayerInitData_resources")
-require("app.datas.PlayerInitData_materials")
-require("app.datas.PlayerInitData_soldierMaterials")
-require("app.datas.PlayerInitData_dragonMaterials")
-require("app.datas.PlayerInitData_houses")
 require("app.datas.PlayerInitData_playerLevel")
-
-GameDatas.PlayerVillageExp = {
-	["exp"] = {},
-	["wood"] = {},
-	["stone"] = {},
-	["iron"] = {},
-	["food"] = {},
-	["coin"] = {},
-}
-require("app.datas.PlayerVillageExp_exp")
-require("app.datas.PlayerVillageExp_wood")
-require("app.datas.PlayerVillageExp_stone")
-require("app.datas.PlayerVillageExp_iron")
-require("app.datas.PlayerVillageExp_food")
-require("app.datas.PlayerVillageExp_coin")
 
 GameDatas.ProductionTechLevelUp = {
 	["crane"] = {},
@@ -457,7 +464,7 @@ GameDatas.ProductionTechLevelUp = {
 	["reinforcing"] = {},
 	["rescueTent"] = {},
 	["colonization"] = {},
-	["negotiation"] = {},
+	["recruitment"] = {},
 	["seniorTower"] = {},
 	["trap"] = {},
 	["forestation"] = {},
@@ -476,7 +483,7 @@ require("app.datas.ProductionTechLevelUp_fastFix")
 require("app.datas.ProductionTechLevelUp_reinforcing")
 require("app.datas.ProductionTechLevelUp_rescueTent")
 require("app.datas.ProductionTechLevelUp_colonization")
-require("app.datas.ProductionTechLevelUp_negotiation")
+require("app.datas.ProductionTechLevelUp_recruitment")
 require("app.datas.ProductionTechLevelUp_seniorTower")
 require("app.datas.ProductionTechLevelUp_trap")
 require("app.datas.ProductionTechLevelUp_forestation")
@@ -505,9 +512,11 @@ require("app.datas.PvE_stages")
 GameDatas.Soldiers = {
 	["normal"] = {},
 	["special"] = {},
+	["fightFix"] = {},
 }
 require("app.datas.Soldiers_normal")
 require("app.datas.Soldiers_special")
+require("app.datas.Soldiers_fightFix")
 
 GameDatas.StoreItems = {
 	["items"] = {},

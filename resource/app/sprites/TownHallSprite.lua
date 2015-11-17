@@ -2,12 +2,14 @@ local zz = import("..particles.zz")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local TownHallSprite = class("TownHallSprite", FunctionUpgradingSprite)
 
-function TownHallSprite:OnNewDailyQuestsEvent(changed_map)
-    local changed_map = changed_map or {}
-    for _,v in ipairs(changed_map.edit or {}) do
-        if v.finishTime == 0 then
-            app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
-            break
+function TownHallSprite:OnUserDataChanged_dailyQuestEvents(userData, deltaData)
+    local ok, value = deltaData("dailyQuestEvents.edit")
+    if ok then
+        for _,v in ipairs(value) do
+            if v.finishTime == 0 then
+                app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
+                break
+            end
         end
     end
     self:CheckEvent()
@@ -18,7 +20,7 @@ local EMPTY_TAG = 11400
 local TIP_TAG = 11201
 function TownHallSprite:ctor(city_layer, entity, city)
     TownHallSprite.super.ctor(self, city_layer, entity, city)
-    city:GetUser():AddListenOnType(self, city:GetUser().LISTEN_TYPE.NEW_DALIY_QUEST_EVENT)
+    city:GetUser():AddListenOnType(self, "dailyQuestEvents")
     display.newNode():addTo(self):schedule(function()
         self:CheckEvent()
     end,1)

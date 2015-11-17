@@ -11,27 +11,20 @@ local UIListView = import(".UIListView")
 local WidgetSoldierBox = import("..widget.WidgetSoldierBox")
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 local WidgetShrineRewardsInfo = import("..widget.WidgetShrineRewardsInfo")
-local AllianceShrine = import("..entity.AllianceShrine")
 local UILib = import(".UILib")
 local Localize = import("..utils.Localize")
-function GameUIAllianceShrineDetail:ctor(shrineStage,allianceShrine,isActivate)
+function GameUIAllianceShrineDetail:ctor(shrineStage,isActivate)
     local HEIGHT = 738
     self.isActivate_ = isActivate or false
     self.shrineStage_ = shrineStage
-    self.allianceShrine_ = allianceShrine
+    local alliance = Alliance_Manager:GetMyAlliance()
     if self:IsActivate() then
-        self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnPerceotionChanged)
-        self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnFightEventTimerChanged)
-        self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
-        self:GetAllianceShrine():AddListenOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
+        alliance:AddListenOnType(self, "shrineEvents")
     else
         HEIGHT = 600 -- 修改背景高度
     end
-    GameUIAllianceShrineDetail.super.ctor(self,HEIGHT,self:GetShrineStage():GetDescStageName(),window.top - 82,"title_red_600x56.png")
-end
-
-function GameUIAllianceShrineDetail:GetAllianceShrine()
-    return self.allianceShrine_
+    local title = Localize.shrine_desc[shrineStage.stageName][1]
+    GameUIAllianceShrineDetail.super.ctor(self,HEIGHT, title, window.top - 82,"title_red_600x56.png")
 end
 --是否有激活操作
 function GameUIAllianceShrineDetail:IsActivate()
@@ -39,35 +32,29 @@ function GameUIAllianceShrineDetail:IsActivate()
 end
 
 function GameUIAllianceShrineDetail:OnMoveOutStage()
+    local alliance = Alliance_Manager:GetMyAlliance()
     if self:IsActivate() then
-        self.allianceShrine_:RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnPerceotionChanged)
-        self.allianceShrine_:RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnFightEventTimerChanged)
-        self.allianceShrine_:RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsChanged)
-        self.allianceShrine_:RemoveListenerOnType(self,AllianceShrine.LISTEN_TYPE.OnShrineEventsRefresh)
+        alliance:RemoveListenerOnType(self, "shrineEvents")
     end
     GameUIAllianceShrineDetail.super.OnMoveOutStage(self)
 end
-
-function GameUIAllianceShrineDetail:OnShrineEventsRefresh()
-    self:OnShrineEventsChanged()
-end
-
-function GameUIAllianceShrineDetail:OnShrineEventsChanged( change_map )
+function GameUIAllianceShrineDetail:OnAllianceDataChanged_shrineEvents(alliance, deltaData)
     self:RefreshStateLable()
 end
 
 function GameUIAllianceShrineDetail:RefreshStateLable()
-    local event = self:GetAllianceShrine():GetShrineEventByStageName(self:GetShrineStage():StageName())
+    local event = Alliance_Manager:GetMyAlliance():GetShrineEventByStageName(self:GetShrineStage().stageName)
     if event then
         self.insight_icon:hide()
-        self.state_label:setString(_("正在进行") .. "\n" .. GameUtils:formatTimeStyle1(event:GetTime()))
+        local time = math.ceil(event.startTime/1000 - app.timer:GetServerTime())
+        self.state_label:setString(_("正在进行") .. "\n" .. GameUtils:formatTimeStyle1(time))
     else
         self.state_label:hide()
     end
 end
 
 function GameUIAllianceShrineDetail:OnFightEventTimerChanged(event)
-    if event:StageName() == self:GetShrineStage():StageName() then
+    if event:StageName() == self:GetShrineStage().stageName then
         if event:GetTime() > 1 then -- 有误差 1s
             self.insight_icon:hide()
             self.state_label:setString(_("正在进行") .. "\n" .. GameUtils:formatTimeStyle1(event:GetTime()))
@@ -79,14 +66,15 @@ function GameUIAllianceShrineDetail:OnFightEventTimerChanged(event)
     end
 end
 
-function GameUIAllianceShrineDetail:OnPerceotionChanged()
-    local resource = self:GetAllianceShrine():GetPerceptionResource()
-    self.event_button:setButtonEnabled(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime()) >= self:GetShrineStage():NeedPerception())
-end
-
 function GameUIAllianceShrineDetail:onEnter()
     GameUIAllianceShrineDetail.super.onEnter(self)
     self:BuildUI()
+
+    scheduleAt(self, function()
+        self.event_button:setButtonEnabled(
+        Alliance_Manager:GetMyAlliance():GetPerception() 
+        >= self:GetShrineStage().needPerception)
+    end)
 end
 
 function GameUIAllianceShrineDetail:BuildUI()
@@ -111,8 +99,8 @@ function GameUIAllianceShrineDetail:BuildUI()
                 self:OnEventButtonClicked()
             end)
         self.event_button = event_button
-        local resource = self:GetAllianceShrine():GetPerceptionResource()
-        event_button:setButtonEnabled(resource:GetResourceValueByCurrentTime(app.timer:GetServerTime()) >= self:GetShrineStage():NeedPerception())
+        local value = Alliance_Manager:GetMyAlliance():GetPerception()
+        event_button:setButtonEnabled(value >= self:GetShrineStage().needPerception)
         local insight_icon = display.newSprite("insight_icon_40x44.png")
             :align(display.RIGHT_BOTTOM,570 - event_button:getCascadeBoundingBox().width - 120,desc_label:getPositionY() + 60)
             :addTo(background)
@@ -120,13 +108,13 @@ function GameUIAllianceShrineDetail:BuildUI()
             text = _("需要感知力"),
             size = 18,
             color = 0x6d6651
-        }):addTo(insight_icon):align(display.LEFT_TOP,insight_icon:getContentSize().width,45)
+        }):addTo(insight_icon):align(display.LEFT_TOP,insight_icon:getContentSize().width + 10,45)
 
         local need_insight_val_title = UIKit:ttfLabel({
-            text = string.formatnumberthousands(self:GetShrineStage():NeedPerception()),
-            color = 0x403c2f,
+            text = "-"..string.formatnumberthousands(self:GetShrineStage().needPerception),
+            color = 0x7e0000,
             size  = 24
-        }):addTo(insight_icon):align(display.LEFT_BOTTOM,insight_icon:getContentSize().width, -5)
+        }):addTo(insight_icon):align(display.LEFT_BOTTOM,insight_icon:getContentSize().width + 10, -5)
         self.insight_icon = insight_icon
         self.state_label = UIKit:ttfLabel({
             text = _("正在进行") .. "\n" .. "00:01:55",
@@ -148,7 +136,7 @@ function GameUIAllianceShrineDetail:BuildUI()
         title = _("事件完成奖励"),
         h = 186,
         info = self:GetShrineStage()
-    }):addTo(background)
+    }):addTo(background,2)
         :align(display.BOTTOM_CENTER,items_box_x,items_box_y)
 
     local soldier_x,soldier_y = 14,self:IsActivate() and items_box:getPositionY()+342+10 or 210
@@ -174,9 +162,9 @@ end
 function GameUIAllianceShrineDetail:GetInfoData()
     local stage = self:GetShrineStage()
     local r = {}
-    r[1] = {"dragon_strength_27x31.png",_("敌方总战斗力"),stage:EnemyPower()}
-    r[2] = {"res_citizen_88x82.png",_("建议玩家数量"),stage:SuggestPlayer()}
-    r[3] = {"dragon_strength_27x31.png",_("建议部队战斗力"),"> " .. stage:SuggestPower()}
+    r[1] = {"dragon_strength_27x31.png",_("敌方总战斗力"),stage.enemyPower}
+    r[2] = {"res_citizen_88x82.png",_("建议玩家数量"),stage.suggestPlayer}
+    r[3] = {"dragon_strength_27x31.png",_("建议部队战斗力"),"> " .. stage.suggestPower}
     return r
 end
 
@@ -229,7 +217,7 @@ end
 
 function GameUIAllianceShrineDetail:RefreshSoldierListView()
     self.soldier_list:removeAllItems()
-    for _,v in ipairs(self:GetShrineStage():Troops()) do
+    for _,v in ipairs(UtilsForShrine:FormatShrineTroops(self:GetShrineStage())) do
         if self:IsNotDragon(v) then
             local item = self.soldier_list:newItem()
             local content = WidgetSoldierBox.new("",function()end)
@@ -248,9 +236,9 @@ function GameUIAllianceShrineDetail:GetShrineStage()
 end
 
 function GameUIAllianceShrineDetail:OnEventButtonClicked()
-    local member = self:GetAllianceShrine():GetAlliance():GetSelf()
+    local member = Alliance_Manager:GetMyAlliance():GetSelf()
     if member:CanActivateShirneEvent() then
-        NetManager:getActivateAllianceShrineStagePromise(self:GetShrineStage():StageName()):done(function()
+        NetManager:getActivateAllianceShrineStagePromise(self:GetShrineStage().stageName):done(function()
             self:LeftButtonClicked()
         end)
     else

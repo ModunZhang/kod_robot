@@ -62,7 +62,7 @@ function GameUIAttackPlayerCity:BuildUI()
 		color= 0x615b44
 	}):align(display.LEFT_BOTTOM, line_2:getPositionX()+2, line_2:getPositionY()+4):addTo(bg_node)
 
-	local from_location = self:GetAlliance():GetAllianceMap():FindAllianceBuildingInfoByName('moonGate').location
+	local from_location = self:GetAlliance():FindAllianceBuildingInfoByName('moonGate').location
 	UIKit:ttfLabel({
 		text = from_location.x .. "," .. from_location.y,
 		size = 20,

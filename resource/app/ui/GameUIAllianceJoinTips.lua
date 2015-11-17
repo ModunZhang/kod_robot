@@ -75,7 +75,7 @@ function GameUIAllianceJoinTips:onEnter()
 		end)
 	self:RefreshUI()
 	self:RefreshListView()
-	User:AddListenOnType(self, User.LISTEN_TYPE.COUNT_INFO)
+	User:AddListenOnType(self, "countInfo")
 end
 
 function GameUIAllianceJoinTips:RefreshUI()
@@ -88,7 +88,7 @@ function GameUIAllianceJoinTips:RefreshUI()
 		self.create_alliance_button:setVisible(false)
 		self.join_alliance_button:setVisible(false)
 
-		if User:GetCountInfo().firstJoinAllianceRewardGeted then
+		if User.countInfo.firstJoinAllianceRewardGeted then
 			self.get_reward_button:setButtonEnabled(false)
 		else
 			self.get_reward_button:setButtonEnabled(true)
@@ -97,8 +97,8 @@ function GameUIAllianceJoinTips:RefreshUI()
 end
 
 
-function GameUIAllianceJoinTips:OnCountInfoChanged()
-	local countInfo = User:GetCountInfo()
+function GameUIAllianceJoinTips:OnUserDataChanged_countInfo()
+	local countInfo = User.countInfo
 	if countInfo.firstJoinAllianceRewardGeted then
 		self:LeftButtonClicked()
 	end
@@ -146,7 +146,7 @@ function GameUIAllianceJoinTips:OnGetRewardButtonClicked()
 end
 
 function GameUIAllianceJoinTips:onCleanup()
-	User:RemoveListenerOnType(self, User.LISTEN_TYPE.COUNT_INFO)
+	User:RemoveListenerOnType(self, "countInfo")
 	GameUIAllianceJoinTips.super.onCleanup(self)
 	cc.Director:getInstance():getTextureCache():removeTextureForKey("join_alliance_tips_bg_572x536.jpg")
 end

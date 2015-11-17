@@ -8,15 +8,14 @@ local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 local scene_enter_music_map = {
 	MainScene     = "music_begin.mp3",
 	MyCityScene   = "bgm_peace.mp3",
-	AllianceScene = "bgm_peace.mp3",
-	AllianceBattleScene = "bgm_battle.mp3",
+	AllianceDetailScene = "bgm_peace.mp3",
 	PVEScene      = "bgm_battle.mp3"
 }
 
 local terrain_music_map = {
-	grassLand               = "sfx_grassland.mp3",
-	iceField                = "sfx_icefield.mp3",
-	desert                  = "sfx_desert.mp3",
+	[1] = "sfx_grassland.mp3",
+	[2] = "sfx_icefield.mp3",
+	[3] = "sfx_desert.mp3",
 }
 
 local effect_sound_map = {
@@ -50,6 +49,12 @@ local effect_sound_map = {
 	PVE_MOVE1 = "sfx_pve_move1.mp3",
 	PVE_MOVE2 = "sfx_pve_move2.mp3",
 	PVE_MOVE3 = "sfx_pve_move3.mp3",
+	PVE_STAR1 = "sfx_pve_star1.mp3",
+	PVE_STAR2 = "sfx_pve_star2.mp3",
+	PVE_STAR3 = "sfx_pve_star3.mp3",
+	PVE_SWEEP = "sfx_get.mp3",
+	TECHNOLOGY = "sfx_technology.mp3",
+	HATCH_DRAGON = "sfx_dragon3.mp3",
 }
 
 local soldier_step_sfx_map = {
@@ -258,7 +263,7 @@ end
 local get_scene_name_in_enter_music_map = function(sceneName)
 	if sceneName == 'FteScene' then
 		return "MyCityScene" 
-	elseif sceneName == 'PVEFteScene' then
+	elseif sceneName == 'PVESceneNewFte' then
 		return "PVEScene"
 	elseif sceneName == 'FteScene' then
 		return "MyCityScene"
@@ -291,9 +296,9 @@ function AudioManager:PlayGameMusicAutoCheckScene()
 			end
 		else
 			local alliance    = Alliance_Manager:GetMyAlliance()
-			local status      = alliance:Status()
+			local status      = alliance.basicInfo.status
 			local lastFileKey = self:GetLastPlayedFileName()
-			local terrain     = alliance:Terrain()
+			local terrain     = alliance.basicInfo.terrain
 
 			if alliance:IsDefault() then -- 无联盟
 				if real_scene_name == 'MyCityScene' then
@@ -304,23 +309,21 @@ function AudioManager:PlayGameMusicAutoCheckScene()
 					else
 						self:PlayBgMusicWithFileKey('bgm_peace',false)
 					end
-				elseif real_scene_name == 'AllianceScene' then
-					if lastFileKey == 'bgm_peace' then
-						self:PlayeBgMusic(terrain_music_map[terrain], false)
-					else
-						self:PlayBgMusicWithFileKey('bgm_peace',false)
-					end
 				end
 			else --有联盟
 				if status == 'prepare' or status == 'fight' then
 					if real_scene_name == 'MyCityScene' then
-						if lastFileKey == 'sfx_city' then
+						if lastFileKey == 'bgm_battle' then
+							self:PlayBgMusicWithFileKey('sfx_city',false)
+						elseif lastFileKey == "sfx_city" then
 							self:PlayBgMusicWithFileKey('bgm_battle',false)
 						else
-							self:PlayBgMusicWithFileKey('sfx_city',false)
+							self:PlayBgMusicWithFileKey('bgm_battle',false)
 						end
-					elseif real_scene_name == 'AllianceScene' or real_scene_name == 'AllianceBattleScene' then
-						if lastFileKey == 'sfx_battle' then
+					elseif real_scene_name == 'AllianceDetailScene' then
+						if lastFileKey == 'bgm_battle' then
+							self:PlayBgMusicWithFileKey('sfx_battle',false)
+						elseif lastFileKey == "sfx_battle" then
 							self:PlayBgMusicWithFileKey('bgm_battle',false)
 						else
 							self:PlayBgMusicWithFileKey('bgm_battle',false)
@@ -335,9 +338,9 @@ function AudioManager:PlayGameMusicAutoCheckScene()
 						else
 							self:PlayBgMusicWithFileKey('bgm_peace',false)
 						end
-					elseif real_scene_name == 'AllianceScene' or real_scene_name == 'AllianceBattleScene' then
+					elseif real_scene_name == 'AllianceDetailScene' then
 						if lastFileKey == 'bgm_peace' then
-							self:PlayeBgMusic(terrain_music_map[terrain], false)
+							self:PlayeBgMusic(terrain_music_map[math.random(3)], false)
 						else
 							self:PlayBgMusicWithFileKey('bgm_peace',false)
 						end
@@ -353,11 +356,13 @@ function AudioManager:PlayGameMusicOnSceneEnter(scene_name,loop)
 	if scene_enter_music_map[scene_name] then
 		if scene_name == 'MyCityScene' then
 			if Alliance_Manager then
-				local status = Alliance_Manager:GetMyAlliance():Status()
+				local status = Alliance_Manager:GetMyAlliance().basicInfo.status
 				if status == 'prepare' or status == 'fight' then
-					scene_name = 'AllianceBattleScene' --battle
+					scene_name = 'AllianceDetailScene' --battle
+					self:PlayBgMusicWithFileKey('bgm_battle',false)
+				else
+					self:PlayeBgMusic(scene_enter_music_map[scene_name],loop)
 				end
-				self:PlayeBgMusic(scene_enter_music_map[scene_name],loop)
 			else
 				self:PlayeBgMusic(scene_enter_music_map[scene_name],loop)
 			end

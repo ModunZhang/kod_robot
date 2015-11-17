@@ -2,14 +2,8 @@ local zz = import("..particles.zz")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local BarracksSprite = class("BarracksSprite", FunctionUpgradingSprite)
 
-function BarracksSprite:OnBeginRecruit()
+function BarracksSprite:OnUserDataChanged_soldierEvents(userData, deltaData)
     self:DoAni()
-end
-function BarracksSprite:OnRecruiting()
-end
-function BarracksSprite:OnEndRecruit()
-    self:DoAni()
-    app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
 end
 
 
@@ -17,7 +11,7 @@ end
 local EMPTY_TAG = 11400
 function BarracksSprite:ctor(city_layer, entity, city)
     BarracksSprite.super.ctor(self, city_layer, entity, city)
-    entity:AddBarracksListener(self)
+    city:GetUser():AddListenOnType(self, "soldierEvents")
 end
 function BarracksSprite:RefreshSprite()
     BarracksSprite.super.RefreshSprite(self)
@@ -25,7 +19,7 @@ function BarracksSprite:RefreshSprite()
 end
 function BarracksSprite:DoAni()
     if self:GetEntity():IsUnlocked() then
-        if self:GetEntity():IsRecruting() then
+        if #self:GetEntity():BelongCity():GetUser().soldierEvents > 0 then
             self:PlayAni()
             self:removeChildByTag(EMPTY_TAG)
         else

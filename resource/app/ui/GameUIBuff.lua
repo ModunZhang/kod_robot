@@ -22,12 +22,12 @@ function GameUIBuff:OnMoveInStage()
 end
 function GameUIBuff:CityBuff()
     local content = self:CreateItem(_("城市增益效果"),WidgetBackGroundWithInnerTitle.TITLE_COLOR.BLUE)
-    self:InitBuffs(ItemManager:GetAllCityBuffTypes(),content,"city")
+    self:InitBuffs(UtilsForItem:GetAllCityBuffTypes(),content,"city")
 
 end
 function GameUIBuff:WarBuff()
     local content = self:CreateItem(_("战争增益效果"),WidgetBackGroundWithInnerTitle.TITLE_COLOR.RED)
-    self:InitBuffs(ItemManager:GetAllWarBuffTypes(),content,"war")
+    self:InitBuffs(UtilsForItem:GetAllWarBuffTypes(),content,"war")
 end
 function GameUIBuff:CreateItem(title,title_color)
     local list = self.list

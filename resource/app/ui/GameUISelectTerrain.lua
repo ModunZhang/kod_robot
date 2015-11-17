@@ -5,9 +5,10 @@ local UICanCanelCheckBoxButtonGroup = import('.UICanCanelCheckBoxButtonGroup')
 local UICheckBoxButton = import(".UICheckBoxButton")
 local WidgetPopDialog = import("..widget.WidgetPopDialog")
 local GameUISelectTerrain = class("GameUISelectTerrain", WidgetPopDialog)
+local intInit = GameDatas.PlayerInitData.intInit
 
 
-    
+
 
 function GameUISelectTerrain:ctor()
     GameUISelectTerrain.super.ctor(self, 776, _("我们应该去哪儿?"), display.top - 100)
@@ -56,21 +57,24 @@ local terrain_map = {
 local desc_map = {
     grassLand = {
         title = _("草地"),
-        desc1 = _("绿龙的聚集地"),
-        desc2 = _("绿龙生命恢复速度+10%"),
-        desc3 = _("战斗中, 绿龙力量+10%"),
+        desc1 =  _("木材产量").. "+"..intInit.grassLandWoodAddPercent.value.."%",
+        desc2 = _("铁矿产量").. "+"..intInit.grassLandIronAddPercent.value.."%",
+        desc3 = _("石料产量").. "+"..intInit.grassLandStoneAddPercent.value.."%",
+        desc4 = _("粮食产量").. "+"..intInit.grassLandFoodAddPercent.value.."%",
     },
     desert = {
         title = _("沙漠"),
-        desc1 = _("红龙的聚集地"),
-        desc2 = _("红龙生命恢复速度+10%"),
-        desc3 = _("战斗中, 红龙力量+10%"),
+        desc1 =  _("步兵攻击").. "+"..intInit.desertAttackAddPercent.value.."%",
+        desc2 = _("弓手攻击").. "+"..intInit.desertAttackAddPercent.value.."%",
+        desc3 = _("骑兵攻击").. "+"..intInit.desertAttackAddPercent.value.."%",
+        desc4 = _("攻城器械攻击").. "+"..intInit.desertAttackAddPercent.value.."%",
     },
     iceField = {
         title = _("雪地"),
-        desc1 = _("蓝龙的聚集地"),
-        desc2 = _("蓝龙生命恢复速度+10%"),
-        desc3 = _("战斗中, 蓝龙力量+10%"),
+        desc1 =  _("步兵生命值").. "+"..intInit.iceFieldDefenceAddPercent.value.."%",
+        desc2 = _("弓手生命值").. "+"..intInit.iceFieldDefenceAddPercent.value.."%",
+        desc3 = _("骑兵生命值").. "+"..intInit.iceFieldDefenceAddPercent.value.."%",
+        desc4 = _("攻城器械生命值").. "+"..intInit.iceFieldDefenceAddPercent.value.."%",
     },
 }
 function GameUISelectTerrain:RefreshDragon(terrainType)
@@ -89,6 +93,7 @@ function GameUISelectTerrain:RefreshDragon(terrainType)
     self.ui_map.desc1:setString(desc_map[terrainType].desc1)
     self.ui_map.desc2:setString(desc_map[terrainType].desc2)
     self.ui_map.desc3:setString(desc_map[terrainType].desc3)
+    self.ui_map.desc4:setString(desc_map[terrainType].desc4)
     self.terrainType = terrainType
 end
 function GameUISelectTerrain:PromiseOfSelectDragon()
@@ -121,12 +126,12 @@ function GameUISelectTerrain:BuildUI()
             :setButtonSelected(true)
     ):addButton(
         UICheckBoxButton.new(checkbox_image)
-            -- :setButtonLabel(UIKit:ttfLabel({text = _("沙漠"),size = 20,color = 0x5c553f}))
-            -- :setButtonLabelOffset(40, 0)
+    -- :setButtonLabel(UIKit:ttfLabel({text = _("沙漠"),size = 20,color = 0x5c553f}))
+    -- :setButtonLabelOffset(40, 0)
     ):addButton(
         UICheckBoxButton.new(checkbox_image)
-            -- :setButtonLabel(UIKit:ttfLabel({text = _("雪地"),size = 20,color = 0x5c553f}))
-            -- :setButtonLabelOffset(40, 0)
+    -- :setButtonLabel(UIKit:ttfLabel({text = _("雪地"),size = 20,color = 0x5c553f}))
+    -- :setButtonLabelOffset(40, 0)
     ):addTo(self:GetBody()):pos(40, s.height - 430)
         :setButtonsLayoutMargin(0,130,0,0)
         :setIsSwitchModel(false)
@@ -135,7 +140,7 @@ function GameUISelectTerrain:BuildUI()
     UIKit:ttfLabel({text = _("沙漠"),size = 20,color = 0x5c553f}):addTo(self:GetBody()):pos(290, s.height - 400)
     UIKit:ttfLabel({text = _("雪地"),size = 20,color = 0x5c553f}):addTo(self:GetBody()):pos(480, s.height - 400)
 
-    local list_bg = display.newScale9Sprite("back_ground_540x64.png", s.width/2, s.height - 490, cc.size(540, 156))
+    local list_bg = display.newScale9Sprite("back_ground_540x64.png", s.width/2, s.height - 490, cc.size(540, 202))
         :align(display.TOP_CENTER):addTo(self:GetBody())
     local s3 = list_bg:getContentSize()
     local title_bg = display.newSprite("alliance_evnets_title_548x50.png")
@@ -143,6 +148,7 @@ function GameUISelectTerrain:BuildUI()
     local bar1 = display.newScale9Sprite("back_ground_548x40_1.png"):addTo(list_bg):pos(s3.width/2, s3.height-30):size(520,46)
     local bar2 = display.newScale9Sprite("back_ground_548x40_2.png"):addTo(list_bg):pos(s3.width/2, s3.height-30 - 46 * 1):size(520,46)
     local bar3 = display.newScale9Sprite("back_ground_548x40_1.png"):addTo(list_bg):pos(s3.width/2, s3.height-30 - 46 * 2):size(520,46)
+    local bar4 = display.newScale9Sprite("back_ground_548x40_2.png"):addTo(list_bg):pos(s3.width/2, s3.height-30 - 46 * 3):size(520,46)
 
     local s4 = title_bg:getContentSize()
     ui_map.title = UIKit:ttfLabel({size = 22,color = 0xffedae})
@@ -153,6 +159,8 @@ function GameUISelectTerrain:BuildUI()
         :align(display.LEFT_CENTER, 20, 23):addTo(bar2)
     ui_map.desc3 = UIKit:ttfLabel({size = 20,color = 0x403c2f})
         :align(display.LEFT_CENTER, 20, 23):addTo(bar3)
+    ui_map.desc4 = UIKit:ttfLabel({size = 20,color = 0x403c2f})
+        :align(display.LEFT_CENTER, 20, 23):addTo(bar4)
 
 
     ui_map.select = cc.ui.UIPushButton.new(
@@ -163,11 +171,13 @@ function GameUISelectTerrain:BuildUI()
         size = 24,
         color = 0xffedae,
         shadow= true
-    })):addTo(self:GetBody()):pos(s.width/2, 60)
+    })):addTo(self:GetBody()):pos(s.width/2, 50)
     return ui_map
 end
 
 return GameUISelectTerrain
+
+
 
 
 

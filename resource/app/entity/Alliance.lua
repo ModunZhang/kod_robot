@@ -1,141 +1,97 @@
+local Enum = import("..utils.Enum")
+local memberMeta = import(".memberMeta")
 local Localize = import("..utils.Localize")
 local property = import("..utils.property")
-local Enum = import("..utils.Enum")
-local Flag = import(".Flag")
-local AllianceShrine = import(".AllianceShrine")
-local AllianceMoonGate = import(".AllianceMoonGate")
-local AllianceMap = import(".AllianceMap")
-local HelpEvent = import(".HelpEvent")
-local memberMeta = import(".memberMeta")
 local MultiObserver = import(".MultiObserver")
-local MarchAttackEvent = import(".MarchAttackEvent")
-local MarchAttackReturnEvent = import(".MarchAttackReturnEvent")
-local AllianceItemsManager = import(".AllianceItemsManager")
 local Alliance = class("Alliance", MultiObserver)
-local VillageEvent = import(".VillageEvent")
-local AllianceBelvedere = import(".AllianceBelvedere")
-local config_palace = GameDatas.AllianceBuilding.palace
-local pushManager_ = app:GetPushManager()
-local audioManager_ = app:GetAudioManager()
---注意:突袭用的MarchAttackEvent 所以使用OnAttackMarchEventTimerChanged
+local buildingName = GameDatas.AllianceMap.buildingName
 Alliance.LISTEN_TYPE = Enum(
-    "OPERATION",
-    "BASIC",
-    "MEMBER",
-    "EVENTS",
-    "JOIN_EVENTS",
-    "HELP_EVENTS",
-    "ALL_HELP_EVENTS",
-    "FIGHT_REQUESTS",
-    "FIGHT_REPORTS",
-    "OnAttackMarchEventDataChanged",
-    "OnAttackMarchEventTimerChanged",
-    "OnAttackMarchReturnEventDataChanged",
-    "ALLIANCE_FIGHT",
-    "OnStrikeMarchEventDataChanged",
-    "OnStrikeMarchReturnEventDataChanged",
-    "OnVillageEventsDataChanged",
-    "OnVillageEventTimer",
-    "COUNT_INFO",
-    "VILLAGE_LEVELS_CHANGED",
-    "OnMarchEventRefreshed")
-local unpack = unpack
-property(Alliance, "id", nil)
-property(Alliance, "name", "")
-property(Alliance, "titles", {
-    ["member"]        = "__member",
-    ["supervisor"]    = "__supervisor",
-    ["quartermaster"] = "__quartermaster",
-    ["general"]       = "__general",
-    ["archon"]        = "__archon",
-    ["elite"]         = "__elite",
-})
-property(Alliance, "tag", "")
-property(Alliance, "defaultLanguage", "all")
-property(Alliance, "terrain", "grassLand")
-property(Alliance, "power", 0)
-property(Alliance, "createTime", 0)
-property(Alliance, "kill", 0)
-property(Alliance, "honour", 0)
-property(Alliance, "joinType", "all")
-property(Alliance, "maxMembers", 0)
-property(Alliance, "describe", "")
-property(Alliance, "notice", "")
-property(Alliance, "archon", "")
-property(Alliance, "monsterRefreshTime", 0)
--- 成员信息
+    "operation", -- 自己加的
+    "mapIndex",
+
+    "basicInfo",
+    "members",
+
+    "shrineDatas",
+    "shrineReports",
+    "shrineEvents",
+    "villageEvents",
+
+    "items",
+    "itemLogs",
+
+    "mapObjects",
+    "villageLevels",
+    "events",
+    "joinRequestEvents",
+    "helpEvents",
+    "marchEvents",
+    "buildings",
+    "allianceFight")
+property(Alliance, "_id", nil)
+property(Alliance, "mapIndex", nil)
+property(Alliance, "desc", "")
+
 property(Alliance, "members", {})
-property(Alliance, "memberCount", 0)
-property(Alliance, "status", "")
-property(Alliance, "statusStartTime", 0)
-property(Alliance, "statusFinishTime", 0)
-property(Alliance, "fightPosition", "")
-property(Alliance, "fightRequests", {})
+
+property(Alliance, "items", {})
+property(Alliance, "itemLogs", {})
+
+property(Alliance, "basicInfo", {})
 property(Alliance, "countInfo", {})
+
 property(Alliance, "events", {})
-property(Alliance, "joinRequestEvents", nil)
+property(Alliance, "joinRequestEvents", {})
+property(Alliance, "helpEvents", {})
+
 property(Alliance, "villages", {})
 property(Alliance, "monsters", {})
 property(Alliance, "villageLevels", {})
-property(Alliance, "allianceFight", {})
+
+property(Alliance, "allianceFight", nil)
 property(Alliance, "allianceFightReports", nil)
 property(Alliance, "lastAllianceFightReport", nil)
---行军事件
-property(Alliance, "attackMarchEvents", {})
-property(Alliance, "attackMarchReturnEvents", {})
-property(Alliance, "strikeMarchEvents", {})
-property(Alliance, "strikeMarchReturnEvents", {})
--- 村落事件
-property(Alliance, "villageEvents", {})
 function Alliance:ctor()
     Alliance.super.ctor(self)
-    self.flag = Flag:RandomFlag()
-    self.alliance_map = AllianceMap.new(self)
-    self.alliance_shrine = AllianceShrine.new(self)
-    self.alliance_belvedere = AllianceBelvedere.new(self) -- 村落采集
-    self.help_events = {}
-    -- 联盟道具管理
-    self.items_manager = AllianceItemsManager.new()
+    self.resources_cache = {
+        perception  = {limit = math.huge, output = 0},
+    }
 end
-function Alliance:GetAllianceBelvedere()
-    return self.alliance_belvedere
+
+--[[resourse begin]]
+function Alliance:GetPerceptionRes()
+    return self.resources_cache.perception
 end
-function Alliance:GetAllianceShrine()
-    return self.alliance_shrine
+function Alliance:GetPerception()
+    local res = self.resources_cache.perception
+    return GameUtils:GetCurrentProduction(
+        self.basicInfo.perception,
+        self.basicInfo.perceptionRefreshTime / 1000,
+        res.limit,
+        res.output,
+        app.timer:GetServerTime()
+    )
 end
-function Alliance:GetAllianceFight()
-    return self.allianceFight
+--[[end]]
+
+function Alliance:AddListenOnType(listener, listenerType)
+    if type(listenerType) == "string" then
+        listenerType = Alliance.LISTEN_TYPE[listenerType]
+    end
+    Alliance.super.AddListenOnType(self, listener, listenerType)
+end
+function Alliance:RemoveListenerOnType(listener, listenerType)
+    if type(listenerType) == "string" then
+        listenerType = Alliance.LISTEN_TYPE[listenerType]
+    end
+    Alliance.super.RemoveListenerOnType(self, listener, listenerType)
 end
 function Alliance:GetVillageLevels()
     return self.villageLevels
 end
-function Alliance:GetItemsManager()
-    return self.items_manager
-end
 function Alliance:ResetAllListeners()
-    self.alliance_shrine:ClearAllListener()
-    self.alliance_map:ClearAllListener()
     self:ClearAllListener()
 end
-function Alliance:GetAllianceMap()
-    return self.alliance_map
-end
-function Alliance:DecodeFromJsonData(json_data)
-    local alliance = Alliance.new()
-    alliance:SetId(json_data.id)
-    alliance:SetName(json_data.name)
-    alliance:SetTag(json_data.tag)
-    alliance:SetLanguage(json_data.language)
-    alliance:SetHonour(json_data.honour)
-    alliance:SetPower(json_data.power)
-    alliance:SetArchon(json_data.archon)
-    alliance:SetKill(json_data.kill)
-    alliance:SetMemberCount(json_data.members)
-    alliance:SetJoinType(json_data.joinType)
-    alliance:SetFlag(Flag:DecodeFromJson(json_data.flag))
-    return alliance
-end
-local alliance_title = Localize.alliance_title
 function Alliance:GetMemberTitle()
     return self:GetTitles()["member"]
 end
@@ -154,58 +110,25 @@ end
 function Alliance:GetEliteTitle()
     return self:GetTitles()["elite"]
 end
-function Alliance:ModifyTitleWithMemberType(member_type, new_name)
-    if self.titles[member_type] ~= new_name then
-        local old_value = self.titles[member_type]
-        self.titles[member_type] = new_name
-        self:OnBasicChanged{
-            ["title_name"] = {old = old_value, new = new_name}
-        }
-    end
-end
-function Alliance:SetTitleNames(title_names)
-    for k, v in pairs(title_names) do
-        self:ModifyTitleWithMemberType(k, v)
-    end
-end
 function Alliance:GetTitles()
-    return LuaUtils:table_map(self.titles, function(k, v)
-        if string.sub(v, 1, 2) == "__" then
-            return k, alliance_title[k]
-        end
-        return k,v
-    end)
-end
-function Alliance:Flag()
-    return self.flag
-end
-function Alliance:SetFlag(flag)
-    if self.flag:IsDifferentWith(flag) then
-        local old = self.flag
-        self.flag = flag
-        self:OnPropertyChange("flag", old, flag)
-    end
-end
-function Alliance:IsDefault()
-    return self:Id() == nil or self:Id() == json.null
-end
-function Alliance:OnPropertyChange(property_name, old_value, new_value)
-    local is_new_alliance = property_name == "id" and (old_value == nil or old_value == json.null) and new_value ~= nil
-    if is_new_alliance then
-        self:OnOperation("join")
-    end
-    self:OnBasicChanged{
-        [property_name] = {old = old_value, new = new_value}
+    return {
+        archon = Localize.alliance_title["archon"],
+        general = Localize.alliance_title["general"],
+        quartermaster = Localize.alliance_title["quartermaster"],
+        supervisor = Localize.alliance_title["supervisor"],
+        elite = Localize.alliance_title["elite"],
+        member = Localize.alliance_title["member"],
     }
 end
-function Alliance:OnBasicChanged(changed_map)
-    self:NotifyListeneOnType(Alliance.LISTEN_TYPE.BASIC, function(listener)
-        listener:OnAllianceBasicChanged(self, changed_map)
-    end)
+function Alliance:IsDefault()
+    return self._id == nil or self._id == json.null
+end
+function Alliance:OnPropertyChange(property_name, old_value, new_value)
+
 end
 function Alliance:IteratorAllMembers(func)
-    for id, v in pairs(self.members) do
-        if func(id, v) then
+    for _,v in pairs(self.members) do
+        if func(v) then
             return
         end
     end
@@ -213,7 +136,7 @@ end
 
 function Alliance:GetAllianceArchon()
     local archon = json.null
-    self:IteratorAllMembers(function(__,member)
+    self:IteratorAllMembers(function(member)
         if member:IsArchon() then
             archon = member
         end
@@ -222,10 +145,18 @@ function Alliance:GetAllianceArchon()
 end
 
 function Alliance:GetMemeberById(id)
-    return self.members[id]
+    for _,v in pairs(self.members) do
+        if v.id == id then
+            return v
+        end
+    end
 end
 function Alliance:GetMemberByMapObjectsId(id)
-    return self.members_mapObjects[id]
+    for _,v in pairs(self.members) do
+        if v.mapId == id then
+            return v
+        end
+    end
 end
 function Alliance:GetAllMembers()
     return self.members
@@ -238,6 +169,7 @@ function Alliance:GetMembersCount()
     return count
 end
 -- return 当前人数,在线人数,最大成员数
+local palace = GameDatas.AllianceBuilding.palace
 function Alliance:GetMembersCountInfo()
     local count,online,maxCount = 0,0,0
     for __,v in pairs(self:GetAllMembers()) do
@@ -246,21 +178,20 @@ function Alliance:GetMembersCountInfo()
             online = online + 1
         end
     end
-    return count,online,self:MaxMembers()
-end
-function Alliance:OnMemberChanged(changed_map)
-    self:NotifyListeneOnType(Alliance.LISTEN_TYPE.MEMBER, function(listener)
-        listener:OnMemberChanged(self, changed_map)
-    end)
-end
-function Alliance:GetFightRequestPlayerNum()
-    return #self.fightRequests
-end
-function Alliance:IsRequested()
-    for _,v in pairs(self:FightRequests()) do
-        if v == User:Id() then
-            return true
+    local maxmembers = palace[1].memberCount
+    for _,v in ipairs(self.buildings) do
+        if v.name == 'palace' then
+            maxmembers = palace[v.level].memberCount
+            break
         end
+    end
+    return count,online,maxmembers
+end
+-- 获取战争期敌对联盟信息
+function Alliance:GetEnemyAlliance()
+    local allianceFight = self:AllianceFight()
+    if allianceFight then
+        return self._id == allianceFight.attacker.alliance.id and allianceFight.defencer or allianceFight.attacker
     end
 end
 function Alliance:GetLastAllianceFightReports()
@@ -279,77 +210,41 @@ end
 function Alliance:GetOurLastAllianceFightReportsData()
     local last = self:GetLastAllianceFightReports()
     if last then
-        return self.id == last.attackAllianceId and last.attackAlliance or last.defenceAlliance
+        return self._id == last.attackAllianceId and last.attackAlliance or last.defenceAlliance
     end
 end
 function Alliance:GetEnemyLastAllianceFightReportsData()
     local last = self:GetLastAllianceFightReports()
     if last then
-        return self.id == last.attackAllianceId and last.defenceAlliance or last.attackAlliance
+        return self._id == last.attackAllianceId and last.defenceAlliance or last.attackAlliance
     end
 end
-function Alliance:GetAllHelpEvents()
-    return self.help_events
-end
 function Alliance:GetCouldShowHelpEvents()
+    local User = User
     local could_show = {}
-    for k,event in pairs(self.help_events) do
+    for k,event in pairs(self.helpEvents) do
         -- 去掉被自己帮助过的
         local isHelped
         local _id = User:Id()
-        for k,id in pairs(event:GetEventData():HelpedMembers()) do
+        for k,id in pairs(event.eventData.helpedMembers) do
             if id == _id then
                 isHelped = true
             end
         end
         if not isHelped then
             -- 已经帮助到最大次数的去掉
-            if #event:GetEventData():HelpedMembers() < event:GetEventData():MaxHelpCount() then
-
+            if #event.eventData.helpedMembers < event.eventData.maxHelpCount then
                 -- 属于自己的求助事件，已经结束的
                 local isFinished = false
-                if User:Id() == event:GetPlayerData():Id() then
+                if User:Id() == event.playerData.id then
                     local city = City
-                    local eventData = event:GetEventData()
-                    local type = eventData:Type()
-                    local event_id = eventData:Id()
-                    if type == "buildingEvents" then
-                        city:IteratorFunctionBuildingsByFunc(function(key, building)
-                            if building:UniqueUpgradingKey() == event_id then
-                                isFinished = true
-                            end
-                        end)
-                        -- 城墙，箭塔
-                        if city:GetGate():UniqueUpgradingKey() == event_id then
+                    local eventData = event.eventData
+                    local type = eventData.type
+                    local event_id = eventData.id
+                    for _,event in ipairs(User[type] or {}) do
+                        if event.id == event_id then
                             isFinished = true
                         end
-                        if city:GetTower():UniqueUpgradingKey() == event_id then
-                            isFinished = true
-                        end
-                    elseif type == "houseEvents" then
-                        city:IteratorDecoratorBuildingsByFunc(function(key, building)
-                            if building:UniqueUpgradingKey() == event_id then
-                                isFinished = true
-                            end
-                        end)
-                    elseif type == "productionTechEvents" then
-                        city:IteratorProductionTechEvents(function(productionTechnologyEvent)
-                            if productionTechnologyEvent:Id() == event_id then
-                                isFinished = true
-                            end
-                        end)
-                    elseif type == "militaryTechEvents" then
-                        city:GetSoldierManager():IteratorMilitaryTechEvents(function(militaryTechEvent)
-                            if militaryTechEvent:Id() == event_id then
-                                isFinished = true
-                            end
-                        end)
-                    elseif type == "soldierStarEvents" then
-                        city:GetSoldierManager():IteratorSoldierStarEvents(function(soldierStarEvent)
-                            if soldierStarEvent:Id() == event_id then
-                                isFinished = true
-                            end
-                        end)
                     end
                 else
                     isFinished = true
@@ -362,694 +257,536 @@ function Alliance:GetCouldShowHelpEvents()
     end
     return could_show
 end
-function Alliance:AddHelpEvent(event)
-    local help_events = self.help_events
-    assert(help_events[event:Id()] == nil)
-    help_events[event:Id()] = event
-    return event
-end
-function Alliance:RemoveHelpEvent(event)
-    return self:RemoveHelpEventById(event:Id())
-end
-function Alliance:RemoveHelpEventById(id)
-    local help_events = self.help_events
-    local old = help_events[id]
-    help_events[id] = nil
-    return old
-end
-function Alliance:EditHelpEvent(help_event)
-    local help_events = self.help_events
-    help_events[help_event.id]:UpdateData(help_event)
-    return help_events[help_event.id]
-end
-function Alliance:ReFreashHelpEvent(changed_help_event)
-    self:NotifyListeneOnType(Alliance.LISTEN_TYPE.HELP_EVENTS, function(listener)
-        listener:OnHelpEventChanged(changed_help_event)
-    end)
 
-end
-function Alliance:HasBeenRequestedToHelpSpeedup(eventId)
-    if self.help_events then
-        for _,h_event in pairs(self.help_events) do
-            if h_event:GetPlayerData():Id() == User:Id() and h_event:GetEventData():Id() == eventId then
-                return true
-            end
+local function IsCanbeHelpedByMe(event)
+    local _id = User:Id()
+    for k,id in pairs(event.eventData.helpedMembers) do
+        if id == _id then
+            return false
         end
     end
+    return event.playerData.id ~= _id
 end
 -- 获取其他所有联盟成员的申请的没有被自己帮助过的事件数量
 function Alliance:GetOtherRequestEventsNum()
     local request_num = 0
-    if self.help_events then
-        for _,h_event in pairs(self.help_events) do
-            if h_event:GetPlayerData():Id() ~= User:Id() and not h_event:IsHelpedByMe() then
-                request_num = request_num + 1
-            end
-        end
+    for _,v in pairs(self.helpEvents) do
+        request_num = request_num + (IsCanbeHelpedByMe(v) and 1 or 0)
     end
     return request_num
 end
-function Alliance:Reset()
+function Alliance:GetMapObjectType(mapobj)
+    return buildingName[mapobj.name] and buildingName[mapobj.name].type or mapobj.name
+end
+function Alliance:GetSizeWithMapObj(mapobj)
+    local size = buildingName[mapobj.name]
+    return size.width, size.height
+end
+function Alliance:GetLogicPositionWithMapObj(mapobj)
+    local location = mapobj.location
+    return location.x, location.y
+end
+function Alliance:GetMidLogicPositionWithMapObj(mapobj)
+    local w,h = Alliance:GetSizeWithMapObj(mapobj)
+    local x,y = Alliance:GetLogicPositionWithMapObj(mapobj)
+    return (2 * x - w + 1) / 2, (2 * y - h + 1) / 2
+end
+-- function Alliance:GetMidLogicPosition()
+--     local start_x, end_x, start_y, end_y = self:GetGlobalRegion()
+--     return (start_x + end_x) / 2, (start_y + end_y) / 2
+-- end
+-- function Alliance:GetTopLeftPoint()
+--     local start_x, end_x, start_y, end_y = self:GetGlobalRegion()
+--     return start_x, start_y
+-- end
+-- function Alliance:GetTopRightPoint()
+--     local start_x, end_x, start_y, end_y = self:GetGlobalRegion()
+--     return end_x, start_y
+-- end
+-- function Alliance:GetBottomLeftPoint()
+--     local start_x, end_x, start_y, end_y = self:GetGlobalRegion()
+--     return start_x, end_y
+-- end
+-- function Alliance:GetBottomRightPoint()
+--     local start_x, end_x, start_y, end_y = self:GetGlobalRegion()
+--     return end_x, end_y
+-- end
+function Alliance:IsContainPointWithMapObj(mapobj, x, y)
+    local start_x, end_x, start_y, end_y = Alliance:GetGlobalRegionWithMapObj(mapobj)
+    return x >= start_x and x <= end_x and y >= start_y and y <= end_y
+end
+-- function Alliance:IsIntersect(building)
+--     local start_x, end_x, start_y, end_y = building:GetGlobalRegion()
+--     if self:IsContainPoint(start_x, start_y) then
+--         return true
+--     end
+--     if self:IsContainPoint(start_x, end_y) then
+--         return true
+--     end
+--     if self:IsContainPoint(end_x, start_y) then
+--         return true
+--     end
+--     if self:IsContainPoint(end_x, end_y) then
+--         return true
+--     end
+-- end
+function Alliance:GetGlobalRegionWithMapObj(mapobj)
+    local w, h = Alliance:GetSizeWithMapObj(mapobj)
+    local x, y = Alliance:GetLogicPositionWithMapObj(mapobj)
+
+    local start_x, end_x, start_y, end_y
+
+    local is_orient_x = w > 0
+    local is_orient_neg_x = not is_orient_x
+    local is_orient_y = h > 0
+    local is_orient_neg_y = not is_orient_y
+
+    if is_orient_x then
+        start_x, end_x = x - w + 1, x
+    elseif is_orient_neg_x then
+        start_x, end_x = x, x + math.abs(w) - 1
+    end
+
+    if is_orient_y then
+        start_y, end_y = y - h + 1, y
+    elseif is_orient_neg_y then
+        start_y, end_y = y, y + math.abs(h) - 1
+    end
+    return start_x, end_x, start_y, end_y
+end
+
+function Alliance:IteratorAllianceBuildings(func)
+    for k,v in pairs(self:GetMapObjectsByType("building")) do
+        if func(k,v) then
+            return
+        end
+    end
+end
+function Alliance:IteratorCities(func)
+    for k,v in pairs(self:GetMapObjectsByType("member")) do
+        if func(k,v) then
+            return
+        end
+    end
+end
+function Alliance:IteratorVillages(func)
+    for k,v in pairs(self:GetMapObjectsByType("village")) do
+        if func(k,v) then
+            return
+        end
+    end
+end
+function Alliance:GetMapObjectsByType(type_)
+    local t = {}
+    for _,v in pairs(self.mapObjects) do
+        if buildingName[v.name].type == type_ then
+            table.insert(t, v)
+        end
+    end
+    return t
+end
+function Alliance:IteratorAllObjects(func)
+    for k, v in pairs(self.mapObjects) do
+        if func(k, v) then
+            return
+        end
+    end
+end
+function Alliance:FindMapObjectById(id)
+    for i,v in ipairs(self.mapObjects) do
+        if v.id == id then
+            return v
+        end
+    end
+end
+function Alliance:FindAllianceBuildingInfoByObjects(object)
+    if buildingName[object.name].type == "building" then
+        local id = object.id
+        for _,v in ipairs(self.buildings) do
+            if v.id == id then
+                return v
+            end
+        end
+    end
+end
+function Alliance:FindAllianceVillagesInfoByObject(object)
+    if buildingName[object.name].type == "village" then
+        local village_info = self:GetAllianceVillageInfosById(object.id)
+        if village_info then
+            return village_info
+        end
+    end
+end
+function Alliance:FindAllianceMonsterInfoByObject(object)
+    if buildingName[object.name].type == "monster" then
+        local monster_info = self:GetMapObjectInfoByObject(object)
+        if monster_info then
+            for i,v in ipairs(self.monsters) do
+                if v.id == monster_info.id then
+                    return v
+                end
+            end
+        end
+    end
+end
+function Alliance:FindAllianceBuildingInfoByName(name)
+    for k, v in pairs(self.buildings) do
+        if v.name == name then
+            return v
+        end
+    end
+end
+function Alliance:GetMapObjectInfoByObject(mapObj)
+    for k,v in pairs(self.mapObjects) do
+        local location = v.location
+        if location.x == mapObj.x and location.y == mapObj.y then
+            return v
+        end
+    end
+    return self:GetAllianceBuildingInfoByName(mapObj.name)
+end
+function Alliance:IsReachEventLimit()
+    return User.basicInfo.marchQueue <= #UtilsForEvent:GetAllMyMarchEvents()
+end
+function Alliance:GetMyMarchEvents()
+    local my_events = {}
+    if self.marchEvents then
+        for k,kindsOfEvents in pairs(self.marchEvents) do
+            for i,event in ipairs(kindsOfEvents) do
+                if event.attackPlayerData.id == User:Id() then
+                    table.insert(my_events, event)
+                end
+            end
+        end
+    end
+    return my_events
+end
+function Alliance:GetOtherToMineMarchEvents()
+    local to_my_events = {}
+    for k,kindsOfEvents in pairs(self.marchEvents) do
+        for i,event in ipairs(kindsOfEvents) do
+            if event.defencePlayerData and event.defencePlayerData.id == User:Id() then
+                event.eventType = k
+                table.insert(to_my_events, event)
+            end
+        end
+    end
+    return to_my_events
+end
+function Alliance:Reset(deltaData)
+    print("===================>Reset")
+    print(debug.traceback("", 2))
     property(self, "RESET")
-    self.help_events = {}
-    self.alliance_map:Reset()
-    self.alliance_shrine:Reset()
-    self:GetAllianceBelvedere():Reset()
-    self:ResetMarchEvent()
-    self:ResetVillageEvents()
-    self:OnOperation("quit")
+    self:OnOperation("quit", deltaData)
 end
-function Alliance:OnOperation(operation_type)
-    self:NotifyListeneOnType(Alliance.LISTEN_TYPE.OPERATION, function(listener)
-        listener:OnOperation(self, operation_type)
+
+--[[itemLogs begin]]
+function Alliance:SetNewGoodsCome(b)
+    self.isNewGoodsCome = b
+end
+function Alliance:GetItemCount(item_name)
+    return UtilsForItem:GetItemCount(self.items, item_name)
+end
+--[[end]]
+
+
+--[[shrine begin]]
+local shrineStage = GameDatas.AllianceInitData.shrineStage
+function Alliance:GetMaxStage()
+    local maxStages = 0
+    table.foreach(shrineStage,function(key, config)
+        if config.stage > maxStages then
+            maxStages = config.stage
+        end
     end)
+    return maxStages
 end
-function Alliance:OnEventsChanged()
-    self:NotifyListeneOnType(Alliance.LISTEN_TYPE.EVENTS, function(listener)
-        listener:OnEventsChanged(self)
+function Alliance:GetStageInfoBy(key)
+    if type(key) == "string" then
+        return shrineStage[key]
+    elseif type(key) == "number" then
+        for _,v in pairs(shrineStage) do
+            if v.index == index then
+                return v
+            end
+        end
+    end
+end
+function Alliance:CanSendTroopToShrine(member_id)
+    if self:GetShrineEventByPlayerId(member_id) then
+        printInfo("%s","已经驻防的部队检查到玩家信息")
+        return false
+    end
+    --check 正在行军的部队
+    for i,v in ipairs(self.marchEvents.attackMarchEvents) do
+        if v.marchType == "shrine" then
+            if member_id == v.attackPlayerData.id then
+                printInfo("%s","正在行军的部队检查到玩家信息")
+                return false
+            end
+        end
+    end
+    return true
+end
+function Alliance:GetShrineEventByPlayerId(id)
+    for _,event in ipairs(self.shrineEvents) do
+        for _,player in ipairs(event.playerTroops) do
+            if player.id == id then
+                return event
+            end
+        end
+    end
+end
+function Alliance:GetShrineEventsBySeq()
+    local r = {}
+    for _,v in pairs(self.shrineEvents) do
+        table.insert(r,v)
+    end
+    table.sort(r, function(a,b)
+        return a.startTime > b.startTime
     end)
+    return r
 end
-function Alliance:OnJoinEventsChanged()
-    self:NotifyListeneOnType(Alliance.LISTEN_TYPE.JOIN_EVENTS, function(listener)
-        listener:OnJoinEventsChanged(self)
-    end)
+function Alliance:GetShrineEventByStageName(stageName)
+    for _,event in pairs(self.shrineEvents) do
+        if event.stageName == stageName then
+            return event
+        end
+    end
 end
---更新联盟的成员人数限制
-function Alliance:UpdateMaxMemberCount(alliacne_data)
-    if alliacne_data and alliacne_data.buildings then
-        for __,v in ipairs(alliacne_data.buildings) do
-            if v.name == 'palace' then
-                self:SetMaxMembers(config_palace[v.level].memberCount)
-                break
+function Alliance:GetShrineEventByid(id)
+    for _,v in ipairs(self.shrineEvents) do
+        if v.id == id then
+            return v
+        end
+    end
+end
+function Alliance:GetStarInfoBy(stage)
+    local stagesinfo = {}
+    local stages_map = {}
+    for _,v in pairs(shrineStage) do
+        if shrineStage[v.stageName].stage == stage then
+            table.insert(stagesinfo, v)
+            stages_map[v.stageName] = v
+        end
+    end
+    local total_stars = #stagesinfo * 3
+    local stars = 0
+    for i,v in ipairs(self.shrineDatas) do
+        if stages_map[v.stageName] then
+            stars = stars + v.maxStar
+        end
+    end
+    return stars,total_stars
+end
+function Alliance:GetSubStagesInfoBy(stage)
+    local t = {}
+    for _,v in pairs(shrineStage) do
+        if v.stage == stage then
+            table.insert(t, v)
+        end
+    end
+    table.sort(t,function(a,b) return a.index < b.index end)
+    return t
+end
+function Alliance:IsSubStageUnlock(stageName)
+    local index = shrineStage[stageName].index - 1
+    if index <= 0 then return true end
+    for i,v in ipairs(self.shrineDatas) do
+        if shrineStage[v.stageName].index == index then
+            return true
+        end
+    end
+    return false
+end
+function Alliance:GetSubStageStar(stageName)
+    for i,v in ipairs(self.shrineDatas) do
+        if v.stageName == stageName then
+            return v.maxStar
+        end
+    end
+    return 0
+end
+--[[end]]
+function Alliance:GetEnemyAllianceMapIndex()
+    if self.allianceFight ~= nil
+        and self.allianceFight ~= json.null then
+        for k,v in pairs(self.allianceFight) do
+            if v.alliance.id ~= self._id then
+                return v.alliance.mapIndex
+            end
+        end
+    end
+end
+function Alliance:GetEnemyAllianceId()
+    if self.allianceFight ~= nil
+        and self.allianceFight ~= json.null then
+        for k,v in pairs(self.allianceFight) do
+            if v.alliance.id ~= self._id then
+                return v.alliance.id
             end
         end
     end
 end
 
-function Alliance:OnAllianceDataChanged(alliance_data,refresh_time,deltaData)
-    if alliance_data.notice then
-        self:SetNotice(alliance_data.notice)
-    end
-    if alliance_data.desc then
-        self:SetDescribe(alliance_data.desc)
-    end
-    if alliance_data.titles then
-        self:SetTitleNames(alliance_data.titles)
-    end
-    self:UpdateMaxMemberCount(alliance_data)
-    self:OnAllianceFightChanged(alliance_data, deltaData)
-    self:OnAllianceFightReportsChanged(alliance_data, deltaData)
-    self:OnAllianceBasicInfoChangedFirst(alliance_data,deltaData)
 
-    self:OnAllianceMemberDataChanged(alliance_data,deltaData)
-
-    self:OnAllianceEventsChanged(alliance_data,deltaData)
-
-    self:OnJoinRequestEventsChanged(alliance_data,deltaData)
-
-    self:OnHelpEventsChanged(alliance_data,deltaData)
-
-    self:OnAllianceCountInfoChanged(alliance_data, deltaData)
-
-
-    self:OnAllianceFightRequestsChanged(alliance_data, deltaData)
-
-    self:OnVillageLevelsChanged(alliance_data, deltaData)
-    self:OnVillagesChanged(alliance_data,deltaData)
-    self:OnMonstersChanged(alliance_data,deltaData)
-    self.alliance_shrine:OnAllianceDataChanged(alliance_data,deltaData,refresh_time)
-    self.alliance_map:OnAllianceDataChanged(alliance_data, deltaData)
-
-    self:OnAttackMarchEventsDataChanged(alliance_data,deltaData,refresh_time)
-
-    self:OnAttackMarchReturnEventsDataChanged(alliance_data,deltaData,refresh_time)
-
-    self:OnStrikeMarchEventsDataChanged(alliance_data,deltaData,refresh_time)
-
-    self:OnStrikeMarchReturnEventsDataChanged(alliance_data,deltaData,refresh_time)
-
-    self:OnVillageEventsDataChanged(alliance_data,deltaData,refresh_time)
-
-    -- 联盟道具管理
-    self.items_manager:OnItemsChanged(alliance_data,deltaData)
-    self.items_manager:OnItemLogsChanged(alliance_data,deltaData)
-
+--[[resouese begin]]
+local shrine = GameDatas.AllianceBuilding.shrine
+function Alliance:RefreshOutput()
+    local building = self:FindAllianceBuildingInfoByName("shrine")
+    local config = shrine[building.level]
+    self.resources_cache.perception.limit = config.perception
+    self.resources_cache.perception.output= config.pRecoveryPerHour
 end
+--[[end]]
+local before_map = {
+    items = function(allianceData, deltaData)
 
-function Alliance:OnAllianceBasicInfoChangedFirst(alliance_data,deltaData)
-    if not alliance_data.basicInfo then return end
-    local basicInfo = alliance_data.basicInfo
-    self:SetName(basicInfo.name)
-    self:SetTag(basicInfo.tag)
-    self:SetDefaultLanguage(basicInfo.language)
-    self:SetFlag(Flag:DecodeFromJson(basicInfo.flag))
-    self:SetTerrain(basicInfo.terrain)
-    self:SetJoinType(basicInfo.joinType)
-    self:SetKill(basicInfo.kill)
-    self:SetPower(basicInfo.power)
-    self:SetHonour(basicInfo.honour)
-    self:SetCreateTime(basicInfo.createTime)
-    self:SetStatus(basicInfo.status)
-    self:SetStatusStartTime(basicInfo.statusStartTime)
-    self:SetStatusFinishTime(basicInfo.statusFinishTime)
-    self:SetMonsterRefreshTime(basicInfo.monsterRefreshTime)
-end
-function Alliance:OnAllianceEventsChanged(alliance_data,deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.events ~= nil
-    if is_fully_update or is_delta_update then
-        self.events = alliance_data.events
-        self:OnEventsChanged()
-    end
-end
-function Alliance:OnJoinRequestEventsChanged(alliance_data,deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.joinRequestEvents ~= nil
-    if is_fully_update or is_delta_update then
-        self.joinRequestEvents = alliance_data.joinRequestEvents
-        self:OnJoinEventsChanged()
-    end
-end
-function Alliance:OnAllianceMemberDataChanged(alliance_data,deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.members ~= nil
-    if is_fully_update then
-        self.members_mapObjects = {}
-        self.members = {}
-        for _,v in ipairs(alliance_data.members) do
-            self.members[v.id] = self:DecodeMember(v)
+    end,
+    basicInfo = function(allianceData, deltaData)
+        allianceData:RefreshOutput()
+    end,
+    members = function()end,
+
+    items = function()end,
+    itemLogs = function(allianceData, deltaData)
+        local ok,value = deltaData("itemLogs.add")
+        if ok then
+            allianceData:SetNewGoodsCome(value[1].type == "addItem")
         end
-        self:OnMemberChanged()
-    end
-    if is_delta_update then
-        local changed_map = GameUtils:Handler_DeltaData_Func(
-            deltaData.members
-            ,function(event_data)
-                if not self.members[event_data.id] then
-                    self.members[event_data.id] = self:DecodeMember(event_data)
-                    return self.members[event_data.id]
+    end,
+
+    mapObjects = function()end,
+    villageLevels = function()end,
+
+    shrineDatas = function()end,
+    shrineReports = function()end,
+
+    events = function()end,
+    buildings = function()end,
+    joinRequestEvents = function()end,
+    allianceFight = function()end,
+    helpEvents = function(allianceData, deltaData)
+        if allianceData:IsMyAlliance() then
+            allianceData:NotifyHelpEvents(deltaData)
+        end
+    end,
+    marchEvents = function(allianceData, deltaData)
+        local ok, value = deltaData("marchEvents.attackMarchEvents.remove")
+        if ok then
+            for i,v in ipairs(value) do
+                if v.attackPlayerData.id == User._id then
+                    app:GetAudioManager():PlayeEffectSoundWithKey("ATTACK_PLAYER_ARRIVE")
                 end
             end
-            ,function(event_data)
-                if self.members[event_data.id] then
-                    self.members[event_data.id] = self:DecodeMember(event_data)
-                    return self.members[event_data.id]
+        end
+        local ok, value = deltaData("marchEvents.strikeMarchEvents.remove")
+        if ok then
+            for i,v in ipairs(value) do
+                if v.attackPlayerData.id == User._id then
+                    app:GetAudioManager():PlayeEffectSoundWithKey("STRIKE_PLAYER_ARRIVE")
                 end
             end
-            ,function(event_data)
-                if self.members[event_data.id] then
-                    self.members[event_data.id] = nil
-                    return event_data
+        end
+        local ok, value = deltaData("marchEvents.attackMarchReturnEvents.remove")
+        if ok then
+            for i,v in ipairs(value) do
+                if v.attackPlayerData.id == User._id then
+                    app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_BACK")
                 end
             end
-        )
-        self:OnMemberChanged(changed_map)
-    end
-end
-function Alliance:DecodeMember(member_raw)
-    local v = setmetatable(member_raw, memberMeta)
-    self.members_mapObjects[member_raw.mapId] = v
-    return v
-end
-function Alliance:OnAllianceFightRequestsChanged(alliance_data, deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.fightRequests ~= nil
-    if is_fully_update or is_delta_update then
-        self.fightRequests = alliance_data.fightRequests or {}
-        self:NotifyListeneOnType(Alliance.LISTEN_TYPE.FIGHT_REQUESTS, function(listener)
-            listener:OnAllianceFightRequestsChanged(#self.fightRequests)
-        end)
-    end
-end
-function Alliance:OnAllianceFightReportsChanged(alliance_data, deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.allianceFightReports ~= nil
-    if is_fully_update or is_delta_update then
-        self.allianceFightReports = alliance_data.allianceFightReports
-    end
-end
-function Alliance:OnHelpEventsChanged(alliance_data,deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.helpEvents ~= nil
-    if is_fully_update then
-        if alliance_data.helpEvents then
-            self.help_events = {}
-            for _,v in pairs(alliance_data.helpEvents) do
-                self.help_events[v.id] = HelpEvent.new():UpdateData(v)
-            end
-            self:NotifyListeneOnType(Alliance.LISTEN_TYPE.ALL_HELP_EVENTS, function(listener)
-                listener:OnAllHelpEventChanged(self.help_events)
-            end)
+        end
+    end,
+    shrineEvents = function()end,
+    villageEvents = function()end,
+}
+function Alliance:OnAllianceDataChanged(allianceData,refresh_time,deltaData)
+    dump(allianceData.allianceFight,"allianceFight")
+    local is_join, is_quit
+    if self._id ~= allianceData._id then
+        if (self._id == nil or self._id == json.null) and allianceData._id ~= nil and allianceData._id ~= json.null then
+            is_join = true
+        elseif self._id ~= nil and self._id ~= json.null and (allianceData._id == nil or allianceData._id == json.null) then
+            is_quit = true
         end
     end
-    if is_delta_update then
-        local added = {}
-        local removed = {}
-        local edit = {}
-        GameUtils:Handler_DeltaData_Func(
-            deltaData.helpEvents,
-            function(help_event)
-                local helpEvent = HelpEvent.new():UpdateData(help_event)
-                self:AddHelpEvent(helpEvent)
-                table.insert(added, helpEvent)
-            end,
-            function(help_event)
-                local helpEvent = self:EditHelpEvent(help_event)
-                table.insert(edit, helpEvent)
-            end,
-            function(help_event)
-                local helpEvent = HelpEvent.new():UpdateData(help_event)
-                self:RemoveHelpEvent(helpEvent)
-                table.insert(removed, helpEvent)
-            end
-        )
-        self:ReFreashHelpEvent{
-            added = added,
-            removed = removed,
-            edit = edit,
-        }
+    for k,v in pairs(allianceData) do
+        self[k] = v
     end
+    for _,v in ipairs(self.members) do
+        setmetatable(v, memberMeta)
+    end
+    if is_join then
+        self:OnOperation("join")
+    end
+
+    if deltaData then
+        for i,k in ipairs(Alliance.LISTEN_TYPE) do
+            local before_func = before_map[k]
+            if type(k) == "string" and before_func then
+                if deltaData(k) then
+                    before_func(self, deltaData)
+                    local notify_function_name = string.format("OnAllianceDataChanged_%s", k)
+                    self:NotifyListeneOnType(Alliance.LISTEN_TYPE[k], function(listener)
+                        local func = listener[notify_function_name]
+                        if func then
+                            func(listener, self, deltaData)
+                        end
+                    end)
+                end
+            end
+        end
+    else
+        self:RefreshOutput()
+    end
+end
+function Alliance:NotifyHelpEvents(deltaData)
+    local ok, value = deltaData("helpEvents")
+    if ok then
+        for k,v in pairs(value) do
+            if type(k) == "number" then
+                if v.eventData and v.eventData.helpedMembers and v.eventData.helpedMembers.add then
+                    local event = self.helpEvents[k]
+                    if event and event.playerData.id == User._id then
+                        self:NotifyMemberHelp(v.eventData.helpedMembers.add[1], event.eventData)
+                    end
+                end
+            end
+        end
+    end
+end
+function Alliance:NotifyMemberHelp(id, eventData)
+    local event_name
+    if eventData.type == "buildingEvents" or eventData.type == "houseEvents" then
+        event_name = Localize.building_name[eventData.name]
+    elseif eventData.type == "militaryTechEvents" then
+        local soldiers = string.split(eventData.name, "_")
+        local soldier_category = Localize.soldier_category
+        if soldiers[2] == "hpAdd" then
+            event_name = string.format(_("%s血量增加"),soldier_category[soldiers[1]])
+        else
+            event_name = string.format(_("%s对%s的攻击"),soldier_category[soldiers[1]],soldier_category[soldiers[2]])
+        end
+    elseif eventData.type == "soldierStarEvents" then
+        event_name = string.format(_("晋升%s的星级"),Localize.soldier_name[eventData.name])
+    elseif eventData.type == "productionTechEvents" then
+        event_name = Localize.productiontechnology_name[eventData.name]
+    end
+    local name = self:GetMemeberById(id):Name()
+    GameGlobalUI:showTips(_("提示"),string.format(_("%s帮助升级%s成功"),name,event_name))
+    app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
 end
 function Alliance:GetAllianceArchonMember()
-    for k,v in pairs(self.members) do
+    for _,v in pairs(self.members) do
         if v:IsArchon() then
             return v
         end
     end
-    return nil
 end
-
-function Alliance:OnTimer(current_time)
-    self:GetAllianceShrine():OnTimer(current_time)
-    self:IteratorAttackMarchEvents(function(attackMarchEvent)
-        attackMarchEvent:OnTimer(current_time)
+function Alliance:OnOperation(operation_type, deltaData)
+    self:NotifyListeneOnType(Alliance.LISTEN_TYPE.operation, function(listener)
+        listener["OnAllianceDataChanged_operation"](listener, self, operation_type, deltaData)
     end)
-    self:IteratorAttackMarchReturnEvents(function(attackMarchReturnEvent)
-        attackMarchReturnEvent:OnTimer(current_time)
-    end)
-    self:IteratorStrikeMarchEvents(function(strikeMarchEvent)
-        strikeMarchEvent:OnTimer(current_time)
-    end)
-    self:IteratorStrikeMarchReturnEvents(function(strikeMarchReturnEvent)
-        strikeMarchReturnEvent:OnTimer(current_time)
-    end)
-    self:IteratorVillageEvents(function(villageEvent)
-        villageEvent:OnTimer(current_time)
-    end)
-    if self:Status() == "prepare" and math.floor(self:StatusFinishTime() / 1000) == math.floor(current_time) then
-        app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_START")
-    end
-
-end
-
---行军事件
---------------------------------------------------------------------------------
-function Alliance:OnMarchEventTimer(attackMarchEvent)
-    self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnAttackMarchEventTimerChanged,attackMarchEvent)
-    if self:GetAllianceBelvedere()['OnAttackMarchEventTimerChanged'] then
-        self:GetAllianceBelvedere():OnAttackMarchEventTimerChanged(attackMarchEvent)
-    end
-end
-
-function Alliance:CallEventsChangedListeners(LISTEN_TYPE,changed_map)
-    self:NotifyListeneOnType(LISTEN_TYPE, function(listener)
-        listener[Alliance.LISTEN_TYPE[LISTEN_TYPE]](listener,changed_map,self)
-    end)
-    if self:GetAllianceBelvedere()[Alliance.LISTEN_TYPE[LISTEN_TYPE]] then
-        self:GetAllianceBelvedere()[Alliance.LISTEN_TYPE[LISTEN_TYPE]](self:GetAllianceBelvedere(),changed_map,self)
-    end
-end
-
-function Alliance:GetAttackMarchEvents(march_type)
-    local r = {}
-    if not march_type then
-        self:IteratorAttackMarchEvents(function(attackMarchEvent)
-            table.insert(r,attackMarchEvent)
-        end)
-    else
-        self:IteratorAttackMarchEvents(function(attackMarchEvent)
-            if attackMarchEvent:MarchType() == march_type then
-                table.insert(r,attackMarchEvent)
-            end
-        end)
-    end
-    return r
-end
-
-function Alliance:GetAttackMarchReturnEvents(march_type)
-    local r = {}
-    if not march_type then
-        self:IteratorAttackMarchReturnEvents(function(attackMarchReturnEvent)
-            table.insert(r,attackMarchReturnEvent)
-        end)
-    else
-        self:IteratorAttackMarchReturnEvents(function(attackMarchReturnEvent)
-            if attackMarchReturnEvent:MarchType() == march_type then
-                table.insert(r,attackMarchReturnEvent)
-            end
-        end)
-    end
-    return r
-end
-
-function Alliance:OnAttackMarchEventsDataChanged(alliance_data,deltaData,refresh_time)
-    if not alliance_data.attackMarchEvents then return end
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.attackMarchEvents ~= nil
-    if is_fully_update then
-        self:IteratorAttackMarchEvents(function(attackMarchEvent)
-            attackMarchEvent:Reset()
-        end)
-        self.attackMarchEvents = {}
-        for _,v in ipairs(alliance_data.attackMarchEvents) do
-            local attackMarchEvent = MarchAttackEvent.new()
-            attackMarchEvent:UpdateData(v,refresh_time)
-            self.attackMarchEvents[attackMarchEvent:Id()] = attackMarchEvent
-            attackMarchEvent:AddObserver(self)
-            self:updateWatchTowerLocalPushIf(attackMarchEvent)
-        end
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnMarchEventRefreshed,"OnAttackMarchEventsDataChanged")
-    end
-
-    if is_delta_update then
-        local changed_map = GameUtils:Handler_DeltaData_Func(
-            deltaData.attackMarchEvents
-            ,function(event_data)
-                local attackMarchEvent = MarchAttackEvent.new()
-                attackMarchEvent:UpdateData(event_data,refresh_time)
-                self.attackMarchEvents[attackMarchEvent:Id()] = attackMarchEvent
-                attackMarchEvent:AddObserver(self)
-                self:updateWatchTowerLocalPushIf(attackMarchEvent)
-                return attackMarchEvent
-            end
-            ,function(event_data)
-                if self.attackMarchEvents[event_data.id] then
-                    local attackMarchEvent = self.attackMarchEvents[event_data.id]
-                    attackMarchEvent:UpdateData(event_data,refresh_time)
-                    self:updateWatchTowerLocalPushIf(attackMarchEvent)
-                    return attackMarchEvent
-                end
-            end
-            ,function(event_data)
-                if self.attackMarchEvents[event_data.id] then
-                    local attackMarchEvent = self.attackMarchEvents[event_data.id]
-                    attackMarchEvent:Reset()
-                    self.attackMarchEvents[event_data.id] = nil
-                    attackMarchEvent = MarchAttackEvent.new()
-                    attackMarchEvent:UpdateData(event_data,refresh_time)
-                    self:cancelLocalMarchEventPushIf(attackMarchEvent)
-                    return attackMarchEvent
-                end
-            end
-        )
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnAttackMarchEventDataChanged,GameUtils:pack_event_table(changed_map))
-    end
-end
-
-function Alliance:IteratorAttackMarchEvents(func)
-    for _,attackMarchEvent in pairs(self.attackMarchEvents) do
-        func(attackMarchEvent)
-    end
-end
-
-
-function Alliance:OnAttackMarchReturnEventsDataChanged(alliance_data,deltaData,refresh_time)
-    if not alliance_data.attackMarchReturnEvents then return end
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.attackMarchReturnEvents ~= nil
-    if is_fully_update then
-        self:IteratorAttackMarchReturnEvents(function(attackMarchReturnEvent)
-            attackMarchReturnEvent:Reset()
-        end)
-        self.attackMarchReturnEvents = {}
-        for _,v in ipairs(alliance_data.attackMarchReturnEvents) do
-            local attackMarchReturnEvent = MarchAttackReturnEvent.new()
-            attackMarchReturnEvent:UpdateData(v,refresh_time)
-            self.attackMarchReturnEvents[attackMarchReturnEvent:Id()] = attackMarchReturnEvent
-            attackMarchReturnEvent:AddObserver(self)
-        end
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnMarchEventRefreshed,"OnAttackMarchReturnEventDataChanged")
-    end
-    if is_delta_update then
-        local changed_map = GameUtils:Handler_DeltaData_Func(
-            deltaData.attackMarchReturnEvents
-            ,function(event_data)
-                local attackMarchReturnEvent = MarchAttackReturnEvent.new()
-                attackMarchReturnEvent:UpdateData(event_data,refresh_time)
-                self.attackMarchReturnEvents[attackMarchReturnEvent:Id()] = attackMarchReturnEvent
-                attackMarchReturnEvent:AddObserver(self)
-                return attackMarchReturnEvent
-            end
-            ,function(event_data)
-                if self.attackMarchReturnEvents[event_data.id] then
-                    local attackMarchReturnEvent = self.attackMarchReturnEvents[event_data.id]
-                    attackMarchReturnEvent:UpdateData(event_data,refresh_time)
-                    return attackMarchReturnEvent
-                end
-            end
-            ,function(event_data)
-                if self.attackMarchReturnEvents[event_data.id] then
-                    local attackMarchReturnEvent = self.attackMarchReturnEvents[event_data.id]
-                    attackMarchReturnEvent:Reset()
-                    self.attackMarchReturnEvents[event_data.id] = nil
-                    attackMarchReturnEvent = MarchAttackReturnEvent.new()
-                    attackMarchReturnEvent:UpdateData(event_data,refresh_time)
-                    self:cancelLocalMarchEventPushIf(attackMarchReturnEvent)
-                    return attackMarchReturnEvent
-                end
-            end
-        )
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnAttackMarchReturnEventDataChanged,GameUtils:pack_event_table(changed_map))
-    end
-end
-
-function Alliance:IteratorAttackMarchReturnEvents(func)
-    for _,attackMarchReturnEvent in pairs(self.attackMarchReturnEvents) do
-        func(attackMarchReturnEvent)
-    end
-end
-
---重置行军事件
-function Alliance:ResetMarchEvent()
-    self:IteratorAttackMarchEvents(function(attackMarchEvent)
-        attackMarchEvent:Reset()
-    end)
-    self.attackMarchEvents = {}
-    self:IteratorAttackMarchReturnEvents(function(attackMarchReturnEvent)
-        attackMarchReturnEvent:Reset()
-    end)
-    self.attackMarchReturnEvents = {}
-
-    self:IteratorStrikeMarchEvents(function(strikeMarchEvent)
-        strikeMarchEvent:Reset()
-    end)
-    self.strikeMarchEvents = {}
-    self:IteratorStrikeMarchReturnEvents(function(strikeMarchReturnEvent)
-        strikeMarchReturnEvent:Reset()
-    end)
-    self.strikeMarchReturnEvents = {}
-end
-
-function Alliance:OnAllianceCountInfoChanged(alliance_data, deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.countInfo ~= nil
-    if is_fully_update or is_delta_update then
-        self.countInfo = alliance_data.countInfo
-        self:NotifyListeneOnType(Alliance.LISTEN_TYPE.COUNT_INFO, function(listener)
-            listener:OnAllianceCountInfoChanged(self, self.countInfo)
-        end)
-    end
-end
-function Alliance:OnAllianceFightChanged(alliance_data, deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.allianceFight ~= nil
-    if is_fully_update or is_delta_update then
-        self.allianceFight = alliance_data.allianceFight
-        if self.allianceFight ~= json.null and not LuaUtils:table_empty(self.allianceFight or {}) then
-            local mergeStyle = self:GetAllianceFight()['mergeStyle']
-            local isAttacker = self:Id() == self:GetAllianceFight()['attackAllianceId']
-            if isAttacker then
-                self:SetFightPosition(mergeStyle)
-            else
-                self:SetFightPosition(self:GetReversedPosition(mergeStyle))
-            end
-        else
-            self.allianceFight = {}
-            self:SetFightPosition("")
-        end
-        self:NotifyListeneOnType(Alliance.LISTEN_TYPE.ALLIANCE_FIGHT, function(listener)
-            listener:OnAllianceFightChanged(self,self.allianceFight)
-        end)
-    end
-end
-function Alliance:OnVillageLevelsChanged(alliance_data, deltaData)
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.villageLevels ~= nil
-    if is_fully_update or is_delta_update then
-        self.villageLevels = alliance_data.villageLevels
-        self:NotifyListeneOnType(Alliance.LISTEN_TYPE.VILLAGE_LEVELS_CHANGED, function(listener)
-            listener:OnVillageLevelsChanged(self)
-        end)
-    end
-end
-function Alliance:GetReversedPosition(p)
-    if p == 'left' then
-        return 'right'
-    elseif p == 'right' then
-        return 'left'
-    elseif p == 'top' then
-        return 'bottom'
-    elseif p == 'bottom' then
-        return 'top'
-    end
-end
-
-function Alliance:GetMyAllianceFightCountData()
-    local allianceFight = self.allianceFight
-    return self.id == allianceFight.attackAllianceId and allianceFight.attackAllianceCountData or allianceFight.defenceAllianceCountData
-end
-function Alliance:GetEnemyAllianceFightCountData()
-    local allianceFight = self.allianceFight
-    return self.id == allianceFight.attackAllianceId and allianceFight.defenceAllianceCountData or allianceFight.attackAllianceCountData
-end
-function Alliance:GetMyAllianceFightPlayerKills()
-    local allianceFight = self.allianceFight
-    return self.id == allianceFight.attackAllianceId and allianceFight.attackPlayerKills or allianceFight.defencePlayerKills
-end
-function Alliance:GetEnemyAllianceFightPlayerKills()
-    local allianceFight = self.allianceFight
-    return self.id == allianceFight.attackAllianceId and allianceFight.defencePlayerKills or allianceFight.attackPlayerKills
-end
-
-function Alliance:OnStrikeMarchEventsDataChanged(alliance_data,deltaData,refresh_time)
-    if not alliance_data.strikeMarchEvents then return end
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.strikeMarchEvents ~= nil
-    if is_fully_update then
-        self:IteratorStrikeMarchEvents(function(strikeMarchEvent)
-            strikeMarchEvent:Reset()
-        end)
-        self.strikeMarchEvents = {}
-        for _,v in ipairs(alliance_data.strikeMarchEvents) do
-            local strikeMarchEvent = MarchAttackEvent.new(true)
-            strikeMarchEvent:UpdateData(v,refresh_time)
-            self.strikeMarchEvents[strikeMarchEvent:Id()] = strikeMarchEvent
-            strikeMarchEvent:AddObserver(self)
-            self:updateWatchTowerLocalPushIf(strikeMarchEvent)
-        end
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnMarchEventRefreshed,"OnStrikeMarchEventDataChanged")
-    end
-    if is_delta_update then
-        local changed_map = GameUtils:Handler_DeltaData_Func(
-            deltaData.strikeMarchEvents
-            ,function(event_data)
-                local strikeMarchEvent = MarchAttackEvent.new(true)
-                strikeMarchEvent:UpdateData(event_data,refresh_time)
-                self.strikeMarchEvents[strikeMarchEvent:Id()] = strikeMarchEvent
-                strikeMarchEvent:AddObserver(self)
-                self:updateWatchTowerLocalPushIf(strikeMarchEvent)
-                return strikeMarchEvent
-            end
-            ,function(event_data)
-                if self.strikeMarchEvents[event_data.id] then
-                    local strikeMarchEvent = self.strikeMarchEvents[event_data.id]
-                    strikeMarchEvent:UpdateData(event_data,refresh_time)
-                    self:updateWatchTowerLocalPushIf(strikeMarchEvent)
-                    return strikeMarchEvent
-                end
-            end
-            ,function(event_data)
-                if self.strikeMarchEvents[event_data.id] then
-                    local strikeMarchEvent = self.strikeMarchEvents[event_data.id]
-                    strikeMarchEvent:Reset()
-                    self.strikeMarchEvents[event_data.id] = nil
-                    strikeMarchEvent = MarchAttackEvent.new(true)
-                    strikeMarchEvent:UpdateData(event_data,refresh_time)
-                    self:cancelLocalMarchEventPushIf(strikeMarchEvent)
-                    return strikeMarchEvent
-                end
-            end
-        )
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnStrikeMarchEventDataChanged,GameUtils:pack_event_table(changed_map))
-    end
-end
-
-function Alliance:IteratorStrikeMarchEvents(func)
-    for _,v in pairs(self.strikeMarchEvents) do
-        func(v)
-    end
-end
-
-function Alliance:OnStrikeMarchReturnEventsDataChanged(alliance_data,deltaData,refresh_time)
-    if not alliance_data.strikeMarchReturnEvents then return end
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.strikeMarchReturnEvents ~= nil
-    if is_fully_update then
-        self:IteratorStrikeMarchReturnEvents(function(strikeMarchReturnEvent)
-            strikeMarchReturnEvent:Reset()
-        end)
-        self.strikeMarchReturnEvents = {}
-        for _,v in ipairs(alliance_data.strikeMarchReturnEvents) do
-            local strikeMarchReturnEvent = MarchAttackReturnEvent.new(true)
-            strikeMarchReturnEvent:UpdateData(v,refresh_time)
-            self.strikeMarchReturnEvents[strikeMarchReturnEvent:Id()] = strikeMarchReturnEvent
-            strikeMarchReturnEvent:AddObserver(self)
-        end
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnMarchEventRefreshed,"OnStrikeMarchReturnEventDataChanged")
-    end
-    if is_delta_update then
-        local changed_map = GameUtils:Handler_DeltaData_Func(
-            deltaData.strikeMarchReturnEvents
-            ,function(event_data)
-                local strikeMarchReturnEvent = MarchAttackReturnEvent.new(true)
-                strikeMarchReturnEvent:UpdateData(event_data,refresh_time)
-                self.strikeMarchReturnEvents[strikeMarchReturnEvent:Id()] = strikeMarchReturnEvent
-                strikeMarchReturnEvent:AddObserver(self)
-                return strikeMarchReturnEvent
-            end
-            ,function(event_data)
-                if self.strikeMarchReturnEvents[event_data.id] then
-                    local strikeMarchReturnEvent = self.strikeMarchReturnEvents[event_data.id]
-                    strikeMarchReturnEvent:UpdateData(event_data,refresh_time)
-                    return strikeMarchReturnEvent
-                end
-            end
-            ,function(event_data)
-                if self.strikeMarchReturnEvents[event_data.id] then
-                    local strikeMarchReturnEvent = self.strikeMarchReturnEvents[event_data.id]
-                    strikeMarchReturnEvent:Reset()
-                    self.strikeMarchReturnEvents[event_data.id] = nil
-                    strikeMarchReturnEvent = MarchAttackReturnEvent.new(true)
-                    strikeMarchReturnEvent:UpdateData(event_data,refresh_time)
-                    self:cancelLocalMarchEventPushIf(strikeMarchReturnEvent)
-                    return strikeMarchReturnEvent
-                end
-            end
-        )
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnStrikeMarchReturnEventDataChanged,GameUtils:pack_event_table(changed_map))
-    end
-end
-
-function Alliance:IteratorStrikeMarchReturnEvents(func)
-    for _,v in pairs(self.strikeMarchReturnEvents) do
-        func(v)
-    end
-end
-
-function Alliance:GetStrikeMarchEvents(march_type)
-    local r = {}
-    if not march_type then
-        self:IteratorStrikeMarchEvents(function(strikeMarchEvent)
-            table.insert(r,strikeMarchEvent)
-        end)
-    else
-        self:IteratorStrikeMarchEvents(function(strikeMarchEvent)
-            if strikeMarchEvent:MarchType() == march_type then
-                table.insert(r,strikeMarchEvent)
-            end
-        end)
-    end
-    return r
 end
 
 function Alliance:CheckStrikeVillageHaveTarget(village_id)
@@ -1062,27 +799,12 @@ function Alliance:CheckStrikeVillageHaveTarget(village_id)
     return false
 end
 
-function Alliance:GetStrikeMarchReturnEvents(march_type)
-    local r = {}
-    if not march_type then
-        self:IteratorStrikeMarchReturnEvents(function(strikeMarchReturnEvent)
-            table.insert(r,strikeMarchReturnEvent)
-        end)
-    else
-        self:IteratorStrikeMarchReturnEvents(function(strikeMarchReturnEvent)
-            if strikeMarchReturnEvent:MarchType() == march_type then
-                table.insert(r,strikeMarchReturnEvent)
-            end
-        end)
-    end
-    return r
-end
 
 function Alliance:CheckHelpDefenceMarchEventsHaveTarget(memeberId)
-    local helpEvents = self:GetAttackMarchEvents("helpDefence")
-    for _,attackEvent in ipairs(helpEvents) do
-        if attackEvent:GetPlayerRole() == attackEvent.MARCH_EVENT_PLAYER_ROLE.SENDER
-            and attackEvent:GetDefenceData().id == memeberId then
+    local marchEvents = self.marchEvents.attackMarchEvents
+    for _,attackEvent in ipairs(marchEvents) do
+        if attackEvent.marchType == "helpDefence" and attackEvent.attackPlayerData.id == User:Id()
+            and attackEvent.defencePlayerData.id == memeberId then
             return true
         end
     end
@@ -1090,205 +812,54 @@ function Alliance:CheckHelpDefenceMarchEventsHaveTarget(memeberId)
 end
 
 function Alliance:GetSelf()
-    return self:GetMemeberById(User:Id())
+    return self:GetMemeberById(User._id)
 end
 
---这里会取敌方的的村落信息，因为可能是占领的敌方村落
-------------------------------------------------------------------------------------------
-function Alliance:OnVillageEventTimer(villageEvent)
-    local village = self:GetAllianceVillageInfos()[villageEvent:VillageData().id]
-    if not village and Alliance_Manager:HaveEnemyAlliance() then
-        local enemy_alliance = Alliance_Manager:GetEnemyAlliance()
-        village = enemy_alliance:GetAllianceVillageInfos()[villageEvent:VillageData().id]
-    end
-    if village then
-        if villageEvent:GetTime() >= 0 then
-            local left_resource = village.resource - villageEvent:CollectCount()
-            self:NotifyListeneOnType(Alliance.LISTEN_TYPE.OnVillageEventTimer, function(listener)
-                listener:OnVillageEventTimer(villageEvent,left_resource)
-            end)
-            if self:GetAllianceBelvedere()['OnVillageEventTimer'] then
-                self:GetAllianceBelvedere():OnVillageEventTimer(villageEvent,left_resource)
-            end
-        end
-    end
-end
-
---村落采集事件
-function Alliance:OnVillageEventsDataChanged(alliance_data,deltaData,refresh_time)
-    if not alliance_data.villageEvents then return end
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.villageEvents ~= nil
-    if is_fully_update then
-        local removed = {}
-        self:IteratorVillageEvents(function(villageEvent)
-            table.insert(removed,villageEvent)
-            villageEvent:Reset()
-        end)
-        self.villageEvents = {}
-        for _,v in ipairs(alliance_data.villageEvents) do
-            local villageEvent = VillageEvent.new()
-            villageEvent:UpdateData(v,refresh_time)
-            self.villageEvents[villageEvent:Id()] = villageEvent
-            villageEvent:AddObserver(self)
-        end
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnVillageEventsDataChanged,{removed = removed})
-    end
-    if is_delta_update then
-        local changed_map = GameUtils:Handler_DeltaData_Func(
-            deltaData.villageEvents
-            ,function(event_data)
-                local villageEvent = VillageEvent.new()
-                villageEvent:UpdateData(event_data,refresh_time)
-                self.villageEvents[villageEvent:Id()] = villageEvent
-                villageEvent:AddObserver(self)
-                return villageEvent
-            end
-            ,function(event_data)
-                if self.villageEvents[event_data.id] then
-                    local villageEvent = self.villageEvents[event_data.id]
-                    villageEvent:UpdateData(event_data,refresh_time)
-                    return villageEvent
-                end
-            end
-            ,function(event_data)
-                if self.villageEvents[event_data.id] then
-                    local villageEvent = self.villageEvents[event_data.id]
-                    villageEvent:Reset()
-                    self.villageEvents[villageEvent:Id()] = nil
-                    villageEvent = VillageEvent.new()
-                    villageEvent:UpdateData(event_data,refresh_time)
-                    return villageEvent
-                end
-            end
-        )
-        self:CallEventsChangedListeners(Alliance.LISTEN_TYPE.OnVillageEventsDataChanged,GameUtils:pack_event_table(changed_map))
-    end
-end
-
-function Alliance:IteratorVillageEvents(func)
-    for _,v in pairs(self.villageEvents) do
-        func(v)
-    end
-end
-function Alliance:ResetVillageEvents()
-    self:IteratorVillageEvents(function(villageEvent)
-        villageEvent:Reset()
-    end)
-    self.villageEvents = {}
-end
-
-function Alliance:CheckVillageMarchEventHaveTarget(village_Id)
-    local villageEvents = self:GetAttackMarchEvents("village")
-    for _,attackEvent in ipairs(villageEvents) do
-        if attackEvent:GetPlayerRole() == attackEvent.MARCH_EVENT_PLAYER_ROLE.SENDER
-            and attackEvent:GetDefenceData().id == village_Id then
-            return true
-        end
-    end
-    return false
-end
-
---有id为指定事件 没有id时获取所有采集事件
-function Alliance:GetVillageEvent(id)
-    if id then
-        return self.villageEvents[id]
-    else
-        local r = {}
-        self:IteratorVillageEvents(function(villageEvent)
-            table.insert(r, villageEvent)
-        end)
-        return r
-    end
-end
 function Alliance:FindVillageEventByVillageId(village_id)
     for _,v in pairs(self.villageEvents) do
-        if v:VillageData().id == village_id then
+        if v.villageData.id == village_id then
             return v
         end
     end
-    return nil
+    -- return nil
 end
 --TODO:检测村落重新刷新ui更新是否有bug
-function Alliance:OnVillagesChanged(alliance_data,deltaData)
-    if not alliance_data.villages then return end
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.villages ~= nil
-    if is_fully_update then
-        self.villages = {}
-        for _,v in ipairs(alliance_data.villages) do
-            self.villages[v.id] = v
-        end
-    end
-    if is_delta_update then
-        local changed_map = GameUtils:Handler_DeltaData_Func(
-            deltaData.villages
-            ,function(event_data)
-                self.villages[event_data.id] = event_data
-            end
-            ,function(event_data)
-                if self.villages[event_data.id] then
-                    self.villages[event_data.id] = event_data
-                end
-            end
-            ,function(event_data)
-                if self.villages[event_data.id] then
-                    self.villages[event_data.id] = nil
-                end
-            end
-        )
-    end
-end
-function Alliance:OnMonstersChanged(alliance_data,deltaData)
-    if not alliance_data.monsters then return end
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.monsters ~= nil
-    if is_fully_update then
-        self.monsters = {}
-        for _,v in ipairs(alliance_data.monsters) do
-            self.monsters[v.id] = v
-        end
-    end
-    if is_delta_update then
-        if #deltaData.monsters > 0 then
-            self.monsters = {}
-            for _,v in ipairs(alliance_data.monsters) do
-                self.monsters[v.id] = v
-            end
-        else
-            local changed_map = GameUtils:Handler_DeltaData_Func(
-                deltaData.monsters
-                ,function(event_data)
-                    self.monsters[event_data.id] = event_data
-                end
-                ,function(event_data)
-                    if self.monsters[event_data.id] then
-                        self.monsters[event_data.id] = event_data
-                    end
-                end
-                ,function(event_data)
-                    if self.monsters[event_data.id] then
-                        self.monsters[event_data.id] = nil
-                    end
-                end
-            )
-        end
-    end
-end
 function Alliance:IteratorAllianceVillageInfo(func)
     for _,v in pairs(self.villages) do
         func(v)
     end
 end
 
-function Alliance:GetAllianceVillageInfos()
-    return self.villages
+function Alliance:GetAllianceVillageInfosById(id)
+    for i,v in pairs(self.villages) do
+        if v.id == id then
+            return v
+        end
+    end
 end
-
-function Alliance:GetAllianceMonsterInfos()
-    return self.monsters
+function Alliance:GetAllianceMonsterInfosById(id)
+    for i,v in ipairs(self.monsters) do
+        if v.id == id then
+            return v
+        end
+    end
 end
-
+function Alliance:GetAllianceBuildingInfoByName(name)
+    for i,v in pairs(self.buildings) do
+        if v.name == name then
+            return v
+        end
+    end
+end
+function Alliance:CanCheckOtherAllianceCity()
+    return self:GetAllianceBuildingInfoByName("watchTower").level >= 3
+end
+function Alliance:CanCheckOtherAllianceCityBuildingLevel()
+    return self:GetAllianceBuildingInfoByName("watchTower").level >= 12
+end
+function Alliance:GetShrinePosition()
+    return {x = 13, y = 17}
+end
 function Alliance:SetIsMyAlliance(isMyAlliance)
     self.isMyAlliance = isMyAlliance
 end
@@ -1298,30 +869,32 @@ function Alliance:IsMyAlliance()
 end
 
 function Alliance:updateWatchTowerLocalPushIf(marchEvent)
-    if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
-        if not marchEvent:IsReturnEvent() then
-            local marchType = marchEvent:MarchType()
-            local msg = marchEvent:IsStrikeEvent() and _("你的城市正被敌军突袭") or _("你的城市正被敌军攻击")
-            local warningTime = self:GetAllianceBelvedere():GetWarningTime()
-            if marchType == 'city' then
-                pushManager_:UpdateWatchTowerPush(marchEvent:ArriveTime() - warningTime,msg,marchEvent:Id())
-            end
-        end
-    end
+-- if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
+--     if not marchEvent:IsReturnEvent() then
+--         local marchType = marchEvent:MarchType()
+--         local msg = marchEvent:IsStrikeEvent() and _("你的城市正被敌军突袭") or _("你的城市正被敌军攻击")
+--         local warningTime = self:GetAllianceBelvedere():GetWarningTime()
+--         if marchType == 'city' then
+--             app:GetPushManager():UpdateWatchTowerPush(marchEvent:ArriveTime() - warningTime,msg,marchEvent:Id())
+--         end
+--     end
+-- end
 end
 --因为这里添加了音效效果 so 所有的事件删除都要调用此方法
 function Alliance:cancelLocalMarchEventPushIf(marchEvent)
     if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
         if marchEvent:IsReturnEvent() then
             if not marchEvent:IsStrikeEvent() then --我的一般进攻部队返回城市
-                audioManager_:PlayeEffectSoundWithKey("TROOP_BACK")
+                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_BACK")
             end
         else
-            pushManager_:CancelWatchTowerPush(marchEvent:Id())
+            app:GetPushManager():CancelWatchTowerPush(marchEvent:Id())
         end
     end
 end
 return Alliance
+
+
 
 
 
