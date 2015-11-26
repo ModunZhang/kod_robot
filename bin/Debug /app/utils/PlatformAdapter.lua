@@ -26,6 +26,27 @@ end
 print("- CONFIG_IS_DEBUG :",CONFIG_IS_DEBUG)
 function PlatformAdapter:android()
     device.getOpenUDID = ext.getOpenUDID
+    
+    DEBUG_GET_ANIMATION_PATH = function(filePath)
+        filePath = string.gsub(filePath,".pvr.ccz",".png")
+        return filePath
+    end
+
+    if CONFIG_LOG_DEBUG_FILE then
+        local print__ = print
+        print = function ( ... )
+            print__(...)
+            local t = {}
+            for i,v in ipairs({...}) do
+                if not v then v = "nil" end
+                table.insert(t,tostring(v))
+            end
+            ext.__logFile(table.concat(t,"\t") .. "\n")
+        end
+    end
+
+    local fileutils = cc.FileUtils:getInstance()
+    fileutils:addSearchPath("res/animations")
 end
 
 
@@ -59,6 +80,48 @@ function PlatformAdapter:ios()
     end
 end
 
+
+function PlatformAdapter:winrt()
+    device.getOpenUDID = ext.getOpenUDID
+   
+    audio = require("app.utils.audio-WP")
+
+    DEBUG_GET_ANIMATION_PATH = function(filePath)
+        filePath = string.gsub(filePath,".pvr.ccz",".png")
+        return filePath
+    end
+
+    if true then -- 暂时未实现
+        ext.market_sdk = {}
+        setmetatable(ext.market_sdk,{
+            __index= function(t,key)
+                return function ( ... )
+                    print("\nfunction: ext.market_sdk." .. key .. "\n","args: ",...)
+                end
+            end
+        })
+    end
+    -- some functions
+    device.openURL = ext.openURL
+
+    -- device.showAlert(title, message, buttonLabels, listener)
+    device.showAlert = function( title, message, buttonLabels, listener )
+        ext.showAlert(title or "",message or "",buttonLabels[1] or "",listener)
+    end
+
+    if CONFIG_LOG_DEBUG_FILE then
+        local print__ = print
+        print = function ( ... )
+            print__(...)
+            local t = {}
+            for i,v in ipairs({...}) do
+                if not v then v = "nil" end
+                table.insert(t,tostring(v))
+            end
+            ext.__logFile(table.concat(t,"\t") .. "\n")
+        end
+    end
+end
 
 function PlatformAdapter:mac()
     ccui.UITextView = {}
@@ -189,14 +252,11 @@ function PlatformAdapter:mac()
     -- dump(run_pids_map)
     sourcePidMap(run_pids_map)
 
-    -- print_ = print
-    -- print = function()end
-
 
     local getOpenUDID = device.getOpenUDID
     device.getOpenUDID = function()
         return getOpenUDID().."_"..run_pids_map[pid]
-        -- return "1_0"
+        -- return "2"
     end
 end
 
@@ -211,10 +271,12 @@ function PlatformAdapter:common()
         local printError__ = printError
         printError = function(...)
             printError__(...)
-            local errDesc =   debug.traceback("", 2)
-            device.showAlert("☠Quick Framework错误☠",errDesc,"复制！",function()
-                ext.copyText(errDesc)
-            end)
+            if device.platform ~= 'winrt' then
+                local errDesc =   debug.traceback("", 2)
+                device.showAlert("☠Quick Framework错误☠",errDesc,"复制！",function()
+                    ext.copyText(errDesc)
+                end)
+            end
         end
     end
     self:gameCenter()

@@ -32,7 +32,7 @@ intInit["allianceFightPrepareMinutes"] = {
 }
 intInit["allianceFightTotalFightMinutes"] = {
 	["type"] = "allianceFightTotalFightMinutes",
-	["value"] = 45,
+	["value"] = 60,
 	["desc"] = "联盟战战争期时间"
 }
 intInit["allianceHelpDefenceTroopsMaxCount"] = {
@@ -67,12 +67,12 @@ intInit["dragonStrikeHpDecreasedPercent"] = {
 }
 intInit["allianceFightFaiedProtectMinutes"] = {
 	["type"] = "allianceFightFaiedProtectMinutes",
-	["value"] = 180,
+	["value"] = 480,
 	["desc"] = "联盟战失败保护期时间"
 }
 intInit["allianceFightSuccessProtectMinutes"] = {
 	["type"] = "allianceFightSuccessProtectMinutes",
-	["value"] = 180,
+	["value"] = 240,
 	["desc"] = "联盟战成功保护期时间"
 }
 intInit["KilledCitizenPerDragonExp"] = {
@@ -124,4 +124,14 @@ intInit["bigMapLength"] = {
 	["type"] = "bigMapLength",
 	["value"] = 35,
 	["desc"] = "大地图的大小"
+}
+intInit["allianceFightRewardHonour"] = {
+	["type"] = "allianceFightRewardHonour",
+	["value"] = 20000,
+	["desc"] = "联盟战荣耀值奖励"
+}
+intInit["allianceFightRewardGem"] = {
+	["type"] = "allianceFightRewardGem",
+	["value"] = 200,
+	["desc"] = "联盟战宝石奖励"
 }

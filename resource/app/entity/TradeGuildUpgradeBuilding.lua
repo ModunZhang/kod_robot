@@ -20,7 +20,7 @@ function TradeGuildUpgradeBuilding:GetMaxCart()
 	if tech.level > 0 then
         return math.ceil(config_function[self:GetEfficiencyLevel()].maxCart * (1 + tech_effect))
     end
-    return 0
+    return config_function[self:GetEfficiencyLevel()].maxCart
 end
 function TradeGuildUpgradeBuilding:GetMaxSellQueue()
 	if self:GetLevel() > 0 then
@@ -35,10 +35,13 @@ function TradeGuildUpgradeBuilding:GetCartRecovery()
     return 0
 end
 function TradeGuildUpgradeBuilding:GetNextLevelMaxCart()
-    if self:GetNextLevel() > 0 then
-        return config_function[self:GetNextLevel()].maxCart
+    local User = self:BelongCity():GetUser()
+    local tech = User.productionTechs["logistics"]
+    local tech_effect = UtilsForTech:GetEffect("logistics", tech)
+    if tech.level > 0 then
+        return math.ceil(config_function[self:GetNextLevel()].maxCart * (1 + tech_effect))
     end
-    return 0
+    return config_function[self:GetNextLevel()].maxCart
 end
 function TradeGuildUpgradeBuilding:GetNextLevelCartRecovery()
     if self:GetNextLevel() > 0 then

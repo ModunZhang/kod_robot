@@ -75,8 +75,17 @@ function WidgetInfoWithTitle:CreateInfoItems(info_message)
         end
 
         if v[3] then
-            display.newSprite(v[3]):align(display.RIGHT_CENTER, item_width-15, item_height/2):addTo(content)
-            text_2:setPositionX(item_width-60)
+            if tolua.type(v[3]) == "table" then
+                 text_3 = UIKit:ttfLabel({
+                    text = v[3][1],
+                    size = 20,
+                    color = v[3][2],
+                }):align(display.RIGHT_CENTER, item_width-20, item_height/2):addTo(content)
+                text_2:setPositionX(text_3:getPositionX() - text_3:getContentSize().width - 10)
+            else
+                display.newSprite(v[3]):align(display.RIGHT_CENTER, item_width-15, item_height/2):addTo(content)
+                text_2:setPositionX(item_width-60)
+            end
         end
 
         meetFlag =  not meetFlag

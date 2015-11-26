@@ -185,9 +185,9 @@ function GameUIBuild:OnBuildOnItem(item)
             {
                 listener =  function()
                     if need_gem > User:GetGemValue() then
-                        dialog:CreateOKButton(
+                        UIKit:showMessageDialog(_("提示"),_("金龙币不足")):CreateOKButton(
                             {
-                                llistener =  function ()
+                                listener =  function ()
                                     UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
                                     self:LeftButtonClicked()
                                 end,

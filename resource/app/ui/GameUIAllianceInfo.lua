@@ -106,7 +106,9 @@ function GameUIAllianceInfo:onEnter()
             self:BuildUI()
         end
     end):fail(function ()
-        self:LeftButtonClicked()
+        if self.LeftButtonClicked then
+            self:LeftButtonClicked()
+        end
     end)
 
 end
@@ -184,13 +186,12 @@ function GameUIAllianceInfo:LoadInfo()
 
 
     local languageTitleLabel = UIKit:ttfLabel({
-        text = _("语言"),
+        text = _("国家"),
         size = 20,
         color = 0x615b44
     }):addTo(info_bg):align(display.LEFT_BOTTOM,memberTitleLabel:getPositionX(),10)
-
     local languageValLabel = UIKit:ttfLabel({
-        text = Localize.alliance_language[alliance_data.language], -- language
+        text = Localize.alliance_language[alliance_data.country], -- language
         size = 20,
         color = 0x403c2f
     }):addTo(info_bg):align(display.LEFT_BOTTOM,languageTitleLabel:getPositionX() + languageTitleLabel:getContentSize().width + 10,10)
@@ -269,19 +270,19 @@ function GameUIAllianceInfo:OnJoinActionClicked(joinType,sender)
         if User.serverId ~= self.serverId then
             UIKit:showMessageDialog(_("提示"),_("不能加入其他服务器的联盟"))
             return
-        end
-        local alliance = self:GetAllianceData()
-        if alliance.members == alliance.membersMax then
-            UIKit:showMessageDialog(_("提示"),
-                _("联盟人数已达最大"))
-            return
-        end
-        NetManager:getJoinAllianceDirectlyPromise(self:GetAllianceData().id):fail(function()
+    end
+    local alliance = self:GetAllianceData()
+    if alliance.members == alliance.membersMax then
+        UIKit:showMessageDialog(_("提示"),
+            _("联盟人数已达最大"))
+        return
+    end
+    NetManager:getJoinAllianceDirectlyPromise(self:GetAllianceData().id):fail(function()
 
-            end):done(function()
-            GameGlobalUI:showTips(_("提示"),string.format(_("加入%s联盟成功!"),self:GetAllianceData().name))
-            self:LeftButtonClicked()
-            end)
+        end):done(function()
+        GameGlobalUI:showTips(_("提示"),string.format(_("加入%s联盟成功!"),self:GetAllianceData().name))
+        self:LeftButtonClicked()
+        end)
     else
         if User.serverId ~= self.serverId then
             UIKit:showMessageDialog(_("提示"),_("不能申请加入其他服务器的联盟"))
@@ -396,11 +397,11 @@ function GameUIAllianceInfo:SendMail(addressee,title,content)
     end
     local ar_data = self:GetAllianceArchonData()
     NetManager:getSendPersonalMailPromise(addressee, title, content,{
-                    id = ar_data.id,
-                    name = ar_data.name,
-                    icon = ar_data.icon,
-                    allianceTag = self:GetAllianceData().tag,
-                }):done(function(result)
+        id = ar_data.id,
+        name = ar_data.name,
+        icon = ar_data.icon,
+        allianceTag = self:GetAllianceData().tag,
+    }):done(function(result)
         self:removeFromParent()
         return result
     end)
@@ -661,6 +662,7 @@ function GameUIAllianceInfo:listviewListener(event)
     end
 end
 return GameUIAllianceInfo
+
 
 
 

@@ -68,7 +68,7 @@ function WidgetMaterialDetails:InitMaterialDetails(material_key,material_name)
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
     })
     list_node:addTo(bg):align(display.BOTTOM_CENTER, bg_width/2, 20)
-    if material_key == "buildingMaterials" or 
+    if material_key == "buildingMaterials" or
         material_key == "technologyMaterials" then
         self:CreateOriginItem(list,_("由工具作坊生产"),function ()
             if City:GetFirstBuildingByType("toolShop"):IsUnlocked() then
@@ -80,19 +80,15 @@ function WidgetMaterialDetails:InitMaterialDetails(material_key,material_name)
     elseif material_key == "dragonMaterials" then
         self:CreateOriginItem(list,_("参加联盟圣地战"),function ()
             if not Alliance_Manager:GetMyAlliance():IsDefault() then
-                local buildings = Alliance_Manager:GetMyAlliance():GetMapObjectsByType("building")
-                for k,v in pairs(buildings) do
-                    if v.name == "shrine" then
-                        app:EnterMyAllianceScene({
-                            x = v.location.x,
-                            y = v.location.y,
-                            id = Alliance_Manager:GetMyAlliance().id,
-                            callback = function (scene)
-                                UIKit:newGameUI("GameUIAllianceShrine",City,"fight_event", Alliance_Manager:GetMyAlliance():FindAllianceBuildingInfoByObjects(v)):AddToScene(scene, true)
-                            end
-                        })
+                app:EnterMyAllianceScene({
+                    mapIndex = Alliance_Manager:GetMyAlliance().mapIndex,
+                    x = 13,
+                    y = 17,
+                    id = Alliance_Manager:GetMyAlliance().id,
+                    callback = function (scene)
+                        UIKit:newGameUI("GameUIAllianceShrine",City,"fight_event", Alliance_Manager:GetMyAlliance():GetAllianceBuildingInfoByName("shrine")):AddToScene(scene, true)
                     end
-                end
+                })
             else
                 UIKit:showMessageDialog(_("主人"),_("您还没有加入联盟"))
             end
@@ -105,12 +101,13 @@ function WidgetMaterialDetails:InitMaterialDetails(material_key,material_name)
                 local mapObject = Alliance_Manager:GetMyAlliance():FindMapObjectById(Alliance_Manager:GetMyAlliance():GetSelf():MapId())
                 local location = mapObject.location
                 app:EnterMyAllianceScene({
+                    mapIndex = Alliance_Manager:GetMyAlliance().mapIndex,
                     x = location.x,
                     y = location.y,
                     id = Alliance_Manager:GetMyAlliance().id,
-                    callback = function (scene)
-                        UIKit:newGameUI("GameUIAllianceBattle", City):AddToScene(scene,true)
-                    end
+                    -- callback = function (scene)
+                    --     UIKit:newGameUI("GameUIAllianceBattle", City):AddToScene(scene,true)
+                    -- end
                 })
             else
                 UIKit:showMessageDialog(_("主人"),_("您还没有加入联盟"))
@@ -168,7 +165,7 @@ function WidgetMaterialDetails:CreateOriginItem(listView,label,callback)
 end
 function WidgetMaterialDetails:GetMaterialImage(material_key,material_name)
     local metarial = ""
-    if material_key == "buildingMaterials" or 
+    if material_key == "buildingMaterials" or
         material_key == "technologyMaterials" then
         metarial = "materials"
     elseif material_key == "dragonMaterials"  then
@@ -181,7 +178,7 @@ function WidgetMaterialDetails:GetMaterialImage(material_key,material_name)
     return UILib[metarial][material_name]
 end
 function WidgetMaterialDetails:GetProduceHeight(material_key)
-    if material_key == "buildingMaterials" or 
+    if material_key == "buildingMaterials" or
         material_key == "technologyMaterials" then
         return 57
     elseif material_key == "dragonMaterials" then
@@ -197,6 +194,7 @@ function WidgetMaterialDetails:Find()
 end
 
 return WidgetMaterialDetails
+
 
 
 

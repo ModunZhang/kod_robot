@@ -7,6 +7,8 @@ MailManager.LISTEN_TYPE = Enum("MAILS_CHANGED","UNREAD_MAILS_CHANGED","REPORTS_C
 
 function MailManager:ctor()
     MailManager.super.ctor(self)
+    self.unread_mail = 0
+    self.unread_report = 0
     self.mails = nil
     self.savedMails = nil
     self.sendMails = nil
@@ -19,6 +21,8 @@ function MailManager:ctor()
     self.is_last_saved_report = false
 end
 function MailManager:Reset()
+    self.unread_mail = 0
+    self.unread_report = 0
     self.mails = nil
     self.savedMails = nil
     self.sendMails = nil

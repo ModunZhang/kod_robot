@@ -42,7 +42,7 @@ function GameUIMoveSuccess:ctor(fromIndex, toIndex)
     }):addTo(self.bg):align(display.LEFT_CENTER, -150, -200)
 
     UIKit:ttfLabel({
-        text = DataUtils:getMapRoundByMapIndex(toIndex),
+        text = DataUtils:getMapRoundByMapIndex(toIndex) + 1,
         size = 22,
         color = 0xa1dd00,
     }):addTo(self.bg):align(display.CENTER, 170, -200)

@@ -11,8 +11,6 @@ local UIListView = import(".UIListView")
 local WidgetAllianceHelper = import("..widget.WidgetAllianceHelper")
 local Localize = import("..utils.Localize")
 local aliance_buff = GameDatas.AllianceMap.buff
--- local fire_wall = import("..particles.fire_wall")
-local revenge_limit = GameDatas.AllianceInitData.intInit.allianceRevengeMaxMinutes.value
 
 local GameUIAllianceBattle = UIKit:createUIClass('GameUIAllianceBattle', "GameUIWithCommonHeader")
 
@@ -380,8 +378,8 @@ function GameUIAllianceBattle:InitBattleStatistics()
             other_period_label:setString(Localize.period_type[basicInfo.status])
         end)
         local war_award_info = {
-            {_("联盟战荣耀值基础奖励"),"honour_128x128.png",GameDatas.AllianceInitData.fightRewards[User.serverLevel].honour},
-            {_("联盟战期间最高击杀者"),"gem_icon_62x61.png",GameDatas.AllianceInitData.fightRewards[User.serverLevel].gem},
+            {_("联盟战荣耀值基础奖励"),"honour_128x128.png",GameDatas.AllianceInitData.intInit.allianceFightRewardHonour.value},
+            {_("联盟战期间最高击杀者"),"gem_icon_62x61.png",GameDatas.AllianceInitData.intInit.allianceFightRewardGem.value},
             {_("可召集其他联盟前来助阵")},
             {_("将敌方所有玩家城墙摧毁可强制敌方联盟搬迁")},
         }
@@ -425,6 +423,10 @@ function GameUIAllianceBattle:InitBattleStatistics()
                 }))
                 :onButtonClicked(function(event)
                     if event.name == "CLICKED_EVENT" then
+                        if not alliance:GetMemeberById(User:Id()):IsTitleEqualOrGreaterThan("general") then
+                            UIKit:showMessageDialog(_("提示"),_("联盟操作权限不足"))
+                            return
+                        end
                         if alliance.basicInfo.status=="fight" or alliance.basicInfo.status=="prepare" then
                             UIKit:showMessageDialog(_("提示"),_("联盟正在战争准备期或战争期"))
                             return
@@ -613,7 +615,7 @@ function GameUIAllianceBattle:InitBattleStatistics()
             :addTo(honour_bg,2)
             :scale(50/128)
         UIKit:ttfLabel({
-            text = "+"..string.formatnumberthousands(GameDatas.AllianceInitData.fightRewards[User.serverLevel].honour),
+            text = "+"..string.formatnumberthousands(GameDatas.AllianceInitData.intInit.allianceFightRewardHonour.value),
             size = 22,
             color = 0x90e300,
         }):addTo(honour_bg,2)
@@ -626,7 +628,7 @@ function GameUIAllianceBattle:InitBattleStatistics()
             :addTo(gem_bg,2)
             :scale(0.7)
         UIKit:ttfLabel({
-            text = "+"..string.formatnumberthousands(GameDatas.AllianceInitData.fightRewards[User.serverLevel].gem),
+            text = "+"..string.formatnumberthousands(GameDatas.AllianceInitData.intInit.allianceFightRewardGem.value),
             size = 22,
             color = 0x90e300,
         }):addTo(gem_bg,2)
@@ -1257,14 +1259,20 @@ function GameUIAllianceBattle:HistoryDelegate(listView, tag, idx)
     end
 end
 function GameUIAllianceBattle:CreateHistoryContent()
-    local w,h = 568,338
+    local w,h = 568,338 + 5 * 46
     local content = WidgetUIBackGround.new({height=h,width=w},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
-    -- 战斗发生时间
     UIKit:ttfLabel({
         text = _("立即定位到敌方联盟"),
         size = 20,
         color = 0x615b44,
-    }):align(display.LEFT_CENTER,20, 40)
+    }):align(display.LEFT_CENTER,20, 50)
+        :addTo(content)
+    -- 战斗发生时间
+    local fight_time = UIKit:ttfLabel({
+        text = "",
+        size = 20,
+        color = 0x615b44,
+    }):align(display.LEFT_CENTER,20, 20)
         :addTo(content)
 
     local fight_bg = display.newSprite("report_back_ground.png")
@@ -1311,7 +1319,7 @@ function GameUIAllianceBattle:CreateHistoryContent()
         :addTo(fight_bg)
 
     -- 击杀数，击溃城市
-    local info_bg = WidgetUIBackGround.new({width = 540,height = 160},WidgetUIBackGround.STYLE_TYPE.STYLE_6)
+    local info_bg = WidgetUIBackGround.new({width = 540,height = 160 + 5 * 46},WidgetUIBackGround.STYLE_TYPE.STYLE_6)
         :align(display.BOTTOM_CENTER,w/2,80):addTo(content)
     local function createItem(info,meetFlag)
         local content
@@ -1387,7 +1395,7 @@ function GameUIAllianceBattle:CreateHistoryContent()
 
         enemy_alliance_name:setString(enemyAlliance.name)
         enemy_alliance_tag:setString("["..enemyAlliance.tag.."]")
-
+        fight_time:setString(GameUtils:formatTimeStyle2(report.fightTime))
         if self.self_flag then
             self.self_flag:SetFlag(ourAlliance.flag)
         else
@@ -1406,14 +1414,18 @@ function GameUIAllianceBattle:CreateHistoryContent()
                 :addTo(fight_bg)
             self.enemy_flag = enemy_flag
         end
-
         local info_message = {
             {string.formatnumberthousands(ourAlliance.kill),_("击杀积分"),string.formatnumberthousands(enemyAlliance.kill)},
             {string.formatnumberthousands(ourAlliance.routCount),_("击溃城市"),string.formatnumberthousands(enemyAlliance.routCount)},
             {string.formatnumberthousands(ourAlliance.attackCount),_("进攻次数"),string.formatnumberthousands(enemyAlliance.attackCount)},
+            {ourAlliance.attackSuccessCount,_("进攻获胜"),enemyAlliance.attackSuccessCount},
+            {ourAlliance.strikeCount,_("突袭次数"),enemyAlliance.strikeCount},
+            {ourAlliance.strikeSuccessCount,_("突袭成功"),enemyAlliance.strikeSuccessCount},
+            {killMax.allianceId == alliance._id and killMax.playerName ~= json.null and killMax.playerName or _("无"),_("头号杀手"),killMax.allianceId ~= alliance._id and killMax.playerName ~= json.null and killMax.playerName or _("无")},
+            {string.formatnumberthousands(ourAlliance.honour),_("荣耀值奖励"),string.formatnumberthousands(enemyAlliance.honour)},
         }
         local b_flag = true
-        local origin_y = 160 - 33
+        local origin_y = 160 + 5 * 46 - 33
         local gap_y = 46
         for i,v in ipairs(info_message) do
             createItem(v,b_flag):align(display.CENTER, 270, origin_y - (i-1)*gap_y):addTo(info_bg)

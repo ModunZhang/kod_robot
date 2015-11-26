@@ -1,7 +1,14 @@
 require("cocos.cocos2d.Cocos2dConstants")
 print("加载玩家自定义函数!")
 NOT_HANDLE = function(...) print("net message not handel, please check !") end
-local texture_data_file = device.platform == 'ios' and ".texture_data_iOS" or ".texture_data"
+
+local texture_data_file = ".texture_data"
+if device.platform == 'ios' then
+    texture_data_file = ".texture_data_iOS" 
+elseif device.platform == 'winrt' then
+    texture_data_file = ".texture_data_wp" 
+end
+
 plist_texture_data     = import(texture_data_file)
 local sharedSpriteFrameCache = cc.SpriteFrameCache:getInstance()
 local rgba4444 = import(".rgba4444")
@@ -340,7 +347,7 @@ function display.newTTFLabel(params)
         if device.platform == 'mac' then
             label = cc.Label:createWithTTF(text, font, size, dimensions, textAlign, textValign)
         else
-            label = cc.Label:createWithTTF(text, font, size, dimensions, textAlign, textValign,0)
+            label = cc.Label:createWithTTF(text, font, size, dimensions, textAlign, textValign)
         end
     else
         label = cc.Label:createWithSystemFont(text, font, size, dimensions, textAlign, textValign)
@@ -433,8 +440,8 @@ function display.newSprite(...)
             local plistName = string.sub(found_data_in_plist,1,string.find(found_data_in_plist,"%.") - 1)
             plistName = string.format("%s.plist",plistName)
             display.addSpriteFrames(plistName,found_data_in_plist)
+            printInfo("newSprite: %s load plist texture:%s",name,found_data_in_plist)
         end
-        printInfo("newSprite: %s load plist texture:%s",name,found_data_in_plist)
         args[1] = string.format("#%s",name)
     end
     local sp = display.__newSprite(unpack(args))

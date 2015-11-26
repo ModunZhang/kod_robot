@@ -105,8 +105,8 @@ function GameUIAllianceVillageEnter:GetBuildingInfo()
     }
     local labels = {}
     local village_id = self:GetVillageInfo().id
-    local villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetMyAlliance(), village_id)
-    dump(villageEvent,"villageEvent")
+    local villageEvent = Alliance_Manager:GetMyAllianceVillageEventsByMapId(self:GetMyAlliance(), village_id)
+    local other_villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetFocusAlliance(),village_id)
     if villageEvent then --我方占领
         local startTime = villageEvent.startTime/1000.0
         local finishTime = villageEvent.finishTime/1000.0
@@ -135,7 +135,57 @@ function GameUIAllianceVillageEnter:GetBuildingInfo()
         self:GetProgressTimer():setPercentage(percent*100)
         self:GetProcessLabel():setString(str)
         scheduleAt(self, function()
-            local villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetMyAlliance(), village_id)
+            local villageEvent = Alliance_Manager:GetMyAllianceVillageEventsByMapId(self:GetMyAlliance(), village_id)
+            if not villageEvent then
+                self:LeftButtonClicked()
+                return
+            end
+            local collectTime = app.timer:GetServerTime() - startTime
+            local collectCount = math.floor(collectSpeed * collectTime)
+
+            local str = string.formatnumberthousands(self:GetVillageInfo().resource - collectCount) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
+            local percent = (self:GetVillageInfo().resource - collectCount)/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+            self:GetProgressTimer():setPercentage(percent*100)
+            self:GetProcessLabel():setString(str)
+            local label = self:GetInfoLabelByTag(900)
+            if label then
+                label:setString(string.formatnumberthousands(collectCount) .. "(" .. math.floor(collectCount/villageEvent.villageData.collectTotal * 100)  .. "%)")
+            end
+            local label = self:GetInfoLabelByTag(1000)
+            if label then
+                label:setString(GameUtils:formatTimeStyle1(math.ceil(finishTime - app.timer:GetServerTime())))
+            end
+        end)
+    elseif other_villageEvent then -- 第三方玩家占领
+        local villageEvent = other_villageEvent
+        local startTime = villageEvent.startTime/1000.0
+        local finishTime = villageEvent.finishTime/1000.0
+        local collectTime = app.timer:GetServerTime() - startTime
+        local collectSpeed = villageEvent.villageData.collectTotal/(finishTime - startTime)
+        local collectCount = math.floor(collectSpeed * collectTime)
+        local occupy_label = {
+            {_("占领者"),0x615b44},
+            {_("未知"),0x403c2f}
+        }
+        local current_collect_label =  {
+            {_("当前采集"),0x615b44},
+            {collectCount .. "(" .. math.floor(collectCount/villageEvent.villageData.collectTotal * 100)  .. "%)",0x403c2f,900},
+        }
+        local end_time_label = {
+            {_("完成时间"),0x615b44},
+            {
+                villageEvent.finishTime/1000.0 <= app.timer:GetServerTime() and _("已完成") or GameUtils:formatTimeStyle1(math.ceil(finishTime - app.timer:GetServerTime())),
+                0x403c2f,
+                1000
+            },
+        }
+        labels = {location,occupy_label,current_collect_label,end_time_label}
+        local str = string.formatnumberthousands(self:GetVillageInfo().resource - collectCount) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
+        local percent = (self:GetVillageInfo().resource - collectCount)/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+        self:GetProgressTimer():setPercentage(percent*100)
+        self:GetProcessLabel():setString(str)
+        scheduleAt(self, function()
+            local villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetFocusAlliance(),village_id)
             if not villageEvent then
                 self:LeftButtonClicked()
                 return
@@ -161,12 +211,12 @@ function GameUIAllianceVillageEnter:GetBuildingInfo()
             {_("占领者"),0x615b44},
             {_("无"),0x403c2f}
         }
-    labels = {location,no_one_label}
-    local str = string.formatnumberthousands(self:GetVillageInfo().resource) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
-    local percent = self:GetVillageInfo().resource/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
-    self:GetProgressTimer():setPercentage(percent*100)
-    self:GetProcessLabel():setString(str)
-    end
+        labels = {location,no_one_label}
+        local str = string.formatnumberthousands(self:GetVillageInfo().resource) .. "/" .. string.formatnumberthousands(VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production)
+        local percent = self:GetVillageInfo().resource/VillageEvent.GetVillageConfig(self:GetVillageInfo().name,self:GetVillageInfo().level).production
+        self:GetProgressTimer():setPercentage(percent*100)
+        self:GetProcessLabel():setString(str)
+        end
     return labels
 end
 
@@ -240,7 +290,8 @@ end
 function GameUIAllianceVillageEnter:GetEnterButtons()
     local buttons = {}
     local village_id = self:GetVillageInfo().id
-    local villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetMyAlliance(), village_id)
+    local villageEvent = Alliance_Manager:GetMyAllianceVillageEventsByMapId(self:GetMyAlliance(), village_id)
+    local other_villageEvent = Alliance_Manager:GetVillageEventsByMapId(self:GetFocusAlliance(),village_id)
     local alliance_id = self:GetFocusAlliance()._id
     local checkMeIsProtectedWarinng = self:CheckMeIsProtectedWarinng()
     local focus_alliance = self:GetFocusAlliance()
@@ -281,7 +332,7 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
             buttons = {attack_button}
         end
     else --我方未占领
-        if villageEvent then -- 敌方占领
+        if other_villageEvent then -- 敌方占领
             local attack_button = self:BuildOneButton("capture_38x56.png", _("占领")):onButtonClicked(function()
                 local toLocation = self:GetLogicPosition()
 

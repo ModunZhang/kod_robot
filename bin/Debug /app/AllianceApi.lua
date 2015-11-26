@@ -14,7 +14,7 @@ function AllianceApi:CreateAlliance()
         local tmp = {"desert","iceField","grassLand"}
         local terrian = tmp[random]
         print("创建联盟")
-        return NetManager:getCreateAlliancePromise(name,tag,"all",terrian,WidgetAllianceHelper.new():RandomFlagStr())
+        return NetManager:getCreateAlliancePromise(name,tag,"ALL",terrian,WidgetAllianceHelper.new():RandomFlagStr())
     end
 end
 function AllianceApi:JoinAlliance(id)
@@ -230,10 +230,10 @@ function AllianceApi:UpgradeAllianceBuilding()
     if not Alliance_Manager:GetMyAlliance():IsDefault() then
         local alliance = Alliance_Manager:GetMyAlliance()
         local building_names = {
-            "orderHall",
+            -- "orderHall",
             "palace",
-            "shop",
-            "shrine",
+            -- "shop",
+            -- "shrine",
         }
         local building_name = building_names[math.random(#building_names)]
         local building = alliance:GetAllianceBuildingInfoByName(building_name)
@@ -867,10 +867,10 @@ local function MoveAlliance()
 end
 
 return {
-    -- setRun,
+    setRun,
     JoinAlliance,
     ApproveOrRejectJoinAllianceRequest,
-    -- InviteToJoinAlliance,
+    InviteToJoinAlliance,
     CancelJoinAlliance,
     RequestSpeedUp,
     HelpSpeedUp,

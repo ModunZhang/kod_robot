@@ -316,7 +316,7 @@ function GameUIAlliance:RefreshJoinListContent(alliance,content,idx)
     content.nameLabel:setString(string.format("[%s] %s",alliance.tag,alliance.name))
     content.memberValLabel:setString(string.format("%s/%s",alliance.members,alliance.membersMax))
     content.fightingValLabel:setString(string.formatnumberthousands(alliance.power))
-    content.languageValLabel:setString(alliance.language)
+    content.languageValLabel:setString(Localize.alliance_language[alliance.country])
     content.killValLabel:setString(string.formatnumberthousands(alliance.kill))
     content.leaderLabel:setString(alliance.archon)
     local terrain = alliance.terrain
@@ -438,7 +438,7 @@ function GameUIAlliance:GetJoinListItemContent()
 
 
     local languageTitleLabel = UIKit:ttfLabel({
-        text = _("语言"),
+        text = _("国家"),
         size = 20,
         color = 0x615b44
     }):addTo(info_bg):align(display.LEFT_BOTTOM,memberTitleLabel:getPositionX(),10)
@@ -631,13 +631,13 @@ function GameUIAlliance:getCommonListItem_(listType,alliance)
 
 
     local languageTitleLabel = UIKit:ttfLabel({
-        text = _("语言"),
+        text = _("国家"),
         size = 20,
         color = 0x615b44
     }):addTo(info_bg):align(display.LEFT_BOTTOM,memberTitleLabel:getPositionX(),10)
 
     local languageValLabel = UIKit:ttfLabel({
-        text = alliance.language, -- language
+        text = Localize.alliance_language[alliance.country], -- language
         size = 20,
         color = 0x403c2f
     }):addTo(info_bg):align(display.LEFT_BOTTOM,memberValLabel:getPositionX(),10)
@@ -712,7 +712,7 @@ function GameUIAlliance:getCommonListItem_(listType,alliance)
             :addTo(bg)
         memberValLabel:setString(string.format("%s/%s",alliance.members,alliance.membersMax))
         fightingValLabel:setString(alliance.power)
-        languageValLabel:setString(alliance.language)
+        languageValLabel:setString(Localize.alliance_language[alliance.country])
         killValLabel:setString(string.formatnumberthousands(alliance.kill))
     end
     item:addContent(bg)
@@ -814,7 +814,7 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
         :pos(16,events_title:getPositionY()+events_title:getContentSize().height+10)
     local titileBar = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(438,30), cc.rect(10,10,410,10))
         :addTo(headerBg):align(display.TOP_RIGHT, headerBg:getContentSize().width - 10, headerBg:getContentSize().height - 20)
-    local language_sprite = display.newSprite(string.format("%s",UILib.alliance_language_frame[Alliance_Manager:GetMyAlliance().basicInfo.language]))
+    local language_sprite = display.newSprite(string.format("%s",UILib.alliance_language_frame_1[Alliance_Manager:GetMyAlliance().basicInfo.country]))
         :align(display.RIGHT_CENTER, 410,15)
         :addTo(titileBar)
         :scale(0.5)
@@ -1018,7 +1018,7 @@ function GameUIAlliance:GetEventContent(event)
             if Localize.alliance_title[v] then
                 v = self:GetAllianceDiyTitle(v)
             end
-        elseif 'language' == event_type then
+        elseif 'country' == event_type then
             if Localize.alliance_language[v] then
                 v = Localize.alliance_language[v]
             end
@@ -1069,7 +1069,7 @@ function GameUIAlliance:RefreshOverViewUI()
         self.ui_overview.memberCountLabel:setString(string.format("%s/%s",m_count,m_maxCount))
         self.ui_overview.online_count_label:setString(m_online)
         self.ui_overview.powerLabel:setString(string.formatnumberthousands(alliance_data.basicInfo.power))
-        self.ui_overview.language_sprite:setTexture(UILib.alliance_language_frame[alliance_data.basicInfo.language])
+        self.ui_overview.language_sprite:setTexture(UILib.alliance_language_frame[alliance_data.basicInfo.country])
         self:RefreshNoticeView()
     end
 end

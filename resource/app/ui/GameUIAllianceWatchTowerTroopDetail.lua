@@ -395,7 +395,7 @@ function GameUIAllianceWatchTowerTroopDetail:CanShowDragonEquipment()
     if self:IsCheckOtherHelpTroop() then
         return self:GetWatchTowerLevel() >= 18
     elseif self:IsFromEnemy() then
-        return self:GetWatchTowerLevel() >= 9
+        return self:GetWatchTowerLevel() >= 8
     else
         return true
     end

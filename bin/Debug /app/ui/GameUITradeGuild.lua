@@ -868,6 +868,10 @@ function GameUITradeGuild:OpenSellDialog()
                     goods_type = MARTIAL_MATERIAL_TYPE
                 end
                 local selected = options.currentSelectedIndex_
+                if tag == 'resource' and User:GetResValueByType(goods_type[selected]) < self.sell_num_item:GetValue() then
+                    UIKit:showMessageDialog(_("提示"),_("你所出售的商品已不足"),function()end)
+                    return
+                end
                 if self.sell_num_item:GetValue()==0 then
                     UIKit:showMessageDialog(_("提示"),_("出售数量不能为零"),function()end)
                     return

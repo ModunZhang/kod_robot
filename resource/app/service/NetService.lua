@@ -1,6 +1,18 @@
 local NetService = {}
 local cocos_promise = import("..utils.cocos_promise")
 NetService.NET_STATE = {DISCONNECT = -1 , CONNECT = 0}
+--lua pomelo
+local json = json
+-- if device.platform == 'winrt' then
+    CCPomelo = import("libs.pomelo.CCPomelo")
+    local not_handle = function( ... )
+        return ...
+    end
+    json = {
+        encode = not_handle,
+        decode = not_handle,
+    }
+-- end
 function NetService:init(  )
     self.m_pomelo = CCPomelo:getInstance()
     self.m_deltatime = 0
@@ -102,14 +114,14 @@ function NetService:get(url, args, cb, progressCb)
         local eventName = event.name
 
         if eventName == "completed" then
-            cb(true, request:getResponseStatusCode(), request:getResponseData())
+            cb(true, request:getResponseStatusCode(), request:getResponseData(),request)
         elseif eventName == "cancelled" then
 
         elseif eventName == "failed" then
-            cb(false, request:getErrorCode(), request:getErrorMessage())
+            cb(false, request:getErrorCode(), request:getErrorMessage(),request)
         elseif eventName == "inprogress" or eventName == "progress" then
-            local totalLength = event.dltotal
-            local currentLength = event.dlnow
+            local totalLength = event.total
+            local currentLength = event.dltotal
             if progressCb then progressCb(totalLength, currentLength) end
         end
     end, urlString)

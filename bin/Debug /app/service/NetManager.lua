@@ -1120,7 +1120,7 @@ function NetManager:getFetchMailsPromise(fromIndex)
 end
 -- 阅读邮件
 function NetManager:getReadMailsPromise(mailIds)
-    return get_none_blocking_request_promise("logic.playerHandler.readMails", {
+    return get_blocking_request_promise("logic.playerHandler.readMails", {
         mailIds = mailIds
     }, "阅读邮件失败!"):done(get_response_mail_msg)
 end
@@ -1180,7 +1180,7 @@ function NetManager:getSendAllianceMailPromise(title, content)
 end
 -- 阅读战报
 function NetManager:getReadReportsPromise(reportIds)
-    return get_none_blocking_request_promise("logic.playerHandler.readReports", {
+    return get_blocking_request_promise("logic.playerHandler.readReports", {
         reportIds = reportIds
     }, "阅读战报失败!"):done(get_response_report_msg)
 end
@@ -1260,11 +1260,11 @@ function NetManager:getUnlockPlayerSecondMarchQueuePromise()
         , "解锁玩家第二条行军队列失败!"):done(get_player_response_msg)
 end
 -- 创建联盟
-function NetManager:getCreateAlliancePromise(name, tag, language, terrain, flag)
+function NetManager:getCreateAlliancePromise(name, tag, country, terrain, flag)
     return get_blocking_request_promise("logic.allianceHandler.createAlliance", {
         name = name,
         tag = tag,
-        language = language,
+        country = country,
         terrain = terrain,
         flag = flag
     }, "创建联盟失败!"):done(get_player_response_msg):done(get_alliance_response_msg)
@@ -1435,11 +1435,11 @@ function NetManager:getCancelJoinAlliancePromise(allianceId)
     }, "取消申请联盟失败!"):done(get_player_response_msg)
 end
 --修改联盟基本信息
-function NetManager:getEditAllianceBasicInfoPromise(name, tag, language, flag)
+function NetManager:getEditAllianceBasicInfoPromise(name, tag, country, flag)
     return get_blocking_request_promise("logic.allianceHandler.editAllianceBasicInfo", {
         name = name,
         tag = tag,
-        language = language,
+        country = country,
         flag = flag
     }, "修改联盟基本信息失败!"):done(get_player_response_msg)
 end
@@ -1913,8 +1913,8 @@ function NetManager:getDailyTaskRewards(taskType)
 end
 
 -- 设置玩家Apple Push Notification Id
-function NetManager:getSetApnIdPromise(apnId)
-    return get_none_blocking_request_promise("logic.playerHandler.setApnId",{apnId=apnId},
+function NetManager:getSetApnIdPromise(pushId)
+    return get_none_blocking_request_promise("logic.playerHandler.setPushId",{pushId=pushId},
         "设置玩家Apple Push失败"):done(get_player_response_msg)
 end
 
@@ -1931,28 +1931,26 @@ function NetManager:getAllianceRankPromise(rankType, fromRank)
         fromRank = fromRank or 0,
     },"获取排行榜失败!")
 end
--- 获取GameCenter账号绑定状态
-function NetManager:getGcBindStatusPromise(gcId)
-    return get_none_blocking_request_promise("logic.playerHandler.getGcBindStatus",{gcId=gcId},
-        "获取GameCenter账号绑定状态失败")
+-- 设置gc
+function NetManager:getBindGcPromise(type,gcId,gcName)
+    return get_none_blocking_request_promise("logic.playerHandler.bindGc",{
+        type=type,
+        gcId=gcId,
+        gcName=gcName,
+        },
+        "设置gc失败"):done(get_player_response_msg)
 end
--- 设置GameCenter Id
-function NetManager:getBindGcIdPromise(gcId)
-    return get_none_blocking_request_promise("logic.playerHandler.bindGcId",{gcId=gcId},
-        "设置GameCenter失败"):done(get_player_response_msg)
+-- 更新GcName
+function NetManager:getUpdateGcNamePromise(gcName)
+    return get_none_blocking_request_promise("logic.playerHandler.updateGcName",{gcName=gcName},
+        "更新GcName失败"):done(get_player_response_msg)
+end
+-- 切换GC账号
+function NetManager:getSwitchGcPromise(gcId)
+    return get_none_blocking_request_promise("logic.playerHandler.switchGc",{gcId=gcId},
+        "切换GC账号失败")
 end
 
--- 切换GameCenter账号
-function NetManager:getSwitchGcIdPromise(gcId)
-    return get_none_blocking_request_promise("logic.playerHandler.switchGcId",{gcId=gcId},
-        "切换GameCenter账号失败")
-end
-
--- 强制切换GameCenter账号到原GameCenter账号下的玩家数据,当前未绑定的玩家账号数据会丢失
-function NetManager:getForceSwitchGcIdPromise(gcId)
-    return get_none_blocking_request_promise("logic.playerHandler.forceSwitchGcId",{gcId=gcId},
-        "切换GameCenter账号失败")
-end
 
 -- 获取联盟其他玩家赠送的礼品
 function NetManager:getIapGiftPromise(giftId)
@@ -1996,7 +1994,7 @@ function NetManager:getSetPlayerLanguagePromise(language_code)
 end
 --设置远程推送状态
 function NetManager:getSetApnStatusPromise(type,status)
-    return get_blocking_request_promise("logic.playerHandler.setApnStatus",{type = type,status = status},"设置远程推送状态失败!"):done(get_player_response_msg)
+    return get_blocking_request_promise("logic.playerHandler.setPushStatus",{type = type,status = status},"设置远程推送状态失败!"):done(get_player_response_msg)
 end
 
 function NetManager:getAttackPveSectionPromise(sectionName, dragonType, soldiers)

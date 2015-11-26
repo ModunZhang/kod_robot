@@ -236,6 +236,18 @@ function MyCityScene:onEnterTransitionFinish()
     end
     if ext.gamecenter.isGameCenterEnabled() and not ext.gamecenter.isAuthenticated() then
         ext.gamecenter.authenticate(false)
+        -- ext.gamecenter.authenticate(是否打开gc app,是否弹出游戏内登陆gc界面) false,false
+        -- ext.gamecenter.authenticate(false,false)
+        --[[
+            ext.facebook.initialize()
+            ext.facebook.log(function(data)
+                if data.event == 
+            end)
+         --]]
+    end
+    -- facebook
+    if ext.facebook then
+        ext.facebook.initialize()
     end
     app:GetChatManager():FetMessageFirstStartGame()
     if Alliance_Manager:HasBeenJoinedAlliance() then

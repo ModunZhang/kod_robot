@@ -261,6 +261,9 @@ function GameUIMission:listviewListener(event)
     local listView = event.listView
     if "clicked" == event.name then
         local pos = event.itemPos
+        if not pos then
+            return
+        end
         --这里减掉两个标题item
         local really_pos = pos - 2 - #self:GetAchievementMissionData(true)
         if really_pos > 0 then

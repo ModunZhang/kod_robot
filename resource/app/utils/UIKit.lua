@@ -125,15 +125,27 @@ function UIKit:newWidgetUI(gameUIName,... )
     return instance
 end
 function UIKit:getFontFilePath()
-    return "Droid Sans Fallback.ttf"
+    if device.platform == 'winrt' then
+        return "fonts/Droid Sans Fallback.ttf"
+    else
+        return "Droid Sans Fallback.ttf"
+    end
 end
 
 function UIKit:getEditBoxFont()
-    return "DroidSansFallback"
+    if device.platform == 'android' then -- Android特殊处理,使用字体文件名作为参数,Java已修改。
+        return self:getFontFilePath()
+    elseif device.platform == 'winrt' then
+        return "Droid Sans Fallback.ttf"
+    else
+        return "DroidSansFallback"
+    end
+    return "Droid Sans Fallback.ttf"
 end
 
 local color_map = {}
 function UIKit:hex2rgba(hexNum)
+    hexNum = tonumber(hexNum)
     if not color_map[hexNum] then
         local a = bit:_rshift(hexNum,24)
         if a < 0 then
@@ -543,8 +555,11 @@ function UIKit:createLineItem(params)
         }):align(display.RIGHT_BOTTOM, line_size.width, 4)
         :addTo(line)
 
-    function line:SetValue(value,title)
+    function line:SetValue(value,title,colorOfValue)
         value_label:setString(value)
+        if colorOfValue then
+            value_label:setColor(UIKit:hex2c4b(colorOfValue))
+        end
         if title then
             title_lable:setString(title)
         end
@@ -734,7 +749,7 @@ function UIKit:showSendTroopMessageDialog(attack_func,material_name,effect_str,i
     -- 特殊提示，医院爆满，特殊兵种材料爆满
     local is_hospital_overhead = City:GetFirstBuildingByType("hospital"):IsWoundedSoldierOverhead()
     local is_material_overhead = User:IsMaterialOutOfRange(material_name)
-    -- 
+    --
     if is_material_overhead and not isNotEffection or is_hospital_overhead then
         local dialog = self:showMessageDialogWithParams({
             title = _("提示"),
@@ -919,7 +934,7 @@ function UIKit:GotoPreconditionBuilding(jump_building)
 end
 -- 暂时只有宝箱
 function UIKit:PlayUseItemAni(item_name,awards,message)
-    if string.find(item_name,"dragonChest") 
+    if string.find(item_name,"dragonChest")
         or string.find(item_name,"chest") then
         local ani = ""
         if item_name == "dragonChest_1" then
@@ -968,7 +983,7 @@ function UIKit:getIapPackageName(productId)
     return Localize.iap_package_name[productId]
 end
 
-function UIKit:addTipsToNode( node,tips , include_node ,tip_dimensions)
+function UIKit:addTipsToNode( node,tips , include_node ,tip_dimensions,offset_x,offset_y)
     node:setTouchEnabled(true)
     node:setTouchSwallowEnabled(false)
     local tips_bg
@@ -976,20 +991,41 @@ function UIKit:addTipsToNode( node,tips , include_node ,tip_dimensions)
         tips_bg = display.newScale9Sprite("back_ground_240x73.png",0,0,cc.size(240,73),cc.rect(20,20,200,33))
             :addTo(include_node):align(display.BOTTOM_CENTER)
         tips_bg:setTag(9090)
-        dump(tip_dimensions,"tip_dimensions")
-        local text_1 = UIKit:ttfLabel({text = tips,size = 20 ,color = 0xfff2b3,dimensions = tip_dimensions})
-            :addTo(tips_bg)
-        tips_bg:size(text_1:getContentSize().width+20,text_1:getContentSize().height+40)
-        local t_size = tips_bg:getContentSize()
-        text_1:align(display.CENTER, t_size.width/2, t_size.height/2)
+
         tips_bg:zorder(999999)
         tips_bg:hide()
         function tips_bg:SetTips( tips )
-            text_1:setString(tips)
-            self:size(text_1:getContentSize().width+20,text_1:getContentSize().height+40)
-            local t_size = self:getContentSize()
-            text_1:align(display.CENTER, t_size.width/2, t_size.height/2)
+            if self.tips_table then
+                for i,v in ipairs(self.tips_table) do
+                    self:removeChild(v, true)
+                end
+            end
+            local bg_width,bg_height = 0 , 0
+            local tips_table = {}
+            if tolua.type(tips) == "table" then
+                for i,v in ipairs(tips) do
+                    local tip_label = UIKit:ttfLabel({text = v,size = 20 ,color = 0xfff2b3,dimensions = tip_dimensions})
+                        :addTo(self)
+                    bg_width = tip_label:getContentSize().width
+                    bg_height = bg_height + tip_label:getContentSize().height + 5
+                    table.insert(tips_table, tip_label)
+                end
+            else
+                local tip_label = UIKit:ttfLabel({text = tips,size = 20 ,color = 0xfff2b3,dimensions = tip_dimensions})
+                    :addTo(self)
+                table.insert(tips_table, tip_label)
+                bg_width = tip_label:getContentSize().width
+                bg_height = bg_height + tip_label:getContentSize().height
+            end
+            self:size(bg_width+20,bg_height+40)
+            local pre_y
+            for i,tip_label in ipairs(tips_table) do
+                tip_label:align(display.CENTER,(bg_width + 20)/2, (pre_y or (bg_height + 20)) - tip_label:getContentSize().height/2)
+                pre_y = tip_label:getPositionY() - tip_label:getContentSize().height/2 - 5
+            end
+            self.tips_table = tips_table
         end
+        tips_bg:SetTips(tips)
     else
         tips_bg = include_node:getChildByTag(9090)
     end
@@ -997,7 +1033,7 @@ function UIKit:addTipsToNode( node,tips , include_node ,tip_dimensions)
         if event.name == "began" then
             local world_postion = node:getParent():convertToWorldSpace(cc.p(node:getPosition()))
             local node_postioon = include_node:convertToNodeSpace(world_postion)
-            tips_bg:setPosition(node_postioon.x, node_postioon.y + node:getContentSize().height/2)
+            tips_bg:setPosition(node_postioon.x + (offset_x or 0), node_postioon.y + node:getContentSize().height/2 + (offset_y or 0))
             tips_bg:SetTips(tips)
             tips_bg:show()
         elseif event.name == "ended" then
@@ -1513,7 +1549,7 @@ function UIKit:CreateMoveSoldiers(degree, soldier, s)
     local node = display.newNode():scale(s or 1)
     for _,v in ipairs(location_map[config.count]) do
         create_function(UIKit, soldier_ani_name):addTo(node)
-        :pos(unpack(v)):setScaleX(scalex)
+            :pos(unpack(v)):setScaleX(scalex)
     end
     return node
 end
@@ -1694,14 +1730,14 @@ function UIKit:CreateArrow(param, func)
     arrow.btn = cc.ui.UIPushButton.new({
         normal = param.up or "arrow_up_mine.png",
         pressed = param.down or "arrow_down_mine.png",
-    }):addTo(arrow):pos(96/2, 102/2 - 4)
-    :onButtonClicked(function()
-        if type(func) == "function" then
-            func()
-        end
-    end)
+    }):addTo(arrow):pos(96/2, 102/2 - 3)
+        :onButtonClicked(function()
+            if type(func) == "function" then
+                func()
+            end
+        end)
     arrow.icon = display.newSprite(param.icon or "arrow_icon_mine.png")
-    :addTo(arrow):pos(96/2, 102/2 - 4)
+        :addTo(arrow):pos(96/2, 102/2 - 4)
     return arrow
 end
 
@@ -1786,6 +1822,9 @@ function UIKit:CreateSand()
     end, 2 + math.random(3))
     return emitter
 end
+
+
+
 
 
 

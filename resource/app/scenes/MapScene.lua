@@ -281,8 +281,8 @@ end
 function MapScene:MakeElastic()
     local scene = self.scene_layer
     local min_s, max_s = scene:GetScaleRange()
-    local low = min_s * 1.2
-    local high = max_s * 0.9
+    local low = min_s * 1.1
+    local high = max_s * 0.95
     if scene:getScale() <= low then
         scene:ZoomToByAnimation(low)
     elseif scene:getScale() >= high then

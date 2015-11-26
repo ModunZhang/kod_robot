@@ -1081,18 +1081,40 @@ local CITY_TERRAIN_ICON = {
 }
 
 local ALLIANCE_LANGUAGE_FRAME = {
-    all = "all.png",
-    en  = "en.png",
-    fr  = "fr.png",
-    cn  = "cn.png",
-    tw  = "tw.png",
-    de  = "de.png",
-    ko  = "ko.png",
-    ja  = "ja.png",
-    ru  = "ru.png",
-    es  = "es.png",
-    pt  = "pt.png",
-    it  = "it.png",
+    ALL = "icon_ALL.png",
+    USA ="icon_USA.png",
+    GBR ="icon_GBR.png",
+    CAN = "icon_CAN.png",
+    FRA ="icon_FRA.png",
+    ITA = "icon_ITA.png",
+    DEU ="icon_DEU.png",
+    RUS = "icon_RUS.png",
+    PRT = "icon_PRT.png",
+    CHN ="icon_CHN.png",
+    TWN ="icon_TWN.png",
+    AUS = "icon_AUS.png",
+    ESP = "icon_ESP.png",
+    JPN ="icon_JPN.png",
+    KOR ="icon_KOR.png",
+    FIN ="icon_FIN.png",
+}
+local ALLIANCE_LANGUAGE_FRAME_1 = {
+    ALL = "ALL.png",
+    USA ="USA.png",
+    GBR ="GBR.png",
+    CAN = "CAN.png",
+    FRA ="FRA.png",
+    ITA = "ITA.png",
+    DEU ="DEU.png",
+    RUS = "RUS.png",
+    PRT = "PRT.png",
+    CHN ="CHN.png",
+    TWN ="TWN.png",
+    AUS = "AUS.png",
+    ESP = "ESP.png",
+    JPN ="JPN.png",
+    KOR ="KOR.png",
+    FIN ="FIN.png",
 }
 
 return {
@@ -1143,6 +1165,7 @@ return {
     server_level_image = server_level_image,
     city_terrain_icon = CITY_TERRAIN_ICON,
     alliance_language_frame = ALLIANCE_LANGUAGE_FRAME,
+    alliance_language_frame_1 = ALLIANCE_LANGUAGE_FRAME_1,
 }
 
 

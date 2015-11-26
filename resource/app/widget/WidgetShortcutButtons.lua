@@ -114,7 +114,7 @@ function WidgetShortcutButtons:ctor(city)
         return world_map_btn_bg:getContentSize()
     end
     function world_map_btn_bg:GetXY()
-        return {x = 0 ,y =  485 - display.top }
+        return {x = 0 ,y =  495 - display.top }
     end
     self.world_map_btn_bg = world_map_btn_bg
     order:AddElement(world_map_btn_bg)

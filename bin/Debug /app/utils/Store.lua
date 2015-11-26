@@ -182,4 +182,13 @@ function Store.getTransactionWithIdentifier(identifier)
     }
 end
 
+--[[ 
+    新加 获取默认购买框架的支持
+]] --
+
+function Store.getStoreSupport()
+    if Store.canMakePurchases() then return end
+    printError("Store.getStoreSupport() -  Not support on iOS")
+end
+
 return Store

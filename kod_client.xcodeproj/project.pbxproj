@@ -69,6 +69,8 @@
 		DBF4F1491A6F453B00B6CDE0 /* functions.lua in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBF4F1441A6F453B00B6CDE0 /* functions.lua */; };
 		DBF4F14A1A6F453B00B6CDE0 /* json.lua in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBF4F1451A6F453B00B6CDE0 /* json.lua */; };
 		DBF4F14B1A6F453B00B6CDE0 /* main.lua in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBF4F1461A6F453B00B6CDE0 /* main.lua */; };
+		FF7E0D021C07370B00676746 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF7E0D011C07370B00676746 /* libcrypto.a */; };
+		FF7E0D141C0738C900676746 /* libs in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = FF7E0D131C0738C900676746 /* libs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -78,6 +80,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				FF7E0D141C0738C900676746 /* libs in Copy Files (7 items) */,
 				DBB5137A1AEF875600DDFDB7 /* start.sh in Copy Files (7 items) */,
 				DB7147721AEE2E9A00B3BDEB /* stop.sh in Copy Files (7 items) */,
 				DBF4F1471A6F453B00B6CDE0 /* app in Copy Files (7 items) */,
@@ -233,6 +236,8 @@
 		DBF4F1441A6F453B00B6CDE0 /* functions.lua */ = {isa = PBXFileReference; lastKnownFileType = text; name = functions.lua; path = resource/functions.lua; sourceTree = "<group>"; };
 		DBF4F1451A6F453B00B6CDE0 /* json.lua */ = {isa = PBXFileReference; lastKnownFileType = text; name = json.lua; path = resource/json.lua; sourceTree = "<group>"; };
 		DBF4F1461A6F453B00B6CDE0 /* main.lua */ = {isa = PBXFileReference; lastKnownFileType = text; name = main.lua; path = resource/main.lua; sourceTree = "<group>"; };
+		FF7E0D011C07370B00676746 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
+		FF7E0D131C0738C900676746 /* libs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = libs; path = resource/libs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -240,6 +245,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF7E0D021C07370B00676746 /* libcrypto.a in Frameworks */,
 				DBDE875B1AEF3AAF005C3595 /* libjansson.a in Frameworks */,
 				DBDE875C1AEF3AAF005C3595 /* libpomelo.a in Frameworks */,
 				DBDE875D1AEF3AAF005C3595 /* libuv.a in Frameworks */,
@@ -252,6 +258,7 @@
 		DB60CBB61A6CE5F3000DC25A = {
 			isa = PBXGroup;
 			children = (
+				FF7E0D011C07370B00676746 /* libcrypto.a */,
 				DBDE87071AEF3A94005C3595 /* libpomelo */,
 				DBF4F14E1A6F54C500B6CDE0 /* Resources */,
 				DB60CD791A6DDF68000DC25A /* lua_engine */,
@@ -561,6 +568,7 @@
 		DBF4F14E1A6F54C500B6CDE0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				FF7E0D131C0738C900676746 /* libs */,
 				DBB513791AEF874800DDFDB7 /* start.sh */,
 				DB7147711AEE2E7D00B3BDEB /* stop.sh */,
 				DBF4F1421A6F453B00B6CDE0 /* app */,
@@ -777,6 +785,7 @@
 					"$(PROJECT_DIR)/libpomelo/deps/uv/include",
 					"$(PROJECT_DIR)/lua",
 					"$(PROJECT_DIR)/tolua",
+					"$(PROJECT_DIR)/",
 					"$(PROJECT_DIR)/lua_engine",
 				);
 				LIBRARY_SEARCH_PATHS = (
@@ -784,6 +793,7 @@
 					"$(PROJECT_DIR)/libpomelo/lib/mac",
 					"$(PROJECT_DIR)/libpomelo/lib/ios/iphone",
 					"$(PROJECT_DIR)/libpomelo/lib/ios/sim",
+					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
 				ONLY_ACTIVE_ARCH = YES;
@@ -813,6 +823,7 @@
 					"$(PROJECT_DIR)/libpomelo/deps/uv/include",
 					"$(PROJECT_DIR)/lua",
 					"$(PROJECT_DIR)/tolua",
+					"$(PROJECT_DIR)/",
 					"$(PROJECT_DIR)/lua_engine",
 				);
 				LIBRARY_SEARCH_PATHS = (
@@ -820,6 +831,7 @@
 					"$(PROJECT_DIR)/libpomelo/lib/mac",
 					"$(PROJECT_DIR)/libpomelo/lib/ios/iphone",
 					"$(PROJECT_DIR)/libpomelo/lib/ios/sim",
+					"$(PROJECT_DIR)",
 				);
 				MACH_O_TYPE = mh_execute;
 				ONLY_ACTIVE_ARCH = NO;

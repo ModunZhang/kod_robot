@@ -43,6 +43,9 @@ function DataManager:getFteData()
 end
 
 function DataManager:OnUserDataChanged(userData, timer, deltaData)
+    -- 用于客户端报错，上传GM平台分析错误
+    self.latestUserData = userData
+    self.latestDeltaData = deltaData
     if not User or not City or not Alliance_Manager or not MailManager then
         print(debug.traceback("", 2))
         assert(false)

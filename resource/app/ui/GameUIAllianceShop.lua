@@ -93,6 +93,7 @@ function GameUIAllianceShop:OnMoveInStage()
     self.alliance:AddListenOnType(self, "buildings")
     self.alliance:AddListenOnType(self, "itemLogs")
     self.alliance:AddListenOnType(self, "items")
+    User:AddListenOnType(self, "allianceData")
 end
 function GameUIAllianceShop:CreateBetweenBgAndTitle()
     GameUIAllianceShop.super.CreateBetweenBgAndTitle(self)
@@ -109,6 +110,7 @@ function GameUIAllianceShop:onExit()
     self.alliance:RemoveListenerOnType(self, "itemLogs")
     self.alliance:RemoveListenerOnType(self, "buildings")
     self.alliance:RemoveListenerOnType(self, "items")
+    User:RemoveListenerOnType(self, "allianceData")
     GameUIAllianceShop.super.onExit(self)
 end
 -- 荣耀值和忠诚值
@@ -560,6 +562,10 @@ function GameUIAllianceShop:OnAllianceDataChanged_items(alliance, deltaData)
         end
     end
 end
+function GameUIAllianceShop:OnUserDataChanged_allianceData(userData, deltaData)
+    self.honourAndLoyalty:SetLoyalty(userData.allianceData.loyalty)
+end
+
 return GameUIAllianceShop
 
 

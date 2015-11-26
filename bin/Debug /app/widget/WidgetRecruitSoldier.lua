@@ -663,7 +663,8 @@ function WidgetRecruitSoldier:GetNeedResouce(count)
         need_res_map["citizen"] = left >= 0 and 0 or -left
     else
         for res_type, value in pairs(self.res_total_map) do
-            local left = value - soldier_config[res_type] * count
+            local effect = UtilsForTech:GetEffect("recruitment", User.productionTechs["recruitment"])
+            local left = value - soldier_config[res_type] * count * (k == "citizen" and 1 or (1 - effect))
             need_res_map[res_type] = left >= 0 and 0 or -left
         end
     end

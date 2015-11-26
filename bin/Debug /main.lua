@@ -116,6 +116,7 @@ function GameGlobalUIUtils:showNotice()
 end
 
 
+require("libs.pomelo.CCPomelo")
 require("app.MyApp").new():run()
 running = false
 local run_count = 0

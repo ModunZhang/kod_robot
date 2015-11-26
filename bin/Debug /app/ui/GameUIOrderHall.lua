@@ -151,7 +151,7 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
         }
     ):align(display.RIGHT_CENTER,item_width - 10 , 80)
         :addTo(content)
-
+    item.village_level = village_level
 
     if alliance:GetSelf():CanUpgradeAllianceBuilding() and village_level<#AllianceVillage[village_type] then
         -- 荣耀值
@@ -174,6 +174,7 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
             }))
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
+                    local need_honour = config[item.village_level+1>#config and #config or item.village_level+1].needHonour
                     if alliance.basicInfo.honour < need_honour then
                         UIKit:showMessageDialog(_("提示"),_("荣耀点不足"))
                     else
@@ -189,6 +190,7 @@ function GameUIOrderHall:CreateVillageItem(village_type,village_level)
     self.village_listview:addItem(item)
 
     function item:LevelUpRefresh(village_type,village_level)
+        self.village_level = village_level
         current_level:SetValue(_("等级")..village_level)
         local build_png = SpriteConfig[village_type]:GetConfigByLevel(village_level).png
         building_image:setTexture(build_png)

@@ -29,9 +29,9 @@ function WidgetWorldAllianceInfo:ctor(object,mapIndex,need_goto_btn)
             id = Alliance_Manager:GetMyAlliance()._id
         end
         NetManager:getAllianceBasicInfoPromise(id, User.serverId):done(function(response)
-            if response.success 
-           and response.msg.allianceData 
-           and self.SetAllianceData then
+            if response.success
+                and response.msg.allianceData
+                and self.SetAllianceData then
                 self:SetAllianceData(response.msg.allianceData)
                 self:LoadInfo(response.msg.allianceData)
             end
@@ -55,7 +55,7 @@ function WidgetWorldAllianceInfo:onExit()
 end
 function WidgetWorldAllianceInfo:Located(mapIndex, x, y)
     self.mask_layer:stopAllActions()
-    self.mask_layer:show():performWithDelay(function() 
+    self.mask_layer:show():performWithDelay(function()
         self.mask_layer:hide()
     end, 2)
 
@@ -199,13 +199,13 @@ function WidgetWorldAllianceInfo:LoadInfo(alliance_data)
 
 
     local languageTitleLabel = UIKit:ttfLabel({
-        text = _("语言"),
+        text = _("国家"),
         size = 20,
         color = 0x615b44
     }):addTo(info_bg):align(display.LEFT_BOTTOM,memberTitleLabel:getPositionX(),10)
 
     local languageValLabel = UIKit:ttfLabel({
-        text = Localize.alliance_language[alliance_data.language], -- language
+        text = Localize.alliance_language[alliance_data.country], -- language
         size = 20,
         color = 0x403c2f
     }):addTo(info_bg):align(display.LEFT_BOTTOM,languageTitleLabel:getPositionX() + languageTitleLabel:getContentSize().width + 10,10)
@@ -264,10 +264,44 @@ function WidgetWorldAllianceInfo:LoadInfo(alliance_data)
         dimensions = cc.size(530,0),
         align = cc.TEXT_ALIGNMENT_CENTER,
     }):addTo(desc_bg):align(display.CENTER, desc_bg:getContentSize().width/2,desc_bg:getContentSize().height/2)
-
-    self:BuildOneButton("icon_goto_38x56.png",_("定位")):onButtonClicked(function()
-        self:Located(self.mapIndex)
-    end):addTo(layer):align(display.RIGHT_TOP, l_size.width,10)
+    if alliance_data.id == Alliance_Manager:GetMyAlliance()._id then
+        self:BuildOneButton("icon_goto_38x56.png",_("定位")):onButtonClicked(function()
+            self:Located(self.mapIndex)
+        end):addTo(layer):align(display.RIGHT_TOP, l_size.width,10)
+    else
+        self:BuildOneButton("attack_58x56.png",_("宣战")):onButtonClicked(function()
+            if alliance_data.status =="fight" or alliance_data.status=="prepare" then
+                UIKit:showMessageDialog(_("提示"),_("联盟正在战争准备期或战争期"))
+                return
+            end
+            if alliance_data.status ~= "peace" then
+                UIKit:showMessageDialog(_("提示"),_("目标联盟未处于和平期，不能宣战"))
+                return
+            end
+            if Alliance_Manager:GetMyAlliance().basicInfo.status ~= "peace" and Alliance_Manager:GetMyAlliance().basicInfo.status ~= "protect" then
+                UIKit:showMessageDialog(_("提示"),_("联盟正在战争准备期或战争期"))
+                return
+            end
+            if not Alliance_Manager:GetMyAlliance():GetMemeberById(User:Id()):IsTitleEqualOrGreaterThan("general") then
+                UIKit:showMessageDialog(_("提示"),_("联盟操作权限不足"))
+                return
+            end
+            UIKit:showMessageDialog(_("主人"),_("确定开启联盟会战吗?")):CreateOKButton(
+                {
+                    listener = function ()
+                        NetManager:getAttackAlliancePromose(alliance_data.id)
+                        self:LeftButtonClicked()
+                    end
+                }
+            )
+        end):addTo(layer):align(display.RIGHT_TOP, l_size.width,10)
+        self:BuildOneButton("icon_goto_38x56.png",_("定位")):onButtonClicked(function()
+            self:Located(self.mapIndex)
+        end):addTo(layer):align(display.RIGHT_TOP, l_size.width - 125,10)
+        self:BuildOneButton("icon_info_56x56.png",_("信息")):onButtonClicked(function()
+            UIKit:newGameUI("GameUIAllianceInfo", alliance_data.id):AddToCurrentScene(true)
+        end):addTo(layer):align(display.RIGHT_TOP, l_size.width - 2 * 125,10)
+    end
     return layer
 end
 
@@ -318,7 +352,7 @@ function WidgetWorldAllianceInfo:LoadMoveAlliance()
     scheduleAt(self,function ()
         local time = intInit.allianceMoveColdMinutes.value * 60 + Alliance_Manager:GetMyAlliance().basicInfo.allianceMoveTime/1000.0 - app.timer:GetServerTime()
         local canMove = Alliance_Manager:GetMyAlliance().basicInfo.allianceMoveTime == 0 or time <= 0
-        move_time:SetValue(canMove and _("准备就绪") or GameUtils:formatTimeStyle1(time))
+        move_time:SetValue(canMove and _("准备就绪") or GameUtils:formatTimeStyle1(time),nil,canMove and 0x007c23 or 0x7e0000)
     end)
     local info_buff = WidgetInfo.new({
         info = DataUtils:GetAllianceMapBuffByRound(round),
@@ -397,6 +431,10 @@ function WidgetWorldAllianceInfo:LoadMoveAlliance()
     end
 end
 return WidgetWorldAllianceInfo
+
+
+
+
 
 
 

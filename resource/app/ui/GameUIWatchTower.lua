@@ -393,7 +393,7 @@ function GameUIWatchTower:GetOtherEventItem(entity)
     }):align(display.LEFT_TOP,164,153):addTo(bg)
     local line_1 = display.newScale9Sprite("dividing_line.png"):size(390,2):addTo(bg):align(display.LEFT_TOP,164, 125)
     local desctition_label_val =  UIKit:ttfLabel({
-        text = UtilsForEvent:GetDestination(entity),
+        text = UtilsForEvent:GetDestinationLocation(entity),
         size = 20,
         color= 0x615b44
     }):align(display.RIGHT_TOP,554,153):addTo(bg)
@@ -634,7 +634,7 @@ function GameUIWatchTower:OnRetreatButtonClicked(entity,cb)
         end)
     elseif entity.eventType == "villageEvents" then
         UIKit:showMessageDialog(_("提示"),_("确定撤军?"),function()
-            NetManager:getRetreatFromVillagePromise(entity.villageData.id,entity.id)
+            NetManager:getRetreatFromVillagePromise(entity.id)
                 :done(function()
                     cb(true)
                 end):fail(function()

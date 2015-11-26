@@ -27,11 +27,18 @@ function GameUITower:OnMoveInStage()
     end):pos(window.cx, window.bottom + 34)
 
     self:InitInfo()
+    self.city:GetUser():AddListenOnType(self, "buildings")
+    self.city:GetUser():AddListenOnType(self, "buildingEvents")
 end
 function GameUITower:onExit()
+    self.city:GetUser():RemoveListenerOnType(self, "buildings")
+    self.city:GetUser():RemoveListenerOnType(self, "buildingEvents")
     GameUITower.super.onExit(self)
 end
 function GameUITower:OnUserDataChanged_buildingEvents()
+    self.infos:CreateInfoItems(self:GetInfos())
+end
+function GameUITower:OnUserDataChanged_buildings()
     self.infos:CreateInfoItems(self:GetInfos())
 end
 function GameUITower:CreateBetweenBgAndTitle()
@@ -42,40 +49,47 @@ function GameUITower:CreateBetweenBgAndTitle()
 end
 function GameUITower:GetInfos()
     local atkinfs,atkarcs,atkcavs,atkcats,defencePower = self.building:GetAtk()
+    local current_wall_hp = User:GetResValueByType("wallHp")
+    local eff = self.city:GetUser():GetProductionTechEff(8) -- 高级箭塔科技buff
     return {
         {
             _("对步兵攻击"),
-            atkinfs,
+            string.formatnumberthousands(current_wall_hp * atkinfs),
+            math.floor(atkinfs * (1 + eff)) > atkinfs and {"+".. string.formatnumberthousands(math.floor(atkinfs * (1 + eff)) * current_wall_hp - current_wall_hp * atkinfs),0x068329}
         },
         {
             _("对骑兵攻击"),
-            atkarcs,
+            string.formatnumberthousands(current_wall_hp * atkcavs),
+            math.floor(atkcavs * (1 + eff)) > atkcavs and {"+".. string.formatnumberthousands(math.floor(atkcavs * (1 + eff)) * current_wall_hp - current_wall_hp * atkcavs),0x068329}
         },
         {
             _("对弓箭手攻击"),
-            atkarcs,
+            string.formatnumberthousands(current_wall_hp * atkarcs),
+            math.floor(atkarcs * (1 + eff)) > atkarcs and {"+".. string.formatnumberthousands(math.floor(atkarcs * (1 + eff)) * current_wall_hp - current_wall_hp * atkarcs),0x068329}
         },
         {
             _("对投石车攻击"),
-            atkcats,
+            string.formatnumberthousands(current_wall_hp * atkcats),
+            math.floor(atkcats * (1 + eff)) > atkcats and {"+".. string.formatnumberthousands(math.floor(atkcats * (1 + eff)) * current_wall_hp - current_wall_hp * atkcats),0x068329}
         },
         {
             _("防御力"),
-            defencePower,
+            string.formatnumberthousands(current_wall_hp * defencePower),
         },
     }
 end
 function GameUITower:InitInfo()
-    
     self.infos = WidgetInfoWithTitle.new({
         info = self:GetInfos(),
         title = _("总计"),
         h = 266
-        }):addTo(self.info_layer)
-    :align(display.TOP_CENTER, window.cx, window.top-140)
+    }):addTo(self.info_layer)
+        :align(display.TOP_CENTER, window.cx, window.top-140)
 end
 
 return GameUITower
+
+
 
 
 

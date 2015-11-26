@@ -86,7 +86,6 @@ GameDatas.AllianceInitData = {
 	["right"] = {},
 	["donate"] = {},
 	["shrineStage"] = {},
-	["fightRewards"] = {},
 	["monsters"] = {},
 }
 require("app.datas.AllianceInitData_intInit")
@@ -94,7 +93,6 @@ require("app.datas.AllianceInitData_stringInit")
 require("app.datas.AllianceInitData_right")
 require("app.datas.AllianceInitData_donate")
 require("app.datas.AllianceInitData_shrineStage")
-require("app.datas.AllianceInitData_fightRewards")
 require("app.datas.AllianceInitData_monsters")
 
 GameDatas.AllianceMap = {

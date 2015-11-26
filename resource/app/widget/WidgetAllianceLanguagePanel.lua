@@ -7,36 +7,32 @@ local UICheckBoxButton = import("..ui.UICheckBoxButton")
 local WidgetAllianceLanguagePanel = class("WidgetAllianceLanguagePanel", function()
     return display.newNode()
 end)
-local HEIGHT = 320
+local HEIGHT = 428
 local ALL_LANGUAGE = {
-    "all",
-    "en",
-    "cn",
-    "tw",
-    "ja",
-    "ko",
-    "de",
-    "fr",
-    "ru",
-    "it",
-    "es",
-    "pt",
+    "ALL",
+    "USA",
+    "GBR",
+    "CAN",
+    "FRA",
+    "ITA",
+    "DEU",
+    "RUS",
+    "PRT",
+    "CHN",
+    "TWN",
+    "AUS",
+    "ESP",
+    "JPN",
+    "KOR",
+    "FIN",
 }
 
-local checkbox_image = {
-    off = "checkbox_unselected.png",
-    off_pressed = "checkbox_unselected.png",
-    off_disabled = "checkbox_unselected.png",
-    on = "checkbox_selectd.png",
-    on_pressed = "checkbox_selectd.png",
-    on_disabled = "checkbox_selectd.png",
-}
 WidgetAllianceLanguagePanel.BUTTON_SELECT_CHANGED = "BUTTON_SELECT_CHANGED"
 
 function WidgetAllianceLanguagePanel:ctor(selectLanguage)
     cc(self):addComponent("components.behavior.EventProtocol"):exportMethods()
-	self:setNodeEventEnabled(true)
-	self.currentSelectedIndex_ = selectLanguage ~= nil and  self:FindIndexByLanguage(selectLanguage) or 1
+    self:setNodeEventEnabled(true)
+    self.currentSelectedIndex_ = selectLanguage ~= nil and  self:FindIndexByLanguage(selectLanguage) or 1
 end
 
 function WidgetAllianceLanguagePanel:FindIndexByLanguage(language)
@@ -52,108 +48,223 @@ function WidgetAllianceLanguagePanel:onEnter()
     local bg = UIKit:CreateBoxPanelWithBorder({height = HEIGHT}):addTo(self)
     local title = display.newSprite("alliance_panel_bg_544x32.png"):align(display.CENTER_TOP,bg:getContentSize().width/2, HEIGHT - 6):addTo(bg)
     UIKit:ttfLabel({
-        text = _("联盟语言"),
+        text = _("国家"),
         size = 20,
         color = 0xffedae
     }):addTo(title):align(display.CENTER,272,16)
-	self:createCheckBoxButtons_()
+    self:createCheckBoxButtons_()
     self:buttonEvents_()
     self:selectButtonByIndex(self.currentSelectedIndex_)
 end
 
 
 function WidgetAllianceLanguagePanel:createCheckBoxButtons_()
-	self.buttons_ = {}
-    local start_y = 20
-    local frist_row_x, second_row_x, thrid_row_x = 10,190,370
-	local button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.it,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,frist_row_x,start_y)
-            :addTo(self)
+    self.buttons_ = {}
+    local start_y = 10
+    local frist_row_x, second_row_x, thrid_row_x, fourth_row_x = 57,205,353,499
+    -- 从上往上第一排
+    local button = UICheckBoxButton.new({
+        off = "icon_ESP.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,frist_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_ESP.png"):align(display.CENTER_BOTTOM,frist_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    button:setTag(13)
+    table.insert(self.buttons_,button)
+    button = UICheckBoxButton.new({
+        off = "icon_JPN.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,second_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_JPN.png"):align(display.CENTER_BOTTOM,second_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    button:setTag(14)
+    table.insert(self.buttons_,button)
+    button = UICheckBoxButton.new({
+        off = "icon_KOR.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,thrid_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_KOR.png"):align(display.CENTER_BOTTOM,thrid_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    button:setTag(15)
+    table.insert(self.buttons_,button)
+    button = UICheckBoxButton.new({
+        off = "icon_FIN.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,fourth_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_FIN.png"):align(display.CENTER_BOTTOM,fourth_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    button:setTag(16)
+    table.insert(self.buttons_,button)
+    -- 第二排
+    start_y = start_y + button:getCascadeBoundingBox().height+5
+    button = UICheckBoxButton.new({
+        off = "icon_PRT.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,frist_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_PRT.png"):align(display.CENTER_BOTTOM,frist_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    button:setTag(9)
+    table.insert(self.buttons_,button)
+    button = UICheckBoxButton.new({
+        off = "icon_CHN.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,second_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_CHN.png"):align(display.CENTER_BOTTOM,second_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
     button:setTag(10)
-	table.insert(self.buttons_,button)
-	button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.es,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,second_row_x,start_y)
-            :addTo(self)
+    table.insert(self.buttons_,button)
+    button = UICheckBoxButton.new({
+        off = "icon_TWN.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,thrid_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_TWN.png"):align(display.CENTER_BOTTOM,thrid_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
     button:setTag(11)
     table.insert(self.buttons_,button)
-    button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.pt,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,thrid_row_x,start_y)
-            :addTo(self)
+    button = UICheckBoxButton.new({
+        off = "icon_AUS.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,fourth_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_AUS.png"):align(display.CENTER_BOTTOM,fourth_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
     button:setTag(12)
     table.insert(self.buttons_,button)
-    button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.de,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,frist_row_x,start_y + button:getCascadeBoundingBox().height+5)
-            :addTo(self)
-    button:setTag(7)
-	table.insert(self.buttons_,button) 
-    button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.fr,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,second_row_x,start_y + button:getCascadeBoundingBox().height+5)
-            :addTo(self)
-    button:setTag(8)
-    table.insert(self.buttons_,button)
-    button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.ru,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,thrid_row_x,start_y + button:getCascadeBoundingBox().height+5)
-            :addTo(self)
-    button:setTag(9)
-    table.insert(self.buttons_,button)    
-    button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.tw,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,frist_row_x,start_y + (button:getCascadeBoundingBox().height+5)*2)
-            :addTo(self)
-    button:setTag(4)
-    table.insert(self.buttons_,button)   
-    button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.ja,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,second_row_x,start_y +(button:getCascadeBoundingBox().height+5)*2)
-            :addTo(self)
+    -- 第三排
+    start_y = start_y + button:getCascadeBoundingBox().height+5
+    button = UICheckBoxButton.new({
+        off = "icon_FRA.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,frist_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_FRA.png"):align(display.CENTER_BOTTOM,frist_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
     button:setTag(5)
     table.insert(self.buttons_,button)
-	button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.ko,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,thrid_row_x,start_y +(button:getCascadeBoundingBox().height+5)*2)
-            :addTo(self)
+    button = UICheckBoxButton.new({
+        off = "icon_ITA.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,second_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_ITA.png"):align(display.CENTER_BOTTOM,second_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
     button:setTag(6)
     table.insert(self.buttons_,button)
-    button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.all,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,frist_row_x,start_y +(button:getCascadeBoundingBox().height+5)*3)
-            :addTo(self)
+    button = UICheckBoxButton.new({
+        off = "icon_DEU.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,thrid_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_DEU.png"):align(display.CENTER_BOTTOM,thrid_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    button:setTag(7)
+    table.insert(self.buttons_,button)
+    button = UICheckBoxButton.new({
+        off = "icon_RUS.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,fourth_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_RUS.png"):align(display.CENTER_BOTTOM,fourth_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    button:setTag(8)
+    table.insert(self.buttons_,button)
+    -- 第四排
+    start_y = start_y + button:getCascadeBoundingBox().height+5
+    button = UICheckBoxButton.new({
+        off = "icon_ALL.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,frist_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_ALL.png"):align(display.CENTER_BOTTOM,frist_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
     button:setTag(1)
     table.insert(self.buttons_,button)
-	button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.en,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,second_row_x,start_y +(button:getCascadeBoundingBox().height+5)*3)
-            :addTo(self)
+    button = UICheckBoxButton.new({
+        off = "icon_USA.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,second_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_USA.png"):align(display.CENTER_BOTTOM,second_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
     button:setTag(2)
     table.insert(self.buttons_,button)
-    button = UICheckBoxButton.new(checkbox_image)
-            :setButtonLabel(UIKit:ttfLabel({text = Language.cn,size = 20,color = 0x615b44,dimensions = cc.size(100,0)}))
-            :setButtonLabelOffset(30, 0)
-            :align(display.LEFT_BOTTOM,thrid_row_x,start_y +(button:getCascadeBoundingBox().height+5)*3)
-            :addTo(self)
+    button = UICheckBoxButton.new({
+        off = "icon_GBR.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,thrid_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_GBR.png"):align(display.CENTER_BOTTOM,thrid_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
     button:setTag(3)
+    table.insert(self.buttons_,button)
+    button = UICheckBoxButton.new({
+        off = "icon_CAN.png",
+        on = "icon_language_selected_112x112.png",
+    })
+        :align(display.CENTER_BOTTOM,fourth_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    display.newSprite("icon_CAN.png"):align(display.CENTER_BOTTOM,fourth_row_x,start_y)
+        :addTo(self)
+        :scale(76/94)
+    button:setTag(4)
     table.insert(self.buttons_,button)
 end
 
 function WidgetAllianceLanguagePanel:buttonEvents_()
-	for i,button in ipairs(self.buttons_) do
+    for i,button in ipairs(self.buttons_) do
         button:onButtonStateChanged(handler(self, self.onButtonStateChanged_))
         button:onButtonClicked(handler(self, self.onButtonStateChanged_))
     end
@@ -213,3 +324,6 @@ function WidgetAllianceLanguagePanel:getSelectedLanguage()
 end
 
 return WidgetAllianceLanguagePanel
+
+
+

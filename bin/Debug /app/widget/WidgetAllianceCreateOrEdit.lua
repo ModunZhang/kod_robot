@@ -112,7 +112,7 @@ function WidgetAllianceCreateOrEdit:CreateAllianceButtonClicked()
 		return 
 	end
 	if self:IsCreate() then
-		NetManager:getCreateAlliancePromise(data.name,data.tag,data.language,data.terrain,data.flag):done(function()
+		NetManager:getCreateAlliancePromise(data.name,data.tag,data.country,data.terrain,data.flag):done(function()
 			 GameGlobalUI:showTips(_("提示"),_("创建联盟成功!"))
 		end)
 	else
@@ -120,10 +120,10 @@ function WidgetAllianceCreateOrEdit:CreateAllianceButtonClicked()
 		if self:GetFlagInfomation() == Alliance_Manager:GetMyAlliance().basicInfo.flag and 
 			my_alliance.basicInfo.tag == data.tag and 
 			my_alliance.basicInfo.name == data.name and 
-			my_alliance.basicInfo.language == data.language then
+			my_alliance.basicInfo.country == data.country then
 			UIKit:showMessageDialog(_("提示"),_("联盟信息当前没有任何改动!"))
 		else
-			NetManager:getEditAllianceBasicInfoPromise(data.name,data.tag,data.language,data.flag):done(function(result)
+			NetManager:getEditAllianceBasicInfoPromise(data.name,data.tag,data.country,data.flag):done(function(result)
 				GameGlobalUI:showTips(_("提示"),_("修改联盟信息成功!"))
 				if self.callback and type(self.callback) == 'function' then
 					self.callback()
@@ -275,7 +275,7 @@ function WidgetAllianceCreateOrEdit:createCheckAllianeGroup()
 	    	:pos(0,landSelect:getCascadeBoundingBox().height+landSelect:getPositionY()+20)
     	self:SelectLandCheckButton(self.terrain_info,true)
 	else
-   		self.languageSelected  = WidgetAllianceLanguagePanel.new(Alliance_Manager:GetMyAlliance().basicInfo.language):addTo(groupNode):pos(0,0)
+   		self.languageSelected  = WidgetAllianceLanguagePanel.new(Alliance_Manager:GetMyAlliance().basicInfo.country):addTo(groupNode):pos(0,0)
    	end
     return groupNode
 end
@@ -407,7 +407,7 @@ function WidgetAllianceCreateOrEdit:AdapterCreateData2Server_()
 	return {
 		name=string.trim(self.editbox_name:getText()),
 		tag=string.trim(self.editbox_tag:getText()),
-		language=self.languageSelected:getSelectedLanguage(),
+		country=self.languageSelected:getSelectedLanguage(),
 		terrain=self.alliance_ui_helper:GetTerrainNameByIndex(self.terrain_info),
 		flag=self:GetFlagInfomation(),
 	}

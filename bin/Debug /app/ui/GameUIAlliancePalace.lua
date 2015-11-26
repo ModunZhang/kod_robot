@@ -453,7 +453,7 @@ function GameUIAlliancePalace:InitInfoPart()
             if event.name == "CLICKED_EVENT" then
                 if need_honour > self.alliance.basicInfo.honour then
                     UIKit:showMessageDialog(_("提示"),_("联盟荣耀值不足"))
-                elseif self.alliance.basicInfo.status == "fight" then
+                elseif self.alliance.basicInfo.status == "fight" or self.alliance.basicInfo.status == "prepare" then
                     UIKit:showMessageDialog(_("提示"),_("战争期不能修改联盟地形"))
                 elseif self:MapIndexToTerrian(self.select_terrian_index) == self.alliance.basicInfo.terrain then
                     UIKit:showMessageDialog(_("提示"),_("选择的新地形与当前地形相同"))

@@ -13,108 +13,113 @@ local Localize = import("..utils.Localize")
 local UILib = import(".UILib")
 
 function GameUISettingServer:onEnter()
-	GameUISettingServer.super.onEnter(self)
-	self.current_code = User.serverId
-	self.server_code = self.current_code
-	self.HIGH_COLOR = UIKit:hex2c3b(0x970000)
-	self.LOW_COLOR = UIKit:hex2c3b(0x1d8a00)
-	self:BuildUI()
+    GameUISettingServer.super.onEnter(self)
+    self.current_code = User.serverId
+    self.server_code = self.current_code
+    self.HIGH_COLOR = UIKit:hex2c3b(0x970000)
+    self.LOW_COLOR = UIKit:hex2c3b(0x1d8a00)
+    self:BuildUI()
 end
 
 function GameUISettingServer:BuildUI()
-	local bg = WidgetUIBackGround.new({height=762})
-	self:addTouchAbleChild(bg)
-	self.bg = bg
-	bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
-	local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,747):addTo(bg)
-	local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
-	   	:addTo(titleBar)
-	   	:align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
-	   	:onButtonClicked(function ()
-	   		self:LeftButtonClicked()
-	   	end)
-	UIKit:ttfLabel({
-		text = _("选择服务器"),
-		size = 22,
-		shadow = true,
-		color = 0xffedae
-	}):addTo(titleBar):align(display.CENTER,300,28)
-	self.select_button = WidgetPushButton.new({normal = 'yellow_btn_up_186x66.png',pressed = 'yellow_btn_down_186x66.png',disabled = "grey_btn_186x66.png"})
-		:align(display.BOTTOM_RIGHT, 588, 28)
-		:addTo(bg)
-		:setButtonLabel("normal", UIKit:commonButtonLable({
-			text = _("切换服务器"),
-		}))
-		:onButtonClicked(function()
-			if not Alliance_Manager:GetMyAlliance():IsDefault() then
-				UIKit:showMessageDialog(_("错误"),_("你已加入联盟不能切换服务器，退出联盟后重试。"))
-				return 
-			end
-			if self.server_code ~= User.serverId then
-				NetManager:getSwitchServer(self.server_code)
-			end
-		end)
-	self.list_view = UIListView.new{
-        viewRect = cc.rect(20,98,568,532),
+    local bg_height = 722
+    local bg = WidgetUIBackGround.new({height= bg_height})
+    self:addTouchAbleChild(bg)
+    self.bg = bg
+    bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
+    local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,bg_height - 15):addTo(bg)
+    local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
+        :addTo(titleBar)
+        :align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
+        :onButtonClicked(function ()
+            self:LeftButtonClicked()
+        end)
+    UIKit:ttfLabel({
+        text = _("选择服务器"),
+        size = 22,
+        shadow = true,
+        color = 0xffedae
+    }):addTo(titleBar):align(display.CENTER,300,28)
+
+    local couldChangeFree = City:GetFirstBuildingByType("keep"):GetLevel() < 10
+    local btn_images = couldChangeFree and {normal = 'yellow_btn_up_186x66.png',pressed = 'yellow_btn_down_186x66.png',disabled = "grey_btn_186x66.png"}
+        or {normal = 'green_btn_up_148x76.png',pressed = 'green_btn_down_148x76.png',disabled = "grey_btn_148x78.png"}
+
+    self.select_button = WidgetPushButton.new(btn_images)
+        :align(display.BOTTOM_CENTER, bg:getContentSize().width/2, 20)
+        :addTo(bg)
+        :setButtonLabel("normal", UIKit:commonButtonLable({
+            text = _("传送"),
+        }))
+        :onButtonClicked(function()
+            if not Alliance_Manager:GetMyAlliance():IsDefault() then
+                UIKit:showMessageDialog(_("错误"),_("你已加入联盟不能切换服务器，退出联盟后重试。"))
+                return
+            end
+            if self.server_code ~= User.serverId then
+                NetManager:getSwitchServer(self.server_code)
+            end
+        end)
+    -- 切换服务器需要花费的金龙币
+    if not couldChangeFree then
+        self.select_button:setButtonLabelOffset(0, 16)
+        local num_bg = display.newSprite("back_ground_124x28.png", nil, nil, {class=cc.FilteredSpriteWithOne}):addTo(self.select_button):align(display.CENTER, 0, 22):setTag(1)
+        -- gem icon
+        local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(num_bg):align(display.CENTER, 20, num_bg:getContentSize().height/2):scale(0.6)
+        local price = UIKit:ttfLabel({
+            text = string.formatnumberthousands(5000),
+            size = 18,
+            color = 0xffd200,
+        }):align(display.LEFT_CENTER, 50 , num_bg:getContentSize().height/2)
+            :addTo(num_bg)
+    end
+    local list_view ,list_node = UIKit:commonListView({
+        viewRect = cc.rect(0,0,568,460),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
         async = true,
-    }:addTo(bg):onTouch(handler(self, self.listviewListener))
-    self.list_view:setDelegate(handler(self, self.sourceDelegate))
- 	local tips_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 96}):addTo(bg):align(display.TOP_CENTER, 304, 740)
- 	UIKit:ttfLabel({
- 		text = _("你只能在未加入联盟的情况下，迁移服务器，执行此操作不会清空你当前的进度。"),
- 		size = 20,
- 		color= 0x615b44,
- 		align = cc.TEXT_ALIGNMENT_CENTER,
- 		dimensions = cc.size(518, 82)
- 	}):align(display.CENTER, 278, 48):addTo(tips_bg)
- 	self:FetchServers()
- 	
-end
+    })
+    list_node:addTo(bg):pos(20,118)
+    list_view:onTouch(handler(self, self.listviewListener))
+    list_view:setDelegate(handler(self, self.sourceDelegate))
+    self.list_view = list_view
+    local tips_bg = UIKit:CreateBoxPanelWithBorder({width = 556,height = 88}):addTo(bg):align(display.TOP_CENTER, 304, bg_height - 22)
+    UIKit:ttfLabel({
+        text = string.format(_("城堡等级 Lv%s"),City:GetFirstBuildingByType("keep"):GetLevel()),
+        size = 22,
+        color= 0x403c2f,
+    }):align(display.LEFT_CENTER, 20, 60):addTo(tips_bg)
+    UIKit:ttfLabel({
+        text = Alliance_Manager:GetMyAlliance():IsDefault() and _("不在联盟中") or _("在联盟当中"),
+        size = 20,
+        color= Alliance_Manager:GetMyAlliance():IsDefault() and 0x1d8a00 or 0x970000,
+    }):align(display.LEFT_CENTER, 20, 30):addTo(tips_bg)
+    local info_icon = display.newSprite("info_26x26.png"):addTo(tips_bg):align(display.LEFT_CENTER, tips_bg:getContentSize().width - 40, tips_bg:getContentSize().height/2)
+    local ruls =UIKit:ttfLabel({
+        text = _("传送规则"),
+        size = 22,
+        color= 0x076886,
+    }):align(display.RIGHT_CENTER, info_icon:getPositionX() - 10, tips_bg:getContentSize().height/2):addTo(tips_bg)
+    UIKit:addTipsToNode(ruls,{_("你只能在未加入联盟的情况传送到新的服务器。"),
+        _("城堡在Lv10一下(不包括Lv10)可免费传送。"),
+        _("城堡在Lv10一下(城堡在Lv10以上(包括Lv10)不能传送到新服。)可免费传送。"),
+    },tips_bg,cc.size(420,0),-200,-200)
+    self:FetchServers()
 
-function GameUISettingServer:BuildServersUI()
-	local tips_label = UIKit:ttfLabel({
- 		text = _("每次进行联盟匹配奖励"),
- 		size = 18,
- 		color= 0x403c2f
- 	}):align(display.LEFT_BOTTOM, 30, 76):addTo(self.bg)
- 	local honour_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(130,30),cc.rect(15,10,136,64)):addTo(self.bg):align(display.LEFT_CENTER, 42, 56)
- 	local honour_icon = display.newSprite("honour_128x128.png"):align(display.LEFT_CENTER, -12, 15):scale(0.48):addTo(honour_bg):scale(0.35)
-
- 	local gems_bg = display.newScale9Sprite("back_ground_166x84.png",0 , 0,cc.size(130,30),cc.rect(15,10,136,64)):addTo(self.bg):align(display.LEFT_CENTER, honour_bg:getPositionX()+130+26, 56)
- 	local gems_icon = display.newSprite("gem_icon_62x61.png"):align(display.LEFT_CENTER, -12, 15):addTo(gems_bg):scale(0.7)
-
- 	local honour_label = UIKit:ttfLabel({
- 		text = "",
- 		size = 22,
- 		color= 0x288400,
- 		align = cc.TEXT_ALIGNMENT_RIGHT,
- 	}):align(display.RIGHT_CENTER, 120, 15):addTo(honour_bg)
-
- 	local gem_label = UIKit:ttfLabel({
- 		text = "",
- 		size = 22,
- 		color= 0x288400,
- 		align = cc.TEXT_ALIGNMENT_CENTER,
- 	}):align(display.LEFT_CENTER, 30, 15):addTo(gems_bg)
- 	self.honour_label = honour_label
- 	self.gem_label = gem_label
 end
 
 function GameUISettingServer:FetchServers()
-	NetManager:getServersPromise():done(function(response)
-		if response.msg.code == 200 then
-			local servers = response.msg.servers
-			self.data = servers
-			self:RefreshList()
-			self:BuildServersUI()
-			self:RefreshServerInfo()
-		end
-	end)
+    NetManager:getServersPromise():done(function(response)
+        if response.msg.code == 200 then
+            local servers = response.msg.servers
+            self.data = servers
+            self:RefreshList()
+            self:RefreshServerInfo()
+        end
+    end)
 end
 
 function GameUISettingServer:sourceDelegate(listView, tag, idx)
-	if cc.ui.UIListView.COUNT_TAG == tag then
+    if cc.ui.UIListView.COUNT_TAG == tag then
         return #self.data
     elseif cc.ui.UIListView.CELL_TAG == tag then
         local item
@@ -129,144 +134,156 @@ function GameUISettingServer:sourceDelegate(listView, tag, idx)
             content = item:getContent()
         end
         self:FillDataItem(content,data)
-        item:setItemSize(560,130)
+        item:setItemSize(566,149)
         return item
     end
 end
 
 function GameUISettingServer:RefreshList()
-	self:SortServerData()
-	self.list_view:reload()
+    self:SortServerData()
+    self.list_view:reload()
 end
 
 function GameUISettingServer:SortServerData()
-	table.sort( self.data, function(a,b)
-		if self:IsServerLevelGreateThanOther(a,b) then 
-			return true
-		else
-		 	return a.id < b.id
-		end
-	end )
+    table.sort( self.data, function(a,b)
+        if self:IsServerLevelGreateThanOther(a,b) then
+            return true
+        else
+            return a.id < b.id
+        end
+    end )
 end
 
 function GameUISettingServer:IsServerLevelGreateThanOther(server1,server2)
-	return config_fightRewards[server1.level].gem > config_fightRewards[server2.level].gem
+    local level_1 = string.sub(server1.id,-1,-1)
+    local level_2 = string.sub(server2.id,-1,-1)
+    return tonumber(level_1) > tonumber(level_2)
 end
 
 function GameUISettingServer:GetServerLocalizeName(server)
-	local __,__,indexName = string.find(server.id or "","-(%d+)")
-	return string.format("%s %d",Localize.server_name[server.level],indexName)
+    local server_level = string.sub(server.id,-1,-1)
+    return string.format(_("World %s"),server_level)
 end
 
 
 function GameUISettingServer:GetStateLableInfoByUserCount(count)
-	if count >= 500 then
-		return "HIGH",self.HIGH_COLOR
-	else
-		return "LOW",self.LOW_COLOR
-	end
+    if count >= 500 then
+        return "HIGH",self.HIGH_COLOR
+    else
+        return "LOW",self.LOW_COLOR
+    end
 end
 
 function GameUISettingServer:GetItemContent()
-	local content = display.newSprite("server_item_568x130.png")
-	for k,v in pairs(UILib.server_level_image) do
-		local sp = display.newSprite(v):addTo(content):align(display.CENTER, 64,65)
-		content[k] = sp
-	end
-	local title_label = UIKit:ttfLabel({
-		text = "",
-		size = 22,
-		color= 0x403c2f
-	}):align(display.LEFT_BOTTOM,142, 74):addTo(content)
-	local desc_label = UIKit:ttfLabel({
-		text = _("人口"),
-		size = 20,
-		color= 0x403c2f
-	}):align(display.LEFT_BOTTOM, 142, 48):addTo(content)
-	local state_label = UIKit:ttfLabel({
-		text = "HIGH",
-		size = 20,
-		color= 0x970000
-	}):align(display.LEFT_BOTTOM, desc_label:getContentSize().width + desc_label:getPositionX() + 10, 48):addTo(content)
-	local here_label = UIKit:ttfLabel({
-		text = _("你在这儿"),
-		size = 20,
-		color= 0x076886
-	}):align(display.LEFT_BOTTOM, 142, 20):addTo(content)
-	local unselected = display.newSprite("checkbox_unselected.png"):addTo(content):align(display.RIGHT_CENTER,544, 65)
-	local selected = display.newSprite("checkbox_selectd.png"):addTo(content):align(display.RIGHT_CENTER,544, 65)
-	content.title_label = title_label
-	content.state_label = state_label
-	content.unselected = unselected
-	content.selected = selected
-	content.here_label = here_label
-	return content
+    local content_bg_width,content_bg_height = 566,149
+    local content = WidgetUIBackGround.new({width = content_bg_width,height=content_bg_height},WidgetUIBackGround.STYLE_TYPE.STYLE_2)
+    local title_bg = display.newSprite("title_blue_558x34.png")
+        :align(display.CENTER_TOP, content_bg_width/2, content_bg_height - 6):addTo(content)
+    local title_label = UIKit:ttfLabel({
+        text = "",
+        size = 22,
+        color= 0xffedae
+    }):align(display.LEFT_CENTER,20, 17):addTo(title_bg)
+    local is_new_server_label = UIKit:ttfLabel({
+        text = "",
+        size = 22,
+        color= 0x96ff00
+    }):align(display.RIGHT_CENTER,538, 17):addTo(title_bg)
+    local topAllianceCountry = display.newSprite("icon_unknow_country.png"):align(display.LEFT_BOTTOM, 20, 0):addTo(content)
+    local topAlliance = UIKit:ttfLabel({
+        text = _("占领者"),
+        size = 20,
+        color= 0x403c2f
+    }):align(display.LEFT_BOTTOM, 132, 76):addTo(content)
+    local top_alliance_label = UIKit:ttfLabel({
+        text = "DragonFall",
+        size = 20,
+        color= 0x970000
+    }):align(display.LEFT_BOTTOM, topAlliance:getContentSize().width + topAlliance:getPositionX() + 10, 76):addTo(content)
+    local desc_label = UIKit:ttfLabel({
+        text = _("人口"),
+        size = 20,
+        color= 0x403c2f
+    }):align(display.LEFT_BOTTOM, 132, 48):addTo(content)
+    local state_label = UIKit:ttfLabel({
+        text = "HIGH",
+        size = 20,
+        color= 0x970000
+    }):align(display.LEFT_BOTTOM, desc_label:getContentSize().width + desc_label:getPositionX() + 10, 48):addTo(content)
+    local here_label = UIKit:ttfLabel({
+        text = _("你拥有一片领地"),
+        size = 20,
+        color= 0x076886
+    }):align(display.LEFT_BOTTOM, 132, 20):addTo(content)
+    local unselected = display.newSprite("checkbox_unselected.png"):addTo(content):align(display.RIGHT_CENTER,544, 65)
+    local selected = display.newSprite("checkbox_selectd.png"):addTo(content):align(display.RIGHT_CENTER,544, 65)
+    content.title_label = title_label
+    content.is_new_server_label = is_new_server_label
+    content.topAllianceCountry = topAllianceCountry
+    content.top_alliance_label = top_alliance_label
+    content.state_label = state_label
+    content.unselected = unselected
+    content.selected = selected
+    content.here_label = here_label
+    return content
 end
 
 function GameUISettingServer:FillDataItem(content,data)
-	content.title_label:setString(self:GetServerLocalizeName(data))
-	for k,__ in pairs(UILib.server_level_image) do
-		if data.level == k then
-			content[k]:show()
-		else
-			content[k]:hide()
-		end
-	end
-
-	local str,color = self:GetStateLableInfoByUserCount(data.userCount or 0)
-	content.state_label:setString(str)
-	content.state_label:setColor(color)
-	if data.id == self.server_code then
-		content.selected:show()
-		content.unselected:hide()
-	else
-		content.selected:hide()
-		content.unselected:show()
-	end
-	if data.id == self.current_code then
-		content.here_label:show()
-	else
-		content.here_label:hide()
-	end
+    content.title_label:setString(self:GetServerLocalizeName(data))
+    content.is_new_server_label:setString(data.isNew == "true" and "[NEW!]" or "")
+    content.topAllianceCountry:setTexture(data.serverInfo.alliance and data.serverInfo.alliance ~= json.null and UILib.alliance_language_frame[data.serverInfo.alliance.country] or "icon_unknow_country.png")
+    content.top_alliance_label:setString(data.serverInfo.alliance and data.serverInfo.alliance ~= json.null and data.serverInfo.alliance.name or _("无"))
+    local str,color = self:GetStateLableInfoByUserCount(data.serverInfo.loginedCount or 0)
+    content.state_label:setString(str)
+    content.state_label:setColor(color)
+    if data.id == self.server_code then
+        content.selected:show()
+        content.unselected:hide()
+    else
+        content.selected:hide()
+        content.unselected:show()
+    end
+    if data.id == self.current_code then
+        content.here_label:show()
+    else
+        content.here_label:hide()
+    end
 end
 
 function GameUISettingServer:listviewListener(event)
     local listView = event.listView
     if "clicked" == event.name then
-    	local server = self.data[event.itemPos]
-    	if not server then return end
-    	self.server_code = server.id
-    	self:RefreshCurrentPageList()
-		self:RefreshServerInfo()
+        local server = self.data[event.itemPos]
+        if not server then return end
+        self.server_code = server.id
+        self:RefreshCurrentPageList()
+        self:RefreshServerInfo()
     end
 end
 
 function GameUISettingServer:RefreshCurrentPageList()
-	local items = self.list_view:getItems()
-	for __,v in ipairs(items) do
-		local idx = v.idx_ 
-		local server = self.data[idx]
-		local content = v:getContent()
-		self:FillDataItem(content,server)
-	end
+    local items = self.list_view:getItems()
+    for __,v in ipairs(items) do
+        local idx = v.idx_
+        local server = self.data[idx]
+        local content = v:getContent()
+        self:FillDataItem(content,server)
+    end
 end
 
 function GameUISettingServer:RefreshServerInfo()
-	self.select_button:setButtonEnabled(self.server_code ~= self.current_code)
-	local current_server_level = ""
-	local honour,gem = 0,0
-	for __,v in ipairs(self.data) do
-		if v.id == self.server_code then
-			current_server_level = v.level
-			break
-		end
-	end
-	local config = config_fightRewards[current_server_level]
-	if config then
-		honour,gem = config.honour,config.gem
-	end
-	self.honour_label:setString(string.format("+%s",string.formatnumberthousands(honour)))
-	self.gem_label:setString(string.format("+%s",string.formatnumberthousands(gem)))
+    local btn_status = self.server_code ~= self.current_code
+    self.select_button:setButtonEnabled(btn_status)
+    if self.select_button:getChildByTag(1) then
+        if btn_status then
+            self.select_button:getChildByTag(1):clearFilter()
+        else
+            self.select_button:getChildByTag(1):setFilter(filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1}))
+        end
+    end
 end
 
 return GameUISettingServer
+
+
+

@@ -296,10 +296,18 @@ function WorldLayer:LoadAlliance()
     -- for k,v in pairs(self:GetAvailableIndex()) do
     --     table.insert(request_body, tonumber(k))
     -- end
+    local indexes = self:GetAvailableIndex()
+    local key_map = {}
+    for i,v in ipairs(indexes) do
+        key_map[tostring(v)] = json.null
+    end
     NetManager:getMapAllianceDatasPromise(self:GetAvailableIndex())
     :done(function(response)
         dump(response.msg.datas)
         for k,v in pairs(response.msg.datas) do
+            key_map[k] = v
+        end
+        for k,v in pairs(key_map) do
             if self.LoadAllianceBy then
                 self:LoadAllianceBy(k,v)
             end

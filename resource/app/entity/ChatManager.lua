@@ -57,7 +57,7 @@ function EmojiUtil:ConvertEmojiToRichText(chatmsg,func_handler_dest)
                         reportId = string.split(r,":")[2]
                     end
                 end
-                dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\",\"color\":0xd64600,\"url\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\"}',string.sub(result,1,r_s - 1), msg_value,"report:"..userId..":"..reportId,string.sub(result,r_e+1))
+                dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\",\"color\":"0xd64600",\"url\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\"}',string.sub(result,1,r_s - 1), msg_value,"report:"..userId..":"..reportId,string.sub(result,r_e+1))
             else
                 dest[i] = string.format('{\"type\":\"text\", \"value\":\"%s\"}', v)
             end
@@ -93,9 +93,9 @@ function EmojiUtil:FormatSystemChat(msg,opt)
         msg = string.gsub(msg,'"',"''")
         msg = string.gsub(msg,'\\','\\\\')
         if opt then
-            return string.format('[{\"type\":\"text\", \"value\":\"%s\",\"color\":0x00b835}]',msg)
+            return string.format('[{\"type\":\"text\", \"value\":\"%s\",\"color\":"0x00b835"}]',msg)
         else
-            return string.format('[{\"type\":\"text\", \"value\":\"%s\",\"color\":0x245f00}]',msg)
+            return string.format('[{\"type\":\"text\", \"value\":\"%s\",\"color\":"0x245f00"}]',msg)
         end
     end
     return ""
@@ -293,7 +293,7 @@ function ChatManager:__formatLastMessage(chat)
     else
         local chat_text = string.format(" : %s",chat.text)
         local result = self:GetEmojiUtil():ConvertEmojiToRichText(chat_text,function(json_table)
-            table.insert(json_table,1,string.format('{\"type\":\"text\", \"value\":\"%s\",\"color\":0x00b4cf}', chat.name))
+            table.insert(json_table,1,string.format('{\"type\":\"text\", \"value\":\"%s\",\"color\":"0x00b4cf"}', chat.name))
         end)
         return result
     end

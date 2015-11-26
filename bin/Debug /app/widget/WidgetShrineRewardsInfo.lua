@@ -62,7 +62,7 @@ function WidgetShrineRewardsInfo:CreateInfoItems(shrineStage)
                 local size = sp:getContentSize()
                 sp:scale(100/math.max(size.width,size.height)):addTo(item)
                 UIKit:addTipsToNode(item,Localize.equip_material[v.sub_type],self)
-            elseif v.type == 'allianceInfo' then
+            elseif v.type == 'allianceData' then
                 if v.sub_type == 'loyalty' then
                     local sp = display.newSprite("loyalty_128x128.png"):align(display.CENTER,59,59)
                     sp:scale(0.78):addTo(item)

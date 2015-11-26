@@ -82,9 +82,9 @@ function GameUISettingPush:CreatePushNode()
         {_("科技研发完成提醒"),app:GetPushManager():GetTechnologyPushState()},
         {_("工具&装备制造完成提醒"),app:GetPushManager():GetToolEquipemtPushState()},
         {_("瞭望塔预警提醒"),app:GetPushManager():GetWatchTowerPushState()},
-        {_("圣地战提醒"),User.apnStatus.onAllianceShrineEventStart},
-        {_("联盟战提醒"),User.apnStatus.onAllianceFightPrepare},
-        {_("被攻打提醒"),User.apnStatus.onCityBeAttacked},
+        {_("圣地战提醒"),User.pushStatus.onAllianceShrineEventStart},
+        {_("联盟战提醒"),User.pushStatus.onAllianceFightPrepare},
+        {_("被攻打提醒"),User.pushStatus.onCityBeAttacked},
     }
 
     for i,v in ipairs(push_datas) do

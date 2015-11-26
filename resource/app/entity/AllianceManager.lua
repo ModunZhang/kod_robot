@@ -133,6 +133,18 @@ function AllianceManager:GetVillageEventsByMapId(alliance, mapId)
         end
     end
 end
+function AllianceManager:GetMyAllianceVillageEventsByMapId(alliance, mapId)
+    for k,v in pairs(alliance.villageEvents) do
+        if v.villageData.id == mapId then
+            return v
+        end
+    end
+    for k,v in pairs(self.my_alliance_mapData.villageEvents) do
+        if v ~= json.null and v.villageData.id == mapId then
+            return v
+        end
+    end
+end
 function AllianceManager:GetAllianceByCache(key)
     local cache_alliance = self.alliance_caches[key]
     if cache_alliance and self:GetMyAlliance()._id ~= cache_alliance._id then

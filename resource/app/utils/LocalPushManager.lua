@@ -30,7 +30,7 @@ function LocalPushManager:GetGameDefault()
 end
 --返回本地通知是否支持该平台
 function LocalPushManager:IsSupport()
-	return device.platform == 'ios'
+	return device.platform == 'ios' or device.platform == 'android' or device.platform == 'winrt'
 end
 
 function LocalPushManager:CancelAll()

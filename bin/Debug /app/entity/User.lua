@@ -11,6 +11,7 @@ User.LISTEN_TYPE = Enum(
     "resources",
     "growUpTasks",
     "deals",
+    "allianceData",
 
     "helpedByTroops",
     "helpToTroops",
@@ -386,7 +387,12 @@ end
 
 --[[gcId]]
 function User:IsBindGameCenter()
-    return self.gcId ~= "" and self.gcId ~= json.null
+    local gc = self.gc
+    return gc and gc.type == "gamecenter" and gc.gcId ~= "" and gc.gcId ~= json.null
+end
+function User:IsBindFacebook()
+    local gc = self.gc
+    return gc and gc.type == "facebook" and gc.gcId ~= "" and gc.gcId ~= json.null
 end
 --[[end]]
 
@@ -1120,6 +1126,10 @@ function User:GetProductionTech(index)
         end
     end
 end
+function User:GetProductionTechEff(index)
+   local tech_name,v = self:GetProductionTech(index)
+   return productionTechs[tech_name].effectPerLevel * v.level
+end
 function User:HasProductionTechEvent()
     return next(self.productionTechEvents)
 end
@@ -1521,6 +1531,7 @@ local before_map = {
     end,
     countInfo = function()end,
     deals = function()end,
+    allianceData = function()end,
     iapGifts = function()end,
     growUpTasks = function()end,
     allianceDonate = function()end,

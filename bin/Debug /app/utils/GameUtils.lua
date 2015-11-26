@@ -294,7 +294,16 @@ function GameUtils:PingBaidu(callback)
     request:start()
 end
 
+function GameUtils:getPlatformForServer()
+    local platform = device.platform
+    if platform == 'winrt' or platform == 'wp8' then
+        platform = 'wp'
+    end
+    return platform
+end
+
 function GameUtils:GetServerInfo(param, callback)
+    local platform = self:getPlatformForServer()
     local request = network.createHTTPRequest(function(event)
         if event.name == "completed" then
             callback(true, json.decode(event.request:getResponseData()))
@@ -302,7 +311,7 @@ function GameUtils:GetServerInfo(param, callback)
             callback(false)
         end
     end, 
-    string.format("http://gate.batcatstudio.com/dragonfall/query-entry?env=%s&version=%s", string.urlencode(param.env), string.urlencode(param.version)), "GET")
+    string.format("http://gate.batcatstudio.com/dragonfall/query-entry?env=%s&version=%s&platform=%s", string.urlencode(param.env), string.urlencode(param.version),platform), "GET")
     request:setTimeout(180)
     request:start()
 end
