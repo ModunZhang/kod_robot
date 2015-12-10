@@ -493,9 +493,10 @@ function GameUIMail:CreateInboxContent()
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
                     parent:SelectAllMailsOrReports(false)
+                    local manager = parent.manager
                     if tolua.type(mail.isRead)=="boolean" and not mail.isRead then
                         parent:ReadMailOrReports({mail.id},function ()
-                            parent.manager:DecreaseUnReadMailsNum(1)
+                            manager:DecreaseUnReadMailsNum(1)
                         end)
                     end
 

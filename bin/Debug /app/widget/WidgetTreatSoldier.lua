@@ -161,7 +161,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
 
     -- food icon
     cc.ui.UIImage.new("res_food_91x74.png"):addTo(back_ground, 2)
-        :align(display.CENTER, size.width - 133, size.height - 100):scale(0.4)
+        :align(display.CENTER, size.width - 153, size.height - 100):scale(0.4)
 
     cc.ui.UILabel.new({
         text = _("维护费"),
@@ -188,7 +188,7 @@ function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
         :OnSliderValueChanged(function(event)
             self:OnCountChanged(math.floor(event.value))
         end)
-        :LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.RIGHT,0)
+        :LayoutValueLabel(WidgetSliderWithInput.STYLE_LAYOUT.RIGHT,20)
 
 
 

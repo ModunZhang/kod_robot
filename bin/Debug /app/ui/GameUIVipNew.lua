@@ -318,6 +318,16 @@ function GameUIVipNew:InitVipTop()
     }):align(display.RIGHT_CENTER, continuous_login:getPositionX() - continuous_login:getContentSize().width - 10, label_1:getPositionY())
         :addTo(top_bg)
 end
+function GameUIVipNew:GetVipEffectiveCountByLevel(level)
+    local add_count = 0
+    for k,v in ipairs(VIP_EFFECIVE_ALL_TYPE) do
+        local effect = VIP_LEVEL[level][v]
+        if effect > 0 then
+            add_count = add_count + 1
+        end
+    end
+    return add_count
+end
 function GameUIVipNew:CreateVipEff()
     local vip_layer = self.vip_layer
     local line = display.newScale9Sprite("dividing_line.png",0,0,cc.size(552,2),cc.rect(10,2,382,2)):align(display.CENTER, window.cx, window.top - 568):addTo(vip_layer)
@@ -333,33 +343,109 @@ function GameUIVipNew:CreateVipEff()
         color = 0xffd200,
     }):align(display.CENTER, 160,42)
         :addTo(level_bg)
-    -- local right_level_label = UIKit:ttfLabel({
-    --     text = "VIP "..self.right_level,
-    --     size = 26,
-    --     color = 0xffd200,
-    -- }):align(display.CENTER, 400,42)
-    --     :addTo(level_bg)
 
     local bottom_vip_level_node = display.newNode()
     bottom_vip_level_node:setContentSize(cc.size(292,22))
     bottom_vip_level_node:align(display.CENTER, window.cx, window.bottom_top + 20):addTo(vip_layer)
     local parent = self
-    function bottom_vip_level_node:InitLevelNode()
+    function bottom_vip_level_node:InitLevelNode(right_level)
         self:removeAllChildren()
         for i=1,VIP_MAX_LEVEL do
-            display.newSprite(parent.right_level == i and "vip_icon_22x22_1.png" or "vip_icon_22x22_2.png"):align(display.LEFT_CENTER, (i - 1) * 30, 11):addTo(self)
+            display.newSprite(right_level == i and "vip_icon_22x22_1.png" or "vip_icon_22x22_2.png"):align(display.LEFT_CENTER, (i - 1) * 30, 11):addTo(self)
         end
     end
+
+    --- new vip test ----
+
+    -- 当前vip等级
 
     local bg_width, bg_height = 250 , 534
     local left_eff_bg = WidgetUIBackGround.new({width = bg_width,height = bg_height},WidgetUIBackGround.STYLE_TYPE.STYLE_6):addTo(vip_layer):align(display.LEFT_TOP,window.left + 50,window.top - 314)
     local right_eff_bg = WidgetUIBackGround.new({width = bg_width,height = bg_height},WidgetUIBackGround.STYLE_TYPE.STYLE_6):addTo(vip_layer):align(display.RIGHT_TOP,window.right - 50,window.top - 314)
 
-    local listview = UIListView.new{
-        -- bgColor = UIKit:hex2c4b(0x7a10aaee),
-        viewRect = cc.rect(0, 0, 520 , 514),
-        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
-    }:addTo(vip_layer):pos(window.left + 60,window.bottom_top + 44)
+    local clipeNode = display.newClippingRegionNode(cc.rect(window.left + 60,window.bottom_top + 44 , bg_width - 20 , 514)):addTo(vip_layer)
+    local current_vip_node = self:CreateVipEffNodeByLevel(vip_level,self:GetVipEffectiveCountByLevel(vip_level) * 86)
+        :align(display.LEFT_TOP, window.left + 60, window.bottom_top + 44 + 514):addTo(clipeNode)
+
+    local pv = UIPageView.new {
+        viewRect = cc.rect(window.right - 50 - bg_width + 10 , window.bottom_top + 44 , bg_width - 20 , 514),
+        row = 1,
+        padding = {left = 0, right = 0, top = 10, bottom = 0},
+        nBounce = true,
+        continuous_touch = true
+    }
+    pv:onTouch(function (event)
+        if event.name == "pageChange" then
+            bottom_vip_level_node:InitLevelNode(event.pageIdx >= self.current_vip_level and (event.pageIdx + 1) or event.pageIdx)
+        end
+    end):addTo(vip_layer)
+    pv:setTouchSwallowEnabled(false)
+    local all_vip_nodes = {}
+    for i=1,VIP_MAX_LEVEL do
+        if i ~= self.current_vip_level then
+            local item = pv:newItem()
+            local content_node = display.newNode()
+            content_node:setContentSize(cc.size(bg_width - 20 , 514))
+            local vip_node = self:CreateVipEffNodeByLevel(i)
+            vip_node:align(display.TOP_LEFT,0, 514 ):addTo(content_node)
+            table.insert(all_vip_nodes, vip_node)
+            item:addChild(content_node)
+            pv:addItem(item)
+        end
+    end
+    pv:reload()
+    pv:gotoPage(self.right_level > self.current_vip_level and (self.right_level - 1) or self.right_level)
+
+    -- 处理pageview的上下滑动的事件 node
+    local pv_node = display.newNode():addTo(vip_layer)
+    pv_node:setContentSize(cc.size(bg_width - 20 , 514))
+    pv_node:setTouchEnabled(true)
+    pv_node:setNodeEventEnabled(true)
+    pv_node:setTouchSwallowEnabled(false)
+    pv_node:pos(window.right - 50 - bg_width + 10 , window.bottom_top + 44 )
+
+    pv_node:addNodeEventListener(cc.NODE_TOUCH_EVENT, function (event)
+        if event.name == 'moved' then
+            local offset_y = event.y - event.prevY
+            for i,vip_node in ipairs(all_vip_nodes) do
+                local tar_y = vip_node:getPositionY() + offset_y
+                tar_y = math.max(tar_y,514)
+                tar_y = math.min(tar_y, math.max(self:GetVipEffectiveCountByLevel(pv:getCurPageIdx()) * 86,current_vip_node:getContentSize().height))
+                vip_node:setPositionY(tar_y)
+            end
+            local tar_y = current_vip_node:getPositionY() + offset_y
+            tar_y = math.max(tar_y,window.bottom_top + 44 + 514)
+            tar_y = math.min(tar_y,math.max(window.bottom_top + 44 + self:GetVipEffectiveCountByLevel(pv:getCurPageIdx()) * 86,window.bottom_top + 44 + current_vip_node:getContentSize().height))
+            current_vip_node:setPositionY(tar_y)
+        end
+        return true
+    end)
+
+    -- 处理当前vip效果node的上下滑动的事件 node
+    local cu_node = display.newNode():addTo(vip_layer)
+    cu_node:setContentSize(cc.size(bg_width - 20 , 514))
+    cu_node:setTouchEnabled(true)
+    cu_node:setNodeEventEnabled(true)
+    cu_node:setTouchSwallowEnabled(false)
+    cu_node:pos(window.left + 60, window.bottom_top + 44)
+
+    cu_node:addNodeEventListener(cc.NODE_TOUCH_EVENT, function (event)
+        if event.name == 'moved' then
+            local offset_y = event.y - event.prevY
+            for i,vip_node in ipairs(all_vip_nodes) do
+                local tar_y = vip_node:getPositionY() + offset_y
+                tar_y = math.max(tar_y,514)
+                tar_y = math.min(tar_y, math.max(self:GetVipEffectiveCountByLevel(pv:getCurPageIdx()) * 86,current_vip_node:getContentSize().height))
+                vip_node:setPositionY(tar_y)
+            end
+            local tar_y = current_vip_node:getPositionY() + offset_y
+            tar_y = math.max(tar_y,window.bottom_top + 44 + 514)
+            tar_y = math.min(tar_y,math.max(window.bottom_top + 44 + self:GetVipEffectiveCountByLevel(pv:getCurPageIdx()) * 86,window.bottom_top + 44 + current_vip_node:getContentSize().height))
+            current_vip_node:setPositionY(tar_y)
+        end
+        return true
+    end)
+    --- new vip test ----
 
     local clipeNode = display.newClippingRegionNode(cc.rect(window.left + 60 + 520 - bg_width + 20 - 12, window.top - 310  , bg_width - 20 - 12, 70)):addTo(vip_layer)
     local pv_right_level = UIPageView.new {
@@ -372,160 +458,34 @@ function GameUIVipNew:CreateVipEff()
     pv_right_level:setTouchSwallowEnabled(false)
     local cover_layer = display.newLayer():addTo(vip_layer,3):pos(window.left + 60 + 520 - bg_width + 20 , window.top - 310)
     cover_layer:setContentSize(cc.size(bg_width - 20, 70))
-    local function showNode()
-        listview:removeAllItems()
-        pv_right_level:removeAllItems()
-        local all_node = display.newNode()
-        local max_level = math.max(self.current_vip_level,(self.right_level + 1) <= VIP_MAX_LEVEL and (self.right_level + 1) or self.right_level)
-        local available_count = 0
-        for k,v in ipairs(VIP_EFFECIVE_ALL_TYPE) do
-            local effect = VIP_LEVEL[max_level][v]
-            if effect > 0 then
-                available_count = available_count + 1
-            end
+    for i= 1,VIP_MAX_LEVEL do
+        if i ~= self.current_vip_level then
+            local item = pv_right_level:newItem()
+            -- local content_node = display.newColorLayer(UIKit:hex2c4b(0x7a0aa000))
+            local content_node = display.newNode()
+            content_node:setContentSize(cc.size(bg_width - 20, bg_height + 86))
+            UIKit:ttfLabel({
+                text = "VIP "..i,
+                size = 26,
+                color = 0xffd200,
+            }):align(display.CENTER, (bg_width - 20)/2 - 20, bg_height + 86 - 54):addTo(content_node)
+            item:addChild(content_node)
+            pv_right_level:addItem(item)
         end
-        all_node:setContentSize(cc.size(520,available_count * 86))
-        local current_vip_node = self:CreateVipEffNodeByLevel(self.current_vip_level,available_count):addTo(all_node):pos(0,0)
-        local function changeIndex( isAdd )
-            local change
-            if isAdd then
-                change = self.right_level + 1
-                if change == self.current_vip_level then
-                    change = change + 1
-                end
-            else
-                change = self.right_level - 1
-                if change == self.current_vip_level then
-                    change = change - 1
-                end
-            end
-            return change
-        end
-        local pv = UIPageView.new {
-            viewRect = cc.rect(520 - bg_width + 20, 0 , bg_width - 20, available_count * 86),
-            row = 1,
-            padding = {left = 0, right = 0, top = 10, bottom = 0},
-            nBounce = true,
-            continuous_touch = true
-        }
-        pv:onTouch(function (event)
-            if event.name == "pageChange" then
-                local total_pages = pv:getPageCount()
-                if total_pages == 2 then
-                    if self.right_level == (VIP_MAX_LEVEL - 1) or self.right_level == VIP_MAX_LEVEL then
-                        if event.pageIdx == 1 then
-                            self.right_level = changeIndex(false)
-                            self.last_list_position_y = listview.container:getPositionY()
-                            showNode()
-                        end
-                    elseif self.right_level == 1 or self.right_level == 2 then
-                        if event.pageIdx == 2 then
-                            self.right_level = changeIndex(true)
-                            self.last_list_position_y = listview.container:getPositionY()
-                            showNode()
-                        end
-                    end
-                elseif total_pages == 3 then
-                    if event.pageIdx == 1 then
-                        self.right_level = changeIndex(false)
-                        self.last_list_position_y = listview.container:getPositionY()
-                        showNode()
-                    elseif event.pageIdx == 3 then
-                        self.right_level = changeIndex(true)
-                        self.last_list_position_y = listview.container:getPositionY()
-                        showNode()
-                    end
-                end
-                -- right_level_label:setString("VIP "..self.right_level)
-                bottom_vip_level_node:InitLevelNode()
-            end
-        end):addTo(all_node)
-        pv:setTouchSwallowEnabled(false)
-
-        local begin_index,end_index
-        local re_r , add_r= self.right_level - 1,self.right_level + 1
-        if re_r == self.current_vip_level  then
-            if re_r == 1 then
-                begin_index = self.right_level
-            else
-                begin_index = re_r - 1
-            end
-        else
-            begin_index = re_r < 1 and 1 or re_r
-        end
-        if add_r == self.current_vip_level then
-            if add_r == VIP_MAX_LEVEL then
-                end_index = self.right_level
-            else
-                end_index = add_r + 1
-            end
-        else
-            end_index = add_r > VIP_MAX_LEVEL and (add_r - 1) or add_r
-        end
-        local page_index = 0
-        local right_index
-        for i= begin_index,end_index do
-            if i ~= self.current_vip_level then
-                page_index = page_index + 1
-                local item = pv:newItem()
-                local content_node = self:CreateVipEffNodeByLevel(i,available_count)
-                item:addChild(content_node)
-                pv:addItem(item)
-                if self.right_level == i then
-                    right_index = page_index
-                end
-            end
-        end
-        pv:reload()
-        pv:gotoPage(right_index)
-        local item = listview:newItem()
-        item:setItemSize(520,available_count * 86)
-        item:addContent(all_node)
-        listview:addItem(item)
-        listview:reload()
-        if self.last_list_position_y then
-            listview.container:setPositionY(self.last_list_position_y + (self.available_count - available_count) * 86)
-        end
-        self.available_count = available_count
-
-
-        local page_index_2 = 0,right_index_2
-        for i= begin_index,end_index do
-            if i ~= self.current_vip_level then
-                page_index_2 = page_index_2 + 1
-                local item = pv_right_level:newItem()
-                -- local content_node = display.newColorLayer(UIKit:hex2c4b(0x7a0aa000))
-                local content_node = display.newNode()
-                content_node:setContentSize(cc.size(bg_width - 20, bg_height + 86))
-                UIKit:ttfLabel({
-                    text = "VIP "..i,
-                    size = 26,
-                    color = 0xffd200,
-                }):align(display.CENTER, (bg_width - 20)/2 - 20, bg_height + 86 - 54):addTo(content_node)
-                item:addChild(content_node)
-                pv_right_level:addItem(item)
-                if self.right_level == i then
-                    right_index_2 = page_index_2
-                end
-            end
-        end
-        pv_right_level:reload()
-        pv_right_level:gotoPage(right_index_2)
     end
-    showNode()
+    pv_right_level:reload()
+    pv_right_level:gotoPage(self.right_level > self.current_vip_level and (self.right_level - 1) or self.right_level)
+
 end
-function GameUIVipNew:CreateVipEffNodeByLevel(level,available_count)
+function GameUIVipNew:CreateVipEffNodeByLevel(level,height)
     local node = display.newNode()
-    local width,height = 230,available_count * 86
+    local width,height = 230, height or LuaUtils:table_size(VIP_EFFECIVE_ALL) * 86
     node:setContentSize(cc.size(width,height))
     local flag = true
-    local none_eff_count = 0
-    local add_count = 0
     dump(VIP_LEVEL[level],level)
     for k,v in ipairs(VIP_EFFECIVE_ALL_TYPE) do
         local effect = VIP_LEVEL[level][v]
         if effect > 0 then
-            add_count = add_count + 1
             if effect<1 and v ~="helpSpeedup" then
                 effect = tonumber(effect*100).."%"
             end
@@ -554,17 +514,6 @@ function GameUIVipNew:CreateVipEffNodeByLevel(level,available_count)
                 :addTo(booty_item_bg)
 
             flag = not flag
-        else
-            none_eff_count = none_eff_count + 1
-        end
-    end
-    if (add_count+1) < available_count then
-        local count = 1
-        for i = (add_count+1),available_count do
-            -- local balck_node = WidgetUIBackGround.new({width = width,height = 86},WidgetUIBackGround.STYLE_TYPE.STYLE_6):align(display.TOP_CENTER,width/2, height - (add_count + count - 1) * 86):addTo(node)
-            local balck_node = display.newNode()
-            balck_node:setContentSize(cc.size(width,86)):align(display.TOP_CENTER,width/2, height - (add_count + count - 1) * 86):addTo(node)
-            count = count + 1
         end
     end
     return node
@@ -655,6 +604,7 @@ function GameUIVipNew:OnVipEventTimer()
     end
 end
 return GameUIVipNew
+
 
 
 

@@ -41,9 +41,8 @@ function GameUIAlliance:OnAllianceDataChanged_basicInfo(alliance, deltaData)
     if self.tab_buttons:GetSelectedButtonTag() == 'overview' then
         if deltaData("basicInfo.flag") then
             self:RefreshFlag()
-        else
-            self:RefreshOverViewUI()
         end
+        self:RefreshOverViewUI()
     end
     if self.tab_buttons:GetSelectedButtonTag() == 'infomation' then
         self:RefreshInfomationView()
@@ -1069,7 +1068,7 @@ function GameUIAlliance:RefreshOverViewUI()
         self.ui_overview.memberCountLabel:setString(string.format("%s/%s",m_count,m_maxCount))
         self.ui_overview.online_count_label:setString(m_online)
         self.ui_overview.powerLabel:setString(string.formatnumberthousands(alliance_data.basicInfo.power))
-        self.ui_overview.language_sprite:setTexture(UILib.alliance_language_frame[alliance_data.basicInfo.country])
+        self.ui_overview.language_sprite:setTexture(UILib.alliance_language_frame_1[alliance_data.basicInfo.country])
         self:RefreshNoticeView()
     end
 end

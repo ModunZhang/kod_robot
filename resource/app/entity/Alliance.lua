@@ -133,7 +133,15 @@ function Alliance:IteratorAllMembers(func)
         end
     end
 end
-
+--获得有加成的龙类型
+function Alliance:GetBestDragon()
+    local bestDragonForTerrain = {
+        grassLand = "greenDragon",
+        desert= "redDragon",
+        iceField = "blueDragon",
+    }
+    return bestDragonForTerrain[self.basicInfo.terrain]
+end
 function Alliance:GetAllianceArchon()
     local archon = json.null
     self:IteratorAllMembers(function(member)

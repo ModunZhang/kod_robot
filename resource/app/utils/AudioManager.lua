@@ -144,14 +144,14 @@ end
 
 function AudioManager:PlayeBgSound(filename)
 	if self.is_bg_auido_on then
-		audio.playSound("audios/" .. filename,true)
+		-- audio.playSound("audios/" .. filename,true)
 	end
 end
 
 function AudioManager:PlayeEffectSound(filename)
 	printLog("AudioManager","PlayeEffectSound:%s",filename)
 	if self.is_effect_audio_on then
-		audio.playSound("audios/" .. filename,false)
+		-- audio.playSound("audios/" .. filename,false)
 	end
 end
 

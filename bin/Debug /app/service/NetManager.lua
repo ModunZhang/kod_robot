@@ -715,6 +715,21 @@ end
 -- 获取服务器列表
 function NetManager:getLogicServerInfoPromise()
     local device_id = device.getOpenUDID()
+    local platform = ''
+    if device.platform == "windows" then
+        platform = 'wp'
+    elseif device.platform == "mac" then
+        platform = 'ios'
+    elseif device.platform == "android" then
+        platform = 'android'
+    elseif device.platform == "ios" then
+        platform = 'ios'
+    elseif device.platform == "winrt" then
+        platform = 'wp'
+    elseif device.platform == "wp8" then
+        platform = 'wp'
+    end
+    print("platform===",platform)
     local device_tag = app.client_tag
     if not device_tag then -- fix tag nil
         device_tag = self:tryGetAppTag()
@@ -724,8 +739,9 @@ function NetManager:getLogicServerInfoPromise()
             end)
         end
     end
-    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {deviceId = device_id,tag = device_tag}, "获取逻辑服务器失败",true)
+    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {platform = platform,deviceId = device_id,tag = device_tag}, "获取逻辑服务器失败",true)
         :done(function(result)
+            dump(result.msg.data,"result.msg.data")
             self:CleanAllEventListeners()
             self.m_netService:disconnect()
             self.m_logicServer.host = result.msg.data.host
@@ -1832,9 +1848,29 @@ function NetManager:getBuyAllianceItemPromise(itemName,count)
 end
 --玩家内购
 function NetManager:getVerifyIAPPromise(transactionId,receiptData)
-    return get_none_blocking_request_promise("logic.playerHandler.addPlayerBillingData",
+    return get_none_blocking_request_promise("logic.playerHandler.addIosPlayerBillingData",
         {
             receiptData=receiptData
+        }
+        ,"玩家内购失败", true):next(get_player_response_msg)
+end
+-- WindowsPhone内购
+function NetManager:getVerifyAdeasygoIAPPromise(transactionIdentifier)
+   if not self.__AdeasygoUID  then
+        self.__AdeasygoUID = ext.adeasygo.getUid()
+   end
+   local uid = self.__AdeasygoUID
+   return get_none_blocking_request_promise("logic.playerHandler.addWpAdeasygoPlayerBillingData",
+        {
+            transactionId=transactionIdentifier,
+            uid = uid,
+        }
+        ,"玩家内购失败", true):next(get_player_response_msg)
+end
+function NetManager:getVerifyMicrosoftIAPPromise( transactionIdentifier )
+    return get_none_blocking_request_promise("logic.playerHandler.addWpOfficialPlayerBillingData",
+        {
+            receiptData=transactionIdentifier,
         }
         ,"玩家内购失败", true):next(get_player_response_msg)
 end

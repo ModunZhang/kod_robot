@@ -218,11 +218,15 @@ function GameUIAllianceHome:InitArrow()
         if not mapIndex then return self.arrow_enemy:hide() end
         local scene = display.getRunningScene()
         if Alliance_Manager:GetAllianceByCache(mapIndex) then
-            scene:GotoAllianceByXY(scene:GetSceneLayer():IndexToLogic(mapIndex))
-        else
-            scene:FetchAllianceDatasByIndex(mapIndex, function()
+            if scene.GetSceneLayer then
                 scene:GotoAllianceByXY(scene:GetSceneLayer():IndexToLogic(mapIndex))
-            end)
+            end
+        else
+            if scene.GetSceneLayer then
+                scene:FetchAllianceDatasByIndex(mapIndex, function()
+                    scene:GotoAllianceByXY(scene:GetSceneLayer():IndexToLogic(mapIndex))
+                end)
+            end
         end
     end):addTo(self, 10):align(display.TOP_CENTER):hide():scale(0.8)
     self.arrow_enemy.icon:scale(0.68)

@@ -3,7 +3,7 @@ local cocos_promise = import("..utils.cocos_promise")
 NetService.NET_STATE = {DISCONNECT = -1 , CONNECT = 0}
 --lua pomelo
 local json = json
--- if device.platform == 'winrt' then
+if device.platform == 'winrt' then
     CCPomelo = import("libs.pomelo.CCPomelo")
     local not_handle = function( ... )
         return ...
@@ -12,7 +12,7 @@ local json = json
         encode = not_handle,
         decode = not_handle,
     }
--- end
+end
 function NetService:init(  )
     self.m_pomelo = CCPomelo:getInstance()
     self.m_deltatime = 0

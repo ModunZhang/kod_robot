@@ -150,7 +150,7 @@ function WidgetDragons:OnTouchCancelled(pre_x, pre_y, x, y)
 
 end
 function WidgetDragons:OnTouchMove(pre_x, pre_y, x, y)
-    if not self:IsScrollable() then return end
+    if not self:IsScrollable() or pre_x == x then return end
     self:Move(x - pre_x)
     if self.cur_index then
         self:OnLeaveIndex(self.cur_index)

@@ -210,10 +210,12 @@ function GameUIAllianceMemberInfo:AdapterPlayerList()
         table.insert(r,{_("职位"),_("无")})
         table.insert(r,{_("联盟"),_("无")})
     end
-    if type(player.online) == 'boolean' and player.online then
-        table.insert(r,{_("最后登陆"),_("在线")})
-    else
-        table.insert(r,{_("最后登陆"),NetService:formatTimeAsTimeAgoStyleByServerTime(player.lastLogoutTime)})
+    if player.alliance.tag == Alliance_Manager:GetMyAlliance().basicInfo.tag then
+        if type(player.online) == 'boolean' and player.online then
+            table.insert(r,{_("最后登陆"),_("在线")})
+        else
+            table.insert(r,{_("最后登陆"),NetService:formatTimeAsTimeAgoStyleByServerTime(player.lastLogoutTime)})
+        end
     end
     table.insert(r,{_("服务器"),string.format(_("World %s"),string.sub(User.serverId,-1,-1))})
     table.insert(r,{_("战斗力"),string.formatnumberthousands(player.power)})

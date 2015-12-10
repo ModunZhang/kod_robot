@@ -338,6 +338,7 @@ function AllianceManager:setMapIndexData(mapIndexData)
 end
 local terrainStyle = GameDatas.AllianceMap.terrainStyle
 function AllianceManager:getMapDataByIndex(index)
+    if self.mapIndexData == json.null then return end
     local key = self.mapIndexData[tostring(index)]
     if not key then return end
     for _,v in pairs(terrainStyle) do
@@ -348,6 +349,7 @@ function AllianceManager:getMapDataByIndex(index)
     end
 end
 function AllianceManager:setMapDataByIndex(index, data)
+    if self.mapIndexData == json.null then return end
     self.mapIndexData[tostring(index)] = data
 end
 -- json decode to a alliance

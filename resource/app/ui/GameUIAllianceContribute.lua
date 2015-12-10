@@ -111,7 +111,9 @@ end
 function GameUIAllianceContribute:onExit()
     -- UIKit:getRegistry().removeObject(self.__cname)
     self.observer:NotifyObservers(function ( listener )
-        listener:UIAllianceContributeClose()
+        if listener.UIAllianceContributeClose then
+            listener:UIAllianceContributeClose()
+        end
     end)
     User:RemoveListenerOnType(self, "allianceDonate")
 end

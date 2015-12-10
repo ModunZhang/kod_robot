@@ -38,7 +38,7 @@ function PlatformAdapter:android()
             print__(...)
             local t = {}
             for i,v in ipairs({...}) do
-                if not v then v = "nil" end
+                if type(v) == 'nil' then v = "nil" end
                 table.insert(t,tostring(v))
             end
             ext.__logFile(table.concat(t,"\t") .. "\n")
@@ -58,7 +58,7 @@ function PlatformAdapter:ios()
             print__(...)
             local t = {}
             for i,v in ipairs({...}) do
-                if not v then v = "nil" end
+                if type(v) == 'nil' then v = "nil" end
                 table.insert(t,tostring(v))
             end
             ext.__logFile(table.concat(t,"\t") .. "\n")
@@ -115,7 +115,7 @@ function PlatformAdapter:winrt()
             print__(...)
             local t = {}
             for i,v in ipairs({...}) do
-                if not v then v = "nil" end
+                if type(v) == 'nil' then v = "nil" end
                 table.insert(t,tostring(v))
             end
             ext.__logFile(table.concat(t,"\t") .. "\n")

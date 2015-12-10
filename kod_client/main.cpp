@@ -68,7 +68,7 @@ std::map<CCPomelo*, LuaEngine*> GlobalPomeloToLuaEngine;
 #define MULTI_THREAD 1
 #endif
 
-const int MAX_CLIENT = 10;
+const int MAX_CLIENT = 1;
 static int pipefds[MAX_CLIENT * 2] = {};
 static int pipefd[2];
 

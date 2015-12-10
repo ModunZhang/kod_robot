@@ -130,7 +130,7 @@ end
 function GameUIAllianceTitle:CheckArchonLastLoginTimeGraterThen7Days()
     local alliance = Alliance_Manager:GetMyAlliance()
     local alliance_archon =  alliance:GetAllianceArchon()
-    if alliance_archon:LastLoginTime()/1000 - app.timer:GetServerTime() > 7 * 24 * 60 *60 then
+    if alliance_archon.lastLogoutTime / 1000 - app.timer:GetServerTime() > 7 * 24 * 60 *60 then
         return true
     else
         return false

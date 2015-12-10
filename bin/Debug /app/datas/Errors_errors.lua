@@ -555,11 +555,6 @@ errors["netErrorWithIapServer"] = {
 	["code"] = 610,
 	["message"] = "IAP服务器通讯出错"
 }
-errors["iapServerNotAvailable"] = {
-	["key"] = "iapServerNotAvailable",
-	["code"] = 611,
-	["message"] = "IAP服务器关闭"
-}
 errors["playerAlreadyJoinAlliance"] = {
 	["key"] = "playerAlreadyJoinAlliance",
 	["code"] = 612,
@@ -1064,4 +1059,9 @@ errors["playerNotBindGC"] = {
 	["key"] = "playerNotBindGC",
 	["code"] = 714,
 	["message"] = "玩家还未绑定GC"
+}
+errors["canNotSwitchToTheSelectedServer"] = {
+	["key"] = "canNotSwitchToTheSelectedServer",
+	["code"] = 715,
+	["message"] = "不能迁移到选定的服务器"
 }

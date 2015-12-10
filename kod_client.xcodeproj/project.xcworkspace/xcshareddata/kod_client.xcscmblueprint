@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "7F9C984E06CD4B8BA1CBFAC2393F919A78A28DB2",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "27A5208A9F134712A4D7B6CEB435AF37083A1327" : 0,
+    "7F9C984E06CD4B8BA1CBFAC2393F919A78A28DB2" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "ADEFB07F-A3AC-4035-8996-A2D58F8759CF",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "27A5208A9F134712A4D7B6CEB435AF37083A1327" : "kod_robot\/kod_client\/libpomelo1\/",
+    "7F9C984E06CD4B8BA1CBFAC2393F919A78A28DB2" : "kod_robot"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "kod_client",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "kod_client.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/NetEase\/libpomelo.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "27A5208A9F134712A4D7B6CEB435AF37083A1327"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "github.com:ModunZhang\/kod_robot.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "7F9C984E06CD4B8BA1CBFAC2393F919A78A28DB2"
+    }
+  ]
+}

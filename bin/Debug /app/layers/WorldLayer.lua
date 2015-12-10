@@ -26,6 +26,10 @@ function WorldLayer:onEnter()
     self:CreateCorner()
     self:CreateEdge()
     self.map = self:CreateMap()
+
+    local p = self:ConvertLogicPositionToMapPosition(self:IndexToLogic(612))
+    display.newSprite("world_middle.png"):addTo(self.map):pos(p.x, p.y)
+
     self.leveLayer = display.newNode():addTo(self.map,1)
     self.lineLayer = display.newNode():addTo(self.map,2)
     self.allianceLayer = display.newNode():addTo(self.map,3)
@@ -169,6 +173,11 @@ function WorldLayer:LoadLevelBg(index)
         }):addTo(sp):align(display.CENTER, size.width/2, size.height/2)
         self.levelSprites[index] = sp
     end
+end
+function WorldLayer:GetRoundNumber(index)
+    local x,y = self:IndexToLogic(index)
+    local mx, my = 17, 17
+    return math.max(math.abs(x - mx), math.abs(y - my)) + 1
 end
 local screen_rect = cc.rect(0, 0, display.width, display.height)
 function WorldLayer:MoveAllianceFromTo(fromIndex, toIndex)
@@ -357,10 +366,15 @@ function WorldLayer:CreateAllianceSprite(index, alliance)
     node.alliance = alliance
     
     local sprite = display.newSprite(string.format("world_alliance_%s.png", alliance.terrain))
-    :addTo(node, 0, 1):scale(0.8)
+    :addTo(node, 0, 1)
+    if device.platform ~= 'winrt' then
+        sprite:scale(0.8)
+    else
+        sprite:scale(1.2)
+    end
     if index ~= Alliance_Manager:GetMyAlliance().mapIndex then
         math.randomseed(index)
-        sprite:pos(30 - math.random(30), 30 - math.random(30))
+        sprite:pos(30 - math.random(60), 30 - math.random(60))
     end
     local size = sprite:getContentSize()
     local banner = display.newSprite("alliance_banner.png")
@@ -372,6 +386,14 @@ function WorldLayer:CreateAllianceSprite(index, alliance)
         ellipsis = true,
         dimensions = cc.size(100,15),
     }):addTo(sprite):align(display.CENTER, size.width/2, 5):scale(0.5)
+    local round = self:GetRoundNumber(index)
+    if round <= 3 then
+        local half = sprite.name:getContentSize().width / 4
+        sprite.round = display.newSprite(string.format("world_icon%d.png", round))
+        :addTo(sprite):pos(size.width/2 - half - 14, 2)
+    end
+
+
     sprite.flagstr = alliance.flag
     sprite.flag = ui_helper:CreateFlagContentSprite(alliance.flag)
         :addTo(sprite, 10):align(display.CENTER, 100, 90):scale(0.4)
@@ -430,12 +452,12 @@ function WorldLayer:CraeteLineWith(from, to)
     local line_key = string.format("%d_%d", from, to)
     if self.lineSprites[line_key] then return end
     math.randomseed(from)
-    local fromx, fromy = 30 - math.random(30), 30 - math.random(30)
+    local fromx, fromy = 30 - math.random(60), 30 - math.random(60)
     local p1 = self:ConvertLogicPositionToMapPosition(self:IndexToLogic(from))
     p1.x = p1.x + fromx
     p1.y = p1.y + fromy
     math.randomseed(to)
-    local tox, toy = 30 - math.random(30), 30 - math.random(30)
+    local tox, toy = 30 - math.random(60), 30 - math.random(60)
     local p2 = self:ConvertLogicPositionToMapPosition(self:IndexToLogic(to))
     p2.x = p2.x + tox
     p2.y = p2.y + toy
@@ -479,6 +501,23 @@ function WorldLayer:UpdateAllianceSprite(index, alliance)
     local size = sprite:getContentSize()
     sprite:setTexture(string.format("world_alliance_%s.png", alliance.terrain))
     sprite.name:setString(string.format("[%s]%s", alliance.tag, alliance.name))
+
+    local round = self:GetRoundNumber(index)
+    if round <= 3 then
+        local png = string.format("world_icon%d.png", round)
+        if sprite.round then
+            sprite.round:setTexture(png)
+        else
+            sprite.round = display.newSprite(png):addTo(sprite)
+        end
+        local half = sprite.name:getContentSize().width / 4
+        sprite.round:pos(size.width/2 - half - 14, 2)
+    elseif sprite.round then
+        sprite.round:removeFromParent()
+        sprite.round = nil
+    end
+
+
     if sprite.flagstr ~= alliance.flag then
         sprite.flag:SetFlag(alliance.flag)
     end
@@ -524,17 +563,35 @@ function WorldLayer:IsFightWithOtherAlliance(aln, index)
     end
 end
 function WorldLayer:CreateFlag(index)
-    local index = tostring(index)
+    local indexstr = tostring(index)
     local p = self:ConvertLogicPositionToMapPosition(self:IndexToLogic(index))
-    local node = display.newNode():addTo(self.allianceLayer):pos(p.x, p.y)
-    local sprite = ccs.Armature:create("daqizi"):addTo(node)
-    :scale(0.4):pos(60 - math.random(60), 30 - math.random(30))
-    local ani = sprite:getAnimation()
-    ani:playWithIndex(0)
-    ani:gotoAndPlay(math.random(71) - 1)
-    self.flagSprites[index] = node
+    local node
+    if tonumber(index) == self:LogicToIndex(17, 17) then
+        node = display.newNode():addTo(self.allianceLayer):pos(p.x+50, p.y + 50)
+        display.newSprite("world_crown_circle2.png"):addTo(node):pos(-40, -50)
+        local circle = display.newSprite("world_crown_circle1.png"):addTo(node):pos(-40, -50)
+        circle:runAction(cc.RepeatForever:create(transition.sequence({
+            cc.CallFunc:create(function() 
+                circle:opacity(0) 
+                circle:scale(1)
+            end),
+            cc.FadeIn:create(0.5),
+            cc.CallFunc:create(function() circle:fadeOut(2) end),
+            cc.ScaleTo:create(2, 2),
+        })))
+        display.newSprite("world_crown.png"):addTo(node)
+    else
+        node = display.newNode():addTo(self.allianceLayer):pos(p.x, p.y)
+        local sprite = ccs.Armature:create("daqizi"):addTo(node)
+        :scale(0.4):pos(40 - math.random(80), 30 - math.random(60))
+        local ani = sprite:getAnimation()
+        ani:playWithIndex(0)
+        ani:gotoAndPlay(math.random(71) - 1)
+    end
+    self.flagSprites[indexstr] = node
 end
 function WorldLayer:IndexToLogic(index)
+    local index = tonumber(index)
     return index % WIDTH, math.floor(index / WIDTH)
 end
 function WorldLayer:LogicToIndex(x, y)

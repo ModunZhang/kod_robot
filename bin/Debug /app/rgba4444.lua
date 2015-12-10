@@ -1,5 +1,4 @@
 local rgba444_single = {}
-rgba444_single[".DS_Store"] = cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A4444
 rgba444_single["ancientRunes_128x128.png"] = cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A4444
 rgba444_single["b_ballista_2.png"] = cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A4444
 rgba444_single["b_ballista_3.png"] = cc.TEXTURE2_D_PIXEL_FORMAT_RGB_A4444

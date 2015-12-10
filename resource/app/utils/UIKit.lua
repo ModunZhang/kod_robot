@@ -843,7 +843,7 @@ function UIKit:showEvaluateDialog(ok_callback)
     local dialog = UIKit:newGameUI("FullScreenPopDialogUI"):SetTitle(_("评价我们")):SetPopMessage(_("喜欢我们的游戏吗？"))
         :CreateOKButton({
             listener =  function ()
-                device.openURL(CONFIG_APP_URL[device.platform])
+                device.openURL(CONFIG_APP_REVIEW[device.platform])
                 if ok_callback then
                     ok_callback()
                 end

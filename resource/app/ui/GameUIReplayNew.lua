@@ -1102,10 +1102,10 @@ function GameUIReplayNew:DecodeStateBySide(side, is_left)
     elseif state == "hurt" then
         action = BattleObject:Do():next(function(corps)
             if is_left then
-                return promise.any(corps:hit(), self:HurtSoldierLeft(corps, side.decrease))
+                return promise.all(corps:hit():next(BattleObject:BreathForever()), self:HurtSoldierLeft(corps, side.decrease))
                     :next(function() return corps end)
             else
-                return promise.any(corps:hit(), self:HurtSoldierRight(corps, side.decrease))
+                return promise.all(corps:hit():next(BattleObject:BreathForever()), self:HurtSoldierRight(corps, side.decrease))
                     :next(function() return corps end)
             end
         end):next(function(corps)

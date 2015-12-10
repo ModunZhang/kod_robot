@@ -65,6 +65,9 @@ function WidgetSoldierBox:SetNumber(number)
     elseif type(number) == 'number' then
         self.number:setString(string.formatnumberthousands(number))
     end
+    if self.lock_icon then
+        self.lock_icon:hide()
+    end
     return self
 end
 function WidgetSoldierBox:Enable(b)
@@ -80,7 +83,11 @@ function WidgetSoldierBox:Enable(b)
     return self
 end
 function WidgetSoldierBox:SetCondition(text)
-    self.number:setString(text)
+    self.number:setString(_("未解锁"))
+    if not self.lock_icon then
+        self.lock_icon = display.newSprite("icon_lock_14x18.png"):addTo(self.number:getParent()):align(display.LEFT_CENTER, 10, self.number:getParent():getContentSize().height/2-1)
+    end
+    UIKit:addTipsToNode(self.number,text,self)
     return self
 end
 function WidgetSoldierBox:IsLocked()

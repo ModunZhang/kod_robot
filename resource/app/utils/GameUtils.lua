@@ -108,7 +108,7 @@ function GameUtils:formatTimeAsTimeAgoStyle( time )
         timeText = string.format(_("%d天前"), 1)
     else
         time = math.floor(time / 86400)
-        timeText = string.format(_("%d天前"), time)
+        timeText = time >= 8 and _("很久") or string.format(_("%d天前"), time)
     end
 
     return timeText

@@ -24,7 +24,7 @@ CONFIG_LOCAL_SERVER = {
     },
     gate = {
         host = "127.0.0.1",
-        port = 3011,
+        port = 13100,
         name = "gate-server-1"
     },
 }
@@ -36,7 +36,7 @@ CONFIG_REMOTE_SERVER = {
     },
     gate = {
         host = "54.223.172.65",
-        port = 3011,
+        port = 13100,
         name = "gate-server-1"
     },
 }

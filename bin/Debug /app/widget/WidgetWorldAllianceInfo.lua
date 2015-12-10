@@ -53,49 +53,7 @@ end
 function WidgetWorldAllianceInfo:onExit()
 
 end
-function WidgetWorldAllianceInfo:Located(mapIndex, x, y)
-    self.mask_layer:stopAllActions()
-    self.mask_layer:show():performWithDelay(function()
-        self.mask_layer:hide()
-    end, 2)
-
-    local scene = display.getRunningScene()
-    if mapIndex and x and y then
-        if scene.__cname ~= 'AllianceDetailScene' then
-            app:EnterMyAllianceScene({
-                mapIndex = mapIndex,
-                x = x,
-                y = y,
-            })
-        else
-            local x,y = DataUtils:GetAbsolutePosition(mapIndex, x, y)
-            if Alliance_Manager:GetAllianceByCache(mapIndex) then
-                scene:GotoPosition(x,y)
-                self:EnterIn(mapIndex)
-            else
-                scene:FetchAllianceDatasByIndex(mapIndex, function()
-                    scene:GotoPosition(x,y)
-                    self:EnterIn(mapIndex)
-                end)
-            end
-        end
-    else
-        if scene.__cname ~= 'AllianceDetailScene' then
-            app:EnterMyAllianceScene({mapIndex = mapIndex})
-        else
-            if Alliance_Manager:GetAllianceByCache(mapIndex) then
-                scene:GotoAllianceByXY(scene:GetSceneLayer():IndexToLogic(mapIndex))
-                self:EnterIn(mapIndex)
-            else
-                scene:FetchAllianceDatasByIndex(mapIndex, function()
-                    scene:GotoAllianceByXY(scene:GetSceneLayer():IndexToLogic(mapIndex))
-                    self:EnterIn(mapIndex)
-                end)
-            end
-        end
-    end
-end
-function WidgetWorldAllianceInfo:EnterIn(mapIndex)
+local function EnterIn(mapIndex)
     local worldmap = UIKit:GetUIInstance("GameUIWorldMap")
     local scenelayer = worldmap:GetSceneLayer()
     local sprite = scenelayer.allainceSprites[tostring(mapIndex)]
@@ -136,8 +94,95 @@ function WidgetWorldAllianceInfo:EnterIn(mapIndex)
             end)
         })
     end
-    self:LeftButtonClicked()
 end
+function WidgetWorldAllianceInfo:Located(mapIndex, x, y)
+    self.mask_layer:stopAllActions()
+    self.mask_layer:show():performWithDelay(function()
+        self.mask_layer:hide()
+    end, 2)
+
+    local scene = display.getRunningScene()
+    if mapIndex and x and y then
+        if scene.__cname ~= 'AllianceDetailScene' then
+            app:EnterMyAllianceScene({
+                mapIndex = mapIndex,
+                x = x,
+                y = y,
+            })
+        else
+            local x,y = DataUtils:GetAbsolutePosition(mapIndex, x, y)
+            if Alliance_Manager:GetAllianceByCache(mapIndex) then
+                scene:GotoPosition(x,y)
+                EnterIn(mapIndex)
+                self:LeftButtonClicked()
+            else
+                scene:FetchAllianceDatasByIndex(mapIndex, function()
+                    scene:GotoPosition(x,y)
+                    EnterIn(mapIndex)
+                    self:LeftButtonClicked()
+                end)
+            end
+        end
+    else
+        if scene.__cname ~= 'AllianceDetailScene' then
+            app:EnterMyAllianceScene({mapIndex = mapIndex})
+        else
+            if Alliance_Manager:GetAllianceByCache(mapIndex) then
+                scene:GotoAllianceByXY(scene:GetSceneLayer():IndexToLogic(mapIndex))
+                EnterIn(mapIndex)
+                self:LeftButtonClicked()
+            else
+                scene:FetchAllianceDatasByIndex(mapIndex, function()
+                    scene:GotoAllianceByXY(scene:GetSceneLayer():IndexToLogic(mapIndex))
+                    EnterIn(mapIndex)
+                    self:LeftButtonClicked()
+                end)
+            end
+        end
+    end
+end
+-- function WidgetWorldAllianceInfo:EnterIn(mapIndex)
+--     local worldmap = UIKit:GetUIInstance("GameUIWorldMap")
+--     local scenelayer = worldmap:GetSceneLayer()
+--     local sprite = scenelayer.allainceSprites[tostring(mapIndex)]
+--     local wp
+--     if sprite then
+--         wp = sprite:getParent():convertToWorldSpace(cc.p(sprite:getPosition()))
+--     else
+--         wp = scenelayer:ConverToWorldSpace(scenelayer:IndexToLogic(mapIndex))
+--     end
+--     if wp.x < 0 then
+--         wp.x = 0
+--     elseif wp.x > display.width then
+--         wp.x = display.width
+--     end
+--     wp.y = wp.y - (display.width > 640 and (152 * display.width/768) or 152)
+--     if wp.y < 0 then
+--         wp.y = 0
+--     elseif wp.y > display.height then
+--         wp.y = display.height
+--     end
+
+--     if UIKit:GetUIInstance("GameUIWorldMap") then
+--         UIKit:GetUIInstance("GameUIWorldMap").mask_layer:show()
+--         local s = UIKit:GetUIInstance("GameUIWorldMap"):GetSceneLayer():getScale()
+--         local scene_node = UIKit:GetUIInstance("GameUIWorldMap"):GetSceneLayer().scene_node
+--         local lp = scene_node:getParent():convertToNodeSpace(wp)
+--         local size = scene_node:getCascadeBoundingBox()
+
+--         local xp = lp.x * s / size.width
+--         local yp = lp.y * s / size.height
+--         scene_node:pos(lp.x, lp.y):setAnchorPoint(cc.p(xp, yp))
+--         scene_node:runAction(transition.sequence{
+--             cc.ScaleTo:create(0.3, 2.5),
+--             cc.CallFunc:create(function()
+--                 if UIKit:GetUIInstance("GameUIWorldMap") then
+--                     UIKit:GetUIInstance("GameUIWorldMap"):LeftButtonClicked()
+--                 end
+--             end)
+--         })
+--     end
+-- end
 function WidgetWorldAllianceInfo:LoadInfo(alliance_data)
     local layer = self.body
     local l_size = layer:getContentSize()

@@ -107,7 +107,7 @@ function Store.finishTransaction(transaction)
         printError("Store.finishTransaction() - store not init")
         return false
     end
-    cc.storeProvider.consumePurchase(transaction.productIdentifier)
+    cc.storeProvider.consumePurchase(transaction.productIdentifier,transaction.transactionId)
 end
 --[[
     新加 客户端不请求商品信息的情况下 直接通过商品id进行内购
@@ -141,10 +141,9 @@ end
 --[[ 
     新加 构造一个Transaction
 ]]--
-function Store.getTransactionWithIdentifier(identifier)
+function Store.getTransactionWithIdentifier(productIdentifier,transactionIdentifier)
     if not checkCCStore() then return false end
-    printError("Store.restore - Not support on WP")
-    return identifier
+    return {productIdentifier = productIdentifier,transactionIdentifier = transactionIdentifier or ""}
 end
 
 --[[ 

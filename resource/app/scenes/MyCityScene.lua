@@ -225,30 +225,27 @@ function MyCityScene:onEnterTransitionFinish()
     app:sendPlayerLanguageCodeIf()
     app:sendApnIdIf()
     if self.isFromLogin then
+
         local isFinished_fte = DataManager:getUserData().countInfo.isFTEFinished
         local not_buy_any_gems = DataManager:getUserData().countInfo.iapCount == 0
         if isFinished_fte and not_buy_any_gems then
             UIKit:newGameUI("GameUIActivityRewardNew",GameUIActivityRewardNew.REWARD_TYPE.FIRST_IN_PURGURE):AddToScene(self, true)
         end
-        if device.platform ~= 'mac' then
-            app:getStore():updateTransactionStates()
+        --开启屏幕锁定定时器(前面已经关闭)
+        if ext.disableIdleTimer then
+            ext.disableIdleTimer(false)
         end
-    end
-    if ext.gamecenter.isGameCenterEnabled() and not ext.gamecenter.isAuthenticated() then
-        ext.gamecenter.authenticate(false)
-        -- ext.gamecenter.authenticate(是否打开gc app,是否弹出游戏内登陆gc界面) false,false
-        -- ext.gamecenter.authenticate(false,false)
-        --[[
+        -- gamecenter 初始化
+        if ext.gamecenter.isGameCenterEnabled() and not ext.gamecenter.isAuthenticated() then
+            ext.gamecenter.authenticate(false)
+        end
+        -- facebook 初始化
+        if ext.facebook then
             ext.facebook.initialize()
-            ext.facebook.log(function(data)
-                if data.event == 
-            end)
-         --]]
+        end
+
     end
-    -- facebook
-    if ext.facebook then
-        ext.facebook.initialize()
-    end
+
     app:GetChatManager():FetMessageFirstStartGame()
     if Alliance_Manager:HasBeenJoinedAlliance() then
         return
@@ -425,7 +422,7 @@ local ui_map = setmetatable({
     miner          = {"GameUIResource"            ,},
     wall           = {"GameUIWall"                ,       "upgrade",          },
     tower          = {"GameUITower"               ,},
-    watchTower     = {"GameUIWatchTower"               ,  "march"             },
+    watchTower     = {"GameUIWatchTower"          ,         "march",          },
     airship        = {},
     FairGround     = {},
     square         = {},
@@ -477,41 +474,4 @@ function MyCityScene:OpenUI(building, default_tab, need_tips, build_name)
 end
 
 return MyCityScene
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

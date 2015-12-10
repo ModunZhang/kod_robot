@@ -453,18 +453,22 @@ function GameUIAllianceInfo:LoadMembers()
         color = 0x403c2f,
         align = cc.TEXT_ALIGNMENT_LEFT,
     }):addTo(layer):align(display.LEFT_BOTTOM,powerIcon:getPositionX()+powerIcon:getContentSize().width+10,powerIcon:getPositionY())
-    local time_str = _("在线")
-    local isOnline = (type(archon_data.online) == 'boolean' and archon_data.online) and true or false
-    if not isOnline then
-        time_str = _("最后登录:") .. NetService:formatTimeAsTimeAgoStyleByServerTime(archon_data.lastLogoutTime)
+    if Alliance_Manager:GetMyAlliance():GetMemeberById(archon_data.id) then
+        local isOnline = (type(archon_data.online) == 'boolean' and archon_data.online) and true or false
+        local time_str = _("在线")
+        if not isOnline then
+            time_str = _("最后登录:") .. NetService:formatTimeAsTimeAgoStyleByServerTime(archon_data.lastLogoutTime)
+        end
+        UIKit:GetPlayerCommonIcon(archon_data.icon,isOnline):addTo(box):pos(63,67)
+        local loginLabel = UIKit:ttfLabel({
+            text = time_str,
+            size = 22,
+            color = 0x403c2f,
+            align = cc.TEXT_ALIGNMENT_RIGHT,
+        }):addTo(layer):align(display.BOTTOM_RIGHT,line_2:getPositionX() + 428,line_2:getPositionY() + 5)
+    else
+        UIKit:GetPlayerCommonIcon(archon_data.icon,true):addTo(box):pos(63,67)
     end
-    UIKit:GetPlayerCommonIcon(archon_data.icon,isOnline):addTo(box):pos(63,67)
-    local loginLabel = UIKit:ttfLabel({
-        text = time_str,
-        size = 22,
-        color = 0x403c2f,
-        align = cc.TEXT_ALIGNMENT_RIGHT,
-    }):addTo(layer):align(display.BOTTOM_RIGHT,line_2:getPositionX() + 428,line_2:getPositionY() + 5)
     local line_1 = display.newScale9Sprite("dividing_line.png",0,0,cc.size(428,2),cc.rect(10,2,382,2))
         :addTo(layer)
         :align(display.LEFT_BOTTOM,title_bar:getPositionX(),572)

@@ -24,7 +24,7 @@ local format = string.format
 City.LISTEN_TYPE = Enum(
     "LOCK_TILE",
     "UNLOCK_TILE",
-    "UNLOCK_ROUND",
+    -- "UNLOCK_ROUND",
     "CREATE_DECORATOR",
     "OCCUPY_RUINS",
     "DESTROY_DECORATOR",

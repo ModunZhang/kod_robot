@@ -169,6 +169,7 @@ function Corps:StopAnimation()
 end
 function Corps:breath(is_forever)
     if self.config.type == "siege" then
+        self:PlayAnimation("move_90")
         self:StopAnimation()
         return cocos_promise.defer(function()
             return self

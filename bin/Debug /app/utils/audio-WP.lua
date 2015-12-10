@@ -1,17 +1,61 @@
---[[ 
-    这个文件是为了适配windows phone8.1的新音乐底层,重写quick的所有音乐函数
---]]
+--[[
 
+Copyright (c) 2011-2014 chukong-inc.com
 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+]]
+
+--------------------------------
+-- @module audio
+
+--[[--
+
+播放音乐、音效
+
+]]
 
 local audio = {}
 
-local sharedEngine = ext.audio
+local sharedEngine = cc.SimpleAudioEngine:getInstance()
+local sharedEngine_ext = ext.audio
 
-if not sharedEngine then return audio end -- 如果发现没有拓展audio，直接返回空表
+if not sharedEngine then
+    printError("not sharedEngine")
+    return audio
+end
+if not sharedEngine_ext then
+    printError("not sharedEngine_ext")
+    return audio
+end
+
+-- start --
+
+--------------------------------
+-- 返回音乐的音量值
+-- @function [parent=#audio] getMusicVolume
+-- @return number#number ret (return value: number)  返回值在 0.0 到 1.0 之间，0.0 表示完全静音，1.0 表示 100% 音量
+
+-- end --
 
 function audio.getMusicVolume()
-    local volume = sharedEngine.getMusicVolume()
+    local volume = sharedEngine_ext.getMusicVolume()
     if DEBUG > 1 then
         printInfo("audio.getMusicVolume() - volume: %0.1f", volume)
     end
@@ -32,7 +76,7 @@ function audio.setMusicVolume(volume)
     if DEBUG > 1 then
         printInfo("audio.setMusicVolume() - volume: %0.1f", volume)
     end
-    sharedEngine.setMusicVolume(volume)
+    sharedEngine_ext.setMusicVolume(volume)
 end
 
 -- start --
@@ -45,10 +89,11 @@ end
 -- end --
 
 function audio.getSoundsVolume()
+    local volume = sharedEngine:getEffectsVolume()
     if DEBUG > 1 then
-        printInfo("audio.getSoundsVolume() - Not Support")
+        printInfo("audio.getSoundsVolume() - volume: %0.1f", volume)
     end
-    return 1
+    return volume
 end
 
 -- start --
@@ -61,9 +106,11 @@ end
 -- end --
 
 function audio.setSoundsVolume(volume)
-   if DEBUG > 1 then
-        printInfo("audio.setSoundsVolume() - Not Support")
+    volume = checknumber(volume)
+    if DEBUG > 1 then
+        printInfo("audio.setSoundsVolume() - volume: %0.1f", volume)
     end
+    sharedEngine:setEffectsVolume(volume)
 end
 
 -- start --
@@ -76,9 +123,8 @@ end
 -- end --
 
 function audio.preloadMusic(filename)
-    if DEBUG > 1 then
-        printInfo("audio.preloadMusic() - Not Support")
-    end
+    printError("audio.preloadMusic() - Not Support")
+    return
 end
 
 -- start --
@@ -97,10 +143,12 @@ function audio.playMusic(filename, isLoop)
         return
     end
     if type(isLoop) ~= "boolean" then isLoop = true end
+
+    audio.stopMusic()
     if DEBUG > 1 then
         printInfo("audio.playMusic() - filename: %s, isLoop: %s", tostring(filename), tostring(isLoop))
     end
-    sharedEngine.playMusic(filename, isLoop)
+    sharedEngine_ext.playMusic(filename, isLoop)
 end
 
 -- start --
@@ -117,7 +165,7 @@ function audio.stopMusic(isReleaseData)
     if DEBUG > 1 then
         printInfo("audio.stopMusic() - isReleaseData: %s", tostring(isReleaseData))
     end
-    sharedEngine.stopMusic(isReleaseData)
+    sharedEngine_ext.stopMusic(isReleaseData)
 end
 
 -- start --
@@ -132,7 +180,7 @@ function audio.pauseMusic()
     if DEBUG > 1 then
         printInfo("audio.pauseMusic()")
     end
-    sharedEngine.pauseMusic()
+    sharedEngine_ext.pauseMusic()
 end
 
 -- start --
@@ -147,7 +195,7 @@ function audio.resumeMusic()
     if DEBUG > 1 then
         printInfo("audio.resumeMusic()")
     end
-    sharedEngine.resumeMusic()
+    sharedEngine_ext.resumeMusic()
 end
 
 -- start --
@@ -159,9 +207,8 @@ end
 -- end --
 
 function audio.rewindMusic()
-    if DEBUG > 1 then
-        printInfo("audio.rewindMusic() not Support")
-    end
+    printError("audio.rewindMusic() - Not Support")
+    return
 end
 
 -- start --
@@ -176,9 +223,8 @@ end
 -- end --
 
 function audio.willPlayMusic()
-    if DEBUG > 1 then
-        printInfo("audio.willPlayMusic() not Support")
-    end    
+    printError("audio.willPlayMusic() - Not Support")
+    return
 end
 
 -- start --
@@ -191,7 +237,7 @@ end
 -- end --
 
 function audio.isMusicPlaying()
-    local ret = sharedEngine.isMusicPlaying()
+    local ret = sharedEngine_ext.isMusicPlaying()
     if DEBUG > 1 then
         printInfo("audio.isMusicPlaying() - ret: %s", tostring(ret))
     end
@@ -210,7 +256,7 @@ end
 -- @return integer#integer ret (return value: int)  音效句柄
 
 -- end --
--- dannyhe:isLoop 无效
+
 function audio.playSound(filename, isLoop)
     if not filename then
         printError("audio.playSound() - invalid filename")
@@ -218,9 +264,9 @@ function audio.playSound(filename, isLoop)
     end
     if type(isLoop) ~= "boolean" then isLoop = false end
     if DEBUG > 1 then
-        printInfo("audio.playSound() - filename: %s", tostring(filename))
+        printInfo("audio.playSound() - filename: %s, isLoop: %s", tostring(filename), tostring(isLoop))
     end
-    return sharedEngine.playEffect(filename)
+    return sharedEngine:playEffect(filename, isLoop)
 end
 
 -- start --
@@ -233,9 +279,14 @@ end
 -- end --
 
 function audio.pauseSound(handle)
+    if not handle then
+        printError("audio.pauseSound() - invalid handle")
+        return
+    end
     if DEBUG > 1 then
-        printInfo("audio.pauseSound() not Support")
-    end   
+        printInfo("audio.pauseSound() - handle: %s", tostring(handle))
+    end
+    sharedEngine:pauseEffect(handle)
 end
 
 -- start --
@@ -250,7 +301,7 @@ function audio.pauseAllSounds()
     if DEBUG > 1 then
         printInfo("audio.pauseAllSounds()")
     end
-    sharedEngine.pauseAllEffects()
+    sharedEngine:pauseAllEffects()
 end
 
 -- start --
@@ -263,9 +314,14 @@ end
 -- end --
 
 function audio.resumeSound(handle)
+    if not handle then
+        printError("audio.resumeSound() - invalid handle")
+        return
+    end
     if DEBUG > 1 then
-        printInfo("audio.resumeSound() not Support")
-    end   
+        printInfo("audio.resumeSound() - handle: %s", tostring(handle))
+    end
+    sharedEngine:resumeEffect(handle)
 end
 
 -- start --
@@ -280,7 +336,7 @@ function audio.resumeAllSounds()
     if DEBUG > 1 then
         printInfo("audio.resumeAllSounds()")
     end
-    sharedEngine.resumeAllEffects()
+    sharedEngine:resumeAllEffects()
 end
 
 -- start --
@@ -293,9 +349,14 @@ end
 -- end --
 
 function audio.stopSound(handle)
+    if not handle then
+        printError("audio.stopSound() - invalid handle")
+        return
+    end
     if DEBUG > 1 then
-        printInfo("audio.stopSound() not Support")
-    end   
+        printInfo("audio.stopSound() - handle: %s", tostring(handle))
+    end
+    sharedEngine:stopEffect(handle)
 end
 
 -- start --
@@ -310,7 +371,7 @@ function audio.stopAllSounds()
     if DEBUG > 1 then
         printInfo("audio.stopAllSounds()")
     end
-    sharedEngine.stopAllEffects()
+    sharedEngine:stopAllEffects()
 end
 
 -- start --
@@ -323,9 +384,14 @@ end
 -- end --
 
 function audio.preloadSound(filename)
+    if not filename then
+        printError("audio.preloadSound() - invalid filename")
+        return
+    end
     if DEBUG > 1 then
-        printInfo("audio.preloadSound() not Support")
-    end 
+        printInfo("audio.preloadSound() - filename: %s", tostring(filename))
+    end
+    sharedEngine:preloadEffect(filename)
 end
 
 -- start --
@@ -338,9 +404,14 @@ end
 -- end --
 
 function audio.unloadSound(filename)
+    if not filename then
+        printError("audio.unloadSound() - invalid filename")
+        return
+    end
     if DEBUG > 1 then
-        printInfo("audio.unloadSound() not Support")
-    end 
+        printInfo("audio.unloadSound() - filename: %s", tostring(filename))
+    end
+    sharedEngine:unloadEffect(filename)
 end
 
 return audio

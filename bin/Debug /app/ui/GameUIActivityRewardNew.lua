@@ -25,7 +25,7 @@ local height_config = {
     EVERY_DAY_LOGIN = 762,
     CONTINUITY = 762,
     ONLINE = 762,
-    FIRST_IN_PURGURE = 746,
+    FIRST_IN_PURGURE = 720,
     PLAYER_LEVEL_UP = 762,
 }
 local ui_titles = {
@@ -183,10 +183,12 @@ function GameUIActivityRewardNew:BuildUI()
     self:addTouchAbleChild(bg)
     self.bg = bg
     bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
-    local titleBar = display.newSprite("title_blue_600x56.png"):align(display.LEFT_BOTTOM,3,height - 15):addTo(bg)
+    local is_first_in_purgure = self:GetRewardType() == self.REWARD_TYPE.FIRST_IN_PURGURE
+    local titleBar = display.newSprite(is_first_in_purgure and "title_red_634x134.png" or "title_blue_600x56.png")
+        :align(display.LEFT_BOTTOM,is_first_in_purgure and -13 or 3,is_first_in_purgure and height - 80 or height - 15):addTo(bg):zorder(2)
     local closeButton = cc.ui.UIPushButton.new({normal = "X_1.png",pressed = "X_2.png"}, {scale9 = false})
         :addTo(titleBar)
-        :align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,0)
+        :align(display.BOTTOM_RIGHT,titleBar:getContentSize().width,self:GetRewardType() == self.REWARD_TYPE.FIRST_IN_PURGURE and 40 or 0)
         :onButtonClicked(function ()
             self:LeftButtonClicked()
         end)
@@ -195,7 +197,7 @@ function GameUIActivityRewardNew:BuildUI()
         size = 22,
         shadow = true,
         color = 0xffedae
-    }):addTo(titleBar):align(display.CENTER,300,28)
+    }):addTo(titleBar):align(display.CENTER,titleBar:getContentSize().width/2,is_first_in_purgure and 96 or 28)
     if self['ui_' .. self.REWARD_TYPE[self:GetRewardType()]] then
         self['ui_' .. self.REWARD_TYPE[self:GetRewardType()]](self)
     end
@@ -553,28 +555,41 @@ function GameUIActivityRewardNew:GetRewardName(reward_type,reward_key)
 end
 -----------------------
 function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
-    local bar = display.newSprite("activity_first_purgure_588x176.jpg"):align(display.TOP_CENTER, 304,self.height - 15):addTo(self.bg)
+    local bar = display.newSprite("background_608x678.png"):align(display.TOP_CENTER, 288,self.height - 20):addTo(self.bg)
     lights():addTo(bar):pos(100, 100)
 
-    local bg = display.newSprite("selenaquestion_bg_580x536.png"):addTo(self.bg):align(display.TOP_CENTER, 304, self.height - 15 - 176):scale(587/580)
-    display.newSprite("Npc.png"):align(display.RIGHT_BOTTOM, 315, -10):addTo(self.bg):scale(552/423)
-    local reward_bg = display.newScale9Sprite("activity_day_bg_104x34.png",0,0,cc.size(290,510),cc.rect(10,10,84,14)):align(display.LEFT_BOTTOM, 260, 14):addTo(bg)
+    UIKit:ttfLabel({
+        text = _("首次储值任意金额"),
+        size = 34,
+        color = 0xfed36c,
+        shadow = true
+    }):addTo(bar):align(display.RIGHT_CENTER,580,622)
+     UIKit:ttfLabel({
+        text = _("永久激活第二条建筑队列并可领取下列丰厚奖励"),
+        size = 22,
+        color = 0xffedae,
+        align = cc.ui.TEXT_ALIGN_CENTER,
+        valign = cc.ui.TEXT_VALIGN_CENTER,
+        dimensions = cc.size(300,0),
+        shadow = true
+    }):addTo(bar):align(display.CENTER,440,540)
+      
     local countInfo = User.countInfo
     local rewards = self:GetFirstPurgureRewards()
-    local x,y = 20,500
-    self.purgure_get_button = WidgetPushButton.new({normal = 'store_buy_button_n_332x76.png',pressed = 'store_buy_button_l_332x76.png',scale9 = true})
+    local x,y = 300,500
+    self.purgure_get_button = WidgetPushButton.new({normal = 'tmp_button_battle_up_234x82.png',pressed = 'tmp_button_battle_down_234x82.png'},{scale9 = true})
         :setButtonLabel("normal", UIKit:commonButtonLable({
             text = _("领取")
         }))
-        :addTo(reward_bg,1)
-        :pos(145,58)
+        :addTo(bar,1)
+        :pos(430,58)
         :setButtonSize(190,66)
-    self.go_store_button = WidgetPushButton.new({normal = 'store_buy_button_n_332x76.png',pressed = 'store_buy_button_l_332x76.png'},{scale9 = true})
+    self.go_store_button = WidgetPushButton.new({normal = 'tmp_button_battle_up_234x82.png',pressed = 'tmp_button_battle_down_234x82.png'},{scale9 = true})
         :setButtonLabel("normal", UIKit:commonButtonLable({
             text = _("前往充值")
         }))
-        :addTo(reward_bg,1)
-        :pos(145,58)
+        :addTo(bar,1)
+        :pos(430,58)
         :onButtonClicked(function()
             UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
         end)
@@ -585,7 +600,7 @@ function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
         if index <= 6 then
             local reward_type,reward_name,count = unpack(reward)
             table.insert(tips_list, Localize_item.item_name[reward_name] .. " x" .. count)
-            local item_bg = display.newSprite("box_118x118.png"):align(display.LEFT_TOP, x, y):addTo(reward_bg):scale(110/118)
+            local item_bg = display.newSprite("box_118x118.png"):align(display.LEFT_TOP, x, y):addTo(bar):scale(110/118)
             local sp = display.newSprite(UIKit:GetItemImage(reward_type,reward_name),59,59):addTo(item_bg)
             local size = sp:getContentSize()
             sp:scale(90/math.max(size.width,size.height))
@@ -603,7 +618,7 @@ function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
             UIKit:addTipsToNode(sp,Localize_item.item_name[reward_name] .. " x" .. count,self)
             x = x  + 110 + 35
             if index % 2 == 0 then
-                x = 20
+                x = 300
                 y = y - 108 - 21
             end
         end

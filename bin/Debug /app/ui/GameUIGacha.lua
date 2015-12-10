@@ -223,7 +223,9 @@ function GameUIGacha:CreateGachaPool(layer)
         temp_box:SetPassStatus()
         current_box = temp_box
         current_index = next_index
-        app:GetAudioManager():PlayeEffectSound("sfx_gacha.mp3")
+        if device.platform ~= 'winrt' then
+            app:GetAudioManager():PlayeEffectSound("sfx_gacha.mp3")
+        end
     end
     function GachaPool:Stop()
         current_box:ResetLigt()

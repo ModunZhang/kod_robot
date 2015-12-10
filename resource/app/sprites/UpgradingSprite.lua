@@ -25,7 +25,6 @@ function UpgradingSprite:GetCurrentLocation()
 end
 function UpgradingSprite:UpgradeBegin()
     self:StartBuildingAnimation()
-    self:CheckCondition()
 end
 
 function UpgradingSprite:UpgradeFinished()
@@ -39,7 +38,6 @@ function UpgradingSprite:UpgradeFinished()
             running_scene:GetHomePage():ShowResourceAni("coin", tp)
         end
     end
-    self:CheckCondition()
 end
 function UpgradingSprite:StartBuildingAnimation()
     if self.building_animation then return end
@@ -62,32 +60,31 @@ function UpgradingSprite:StopBuildingAnimation()
         self.hammer_animation:removeFromParent()
         self.hammer_animation = nil
     end
-
-    self.level_bg:pos(self:GetSpriteTopPosition())
+    -- self.level_bg:pos(self:GetSpriteTopPosition())
 end
-function UpgradingSprite:CheckCondition()
-    if not self.level_bg then return end
-    local building = self:GetEntity():GetRealEntity()
-    local level = building:GetLevel()
-    local canUpgrade = building:CanUpgrade()
-    self.level_bg:setVisible(level > 0)
-    self.text_field:setString(level)
-    self.can_level_up:setVisible(canUpgrade)
-    self.can_not_level_up:setVisible(not canUpgrade)
-end
+-- function UpgradingSprite:CheckCondition()
+--     if not self.level_bg then return end
+--     local building = self:GetEntity():GetRealEntity()
+--     local level = building:GetLevel()
+--     local canUpgrade = building:CanUpgrade()
+--     self.level_bg:setVisible(level > 0)
+--     self.text_field:setString(level)
+--     self.can_level_up:setVisible(canUpgrade)
+--     self.can_not_level_up:setVisible(not canUpgrade)
+-- end
 function UpgradingSprite:ctor(city_layer, entity)
     self.config = SpriteConfig[entity:GetType()]
     local x, y = city_layer:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
     UpgradingSprite.super.ctor(self, city_layer, entity, x, y)
     local User = entity:BelongCity():GetUser()
 
-    if entity:GetType() == "wall" then
-        if entity:IsGate() then
-            self:CreateLevelNode()
-        end
-    else
-        self:CreateLevelNode()
-    end
+    -- if entity:GetType() == "wall" then
+    --     if entity:IsGate() then
+    --         self:CreateLevelNode()
+    --     end
+    -- else
+    --     self:CreateLevelNode()
+    -- end
     if User:GetBuildingEventByLocation(self:GetCurrentLocation()) then
         if entity:GetType() ~= "wall" then
             self:UpgradeBegin()
@@ -95,9 +92,9 @@ function UpgradingSprite:ctor(city_layer, entity)
             self:UpgradeBegin()
         end
     end
-    scheduleAt(self, function()
-        self:CheckCondition()
-    end)
+    -- scheduleAt(self, function()
+    --     self:CheckCondition()
+    -- end)
     -- self:CreateBase()
 end
 function UpgradingSprite:DestorySelf()
@@ -170,25 +167,25 @@ end
 function UpgradingSprite:GetCenterPosition()
     return self:GetLogicMap():ConvertToMapPosition(self:GetEntity():GetMidLogicPosition())
 end
-function UpgradingSprite:CreateLevelNode()
-    self.level_bg = display.newNode():addTo(self, 1000):pos(self:GetSpriteTopPosition())
-    self.level_bg:setCascadeOpacityEnabled(true)
-    self.can_level_up = cc.ui.UIImage.new("can_level_up.png"):addTo(self.level_bg):show()
-    self.can_not_level_up = cc.ui.UIImage.new("can_not_level_up.png"):addTo(self.level_bg):pos(0,-10):hide()
-    self.text_field = UIKit:ttfLabel({
-        size = 16,
-        color = 0xfff1cc,
-    }):addTo(self.level_bg):align(display.CENTER, 10, 18)
-    self.text_field:setSkewY(-30)
-end
-function UpgradingSprite:ShowLevelUpNode()
-    self.level_bg:stopAllActions()
-    self.level_bg:fadeTo(0.5, 255)
-end
-function UpgradingSprite:HideLevelUpNode()
-    self.level_bg:stopAllActions()
-    self.level_bg:fadeTo(0.5, 0)
-end
+-- function UpgradingSprite:CreateLevelNode()
+--     self.level_bg = display.newNode():addTo(self, 1000):pos(self:GetSpriteTopPosition())
+--     self.level_bg:setCascadeOpacityEnabled(true)
+--     self.can_level_up = cc.ui.UIImage.new("can_level_up.png"):addTo(self.level_bg):show()
+--     self.can_not_level_up = cc.ui.UIImage.new("can_not_level_up.png"):addTo(self.level_bg):pos(0,-10):hide()
+--     self.text_field = UIKit:ttfLabel({
+--         size = 16,
+--         color = 0xfff1cc,
+--     }):addTo(self.level_bg):align(display.CENTER, 10, 18)
+--     self.text_field:setSkewY(-30)
+-- end
+-- function UpgradingSprite:ShowLevelUpNode()
+--     self.level_bg:stopAllActions()
+--     self.level_bg:fadeTo(0.5, 255)
+-- end
+-- function UpgradingSprite:HideLevelUpNode()
+--     self.level_bg:stopAllActions()
+--     self.level_bg:fadeTo(0.5, 0)
+-- end
 return UpgradingSprite
 
 

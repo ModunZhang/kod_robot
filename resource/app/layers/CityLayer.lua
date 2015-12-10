@@ -150,9 +150,9 @@ function CityLayer:OnTileChanged(city)
     self:UpdateSingleTreeVisibleWithCity(city)
     self:UpdateAllDynamicWithCity(city)
 end
-function CityLayer:OnRoundUnlocked(round)
-    print("OnRoundUnlocked", round)
-end
+-- function CityLayer:OnRoundUnlocked(round)
+--     print("OnRoundUnlocked", round)
+-- end
 function CityLayer:OnOccupyRuins(occupied_ruins)
     for _, occupy_ruin in pairs(occupied_ruins) do
         for _, ruin_sprite in pairs(self.ruins) do
@@ -167,6 +167,7 @@ function CityLayer:OnCreateDecorator(building)
     local house = self:CreateDecorator(building)
     city_node:addChild(house)
     table.insert(self.houses, house)
+    self:CreateLevelArrowBy(house)
 
     -- self:NotifyObservers(function(listener)
     --     listener:OnCreateDecoratorSprite(house)
@@ -179,7 +180,9 @@ function CityLayer:OnDestoryDecorator(destory_decorator, release_ruins)
             -- self:NotifyObservers(function(listener)
             --     listener:OnDestoryDecoratorSprite(house)
             -- end)
-            table.remove(self.houses, i):removeFromParent()
+            local house = table.remove(self.houses, i)
+            self:DeleteLevelArrowBy(house)
+            house:removeFromParent()
             break
         end
     end
@@ -195,12 +198,11 @@ end
 function CityLayer:OnUserDataChanged_buildings(userData, deltaData)
     for k,v in pairs(self.buildings) do
         v:RefreshSprite()
-        v:CheckCondition()
     end
     for k,v in pairs(self.houses) do
         v:RefreshSprite()
-        v:CheckCondition()
     end
+    self:CheckUpgradeCondition()
 end
 function CityLayer:OnUserDataChanged_houseEvents(userData, deltaData)
     local ok, value = deltaData("houseEvents.remove")
@@ -280,7 +282,7 @@ function CityLayer:IsBarracksMoving()
 end
 -----
 local SCENE_ZORDER = Enum("SCENE_BACKGROUND", "CITY_LAYER", "SKY_LAYER", "INFO_LAYER")
-local CITY_ZORDER = Enum("BUILDING_NODE")
+local CITY_ZORDER = Enum("BUILDING_NODE", "LEVEL_NODE")
 function CityLayer:ctor(city_scene)
     Observer.extend(self)
     CityLayer.super.ctor(self, city_scene, 0.6, 1.5)
@@ -325,6 +327,8 @@ function CityLayer:InitCity()
     end, cc.TEXTURE2_D_PIXEL_FORMAT_A8)
 
     self.city_node = display.newLayer():addTo(self.city_layer, CITY_ZORDER.BUILDING_NODE):align(display.BOTTOM_LEFT)
+    self.level_node = display.newLayer():addTo(self.city_layer, CITY_ZORDER.LEVEL_NODE):align(display.BOTTOM_LEFT)
+    self.level_map = {}
     local origin_point = self:GetPositionIndex(0, 0)
     self.iso_map = IsoMapAnchorBottomLeft.new({
         tile_w = 51,
@@ -351,9 +355,7 @@ function CityLayer:GetCityNode()
     return self.city_node
 end
 function CityLayer:CheckCanUpgrade()
-    self:IteratorCanUpgradingBuilding(function(_, sprite)
-        sprite:CheckCondition()
-    end)
+    self:CheckUpgradeCondition()
 end
 --
 function CityLayer:InitWeather()
@@ -443,7 +445,7 @@ end
 function CityLayer:InitWithCity(city)
     city:AddListenOnType(self, city.LISTEN_TYPE.UNLOCK_TILE)
     city:AddListenOnType(self, city.LISTEN_TYPE.LOCK_TILE)
-    city:AddListenOnType(self, city.LISTEN_TYPE.UNLOCK_ROUND)
+    -- city:AddListenOnType(self, city.LISTEN_TYPE.UNLOCK_ROUND)
     city:AddListenOnType(self, city.LISTEN_TYPE.OCCUPY_RUINS)
     city:AddListenOnType(self, city.LISTEN_TYPE.CREATE_DECORATOR)
     city:AddListenOnType(self, city.LISTEN_TYPE.DESTROY_DECORATOR)
@@ -474,12 +476,14 @@ function CityLayer:InitWithCity(city)
         city:AddListenOnType(building_sprite, city.LISTEN_TYPE.LOCK_TILE)
         city:AddListenOnType(building_sprite, city.LISTEN_TYPE.UNLOCK_TILE)
         table.insert(self.buildings, building_sprite)
+        self:CreateLevelArrowBy(building_sprite)
     end
 
     -- 加小屋
     for _, house in pairs(city:GetAllDecorators()) do
         local house = self:CreateDecorator(house):addTo(city_node)
         table.insert(self.houses, house)
+        self:CreateLevelArrowBy(house)
     end
 
     -- 加树
@@ -535,6 +539,10 @@ function CityLayer:InitWithCity(city)
     for i = 1,1 do
         self:CreateBird(0, 0):scale(0.8):addTo(self.sky_layer)
     end
+
+    scheduleAt(self, function()
+        self:CheckUpgradeCondition()
+    end)
 end
 function CityLayer:MoveBarracksSoldiers(soldier_name, is_mark)
     if soldier_name then
@@ -546,6 +554,60 @@ function CityLayer:MoveBarracksSoldiers(soldier_name, is_mark)
             :align(display.BOTTOM_CENTER, 0, 50):scale(0.6)
         end
     end
+end
+function CityLayer:CheckUpgradeCondition()
+    for building_sprite, level_bg in pairs(self.level_map) do
+        local entity = building_sprite:GetEntity()
+        local x, y = self:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
+        local ox, oy = building_sprite:GetSpriteTopPosition()
+        local building = building_sprite:GetEntity():GetRealEntity()
+        local level = building:GetLevel()
+        local canUpgrade = building:CanUpgrade()
+        level_bg:pos(x + ox, y + oy):setVisible(level > 0)
+        level_bg.can_level_up:setVisible(canUpgrade)
+        level_bg.can_not_level_up:setVisible(not canUpgrade)
+        if level_bg.level ~= level then
+            level_bg.text_field:removeFromParent()
+            level_bg.text_field = self:CreateNumber(level):addTo(level_bg):pos(3, -3)
+        end
+    end
+end
+function CityLayer:CreateLevelArrowBy(building_sprite)
+    if not self.level_map[building_sprite] then
+        self.level_map[building_sprite] = self:CreateLevelNode(building_sprite)
+    end
+end
+function CityLayer:DeleteLevelArrowBy(building_sprite)
+    if self.level_map[building_sprite] then
+        self.level_map[building_sprite]:removeFromParent()
+        self.level_map[building_sprite] = nil
+    end
+end
+function CityLayer:CreateLevelNode(building_sprite)
+    local entity = building_sprite:GetEntity()
+    local building = entity:GetRealEntity()
+    local level = building:GetLevel()
+    local x, y = self:GetLogicMap():ConvertToMapPosition(entity:GetLogicPosition())
+    local ox, oy = building_sprite:GetSpriteTopPosition()
+    level_bg = display.newNode():addTo(self.level_node):pos(x + ox, y + oy)
+    level_bg:setCascadeOpacityEnabled(true)
+    level_bg.can_level_up = display.newSprite("can_level_up.png"):addTo(level_bg):show()
+    level_bg.can_not_level_up = display.newSprite("can_not_level_up.png"):addTo(level_bg):pos(0,-5)
+    level_bg.text_field = self:CreateNumber(level):addTo(level_bg):pos(3, -3)
+    level_bg.level = level
+    return level_bg
+end
+function CityLayer:CreateNumber(number)
+    local node = display.newNode()
+    local str = tostring(number)
+    local len = #str
+    local w = len * 8
+    for i = 1, len do
+        display.newSprite(string.format("level_%d.png", string.sub(str,i,i)))
+        :addTo(node):pos(-w/2 + ((i-1)*8), 0)
+    end
+    node:setSkewY(-30)
+    return node
 end
 ---
 function CityLayer:EnterEditMode()
@@ -642,7 +704,11 @@ function CityLayer:UpdateWallsWithCity(city)
     local new_walls = {}
     local _, level = SpriteConfig["wall"]:GetConfigByLevel(city:GetGate():GetLevel())
     for _, v in pairs(city:GetWalls()) do
-        table.insert(new_walls, self:CreateWall(v, level):addTo(city_node))
+        local wall = self:CreateWall(v, level):addTo(city_node)
+        table.insert(new_walls, wall)
+        if v:IsGate() then
+            self:CreateLevelArrowBy(wall)
+        end
     end
     self.walls = new_walls
 
@@ -651,6 +717,7 @@ function CityLayer:UpdateWallsWithCity(city)
     -- end)
 
     for _, v in pairs(old_walls) do
+        self:DeleteLevelArrowBy(v)
         v:DestorySelf()
     end
     self:UpdateTowersWithCity(city)
@@ -661,7 +728,9 @@ function CityLayer:UpdateTowersWithCity(city)
     local new_towers = {}
     local _, level = SpriteConfig["wall"]:GetConfigByLevel(city:GetGate():GetLevel())
     for k, v in pairs(city:GetVisibleTowers()) do
-        table.insert(new_towers, self:CreateTower(v, level):addTo(city_node))
+        local tower = self:CreateTower(v, level):addTo(city_node)
+        table.insert(new_towers, tower)
+        self:CreateLevelArrowBy(tower)
     end
     self.towers = new_towers
 
@@ -670,6 +739,7 @@ function CityLayer:UpdateTowersWithCity(city)
     -- end)
 
     for k, v in pairs(old_towers) do
+        self:DeleteLevelArrowBy(v)
         v:DestorySelf()
     end
 end
@@ -962,14 +1032,24 @@ function CityLayer:UpdateWeather()
     self.weather_glstate:setUniformVec2("u_position", {x = pos.x / size.width, y = pos.y / size.height})
 end
 function CityLayer:HideLevelUpNode()
-    self:IteratorCanUpgradingBuilding(function(_, sprite)
-        sprite:HideLevelUpNode()
-    end)
+    -- self:IteratorCanUpgradingBuilding(function(_, sprite)
+    --     sprite:HideLevelUpNode()
+    -- end)
+    self:HideLevelUpNode()
 end
 function CityLayer:ShowLevelUpNode()
-    self:IteratorCanUpgradingBuilding(function(_, sprite)
-        sprite:ShowLevelUpNode()
-    end)
+    -- self:IteratorCanUpgradingBuilding(function(_, sprite)
+    --     sprite:ShowLevelUpNode()
+    -- end)
+    self:ShowLevelUpNode()
+end
+function CityLayer:ShowLevelUpNode()
+    self.level_node:stopAllActions()
+    self.level_node:fadeTo(0.5, 255)
+end
+function CityLayer:HideLevelUpNode()
+    self.level_node:stopAllActions()
+    self.level_node:fadeTo(0.5, 0)
 end
 
 return CityLayer

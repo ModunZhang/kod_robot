@@ -127,8 +127,8 @@ function WidgetSliderWithInput:LayoutValueLabel(layout,offset)
         self.soldier_total_count:setPosition(self:getContentSize().width,offset)
         self.text_btn:setPosition(self:getContentSize().width-self.soldier_total_count:getContentSize().width-10-60,offset)
     else
-        self.soldier_total_count:setPosition(self.slider.scale9Size_[1]+80,0)
-        self.text_btn:setPosition(self.slider.scale9Size_[1]+60,30)
+        self.soldier_total_count:setPosition(self.slider.scale9Size_[1]+80 + offset,0)
+        self.text_btn:setPosition(self.slider.scale9Size_[1]+60 + offset,30)
     end
     return self
 end
