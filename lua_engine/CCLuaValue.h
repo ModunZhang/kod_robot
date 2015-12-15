@@ -25,7 +25,7 @@
 
 #ifndef __CC_LUA_VALUE_H_
 #define __CC_LUA_VALUE_H_
-
+#include <cstring>
 #include <string>
 #include <map>
 #include <list>

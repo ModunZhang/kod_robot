@@ -1,6 +1,6 @@
 GCC=gcc
 OBJDIR=./obj
-CFLAGS= -Wall -c  -I../lua_engine/ -I../tolua/ -I../libpomelo/deps/jansson/src \
+CFLAGS= -Wall -c  -I../lua_engine/ -I../tolua/ -I../lua/ -I../libpomelo/deps/jansson/src \
  -I../libpomelo/include -I../libpomelo/deps/uv/include
 
 libjansson_la_obj = dump.o error.o hashtable.o load.o \
@@ -27,17 +27,17 @@ all: kod_client
 	@$(MAKE) clean
 
 kod_client: $(objects)
-	$(GCC) -lstdc++ -std=c++11 -framework CoreServices \
-	$(objects) -o kod_client -L../libpomelo/lib/mac/ -luv -ljansson -lpomelo
+	$(GCC) -std=c++11 -lstdc++ -pthread \
+	$(objects) -o kod_client -L../ -luv -ljansson -lpomelo 
 
 %.o: ../lua/%.c 
 	$(GCC) $(CFLAGS) -o $@ $<  
 
 %.o: ../lua_engine/%.cpp
-	$(GCC) $(CFLAGS) -o $@ $<
+	$(GCC) -std=c++11 $(CFLAGS) -o $@ $<
 #
 %.o: ../tolua/%.cpp
-	$(GCC) $(CFLAGS) -o $@ $<
+	$(GCC) -std=c++11 $(CFLAGS) -o $@ $<
 %.o: ../tolua/%.c
 	$(GCC) $(CFLAGS) -o $@ $<
 #
@@ -45,7 +45,7 @@ kod_client: $(objects)
 	$(GCC) $(CFLAGS) -o $@ $<
 #
 %.o: %.cpp
-	$(GCC) $(CFLAGS) -std=c++11 -o $@ $<
+	$(GCC) -std=c++11 $(CFLAGS) -std=c++11 -o $@ $<
 
 
 .PHONY : clean

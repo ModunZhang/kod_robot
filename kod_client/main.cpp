@@ -26,7 +26,6 @@
 #include <stdio.h>
 #include <semaphore.h>
 
-
 extern "C"{	
 	#include "../lua/lua.h"
 	#include "../lua/lualib.h"
@@ -79,8 +78,8 @@ sig_handler( int sig )
 {	
 	if (sig == SIGCHLD)
 	{
-        wait(NULL);
-//		return;
+        // wait(NULL);
+		// return;
 	}
 	printf("receive sig %d\n", sig);
 	int save_errno = errno;

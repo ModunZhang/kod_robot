@@ -30,7 +30,7 @@ extern "C" {
 #include "lua.h"
 }
 
-
+#include <functional>
 #include "CCLuaValue.h"
 
 #define LUASTACK_USED_FOR_QUICK_COCOS2DX
