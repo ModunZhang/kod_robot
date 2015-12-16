@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/wait.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <assert.h>
@@ -78,7 +79,7 @@ sig_handler( int sig )
 {	
 	if (sig == SIGCHLD)
 	{
-        // wait(NULL);
+        wait(NULL);
 		// return;
 	}
 	printf("receive sig %d\n", sig);

@@ -1,6 +1,6 @@
 GCC=gcc
 OBJDIR=./obj
-CFLAGS= -Wall -c  -I../lua_engine/ -I../tolua/ -I../lua/ -I../libpomelo/deps/jansson/src \
+CFLAGS= -Wall -c -I../lua_engine/ -I../tolua/ -I../lua/ -I../libpomelo/deps/jansson/src \
  -I../libpomelo/include -I../libpomelo/deps/uv/include
 
 libjansson_la_obj = dump.o error.o hashtable.o load.o \
@@ -19,19 +19,17 @@ lvm.o lzio.o print.o
 
 client_obj = CCPomelo.o LuaExtension.o main.o 
 
-objects = $(libjansson_la_obj) $(luaengine_obj) \
-$(tolua_obj) $(lua_obj) $(client_obj)
+objects = $(luaengine_obj) $(tolua_obj) $(client_obj)
 
 
 all: kod_client
 	@$(MAKE) clean
 
 kod_client: $(objects)
-	$(GCC) -std=c++11 -lstdc++ -pthread \
-	$(objects) -o kod_client -L../ -luv -ljansson -lpomelo 
+	$(GCC) $(objects) -o kod_client -L .. -L ../lua -L ../libpomelo/out/Default/obj.target/ -L ../libpomelo/out/Default/obj.target/deps/jansson -L ../libpomelo/out/Default/obj.target/deps/uv -pthread -std=c++11 -lstdc++ -lresolv  -lpomelo -luv -ljansson -llua -lm -ldl  
 
-%.o: ../lua/%.c 
-	$(GCC) $(CFLAGS) -o $@ $<  
+# %.o: ../lua/%.c 
+# 	$(GCC) $(CFLAGS) -o $@ $<  
 
 %.o: ../lua_engine/%.cpp
 	$(GCC) -std=c++11 $(CFLAGS) -o $@ $<
@@ -40,10 +38,10 @@ kod_client: $(objects)
 	$(GCC) -std=c++11 $(CFLAGS) -o $@ $<
 %.o: ../tolua/%.c
 	$(GCC) $(CFLAGS) -o $@ $<
-#
-%.o: ../libpomelo/deps/jansson/src/%.c
-	$(GCC) $(CFLAGS) -o $@ $<
-#
+
+# %.o: ../libpomelo/deps/jansson/src/%.c
+# 	$(GCC) $(CFLAGS) -o $@ $<
+
 %.o: %.cpp
 	$(GCC) -std=c++11 $(CFLAGS) -std=c++11 -o $@ $<
 
