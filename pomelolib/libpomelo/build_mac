@@ -1,0 +1,3 @@
+xcodebuild -project deps/jansson/jansson.xcodeproj -sdk "macosx"
+xcodebuild -project deps/uv/uv.xcodeproj -sdk "macosx"
+xcodebuild -project pomelo.xcodeproj -sdk "macosx"

@@ -1,0 +1,7 @@
+xcodebuild clean -project deps/jansson/jansson.xcodeproj
+xcodebuild clean -project deps/uv/uv.xcodeproj
+xcodebuild clean -project pomelo.xcodeproj
+
+xcodebuild -project deps/jansson/jansson.xcodeproj -arch armv7 GCC_PREPROCESSOR_DEFINITIONS="\${GCC_PREPROCESSOR_DEFINITIONS} NDEBUG=1"
+xcodebuild -project deps/uv/uv.xcodeproj -arch armv7 GCC_PREPROCESSOR_DEFINITIONS="\${GCC_PREPROCESSOR_DEFINITIONS} NDEBUG=1"
+xcodebuild -project pomelo.xcodeproj -arch armv7 GCC_PREPROCESSOR_DEFINITIONS="\${GCC_PREPROCESSOR_DEFINITIONS} NDEBUG=1"
