@@ -214,33 +214,34 @@ static const unsigned char group_modp5[] = {
 
 static const unsigned char two_generator[] = { 2 };
 typedef struct dh_st DH;
-DH* dh = NULL;
 
-
-
-void
-createdh() {
-    if(dh) {
-        DH_free(dh);
-        dh = NULL;
-    }
-    dh = DH_new();
-    dh->p = BN_bin2bn((const unsigned char*)group_modp1, sizeof(group_modp1), 0);
-    dh->g = BN_bin2bn((const unsigned char*)two_generator, 1, 0);
-    int codes;
-    if (!DH_check(dh, &codes)) {
-        assert(0);
-    }
-    if (!DH_generate_key(dh)) {
-        assert(0);
+void freeDh(void *d) {
+    if(d) {
+        DH_free((DH*)d);
     }
 }
 
-unsigned char*
-getpublickey(int * len) {
-    if (!dh) {
+void *
+createdh() {
+    DH* d = DH_new();
+    d->p = BN_bin2bn((const unsigned char*)group_modp1, sizeof(group_modp1), 0);
+    d->g = BN_bin2bn((const unsigned char*)two_generator, 1, 0);
+    int codes;
+    if (!DH_check(d, &codes)) {
         assert(0);
     }
+    if (!DH_generate_key(d)) {
+        assert(0);
+    }
+    return (void *)d;
+}
+
+unsigned char*
+getpublickey(void * d, int * len) {
+    if (!d) {
+        assert(0);
+    }
+    DH * dh = (DH*)d;
     if (dh->pub_key == NULL) {
         assert(0);
     }
@@ -252,10 +253,11 @@ getpublickey(int * len) {
 }
 
 char *
-computesecret(const char * buffer, int len) {
-    if (!dh) {
+computesecret(void * d, const char * buffer, int len) {
+    if (!d) {
         assert(0);
     }
+    DH* dh = (DH*)d;
     BIGNUM* key = BN_bin2bn((const unsigned char *)(buffer), len, 0);
     int dataSize = DH_size(dh);
     char* data = (char*)malloc(dataSize);
