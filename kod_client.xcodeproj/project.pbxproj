@@ -51,116 +51,57 @@
 		DB60CD821A6DDF68000DC25A /* CCLuaValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DB60CD7E1A6DDF68000DC25A /* CCLuaValue.cpp */; };
 		DB7147721AEE2E9A00B3BDEB /* stop.sh in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DB7147711AEE2E7D00B3BDEB /* stop.sh */; };
 		DBB5137A1AEF875600DDFDB7 /* start.sh in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBB513791AEF874800DDFDB7 /* start.sh */; };
-		DBDE87481AEF3A94005C3595 /* dump.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE870B1AEF3A94005C3595 /* dump.c */; };
-		DBDE87491AEF3A94005C3595 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE870C1AEF3A94005C3595 /* error.c */; };
-		DBDE874A1AEF3A94005C3595 /* hashtable.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE870D1AEF3A94005C3595 /* hashtable.c */; };
-		DBDE874B1AEF3A94005C3595 /* load.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE87141AEF3A94005C3595 /* load.c */; };
-		DBDE874C1AEF3A94005C3595 /* memory.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE87161AEF3A94005C3595 /* memory.c */; };
-		DBDE874D1AEF3A94005C3595 /* pack_unpack.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE87171AEF3A94005C3595 /* pack_unpack.c */; };
-		DBDE874E1AEF3A94005C3595 /* strbuffer.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE87181AEF3A94005C3595 /* strbuffer.c */; };
-		DBDE874F1AEF3A94005C3595 /* strconv.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE871A1AEF3A94005C3595 /* strconv.c */; };
-		DBDE87501AEF3A94005C3595 /* utf.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE871B1AEF3A94005C3595 /* utf.c */; };
-		DBDE87511AEF3A94005C3595 /* value.c in Sources */ = {isa = PBXBuildFile; fileRef = DBDE871D1AEF3A94005C3595 /* value.c */; };
+		DBBBB4721C27D38900E2E843 /* libjansson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBBB46B1C27D34F00E2E843 /* libjansson.a */; };
+		DBBBB4731C27D38900E2E843 /* libpomelo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBBB4531C27D33E00E2E843 /* libpomelo.a */; };
+		DBBBB4861C27D4B200E2E843 /* libuv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DBBBB4831C27D4A700E2E843 /* libuv.a */; };
 		DBF4F1471A6F453B00B6CDE0 /* app in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBF4F1421A6F453B00B6CDE0 /* app */; };
 		DBF4F1481A6F453B00B6CDE0 /* config.lua in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBF4F1431A6F453B00B6CDE0 /* config.lua */; };
 		DBF4F1491A6F453B00B6CDE0 /* functions.lua in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBF4F1441A6F453B00B6CDE0 /* functions.lua */; };
 		DBF4F14A1A6F453B00B6CDE0 /* json.lua in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBF4F1451A6F453B00B6CDE0 /* json.lua */; };
 		DBF4F14B1A6F453B00B6CDE0 /* main.lua in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = DBF4F1461A6F453B00B6CDE0 /* main.lua */; };
-		FF07193A1C1927B3006E4869 /* libpomelo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF0719291C19279A006E4869 /* libpomelo.a */; };
-		FF07194E1C192841006E4869 /* libjansson.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF0719491C192809006E4869 /* libjansson.a */; };
-		FF07194F1C192845006E4869 /* libuv.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF0719431C1927FC006E4869 /* libuv.a */; };
 		FF7E0D021C07370B00676746 /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF7E0D011C07370B00676746 /* libcrypto.a */; };
 		FF7E0D141C0738C900676746 /* libs in Copy Files (7 items) */ = {isa = PBXBuildFile; fileRef = FF7E0D131C0738C900676746 /* libs */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		FF0719281C19279A006E4869 /* PBXContainerItemProxy */ = {
+		DBBBB4521C27D33E00E2E843 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
+			containerPortal = DBBBB44E1C27D33E00E2E843 /* pomelo.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 07390FDF2C637EBD093867CC;
 			remoteInfo = libpomelo;
 		};
-		FF07192A1C19279A006E4869 /* PBXContainerItemProxy */ = {
+		DBBBB46A1C27D34F00E2E843 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = FAED8970A57B163CCFC87ECA;
-			remoteInfo = destroy;
-		};
-		FF07192C1C19279A006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 7FA2AD8C43CA89DDC8D3986C;
-			remoteInfo = notify;
-		};
-		FF07192E1C19279A006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = CA1D6E61B836B3AD372F7877;
-			remoteInfo = request;
-		};
-		FF0719301C19279A006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 2BDD63FDC40DE1D64114B19B;
-			remoteInfo = echo;
-		};
-		FF0719321C19279A006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 640F5DADDBEA0250854F2CBF;
-			remoteInfo = echo2;
-		};
-		FF0719341C19279A006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 39C460917C27E012DBF26365;
-			remoteInfo = test_protobuf;
-		};
-		FF0719361C19279A006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 6201BA87C25025417F3AE79F;
-			remoteInfo = robot_chat;
-		};
-		FF0719381C1927A1006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = FFDDF0E039E6E9D6BDF304D9;
-			remoteInfo = libpomelo;
-		};
-		FF0719421C1927FC006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF07193B1C1927FC006E4869 /* uv.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 1366FBDA3B41EA03E9CC86CA;
-			remoteInfo = libuv;
-		};
-		FF0719481C192809006E4869 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = FF0719441C192809006E4869 /* jansson.xcodeproj */;
+			containerPortal = DBBBB4661C27D34E00E2E843 /* jansson.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 59F286A69EC2A309743023EC;
 			remoteInfo = jansson;
 		};
-		FF07194A1C192810006E4869 /* PBXContainerItemProxy */ = {
+		DBBBB46C1C27D37B00E2E843 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = FF0719441C192809006E4869 /* jansson.xcodeproj */;
+			containerPortal = DBBBB4661C27D34E00E2E843 /* jansson.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = A42BD6BC281DD5AD92086C4D;
 			remoteInfo = jansson;
 		};
-		FF07194C1C192815006E4869 /* PBXContainerItemProxy */ = {
+		DBBBB4701C27D38200E2E843 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = FF07193B1C1927FC006E4869 /* uv.xcodeproj */;
+			containerPortal = DBBBB44E1C27D33E00E2E843 /* pomelo.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = FFDDF0E039E6E9D6BDF304D9;
+			remoteInfo = libpomelo;
+		};
+		DBBBB4821C27D4A700E2E843 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DBBBB47B1C27D4A600E2E843 /* uv.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 1366FBDA3B41EA03E9CC86CA;
+			remoteInfo = libuv;
+		};
+		DBBBB4841C27D4AE00E2E843 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DBBBB47B1C27D4A600E2E843 /* uv.xcodeproj */;
 			proxyType = 1;
 			remoteGlobalIDString = 178071661CB321BB5A46AC92;
 			remoteInfo = libuv;
@@ -276,6 +217,9 @@
 		DB60CD7F1A6DDF68000DC25A /* CCLuaValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCLuaValue.h; sourceTree = "<group>"; };
 		DB7147711AEE2E7D00B3BDEB /* stop.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = stop.sh; path = resource/stop.sh; sourceTree = "<group>"; };
 		DBB513791AEF874800DDFDB7 /* start.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; name = start.sh; path = resource/start.sh; sourceTree = "<group>"; };
+		DBBBB44E1C27D33E00E2E843 /* pomelo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = pomelo.xcodeproj; path = pomelolib/libpomelo/pomelo.xcodeproj; sourceTree = "<group>"; };
+		DBBBB4661C27D34E00E2E843 /* jansson.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = jansson.xcodeproj; path = pomelolib/libpomelo/deps/jansson/jansson.xcodeproj; sourceTree = "<group>"; };
+		DBBBB47B1C27D4A600E2E843 /* uv.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = uv.xcodeproj; path = pomelolib/libpomelo/deps/uv/uv.xcodeproj; sourceTree = "<group>"; };
 		DBDE870B1AEF3A94005C3595 /* dump.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dump.c; sourceTree = "<group>"; };
 		DBDE870C1AEF3A94005C3595 /* error.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = error.c; sourceTree = "<group>"; };
 		DBDE870D1AEF3A94005C3595 /* hashtable.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hashtable.c; sourceTree = "<group>"; };
@@ -330,9 +274,6 @@
 		DBF4F1441A6F453B00B6CDE0 /* functions.lua */ = {isa = PBXFileReference; lastKnownFileType = text; name = functions.lua; path = resource/functions.lua; sourceTree = "<group>"; };
 		DBF4F1451A6F453B00B6CDE0 /* json.lua */ = {isa = PBXFileReference; lastKnownFileType = text; name = json.lua; path = resource/json.lua; sourceTree = "<group>"; };
 		DBF4F1461A6F453B00B6CDE0 /* main.lua */ = {isa = PBXFileReference; lastKnownFileType = text; name = main.lua; path = resource/main.lua; sourceTree = "<group>"; };
-		FF07191A1C192799006E4869 /* pomelo.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = pomelo.xcodeproj; path = libpomelo/pomelo.xcodeproj; sourceTree = "<group>"; };
-		FF07193B1C1927FC006E4869 /* uv.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = uv.xcodeproj; path = libpomelo/deps/uv/uv.xcodeproj; sourceTree = "<group>"; };
-		FF0719441C192809006E4869 /* jansson.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = jansson.xcodeproj; path = libpomelo/deps/jansson/jansson.xcodeproj; sourceTree = "<group>"; };
 		FF7E0D011C07370B00676746 /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libcrypto.a; sourceTree = "<group>"; };
 		FF7E0D131C0738C900676746 /* libs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = libs; path = resource/libs; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -342,9 +283,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF07194F1C192845006E4869 /* libuv.a in Frameworks */,
-				FF07194E1C192841006E4869 /* libjansson.a in Frameworks */,
-				FF07193A1C1927B3006E4869 /* libpomelo.a in Frameworks */,
+				DBBBB4861C27D4B200E2E843 /* libuv.a in Frameworks */,
+				DBBBB4721C27D38900E2E843 /* libjansson.a in Frameworks */,
+				DBBBB4731C27D38900E2E843 /* libpomelo.a in Frameworks */,
 				FF7E0D021C07370B00676746 /* libcrypto.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -355,9 +296,9 @@
 		DB60CBB61A6CE5F3000DC25A = {
 			isa = PBXGroup;
 			children = (
-				FF0719441C192809006E4869 /* jansson.xcodeproj */,
-				FF07193B1C1927FC006E4869 /* uv.xcodeproj */,
-				FF07191A1C192799006E4869 /* pomelo.xcodeproj */,
+				DBBBB47B1C27D4A600E2E843 /* uv.xcodeproj */,
+				DBBBB4661C27D34E00E2E843 /* jansson.xcodeproj */,
+				DBBBB44E1C27D33E00E2E843 /* pomelo.xcodeproj */,
 				FF7E0D011C07370B00676746 /* libcrypto.a */,
 				DBDE87071AEF3A94005C3595 /* libpomelo */,
 				DBF4F14E1A6F54C500B6CDE0 /* Resources */,
@@ -487,6 +428,30 @@
 				DB60CD7F1A6DDF68000DC25A /* CCLuaValue.h */,
 			);
 			path = lua_engine;
+			sourceTree = "<group>";
+		};
+		DBBBB44F1C27D33E00E2E843 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DBBBB4531C27D33E00E2E843 /* libpomelo.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DBBBB4671C27D34E00E2E843 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DBBBB46B1C27D34F00E2E843 /* libjansson.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DBBBB47C1C27D4A600E2E843 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DBBBB4831C27D4A700E2E843 /* libuv.a */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		DBDE87071AEF3A94005C3595 /* libpomelo */ = {
@@ -680,37 +645,6 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		FF07191B1C192799006E4869 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF0719291C19279A006E4869 /* libpomelo.a */,
-				FF07192B1C19279A006E4869 /* destroy */,
-				FF07192D1C19279A006E4869 /* notify */,
-				FF07192F1C19279A006E4869 /* request */,
-				FF0719311C19279A006E4869 /* echo */,
-				FF0719331C19279A006E4869 /* echo2 */,
-				FF0719351C19279A006E4869 /* test_protobuf */,
-				FF0719371C19279A006E4869 /* robot_chat */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF07193C1C1927FC006E4869 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF0719431C1927FC006E4869 /* libuv.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
-		FF0719451C192809006E4869 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FF0719491C192809006E4869 /* libjansson.a */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -725,9 +659,9 @@
 			buildRules = (
 			);
 			dependencies = (
-				FF07194D1C192815006E4869 /* PBXTargetDependency */,
-				FF07194B1C192810006E4869 /* PBXTargetDependency */,
-				FF0719391C1927A1006E4869 /* PBXTargetDependency */,
+				DBBBB4851C27D4AE00E2E843 /* PBXTargetDependency */,
+				DBBBB4711C27D38200E2E843 /* PBXTargetDependency */,
+				DBBBB46D1C27D37B00E2E843 /* PBXTargetDependency */,
 			);
 			name = kod_client;
 			productName = kod_client;
@@ -760,16 +694,16 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = FF0719451C192809006E4869 /* Products */;
-					ProjectRef = FF0719441C192809006E4869 /* jansson.xcodeproj */;
+					ProductGroup = DBBBB4671C27D34E00E2E843 /* Products */;
+					ProjectRef = DBBBB4661C27D34E00E2E843 /* jansson.xcodeproj */;
 				},
 				{
-					ProductGroup = FF07191B1C192799006E4869 /* Products */;
-					ProjectRef = FF07191A1C192799006E4869 /* pomelo.xcodeproj */;
+					ProductGroup = DBBBB44F1C27D33E00E2E843 /* Products */;
+					ProjectRef = DBBBB44E1C27D33E00E2E843 /* pomelo.xcodeproj */;
 				},
 				{
-					ProductGroup = FF07193C1C1927FC006E4869 /* Products */;
-					ProjectRef = FF07193B1C1927FC006E4869 /* uv.xcodeproj */;
+					ProductGroup = DBBBB47C1C27D4A600E2E843 /* Products */;
+					ProjectRef = DBBBB47B1C27D4A600E2E843 /* uv.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -780,74 +714,25 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		FF0719291C19279A006E4869 /* libpomelo.a */ = {
+		DBBBB4531C27D33E00E2E843 /* libpomelo.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libpomelo.a;
-			remoteRef = FF0719281C19279A006E4869 /* PBXContainerItemProxy */;
+			remoteRef = DBBBB4521C27D33E00E2E843 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
-		FF07192B1C19279A006E4869 /* destroy */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = destroy;
-			remoteRef = FF07192A1C19279A006E4869 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF07192D1C19279A006E4869 /* notify */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = notify;
-			remoteRef = FF07192C1C19279A006E4869 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF07192F1C19279A006E4869 /* request */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = request;
-			remoteRef = FF07192E1C19279A006E4869 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF0719311C19279A006E4869 /* echo */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = echo;
-			remoteRef = FF0719301C19279A006E4869 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF0719331C19279A006E4869 /* echo2 */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = echo2;
-			remoteRef = FF0719321C19279A006E4869 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF0719351C19279A006E4869 /* test_protobuf */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = test_protobuf;
-			remoteRef = FF0719341C19279A006E4869 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF0719371C19279A006E4869 /* robot_chat */ = {
-			isa = PBXReferenceProxy;
-			fileType = "compiled.mach-o.executable";
-			path = robot_chat;
-			remoteRef = FF0719361C19279A006E4869 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF0719431C1927FC006E4869 /* libuv.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libuv.a;
-			remoteRef = FF0719421C1927FC006E4869 /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		FF0719491C192809006E4869 /* libjansson.a */ = {
+		DBBBB46B1C27D34F00E2E843 /* libjansson.a */ = {
 			isa = PBXReferenceProxy;
 			fileType = archive.ar;
 			path = libjansson.a;
-			remoteRef = FF0719481C192809006E4869 /* PBXContainerItemProxy */;
+			remoteRef = DBBBB46A1C27D34F00E2E843 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		DBBBB4831C27D4A700E2E843 /* libuv.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libuv.a;
+			remoteRef = DBBBB4821C27D4A700E2E843 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -863,25 +748,17 @@
 				DB60CD821A6DDF68000DC25A /* CCLuaValue.cpp in Sources */,
 				DB60CD221A6D053C000DC25A /* ltable.c in Sources */,
 				DB60CD741A6D46D1000DC25A /* tolua_fix.cpp in Sources */,
-				DBDE87491AEF3A94005C3595 /* error.c in Sources */,
 				DB60CD231A6D053C000DC25A /* ltablib.c in Sources */,
 				DB60CD271A6D053C000DC25A /* lundump.c in Sources */,
 				DB60CD761A6D46D1000DC25A /* tolua_map.c in Sources */,
 				DB60CD1C1A6D053C000DC25A /* lopcodes.c in Sources */,
-				DBDE874C1AEF3A94005C3595 /* memory.c in Sources */,
 				DB60CD281A6D053C000DC25A /* lvm.c in Sources */,
-				DBDE87511AEF3A94005C3595 /* value.c in Sources */,
-				DBDE874E1AEF3A94005C3595 /* strbuffer.c in Sources */,
 				DB60CD121A6D053C000DC25A /* ldump.c in Sources */,
 				DB60CD241A6D053C000DC25A /* ltm.c in Sources */,
-				DBDE87481AEF3A94005C3595 /* dump.c in Sources */,
 				DB60CD191A6D053C000DC25A /* lmem.c in Sources */,
 				DB60CD781A6D46D1000DC25A /* tolua_to.c in Sources */,
-				DBDE874F1AEF3A94005C3595 /* strconv.c in Sources */,
 				DB60CD2B1A6D053C000DC25A /* print.c in Sources */,
-				DBDE87501AEF3A94005C3595 /* utf.c in Sources */,
 				DB60CBC31A6CE5F3000DC25A /* main.cpp in Sources */,
-				DBDE874B1AEF3A94005C3595 /* load.c in Sources */,
 				DB60CD291A6D053C000DC25A /* lzio.c in Sources */,
 				DB60CD731A6D46D1000DC25A /* tolua_event.c in Sources */,
 				DB60CD101A6D053C000DC25A /* ldebug.c in Sources */,
@@ -895,7 +772,6 @@
 				DB60CD211A6D053C000DC25A /* lstrlib.c in Sources */,
 				DB60CD771A6D46D1000DC25A /* tolua_push.c in Sources */,
 				DB60CD0B1A6D053C000DC25A /* lapi.c in Sources */,
-				DBDE874A1AEF3A94005C3595 /* hashtable.c in Sources */,
 				DB60CD811A6DDF68000DC25A /* CCLuaStack.cpp in Sources */,
 				DB60CD751A6D46D1000DC25A /* tolua_is.c in Sources */,
 				DB60CD181A6D053C000DC25A /* lmathlib.c in Sources */,
@@ -907,7 +783,6 @@
 				DB60CD801A6DDF68000DC25A /* CCLuaEngine.cpp in Sources */,
 				DB60CD1F1A6D053C000DC25A /* lstate.c in Sources */,
 				DB60CD201A6D053C000DC25A /* lstring.c in Sources */,
-				DBDE874D1AEF3A94005C3595 /* pack_unpack.c in Sources */,
 				DB60CD161A6D053C000DC25A /* liolib.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -915,20 +790,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		FF0719391C1927A1006E4869 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = libpomelo;
-			targetProxy = FF0719381C1927A1006E4869 /* PBXContainerItemProxy */;
-		};
-		FF07194B1C192810006E4869 /* PBXTargetDependency */ = {
+		DBBBB46D1C27D37B00E2E843 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = jansson;
-			targetProxy = FF07194A1C192810006E4869 /* PBXContainerItemProxy */;
+			targetProxy = DBBBB46C1C27D37B00E2E843 /* PBXContainerItemProxy */;
 		};
-		FF07194D1C192815006E4869 /* PBXTargetDependency */ = {
+		DBBBB4711C27D38200E2E843 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = libpomelo;
+			targetProxy = DBBBB4701C27D38200E2E843 /* PBXContainerItemProxy */;
+		};
+		DBBBB4851C27D4AE00E2E843 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = libuv;
-			targetProxy = FF07194C1C192815006E4869 /* PBXContainerItemProxy */;
+			targetProxy = DBBBB4841C27D4AE00E2E843 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1019,9 +894,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(PROJECT_DIR)/libpomelo/include",
-					"$(PROJECT_DIR)/libpomelo/deps/jansson/src",
-					"$(PROJECT_DIR)/libpomelo/deps/uv/include",
+					"$(PROJECT_DIR)/pomelolib/libpomelo/include",
+					"$(PROJECT_DIR)/pomelolib/libpomelo/deps/jansson/src",
+					"$(PROJECT_DIR)/pomelolib/libpomelo/deps/uv/include",
 					"$(PROJECT_DIR)/lua",
 					"$(PROJECT_DIR)/tolua",
 					"$(PROJECT_DIR)/",
@@ -1029,12 +904,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/libpomelo/lib/mac",
-					"$(PROJECT_DIR)/libpomelo/lib/ios/iphone",
-					"$(PROJECT_DIR)/libpomelo/lib/ios/sim",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/libpomelo1/deps/jansson/build/Default",
-					"$(PROJECT_DIR)/libpomelo1/deps/uv/build/Default",
 				);
 				MACH_O_TYPE = mh_execute;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1059,9 +929,9 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(PROJECT_DIR)/libpomelo/include",
-					"$(PROJECT_DIR)/libpomelo/deps/jansson/src",
-					"$(PROJECT_DIR)/libpomelo/deps/uv/include",
+					"$(PROJECT_DIR)/pomelolib/libpomelo/include",
+					"$(PROJECT_DIR)/pomelolib/libpomelo/deps/jansson/src",
+					"$(PROJECT_DIR)/pomelolib/libpomelo/deps/uv/include",
 					"$(PROJECT_DIR)/lua",
 					"$(PROJECT_DIR)/tolua",
 					"$(PROJECT_DIR)/",
@@ -1069,12 +939,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(PROJECT_DIR)/libpomelo/lib/mac",
-					"$(PROJECT_DIR)/libpomelo/lib/ios/iphone",
-					"$(PROJECT_DIR)/libpomelo/lib/ios/sim",
 					"$(PROJECT_DIR)",
-					"$(PROJECT_DIR)/libpomelo1/deps/jansson/build/Default",
-					"$(PROJECT_DIR)/libpomelo1/deps/uv/build/Default",
 				);
 				MACH_O_TYPE = mh_execute;
 				ONLY_ACTIVE_ARCH = NO;
