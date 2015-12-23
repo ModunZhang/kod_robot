@@ -21,7 +21,6 @@ out/
 build/
 .tags
 .tags_sorted_by_file
-**xcodeproj/
 **dSYM/
 test/
 *.mk

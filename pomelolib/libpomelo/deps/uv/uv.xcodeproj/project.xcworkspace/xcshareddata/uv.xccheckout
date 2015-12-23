@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>7007B323-363F-4C72-B894-C60CB9CED739</string>
+	<key>IDESourceControlProjectName</key>
+	<string>uv</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>27A5208A9F134712A4D7B6CEB435AF37083A1327</key>
+		<string>https://github.com/NetEase/libpomelo</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>deps/uv/uv.xcodeproj</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>27A5208A9F134712A4D7B6CEB435AF37083A1327</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/NetEase/libpomelo</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>111</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>27A5208A9F134712A4D7B6CEB435AF37083A1327</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>27A5208A9F134712A4D7B6CEB435AF37083A1327</string>
+			<key>IDESourceControlWCCName</key>
+			<string>libpomelo</string>
+		</dict>
+	</array>
+</dict>
+</plist>
