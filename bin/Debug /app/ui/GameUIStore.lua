@@ -164,7 +164,11 @@ end
 
 function GameUIStore:OnBuyButtonClicked(productId)
 	device.showActivityIndicator()
-	app:getStore().purchaseWithProductId(productId,1)
+	if device.platform == 'android' then
+		UIKit:showMessageDialog("抱歉","暂不支持android平台的购买")
+	else
+		app:getStore().purchaseWithProductId(productId,1)
+	end
 end
 
 function GameUIStore:GetItemMoreButton(data)

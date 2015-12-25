@@ -26,6 +26,7 @@ function GameUIPVESendTroop:ctor(pve_soldiers,march_callback)
     GameUIPVESendTroop.super.ctor(self,City,_("准备进攻"))
     self.march_callback = march_callback
     self.pve_soldiers = pve_soldiers
+    dump(pve_soldiers,"pve_soldiers")
     self.dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
     self.soldiers_table = {}
     -- 默认选中最强的并且可以出战的龙,如果都不能出战，则默认最强龙
@@ -351,7 +352,7 @@ function GameUIPVESendTroop:SelectSoldiers()
             :align(display.LEFT_CENTER, 440,90)
 
         -- 士兵头像
-        local soldier_ui_config = UILib.soldier_image[name][star]
+        local soldier_ui_config = UILib.soldier_image[name]
         local color_bg = display.newSprite(UILib.soldier_color_bg_images[name]):align(display.CENTER,60,64):addTo(content):scale(104/128)
 
         local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER,60,64):addTo(content):scale(104/128)
@@ -386,14 +387,30 @@ function GameUIPVESendTroop:SelectSoldiers()
     end
     local soldiers = {}
     local soldier_map = {
-        "swordsman",
-        "ranger",
-        "lancer",
-        "catapult",
-        "sentinel",
-        "crossbowman",
-        "horseArcher",
-        "ballista",
+        "swordsman_1",
+        "ranger_1",
+        "lancer_1",
+        "catapult_1",
+        "sentinel_1",
+        "crossbowman_1",
+        "horseArcher_1",
+        "ballista_1",
+        "swordsman_2",
+        "ranger_2",
+        "lancer_2",
+        "catapult_2",
+        "sentinel_2",
+        "crossbowman_2",
+        "horseArcher_2",
+        "ballista_2",
+        "swordsman_3",
+        "ranger_3",
+        "lancer_3",
+        "catapult_3",
+        "sentinel_3",
+        "crossbowman_3",
+        "horseArcher_3",
+        "ballista_3",
         "skeletonWarrior",
         "skeletonArcher",
         "deathKnight",
@@ -536,8 +553,9 @@ function GameUIPVESendTroop:CreateTroopsShow()
                 local name = soldiers[i].name
                 local star = soldiers[i].star or 1
                 -- 士兵头像
-                local soldier_ui_config = UILib.soldier_image[name][star]
-                local color_bg = UILib.soldier_color_bg_images[name][star]
+                print("·RefreshPVESoldiers·=",name)
+                local soldier_ui_config = UILib.soldier_image[name]
+                local color_bg = UILib.soldier_color_bg_images[name]
                 local soldier_color_bg = display.newSprite(color_bg):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
                 local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
                 local soldier_head_bg  = display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2,soldier_head_icon:getContentSize().height/2)
@@ -573,7 +591,7 @@ function GameUIPVESendTroop:CreateTroopsShow()
                     local name = my_soldiers[i].name
                     local star = my_soldiers[i].star
                     -- 士兵头像
-                    local soldier_ui_config = UILib.soldier_image[name][star]
+                    local soldier_ui_config = UILib.soldier_image[name]
                     local soldier_color_bg = display.newSprite("blue_bg_128x128.png"):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
                     local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
                     local soldier_head_bg  = display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2,soldier_head_icon:getContentSize().height/2)

@@ -24,7 +24,7 @@ local fightReport1 = {
         hpDecreased = 22
     },
     playerSoldierRoundDatas = {{
-        soldierName = "swordsman",
+        soldierName = "swordsman_1",
         morale = 100,
         soldierCount = 100,
         soldierWoundedCount = 2,
@@ -33,69 +33,69 @@ local fightReport1 = {
         soldierDamagedCount = 2,
         moraleDecreased = 2
     }, {
-        soldierName = "swordsman",
+        soldierName = "swordsman_1",
         morale = 98,
         soldierCount = 98,
         soldierWoundedCount = 2,
         soldierStar = 1,
         isWin = true,
         soldierDamagedCount = 2,
-        moraleDecreased = 4
+        moraleDecreased = 32
     }, {
-        soldierName = "swordsman",
-        morale = 94,
+        soldierName = "swordsman_1",
+        morale = 66,
         soldierCount = 96,
         soldierWoundedCount = 1,
         soldierStar = 1,
         isWin = true,
         soldierDamagedCount = 1,
-        moraleDecreased = 4
+        moraleDecreased = 66
     }, {
-        soldierName = "swordsman",
-        morale = 90,
-        soldierCount = 95,
+        soldierName = "ranger_1",
+        morale = 100,
+        soldierCount = 100,
         soldierWoundedCount = 1,
         soldierStar = 1,
         isWin = true,
         soldierDamagedCount = 1,
-        moraleDecreased = 8
+        moraleDecreased = 1
     }},
     sectionSoldierRoundDatas = {{
-        soldierName = "lancer",
+        soldierName = "lancer_1",
+        morale = 5,
+        soldierCount = 5,
+        soldierWoundedCount = 0,
+        soldierStar = 1,
+        isWin = false,
+        soldierDamagedCount = 3,
+        moraleDecreased = 3
+    }, {
+        soldierName = "ranger_1",
         morale = 8,
         soldierCount = 8,
         soldierWoundedCount = 0,
         soldierStar = 1,
         isWin = false,
-        soldierDamagedCount = 3,
-        moraleDecreased = 8
+        soldierDamagedCount = 5,
+        moraleDecreased = 5
     }, {
-        soldierName = "ranger",
-        morale = 12,
-        soldierCount = 12,
-        soldierWoundedCount = 0,
-        soldierStar = 1,
-        isWin = false,
-        soldierDamagedCount = 3,
-        moraleDecreased = 12
-    }, {
-        soldierName = "catapult",
+        soldierName = "catapult_1",
         morale = 2,
         soldierCount = 2,
         soldierWoundedCount = 0,
         soldierStar = 1,
         isWin = false,
-        soldierDamagedCount = 1,
+        soldierDamagedCount = 2,
         moraleDecreased = 2
     }, {
-        soldierName = "swordsman",
-        morale = 4,
-        soldierCount = 4,
+        soldierName = "swordsman_1",
+        morale = 3,
+        soldierCount = 3,
         soldierWoundedCount = 0,
         soldierStar = 1,
         isWin = false,
-        soldierDamagedCount = 3,
-        moraleDecreased = 4
+        soldierDamagedCount = 2,
+        moraleDecreased = 2
     }}
 }
 
@@ -116,78 +116,78 @@ local fightReport2 = {
         hpDecreased = 22
     },
     playerSoldierRoundDatas = {{
-        soldierName = "swordsman",
+        soldierName = "swordsman_1",
         morale = 100,
         soldierCount = 100,
-        soldierWoundedCount = 3,
-        soldierStar = 1,
-        isWin = true,
-        soldierDamagedCount = 3,
-        moraleDecreased = 3
-    }, {
-        soldierName = "swordsman",
-        morale = 97,
-        soldierCount = 97,
-        soldierWoundedCount = 3,
-        soldierStar = 1,
-        isWin = true,
-        soldierDamagedCount = 3,
-        moraleDecreased = 6
-    }, {
-        soldierName = "swordsman",
-        morale = 91,
-        soldierCount = 94,
         soldierWoundedCount = 2,
         soldierStar = 1,
         isWin = true,
         soldierDamagedCount = 2,
-        moraleDecreased = 8
+        moraleDecreased = 2
     }, {
-        soldierName = "swordsman",
-        morale = 83,
-        soldierCount = 92,
+        soldierName = "swordsman_1",
+        morale = 98,
+        soldierCount = 98,
         soldierWoundedCount = 1,
         soldierStar = 1,
         isWin = true,
         soldierDamagedCount = 1,
-        moraleDecreased = 8
+        moraleDecreased = 16
+    }, {
+        soldierName = "swordsman_1",
+        morale = 82,
+        soldierCount = 97,
+        soldierWoundedCount = 2,
+        soldierStar = 1,
+        isWin = true,
+        soldierDamagedCount = 2,
+        moraleDecreased = 82
+    }, {
+        soldierName = "ranger_1",
+        morale = 100,
+        soldierCount = 100,
+        soldierWoundedCount = 1,
+        soldierStar = 1,
+        isWin = true,
+        soldierDamagedCount = 1,
+        moraleDecreased = 1
     }},
     sectionSoldierRoundDatas = {{
-        soldierName = "catapult",
-        morale = 6,
-        soldierCount = 6,
+        soldierName = "catapult_1",
+        morale = 7,
+        soldierCount = 7,
         soldierWoundedCount = 0,
         soldierStar = 1,
         isWin = false,
         soldierDamagedCount = 2,
-        moraleDecreased = 6
+        moraleDecreased = 2
     }, {
-        soldierName = "swordsman",
-        morale = 18,
-        soldierCount = 18,
-        soldierWoundedCount = 0,
-        soldierStar = 1,
-        isWin = false,
-        soldierDamagedCount = 5,
-        moraleDecreased = 18
-    }, {
-        soldierName = "lancer",
-        morale = 6,
-        soldierCount = 6,
-        soldierWoundedCount = 0,
-        soldierStar = 1,
-        isWin = false,
-        soldierDamagedCount = 2,
-        moraleDecreased = 6
-    }, {
-        soldierName = "ranger",
-        morale = 6,
-        soldierCount = 6,
+        soldierName = "swordsman_1",
+        morale = 11,
+        soldierCount = 11,
         soldierWoundedCount = 0,
         soldierStar = 1,
         isWin = false,
         soldierDamagedCount = 3,
-        moraleDecreased = 6
+        moraleDecreased = 3
+    }, {
+        soldierName = "lancer_1",
+        morale = 4,
+        soldierCount = 4,
+        soldierWoundedCount = 0,
+        soldierStar = 1,
+        isWin = false,
+        soldierDamagedCount = 3,
+        moraleDecreased = 3
+    }, {
+        soldierName = "ranger_1",
+        morale = 4,
+        soldierCount = 4,
+        soldierWoundedCount = 0,
+        soldierStar = 1,
+        isWin = false,
+        soldierDamagedCount = 4,
+        moraleDecreased = 4
     }}
 }
 
@@ -208,96 +208,78 @@ local fightReport3 = {
         hpDecreased = 22
     },
     playerSoldierRoundDatas = {{
-        soldierName = "swordsman",
+        soldierName = "swordsman_1",
         morale = 100,
         soldierCount = 100,
         soldierWoundedCount = 7,
         soldierStar = 1,
         isWin = false,
         soldierDamagedCount = 7,
-        moraleDecreased = 8
+        moraleDecreased = 7
     }, {
-        soldierName = "ranger",
+        soldierName = "swordsman_1",
+        morale = 93,
+        soldierCount = 93,
+        soldierWoundedCount = 2,
+        soldierStar = 1,
+        isWin = true,
+        soldierDamagedCount = 2,
+        moraleDecreased = 32
+    }, {
+        soldierName = "swordsman_1",
+        morale = 61,
+        soldierCount = 91,
+        soldierWoundedCount = 2,
+        soldierStar = 1,
+        isWin = true,
+        soldierDamagedCount = 2,
+        moraleDecreased = 61
+    }, {
+        soldierName = "ranger_1",
         morale = 100,
         soldierCount = 100,
-        soldierWoundedCount = 5,
-        soldierStar = 1,
-        isWin = true,
-        soldierDamagedCount = 5,
-        moraleDecreased = 5
-    }, {
-        soldierName = "ranger",
-        morale = 95,
-        soldierCount = 95,
-        soldierWoundedCount = 5,
-        soldierStar = 1,
-        isWin = true,
-        soldierDamagedCount = 5,
-        moraleDecreased = 10
-    }, {
-        soldierName = "ranger",
-        morale = 85,
-        soldierCount = 90,
         soldierWoundedCount = 2,
         soldierStar = 1,
         isWin = true,
         soldierDamagedCount = 2,
-        moraleDecreased = 8
-    }, {
-        soldierName = "ranger",
-        morale = 77,
-        soldierCount = 88,
-        soldierWoundedCount = 2,
-        soldierStar = 1,
-        isWin = true,
-        soldierDamagedCount = 2,
-        moraleDecreased = 16
+        moraleDecreased = 2
     }},
     sectionSoldierRoundDatas = {{
         soldierName = "skeletonArcher",
-        morale = 16,
-        soldierCount = 16,
+        morale = 8,
+        soldierCount = 8,
         soldierWoundedCount = 0,
-        soldierStar = 2,
+        soldierStar = 3,
         isWin = true,
-        soldierDamagedCount = 3,
-        moraleDecreased = 6
-    }, {
-        soldierName = "skeletonArcher",
-        morale = 10,
-        soldierCount = 13,
-        soldierWoundedCount = 0,
-        soldierStar = 2,
-        isWin = false,
-        soldierDamagedCount = 4,
-        moraleDecreased = 10
+        soldierDamagedCount = 1,
+        moraleDecreased = 3
     }, {
         soldierName = "meatWagon",
         morale = 3,
         soldierCount = 3,
         soldierWoundedCount = 0,
-        soldierStar = 2,
+        soldierStar = 3,
         isWin = false,
         soldierDamagedCount = 1,
-        moraleDecreased = 3
+        moraleDecreased = 1
     }, {
         soldierName = "skeletonWarrior",
-        morale = 8,
-        soldierCount = 8,
+        morale = 4,
+        soldierCount = 4,
         soldierWoundedCount = 0,
-        soldierStar = 2,
-        isWin = false,
-        soldierDamagedCount = 2,
-        moraleDecreased = 8
-    }, {
-        soldierName = "deathKnight",
-        morale = 2,
-        soldierCount = 2,
-        soldierWoundedCount = 0,
-        soldierStar = 2,
+        soldierStar = 3,
         isWin = false,
         soldierDamagedCount = 1,
-        moraleDecreased = 2
+        moraleDecreased = 1
+    }, {
+        soldierName = "deathKnight",
+        morale = 1,
+        soldierCount = 1,
+        soldierWoundedCount = 0,
+        soldierStar = 3,
+        isWin = false,
+        soldierDamagedCount = 1,
+        moraleDecreased = 1
     }}
 }
 
@@ -318,7 +300,7 @@ function GameUIPveAttackFte:PormiseOfFte()
         table.remove(soldiers, 1)
         UIKit:newGameUI('GameUIPVEFteSendTroop',
             LuaUtils:table_map(soldiers, function(k,v)
-                local name,star = unpack(string.split(v, "_"))
+                local name,star = unpack(string.split(v, ":"))
                 return k, {name = name, star = tonumber(star)}
             end),
             function(dragonType, soldiers)

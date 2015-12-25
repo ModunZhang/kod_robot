@@ -48,15 +48,17 @@ function TileSprite:CreateSprite()
     local x, y = tile.x, tile.y
     if x == 2 then
         local dx, dy = 510/2, 310/2
+        local road_png = self:GetRoadPng()
         sprite:setTexture(self:GetUnlockTilePng())
-        display.newSprite(self:GetRoadPng()):addTo(sprite):pos(dx, dy)
+        display.newSprite(road_png):addTo(sprite):pos(dx, dy)
         if y == 5 and x == 2 then
             for i = 1, 2 do
-                table.insert(self.roads, 
-                    display.newSprite(string.format("unlock_road_%s.png",
-                    self:GetMapLayer():Terrain())):addTo(self):pos(-dx * i, -dy * i))
+                table.insert(self.roads,
+                    display.newSprite(road_png):addTo(self):pos(-dx * i, -dy * i))
             end
         end
+        setAliasTexParametersForKey(self:GetUnlockTilePng())
+        setAliasTexParametersForKey(road_png)
     else
         local sx,ex,sy,ey = 200,230,150,200
         local maps = surface[self:GetMapLayer():Terrain()]

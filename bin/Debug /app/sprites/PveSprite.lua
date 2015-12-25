@@ -47,7 +47,7 @@ function PveSprite:RefreshSprite()
 end
 function PveSprite:GetSpriteFile()
     if self:IsBoss() then
-        return "alliance_moonGate.png", 0.8
+        return "pve_moonGate.png", 0.8
     end
     if self:IsSpecial() then
         return "pve_flag_special.png", 1.2
@@ -58,7 +58,7 @@ function PveSprite:IsSpecial()
     if not self:IsBoss() then
         local troops = string.split(sections[self.npc_name].troops, ",")
         for i,v in ipairs(troops) do
-            local name = unpack(string.split(v, "_"))
+            local name = unpack(string.split(v, ":"))
             if special[name] then
                 return true
             end

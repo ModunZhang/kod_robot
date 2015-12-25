@@ -27,65 +27,6 @@ local PLAYER_ICON = {
     "player_icon_10.png",
     "player_icon_11.png",
 }
-local UI_ANIMATION_FILES = {
-    "animations/win.ExportJson"
-}
-
-local BUILDING_ANIMATIONS_FILES = {
-    watchTower = {
-        "animations/liaowangta.ExportJson"
-    },
-    barracks = {
-        "animations/bingyin.ExportJson",
-        "animations/bingyin_1.ExportJson"
-    },
-    tradeGuild = {
-        "animations/maoyihanghui.ExportJson",
-    },
-    mill = {
-        "animations/mofang.ExportJson",
-    },
-    townHall = {
-        "animations/shizhenting.ExportJson",
-    },
-    academy = {
-        "animations/xueyuan.ExportJson",
-    },
-    hospital = {
-        "animations/yiyuan.ExportJson",
-    },
-    warehouse = {
-        "animations/ziyuancangku.ExportJson",
-    },
-    hammer = {
-        "animations/chuizi.ExportJson",
-    },
-    airShip = {
-        "animations/feiting.ExportJson",
-    },
-    citizen = {
-        "animations/caodi_nan.ExportJson",
-        "animations/caodi_nv.ExportJson",
-        "animations/xuedi_nan.ExportJson",
-        "animations/xuedi_nv.ExportJson",
-        "animations/shadi_nan.ExportJson",
-        "animations/shadi_nv.ExportJson",
-    },
-    bird = {
-        "animations/gezi.ExportJson",
-    },
-    box = {
-        "animations/lanse.ExportJson",
-        "animations/lvse_box.ExportJson",
-        "animations/zise_box.ExportJson",
-        "animations/mu_box.ExportJson",
-        "animations/tong_box.ExportJson",
-        "animations/yin_box.ExportJson",
-        "animations/jin_box.ExportJson",
-        "animations/Box_guang.ExportJson",
-    }
-}
-local BUILDING_ANIMATIONS = getAniNameFromAnimationFiles(BUILDING_ANIMATIONS_FILES)
 local RESOURCE = {
     blood = "heroBlood_3_128x128.png",
     food = "res_food_91x74.png",
@@ -201,185 +142,49 @@ local EQUIPMENT = {
     ["greenArmguard_s4"] = "greenArmguard_s4_128x128.png",
 }
 
-local EFFECT_ANIMATION_FILES = {
-    ranger = {
-        "animations/swordsman_effect/Swordsman_effects.ExportJson",
-    },
-    crossbowman = {
-        "animations/swordsman_effect/Swordsman_effects.ExportJson",
-    },
-    catapult = {
-        "animations/catapult_effect/Catapult1effects.ExportJson",
-    },
-    ballista = {
-        "animations/catapult_effect/Catapult1effects.ExportJson",
-    },
-    lancer = {
-        "animations/lancer_effect/Lancer_effects.ExportJson",
-    },
-    horseArcher = {
-        "animations/lancer_effect/Lancer_effects.ExportJson",
-    },
-    swordsman = {
-        "animations/swordsman_effect/Swordsman_effects.ExportJson",
-    },
-    sentinel = {
-        "animations/swordsman_effect/Swordsman_effects.ExportJson",
-    },
-    wall = {
-        "animations/swordsman_effect/Swordsman_effects.ExportJson",
-    }
-}
-local SOLDIER_ANIMATION_FILES = {
-    ranger = {
-        "animations/gongjianshou_1.ExportJson",
-        "animations/gongjianshou_2.ExportJson",
-        "animations/gongjianshou_3.ExportJson",
-    },
-    crossbowman = {
-        "animations/nugongshou_1.ExportJson",
-        "animations/nugongshou_2.ExportJson",
-        "animations/nugongshou_3.ExportJson",
-    },
-    catapult = {
-        "animations/toushiche.ExportJson",
-        "animations/toushiche_2.ExportJson",
-        "animations/toushiche_3.ExportJson",
-    },
-    ballista = {
-        "animations/nuche_1.ExportJson",
-        "animations/nuche_2.ExportJson",
-        "animations/nuche_3.ExportJson",
-    },
-    lancer = {
-        "animations/qibing_1.ExportJson",
-        "animations/qibing_2.ExportJson",
-        "animations/qibing_3.ExportJson",
-    },
-    horseArcher = {
-        "animations/youqibing_1.ExportJson",
-        "animations/youqibing_2.ExportJson",
-        "animations/youqibing_3.ExportJson",
-    },
-    swordsman = {
-        "animations/bubing_1.ExportJson",
-        "animations/bubing_2.ExportJson",
-        "animations/bubing_3.ExportJson",
-    },
-    sentinel = {
-        "animations/shaobing_1.ExportJson",
-        "animations/shaobing_2.ExportJson",
-        "animations/shaobing_3.ExportJson",
-    },
-    skeletonWarrior = {
-        "animations/kulouyongshi.ExportJson",
-        "animations/kulouyongshi.ExportJson",
-        "animations/kulouyongshi.ExportJson",
-    },
-    skeletonArcher = {
-        "animations/kulousheshou.ExportJson",
-        "animations/kulousheshou.ExportJson",
-        "animations/kulousheshou.ExportJson",
-    },
-    deathKnight = {
-        "animations/siwangqishi.ExportJson",
-        "animations/siwangqishi.ExportJson",
-        "animations/siwangqishi.ExportJson",
-    },
-    meatWagon = {
-        "animations/jiaorouche.ExportJson",
-        "animations/jiaorouche.ExportJson",
-        "animations/jiaorouche.ExportJson",
-    },
-    wall = {
-        "animations/chengqiang_1.ExportJson",
-    },
-    shrine = {
-        "animations/shengdi.ExportJson",
-    }
-}
 local SOLDIER_IMAGES = {
-    ranger = {
-        "ranger_1.png",
-        "ranger_2.png",
-        "ranger_3.png",
-    },
-    catapult = {
-        "catapult_1.png",
-        "catapult_2.png",
-        "catapult_3.png",
-    },
-    lancer = {
-        "lancer_1.png",
-        "lancer_2.png",
-        "lancer_3.png",
-    },
-    swordsman = {
-        "swordsman_1.png",
-        "swordsman_2.png",
-        "swordsman_3.png",
-    },
-    sentinel = {
-        "sentinel_1.png",
-        "sentinel_2.png",
-        "sentinel_3.png",
-    },
-    crossbowman = {
-        "crossbowman_1.png",
-        "crossbowman_2.png",
-        "crossbowman_3.png",
-    },
-    horseArcher = {
-        "horseArcher_1.png",
-        "horseArcher_2.png",
-        "horseArcher_3.png",
-    },
-    ballista = {
-        "ballista_1.png",
-        "ballista_2.png",
-        "ballista_3.png",
-    },
+    ranger_1 = "ranger_1.png",
+    ranger_2 = "ranger_2.png",
+    ranger_3 = "ranger_3.png",
+    
+    catapult_1 = "catapult_1.png",
+    catapult_2 = "catapult_2.png",
+    catapult_3 = "catapult_3.png",
+    
+    lancer_1 = "lancer_1.png",
+    lancer_2 = "lancer_2.png",
+    lancer_3 = "lancer_3.png",
 
-    skeletonWarrior = {
-        "skeletonWarrior.png",
-        "skeletonWarrior.png",
-        "skeletonWarrior.png",
-    },
-    skeletonArcher = {
-        "skeletonArcher.png",
-        "skeletonArcher.png",
-        "skeletonArcher.png",
-    },
-    deathKnight = {
-        "deathKnight.png",
-        "deathKnight.png",
-        "deathKnight.png",
-    },
-    meatWagon = {
-        "meatWagon.png",
-        "meatWagon.png",
-        "meatWagon.png",
-    },
-    priest = {
-        "skeletonWarrior.png",
-        "skeletonWarrior.png",
-        "skeletonWarrior.png",
-    },
-    demonHunter = {
-        "skeletonArcher.png",
-        "skeletonArcher.png",
-        "skeletonArcher.png",
-    },
-    paladin = {
-        "deathKnight.png",
-        "deathKnight.png",
-        "deathKnight.png",
-    },
-    steamTank = {
-        "meatWagon.png",
-        "meatWagon.png",
-        "meatWagon.png",
-    },
+    swordsman_1 = "swordsman_1.png",
+    swordsman_2 = "swordsman_2.png",
+    swordsman_3 = "swordsman_3.png",
+
+    sentinel_1 = "sentinel_1.png",
+    sentinel_2 = "sentinel_2.png",
+    sentinel_3 = "sentinel_3.png",
+    
+    crossbowman_1 = "crossbowman_1.png",
+    crossbowman_2 = "crossbowman_2.png",
+    crossbowman_3 = "crossbowman_3.png",
+    
+    horseArcher_1 = "horseArcher_1.png",
+    horseArcher_2 = "horseArcher_2.png",
+    horseArcher_3 = "horseArcher_3.png",
+
+    ballista_1 = "ballista_1.png",
+    ballista_2 = "ballista_2.png",
+    ballista_3 = "ballista_3.png",
+   
+    skeletonWarrior = "skeletonWarrior.png",
+    skeletonArcher = "skeletonArcher.png",
+    deathKnight = "deathKnight.png",
+    meatWagon = "meatWagon.png",
+
+    priest = "skeletonWarrior.png",
+    demonHunter = "skeletonArcher.png",
+    paladin = "deathKnight.png",
+    steamTank = "meatWagon.png",
+
     wall = {
         "gate_1.png",
         "gate_2.png",
@@ -388,119 +193,121 @@ local SOLDIER_IMAGES = {
 }
 local SOLDIER_COLOR_BG_IMAGES = {
     wall = "blue_bg_128x128.png",
-    ranger = "blue_bg_128x128.png",
-    catapult = "blue_bg_128x128.png",
-    lancer = "blue_bg_128x128.png",
-    swordsman = "blue_bg_128x128.png",
-    sentinel = "red_bg_128x128.png",
-    crossbowman = "red_bg_128x128.png",
-    horseArcher = "red_bg_128x128.png",
-    ballista = "red_bg_128x128.png",
-    skeletonWarrior = "green_bg_128x128.png",
-    skeletonArcher = "green_bg_128x128.png",
-    deathKnight = "green_bg_128x128.png",
-    meatWagon = "green_bg_128x128.png",
-    priest = "green_bg_128x128.png",
-    demonHunter = "green_bg_128x128.png",
-    paladin = "green_bg_128x128.png",
-    steamTank = "green_bg_128x128.png",
+    ranger_1 = "green_bg_128x128.png",
+    ranger_2 = "blue_bg_128x128.png",
+    ranger_3 = "purple_bg_128x128.png",
+    catapult_1 = "green_bg_128x128.png",
+    catapult_2 = "blue_bg_128x128.png",
+    catapult_3 = "purple_bg_128x128.png",
+    lancer_1 = "green_bg_128x128.png",
+    lancer_2 = "blue_bg_128x128.png",
+    lancer_3 = "purple_bg_128x128.png",
+    swordsman_1 = "green_bg_128x128.png",
+    swordsman_2 = "blue_bg_128x128.png",
+    swordsman_3 = "purple_bg_128x128.png",
+    sentinel_1 = "green_bg_128x128.png",
+    sentinel_2 = "blue_bg_128x128.png",
+    sentinel_3 = "purple_bg_128x128.png",
+    crossbowman_1 = "green_bg_128x128.png",
+    crossbowman_2 = "blue_bg_128x128.png",
+    crossbowman_3 = "purple_bg_128x128.png",
+    horseArcher_1 = "green_bg_128x128.png",
+    horseArcher_2 = "blue_bg_128x128.png",
+    horseArcher_3 = "purple_bg_128x128.png",
+    ballista_1 = "green_bg_128x128.png",
+    ballista_2 = "blue_bg_128x128.png",
+    ballista_3 = "purple_bg_128x128.png",
+    skeletonWarrior = "purple_bg_128x128.png",
+    skeletonArcher = "purple_bg_128x128.png",
+    deathKnight = "purple_bg_128x128.png",
+    meatWagon = "purple_bg_128x128.png",
+    priest = "purple_bg_128x128.png",
+    demonHunter = "purple_bg_128x128.png",
+    paladin = "purple_bg_128x128.png",
+    steamTank = "purple_bg_128x128.png",
 }
 local BLACK_SOLDIER_COLOR_BG_IMAGES = {
     wall = "red_bg_128x128.png",
-    ranger = "red_bg_128x128.png",
-    catapult = "red_bg_128x128.png",
-    lancer = "red_bg_128x128.png",
-    swordsman = "red_bg_128x128.png",
-    sentinel = "red_bg_128x128.png",
-    crossbowman = "red_bg_128x128.png",
-    horseArcher = "red_bg_128x128.png",
-    ballista = "red_bg_128x128.png",
-    skeletonWarrior = "green_bg_128x128.png",
-    skeletonArcher = "green_bg_128x128.png",
-    deathKnight = "green_bg_128x128.png",
-    meatWagon = "green_bg_128x128.png",
-    priest = "green_bg_128x128.png",
-    demonHunter = "green_bg_128x128.png",
-    paladin = "green_bg_128x128.png",
-    steamTank = "green_bg_128x128.png",
+   ranger_1 = "green_bg_128x128.png",
+    ranger_2 = "blue_bg_128x128.png",
+    ranger_3 = "purple_bg_128x128.png",
+    catapult_1 = "green_bg_128x128.png",
+    catapult_2 = "blue_bg_128x128.png",
+    catapult_3 = "purple_bg_128x128.png",
+    lancer_1 = "green_bg_128x128.png",
+    lancer_2 = "blue_bg_128x128.png",
+    lancer_3 = "purple_bg_128x128.png",
+    swordsman_1 = "green_bg_128x128.png",
+    swordsman_2 = "blue_bg_128x128.png",
+    swordsman_3 = "purple_bg_128x128.png",
+    sentinel_1 = "green_bg_128x128.png",
+    sentinel_2 = "blue_bg_128x128.png",
+    sentinel_3 = "purple_bg_128x128.png",
+    crossbowman_1 = "green_bg_128x128.png",
+    crossbowman_2 = "blue_bg_128x128.png",
+    crossbowman_3 = "purple_bg_128x128.png",
+    horseArcher_1 = "green_bg_128x128.png",
+    horseArcher_2 = "blue_bg_128x128.png",
+    horseArcher_3 = "purple_bg_128x128.png",
+    ballista_1 = "green_bg_128x128.png",
+    ballista_2 = "blue_bg_128x128.png",
+    ballista_3 = "purple_bg_128x128.png",
+    skeletonWarrior = "purple_bg_128x128.png",
+    skeletonArcher = "purple_bg_128x128.png",
+    deathKnight = "purple_bg_128x128.png",
+    meatWagon = "purple_bg_128x128.png",
+    priest = "purple_bg_128x128.png",
+    demonHunter = "purple_bg_128x128.png",
+    paladin = "purple_bg_128x128.png",
+    steamTank = "purple_bg_128x128.png",
 }
 local BLACK_SOLDIER_IMAGES = {
-    ranger = {
-        "ranger_1.png",
-        "b_ranger_2.png",
-        "b_ranger_3.png",
-    },
-    catapult = {
-        "catapult_1.png",
-        "b_catapult_2.png",
-        "b_catapult_3.png",
-    },
-    lancer = {
-        "lancer_1.png",
-        "b_lancer_2.png",
-        "b_lancer_3.png",
-    },
-    swordsman = {
-        "swordsman_1.png",
-        "b_swordsman_2.png",
-        "b_swordsman_3.png",
-    },
-    sentinel = {
-        "sentinel_1.png",
-        "b_sentinel_2.png",
-        "b_sentinel_3.png",
-    },
-    crossbowman = {
-        "crossbowman_1.png",
-        "b_crossbowman_2.png",
-        "b_crossbowman_3.png",
-    },
-    horseArcher = {
-        "horseArcher_1.png",
-        "b_horseArcher_2.png",
-        "b_horseArcher_3.png",
-    },
-    ballista = {
-        "ballista_1.png",
-        "b_ballista_2.png",
-        "b_ballista_3.png",
-    },
+    ranger_1 = "ranger_1.png",
+    ranger_2 = "b_ranger_2.png",
+    ranger_3 = "b_ranger_3.png",
+    
+    catapult_1 = "catapult_1.png",
+    catapult_2 = "b_catapult_2.png",
+    catapult_3 = "b_catapult_3.png",
+    
+    lancer_1 = "lancer_1.png",
+    lancer_2 = "b_lancer_2.png",
+    lancer_3 = "b_lancer_3.png",
 
-    skeletonWarrior = {
-        "skeletonWarrior.png",
-        "skeletonWarrior.png",
-        "skeletonWarrior.png",
-    },
-    skeletonArcher = {
-        "skeletonArcher.png",
-        "skeletonArcher.png",
-        "skeletonArcher.png",
-    },
-    deathKnight = {
-        "deathKnight.png",
-        "deathKnight.png",
-        "deathKnight.png",
-    },
-    meatWagon = {
-        "meatWagon.png",
-        "meatWagon.png",
-        "meatWagon.png",
-    },
+    swordsman_1 = "swordsman_1.png",
+    swordsman_2 = "b_swordsman_2.png",
+    swordsman_3 = "b_swordsman_3.png",
+
+    sentinel_1 = "sentinel_1.png",
+    sentinel_2 = "b_sentinel_2.png",
+    sentinel_3 = "b_sentinel_3.png",
+    
+    crossbowman_1 = "crossbowman_1.png",
+    crossbowman_2 = "b_crossbowman_2.png",
+    crossbowman_3 = "b_crossbowman_3.png",
+    
+    horseArcher_1 = "horseArcher_1.png",
+    horseArcher_2 = "b_horseArcher_2.png",
+    horseArcher_3 = "b_horseArcher_3.png",
+
+    ballista_1 = "ballista_1.png",
+    ballista_2 = "b_ballista_2.png",
+    ballista_3 = "b_ballista_3.png",
+   
+    skeletonWarrior = "skeletonWarrior.png",
+    skeletonArcher = "skeletonArcher.png",
+    deathKnight = "deathKnight.png",
+    meatWagon = "meatWagon.png",
+
+    priest = "skeletonWarrior.png",
+    demonHunter = "skeletonArcher.png",
+    paladin = "deathKnight.png",
+    steamTank = "meatWagon.png",
+
     wall = {
         "gate_1.png",
         "gate_2.png",
         "gate_3.png",
-    }
-}
-local DRAGON_ANIMATIONS_FILES = {
-    redDragon = {
-        "animations/red_long.ExportJson"
-    },
-    blueDragon = {
-        "animations/blue_long.ExportJson"
-    },
-    greenDragon = {
-        "animations/green_long.ExportJson"
     }
 }
 local DECORATOR_IMAGE = {
@@ -748,10 +555,6 @@ local ITEM = {
     sweepScroll = "sweep_128x128.png",
 }
 
-local SOLDIER_ANIMATIONS = getAniNameFromAnimationFiles(SOLDIER_ANIMATION_FILES)
-local SOLDIER_EFFECT_ANIMATIONS = getAniNameFromAnimationFiles(EFFECT_ANIMATION_FILES)
-local DRAGON_ANIMATIONS = getAniNameFromAnimationFiles(DRAGON_ANIMATIONS_FILES)
-
 local ALLIANCE_BUILDING = {
     palace = "alliance_palace.png",
     shrine = "alliance_shrine_1.png",
@@ -773,102 +576,6 @@ local DAILY_TASK_ICON = {
     brotherClub = "Icon_brotherClub_122x124.png",
     growUp = "Icon_growUp_108x115.png"
 }
-local SpriteConfig = import("..sprites.SpriteConfig")
-local PVE_ANIMATION_FILES = {
-    "animations/lanse.ExportJson",
-    
-    "animations/yewaiyindi.ExportJson",
-    "animations/zhihuishi.ExportJson",
-
-    "animations/heihua_bubing_2.ExportJson",
-    "animations/heihua_bubing_3.ExportJson",
-    "animations/heihua_gongjianshou_2.ExportJson",
-    "animations/heihua_gongjianshou_3.ExportJson",
-    "animations/heihua_nuche_2.ExportJson",
-    "animations/heihua_nuche_3.ExportJson",
-    "animations/heihua_nugongshou_2.ExportJson",
-    "animations/heihua_nugongshou_3.ExportJson",
-    "animations/heihua_qibing_2.ExportJson",
-    "animations/heihua_qibing_3.ExportJson",
-    "animations/heihua_shaobing_2.ExportJson",
-    "animations/heihua_shaobing_3.ExportJson",
-    "animations/heihua_toushiche_2.ExportJson",
-    "animations/heihua_toushiche_3.ExportJson",
-    "animations/heihua_youqibing_2.ExportJson",
-    "animations/heihua_youqibing_3.ExportJson",
-    "animations/heilong.ExportJson",
-}
-
-local function loadUIAnimation()
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _,file in pairs(UI_ANIMATION_FILES) do
-        manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH(file))
-    end
-end
-
-local function loadBuildingAnimation()
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _,all_files in pairs(BUILDING_ANIMATIONS_FILES) do
-        for _,ani_file in pairs(all_files) do
-            manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH(ani_file))
-        end
-    end
-end
-local function unLoadBuildingAnimation()
--- local manager = ccs.ArmatureDataManager:getInstance()
--- for _,all_files in pairs(BUILDING_ANIMATIONS_FILES) do
---     for _,ani_file in pairs(all_files) do
---         manager:removeArmatureFileInfo(ani_file)
---     end
--- end
-end
---
-local function loadSolidersAnimation()
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _,all_files in pairs(SOLDIER_ANIMATION_FILES) do
-        for _,ani_file in pairs(all_files) do
-            manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH(ani_file))
-        end
-    end
-end
-local function unLoadSolidersAnimation()
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _,all_files in pairs(SOLDIER_ANIMATION_FILES) do
-        for _,ani_file in pairs(all_files) do
-            manager:removeArmatureFileInfo(DEBUG_GET_ANIMATION_PATH(ani_file))
-        end
-    end
-end
-
-local function loadPveAnimation()
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _,ani_file in pairs(PVE_ANIMATION_FILES) do
-        manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH(ani_file))
-    end
-end
-local function unLoadPveAnimation()
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _,all_files in pairs(PVE_ANIMATION_FILES) do
-        manager:removeArmatureFileInfo(DEBUG_GET_ANIMATION_PATH(ani_file))
-    end
-end
-
-local function loadDragonAnimation()
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _, anis in pairs(DRAGON_ANIMATIONS_FILES) do
-        for _, v in pairs(anis) do
-            manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH(v))
-        end
-    end
-end
-local function unLoadDragonAnimation()
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _, anis in pairs(DRAGON_ANIMATIONS_FILES) do
-        for _, v in pairs(anis) do
-            manager:removeArmatureFileInfo(DEBUG_GET_ANIMATION_PATH(v))
-        end
-    end
-end
 
 
 
@@ -1119,18 +826,12 @@ local ALLIANCE_LANGUAGE_FRAME_1 = {
 
 return {
     resource = RESOURCE,
-    soldier_effect = SOLDIER_EFFECT_ANIMATIONS,
-    effect_animation_files = EFFECT_ANIMATION_FILES,
-    soldier_animation_files = SOLDIER_ANIMATION_FILES,
-    soldier_animation = SOLDIER_ANIMATIONS,
     soldier_image = SOLDIER_IMAGES,
     soldier_color_bg_images = SOLDIER_COLOR_BG_IMAGES,
     black_soldier_color_bg_images = BLACK_SOLDIER_COLOR_BG_IMAGES,
     black_soldier_image = BLACK_SOLDIER_IMAGES,
     dragon_head  = DRAGON_HEAD,
     small_dragon_head  = SMALL_DRAGON_HEAD,
-    dragon_animations = DRAGON_ANIMATIONS,
-    dragon_animations_files = DRAGON_ANIMATIONS_FILES,
     decorator_image = DECORATOR_IMAGE,
     materials = MATERIALS,
     dragon_material_pic_map = DRAGON_MATERIAL_PIC_MAP,
@@ -1140,17 +841,6 @@ return {
     buff = BUFF,
     item = ITEM,
     daily_task_icon = DAILY_TASK_ICON,
-    building_animations = BUILDING_ANIMATIONS,
-    building_animations_files = BUILDING_ANIMATIONS_FILES,
-    loadUIAnimation = loadUIAnimation,
-    loadBuildingAnimation = loadBuildingAnimation,
-    unLoadBuildingAnimation = unLoadBuildingAnimation,
-    loadSolidersAnimation = loadSolidersAnimation,
-    unLoadSolidersAnimation = unLoadSolidersAnimation,
-    loadPveAnimation = loadPveAnimation,
-    unLoadPveAnimation = unLoadPveAnimation,
-    loadDragonAnimation = loadDragonAnimation,
-    unLoadDragonAnimation = unLoadDragonAnimation,
     iap_package_image = IAP_PACKAGE_IMAGE,
     produc_tiontechs_image = PRODUC_TIONTECHS_IMAGE,
     getDragonEquipmentImage = GET_DRAGON_EQUIPMENT_IMAGE,

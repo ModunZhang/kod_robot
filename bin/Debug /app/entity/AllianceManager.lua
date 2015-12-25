@@ -398,20 +398,20 @@ function AllianceManager:RefreshAllianceSceneIf(old_alliance_status)
                     })
                 end
             end
-        elseif scene_name == 'MainScene' then
-            if not self.tipUserWar then
-                self.tipUserWar = true
-                local dialog = UIKit:getMessageDialogWithParams({
-                    content = _("联盟对战已开始，您将进入自己联盟对战地图。"),
-                    ok_callback = function()
-                        app:EnterMyAllianceScene()
-                    end,
-                    cancel_callback = function()end,
-                    auto_close = false,
-                    user_data = '__alliance_war_tips__'
-                })
-                UIKit:addMessageDialogWillShow(dialog)
-            end
+        -- elseif scene_name == 'MainScene' then
+        --     if not self.tipUserWar then
+        --         self.tipUserWar = true
+        --         local dialog = UIKit:getMessageDialogWithParams({
+        --             content = _("联盟对战已开始，您将进入自己联盟对战地图。"),
+        --             ok_callback = function()
+        --                 app:EnterMyAllianceScene()
+        --             end,
+        --             cancel_callback = function()end,
+        --             auto_close = false,
+        --             user_data = '__alliance_war_tips__'
+        --         })
+        --         UIKit:addMessageDialogWillShow(dialog)
+        --     end
         end
     end
 

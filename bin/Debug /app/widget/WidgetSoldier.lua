@@ -46,10 +46,10 @@ function WidgetSoldier:GetBgAndPng(soldierName, soldierStar, isPveSoldier)
 	local soldier_bg, soldier_png
 	if isPveSoldier and soldierStar >= 2 and not special[soldierName] then
 		soldier_bg = "red_bg_128x128.png"
-		soldier_png = UILib.black_soldier_image[soldierName][soldierStar]
+		soldier_png = UILib.black_soldier_image[soldierName]
 	else
 		soldier_bg = UILib.soldier_color_bg_images[soldierName]
-		soldier_png = UILib.soldier_image[soldierName][soldierStar]
+		soldier_png = UILib.soldier_image[soldierName]
 	end
 	return soldier_bg, soldier_png
 end

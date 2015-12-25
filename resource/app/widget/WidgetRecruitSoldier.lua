@@ -545,7 +545,7 @@ end
 function WidgetRecruitSoldier:GetConfigBySoldierTypeAndStar(soldier_name, star)
     local soldier_name_with_star = soldier_name..(star == nil and "" or string.format("_%d", star))
     local soldier_config = NORMAL[soldier_name_with_star] == nil and SPECIAL[soldier_name] or NORMAL[soldier_name_with_star]
-    local soldier_ui_config = UILib.soldier_image[soldier_name][star]
+    local soldier_ui_config = UILib.soldier_image[soldier_name]
     return soldier_config, soldier_ui_config
 end
 function WidgetRecruitSoldier:align(anchorPoint, x, y)

@@ -42,11 +42,6 @@ end
 
 function GameUIStrikePlayer:ReloadDragon()
 	local dragon = self:GetDragon()
-	local x = 257
-	if dragon:Type() == 'redDragon' then
-		x = 307
-	end
-	self.dragon_sprite:setPositionX(x)
 	self.dragon_sprite:ReloadSpriteCauseTerrainChanged(dragon:Type())
 end
 
@@ -81,12 +76,8 @@ function GameUIStrikePlayer:BuildUI()
 		size = 20,
 		color = 0xffedae,
 	}):align(display.CENTER, 310, 20):addTo(info_layer)
-    local x,y = 257,200
-    if self:GetDragon():Type() == 'redDragon' then
-            x = 307
-            y = 200
-    end
-    self.dragon_sprite = DragonSprite.new(display.getRunningScene():GetSceneLayer(),self:GetDragon():Type()):addTo(clipNode):align(display.CENTER, x,y):scale(0.7)
+    self.dragon_sprite = DragonSprite.new(display.getRunningScene():GetSceneLayer(),self:GetDragon():Type())
+    					:addTo(clipNode):align(display.CENTER, 300, 100):scale(0.7)
 	self.list_view = UIListView.new ({
         viewRect = cc.rect(window.left+40,window.bottom + 85,window.width-80,475),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
@@ -113,7 +104,7 @@ function GameUIStrikePlayer:BuildUI()
 					UIKit:showMessageDialogWithParams({
 	        			content = _("没有空闲的行军队列"),
 	        			ok_callback = function()
-	        				UIKit:newGameUI('GameUIWathTowerRegion',City,'march'):AddToCurrentScene(true)
+	        				UIKit:newGameUI('GameUIWatchTower',City,'march'):AddToCurrentScene(true)
 	        			end,
 	        			ok_string = _("前往解锁")
 	    			})
@@ -225,7 +216,7 @@ function GameUIStrikePlayer:CheckDragonIsFree()
 	    return false
 	end
 	if dragon:IsDefenced() then
-		 NetManager:getCancelDefenceDragonPromise():done(function()
+		 NetManager:getCancelDefenceTroopPromise():done(function()
 		 	self:SendDataToServer()
 		 end)
 		 return

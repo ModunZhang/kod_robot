@@ -60,8 +60,8 @@ function GameUIHome:FadeToSelf(isFullDisplay)
         })
     end
 end
-local red_color = UIKit:hex2c4b(0xff3c00)
-local normal_color = UIKit:hex2c4b(0xf3f0b6)
+local red_color = 0xff3c00
+local normal_color = 0xf3f0b6
 function GameUIHome:ctor(city)
     GameUIHome.super.ctor(self,{type = UIKit.UITYPE.BACKGROUND})
     self.city = city
@@ -88,17 +88,17 @@ function GameUIHome:onEnter()
 
     scheduleAt(self, function()
         local User = self.city:GetUser()
-        self.wood_label:setString(GameUtils:formatNumber(User:GetResValueByType("wood")))
-        self.food_label:setString(GameUtils:formatNumber(User:GetResValueByType("food")))
-        self.iron_label:setString(GameUtils:formatNumber(User:GetResValueByType("iron")))
-        self.stone_label:setString(GameUtils:formatNumber(User:GetResValueByType("stone")))
-        self.citizen_label:setString(GameUtils:formatNumber(User:GetResValueByType("citizen")))
-        self.coin_label:setString(GameUtils:formatNumber(User:GetResValueByType("coin")))
-        self.gem_label:setString(string.formatnumberthousands(User:GetResValueByType("gem")))
-        self.wood_label:setColor(User:IsResOverLimit("wood") and red_color or normal_color)
-        self.food_label:setColor(User:IsResOverLimit("food") and red_color or normal_color)
-        self.iron_label:setColor(User:IsResOverLimit("iron") and red_color or normal_color)
-        self.stone_label:setColor(User:IsResOverLimit("stone") and red_color or normal_color)
+        self.wood_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("wood")))
+        self.food_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("food")))
+        self.iron_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("iron")))
+        self.stone_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("stone")))
+        self.citizen_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("citizen")))
+        self.coin_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("coin")))
+        self.gem_label:SetNumString(string.formatnumberthousands(User:GetResValueByType("gem")))
+        self.wood_label:SetNumColor(User:IsResOverLimit("wood") and red_color or normal_color)
+        self.food_label:SetNumColor(User:IsResOverLimit("food") and red_color or normal_color)
+        self.iron_label:SetNumColor(User:IsResOverLimit("iron") and red_color or normal_color)
+        self.stone_label:SetNumColor(User:IsResOverLimit("stone") and red_color or normal_color)
     end)
 end
 function GameUIHome:onExit()
@@ -141,8 +141,8 @@ end
 function GameUIHome:RefreshData()
     local user = self.city:GetUser()
     self.name_label:setString(user.basicInfo.name)
-    self.power_label:setString(string.formatnumberthousands(user.basicInfo.power))
-    self.level_label:setString(user:GetLevel())
+    self.power_label:SetNumString(string.formatnumberthousands(user.basicInfo.power))
+    self.level_label:SetNumString(user:GetLevel())
 end
 
 
@@ -186,18 +186,16 @@ function GameUIHome:CreateTop()
     }):addTo(top_bg):align(display.LEFT_CENTER, ox + 30, 65)
 
     -- 玩家战斗值数字
-    self.power_label = UIKit:ttfLabel({
+    self.power_label = UIKit:CreateNumberImageNode({
         text = "",
         size = 20,
         color = 0xf3f0b6,
-        shadow = true
     }):addTo(top_bg):align(display.LEFT_CENTER, ox + 14, 42)
 
-    self.shadow_power_label = UIKit:ttfLabel({
+    self.shadow_power_label = UIKit:CreateNumberImageNode({
         text = "",
         size = 20,
         color = 0xf3f0b6,
-        shadow = true
     }):addTo(top_bg):align(display.LEFT_CENTER, ox + 14, 42):hide()
 
     -- 资源按钮
@@ -230,11 +228,10 @@ function GameUIHome:CreateTop()
         local x, y = first_col + col * padding_width, first_row - (row * padding_height)
         self.res_icon_map[v[3]] = display.newSprite(v[1]):addTo(button):pos(x, y):scale(0.3)
 
-        self[v[2]] = UIKit:ttfLabel({text = "",
+        self[v[2]] = UIKit:CreateNumberImageNode({text = "",
             size = 18,
             color = 0xf3f0b6,
-            shadow = true
-        }):addTo(button):pos(x + label_padding, y)
+        }):addTo(button):align(display.LEFT_CENTER,x + label_padding, y)
     end
 
     -- 玩家信息背景
@@ -249,12 +246,11 @@ function GameUIHome:CreateTop()
     self:RefreshExp()
 
     local level_bg = display.newSprite("level_bg_72x19.png"):addTo(player_bg):pos(55, 18):setCascadeOpacityEnabled(true)
-    self.level_label = UIKit:ttfLabel({
-        text = "",
-        size = 14,
-        color = 0xfff1cc,
-        shadow = true,
-    }):addTo(level_bg):align(display.CENTER, 37, 11)
+    self.level_label = UIKit:CreateNumberImageNode({text = "",
+            size = 16,
+            color = 0xfff1cc,
+        }):addTo(level_bg):align(display.CENTER, 37, 9)
+    
 
     -- vip
     local vip_btn = cc.ui.UIPushButton.new(
@@ -282,10 +278,15 @@ function GameUIHome:CreateTop()
     local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(button):pos(60, 3)
     light_gem():addTo(gem_icon, 1022):pos(62/2, 61/2)
 
-    self.gem_label = UIKit:ttfLabel({
+    -- self.gem_label = UIKit:ttfLabel({
+    --     size = 20,
+    --     color = 0xffd200,
+    -- }):addTo(button):align(display.CENTER, -30, 8)
+    self.gem_label = UIKit:CreateNumberImageNode({
         size = 20,
         color = 0xffd200,
     }):addTo(button):align(display.CENTER, -30, 8)
+
 
     -- 任务条
     local quest_bar_bg = cc.ui.UIPushButton.new(
@@ -395,7 +396,7 @@ local POWER_ANI_TAG = 1001
 function GameUIHome:ShowPowerAni(wp, old_power)
     local pnt = self.top
     self.power_label:hide()
-    self.shadow_power_label:show():setString(string.formatnumberthousands(old_power))
+    self.shadow_power_label:show():SetNumString(string.formatnumberthousands(old_power))
 
     pnt:removeChildByTag(POWER_ANI_TAG)
     local tp = pnt:convertToNodeSpace(self.power_label:convertToWorldSpace(cc.p(0,0)))
@@ -412,7 +413,7 @@ function GameUIHome:ShowPowerAni(wp, old_power)
     emitter:runAction(transition.sequence{
         cc.MoveTo:create(time, cc.p(tp.x, tp.y)),
         cc.CallFunc:create(function()
-            self:ScaleIcon(self.power_label:show())
+            self:ScaleIcon(self.power_label:show(),self.power_label:getScale())
             self.shadow_power_label:hide()
         end),
         cc.DelayTime:create(delay_time),

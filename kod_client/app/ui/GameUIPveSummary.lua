@@ -298,7 +298,6 @@ function GameUIPveSummary:BuildDefeatUI(param)
         UIKit:newGameUI("GameUIDragonEyrieMain", City, City:GetFirstBuildingByType("dragonEyrie"), "dragon"):AddToCurrentScene(true)
         self:LeftButtonClicked()
     end)
-    -- display.newSprite("dragonEyrie.png"):addTo(dragon):scale(0.3):pos(-150, 0)
     local dragon_bg = display.newSprite("dragon_bg_114x114.png"):addTo(dragon):pos(-180, 0)
     self.dragon_img = display.newSprite(UILib.dragon_head[param.dragonType])
         :align(display.CENTER, dragon_bg:getContentSize().width/2, dragon_bg:getContentSize().height/2+5):addTo(dragon_bg)
@@ -327,7 +326,7 @@ function GameUIPveSummary:BuildDefeatUI(param)
         self:LeftButtonClicked()
     end)
 
-    WidgetSoldier.new("swordsman", 1):addTo(barracks):pos(-180, 0):scale(0.8)
+    WidgetSoldier.new("swordsman_1", 1):addTo(barracks):pos(-180, 0):scale(0.8)
 
     UIKit:ttfLabel({
         text = _("兵营"),

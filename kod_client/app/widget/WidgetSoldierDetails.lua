@@ -65,7 +65,7 @@ function WidgetSoldierDetails:InitSoldierDetails()
         size = 24,
         color = UIKit:hex2c3b(0xffedae)
     }):addTo(title_blue):align(display.LEFT_CENTER, 15, title_size.height/2)
-    local soldier_ui_config = UILib.soldier_image[soldier_type][self.soldier_level]
+    local soldier_ui_config = UILib.soldier_image[soldier_type]
 
 
     display.newSprite(UILib.soldier_color_bg_images[soldier_type]):addTo(bg)

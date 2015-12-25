@@ -60,7 +60,7 @@ function GameUIShop:onEnter()
             if device.platform == 'ios' then
                 ext.clearOpenUdid()
                 app:restart()
-            elseif device.platform == 'mac' then
+            elseif device.platform == 'mac' or device.platform == 'windows' then
                  device.showAlert("提示","改代码!",{_("确定")})
             end
         end)
@@ -603,7 +603,7 @@ function GameUIShop:onEnter()
         :align(display.CENTER, window.left + 500, window.top - 1300)
         :onButtonClicked(function(event)
             cocos_promise.promiseWithCatchError(
-                NetManager:getSetDefenceDragonPromise("redDragon")
+                NetManager:getSetDefenceTroopPromise("redDragon")
             )
         end)
     WidgetPushButton.new(

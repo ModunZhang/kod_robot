@@ -10,7 +10,7 @@ end
 --fte
 local WidgetFteArrow = import("..widget.WidgetFteArrow")
 function GameUIFteBarracks:Find()
-    return self.soldier_map["swordsman"]
+    return self.soldier_map["swordsman_1"]
 end
 function GameUIFteBarracks:PromiseOfFte()
     self.list_view:getScrollNode():setTouchEnabled(false)

@@ -37,7 +37,7 @@ function GameUIShareReport:onEnter()
         local monster_data = report:GetEnemyPlayerData().soldiers[1]
         local soldier_type = monster_data.name
         local soldier_star = monster_data.star
-        local soldier_ui_config = UILib.black_soldier_image[soldier_type][tonumber(soldier_star)]
+        local soldier_ui_config = UILib.black_soldier_image[soldier_type]
 
         display.newSprite(UILib.black_soldier_color_bg_images[soldier_type]):addTo(report_content_bg)
             :align(display.CENTER_TOP,200, 96):scale(80/128)

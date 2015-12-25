@@ -53,6 +53,7 @@ function TouchJudgment:UpdateResistanceTime(millisecond)
         end
         self.touch_handle:OnTouchExtend(old_speed_x, old_speed_y, new_speed_x, new_speed_y, millisecond, self.has_reduced_factor < 0.02)
     else
+        self.touch_handle:OnTouchExtend(self.speed.x, self.speed.y, 0, 0, millisecond, true)
         self:ResetTouch()
     end
 end
@@ -86,7 +87,9 @@ function TouchJudgment:OnTouchMove(pre_x, pre_y, x, y)
             end
         end
     end
-    self.touch_handle:OnTouchMove(pre_x, pre_y, x, y)
+    if pre_x ~= x or pre_y ~= y then
+        self.touch_handle:OnTouchMove(pre_x, pre_y, x, y)
+    end
     local touch = self.one_touch_begin
     if touch then
         local is_finger_moved = math.abs(touch.x - x) > move_judgment_distance or math.abs(touch.y - y) > move_judgment_distance

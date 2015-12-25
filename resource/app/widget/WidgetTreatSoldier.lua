@@ -20,47 +20,10 @@ local WidgetTreatSoldier = class("WidgetTreatSoldier", function(...)
 end)
 local NORMAL = GameDatas.Soldiers.normal
 local SPECIAL = GameDatas.Soldiers.special
+local soldier_vs = GameDatas.ClientInitGame.soldier_vs
 local app = app
 local timer = app.timer
-local SOLDIER_CATEGORY_MAP = {
-    ["swordsman"] = "infantry",
-    ["sentinel"] = "infantry",
-    ["skeletonWarrior"] = "infantry",
 
-    ["ranger"] = "archer",
-    ["crossbowman"] = "archer",
-    ["skeletonArcher"] = "archer",
-
-    ["lancer"] = "cavalry",
-    ["horseArcher"] = "cavalry",
-    ["deathKnight"] = "cavalry",
-
-    ["catapult"] = "siege",
-    ["ballista"] = "siege",
-    ["meatWagon"] = "siege",
-}
-local SOLDIER_VS_MAP = {
-    ["infantry"] = {
-        strong_vs = { "siege", "wall" },
-        weak_vs = { "cavalry", "archer" }
-    },
-    ["archer"] = {
-        strong_vs = { "cavalry", "infantry" },
-        weak_vs = { "wall", "siege" }
-    },
-    ["cavalry"] = {
-        strong_vs = { "infantry", "siege" },
-        weak_vs = { "archer", "wall" }
-    },
-    ["siege"] = {
-        strong_vs = { "wall", "archer" },
-        weak_vs = { "infantry", "cavalry" }
-    },
-    ["wall"] = {
-        strong_vs = { "archer", "cavalry" },
-        weak_vs = { "siege", "infantry"}
-    }
-}
 local SOLDIER_LOCALIZE_MAP = {
     ["infantry"] = _("步兵"),
     ["archer"] = _("弓手"),
@@ -70,7 +33,16 @@ local SOLDIER_LOCALIZE_MAP = {
 }
 
 local function return_vs_soldiers_map(soldier_type)
-    return SOLDIER_VS_MAP[SOLDIER_CATEGORY_MAP[soldier_type]]
+    local strong_vs = {}
+    local weak_vs = {}
+    for k, v in pairs(soldier_vs[DataUtils:GetSoldierTypeByName(soldier_type)]) do
+        if v == "strong" then
+            table.insert(strong_vs, k)
+        elseif v == "weak" then
+            table.insert(weak_vs, k)
+        end
+    end
+    return {strong_vs = strong_vs, weak_vs = weak_vs}
 end
 
 function WidgetTreatSoldier:ctor(soldier_type, star, treat_max)
@@ -479,7 +451,7 @@ end
 function WidgetTreatSoldier:GetConfigBySoldierTypeAndStar(soldier_type, star)
     local soldier_type_with_star = soldier_type..(star == nil and "" or string.format("_%d", star))
     local soldier_config = NORMAL[soldier_type_with_star] == nil and SPECIAL[soldier_type] or NORMAL[soldier_type_with_star]
-    local soldier_ui_config = UILib.soldier_image[soldier_type][star]
+    local soldier_ui_config = UILib.soldier_image[soldier_type]
     return soldier_config, soldier_ui_config
 end
 function WidgetTreatSoldier:align(anchorPoint, x, y)

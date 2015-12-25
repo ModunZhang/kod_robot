@@ -291,9 +291,7 @@ function GameUINpc:BuildUI()
         cc.MoveBy:create(0.4, cc.p(5, 0)),
         cc.MoveBy:create(0.4, cc.p(-5, 0))
     }))
-
-    local manager = ccs.ArmatureDataManager:getInstance()
-    manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH("animations/npc_nv.ExportJson"))
+    
     ui_map.woman = ccs.Armature:create("npc_nv"):addTo(ui_map.dialog_bg)
         :align(display.BOTTOM_CENTER, 130, 0):hide()
     ui_map.man = display.newSprite("npc_man.png"):addTo(ui_map.dialog_bg)

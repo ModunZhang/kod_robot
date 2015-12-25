@@ -192,6 +192,7 @@ void pc__client_init(pc_client_t *client) {
   client->host = NULL;
   client->port = -1;
     client->secret = NULL;
+    client->dh = NULL;
 }
 
 /**

@@ -85,15 +85,18 @@ function PVELayerNew:ctor(scene, user, level)
     })
 
     local color = pve_color[self.level]
+    local suffix = device.platform == "winrt" and "png" or "jpg"
+    local img = string.format("pve_background.%s", suffix)
     GameUtils:LoadImagesWithFormat(function()
         self.background = display.newNode():addTo(self)
         for i = 1, 4 do
-            local bg = display.newSprite("pve_background.jpg")
+            local bg = display.newSprite(img)
             :addTo(self.background)
             :align(display.LEFT_BOTTOM, 0, (i-1) * 800)
             bg:setColor(color + cc.c3b(bg:getColor()))
         end
     end, cc.TEXTURE2_D_PIXEL_FORMAT_RG_B565)
+    setAliasTexParametersForKey(img)
 
     self.cloud_layer = display.newNode():addTo(self, 100)
 

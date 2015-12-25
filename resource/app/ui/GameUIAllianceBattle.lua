@@ -138,7 +138,10 @@ function GameUIAllianceBattle:onExit()
 end
 function GameUIAllianceBattle:onCleanup()
     GameUIAllianceBattle.super.onCleanup(self)
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("alliance_battle_bg_612x886.png")
     cc.Director:getInstance():getTextureCache():removeTextureForKey("alliance_battle_bg_612x886.jpg")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("background_550x170.png")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("background_550x170.jpg")
 end
 
 -- function GameUIAllianceBattle:OnTimer(current_time)
@@ -183,7 +186,9 @@ end
 function GameUIAllianceBattle:InitAllianceInfo()
     local layer = self.info_layer
     local alliance = self.alliance
-    local bg_jpg = display.newSprite("background_550x170.jpg"):align(display.CENTER, window.cx, window.top_bottom - 80):addTo(layer)
+
+    local background_550x170 = device.platform == 'winrt' and "background_550x170.png" or "background_550x170.jpg" 
+    local bg_jpg = display.newSprite(background_550x170):align(display.CENTER, window.cx, window.top_bottom - 80):addTo(layer)
 
     local shadow_layer = UIKit:shadowLayer():size(548,44):pos(1,110):addTo(bg_jpg)
     WidgetPushButton.new()
@@ -244,8 +249,8 @@ function GameUIAllianceBattle:InitBattleStatistics()
     local other_alliance = self.other_alliance
     layer:removeAllChildren()
     self.request_num_label = nil
-
-    display.newSprite("alliance_battle_bg_612x886.jpg"):addTo(layer):align(display.TOP_CENTER,window.cx,window.top_bottom+28)
+    local alliance_battle_bg_612x886 = device.platform == 'winrt' and "alliance_battle_bg_612x886.png" or "alliance_battle_bg_612x886.jpg" 
+    display.newSprite(alliance_battle_bg_612x886):addTo(layer):align(display.TOP_CENTER,window.cx,window.top_bottom+28)
     local status = alliance.basicInfo.status
     -- local status = ""
     if status == "peace" or status == "protect" then

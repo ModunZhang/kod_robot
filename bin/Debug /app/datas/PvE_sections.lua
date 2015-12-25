@@ -7,7 +7,7 @@ sections["1_1"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_1,lancer_1_8,ranger_1_12,catapult_1_2,swordsman_1_4",
+	["troops"] = "blueDragon:1:1,lancer_1:1:5,ranger_1:1:8,catapult_1:1:2,swordsman_1:1:3",
 	["rewards"] = "resources:wood:2000:25,resources:stone:2000:25,resources:iron:2000:25,resources:food:2000:25"
 }
 sections["1_2"] = {
@@ -17,7 +17,7 @@ sections["1_2"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_1,catapult_1_6,swordsman_1_18,lancer_1_6,ranger_1_6",
+	["troops"] = "blueDragon:1:1,catapult_1:1:7,swordsman_1:1:11,lancer_1:1:4,ranger_1:1:4",
 	["rewards"] = "resources:wood:2000:25,resources:stone:2000:25,resources:iron:2000:25,resources:food:2000:25"
 }
 sections["1_3"] = {
@@ -27,8 +27,8 @@ sections["1_3"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_1,skeletonArcher_2_16,meatWagon_2_3,skeletonWarrior_2_8,deathKnight_2_2",
-	["rewards"] = "soldierMaterials:deathHand:1:25,soldierMaterials:heroBones:1:25,soldierMaterials:soulStone:1:25,soldierMaterials:magicBox:1:25"
+	["troops"] = "blueDragon:1:1,skeletonArcher:3:8,meatWagon:3:3,skeletonWarrior:3:4,deathKnight:3:1",
+	["rewards"] = "soldierMaterials:deathHand:3:25,soldierMaterials:heroBones:3:25,soldierMaterials:soulStone:3:25,soldierMaterials:magicBox:3:25"
 }
 sections["1_4"] = {
 	["sectionName"] = "1_4",
@@ -37,7 +37,7 @@ sections["1_4"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_1,swordsman_1_40,lancer_1_15,ranger_1_20,catapult_1_2",
+	["troops"] = "blueDragon:1:1,swordsman_1:1:24,lancer_1:1:9,ranger_1:1:12,catapult_1:1:3",
 	["rewards"] = "resources:wood:2000:25,resources:stone:2000:25,resources:iron:2000:25,resources:food:2000:25"
 }
 sections["1_5"] = {
@@ -47,7 +47,7 @@ sections["1_5"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_1,horseArcher_1_30,ranger_1_45,catapult_1_7,swordsman_1_15",
+	["troops"] = "blueDragon:1:1,horseArcher_1:1:18,ranger_1:1:27,catapult_1:1:9,swordsman_1:1:9",
 	["rewards"] = "resources:wood:4000:25,resources:stone:4000:25,resources:iron:4000:25,resources:food:4000:25"
 }
 sections["1_6"] = {
@@ -57,8 +57,8 @@ sections["1_6"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,meatWagon_2_10,skeletonWarrior_2_30,deathKnight_2_10,skeletonArcher_2_10",
-	["rewards"] = "soldierMaterials:deathHand:2:25,soldierMaterials:heroBones:2:25,soldierMaterials:soulStone:2:25,soldierMaterials:magicBox:2:25"
+	["troops"] = "blueDragon:1:2,meatWagon:3:10,skeletonWarrior:3:15,deathKnight:3:5,skeletonArcher:3:5",
+	["rewards"] = "soldierMaterials:deathHand:6:25,soldierMaterials:heroBones:6:25,soldierMaterials:soulStone:6:25,soldierMaterials:magicBox:6:25"
 }
 sections["1_7"] = {
 	["sectionName"] = "1_7",
@@ -67,7 +67,7 @@ sections["1_7"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,crossbowman_1_100,catapult_1_18,swordsman_1_50,lancer_1_12",
+	["troops"] = "blueDragon:1:2,crossbowman_1:1:60,catapult_1:1:22,swordsman_1:1:30,lancer_1:1:7",
 	["rewards"] = "resources:wood:4000:25,resources:stone:4000:25,resources:iron:4000:25,resources:food:4000:25"
 }
 sections["1_8"] = {
@@ -77,7 +77,7 @@ sections["1_8"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,sentinel_1_120,lancer_1_45,ranger_1_60,catapult_1_7",
+	["troops"] = "blueDragon:1:2,sentinel_1:1:72,lancer_1:1:27,ranger_1:1:36,catapult_1:1:9",
 	["rewards"] = "resources:wood:4000:25,resources:stone:4000:25,resources:iron:4000:25,resources:food:4000:25"
 }
 sections["1_9"] = {
@@ -87,8 +87,8 @@ sections["1_9"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,deathKnight_2_35,skeletonArcher_2_52,meatWagon_2_8,skeletonWarrior_2_17",
-	["rewards"] = "soldierMaterials:deathHand:3:25,soldierMaterials:heroBones:3:25,soldierMaterials:soulStone:3:25,soldierMaterials:magicBox:3:25"
+	["troops"] = "blueDragon:1:2,deathKnight:3:17,skeletonArcher:3:26,meatWagon:3:8,skeletonWarrior:3:9",
+	["rewards"] = "soldierMaterials:deathHand:9:25,soldierMaterials:heroBones:9:25,soldierMaterials:soulStone:9:25,soldierMaterials:magicBox:9:25"
 }
 sections["1_10"] = {
 	["sectionName"] = "1_10",
@@ -97,7 +97,7 @@ sections["1_10"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,ballista_1_40,sentinel_1_120,lancer_1_40,ranger_1_40",
+	["troops"] = "blueDragon:1:2,ballista_1:1:48,sentinel_1:1:72,lancer_1:1:24,ranger_1:1:24",
 	["rewards"] = "resources:wood:6000:25,resources:stone:6000:25,resources:iron:6000:25,resources:food:6000:25"
 }
 sections["1_11"] = {
@@ -107,7 +107,7 @@ sections["1_11"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,crossbowman_1_180,ballista_1_33,swordsman_1_90,lancer_1_22",
+	["troops"] = "blueDragon:1:2,crossbowman_1:1:108,ballista_1:1:40,swordsman_1:1:54,lancer_1:1:13",
 	["rewards"] = "resources:wood:6000:25,resources:stone:6000:25,resources:iron:6000:25,resources:food:6000:25"
 }
 sections["1_12"] = {
@@ -117,8 +117,8 @@ sections["1_12"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,skeletonWarrior_2_100,deathKnight_2_37,skeletonArcher_2_50,meatWagon_2_6",
-	["rewards"] = "soldierMaterials:deathHand:3:25,soldierMaterials:heroBones:3:25,soldierMaterials:soulStone:3:25,soldierMaterials:magicBox:3:25"
+	["troops"] = "blueDragon:1:2,skeletonWarrior:3:48,deathKnight:3:18,skeletonArcher:3:24,meatWagon:3:6",
+	["rewards"] = "soldierMaterials:deathHand:12:25,soldierMaterials:heroBones:12:25,soldierMaterials:soulStone:12:25,soldierMaterials:magicBox:12:25"
 }
 sections["1_13"] = {
 	["sectionName"] = "1_13",
@@ -127,7 +127,7 @@ sections["1_13"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,horseArcher_1_110,crossbowman_1_165,ballista_1_27,swordsman_1_55",
+	["troops"] = "blueDragon:1:2,horseArcher_1:1:66,crossbowman_1:1:99,ballista_1:1:33,swordsman_1:1:33",
 	["rewards"] = "resources:wood:8000:25,resources:stone:8000:25,resources:iron:8000:25,resources:food:8000:25"
 }
 sections["1_14"] = {
@@ -137,7 +137,7 @@ sections["1_14"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,ballista_1_60,sentinel_1_180,horseArcher_1_60,ranger_1_60",
+	["troops"] = "blueDragon:1:2,ballista_1:1:72,sentinel_1:1:108,horseArcher_1:1:36,ranger_1:1:36",
 	["rewards"] = "resources:wood:8000:25,resources:stone:8000:25,resources:iron:8000:25,resources:food:8000:25"
 }
 sections["1_15"] = {
@@ -147,8 +147,8 @@ sections["1_15"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,skeletonArcher_2_130,meatWagon_2_24,skeletonWarrior_2_65,deathKnight_2_16",
-	["rewards"] = "soldierMaterials:deathHand:4:25,soldierMaterials:heroBones:4:25,soldierMaterials:soulStone:4:25,soldierMaterials:magicBox:4:25"
+	["troops"] = "blueDragon:1:2,skeletonArcher:3:63,meatWagon:3:23,skeletonWarrior:3:32,deathKnight:3:8",
+	["rewards"] = "soldierMaterials:deathHand:15:25,soldierMaterials:heroBones:15:25,soldierMaterials:soulStone:15:25,soldierMaterials:magicBox:15:25"
 }
 sections["1_16"] = {
 	["sectionName"] = "1_16",
@@ -157,7 +157,7 @@ sections["1_16"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,sentinel_1_280,horseArcher_1_105,crossbowman_1_140,catapult_1_17",
+	["troops"] = "blueDragon:1:2,sentinel_1:1:168,horseArcher_1:1:63,crossbowman_1:1:84,catapult_1:1:21",
 	["rewards"] = "resources:wood:8000:25,resources:stone:8000:25,resources:iron:8000:25,resources:food:8000:25"
 }
 sections["1_17"] = {
@@ -167,7 +167,7 @@ sections["1_17"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,horseArcher_1_150,crossbowman_1_225,ballista_1_37,sentinel_1_75",
+	["troops"] = "blueDragon:1:2,horseArcher_1:1:90,crossbowman_1:1:135,ballista_1:1:45,sentinel_1:1:45",
 	["rewards"] = "resources:wood:10000:25,resources:stone:10000:25,resources:iron:10000:25,resources:food:10000:25"
 }
 sections["1_18"] = {
@@ -177,8 +177,8 @@ sections["1_18"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_2,meatWagon_2_40,skeletonWarrior_2_120,deathKnight_2_40,skeletonArcher_2_40",
-	["rewards"] = "soldierMaterials:deathHand:5:25,soldierMaterials:heroBones:5:25,soldierMaterials:soulStone:5:25,soldierMaterials:magicBox:5:25"
+	["troops"] = "blueDragon:1:2,meatWagon:3:38,skeletonWarrior:3:58,deathKnight:3:19,skeletonArcher:3:20",
+	["rewards"] = "soldierMaterials:deathHand:18:25,soldierMaterials:heroBones:18:25,soldierMaterials:soulStone:18:25,soldierMaterials:magicBox:18:25"
 }
 sections["1_19"] = {
 	["sectionName"] = "1_19",
@@ -187,7 +187,7 @@ sections["1_19"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,crossbowman_1_340,ballista_1_63,sentinel_1_170,horseArcher_1_42",
+	["troops"] = "blueDragon:1:3,crossbowman_1:1:204,ballista_1:1:76,sentinel_1:1:102,horseArcher_1:1:25",
 	["rewards"] = "resources:wood:10000:25,resources:stone:10000:25,resources:iron:10000:25,resources:food:10000:25"
 }
 sections["1_20"] = {
@@ -197,7 +197,7 @@ sections["1_20"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,sentinel_1_360,horseArcher_1_135,crossbowman_1_180,ballista_1_22",
+	["troops"] = "blueDragon:1:3,sentinel_1:1:216,horseArcher_1:1:81,crossbowman_1:1:108,ballista_1:1:27",
 	["rewards"] = "resources:wood:10000:25,resources:stone:10000:25,resources:iron:10000:25,resources:food:10000:25"
 }
 sections["1_21"] = {
@@ -207,8 +207,8 @@ sections["1_21"] = {
 	["staminaUsed"] = 6,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,deathKnight_2_88,skeletonArcher_2_142,meatWagon_2_26,skeletonWarrior_2_71",
-	["rewards"] = "soldierMaterials:deathHand:6:25,soldierMaterials:heroBones:6:25,soldierMaterials:soulStone:6:25,soldierMaterials:magicBox:6:25"
+	["troops"] = "blueDragon:1:3,deathKnight:3:46,skeletonArcher:3:69,meatWagon:3:23,skeletonWarrior:3:23",
+	["rewards"] = "soldierMaterials:deathHand:21:25,soldierMaterials:heroBones:21:25,soldierMaterials:soulStone:21:25,soldierMaterials:magicBox:21:25"
 }
 sections["2_1"] = {
 	["sectionName"] = "2_1",
@@ -217,7 +217,7 @@ sections["2_1"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,catapult_1_100,swordsman_1_300,lancer_1_100,ranger_1_100",
+	["troops"] = "blueDragon:1:3,catapult_1:1:120,swordsman_1:1:180,lancer_1:1:60,ranger_1:1:60",
 	["rewards"] = "resources:wood:12000:25,resources:stone:12000:25,resources:iron:12000:25,resources:food:12000:25"
 }
 sections["2_2"] = {
@@ -227,7 +227,7 @@ sections["2_2"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,ranger_1_420,catapult_1_78,swordsman_1_210,lancer_1_52",
+	["troops"] = "blueDragon:1:3,ranger_1:1:252,catapult_1:1:94,swordsman_1:1:126,lancer_1:1:31",
 	["rewards"] = "resources:wood:12000:25,resources:stone:12000:25,resources:iron:12000:25,resources:food:12000:25"
 }
 sections["2_3"] = {
@@ -237,8 +237,8 @@ sections["2_3"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,skeletonWarrior_2_220,deathKnight_2_82,skeletonArcher_2_110,meatWagon_2_13",
-	["rewards"] = "soldierMaterials:deathHand:6:25,soldierMaterials:heroBones:6:25,soldierMaterials:soulStone:6:25,soldierMaterials:magicBox:6:25"
+	["troops"] = "blueDragon:1:3,skeletonWarrior:3:106,deathKnight:3:40,skeletonArcher:3:53,meatWagon:3:13",
+	["rewards"] = "soldierMaterials:deathHand:24:25,soldierMaterials:heroBones:24:25,soldierMaterials:soulStone:24:25,soldierMaterials:magicBox:24:25"
 }
 sections["2_4"] = {
 	["sectionName"] = "2_4",
@@ -247,7 +247,7 @@ sections["2_4"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,horseArcher_1_230,ranger_1_345,catapult_1_57,swordsman_1_115",
+	["troops"] = "blueDragon:1:3,horseArcher_1:1:138,ranger_1:1:207,catapult_1:1:69,swordsman_1:1:69",
 	["rewards"] = "resources:wood:14000:25,resources:stone:14000:25,resources:iron:14000:25,resources:food:14000:25"
 }
 sections["2_5"] = {
@@ -257,7 +257,7 @@ sections["2_5"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,ballista_1_120,swordsman_1_360,lancer_1_120,ranger_1_120",
+	["troops"] = "blueDragon:1:3,ballista_1:1:144,swordsman_1:1:216,lancer_1:1:72,ranger_1:1:72",
 	["rewards"] = "resources:wood:14000:25,resources:stone:14000:25,resources:iron:14000:25,resources:food:14000:25"
 }
 sections["2_6"] = {
@@ -267,8 +267,8 @@ sections["2_6"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,skeletonArcher_2_250,meatWagon_2_46,skeletonWarrior_2_125,deathKnight_2_31",
-	["rewards"] = "soldierMaterials:deathHand:7:25,soldierMaterials:heroBones:7:25,soldierMaterials:soulStone:7:25,soldierMaterials:magicBox:7:25"
+	["troops"] = "blueDragon:1:3,skeletonArcher:3:120,meatWagon:3:45,skeletonWarrior:3:60,deathKnight:3:15",
+	["rewards"] = "soldierMaterials:deathHand:27:25,soldierMaterials:heroBones:27:25,soldierMaterials:soulStone:27:25,soldierMaterials:magicBox:27:25"
 }
 sections["2_7"] = {
 	["sectionName"] = "2_7",
@@ -277,7 +277,7 @@ sections["2_7"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,sentinel_1_520,lancer_1_195,ranger_1_260,catapult_1_32",
+	["troops"] = "blueDragon:1:3,sentinel_1:1:312,lancer_1:1:117,ranger_1:1:156,catapult_1:1:39",
 	["rewards"] = "resources:wood:14000:25,resources:stone:14000:25,resources:iron:14000:25,resources:food:14000:25"
 }
 sections["2_8"] = {
@@ -287,7 +287,7 @@ sections["2_8"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,horseArcher_1_270,crossbowman_1_405,catapult_1_67,swordsman_1_135",
+	["troops"] = "blueDragon:1:3,horseArcher_1:1:162,crossbowman_1:1:243,catapult_1:1:81,swordsman_1:1:81",
 	["rewards"] = "resources:wood:16000:25,resources:stone:16000:25,resources:iron:16000:25,resources:food:16000:25"
 }
 sections["2_9"] = {
@@ -297,8 +297,8 @@ sections["2_9"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,meatWagon_2_70,skeletonWarrior_2_210,deathKnight_2_70,skeletonArcher_2_70",
-	["rewards"] = "soldierMaterials:deathHand:8:25,soldierMaterials:heroBones:8:25,soldierMaterials:soulStone:8:25,soldierMaterials:magicBox:8:25"
+	["troops"] = "blueDragon:1:3,meatWagon:3:67,skeletonWarrior:3:101,deathKnight:3:34,skeletonArcher:3:34",
+	["rewards"] = "soldierMaterials:deathHand:30:25,soldierMaterials:heroBones:30:25,soldierMaterials:soulStone:30:25,soldierMaterials:magicBox:30:25"
 }
 sections["2_10"] = {
 	["sectionName"] = "2_10",
@@ -307,7 +307,7 @@ sections["2_10"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_3,crossbowman_1_580,ballista_1_108,swordsman_1_290,lancer_1_72",
+	["troops"] = "blueDragon:1:3,crossbowman_1:1:348,ballista_1:1:130,swordsman_1:1:174,lancer_1:1:43",
 	["rewards"] = "resources:wood:16000:25,resources:stone:16000:25,resources:iron:16000:25,resources:food:16000:25"
 }
 sections["2_11"] = {
@@ -317,7 +317,7 @@ sections["2_11"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,sentinel_1_600,horseArcher_1_225,ranger_1_300,catapult_1_37",
+	["troops"] = "blueDragon:1:4,sentinel_1:1:360,horseArcher_1:1:135,ranger_1:1:180,catapult_1:1:45",
 	["rewards"] = "resources:wood:16000:25,resources:stone:16000:25,resources:iron:16000:25,resources:food:16000:25"
 }
 sections["2_12"] = {
@@ -327,8 +327,8 @@ sections["2_12"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,deathKnight_2_155,skeletonArcher_2_232,meatWagon_2_38,skeletonWarrior_2_77",
-	["rewards"] = "soldierMaterials:deathHand:9:25,soldierMaterials:heroBones:9:25,soldierMaterials:soulStone:9:25,soldierMaterials:magicBox:9:25"
+	["troops"] = "blueDragon:1:4,deathKnight:3:74,skeletonArcher:3:112,meatWagon:3:37,skeletonWarrior:3:38",
+	["rewards"] = "soldierMaterials:deathHand:33:25,soldierMaterials:heroBones:33:25,soldierMaterials:soulStone:33:25,soldierMaterials:magicBox:33:25"
 }
 sections["2_13"] = {
 	["sectionName"] = "2_13",
@@ -337,7 +337,7 @@ sections["2_13"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,ballista_1_160,sentinel_1_480,horseArcher_1_160,ranger_1_160",
+	["troops"] = "blueDragon:1:4,ballista_1:1:192,sentinel_1:1:288,horseArcher_1:1:96,ranger_1:1:96",
 	["rewards"] = "resources:wood:18000:25,resources:stone:18000:25,resources:iron:18000:25,resources:food:18000:25"
 }
 sections["2_14"] = {
@@ -347,7 +347,7 @@ sections["2_14"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,crossbowman_1_660,ballista_1_123,sentinel_1_330,lancer_1_82",
+	["troops"] = "blueDragon:1:4,crossbowman_1:1:396,ballista_1:1:148,sentinel_1:1:198,lancer_1:1:49",
 	["rewards"] = "resources:wood:18000:25,resources:stone:18000:25,resources:iron:18000:25,resources:food:18000:25"
 }
 sections["2_15"] = {
@@ -357,8 +357,8 @@ sections["2_15"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,skeletonWarrior_2_340,deathKnight_2_127,skeletonArcher_2_170,meatWagon_2_21",
-	["rewards"] = "soldierMaterials:deathHand:9:25,soldierMaterials:heroBones:9:25,soldierMaterials:soulStone:9:25,soldierMaterials:magicBox:9:25"
+	["troops"] = "blueDragon:1:4,skeletonWarrior:3:164,deathKnight:3:61,skeletonArcher:3:82,meatWagon:3:20",
+	["rewards"] = "soldierMaterials:deathHand:36:25,soldierMaterials:heroBones:36:25,soldierMaterials:soulStone:36:25,soldierMaterials:magicBox:36:25"
 }
 sections["2_16"] = {
 	["sectionName"] = "2_16",
@@ -367,7 +367,7 @@ sections["2_16"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,horseArcher_1_350,crossbowman_1_525,ballista_1_87,sentinel_1_175",
+	["troops"] = "blueDragon:1:4,horseArcher_1:1:210,crossbowman_1:1:315,ballista_1:1:105,sentinel_1:1:105",
 	["rewards"] = "resources:wood:20000:25,resources:stone:20000:25,resources:iron:20000:25,resources:food:20000:25"
 }
 sections["2_17"] = {
@@ -377,7 +377,7 @@ sections["2_17"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,ballista_1_180,sentinel_1_540,horseArcher_1_180,crossbowman_1_180",
+	["troops"] = "blueDragon:1:4,ballista_1:1:216,sentinel_1:1:324,horseArcher_1:1:108,crossbowman_1:1:108",
 	["rewards"] = "resources:wood:20000:25,resources:stone:20000:25,resources:iron:20000:25,resources:food:20000:25"
 }
 sections["2_18"] = {
@@ -387,8 +387,8 @@ sections["2_18"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,skeletonArcher_2_370,meatWagon_2_69,skeletonWarrior_2_185,deathKnight_2_46",
-	["rewards"] = "soldierMaterials:deathHand:10:25,soldierMaterials:heroBones:10:25,soldierMaterials:soulStone:10:25,soldierMaterials:magicBox:10:25"
+	["troops"] = "blueDragon:1:4,skeletonArcher:3:178,meatWagon:3:67,skeletonWarrior:3:89,deathKnight:3:22",
+	["rewards"] = "soldierMaterials:deathHand:39:25,soldierMaterials:heroBones:39:25,soldierMaterials:soulStone:39:25,soldierMaterials:magicBox:39:25"
 }
 sections["2_19"] = {
 	["sectionName"] = "2_19",
@@ -397,7 +397,7 @@ sections["2_19"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,sentinel_1_760,horseArcher_1_285,crossbowman_1_380,ballista_1_47",
+	["troops"] = "blueDragon:1:4,sentinel_1:1:456,horseArcher_1:1:171,crossbowman_1:1:228,ballista_1:1:57",
 	["rewards"] = "resources:wood:20000:25,resources:stone:20000:25,resources:iron:20000:25,resources:food:20000:25"
 }
 sections["2_20"] = {
@@ -407,7 +407,7 @@ sections["2_20"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,lancer_1_390,ranger_1_585,catapult_1_97,swordsman_1_195",
+	["troops"] = "blueDragon:1:4,lancer_1:1:234,ranger_1:1:351,catapult_1:1:117,swordsman_1:1:117",
 	["rewards"] = "resources:wood:22000:25,resources:stone:22000:25,resources:iron:22000:25,resources:food:22000:25"
 }
 sections["2_21"] = {
@@ -417,8 +417,8 @@ sections["2_21"] = {
 	["staminaUsed"] = 6,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_1_4,meatWagon_2_93,skeletonWarrior_2_300,deathKnight_2_112,skeletonArcher_2_150",
-	["rewards"] = "soldierMaterials:deathHand:11:25,soldierMaterials:heroBones:11:25,soldierMaterials:soulStone:11:25,soldierMaterials:magicBox:11:25"
+	["troops"] = "blueDragon:1:4,meatWagon:3:96,skeletonWarrior:3:144,deathKnight:3:48,skeletonArcher:3:48",
+	["rewards"] = "soldierMaterials:deathHand:42:25,soldierMaterials:heroBones:42:25,soldierMaterials:soulStone:42:25,soldierMaterials:magicBox:42:25"
 }
 sections["3_1"] = {
 	["sectionName"] = "3_1",
@@ -427,7 +427,7 @@ sections["3_1"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_4,ranger_1_820,catapult_1_153,swordsman_1_410,lancer_1_102",
+	["troops"] = "greenDragon:1:4,ranger_1:1:492,catapult_1:1:184,swordsman_1:1:246,lancer_1:1:61",
 	["rewards"] = "resources:wood:22000:25,resources:stone:22000:25,resources:iron:22000:25,resources:food:22000:25"
 }
 sections["3_2"] = {
@@ -437,7 +437,7 @@ sections["3_2"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_4,swordsman_1_840,lancer_1_315,ranger_1_420,catapult_1_52",
+	["troops"] = "greenDragon:1:4,swordsman_1:1:504,lancer_1:1:189,ranger_1:1:252,catapult_1:1:63",
 	["rewards"] = "resources:wood:22000:25,resources:stone:22000:25,resources:iron:22000:25,resources:food:22000:25"
 }
 sections["3_3"] = {
@@ -447,8 +447,8 @@ sections["3_3"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,deathKnight_2_215,skeletonArcher_2_322,meatWagon_2_53,skeletonWarrior_2_107",
-	["rewards"] = "soldierMaterials:deathHand:12:25,soldierMaterials:heroBones:12:25,soldierMaterials:soulStone:12:25,soldierMaterials:magicBox:12:25"
+	["troops"] = "greenDragon:1:5,deathKnight:3:103,skeletonArcher:3:155,meatWagon:3:52,skeletonWarrior:3:52",
+	["rewards"] = "soldierMaterials:deathHand:45:25,soldierMaterials:heroBones:45:25,soldierMaterials:soulStone:45:25,soldierMaterials:magicBox:45:25"
 }
 sections["3_4"] = {
 	["sectionName"] = "3_4",
@@ -457,7 +457,7 @@ sections["3_4"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,ballista_1_220,swordsman_1_660,lancer_1_220,ranger_1_220",
+	["troops"] = "greenDragon:1:5,ballista_1:1:264,swordsman_1:1:396,lancer_1:1:132,ranger_1:1:132",
 	["rewards"] = "resources:wood:24000:25,resources:stone:24000:25,resources:iron:24000:25,resources:food:24000:25"
 }
 sections["3_5"] = {
@@ -467,7 +467,7 @@ sections["3_5"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,crossbowman_1_900,catapult_1_168,swordsman_1_450,lancer_1_112",
+	["troops"] = "greenDragon:1:5,crossbowman_1:1:540,catapult_1:1:202,swordsman_1:1:270,lancer_1:1:67",
 	["rewards"] = "resources:wood:24000:25,resources:stone:24000:25,resources:iron:24000:25,resources:food:24000:25"
 }
 sections["3_6"] = {
@@ -477,8 +477,8 @@ sections["3_6"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,skeletonWarrior_2_460,deathKnight_2_172,skeletonArcher_2_230,meatWagon_2_28",
-	["rewards"] = "soldierMaterials:deathHand:12:25,soldierMaterials:heroBones:12:25,soldierMaterials:soulStone:12:25,soldierMaterials:magicBox:12:25"
+	["troops"] = "greenDragon:1:5,skeletonWarrior:3:221,deathKnight:3:83,skeletonArcher:3:111,meatWagon:3:28",
+	["rewards"] = "soldierMaterials:deathHand:48:25,soldierMaterials:heroBones:48:25,soldierMaterials:soulStone:48:25,soldierMaterials:magicBox:48:25"
 }
 sections["3_7"] = {
 	["sectionName"] = "3_7",
@@ -487,7 +487,7 @@ sections["3_7"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,horseArcher_1_470,crossbowman_1_705,catapult_1_117,swordsman_1_235",
+	["troops"] = "greenDragon:1:5,horseArcher_1:1:282,crossbowman_1:1:423,catapult_1:1:141,swordsman_1:1:141",
 	["rewards"] = "resources:wood:26000:25,resources:stone:26000:25,resources:iron:26000:25,resources:food:26000:25"
 }
 sections["3_8"] = {
@@ -497,7 +497,7 @@ sections["3_8"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,ballista_1_240,sentinel_1_720,lancer_1_240,ranger_1_240",
+	["troops"] = "greenDragon:1:5,ballista_1:1:288,sentinel_1:1:432,lancer_1:1:144,ranger_1:1:144",
 	["rewards"] = "resources:wood:26000:25,resources:stone:26000:25,resources:iron:26000:25,resources:food:26000:25"
 }
 sections["3_9"] = {
@@ -507,8 +507,8 @@ sections["3_9"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,skeletonArcher_2_490,meatWagon_2_91,skeletonWarrior_2_245,deathKnight_2_61",
-	["rewards"] = "soldierMaterials:deathHand:13:25,soldierMaterials:heroBones:13:25,soldierMaterials:soulStone:13:25,soldierMaterials:magicBox:13:25"
+	["troops"] = "greenDragon:1:5,skeletonArcher:3:236,meatWagon:3:88,skeletonWarrior:3:118,deathKnight:3:29",
+	["rewards"] = "soldierMaterials:deathHand:51:25,soldierMaterials:heroBones:51:25,soldierMaterials:soulStone:51:25,soldierMaterials:magicBox:51:25"
 }
 sections["3_10"] = {
 	["sectionName"] = "3_10",
@@ -517,7 +517,7 @@ sections["3_10"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,sentinel_1_1000,horseArcher_1_375,ranger_1_500,catapult_1_62",
+	["troops"] = "greenDragon:1:5,sentinel_1:1:600,horseArcher_1:1:225,ranger_1:1:300,catapult_1:1:75",
 	["rewards"] = "resources:wood:26000:25,resources:stone:26000:25,resources:iron:26000:25,resources:food:26000:25"
 }
 sections["3_11"] = {
@@ -527,7 +527,7 @@ sections["3_11"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,horseArcher_1_510,crossbowman_1_765,ballista_1_127,swordsman_1_255",
+	["troops"] = "greenDragon:1:5,horseArcher_1:1:306,crossbowman_1:1:459,ballista_1:1:153,swordsman_1:1:153",
 	["rewards"] = "resources:wood:28000:25,resources:stone:28000:25,resources:iron:28000:25,resources:food:28000:25"
 }
 sections["3_12"] = {
@@ -537,8 +537,8 @@ sections["3_12"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,meatWagon_2_130,skeletonWarrior_2_390,deathKnight_2_130,skeletonArcher_2_130",
-	["rewards"] = "soldierMaterials:deathHand:14:25,soldierMaterials:heroBones:14:25,soldierMaterials:soulStone:14:25,soldierMaterials:magicBox:14:25"
+	["troops"] = "greenDragon:1:5,meatWagon:3:125,skeletonWarrior:3:188,deathKnight:3:62,skeletonArcher:3:63",
+	["rewards"] = "soldierMaterials:deathHand:54:25,soldierMaterials:heroBones:54:25,soldierMaterials:soulStone:54:25,soldierMaterials:magicBox:54:25"
 }
 sections["3_13"] = {
 	["sectionName"] = "3_13",
@@ -547,7 +547,7 @@ sections["3_13"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,crossbowman_1_1060,ballista_1_198,sentinel_1_530,lancer_1_132",
+	["troops"] = "greenDragon:1:5,crossbowman_1:1:636,ballista_1:1:238,sentinel_1:1:318,lancer_1:1:79",
 	["rewards"] = "resources:wood:28000:25,resources:stone:28000:25,resources:iron:28000:25,resources:food:28000:25"
 }
 sections["3_14"] = {
@@ -557,7 +557,7 @@ sections["3_14"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,sentinel_1_1080,horseArcher_1_405,crossbowman_1_540,catapult_1_67",
+	["troops"] = "greenDragon:1:5,sentinel_1:1:648,horseArcher_1:1:243,crossbowman_1:1:324,catapult_1:1:81",
 	["rewards"] = "resources:wood:28000:25,resources:stone:28000:25,resources:iron:28000:25,resources:food:28000:25"
 }
 sections["3_15"] = {
@@ -567,8 +567,8 @@ sections["3_15"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_5,deathKnight_2_275,skeletonArcher_2_412,meatWagon_2_68,skeletonWarrior_2_137",
-	["rewards"] = "soldierMaterials:deathHand:15:25,soldierMaterials:heroBones:15:25,soldierMaterials:soulStone:15:25,soldierMaterials:magicBox:15:25"
+	["troops"] = "greenDragon:1:5,deathKnight:3:132,skeletonArcher:3:198,meatWagon:3:66,skeletonWarrior:3:66",
+	["rewards"] = "soldierMaterials:deathHand:57:25,soldierMaterials:heroBones:57:25,soldierMaterials:soulStone:57:25,soldierMaterials:magicBox:57:25"
 }
 sections["3_16"] = {
 	["sectionName"] = "3_16",
@@ -577,7 +577,7 @@ sections["3_16"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,ballista_1_280,sentinel_1_840,horseArcher_1_280,crossbowman_1_280",
+	["troops"] = "greenDragon:1:6,ballista_1:1:336,sentinel_1:1:504,horseArcher_1:1:168,crossbowman_1:1:168",
 	["rewards"] = "resources:wood:30000:25,resources:stone:30000:25,resources:iron:30000:25,resources:food:30000:25"
 }
 sections["3_17"] = {
@@ -587,7 +587,7 @@ sections["3_17"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,crossbowman_1_1140,ballista_1_213,sentinel_1_570,horseArcher_1_142",
+	["troops"] = "greenDragon:1:6,crossbowman_1:1:684,ballista_1:1:256,sentinel_1:1:342,horseArcher_1:1:85",
 	["rewards"] = "resources:wood:30000:25,resources:stone:30000:25,resources:iron:30000:25,resources:food:30000:25"
 }
 sections["3_18"] = {
@@ -597,8 +597,8 @@ sections["3_18"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,skeletonWarrior_2_580,deathKnight_2_217,skeletonArcher_2_290,meatWagon_2_36",
-	["rewards"] = "soldierMaterials:deathHand:15:25,soldierMaterials:heroBones:15:25,soldierMaterials:soulStone:15:25,soldierMaterials:magicBox:15:25"
+	["troops"] = "greenDragon:1:6,skeletonWarrior:3:279,deathKnight:3:104,skeletonArcher:3:140,meatWagon:3:35",
+	["rewards"] = "soldierMaterials:deathHand:60:25,soldierMaterials:heroBones:60:25,soldierMaterials:soulStone:60:25,soldierMaterials:magicBox:60:25"
 }
 sections["3_19"] = {
 	["sectionName"] = "3_19",
@@ -607,7 +607,7 @@ sections["3_19"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,lancer_1_590,ranger_1_885,catapult_1_147,swordsman_1_295",
+	["troops"] = "greenDragon:1:6,lancer_1:1:354,ranger_1:1:531,catapult_1:1:177,swordsman_1:1:177",
 	["rewards"] = "resources:wood:32000:25,resources:stone:32000:25,resources:iron:32000:25,resources:food:32000:25"
 }
 sections["3_20"] = {
@@ -617,7 +617,7 @@ sections["3_20"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,catapult_1_300,swordsman_1_900,lancer_1_300,ranger_1_300",
+	["troops"] = "greenDragon:1:6,catapult_1:1:360,swordsman_1:1:540,lancer_1:1:180,ranger_1:1:180",
 	["rewards"] = "resources:wood:32000:25,resources:stone:32000:25,resources:iron:32000:25,resources:food:32000:25"
 }
 sections["3_21"] = {
@@ -627,8 +627,8 @@ sections["3_21"] = {
 	["staminaUsed"] = 6,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,skeletonArcher_2_571,meatWagon_2_114,skeletonWarrior_2_342,deathKnight_2_114",
-	["rewards"] = "soldierMaterials:deathHand:16:25,soldierMaterials:heroBones:16:25,soldierMaterials:soulStone:16:25,soldierMaterials:magicBox:16:25"
+	["troops"] = "greenDragon:1:6,skeletonArcher:3:293,meatWagon:3:110,skeletonWarrior:3:147,deathKnight:3:37",
+	["rewards"] = "soldierMaterials:deathHand:63:25,soldierMaterials:heroBones:63:25,soldierMaterials:soulStone:63:25,soldierMaterials:magicBox:63:25"
 }
 sections["4_1"] = {
 	["sectionName"] = "4_1",
@@ -637,7 +637,7 @@ sections["4_1"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,swordsman_1_1240,lancer_1_465,ranger_1_620,catapult_1_77",
+	["troops"] = "greenDragon:1:6,swordsman_1:2:744,lancer_1:2:279,ranger_1:2:372,catapult_1:2:93",
 	["rewards"] = "resources:wood:32000:25,resources:stone:32000:25,resources:iron:32000:25,resources:food:32000:25"
 }
 sections["4_2"] = {
@@ -647,7 +647,7 @@ sections["4_2"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,horseArcher_1_630,ranger_1_945,catapult_1_157,swordsman_1_315",
+	["troops"] = "greenDragon:1:6,horseArcher_1:2:378,ranger_1:2:567,catapult_1:2:189,swordsman_1:2:189",
 	["rewards"] = "resources:wood:34000:25,resources:stone:34000:25,resources:iron:34000:25,resources:food:34000:25"
 }
 sections["4_3"] = {
@@ -657,8 +657,8 @@ sections["4_3"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,meatWagon_2_160,skeletonWarrior_2_480,deathKnight_2_160,skeletonArcher_2_160",
-	["rewards"] = "soldierMaterials:deathHand:17:25,soldierMaterials:heroBones:17:25,soldierMaterials:soulStone:17:25,soldierMaterials:magicBox:17:25"
+	["troops"] = "greenDragon:1:6,meatWagon:3:230,skeletonWarrior:3:346,deathKnight:3:115,skeletonArcher:3:116",
+	["rewards"] = "soldierMaterials:deathHand:66:25,soldierMaterials:heroBones:66:25,soldierMaterials:soulStone:66:25,soldierMaterials:magicBox:66:25"
 }
 sections["4_4"] = {
 	["sectionName"] = "4_4",
@@ -667,7 +667,7 @@ sections["4_4"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,crossbowman_1_1300,catapult_1_243,swordsman_1_650,lancer_1_162",
+	["troops"] = "greenDragon:1:6,crossbowman_1:2:780,catapult_1:2:292,swordsman_1:2:390,lancer_1:2:97",
 	["rewards"] = "resources:wood:34000:25,resources:stone:34000:25,resources:iron:34000:25,resources:food:34000:25"
 }
 sections["4_5"] = {
@@ -677,7 +677,7 @@ sections["4_5"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,sentinel_1_1320,lancer_1_495,ranger_1_660,catapult_1_82",
+	["troops"] = "greenDragon:1:6,sentinel_1:2:792,lancer_1:2:297,ranger_1:2:396,catapult_1:2:99",
 	["rewards"] = "resources:wood:34000:25,resources:stone:34000:25,resources:iron:34000:25,resources:food:34000:25"
 }
 sections["4_6"] = {
@@ -687,8 +687,8 @@ sections["4_6"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,deathKnight_2_335,skeletonArcher_2_502,meatWagon_2_83,skeletonWarrior_2_167",
-	["rewards"] = "soldierMaterials:deathHand:18:25,soldierMaterials:heroBones:18:25,soldierMaterials:soulStone:18:25,soldierMaterials:magicBox:18:25"
+	["troops"] = "greenDragon:1:6,deathKnight:3:241,skeletonArcher:3:362,meatWagon:3:121,skeletonWarrior:3:121",
+	["rewards"] = "soldierMaterials:deathHand:69:25,soldierMaterials:heroBones:69:25,soldierMaterials:soulStone:69:25,soldierMaterials:magicBox:69:25"
 }
 sections["4_7"] = {
 	["sectionName"] = "4_7",
@@ -697,7 +697,7 @@ sections["4_7"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_6,ballista_1_340,sentinel_1_1020,lancer_1_340,ranger_1_340",
+	["troops"] = "greenDragon:1:6,ballista_1:2:408,sentinel_1:2:612,lancer_1:2:204,ranger_1:2:204",
 	["rewards"] = "resources:wood:36000:25,resources:stone:36000:25,resources:iron:36000:25,resources:food:36000:25"
 }
 sections["4_8"] = {
@@ -707,7 +707,7 @@ sections["4_8"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,crossbowman_1_1380,ballista_1_258,swordsman_1_690,lancer_1_172",
+	["troops"] = "greenDragon:1:7,crossbowman_1:2:828,ballista_1:2:310,swordsman_1:2:414,lancer_1:2:103",
 	["rewards"] = "resources:wood:36000:25,resources:stone:36000:25,resources:iron:36000:25,resources:food:36000:25"
 }
 sections["4_9"] = {
@@ -717,8 +717,8 @@ sections["4_9"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,skeletonWarrior_2_700,deathKnight_2_262,skeletonArcher_2_350,meatWagon_2_43",
-	["rewards"] = "soldierMaterials:deathHand:18:25,soldierMaterials:heroBones:18:25,soldierMaterials:soulStone:18:25,soldierMaterials:magicBox:18:25"
+	["troops"] = "greenDragon:1:7,skeletonWarrior:3:504,deathKnight:3:189,skeletonArcher:3:252,meatWagon:3:63",
+	["rewards"] = "soldierMaterials:deathHand:72:25,soldierMaterials:heroBones:72:25,soldierMaterials:soulStone:72:25,soldierMaterials:magicBox:72:25"
 }
 sections["4_10"] = {
 	["sectionName"] = "4_10",
@@ -727,7 +727,7 @@ sections["4_10"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,horseArcher_1_710,crossbowman_1_1065,ballista_1_177,swordsman_1_355",
+	["troops"] = "greenDragon:1:7,horseArcher_1:2:426,crossbowman_1:2:639,ballista_1:2:213,swordsman_1:2:213",
 	["rewards"] = "resources:wood:38000:25,resources:stone:38000:25,resources:iron:38000:25,resources:food:38000:25"
 }
 sections["4_11"] = {
@@ -737,7 +737,7 @@ sections["4_11"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,ballista_1_360,sentinel_1_1080,horseArcher_1_360,ranger_1_360",
+	["troops"] = "greenDragon:1:7,ballista_1:2:432,sentinel_1:2:648,horseArcher_1:2:216,ranger_1:2:216",
 	["rewards"] = "resources:wood:38000:25,resources:stone:38000:25,resources:iron:38000:25,resources:food:38000:25"
 }
 sections["4_12"] = {
@@ -747,8 +747,8 @@ sections["4_12"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,skeletonArcher_2_730,meatWagon_2_136,skeletonWarrior_2_365,deathKnight_2_91",
-	["rewards"] = "soldierMaterials:deathHand:19:25,soldierMaterials:heroBones:19:25,soldierMaterials:soulStone:19:25,soldierMaterials:magicBox:19:25"
+	["troops"] = "greenDragon:1:7,skeletonArcher:3:526,meatWagon:3:197,skeletonWarrior:3:263,deathKnight:3:66",
+	["rewards"] = "soldierMaterials:deathHand:75:25,soldierMaterials:heroBones:75:25,soldierMaterials:soulStone:75:25,soldierMaterials:magicBox:75:25"
 }
 sections["4_13"] = {
 	["sectionName"] = "4_13",
@@ -757,7 +757,7 @@ sections["4_13"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,sentinel_1_1480,horseArcher_1_555,crossbowman_1_740,catapult_1_92",
+	["troops"] = "greenDragon:1:7,sentinel_1:2:888,horseArcher_1:2:333,crossbowman_1:2:444,catapult_1:2:111",
 	["rewards"] = "resources:wood:38000:25,resources:stone:38000:25,resources:iron:38000:25,resources:food:38000:25"
 }
 sections["4_14"] = {
@@ -767,7 +767,7 @@ sections["4_14"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,horseArcher_1_750,crossbowman_1_1125,ballista_1_187,sentinel_1_375",
+	["troops"] = "greenDragon:1:7,horseArcher_1:2:450,crossbowman_1:2:675,ballista_1:2:225,sentinel_1:2:225",
 	["rewards"] = "resources:wood:40000:25,resources:stone:40000:25,resources:iron:40000:25,resources:food:40000:25"
 }
 sections["4_15"] = {
@@ -777,8 +777,8 @@ sections["4_15"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,meatWagon_2_190,skeletonWarrior_2_570,deathKnight_2_190,skeletonArcher_2_190",
-	["rewards"] = "soldierMaterials:deathHand:20:25,soldierMaterials:heroBones:20:25,soldierMaterials:soulStone:20:25,soldierMaterials:magicBox:20:25"
+	["troops"] = "greenDragon:1:7,meatWagon:3:274,skeletonWarrior:3:411,deathKnight:3:137,skeletonArcher:3:137",
+	["rewards"] = "soldierMaterials:deathHand:78:25,soldierMaterials:heroBones:78:25,soldierMaterials:soulStone:78:25,soldierMaterials:magicBox:78:25"
 }
 sections["4_16"] = {
 	["sectionName"] = "4_16",
@@ -787,7 +787,7 @@ sections["4_16"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,crossbowman_1_1540,ballista_1_288,sentinel_1_770,horseArcher_1_192",
+	["troops"] = "greenDragon:1:7,crossbowman_1:2:924,ballista_1:2:346,sentinel_1:2:462,horseArcher_1:2:115",
 	["rewards"] = "resources:wood:40000:25,resources:stone:40000:25,resources:iron:40000:25,resources:food:40000:25"
 }
 sections["4_17"] = {
@@ -797,7 +797,7 @@ sections["4_17"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,sentinel_1_1560,horseArcher_1_585,crossbowman_1_780,ballista_1_97",
+	["troops"] = "greenDragon:1:7,sentinel_1:2:936,horseArcher_1:2:351,crossbowman_1:2:468,ballista_1:2:117",
 	["rewards"] = "resources:wood:40000:25,resources:stone:40000:25,resources:iron:40000:25,resources:food:40000:25"
 }
 sections["4_18"] = {
@@ -807,8 +807,8 @@ sections["4_18"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,deathKnight_2_395,skeletonArcher_2_592,meatWagon_2_98,skeletonWarrior_2_197",
-	["rewards"] = "soldierMaterials:deathHand:21:25,soldierMaterials:heroBones:21:25,soldierMaterials:soulStone:21:25,soldierMaterials:magicBox:21:25"
+	["troops"] = "greenDragon:1:7,deathKnight:3:284,skeletonArcher:3:427,meatWagon:3:142,skeletonWarrior:3:143",
+	["rewards"] = "soldierMaterials:deathHand:81:25,soldierMaterials:heroBones:81:25,soldierMaterials:soulStone:81:25,soldierMaterials:magicBox:81:25"
 }
 sections["4_19"] = {
 	["sectionName"] = "4_19",
@@ -817,7 +817,7 @@ sections["4_19"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,catapult_1_400,swordsman_1_1200,lancer_1_400,ranger_1_400",
+	["troops"] = "greenDragon:1:7,catapult_1:2:480,swordsman_1:2:720,lancer_1:2:240,ranger_1:2:240",
 	["rewards"] = "resources:wood:42000:25,resources:stone:42000:25,resources:iron:42000:25,resources:food:42000:25"
 }
 sections["4_20"] = {
@@ -827,7 +827,7 @@ sections["4_20"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_7,ranger_1_1620,catapult_1_303,swordsman_1_810,lancer_1_202",
+	["troops"] = "greenDragon:1:7,ranger_1:2:972,catapult_1:2:364,swordsman_1:2:486,lancer_1:2:121",
 	["rewards"] = "resources:wood:42000:25,resources:stone:42000:25,resources:iron:42000:25,resources:food:42000:25"
 }
 sections["4_21"] = {
@@ -837,8 +837,8 @@ sections["4_21"] = {
 	["staminaUsed"] = 6,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_1_8,skeletonWarrior_2_768,deathKnight_2_307,skeletonArcher_2_461,meatWagon_2_76",
-	["rewards"] = "soldierMaterials:deathHand:21:25,soldierMaterials:heroBones:21:25,soldierMaterials:soulStone:21:25,soldierMaterials:magicBox:21:25"
+	["troops"] = "greenDragon:1:8,skeletonWarrior:3:591,deathKnight:3:221,skeletonArcher:3:296,meatWagon:3:74",
+	["rewards"] = "soldierMaterials:deathHand:84:25,soldierMaterials:heroBones:84:25,soldierMaterials:soulStone:84:25,soldierMaterials:magicBox:84:25"
 }
 sections["5_1"] = {
 	["sectionName"] = "5_1",
@@ -847,7 +847,7 @@ sections["5_1"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,horseArcher_1_830,ranger_1_1245,catapult_1_207,swordsman_1_415",
+	["troops"] = "redDragon:1:8,horseArcher_1:2:498,ranger_1:2:747,catapult_1:2:249,swordsman_1:2:249",
 	["rewards"] = "resources:wood:44000:25,resources:stone:44000:25,resources:iron:44000:25,resources:food:44000:25"
 }
 sections["5_2"] = {
@@ -857,7 +857,7 @@ sections["5_2"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,ballista_1_420,swordsman_1_1260,lancer_1_420,ranger_1_420",
+	["troops"] = "redDragon:1:8,ballista_1:2:504,swordsman_1:2:756,lancer_1:2:252,ranger_1:2:252",
 	["rewards"] = "resources:wood:44000:25,resources:stone:44000:25,resources:iron:44000:25,resources:food:44000:25"
 }
 sections["5_3"] = {
@@ -867,8 +867,8 @@ sections["5_3"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,skeletonArcher_2_850,meatWagon_2_159,skeletonWarrior_2_425,deathKnight_2_106",
-	["rewards"] = "soldierMaterials:deathHand:22:25,soldierMaterials:heroBones:22:25,soldierMaterials:soulStone:22:25,soldierMaterials:magicBox:22:25"
+	["troops"] = "redDragon:1:8,skeletonArcher:3:612,meatWagon:3:229,skeletonWarrior:3:306,deathKnight:3:76",
+	["rewards"] = "soldierMaterials:deathHand:87:25,soldierMaterials:heroBones:87:25,soldierMaterials:soulStone:87:25,soldierMaterials:magicBox:87:25"
 }
 sections["5_4"] = {
 	["sectionName"] = "5_4",
@@ -877,7 +877,7 @@ sections["5_4"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,sentinel_1_1720,lancer_1_645,ranger_1_860,catapult_1_107",
+	["troops"] = "redDragon:1:8,sentinel_1:2:1032,lancer_1:2:387,ranger_1:2:516,catapult_1:2:129",
 	["rewards"] = "resources:wood:44000:25,resources:stone:44000:25,resources:iron:44000:25,resources:food:44000:25"
 }
 sections["5_5"] = {
@@ -887,7 +887,7 @@ sections["5_5"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,horseArcher_1_870,crossbowman_1_1305,catapult_1_217,swordsman_1_435",
+	["troops"] = "redDragon:1:8,horseArcher_1:2:522,crossbowman_1:2:783,catapult_1:2:261,swordsman_1:2:261",
 	["rewards"] = "resources:wood:46000:25,resources:stone:46000:25,resources:iron:46000:25,resources:food:46000:25"
 }
 sections["5_6"] = {
@@ -897,8 +897,8 @@ sections["5_6"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,meatWagon_2_220,skeletonWarrior_2_660,deathKnight_2_220,skeletonArcher_2_220",
-	["rewards"] = "soldierMaterials:deathHand:23:25,soldierMaterials:heroBones:23:25,soldierMaterials:soulStone:23:25,soldierMaterials:magicBox:23:25"
+	["troops"] = "redDragon:1:8,meatWagon:3:317,skeletonWarrior:3:476,deathKnight:3:158,skeletonArcher:3:159",
+	["rewards"] = "soldierMaterials:deathHand:90:25,soldierMaterials:heroBones:90:25,soldierMaterials:soulStone:90:25,soldierMaterials:magicBox:90:25"
 }
 sections["5_7"] = {
 	["sectionName"] = "5_7",
@@ -907,7 +907,7 @@ sections["5_7"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,crossbowman_1_1780,ballista_1_333,swordsman_1_890,lancer_1_222",
+	["troops"] = "redDragon:1:8,crossbowman_1:2:1068,ballista_1:2:400,swordsman_1:2:534,lancer_1:2:133",
 	["rewards"] = "resources:wood:46000:25,resources:stone:46000:25,resources:iron:46000:25,resources:food:46000:25"
 }
 sections["5_8"] = {
@@ -917,7 +917,7 @@ sections["5_8"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,sentinel_1_1800,horseArcher_1_675,ranger_1_900,catapult_1_112",
+	["troops"] = "redDragon:1:8,sentinel_1:2:1080,horseArcher_1:2:405,ranger_1:2:540,catapult_1:2:135",
 	["rewards"] = "resources:wood:46000:25,resources:stone:46000:25,resources:iron:46000:25,resources:food:46000:25"
 }
 sections["5_9"] = {
@@ -927,8 +927,8 @@ sections["5_9"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,deathKnight_2_455,skeletonArcher_2_682,meatWagon_2_113,skeletonWarrior_2_227",
-	["rewards"] = "soldierMaterials:deathHand:24:25,soldierMaterials:heroBones:24:25,soldierMaterials:soulStone:24:25,soldierMaterials:magicBox:24:25"
+	["troops"] = "redDragon:1:8,deathKnight:3:328,skeletonArcher:3:492,meatWagon:3:164,skeletonWarrior:3:164",
+	["rewards"] = "soldierMaterials:deathHand:93:25,soldierMaterials:heroBones:93:25,soldierMaterials:soulStone:93:25,soldierMaterials:magicBox:93:25"
 }
 sections["5_10"] = {
 	["sectionName"] = "5_10",
@@ -937,7 +937,7 @@ sections["5_10"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,ballista_1_460,sentinel_1_1380,horseArcher_1_460,ranger_1_460",
+	["troops"] = "redDragon:1:8,ballista_1:2:552,sentinel_1:2:828,horseArcher_1:2:276,ranger_1:2:276",
 	["rewards"] = "resources:wood:48000:25,resources:stone:48000:25,resources:iron:48000:25,resources:food:48000:25"
 }
 sections["5_11"] = {
@@ -947,7 +947,7 @@ sections["5_11"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,crossbowman_1_1860,ballista_1_348,sentinel_1_930,lancer_1_232",
+	["troops"] = "redDragon:1:8,crossbowman_1:2:1116,ballista_1:2:418,sentinel_1:2:558,lancer_1:2:139",
 	["rewards"] = "resources:wood:48000:25,resources:stone:48000:25,resources:iron:48000:25,resources:food:48000:25"
 }
 sections["5_12"] = {
@@ -957,8 +957,8 @@ sections["5_12"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_8,skeletonWarrior_2_940,deathKnight_2_352,skeletonArcher_2_470,meatWagon_2_58",
-	["rewards"] = "soldierMaterials:deathHand:24:25,soldierMaterials:heroBones:24:25,soldierMaterials:soulStone:24:25,soldierMaterials:magicBox:24:25"
+	["troops"] = "redDragon:1:8,skeletonWarrior:3:677,deathKnight:3:254,skeletonArcher:3:339,meatWagon:3:85",
+	["rewards"] = "soldierMaterials:deathHand:96:25,soldierMaterials:heroBones:96:25,soldierMaterials:soulStone:96:25,soldierMaterials:magicBox:96:25"
 }
 sections["5_13"] = {
 	["sectionName"] = "5_13",
@@ -967,7 +967,7 @@ sections["5_13"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,horseArcher_1_950,crossbowman_1_1425,ballista_1_237,sentinel_1_475",
+	["troops"] = "redDragon:1:9,horseArcher_1:2:570,crossbowman_1:2:855,ballista_1:2:285,sentinel_1:2:285",
 	["rewards"] = "resources:wood:50000:25,resources:stone:50000:25,resources:iron:50000:25,resources:food:50000:25"
 }
 sections["5_14"] = {
@@ -977,7 +977,7 @@ sections["5_14"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,ballista_1_480,sentinel_1_1440,horseArcher_1_480,crossbowman_1_480",
+	["troops"] = "redDragon:1:9,ballista_1:2:576,sentinel_1:2:864,horseArcher_1:2:288,crossbowman_1:2:288",
 	["rewards"] = "resources:wood:50000:25,resources:stone:50000:25,resources:iron:50000:25,resources:food:50000:25"
 }
 sections["5_15"] = {
@@ -987,8 +987,8 @@ sections["5_15"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,skeletonArcher_2_970,meatWagon_2_181,skeletonWarrior_2_485,deathKnight_2_121",
-	["rewards"] = "soldierMaterials:deathHand:25:25,soldierMaterials:heroBones:25:25,soldierMaterials:soulStone:25:25,soldierMaterials:magicBox:25:25"
+	["troops"] = "redDragon:1:9,skeletonArcher:3:699,meatWagon:3:262,skeletonWarrior:3:350,deathKnight:3:87",
+	["rewards"] = "soldierMaterials:deathHand:99:25,soldierMaterials:heroBones:99:25,soldierMaterials:soulStone:99:25,soldierMaterials:magicBox:99:25"
 }
 sections["5_16"] = {
 	["sectionName"] = "5_16",
@@ -997,7 +997,7 @@ sections["5_16"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,sentinel_1_1960,horseArcher_1_735,crossbowman_1_980,ballista_1_122",
+	["troops"] = "redDragon:1:9,sentinel_1:2:1176,horseArcher_1:2:441,crossbowman_1:2:588,ballista_1:2:147",
 	["rewards"] = "resources:wood:50000:25,resources:stone:50000:25,resources:iron:50000:25,resources:food:50000:25"
 }
 sections["5_17"] = {
@@ -1007,7 +1007,7 @@ sections["5_17"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,lancer_1_990,ranger_1_1485,catapult_1_247,swordsman_1_495",
+	["troops"] = "redDragon:1:9,lancer_1:2:594,ranger_1:2:891,catapult_1:2:297,swordsman_1:2:297",
 	["rewards"] = "resources:wood:52000:25,resources:stone:52000:25,resources:iron:52000:25,resources:food:52000:25"
 }
 sections["5_18"] = {
@@ -1017,8 +1017,8 @@ sections["5_18"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,meatWagon_2_250,skeletonWarrior_2_750,deathKnight_2_250,skeletonArcher_2_250",
-	["rewards"] = "soldierMaterials:deathHand:26:25,soldierMaterials:heroBones:26:25,soldierMaterials:soulStone:26:25,soldierMaterials:magicBox:26:25"
+	["troops"] = "redDragon:1:9,meatWagon:3:360,skeletonWarrior:3:540,deathKnight:3:180,skeletonArcher:3:180",
+	["rewards"] = "soldierMaterials:deathHand:102:25,soldierMaterials:heroBones:102:25,soldierMaterials:soulStone:102:25,soldierMaterials:magicBox:102:25"
 }
 sections["5_19"] = {
 	["sectionName"] = "5_19",
@@ -1027,7 +1027,7 @@ sections["5_19"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,ranger_1_2020,catapult_1_378,swordsman_1_1010,lancer_1_252",
+	["troops"] = "redDragon:1:9,ranger_1:2:1212,catapult_1:2:454,swordsman_1:2:606,lancer_1:2:151",
 	["rewards"] = "resources:wood:52000:25,resources:stone:52000:25,resources:iron:52000:25,resources:food:52000:25"
 }
 sections["5_20"] = {
@@ -1037,7 +1037,7 @@ sections["5_20"] = {
 	["staminaUsed"] = 3,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,swordsman_1_2040,lancer_1_765,ranger_1_1020,catapult_1_127",
+	["troops"] = "redDragon:1:9,swordsman_1:2:1224,lancer_1:2:459,ranger_1:2:612,catapult_1:2:153",
 	["rewards"] = "resources:wood:52000:25,resources:stone:52000:25,resources:iron:52000:25,resources:food:52000:25"
 }
 sections["5_21"] = {
@@ -1047,8 +1047,8 @@ sections["5_21"] = {
 	["staminaUsed"] = 6,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,deathKnight_2_482,skeletonArcher_2_772,meatWagon_2_144,skeletonWarrior_2_386",
-	["rewards"] = "soldierMaterials:deathHand:27:25,soldierMaterials:heroBones:27:25,soldierMaterials:soulStone:27:25,soldierMaterials:magicBox:27:25"
+	["troops"] = "redDragon:1:9,deathKnight:3:371,skeletonArcher:3:557,meatWagon:3:185,skeletonWarrior:3:186",
+	["rewards"] = "soldierMaterials:deathHand:105:25,soldierMaterials:heroBones:105:25,soldierMaterials:soulStone:105:25,soldierMaterials:magicBox:105:25"
 }
 sections["6_1"] = {
 	["sectionName"] = "6_1",
@@ -1057,7 +1057,7 @@ sections["6_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,ballista_1_520,swordsman_1_1560,lancer_1_520,ranger_1_520",
+	["troops"] = "redDragon:1:9,ballista_1:2:624,swordsman_1:2:936,lancer_1:2:312,ranger_1:2:312",
 	["rewards"] = "resources:wood:54000:25,resources:stone:54000:25,resources:iron:54000:25,resources:food:54000:25"
 }
 sections["6_2"] = {
@@ -1067,7 +1067,7 @@ sections["6_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,crossbowman_1_2100,catapult_1_393,swordsman_1_1050,lancer_1_262",
+	["troops"] = "redDragon:1:9,crossbowman_1:2:1260,catapult_1:2:472,swordsman_1:2:630,lancer_1:2:157",
 	["rewards"] = "resources:wood:54000:25,resources:stone:54000:25,resources:iron:54000:25,resources:food:54000:25"
 }
 sections["6_3"] = {
@@ -1077,8 +1077,8 @@ sections["6_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,skeletonWarrior_2_1060,deathKnight_2_397,skeletonArcher_2_530,meatWagon_2_66",
-	["rewards"] = "soldierMaterials:deathHand:27:25,soldierMaterials:heroBones:27:25,soldierMaterials:soulStone:27:25,soldierMaterials:magicBox:27:25"
+	["troops"] = "redDragon:1:9,skeletonWarrior:3:764,deathKnight:3:286,skeletonArcher:3:382,meatWagon:3:95",
+	["rewards"] = "soldierMaterials:deathHand:108:25,soldierMaterials:heroBones:108:25,soldierMaterials:soulStone:108:25,soldierMaterials:magicBox:108:25"
 }
 sections["6_4"] = {
 	["sectionName"] = "6_4",
@@ -1087,7 +1087,7 @@ sections["6_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_9,horseArcher_1_1070,crossbowman_1_1605,catapult_1_267,swordsman_1_535",
+	["troops"] = "redDragon:1:9,horseArcher_1:2:642,crossbowman_1:2:963,catapult_1:2:321,swordsman_1:2:321",
 	["rewards"] = "resources:wood:56000:25,resources:stone:56000:25,resources:iron:56000:25,resources:food:56000:25"
 }
 sections["6_5"] = {
@@ -1097,7 +1097,7 @@ sections["6_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,ballista_1_540,sentinel_1_1620,lancer_1_540,ranger_1_540",
+	["troops"] = "redDragon:1:10,ballista_1:2:648,sentinel_1:2:972,lancer_1:2:324,ranger_1:2:324",
 	["rewards"] = "resources:wood:56000:25,resources:stone:56000:25,resources:iron:56000:25,resources:food:56000:25"
 }
 sections["6_6"] = {
@@ -1107,8 +1107,8 @@ sections["6_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,skeletonArcher_2_1090,meatWagon_2_204,skeletonWarrior_2_545,deathKnight_2_136",
-	["rewards"] = "soldierMaterials:deathHand:28:25,soldierMaterials:heroBones:28:25,soldierMaterials:soulStone:28:25,soldierMaterials:magicBox:28:25"
+	["troops"] = "redDragon:1:10,skeletonArcher:3:785,meatWagon:3:294,skeletonWarrior:3:393,deathKnight:3:98",
+	["rewards"] = "soldierMaterials:deathHand:111:25,soldierMaterials:heroBones:111:25,soldierMaterials:soulStone:111:25,soldierMaterials:magicBox:111:25"
 }
 sections["6_7"] = {
 	["sectionName"] = "6_7",
@@ -1117,7 +1117,7 @@ sections["6_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,sentinel_1_2200,horseArcher_1_825,ranger_1_1100,catapult_1_137",
+	["troops"] = "redDragon:1:10,sentinel_1:2:1320,horseArcher_1:2:495,ranger_1:2:660,catapult_1:2:165",
 	["rewards"] = "resources:wood:56000:25,resources:stone:56000:25,resources:iron:56000:25,resources:food:56000:25"
 }
 sections["6_8"] = {
@@ -1127,7 +1127,7 @@ sections["6_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,horseArcher_1_1110,crossbowman_1_1665,ballista_1_277,swordsman_1_555",
+	["troops"] = "redDragon:1:10,horseArcher_1:2:666,crossbowman_1:2:999,ballista_1:2:333,swordsman_1:2:333",
 	["rewards"] = "resources:wood:58000:25,resources:stone:58000:25,resources:iron:58000:25,resources:food:58000:25"
 }
 sections["6_9"] = {
@@ -1137,8 +1137,8 @@ sections["6_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,meatWagon_2_280,skeletonWarrior_2_840,deathKnight_2_280,skeletonArcher_2_280",
-	["rewards"] = "soldierMaterials:deathHand:29:25,soldierMaterials:heroBones:29:25,soldierMaterials:soulStone:29:25,soldierMaterials:magicBox:29:25"
+	["troops"] = "redDragon:1:10,meatWagon:3:403,skeletonWarrior:3:605,deathKnight:3:202,skeletonArcher:3:202",
+	["rewards"] = "soldierMaterials:deathHand:114:25,soldierMaterials:heroBones:114:25,soldierMaterials:soulStone:114:25,soldierMaterials:magicBox:114:25"
 }
 sections["6_10"] = {
 	["sectionName"] = "6_10",
@@ -1147,7 +1147,7 @@ sections["6_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,crossbowman_1_2260,ballista_1_423,sentinel_1_1130,lancer_1_282",
+	["troops"] = "redDragon:1:10,crossbowman_1:2:1356,ballista_1:2:508,sentinel_1:2:678,lancer_1:2:169",
 	["rewards"] = "resources:wood:58000:25,resources:stone:58000:25,resources:iron:58000:25,resources:food:58000:25"
 }
 sections["6_11"] = {
@@ -1157,7 +1157,7 @@ sections["6_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,sentinel_1_2280,horseArcher_1_855,crossbowman_1_1140,catapult_1_142",
+	["troops"] = "redDragon:1:10,sentinel_1:2:1368,horseArcher_1:2:513,crossbowman_1:2:684,catapult_1:2:171",
 	["rewards"] = "resources:wood:58000:25,resources:stone:58000:25,resources:iron:58000:25,resources:food:58000:25"
 }
 sections["6_12"] = {
@@ -1167,8 +1167,8 @@ sections["6_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,deathKnight_2_575,skeletonArcher_2_862,meatWagon_2_143,skeletonWarrior_2_287",
-	["rewards"] = "soldierMaterials:deathHand:30:25,soldierMaterials:heroBones:30:25,soldierMaterials:soulStone:30:25,soldierMaterials:magicBox:30:25"
+	["troops"] = "redDragon:1:10,deathKnight:3:414,skeletonArcher:3:621,meatWagon:3:207,skeletonWarrior:3:207",
+	["rewards"] = "soldierMaterials:deathHand:117:25,soldierMaterials:heroBones:117:25,soldierMaterials:soulStone:117:25,soldierMaterials:magicBox:117:25"
 }
 sections["6_13"] = {
 	["sectionName"] = "6_13",
@@ -1177,7 +1177,7 @@ sections["6_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,ballista_1_580,sentinel_1_1740,horseArcher_1_580,crossbowman_1_580",
+	["troops"] = "redDragon:1:10,ballista_1:2:696,sentinel_1:2:1044,horseArcher_1:2:348,crossbowman_1:2:348",
 	["rewards"] = "resources:wood:60000:25,resources:stone:60000:25,resources:iron:60000:25,resources:food:60000:25"
 }
 sections["6_14"] = {
@@ -1187,7 +1187,7 @@ sections["6_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,crossbowman_1_2340,ballista_1_438,sentinel_1_1170,horseArcher_1_292",
+	["troops"] = "redDragon:1:10,crossbowman_1:2:1404,ballista_1:2:526,sentinel_1:2:702,horseArcher_1:2:175",
 	["rewards"] = "resources:wood:60000:25,resources:stone:60000:25,resources:iron:60000:25,resources:food:60000:25"
 }
 sections["6_15"] = {
@@ -1197,8 +1197,8 @@ sections["6_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,skeletonWarrior_2_1180,deathKnight_2_442,skeletonArcher_2_590,meatWagon_2_73",
-	["rewards"] = "soldierMaterials:deathHand:30:25,soldierMaterials:heroBones:30:25,soldierMaterials:soulStone:30:25,soldierMaterials:magicBox:30:25"
+	["troops"] = "redDragon:1:10,skeletonWarrior:3:850,deathKnight:3:319,skeletonArcher:3:425,meatWagon:3:106",
+	["rewards"] = "soldierMaterials:deathHand:120:25,soldierMaterials:heroBones:120:25,soldierMaterials:soulStone:120:25,soldierMaterials:magicBox:120:25"
 }
 sections["6_16"] = {
 	["sectionName"] = "6_16",
@@ -1207,7 +1207,7 @@ sections["6_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,lancer_1_1190,ranger_1_1785,catapult_1_297,swordsman_1_595",
+	["troops"] = "redDragon:1:10,lancer_1:2:714,ranger_1:2:1071,catapult_1:2:357,swordsman_1:2:357",
 	["rewards"] = "resources:wood:62000:25,resources:stone:62000:25,resources:iron:62000:25,resources:food:62000:25"
 }
 sections["6_17"] = {
@@ -1217,7 +1217,7 @@ sections["6_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_1_10,catapult_1_600,swordsman_1_1800,lancer_1_600,ranger_1_600",
+	["troops"] = "redDragon:1:10,catapult_1:2:720,swordsman_1:2:1080,lancer_1:2:360,ranger_1:2:360",
 	["rewards"] = "resources:wood:62000:25,resources:stone:62000:25,resources:iron:62000:25,resources:food:62000:25"
 }
 sections["6_18"] = {
@@ -1227,8 +1227,8 @@ sections["6_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_11,skeletonArcher_2_1210,meatWagon_2_226,skeletonWarrior_2_605,deathKnight_2_151",
-	["rewards"] = "soldierMaterials:deathHand:31:25,soldierMaterials:heroBones:31:25,soldierMaterials:soulStone:31:25,soldierMaterials:magicBox:31:25"
+	["troops"] = "redDragon:2:11,skeletonArcher:3:872,meatWagon:3:327,skeletonWarrior:3:436,deathKnight:3:109",
+	["rewards"] = "soldierMaterials:deathHand:123:25,soldierMaterials:heroBones:123:25,soldierMaterials:soulStone:123:25,soldierMaterials:magicBox:123:25"
 }
 sections["6_19"] = {
 	["sectionName"] = "6_19",
@@ -1237,7 +1237,7 @@ sections["6_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_11,swordsman_1_2440,lancer_1_915,ranger_1_1220,catapult_1_152",
+	["troops"] = "redDragon:2:11,swordsman_1:2:1464,lancer_1:2:549,ranger_1:2:732,catapult_1:2:183",
 	["rewards"] = "resources:wood:62000:25,resources:stone:62000:25,resources:iron:62000:25,resources:food:62000:25"
 }
 sections["6_20"] = {
@@ -1247,7 +1247,7 @@ sections["6_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_11,horseArcher_1_1230,ranger_1_1845,catapult_1_307,swordsman_1_615",
+	["troops"] = "redDragon:2:11,horseArcher_1:2:738,ranger_1:2:1107,catapult_1:2:369,swordsman_1:2:369",
 	["rewards"] = "resources:wood:64000:25,resources:stone:64000:25,resources:iron:64000:25,resources:food:64000:25"
 }
 sections["6_21"] = {
@@ -1257,8 +1257,8 @@ sections["6_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_11,meatWagon_2_290,skeletonWarrior_2_930,deathKnight_2_348,skeletonArcher_2_465",
-	["rewards"] = "soldierMaterials:deathHand:32:25,soldierMaterials:heroBones:32:25,soldierMaterials:soulStone:32:25,soldierMaterials:magicBox:32:25"
+	["troops"] = "redDragon:2:11,meatWagon:3:446,skeletonWarrior:3:670,deathKnight:3:223,skeletonArcher:3:224",
+	["rewards"] = "soldierMaterials:deathHand:126:25,soldierMaterials:heroBones:126:25,soldierMaterials:soulStone:126:25,soldierMaterials:magicBox:126:25"
 }
 sections["7_1"] = {
 	["sectionName"] = "7_1",
@@ -1267,7 +1267,7 @@ sections["7_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,crossbowman_1_2500,catapult_1_468,swordsman_1_1250,lancer_1_312",
+	["troops"] = "blueDragon:2:11,crossbowman_1:3:1500,catapult_1:3:562,swordsman_1:3:750,lancer_1:3:187",
 	["rewards"] = "resources:wood:64000:25,resources:stone:64000:25,resources:iron:64000:25,resources:food:64000:25"
 }
 sections["7_2"] = {
@@ -1277,7 +1277,7 @@ sections["7_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,sentinel_1_2520,lancer_1_945,ranger_1_1260,catapult_1_157",
+	["troops"] = "blueDragon:2:11,sentinel_1:3:1512,lancer_1:3:567,ranger_1:3:756,catapult_1:3:189",
 	["rewards"] = "resources:wood:64000:25,resources:stone:64000:25,resources:iron:64000:25,resources:food:64000:25"
 }
 sections["7_3"] = {
@@ -1287,8 +1287,8 @@ sections["7_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,deathKnight_2_635,skeletonArcher_2_952,meatWagon_2_158,skeletonWarrior_2_317",
-	["rewards"] = "soldierMaterials:deathHand:33:25,soldierMaterials:heroBones:33:25,soldierMaterials:soulStone:33:25,soldierMaterials:magicBox:33:25"
+	["troops"] = "blueDragon:2:11,deathKnight:3:610,skeletonArcher:3:915,meatWagon:3:305,skeletonWarrior:3:305",
+	["rewards"] = "soldierMaterials:deathHand:129:25,soldierMaterials:heroBones:129:25,soldierMaterials:soulStone:129:25,soldierMaterials:magicBox:129:25"
 }
 sections["7_4"] = {
 	["sectionName"] = "7_4",
@@ -1297,7 +1297,7 @@ sections["7_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,ballista_1_640,sentinel_1_1920,lancer_1_640,ranger_1_640",
+	["troops"] = "blueDragon:2:11,ballista_1:3:768,sentinel_1:3:1152,lancer_1:3:384,ranger_1:3:384",
 	["rewards"] = "resources:wood:66000:25,resources:stone:66000:25,resources:iron:66000:25,resources:food:66000:25"
 }
 sections["7_5"] = {
@@ -1307,7 +1307,7 @@ sections["7_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,crossbowman_1_2580,ballista_1_483,swordsman_1_1290,lancer_1_322",
+	["troops"] = "blueDragon:2:11,crossbowman_1:3:1548,ballista_1:3:580,swordsman_1:3:774,lancer_1:3:193",
 	["rewards"] = "resources:wood:66000:25,resources:stone:66000:25,resources:iron:66000:25,resources:food:66000:25"
 }
 sections["7_6"] = {
@@ -1317,8 +1317,8 @@ sections["7_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,skeletonWarrior_2_1300,deathKnight_2_487,skeletonArcher_2_650,meatWagon_2_81",
-	["rewards"] = "soldierMaterials:deathHand:33:25,soldierMaterials:heroBones:33:25,soldierMaterials:soulStone:33:25,soldierMaterials:magicBox:33:25"
+	["troops"] = "blueDragon:2:11,skeletonWarrior:3:1248,deathKnight:3:468,skeletonArcher:3:624,meatWagon:3:156",
+	["rewards"] = "soldierMaterials:deathHand:132:25,soldierMaterials:heroBones:132:25,soldierMaterials:soulStone:132:25,soldierMaterials:magicBox:132:25"
 }
 sections["7_7"] = {
 	["sectionName"] = "7_7",
@@ -1327,7 +1327,7 @@ sections["7_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,horseArcher_1_1310,crossbowman_1_1965,ballista_1_327,swordsman_1_655",
+	["troops"] = "blueDragon:2:11,horseArcher_1:3:786,crossbowman_1:3:1179,ballista_1:3:393,swordsman_1:3:393",
 	["rewards"] = "resources:wood:68000:25,resources:stone:68000:25,resources:iron:68000:25,resources:food:68000:25"
 }
 sections["7_8"] = {
@@ -1337,7 +1337,7 @@ sections["7_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,ballista_1_660,sentinel_1_1980,horseArcher_1_660,ranger_1_660",
+	["troops"] = "blueDragon:2:11,ballista_1:3:792,sentinel_1:3:1188,horseArcher_1:3:396,ranger_1:3:396",
 	["rewards"] = "resources:wood:68000:25,resources:stone:68000:25,resources:iron:68000:25,resources:food:68000:25"
 }
 sections["7_9"] = {
@@ -1347,8 +1347,8 @@ sections["7_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_11,skeletonArcher_2_1330,meatWagon_2_249,skeletonWarrior_2_665,deathKnight_2_166",
-	["rewards"] = "soldierMaterials:deathHand:34:25,soldierMaterials:heroBones:34:25,soldierMaterials:soulStone:34:25,soldierMaterials:magicBox:34:25"
+	["troops"] = "blueDragon:2:11,skeletonArcher:3:1277,meatWagon:3:479,skeletonWarrior:3:639,deathKnight:3:160",
+	["rewards"] = "soldierMaterials:deathHand:135:25,soldierMaterials:heroBones:135:25,soldierMaterials:soulStone:135:25,soldierMaterials:magicBox:135:25"
 }
 sections["7_10"] = {
 	["sectionName"] = "7_10",
@@ -1357,7 +1357,7 @@ sections["7_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,sentinel_1_2680,horseArcher_1_1005,crossbowman_1_1340,catapult_1_167",
+	["troops"] = "blueDragon:2:12,sentinel_1:3:1608,horseArcher_1:3:603,crossbowman_1:3:804,catapult_1:3:201",
 	["rewards"] = "resources:wood:68000:25,resources:stone:68000:25,resources:iron:68000:25,resources:food:68000:25"
 }
 sections["7_11"] = {
@@ -1367,7 +1367,7 @@ sections["7_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,horseArcher_1_1350,crossbowman_1_2025,ballista_1_337,sentinel_1_675",
+	["troops"] = "blueDragon:2:12,horseArcher_1:3:810,crossbowman_1:3:1215,ballista_1:3:405,sentinel_1:3:405",
 	["rewards"] = "resources:wood:70000:25,resources:stone:70000:25,resources:iron:70000:25,resources:food:70000:25"
 }
 sections["7_12"] = {
@@ -1377,8 +1377,8 @@ sections["7_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,meatWagon_2_340,skeletonWarrior_2_1020,deathKnight_2_340,skeletonArcher_2_340",
-	["rewards"] = "soldierMaterials:deathHand:35:25,soldierMaterials:heroBones:35:25,soldierMaterials:soulStone:35:25,soldierMaterials:magicBox:35:25"
+	["troops"] = "blueDragon:2:12,meatWagon:3:653,skeletonWarrior:3:980,deathKnight:3:326,skeletonArcher:3:327",
+	["rewards"] = "soldierMaterials:deathHand:138:25,soldierMaterials:heroBones:138:25,soldierMaterials:soulStone:138:25,soldierMaterials:magicBox:138:25"
 }
 sections["7_13"] = {
 	["sectionName"] = "7_13",
@@ -1387,7 +1387,7 @@ sections["7_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,crossbowman_1_2740,ballista_1_513,sentinel_1_1370,horseArcher_1_342",
+	["troops"] = "blueDragon:2:12,crossbowman_1:3:1644,ballista_1:3:616,sentinel_1:3:822,horseArcher_1:3:205",
 	["rewards"] = "resources:wood:70000:25,resources:stone:70000:25,resources:iron:70000:25,resources:food:70000:25"
 }
 sections["7_14"] = {
@@ -1397,7 +1397,7 @@ sections["7_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,sentinel_1_2760,horseArcher_1_1035,crossbowman_1_1380,ballista_1_172",
+	["troops"] = "blueDragon:2:12,sentinel_1:3:1656,horseArcher_1:3:621,crossbowman_1:3:828,ballista_1:3:207",
 	["rewards"] = "resources:wood:70000:25,resources:stone:70000:25,resources:iron:70000:25,resources:food:70000:25"
 }
 sections["7_15"] = {
@@ -1407,8 +1407,8 @@ sections["7_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,deathKnight_2_695,skeletonArcher_2_1042,meatWagon_2_173,skeletonWarrior_2_347",
-	["rewards"] = "soldierMaterials:deathHand:36:25,soldierMaterials:heroBones:36:25,soldierMaterials:soulStone:36:25,soldierMaterials:magicBox:36:25"
+	["troops"] = "blueDragon:2:12,deathKnight:3:667,skeletonArcher:3:1001,meatWagon:3:334,skeletonWarrior:3:334",
+	["rewards"] = "soldierMaterials:deathHand:141:25,soldierMaterials:heroBones:141:25,soldierMaterials:soulStone:141:25,soldierMaterials:magicBox:141:25"
 }
 sections["7_16"] = {
 	["sectionName"] = "7_16",
@@ -1417,7 +1417,7 @@ sections["7_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,catapult_1_700,swordsman_1_2100,lancer_1_700,ranger_1_700",
+	["troops"] = "blueDragon:2:12,catapult_1:3:840,swordsman_1:3:1260,lancer_1:3:420,ranger_1:3:420",
 	["rewards"] = "resources:wood:72000:25,resources:stone:72000:25,resources:iron:72000:25,resources:food:72000:25"
 }
 sections["7_17"] = {
@@ -1427,7 +1427,7 @@ sections["7_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,ranger_1_2820,catapult_1_528,swordsman_1_1410,lancer_1_352",
+	["troops"] = "blueDragon:2:12,ranger_1:3:1692,catapult_1:3:634,swordsman_1:3:846,lancer_1:3:211",
 	["rewards"] = "resources:wood:72000:25,resources:stone:72000:25,resources:iron:72000:25,resources:food:72000:25"
 }
 sections["7_18"] = {
@@ -1437,8 +1437,8 @@ sections["7_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,skeletonWarrior_2_1420,deathKnight_2_532,skeletonArcher_2_710,meatWagon_2_88",
-	["rewards"] = "soldierMaterials:deathHand:36:25,soldierMaterials:heroBones:36:25,soldierMaterials:soulStone:36:25,soldierMaterials:magicBox:36:25"
+	["troops"] = "blueDragon:2:12,skeletonWarrior:3:1364,deathKnight:3:511,skeletonArcher:3:682,meatWagon:3:170",
+	["rewards"] = "soldierMaterials:deathHand:144:25,soldierMaterials:heroBones:144:25,soldierMaterials:soulStone:144:25,soldierMaterials:magicBox:144:25"
 }
 sections["7_19"] = {
 	["sectionName"] = "7_19",
@@ -1447,7 +1447,7 @@ sections["7_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,horseArcher_1_1430,ranger_1_2145,catapult_1_357,swordsman_1_715",
+	["troops"] = "blueDragon:2:12,horseArcher_1:3:858,ranger_1:3:1287,catapult_1:3:429,swordsman_1:3:429",
 	["rewards"] = "resources:wood:74000:25,resources:stone:74000:25,resources:iron:74000:25,resources:food:74000:25"
 }
 sections["7_20"] = {
@@ -1457,7 +1457,7 @@ sections["7_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,ballista_1_720,swordsman_1_2160,lancer_1_720,ranger_1_720",
+	["troops"] = "blueDragon:2:12,ballista_1:3:864,swordsman_1:3:1296,lancer_1:3:432,ranger_1:3:432",
 	["rewards"] = "resources:wood:74000:25,resources:stone:74000:25,resources:iron:74000:25,resources:food:74000:25"
 }
 sections["7_21"] = {
@@ -1467,8 +1467,8 @@ sections["7_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,skeletonArcher_2_1359,meatWagon_2_271,skeletonWarrior_2_815,deathKnight_2_271",
-	["rewards"] = "soldierMaterials:deathHand:37:25,soldierMaterials:heroBones:37:25,soldierMaterials:soulStone:37:25,soldierMaterials:magicBox:37:25"
+	["troops"] = "blueDragon:2:12,skeletonArcher:3:1392,meatWagon:3:522,skeletonWarrior:3:696,deathKnight:3:174",
+	["rewards"] = "soldierMaterials:deathHand:147:25,soldierMaterials:heroBones:147:25,soldierMaterials:soulStone:147:25,soldierMaterials:magicBox:147:25"
 }
 sections["8_1"] = {
 	["sectionName"] = "8_1",
@@ -1477,7 +1477,7 @@ sections["8_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_12,sentinel_1_2920,lancer_1_1095,ranger_1_1460,catapult_1_182",
+	["troops"] = "blueDragon:2:12,sentinel_1:3:1752,lancer_1:3:657,ranger_1:3:876,catapult_1:3:219",
 	["rewards"] = "resources:wood:74000:25,resources:stone:74000:25,resources:iron:74000:25,resources:food:74000:25"
 }
 sections["8_2"] = {
@@ -1487,7 +1487,7 @@ sections["8_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,horseArcher_1_1470,crossbowman_1_2205,catapult_1_367,swordsman_1_735",
+	["troops"] = "blueDragon:2:13,horseArcher_1:3:882,crossbowman_1:3:1323,catapult_1:3:441,swordsman_1:3:441",
 	["rewards"] = "resources:wood:76000:25,resources:stone:76000:25,resources:iron:76000:25,resources:food:76000:25"
 }
 sections["8_3"] = {
@@ -1497,8 +1497,8 @@ sections["8_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,meatWagon_2_370,skeletonWarrior_2_1110,deathKnight_2_370,skeletonArcher_2_370",
-	["rewards"] = "soldierMaterials:deathHand:38:25,soldierMaterials:heroBones:38:25,soldierMaterials:soulStone:38:25,soldierMaterials:magicBox:38:25"
+	["troops"] = "blueDragon:2:13,meatWagon:3:710,skeletonWarrior:3:1066,deathKnight:3:355,skeletonArcher:3:356",
+	["rewards"] = "soldierMaterials:deathHand:150:25,soldierMaterials:heroBones:150:25,soldierMaterials:soulStone:150:25,soldierMaterials:magicBox:150:25"
 }
 sections["8_4"] = {
 	["sectionName"] = "8_4",
@@ -1507,7 +1507,7 @@ sections["8_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,crossbowman_1_2980,ballista_1_558,swordsman_1_1490,lancer_1_372",
+	["troops"] = "blueDragon:2:13,crossbowman_1:3:1788,ballista_1:3:670,swordsman_1:3:894,lancer_1:3:223",
 	["rewards"] = "resources:wood:76000:25,resources:stone:76000:25,resources:iron:76000:25,resources:food:76000:25"
 }
 sections["8_5"] = {
@@ -1517,7 +1517,7 @@ sections["8_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,sentinel_1_3000,horseArcher_1_1125,ranger_1_1500,catapult_1_187",
+	["troops"] = "blueDragon:2:13,sentinel_1:3:1800,horseArcher_1:3:675,ranger_1:3:900,catapult_1:3:225",
 	["rewards"] = "resources:wood:76000:25,resources:stone:76000:25,resources:iron:76000:25,resources:food:76000:25"
 }
 sections["8_6"] = {
@@ -1527,8 +1527,8 @@ sections["8_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,deathKnight_2_755,skeletonArcher_2_1132,meatWagon_2_188,skeletonWarrior_2_377",
-	["rewards"] = "soldierMaterials:deathHand:39:25,soldierMaterials:heroBones:39:25,soldierMaterials:soulStone:39:25,soldierMaterials:magicBox:39:25"
+	["troops"] = "blueDragon:2:13,deathKnight:3:725,skeletonArcher:3:1088,meatWagon:3:362,skeletonWarrior:3:363",
+	["rewards"] = "soldierMaterials:deathHand:153:25,soldierMaterials:heroBones:153:25,soldierMaterials:soulStone:153:25,soldierMaterials:magicBox:153:25"
 }
 sections["8_7"] = {
 	["sectionName"] = "8_7",
@@ -1537,7 +1537,7 @@ sections["8_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,ballista_1_760,sentinel_1_2280,horseArcher_1_760,ranger_1_760",
+	["troops"] = "blueDragon:2:13,ballista_1:3:912,sentinel_1:3:1368,horseArcher_1:3:456,ranger_1:3:456",
 	["rewards"] = "resources:wood:78000:25,resources:stone:78000:25,resources:iron:78000:25,resources:food:78000:25"
 }
 sections["8_8"] = {
@@ -1547,7 +1547,7 @@ sections["8_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,crossbowman_1_3060,ballista_1_573,sentinel_1_1530,lancer_1_382",
+	["troops"] = "blueDragon:2:13,crossbowman_1:3:1836,ballista_1:3:688,sentinel_1:3:918,lancer_1:3:229",
 	["rewards"] = "resources:wood:78000:25,resources:stone:78000:25,resources:iron:78000:25,resources:food:78000:25"
 }
 sections["8_9"] = {
@@ -1557,8 +1557,8 @@ sections["8_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,skeletonWarrior_2_1540,deathKnight_2_577,skeletonArcher_2_770,meatWagon_2_96",
-	["rewards"] = "soldierMaterials:deathHand:39:25,soldierMaterials:heroBones:39:25,soldierMaterials:soulStone:39:25,soldierMaterials:magicBox:39:25"
+	["troops"] = "blueDragon:2:13,skeletonWarrior:3:1479,deathKnight:3:554,skeletonArcher:3:740,meatWagon:3:185",
+	["rewards"] = "soldierMaterials:deathHand:156:25,soldierMaterials:heroBones:156:25,soldierMaterials:soulStone:156:25,soldierMaterials:magicBox:156:25"
 }
 sections["8_10"] = {
 	["sectionName"] = "8_10",
@@ -1567,7 +1567,7 @@ sections["8_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,horseArcher_1_1550,crossbowman_1_2325,ballista_1_387,sentinel_1_775",
+	["troops"] = "blueDragon:2:13,horseArcher_1:3:930,crossbowman_1:3:1395,ballista_1:3:465,sentinel_1:3:465",
 	["rewards"] = "resources:wood:80000:25,resources:stone:80000:25,resources:iron:80000:25,resources:food:80000:25"
 }
 sections["8_11"] = {
@@ -1577,7 +1577,7 @@ sections["8_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,ballista_1_780,sentinel_1_2340,horseArcher_1_780,crossbowman_1_780",
+	["troops"] = "blueDragon:2:13,ballista_1:3:936,sentinel_1:3:1404,horseArcher_1:3:468,crossbowman_1:3:468",
 	["rewards"] = "resources:wood:80000:25,resources:stone:80000:25,resources:iron:80000:25,resources:food:80000:25"
 }
 sections["8_12"] = {
@@ -1587,8 +1587,8 @@ sections["8_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,skeletonArcher_2_1570,meatWagon_2_294,skeletonWarrior_2_785,deathKnight_2_196",
-	["rewards"] = "soldierMaterials:deathHand:40:25,soldierMaterials:heroBones:40:25,soldierMaterials:soulStone:40:25,soldierMaterials:magicBox:40:25"
+	["troops"] = "blueDragon:2:13,skeletonArcher:3:1508,meatWagon:3:565,skeletonWarrior:3:754,deathKnight:3:188",
+	["rewards"] = "soldierMaterials:deathHand:159:25,soldierMaterials:heroBones:159:25,soldierMaterials:soulStone:159:25,soldierMaterials:magicBox:159:25"
 }
 sections["8_13"] = {
 	["sectionName"] = "8_13",
@@ -1597,7 +1597,7 @@ sections["8_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,sentinel_1_3160,horseArcher_1_1185,crossbowman_1_1580,ballista_1_197",
+	["troops"] = "blueDragon:2:13,sentinel_1:3:1896,horseArcher_1:3:711,crossbowman_1:3:948,ballista_1:3:237",
 	["rewards"] = "resources:wood:80000:25,resources:stone:80000:25,resources:iron:80000:25,resources:food:80000:25"
 }
 sections["8_14"] = {
@@ -1607,7 +1607,7 @@ sections["8_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_13,lancer_1_1590,ranger_1_2385,catapult_1_397,swordsman_1_795",
+	["troops"] = "blueDragon:2:13,lancer_1:3:954,ranger_1:3:1431,catapult_1:3:477,swordsman_1:3:477",
 	["rewards"] = "resources:wood:82000:25,resources:stone:82000:25,resources:iron:82000:25,resources:food:82000:25"
 }
 sections["8_15"] = {
@@ -1617,8 +1617,8 @@ sections["8_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,meatWagon_2_400,skeletonWarrior_2_1200,deathKnight_2_400,skeletonArcher_2_400",
-	["rewards"] = "soldierMaterials:deathHand:41:25,soldierMaterials:heroBones:41:25,soldierMaterials:soulStone:41:25,soldierMaterials:magicBox:41:25"
+	["troops"] = "blueDragon:2:14,meatWagon:3:768,skeletonWarrior:3:1152,deathKnight:3:384,skeletonArcher:3:384",
+	["rewards"] = "soldierMaterials:deathHand:162:25,soldierMaterials:heroBones:162:25,soldierMaterials:soulStone:162:25,soldierMaterials:magicBox:162:25"
 }
 sections["8_16"] = {
 	["sectionName"] = "8_16",
@@ -1627,7 +1627,7 @@ sections["8_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,ranger_1_3220,catapult_1_603,swordsman_1_1610,lancer_1_402",
+	["troops"] = "blueDragon:2:14,ranger_1:3:1932,catapult_1:3:724,swordsman_1:3:966,lancer_1:3:241",
 	["rewards"] = "resources:wood:82000:25,resources:stone:82000:25,resources:iron:82000:25,resources:food:82000:25"
 }
 sections["8_17"] = {
@@ -1637,7 +1637,7 @@ sections["8_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,swordsman_1_3240,lancer_1_1215,ranger_1_1620,catapult_1_202",
+	["troops"] = "blueDragon:2:14,swordsman_1:3:1944,lancer_1:3:729,ranger_1:3:972,catapult_1:3:243",
 	["rewards"] = "resources:wood:82000:25,resources:stone:82000:25,resources:iron:82000:25,resources:food:82000:25"
 }
 sections["8_18"] = {
@@ -1647,8 +1647,8 @@ sections["8_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,deathKnight_2_815,skeletonArcher_2_1222,meatWagon_2_203,skeletonWarrior_2_407",
-	["rewards"] = "soldierMaterials:deathHand:42:25,soldierMaterials:heroBones:42:25,soldierMaterials:soulStone:42:25,soldierMaterials:magicBox:42:25"
+	["troops"] = "blueDragon:2:14,deathKnight:3:782,skeletonArcher:3:1174,meatWagon:3:391,skeletonWarrior:3:392",
+	["rewards"] = "soldierMaterials:deathHand:165:25,soldierMaterials:heroBones:165:25,soldierMaterials:soulStone:165:25,soldierMaterials:magicBox:165:25"
 }
 sections["8_19"] = {
 	["sectionName"] = "8_19",
@@ -1657,7 +1657,7 @@ sections["8_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,ballista_1_820,swordsman_1_2460,lancer_1_820,ranger_1_820",
+	["troops"] = "blueDragon:2:14,ballista_1:3:984,swordsman_1:3:1476,lancer_1:3:492,ranger_1:3:492",
 	["rewards"] = "resources:wood:84000:25,resources:stone:84000:25,resources:iron:84000:25,resources:food:84000:25"
 }
 sections["8_20"] = {
@@ -1667,7 +1667,7 @@ sections["8_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,crossbowman_1_3300,catapult_1_618,swordsman_1_1650,lancer_1_412",
+	["troops"] = "blueDragon:2:14,crossbowman_1:3:1980,catapult_1:3:742,swordsman_1:3:990,lancer_1:3:247",
 	["rewards"] = "resources:wood:84000:25,resources:stone:84000:25,resources:iron:84000:25,resources:food:84000:25"
 }
 sections["8_21"] = {
@@ -1677,8 +1677,8 @@ sections["8_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,skeletonWarrior_2_1563,deathKnight_2_625,skeletonArcher_2_937,meatWagon_2_155",
-	["rewards"] = "soldierMaterials:deathHand:42:25,soldierMaterials:heroBones:42:25,soldierMaterials:soulStone:42:25,soldierMaterials:magicBox:42:25"
+	["troops"] = "blueDragon:2:14,skeletonWarrior:3:1594,deathKnight:3:598,skeletonArcher:3:797,meatWagon:3:199",
+	["rewards"] = "soldierMaterials:deathHand:168:25,soldierMaterials:heroBones:168:25,soldierMaterials:soulStone:168:25,soldierMaterials:magicBox:168:25"
 }
 sections["9_1"] = {
 	["sectionName"] = "9_1",
@@ -1687,7 +1687,7 @@ sections["9_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,horseArcher_1_1686,crossbowman_1_2530,catapult_1_421,swordsman_1_843",
+	["troops"] = "blueDragon:2:14,horseArcher_1:3:1002,crossbowman_1:3:1503,catapult_1:3:501,swordsman_1:3:501",
 	["rewards"] = "resources:wood:86000:25,resources:stone:86000:25,resources:iron:86000:25,resources:food:86000:25"
 }
 sections["9_2"] = {
@@ -1697,7 +1697,7 @@ sections["9_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,ballista_1_852,sentinel_1_2557,lancer_1_852,ranger_1_852",
+	["troops"] = "blueDragon:2:14,ballista_1:3:1008,sentinel_1:3:1512,lancer_1:3:504,ranger_1:3:504",
 	["rewards"] = "resources:wood:86000:25,resources:stone:86000:25,resources:iron:86000:25,resources:food:86000:25"
 }
 sections["9_3"] = {
@@ -1707,8 +1707,8 @@ sections["9_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,skeletonArcher_2_1723,meatWagon_2_322,skeletonWarrior_2_861,deathKnight_2_215",
-	["rewards"] = "soldierMaterials:deathHand:43:25,soldierMaterials:heroBones:43:25,soldierMaterials:soulStone:43:25,soldierMaterials:magicBox:43:25"
+	["troops"] = "blueDragon:2:14,skeletonArcher:3:1623,meatWagon:3:608,skeletonWarrior:3:812,deathKnight:3:203",
+	["rewards"] = "soldierMaterials:deathHand:171:25,soldierMaterials:heroBones:171:25,soldierMaterials:soulStone:171:25,soldierMaterials:magicBox:171:25"
 }
 sections["9_4"] = {
 	["sectionName"] = "9_4",
@@ -1717,7 +1717,7 @@ sections["9_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,sentinel_1_3484,horseArcher_1_1306,ranger_1_1742,catapult_1_217",
+	["troops"] = "blueDragon:2:14,sentinel_1:3:2040,horseArcher_1:3:765,ranger_1:3:1020,catapult_1:3:255",
 	["rewards"] = "resources:wood:86000:25,resources:stone:86000:25,resources:iron:86000:25,resources:food:86000:25"
 }
 sections["9_5"] = {
@@ -1727,7 +1727,7 @@ sections["9_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,horseArcher_1_1761,crossbowman_1_2641,ballista_1_439,swordsman_1_880",
+	["troops"] = "blueDragon:2:14,horseArcher_1:3:1026,crossbowman_1:3:1539,ballista_1:3:513,swordsman_1:3:513",
 	["rewards"] = "resources:wood:88000:25,resources:stone:88000:25,resources:iron:88000:25,resources:food:88000:25"
 }
 sections["9_6"] = {
@@ -1737,8 +1737,8 @@ sections["9_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_14,meatWagon_2_445,skeletonWarrior_2_1335,deathKnight_2_445,skeletonArcher_2_445",
-	["rewards"] = "soldierMaterials:deathHand:44:25,soldierMaterials:heroBones:44:25,soldierMaterials:soulStone:44:25,soldierMaterials:magicBox:44:25"
+	["troops"] = "blueDragon:2:14,meatWagon:3:826,skeletonWarrior:3:1239,deathKnight:3:413,skeletonArcher:3:413",
+	["rewards"] = "soldierMaterials:deathHand:174:25,soldierMaterials:heroBones:174:25,soldierMaterials:soulStone:174:25,soldierMaterials:magicBox:174:25"
 }
 sections["9_7"] = {
 	["sectionName"] = "9_7",
@@ -1747,7 +1747,7 @@ sections["9_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,crossbowman_1_3598,ballista_1_673,sentinel_1_1799,lancer_1_449",
+	["troops"] = "blueDragon:2:15,crossbowman_1:3:2076,ballista_1:3:778,sentinel_1:3:1038,lancer_1:3:259",
 	["rewards"] = "resources:wood:88000:25,resources:stone:88000:25,resources:iron:88000:25,resources:food:88000:25"
 }
 sections["9_8"] = {
@@ -1757,7 +1757,7 @@ sections["9_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,sentinel_1_3636,horseArcher_1_1363,crossbowman_1_1818,catapult_1_226",
+	["troops"] = "blueDragon:2:15,sentinel_1:3:2088,horseArcher_1:3:783,crossbowman_1:3:1044,catapult_1:3:261",
 	["rewards"] = "resources:wood:88000:25,resources:stone:88000:25,resources:iron:88000:25,resources:food:88000:25"
 }
 sections["9_9"] = {
@@ -1767,8 +1767,8 @@ sections["9_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,deathKnight_2_918,skeletonArcher_2_1377,meatWagon_2_228,skeletonWarrior_2_458",
-	["rewards"] = "soldierMaterials:deathHand:45:25,soldierMaterials:heroBones:45:25,soldierMaterials:soulStone:45:25,soldierMaterials:magicBox:45:25"
+	["troops"] = "blueDragon:2:15,deathKnight:3:840,skeletonArcher:3:1260,meatWagon:3:420,skeletonWarrior:3:420",
+	["rewards"] = "soldierMaterials:deathHand:177:25,soldierMaterials:heroBones:177:25,soldierMaterials:soulStone:177:25,soldierMaterials:magicBox:177:25"
 }
 sections["9_10"] = {
 	["sectionName"] = "9_10",
@@ -1777,7 +1777,7 @@ sections["9_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,ballista_1_928,sentinel_1_2785,horseArcher_1_928,crossbowman_1_928",
+	["troops"] = "blueDragon:2:15,ballista_1:3:1056,sentinel_1:3:1584,horseArcher_1:3:528,crossbowman_1:3:528",
 	["rewards"] = "resources:wood:90000:25,resources:stone:90000:25,resources:iron:90000:25,resources:food:90000:25"
 }
 sections["9_11"] = {
@@ -1787,7 +1787,7 @@ sections["9_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,crossbowman_1_3752,ballista_1_702,sentinel_1_1876,horseArcher_1_468",
+	["troops"] = "blueDragon:2:15,crossbowman_1:3:2124,ballista_1:3:796,sentinel_1:3:1062,horseArcher_1:3:265",
 	["rewards"] = "resources:wood:90000:25,resources:stone:90000:25,resources:iron:90000:25,resources:food:90000:25"
 }
 sections["9_12"] = {
@@ -1797,8 +1797,8 @@ sections["9_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,skeletonWarrior_2_1895,deathKnight_2_710,skeletonArcher_2_947,meatWagon_2_118",
-	["rewards"] = "soldierMaterials:deathHand:45:25,soldierMaterials:heroBones:45:25,soldierMaterials:soulStone:45:25,soldierMaterials:magicBox:45:25"
+	["troops"] = "blueDragon:2:15,skeletonWarrior:3:1709,deathKnight:3:641,skeletonArcher:3:855,meatWagon:3:214",
+	["rewards"] = "soldierMaterials:deathHand:180:25,soldierMaterials:heroBones:180:25,soldierMaterials:soulStone:180:25,soldierMaterials:magicBox:180:25"
 }
 sections["9_13"] = {
 	["sectionName"] = "9_13",
@@ -1807,7 +1807,7 @@ sections["9_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,lancer_1_1915,ranger_1_2872,catapult_1_478,swordsman_1_957",
+	["troops"] = "blueDragon:2:15,lancer_1:3:1074,ranger_1:3:1611,catapult_1:3:537,swordsman_1:3:537",
 	["rewards"] = "resources:wood:92000:25,resources:stone:92000:25,resources:iron:92000:25,resources:food:92000:25"
 }
 sections["9_14"] = {
@@ -1817,7 +1817,7 @@ sections["9_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,catapult_1_967,swordsman_1_2902,lancer_1_967,ranger_1_967",
+	["troops"] = "blueDragon:2:15,catapult_1:3:1080,swordsman_1:3:1620,lancer_1:3:540,ranger_1:3:540",
 	["rewards"] = "resources:wood:92000:25,resources:stone:92000:25,resources:iron:92000:25,resources:food:92000:25"
 }
 sections["9_15"] = {
@@ -1827,8 +1827,8 @@ sections["9_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,skeletonArcher_2_1954,meatWagon_2_366,skeletonWarrior_2_977,deathKnight_2_244",
-	["rewards"] = "soldierMaterials:deathHand:46:25,soldierMaterials:heroBones:46:25,soldierMaterials:soulStone:46:25,soldierMaterials:magicBox:46:25"
+	["troops"] = "blueDragon:2:15,skeletonArcher:3:1738,meatWagon:3:652,skeletonWarrior:3:869,deathKnight:3:217",
+	["rewards"] = "soldierMaterials:deathHand:183:25,soldierMaterials:heroBones:183:25,soldierMaterials:soulStone:183:25,soldierMaterials:magicBox:183:25"
 }
 sections["9_16"] = {
 	["sectionName"] = "9_16",
@@ -1837,7 +1837,7 @@ sections["9_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,swordsman_1_3949,lancer_1_1481,ranger_1_1974,catapult_1_246",
+	["troops"] = "blueDragon:2:15,swordsman_1:3:2184,lancer_1:3:819,ranger_1:3:1092,catapult_1:3:273",
 	["rewards"] = "resources:wood:92000:25,resources:stone:92000:25,resources:iron:92000:25,resources:food:92000:25"
 }
 sections["9_17"] = {
@@ -1847,7 +1847,7 @@ sections["9_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,horseArcher_1_1994,ranger_1_2992,catapult_1_498,swordsman_1_997",
+	["troops"] = "blueDragon:2:15,horseArcher_1:3:1098,ranger_1:3:1647,catapult_1:3:549,swordsman_1:3:549",
 	["rewards"] = "resources:wood:94000:25,resources:stone:94000:25,resources:iron:94000:25,resources:food:94000:25"
 }
 sections["9_18"] = {
@@ -1857,8 +1857,8 @@ sections["9_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,meatWagon_2_503,skeletonWarrior_2_1511,deathKnight_2_503,skeletonArcher_2_503",
-	["rewards"] = "soldierMaterials:deathHand:47:25,soldierMaterials:heroBones:47:25,soldierMaterials:soulStone:47:25,soldierMaterials:magicBox:47:25"
+	["troops"] = "blueDragon:2:15,meatWagon:3:883,skeletonWarrior:3:1325,deathKnight:3:442,skeletonArcher:3:442",
+	["rewards"] = "soldierMaterials:deathHand:186:25,soldierMaterials:heroBones:186:25,soldierMaterials:soulStone:186:25,soldierMaterials:magicBox:186:25"
 }
 sections["9_19"] = {
 	["sectionName"] = "9_19",
@@ -1867,7 +1867,7 @@ sections["9_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_15,crossbowman_1_4069,catapult_1_762,swordsman_1_2034,lancer_1_508",
+	["troops"] = "blueDragon:2:15,crossbowman_1:3:2220,catapult_1:3:832,swordsman_1:3:1110,lancer_1:3:277",
 	["rewards"] = "resources:wood:94000:25,resources:stone:94000:25,resources:iron:94000:25,resources:food:94000:25"
 }
 sections["9_20"] = {
@@ -1877,7 +1877,7 @@ sections["9_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_16,sentinel_1_4110,lancer_1_1541,ranger_1_2055,catapult_1_256",
+	["troops"] = "blueDragon:2:16,sentinel_1:3:2232,lancer_1:3:837,ranger_1:3:1116,catapult_1:3:279",
 	["rewards"] = "resources:wood:94000:25,resources:stone:94000:25,resources:iron:94000:25,resources:food:94000:25"
 }
 sections["9_21"] = {
@@ -1887,8 +1887,8 @@ sections["9_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_2_16,deathKnight_2_972,skeletonArcher_2_1556,meatWagon_2_290,skeletonWarrior_2_778",
-	["rewards"] = "soldierMaterials:deathHand:48:25,soldierMaterials:heroBones:48:25,soldierMaterials:soulStone:48:25,soldierMaterials:magicBox:48:25"
+	["troops"] = "blueDragon:2:16,deathKnight:3:898,skeletonArcher:3:1347,meatWagon:3:449,skeletonWarrior:3:449",
+	["rewards"] = "soldierMaterials:deathHand:189:25,soldierMaterials:heroBones:189:25,soldierMaterials:soulStone:189:25,soldierMaterials:magicBox:189:25"
 }
 sections["10_1"] = {
 	["sectionName"] = "10_1",
@@ -1897,7 +1897,7 @@ sections["10_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,ballista_1_1048,sentinel_1_3144,lancer_1_1048,ranger_1_1048",
+	["troops"] = "redDragon:2:16,ballista_2:1:1128,sentinel_2:1:1692,lancer_2:1:564,ranger_2:1:564",
 	["rewards"] = "resources:wood:96000:25,resources:stone:96000:25,resources:iron:96000:25,resources:food:96000:25"
 }
 sections["10_2"] = {
@@ -1907,7 +1907,7 @@ sections["10_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,crossbowman_1_4233,ballista_1_792,swordsman_1_2116,lancer_1_528",
+	["troops"] = "redDragon:2:16,crossbowman_2:1:2268,ballista_2:1:850,swordsman_2:1:1134,lancer_2:1:283",
 	["rewards"] = "resources:wood:96000:25,resources:stone:96000:25,resources:iron:96000:25,resources:food:96000:25"
 }
 sections["10_3"] = {
@@ -1917,8 +1917,8 @@ sections["10_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,skeletonWarrior_2_2137,deathKnight_2_800,skeletonArcher_2_1068,meatWagon_2_132",
-	["rewards"] = "soldierMaterials:deathHand:48:25,soldierMaterials:heroBones:48:25,soldierMaterials:soulStone:48:25,soldierMaterials:magicBox:48:25"
+	["troops"] = "redDragon:2:16,skeletonWarrior:3:2280,deathKnight:3:855,skeletonArcher:3:1140,meatWagon:3:285",
+	["rewards"] = "soldierMaterials:deathHand:192:25,soldierMaterials:heroBones:192:25,soldierMaterials:soulStone:192:25,soldierMaterials:magicBox:192:25"
 }
 sections["10_4"] = {
 	["sectionName"] = "10_4",
@@ -1927,7 +1927,7 @@ sections["10_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,horseArcher_1_2158,crossbowman_1_3237,ballista_1_539,swordsman_1_1079",
+	["troops"] = "redDragon:2:16,horseArcher_2:1:1146,crossbowman_2:1:1719,ballista_2:1:573,swordsman_2:1:573",
 	["rewards"] = "resources:wood:98000:25,resources:stone:98000:25,resources:iron:98000:25,resources:food:98000:25"
 }
 sections["10_5"] = {
@@ -1937,7 +1937,7 @@ sections["10_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,ballista_1_1089,sentinel_1_3268,horseArcher_1_1089,ranger_1_1089",
+	["troops"] = "redDragon:2:16,ballista_2:1:1152,sentinel_2:1:1728,horseArcher_2:1:576,ranger_2:1:576",
 	["rewards"] = "resources:wood:98000:25,resources:stone:98000:25,resources:iron:98000:25,resources:food:98000:25"
 }
 sections["10_6"] = {
@@ -1947,8 +1947,8 @@ sections["10_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,skeletonArcher_2_2200,meatWagon_2_411,skeletonWarrior_2_1100,deathKnight_2_274",
-	["rewards"] = "soldierMaterials:deathHand:49:25,soldierMaterials:heroBones:49:25,soldierMaterials:soulStone:49:25,soldierMaterials:magicBox:49:25"
+	["troops"] = "redDragon:2:16,skeletonArcher:3:2316,meatWagon:3:868,skeletonWarrior:3:1158,deathKnight:3:289",
+	["rewards"] = "soldierMaterials:deathHand:195:25,soldierMaterials:heroBones:195:25,soldierMaterials:soulStone:195:25,soldierMaterials:magicBox:195:25"
 }
 sections["10_7"] = {
 	["sectionName"] = "10_7",
@@ -1957,7 +1957,7 @@ sections["10_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,sentinel_1_4442,horseArcher_1_1665,crossbowman_1_2221,catapult_1_277",
+	["troops"] = "redDragon:2:16,sentinel_2:1:2328,horseArcher_2:1:873,crossbowman_2:1:1164,catapult_2:1:291",
 	["rewards"] = "resources:wood:98000:25,resources:stone:98000:25,resources:iron:98000:25,resources:food:98000:25"
 }
 sections["10_8"] = {
@@ -1967,7 +1967,7 @@ sections["10_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,horseArcher_1_2242,crossbowman_1_3363,ballista_1_560,sentinel_1_1121",
+	["troops"] = "redDragon:2:16,horseArcher_2:1:1170,crossbowman_2:1:1755,ballista_2:1:585,sentinel_2:1:585",
 	["rewards"] = "resources:wood:100000:25,resources:stone:100000:25,resources:iron:100000:25,resources:food:100000:25"
 }
 sections["10_9"] = {
@@ -1977,8 +1977,8 @@ sections["10_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,meatWagon_2_565,skeletonWarrior_2_1697,deathKnight_2_565,skeletonArcher_2_565",
-	["rewards"] = "soldierMaterials:deathHand:50:25,soldierMaterials:heroBones:50:25,soldierMaterials:soulStone:50:25,soldierMaterials:magicBox:50:25"
+	["troops"] = "redDragon:2:16,meatWagon:3:1176,skeletonWarrior:3:1764,deathKnight:3:588,skeletonArcher:3:588",
+	["rewards"] = "soldierMaterials:deathHand:198:25,soldierMaterials:heroBones:198:25,soldierMaterials:soulStone:198:25,soldierMaterials:magicBox:198:25"
 }
 sections["10_10"] = {
 	["sectionName"] = "10_10",
@@ -1987,7 +1987,7 @@ sections["10_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,crossbowman_1_4570,ballista_1_856,sentinel_1_2285,horseArcher_1_570",
+	["troops"] = "redDragon:2:16,crossbowman_2:1:2364,ballista_2:1:886,sentinel_2:1:1182,horseArcher_2:1:295",
 	["rewards"] = "resources:wood:100000:25,resources:stone:100000:25,resources:iron:100000:25,resources:food:100000:25"
 }
 sections["10_11"] = {
@@ -1997,7 +1997,7 @@ sections["10_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_16,sentinel_1_4613,horseArcher_1_1730,crossbowman_1_2306,ballista_1_287",
+	["troops"] = "redDragon:2:16,sentinel_2:1:2376,horseArcher_2:1:891,crossbowman_2:1:1188,ballista_2:1:297",
 	["rewards"] = "resources:wood:100000:25,resources:stone:100000:25,resources:iron:100000:25,resources:food:100000:25"
 }
 sections["10_12"] = {
@@ -2007,8 +2007,8 @@ sections["10_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,deathKnight_2_1164,skeletonArcher_2_1745,meatWagon_2_290,skeletonWarrior_2_581",
-	["rewards"] = "soldierMaterials:deathHand:51:25,soldierMaterials:heroBones:51:25,soldierMaterials:soulStone:51:25,soldierMaterials:magicBox:51:25"
+	["troops"] = "redDragon:2:17,deathKnight:3:1194,skeletonArcher:3:1791,meatWagon:3:597,skeletonWarrior:3:597",
+	["rewards"] = "soldierMaterials:deathHand:201:25,soldierMaterials:heroBones:201:25,soldierMaterials:soulStone:201:25,soldierMaterials:magicBox:201:25"
 }
 sections["10_13"] = {
 	["sectionName"] = "10_13",
@@ -2017,7 +2017,7 @@ sections["10_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,catapult_1_1174,swordsman_1_3524,lancer_1_1174,ranger_1_1174",
+	["troops"] = "redDragon:2:17,catapult_2:1:1200,swordsman_2:1:1800,lancer_2:1:600,ranger_2:1:600",
 	["rewards"] = "resources:wood:102000:25,resources:stone:102000:25,resources:iron:102000:25,resources:food:102000:25"
 }
 sections["10_14"] = {
@@ -2027,7 +2027,7 @@ sections["10_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,ranger_1_4743,catapult_1_888,swordsman_1_2371,lancer_1_592",
+	["troops"] = "redDragon:2:17,ranger_2:1:2412,catapult_2:1:904,swordsman_2:1:1206,lancer_2:1:301",
 	["rewards"] = "resources:wood:102000:25,resources:stone:102000:25,resources:iron:102000:25,resources:food:102000:25"
 }
 sections["10_15"] = {
@@ -2037,8 +2037,8 @@ sections["10_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,skeletonWarrior_2_2393,deathKnight_2_897,skeletonArcher_2_1196,meatWagon_2_149",
-	["rewards"] = "soldierMaterials:deathHand:51:25,soldierMaterials:heroBones:51:25,soldierMaterials:soulStone:51:25,soldierMaterials:magicBox:51:25"
+	["troops"] = "redDragon:2:17,skeletonWarrior:3:2424,deathKnight:3:909,skeletonArcher:3:1212,meatWagon:3:303",
+	["rewards"] = "soldierMaterials:deathHand:204:25,soldierMaterials:heroBones:204:25,soldierMaterials:soulStone:204:25,soldierMaterials:magicBox:204:25"
 }
 sections["10_16"] = {
 	["sectionName"] = "10_16",
@@ -2047,7 +2047,7 @@ sections["10_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,horseArcher_1_2415,ranger_1_3623,catapult_1_603,swordsman_1_1207",
+	["troops"] = "redDragon:2:17,horseArcher_2:1:1218,ranger_2:1:1827,catapult_2:1:609,swordsman_2:1:609",
 	["rewards"] = "resources:wood:104000:25,resources:stone:104000:25,resources:iron:104000:25,resources:food:104000:25"
 }
 sections["10_17"] = {
@@ -2057,7 +2057,7 @@ sections["10_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,ballista_1_1218,swordsman_1_3656,lancer_1_1218,ranger_1_1218",
+	["troops"] = "redDragon:2:17,ballista_2:1:1224,swordsman_2:1:1836,lancer_2:1:612,ranger_2:1:612",
 	["rewards"] = "resources:wood:104000:25,resources:stone:104000:25,resources:iron:104000:25,resources:food:104000:25"
 }
 sections["10_18"] = {
@@ -2067,8 +2067,8 @@ sections["10_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,skeletonArcher_2_2459,meatWagon_2_460,skeletonWarrior_2_1229,deathKnight_2_307",
-	["rewards"] = "soldierMaterials:deathHand:52:25,soldierMaterials:heroBones:52:25,soldierMaterials:soulStone:52:25,soldierMaterials:magicBox:52:25"
+	["troops"] = "redDragon:2:17,skeletonArcher:3:2460,meatWagon:3:922,skeletonWarrior:3:1230,deathKnight:3:307",
+	["rewards"] = "soldierMaterials:deathHand:207:25,soldierMaterials:heroBones:207:25,soldierMaterials:soulStone:207:25,soldierMaterials:magicBox:207:25"
 }
 sections["10_19"] = {
 	["sectionName"] = "10_19",
@@ -2077,7 +2077,7 @@ sections["10_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,sentinel_1_4964,lancer_1_1861,ranger_1_2482,catapult_1_309",
+	["troops"] = "redDragon:2:17,sentinel_2:1:2472,lancer_2:1:927,ranger_2:1:1236,catapult_2:1:309",
 	["rewards"] = "resources:wood:104000:25,resources:stone:104000:25,resources:iron:104000:25,resources:food:104000:25"
 }
 sections["10_20"] = {
@@ -2087,7 +2087,7 @@ sections["10_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,horseArcher_1_2504,crossbowman_1_3757,catapult_1_625,swordsman_1_1252",
+	["troops"] = "redDragon:2:17,horseArcher_2:1:1242,crossbowman_2:1:1863,catapult_2:1:621,swordsman_2:1:621",
 	["rewards"] = "resources:wood:106000:25,resources:stone:106000:25,resources:iron:106000:25,resources:food:106000:25"
 }
 sections["10_21"] = {
@@ -2097,8 +2097,8 @@ sections["10_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,meatWagon_2_591,skeletonWarrior_2_1895,deathKnight_2_710,skeletonArcher_2_947",
-	["rewards"] = "soldierMaterials:deathHand:53:25,soldierMaterials:heroBones:53:25,soldierMaterials:soulStone:53:25,soldierMaterials:magicBox:53:25"
+	["troops"] = "redDragon:2:17,meatWagon:3:1248,skeletonWarrior:3:1872,deathKnight:3:624,skeletonArcher:3:624",
+	["rewards"] = "soldierMaterials:deathHand:210:25,soldierMaterials:heroBones:210:25,soldierMaterials:soulStone:210:25,soldierMaterials:magicBox:210:25"
 }
 sections["11_1"] = {
 	["sectionName"] = "11_1",
@@ -2107,7 +2107,7 @@ sections["11_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,crossbowman_1_5099,ballista_1_955,swordsman_1_2549,lancer_1_636",
+	["troops"] = "redDragon:2:17,crossbowman_2:1:2508,ballista_2:1:940,swordsman_2:1:1254,lancer_2:1:313",
 	["rewards"] = "resources:wood:106000:25,resources:stone:106000:25,resources:iron:106000:25,resources:food:106000:25"
 }
 sections["11_2"] = {
@@ -2117,7 +2117,7 @@ sections["11_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,sentinel_1_5144,horseArcher_1_1929,ranger_1_2572,catapult_1_320",
+	["troops"] = "redDragon:2:17,sentinel_2:1:2520,horseArcher_2:1:945,ranger_2:1:1260,catapult_2:1:315",
 	["rewards"] = "resources:wood:106000:25,resources:stone:106000:25,resources:iron:106000:25,resources:food:106000:25"
 }
 sections["11_3"] = {
@@ -2127,8 +2127,8 @@ sections["11_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_17,deathKnight_2_1297,skeletonArcher_2_1945,meatWagon_2_323,skeletonWarrior_2_648",
-	["rewards"] = "soldierMaterials:deathHand:54:25,soldierMaterials:heroBones:54:25,soldierMaterials:soulStone:54:25,soldierMaterials:magicBox:54:25"
+	["troops"] = "redDragon:2:17,deathKnight:3:1266,skeletonArcher:3:1899,meatWagon:3:633,skeletonWarrior:3:633",
+	["rewards"] = "soldierMaterials:deathHand:213:25,soldierMaterials:heroBones:213:25,soldierMaterials:soulStone:213:25,soldierMaterials:magicBox:213:25"
 }
 sections["11_4"] = {
 	["sectionName"] = "11_4",
@@ -2137,7 +2137,7 @@ sections["11_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,ballista_1_1309,sentinel_1_3927,horseArcher_1_1309,ranger_1_1309",
+	["troops"] = "redDragon:2:18,ballista_2:1:1272,sentinel_2:1:1908,horseArcher_2:1:636,ranger_2:1:636",
 	["rewards"] = "resources:wood:108000:25,resources:stone:108000:25,resources:iron:108000:25,resources:food:108000:25"
 }
 sections["11_5"] = {
@@ -2147,7 +2147,7 @@ sections["11_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,crossbowman_1_5282,ballista_1_989,sentinel_1_2641,lancer_1_659",
+	["troops"] = "redDragon:2:18,crossbowman_2:1:2556,ballista_2:1:958,sentinel_2:1:1278,lancer_2:1:319",
 	["rewards"] = "resources:wood:108000:25,resources:stone:108000:25,resources:iron:108000:25,resources:food:108000:25"
 }
 sections["11_6"] = {
@@ -2157,8 +2157,8 @@ sections["11_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,skeletonWarrior_2_2664,deathKnight_2_998,skeletonArcher_2_1332,meatWagon_2_165",
-	["rewards"] = "soldierMaterials:deathHand:54:25,soldierMaterials:heroBones:54:25,soldierMaterials:soulStone:54:25,soldierMaterials:magicBox:54:25"
+	["troops"] = "redDragon:2:18,skeletonWarrior:3:2568,deathKnight:3:963,skeletonArcher:3:1284,meatWagon:3:321",
+	["rewards"] = "soldierMaterials:deathHand:216:25,soldierMaterials:heroBones:216:25,soldierMaterials:soulStone:216:25,soldierMaterials:magicBox:216:25"
 }
 sections["11_7"] = {
 	["sectionName"] = "11_7",
@@ -2167,7 +2167,7 @@ sections["11_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,horseArcher_1_2687,crossbowman_1_4031,ballista_1_671,sentinel_1_1343",
+	["troops"] = "redDragon:2:18,horseArcher_2:1:1290,crossbowman_2:1:1935,ballista_2:1:645,sentinel_2:1:645",
 	["rewards"] = "resources:wood:110000:25,resources:stone:110000:25,resources:iron:110000:25,resources:food:110000:25"
 }
 sections["11_8"] = {
@@ -2177,7 +2177,7 @@ sections["11_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,ballista_1_1355,sentinel_1_4066,horseArcher_1_1355,crossbowman_1_1355",
+	["troops"] = "redDragon:2:18,ballista_2:1:1296,sentinel_2:1:1944,horseArcher_2:1:648,crossbowman_2:1:648",
 	["rewards"] = "resources:wood:110000:25,resources:stone:110000:25,resources:iron:110000:25,resources:food:110000:25"
 }
 sections["11_9"] = {
@@ -2187,8 +2187,8 @@ sections["11_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,skeletonArcher_2_2734,meatWagon_2_511,skeletonWarrior_2_1367,deathKnight_2_341",
-	["rewards"] = "soldierMaterials:deathHand:55:25,soldierMaterials:heroBones:55:25,soldierMaterials:soulStone:55:25,soldierMaterials:magicBox:55:25"
+	["troops"] = "redDragon:2:18,skeletonArcher:3:2604,meatWagon:3:976,skeletonWarrior:3:1302,deathKnight:3:325",
+	["rewards"] = "soldierMaterials:deathHand:219:25,soldierMaterials:heroBones:219:25,soldierMaterials:soulStone:219:25,soldierMaterials:magicBox:219:25"
 }
 sections["11_10"] = {
 	["sectionName"] = "11_10",
@@ -2197,7 +2197,7 @@ sections["11_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,sentinel_1_5515,horseArcher_1_2068,crossbowman_1_2757,ballista_1_344",
+	["troops"] = "redDragon:2:18,sentinel_2:1:2616,horseArcher_2:1:981,crossbowman_2:1:1308,ballista_2:1:327",
 	["rewards"] = "resources:wood:110000:25,resources:stone:110000:25,resources:iron:110000:25,resources:food:110000:25"
 }
 sections["11_11"] = {
@@ -2207,7 +2207,7 @@ sections["11_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,lancer_1_2781,ranger_1_4171,catapult_1_694,swordsman_1_1390",
+	["troops"] = "redDragon:2:18,lancer_2:1:1314,ranger_2:1:1971,catapult_2:1:657,swordsman_2:1:657",
 	["rewards"] = "resources:wood:112000:25,resources:stone:112000:25,resources:iron:112000:25,resources:food:112000:25"
 }
 sections["11_12"] = {
@@ -2217,8 +2217,8 @@ sections["11_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,meatWagon_2_701,skeletonWarrior_2_2103,deathKnight_2_701,skeletonArcher_2_701",
-	["rewards"] = "soldierMaterials:deathHand:56:25,soldierMaterials:heroBones:56:25,soldierMaterials:soulStone:56:25,soldierMaterials:magicBox:56:25"
+	["troops"] = "redDragon:2:18,meatWagon:3:1320,skeletonWarrior:3:1980,deathKnight:3:660,skeletonArcher:3:660",
+	["rewards"] = "soldierMaterials:deathHand:222:25,soldierMaterials:heroBones:222:25,soldierMaterials:soulStone:222:25,soldierMaterials:magicBox:222:25"
 }
 sections["11_13"] = {
 	["sectionName"] = "11_13",
@@ -2227,7 +2227,7 @@ sections["11_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,ranger_1_5657,catapult_1_1059,swordsman_1_2828,lancer_1_706",
+	["troops"] = "redDragon:2:18,ranger_2:1:2652,catapult_2:1:994,swordsman_2:1:1326,lancer_2:1:331",
 	["rewards"] = "resources:wood:112000:25,resources:stone:112000:25,resources:iron:112000:25,resources:food:112000:25"
 }
 sections["11_14"] = {
@@ -2237,7 +2237,7 @@ sections["11_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,swordsman_1_5705,lancer_1_2139,ranger_1_2852,catapult_1_355",
+	["troops"] = "redDragon:2:18,swordsman_2:1:2664,lancer_2:1:999,ranger_2:1:1332,catapult_2:1:333",
 	["rewards"] = "resources:wood:112000:25,resources:stone:112000:25,resources:iron:112000:25,resources:food:112000:25"
 }
 sections["11_15"] = {
@@ -2247,8 +2247,8 @@ sections["11_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,deathKnight_2_1438,skeletonArcher_2_2156,meatWagon_2_358,skeletonWarrior_2_718",
-	["rewards"] = "soldierMaterials:deathHand:57:25,soldierMaterials:heroBones:57:25,soldierMaterials:soulStone:57:25,soldierMaterials:magicBox:57:25"
+	["troops"] = "redDragon:2:18,deathKnight:3:1338,skeletonArcher:3:2007,meatWagon:3:669,skeletonWarrior:3:669",
+	["rewards"] = "soldierMaterials:deathHand:225:25,soldierMaterials:heroBones:225:25,soldierMaterials:soulStone:225:25,soldierMaterials:magicBox:225:25"
 }
 sections["11_16"] = {
 	["sectionName"] = "11_16",
@@ -2257,7 +2257,7 @@ sections["11_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_18,ballista_1_1450,swordsman_1_4351,lancer_1_1450,ranger_1_1450",
+	["troops"] = "redDragon:2:18,ballista_2:1:1344,swordsman_2:1:2016,lancer_2:1:672,ranger_2:1:672",
 	["rewards"] = "resources:wood:114000:25,resources:stone:114000:25,resources:iron:114000:25,resources:food:114000:25"
 }
 sections["11_17"] = {
@@ -2267,7 +2267,7 @@ sections["11_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,crossbowman_1_5849,catapult_1_1095,swordsman_1_2924,lancer_1_730",
+	["troops"] = "redDragon:2:19,crossbowman_2:1:2700,catapult_2:1:1012,swordsman_2:1:1350,lancer_2:1:337",
 	["rewards"] = "resources:wood:114000:25,resources:stone:114000:25,resources:iron:114000:25,resources:food:114000:25"
 }
 sections["11_18"] = {
@@ -2277,8 +2277,8 @@ sections["11_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,skeletonWarrior_2_2949,deathKnight_2_1105,skeletonArcher_2_1474,meatWagon_2_184",
-	["rewards"] = "soldierMaterials:deathHand:57:25,soldierMaterials:heroBones:57:25,soldierMaterials:soulStone:57:25,soldierMaterials:magicBox:57:25"
+	["troops"] = "redDragon:2:19,skeletonWarrior:3:2712,deathKnight:3:1017,skeletonArcher:3:1356,meatWagon:3:339",
+	["rewards"] = "soldierMaterials:deathHand:228:25,soldierMaterials:heroBones:228:25,soldierMaterials:soulStone:228:25,soldierMaterials:magicBox:228:25"
 }
 sections["11_19"] = {
 	["sectionName"] = "11_19",
@@ -2287,7 +2287,7 @@ sections["11_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,horseArcher_1_2973,crossbowman_1_4460,catapult_1_742,swordsman_1_1486",
+	["troops"] = "redDragon:2:19,horseArcher_2:1:1362,crossbowman_2:1:2043,catapult_2:1:681,swordsman_2:1:681",
 	["rewards"] = "resources:wood:116000:25,resources:stone:116000:25,resources:iron:116000:25,resources:food:116000:25"
 }
 sections["11_20"] = {
@@ -2297,7 +2297,7 @@ sections["11_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,ballista_1_1499,sentinel_1_4497,lancer_1_1499,ranger_1_1499",
+	["troops"] = "redDragon:2:19,ballista_2:1:1368,sentinel_2:1:2052,lancer_2:1:684,ranger_2:1:684",
 	["rewards"] = "resources:wood:116000:25,resources:stone:116000:25,resources:iron:116000:25,resources:food:116000:25"
 }
 sections["11_21"] = {
@@ -2307,8 +2307,8 @@ sections["11_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,skeletonArcher_2_2832,meatWagon_2_566,skeletonWarrior_2_1698,deathKnight_2_566",
-	["rewards"] = "soldierMaterials:deathHand:58:25,soldierMaterials:heroBones:58:25,soldierMaterials:soulStone:58:25,soldierMaterials:magicBox:58:25"
+	["troops"] = "redDragon:2:19,skeletonArcher:3:2748,meatWagon:3:1030,skeletonWarrior:3:1374,deathKnight:3:343",
+	["rewards"] = "soldierMaterials:deathHand:231:25,soldierMaterials:heroBones:231:25,soldierMaterials:soulStone:231:25,soldierMaterials:magicBox:231:25"
 }
 sections["12_1"] = {
 	["sectionName"] = "12_1",
@@ -2317,7 +2317,7 @@ sections["12_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,sentinel_1_6094,horseArcher_1_2285,ranger_1_3047,catapult_1_380",
+	["troops"] = "redDragon:2:19,sentinel_2:1:2760,horseArcher_2:1:1035,ranger_2:1:1380,catapult_2:1:345",
 	["rewards"] = "resources:wood:116000:25,resources:stone:116000:25,resources:iron:116000:25,resources:food:116000:25"
 }
 sections["12_2"] = {
@@ -2327,7 +2327,7 @@ sections["12_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,horseArcher_1_3072,crossbowman_1_4608,ballista_1_767,swordsman_1_1536",
+	["troops"] = "redDragon:2:19,horseArcher_2:1:1386,crossbowman_2:1:2079,ballista_2:1:693,swordsman_2:1:693",
 	["rewards"] = "resources:wood:118000:25,resources:stone:118000:25,resources:iron:118000:25,resources:food:118000:25"
 }
 sections["12_3"] = {
@@ -2337,8 +2337,8 @@ sections["12_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,meatWagon_2_774,skeletonWarrior_2_2322,deathKnight_2_774,skeletonArcher_2_774",
-	["rewards"] = "soldierMaterials:deathHand:59:25,soldierMaterials:heroBones:59:25,soldierMaterials:soulStone:59:25,soldierMaterials:magicBox:59:25"
+	["troops"] = "redDragon:2:19,meatWagon:3:1392,skeletonWarrior:3:2088,deathKnight:3:696,skeletonArcher:3:696",
+	["rewards"] = "soldierMaterials:deathHand:234:25,soldierMaterials:heroBones:234:25,soldierMaterials:soulStone:234:25,soldierMaterials:magicBox:234:25"
 }
 sections["12_4"] = {
 	["sectionName"] = "12_4",
@@ -2347,7 +2347,7 @@ sections["12_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,crossbowman_1_6244,ballista_1_1169,sentinel_1_3122,lancer_1_779",
+	["troops"] = "redDragon:2:19,crossbowman_2:1:2796,ballista_2:1:1048,sentinel_2:1:1398,lancer_2:1:349",
 	["rewards"] = "resources:wood:118000:25,resources:stone:118000:25,resources:iron:118000:25,resources:food:118000:25"
 }
 sections["12_5"] = {
@@ -2357,7 +2357,7 @@ sections["12_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,sentinel_1_6294,horseArcher_1_2360,crossbowman_1_3147,catapult_1_392",
+	["troops"] = "redDragon:2:19,sentinel_2:1:2808,horseArcher_2:1:1053,crossbowman_2:1:1404,catapult_2:1:351",
 	["rewards"] = "resources:wood:118000:25,resources:stone:118000:25,resources:iron:118000:25,resources:food:118000:25"
 }
 sections["12_6"] = {
@@ -2367,8 +2367,8 @@ sections["12_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,deathKnight_2_1586,skeletonArcher_2_2378,meatWagon_2_395,skeletonWarrior_2_792",
-	["rewards"] = "soldierMaterials:deathHand:60:25,soldierMaterials:heroBones:60:25,soldierMaterials:soulStone:60:25,soldierMaterials:magicBox:60:25"
+	["troops"] = "redDragon:2:19,deathKnight:3:1410,skeletonArcher:3:2115,meatWagon:3:705,skeletonWarrior:3:705",
+	["rewards"] = "soldierMaterials:deathHand:237:25,soldierMaterials:heroBones:237:25,soldierMaterials:soulStone:237:25,soldierMaterials:magicBox:237:25"
 }
 sections["12_7"] = {
 	["sectionName"] = "12_7",
@@ -2377,7 +2377,7 @@ sections["12_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,ballista_1_1598,sentinel_1_4796,horseArcher_1_1598,crossbowman_1_1598",
+	["troops"] = "redDragon:2:19,ballista_2:1:1416,sentinel_2:1:2124,horseArcher_2:1:708,crossbowman_2:1:708",
 	["rewards"] = "resources:wood:120000:25,resources:stone:120000:25,resources:iron:120000:25,resources:food:120000:25"
 }
 sections["12_8"] = {
@@ -2387,7 +2387,7 @@ sections["12_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_19,crossbowman_1_6446,ballista_1_1207,sentinel_1_3223,horseArcher_1_805",
+	["troops"] = "redDragon:2:19,crossbowman_2:1:2844,ballista_2:1:1066,sentinel_2:1:1422,horseArcher_2:1:355",
 	["rewards"] = "resources:wood:120000:25,resources:stone:120000:25,resources:iron:120000:25,resources:food:120000:25"
 }
 sections["12_9"] = {
@@ -2397,8 +2397,8 @@ sections["12_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,skeletonWarrior_2_3248,deathKnight_2_1217,skeletonArcher_2_1624,meatWagon_2_202",
-	["rewards"] = "soldierMaterials:deathHand:60:25,soldierMaterials:heroBones:60:25,soldierMaterials:soulStone:60:25,soldierMaterials:magicBox:60:25"
+	["troops"] = "redDragon:2:20,skeletonWarrior:3:2856,deathKnight:3:1071,skeletonArcher:3:1428,meatWagon:3:357",
+	["rewards"] = "soldierMaterials:deathHand:240:25,soldierMaterials:heroBones:240:25,soldierMaterials:soulStone:240:25,soldierMaterials:magicBox:240:25"
 }
 sections["12_10"] = {
 	["sectionName"] = "12_10",
@@ -2407,7 +2407,7 @@ sections["12_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,lancer_1_3274,ranger_1_4911,catapult_1_817,swordsman_1_1637",
+	["troops"] = "redDragon:2:20,lancer_2:1:1434,ranger_2:1:2151,catapult_2:1:717,swordsman_2:1:717",
 	["rewards"] = "resources:wood:122000:25,resources:stone:122000:25,resources:iron:122000:25,resources:food:122000:25"
 }
 sections["12_11"] = {
@@ -2417,7 +2417,7 @@ sections["12_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,catapult_1_1649,swordsman_1_4949,lancer_1_1649,ranger_1_1649",
+	["troops"] = "redDragon:2:20,catapult_2:1:1440,swordsman_2:1:2160,lancer_2:1:720,ranger_2:1:720",
 	["rewards"] = "resources:wood:122000:25,resources:stone:122000:25,resources:iron:122000:25,resources:food:122000:25"
 }
 sections["12_12"] = {
@@ -2427,8 +2427,8 @@ sections["12_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,skeletonArcher_2_3325,meatWagon_2_622,skeletonWarrior_2_1662,deathKnight_2_415",
-	["rewards"] = "soldierMaterials:deathHand:61:25,soldierMaterials:heroBones:61:25,soldierMaterials:soulStone:61:25,soldierMaterials:magicBox:61:25"
+	["troops"] = "redDragon:2:20,skeletonArcher:3:2892,meatWagon:3:1084,skeletonWarrior:3:1446,deathKnight:3:361",
+	["rewards"] = "soldierMaterials:deathHand:243:25,soldierMaterials:heroBones:243:25,soldierMaterials:soulStone:243:25,soldierMaterials:magicBox:243:25"
 }
 sections["12_13"] = {
 	["sectionName"] = "12_13",
@@ -2437,7 +2437,7 @@ sections["12_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,swordsman_1_6703,lancer_1_2513,ranger_1_3351,catapult_1_418",
+	["troops"] = "redDragon:2:20,swordsman_2:1:2904,lancer_2:1:1089,ranger_2:1:1452,catapult_2:1:363",
 	["rewards"] = "resources:wood:122000:25,resources:stone:122000:25,resources:iron:122000:25,resources:food:122000:25"
 }
 sections["12_14"] = {
@@ -2447,7 +2447,7 @@ sections["12_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,horseArcher_1_3377,ranger_1_5066,catapult_1_843,swordsman_1_1688",
+	["troops"] = "redDragon:2:20,horseArcher_2:1:1458,ranger_2:1:2187,catapult_2:1:729,swordsman_2:1:729",
 	["rewards"] = "resources:wood:124000:25,resources:stone:124000:25,resources:iron:124000:25,resources:food:124000:25"
 }
 sections["12_15"] = {
@@ -2457,8 +2457,8 @@ sections["12_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,meatWagon_2_850,skeletonWarrior_2_2552,deathKnight_2_850,skeletonArcher_2_850",
-	["rewards"] = "soldierMaterials:deathHand:62:25,soldierMaterials:heroBones:62:25,soldierMaterials:soulStone:62:25,soldierMaterials:magicBox:62:25"
+	["troops"] = "redDragon:2:20,meatWagon:3:1464,skeletonWarrior:3:2196,deathKnight:3:732,skeletonArcher:3:732",
+	["rewards"] = "soldierMaterials:deathHand:246:25,soldierMaterials:heroBones:246:25,soldierMaterials:soulStone:246:25,soldierMaterials:magicBox:246:25"
 }
 sections["12_16"] = {
 	["sectionName"] = "12_16",
@@ -2467,7 +2467,7 @@ sections["12_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,crossbowman_1_6859,catapult_1_1285,swordsman_1_3429,lancer_1_856",
+	["troops"] = "redDragon:2:20,crossbowman_2:1:2940,catapult_2:1:1102,swordsman_2:1:1470,lancer_2:1:367",
 	["rewards"] = "resources:wood:124000:25,resources:stone:124000:25,resources:iron:124000:25,resources:food:124000:25"
 }
 sections["12_17"] = {
@@ -2477,7 +2477,7 @@ sections["12_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,sentinel_1_6912,lancer_1_2592,ranger_1_3456,catapult_1_431",
+	["troops"] = "redDragon:2:20,sentinel_2:1:2952,lancer_2:1:1107,ranger_2:1:1476,catapult_2:1:369",
 	["rewards"] = "resources:wood:124000:25,resources:stone:124000:25,resources:iron:124000:25,resources:food:124000:25"
 }
 sections["12_18"] = {
@@ -2487,8 +2487,8 @@ sections["12_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,deathKnight_2_1741,skeletonArcher_2_2611,meatWagon_2_434,skeletonWarrior_2_869",
-	["rewards"] = "soldierMaterials:deathHand:63:25,soldierMaterials:heroBones:63:25,soldierMaterials:soulStone:63:25,soldierMaterials:magicBox:63:25"
+	["troops"] = "redDragon:2:20,deathKnight:3:1482,skeletonArcher:3:2223,meatWagon:3:741,skeletonWarrior:3:741",
+	["rewards"] = "soldierMaterials:deathHand:249:25,soldierMaterials:heroBones:249:25,soldierMaterials:soulStone:249:25,soldierMaterials:magicBox:249:25"
 }
 sections["12_19"] = {
 	["sectionName"] = "12_19",
@@ -2497,7 +2497,7 @@ sections["12_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,ballista_1_1754,sentinel_1_5263,lancer_1_1754,ranger_1_1754",
+	["troops"] = "redDragon:2:20,ballista_2:1:1488,sentinel_2:1:2232,lancer_2:1:744,ranger_2:1:744",
 	["rewards"] = "resources:wood:126000:25,resources:stone:126000:25,resources:iron:126000:25,resources:food:126000:25"
 }
 sections["12_20"] = {
@@ -2507,7 +2507,7 @@ sections["12_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,crossbowman_1_7071,ballista_1_1324,swordsman_1_3535,lancer_1_883",
+	["troops"] = "redDragon:2:20,crossbowman_2:1:2988,ballista_2:1:1120,swordsman_2:1:1494,lancer_2:1:373",
 	["rewards"] = "resources:wood:126000:25,resources:stone:126000:25,resources:iron:126000:25,resources:food:126000:25"
 }
 sections["12_21"] = {
@@ -2517,8 +2517,8 @@ sections["12_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_2_20,skeletonWarrior_2_3338,deathKnight_2_1335,skeletonArcher_2_2003,meatWagon_2_333",
-	["rewards"] = "soldierMaterials:deathHand:63:25,soldierMaterials:heroBones:63:25,soldierMaterials:soulStone:63:25,soldierMaterials:magicBox:63:25"
+	["troops"] = "redDragon:2:20,skeletonWarrior:3:3000,deathKnight:3:1125,skeletonArcher:3:1500,meatWagon:3:375",
+	["rewards"] = "soldierMaterials:deathHand:252:25,soldierMaterials:heroBones:252:25,soldierMaterials:soulStone:252:25,soldierMaterials:magicBox:252:25"
 }
 sections["13_1"] = {
 	["sectionName"] = "13_1",
@@ -2527,7 +2527,7 @@ sections["13_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,horseArcher_1_3589,crossbowman_1_5383,ballista_1_896,swordsman_1_1794",
+	["troops"] = "greenDragon:3:21,horseArcher_2:2:1506,crossbowman_2:2:2259,ballista_2:2:753,swordsman_2:2:753",
 	["rewards"] = "resources:wood:128000:25,resources:stone:128000:25,resources:iron:128000:25,resources:food:128000:25"
 }
 sections["13_2"] = {
@@ -2537,7 +2537,7 @@ sections["13_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,ballista_1_1808,sentinel_1_5424,horseArcher_1_1808,ranger_1_1808",
+	["troops"] = "greenDragon:3:21,ballista_2:2:1512,sentinel_2:2:2268,horseArcher_2:2:756,ranger_2:2:756",
 	["rewards"] = "resources:wood:128000:25,resources:stone:128000:25,resources:iron:128000:25,resources:food:128000:25"
 }
 sections["13_3"] = {
@@ -2547,8 +2547,8 @@ sections["13_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,skeletonArcher_2_3643,meatWagon_2_682,skeletonWarrior_2_1821,deathKnight_2_455",
-	["rewards"] = "soldierMaterials:deathHand:64:25,soldierMaterials:heroBones:64:25,soldierMaterials:soulStone:64:25,soldierMaterials:magicBox:64:25"
+	["troops"] = "greenDragon:3:21,skeletonArcher:3:3644,meatWagon:3:1366,skeletonWarrior:3:1822,deathKnight:3:455",
+	["rewards"] = "soldierMaterials:deathHand:255:25,soldierMaterials:heroBones:255:25,soldierMaterials:soulStone:255:25,soldierMaterials:magicBox:255:25"
 }
 sections["13_4"] = {
 	["sectionName"] = "13_4",
@@ -2557,7 +2557,7 @@ sections["13_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,sentinel_1_7340,horseArcher_1_2752,crossbowman_1_3670,catapult_1_458",
+	["troops"] = "greenDragon:3:21,sentinel_2:2:3048,horseArcher_2:2:1143,crossbowman_2:2:1524,catapult_2:2:381",
 	["rewards"] = "resources:wood:128000:25,resources:stone:128000:25,resources:iron:128000:25,resources:food:128000:25"
 }
 sections["13_5"] = {
@@ -2567,7 +2567,7 @@ sections["13_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,horseArcher_1_3697,crossbowman_1_5546,ballista_1_923,sentinel_1_1848",
+	["troops"] = "greenDragon:3:21,horseArcher_2:2:1530,crossbowman_2:2:2295,ballista_2:2:765,sentinel_2:2:765",
 	["rewards"] = "resources:wood:130000:25,resources:stone:130000:25,resources:iron:130000:25,resources:food:130000:25"
 }
 sections["13_6"] = {
@@ -2577,8 +2577,8 @@ sections["13_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,meatWagon_2_931,skeletonWarrior_2_2793,deathKnight_2_931,skeletonArcher_2_931",
-	["rewards"] = "soldierMaterials:deathHand:65:25,soldierMaterials:heroBones:65:25,soldierMaterials:soulStone:65:25,soldierMaterials:magicBox:65:25"
+	["troops"] = "greenDragon:3:21,meatWagon:3:1843,skeletonWarrior:3:2765,deathKnight:3:922,skeletonArcher:3:922",
+	["rewards"] = "soldierMaterials:deathHand:258:25,soldierMaterials:heroBones:258:25,soldierMaterials:soulStone:258:25,soldierMaterials:magicBox:258:25"
 }
 sections["13_7"] = {
 	["sectionName"] = "13_7",
@@ -2587,7 +2587,7 @@ sections["13_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,crossbowman_1_7504,ballista_1_1405,sentinel_1_3752,horseArcher_1_937",
+	["troops"] = "greenDragon:3:21,crossbowman_2:2:3084,ballista_2:2:1156,sentinel_2:2:1542,horseArcher_2:2:385",
 	["rewards"] = "resources:wood:130000:25,resources:stone:130000:25,resources:iron:130000:25,resources:food:130000:25"
 }
 sections["13_8"] = {
@@ -2597,7 +2597,7 @@ sections["13_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,sentinel_1_7559,horseArcher_1_2834,crossbowman_1_3779,ballista_1_471",
+	["troops"] = "greenDragon:3:21,sentinel_2:2:3096,horseArcher_2:2:1161,crossbowman_2:2:1548,ballista_2:2:387",
 	["rewards"] = "resources:wood:130000:25,resources:stone:130000:25,resources:iron:130000:25,resources:food:130000:25"
 }
 sections["13_9"] = {
@@ -2607,8 +2607,8 @@ sections["13_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,deathKnight_2_1903,skeletonArcher_2_2854,meatWagon_2_474,skeletonWarrior_2_951",
-	["rewards"] = "soldierMaterials:deathHand:66:25,soldierMaterials:heroBones:66:25,soldierMaterials:soulStone:66:25,soldierMaterials:magicBox:66:25"
+	["troops"] = "greenDragon:3:21,deathKnight:3:1865,skeletonArcher:3:2798,meatWagon:3:932,skeletonWarrior:3:933",
+	["rewards"] = "soldierMaterials:deathHand:261:25,soldierMaterials:heroBones:261:25,soldierMaterials:soulStone:261:25,soldierMaterials:magicBox:261:25"
 }
 sections["13_10"] = {
 	["sectionName"] = "13_10",
@@ -2617,7 +2617,7 @@ sections["13_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,catapult_1_1917,swordsman_1_5752,lancer_1_1917,ranger_1_1917",
+	["troops"] = "greenDragon:3:21,catapult_2:2:1560,swordsman_2:2:2340,lancer_2:2:780,ranger_2:2:780",
 	["rewards"] = "resources:wood:132000:25,resources:stone:132000:25,resources:iron:132000:25,resources:food:132000:25"
 }
 sections["13_11"] = {
@@ -2627,7 +2627,7 @@ sections["13_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,ranger_1_7725,catapult_1_1447,swordsman_1_3862,lancer_1_964",
+	["troops"] = "greenDragon:3:21,ranger_2:2:3132,catapult_2:2:1174,swordsman_2:2:1566,lancer_2:2:391",
 	["rewards"] = "resources:wood:132000:25,resources:stone:132000:25,resources:iron:132000:25,resources:food:132000:25"
 }
 sections["13_12"] = {
@@ -2637,8 +2637,8 @@ sections["13_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,skeletonWarrior_2_3890,deathKnight_2_1458,skeletonArcher_2_1945,meatWagon_2_242",
-	["rewards"] = "soldierMaterials:deathHand:66:25,soldierMaterials:heroBones:66:25,soldierMaterials:soulStone:66:25,soldierMaterials:magicBox:66:25"
+	["troops"] = "greenDragon:3:21,skeletonWarrior:3:3773,deathKnight:3:1415,skeletonArcher:3:1887,meatWagon:3:472",
+	["rewards"] = "soldierMaterials:deathHand:264:25,soldierMaterials:heroBones:264:25,soldierMaterials:soulStone:264:25,soldierMaterials:magicBox:264:25"
 }
 sections["13_13"] = {
 	["sectionName"] = "13_13",
@@ -2647,7 +2647,7 @@ sections["13_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_21,horseArcher_1_3918,ranger_1_5878,catapult_1_978,swordsman_1_1959",
+	["troops"] = "greenDragon:3:21,horseArcher_2:2:1578,ranger_2:2:2367,catapult_2:2:789,swordsman_2:2:789",
 	["rewards"] = "resources:wood:134000:25,resources:stone:134000:25,resources:iron:134000:25,resources:food:134000:25"
 }
 sections["13_14"] = {
@@ -2657,7 +2657,7 @@ sections["13_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,ballista_1_1973,swordsman_1_5920,lancer_1_1973,ranger_1_1973",
+	["troops"] = "greenDragon:3:22,ballista_2:2:1584,swordsman_2:2:2376,lancer_2:2:792,ranger_2:2:792",
 	["rewards"] = "resources:wood:134000:25,resources:stone:134000:25,resources:iron:134000:25,resources:food:134000:25"
 }
 sections["13_15"] = {
@@ -2667,8 +2667,8 @@ sections["13_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,skeletonArcher_2_3974,meatWagon_2_743,skeletonWarrior_2_1987,deathKnight_2_496",
-	["rewards"] = "soldierMaterials:deathHand:67:25,soldierMaterials:heroBones:67:25,soldierMaterials:soulStone:67:25,soldierMaterials:magicBox:67:25"
+	["troops"] = "greenDragon:3:22,skeletonArcher:3:3816,meatWagon:3:1431,skeletonWarrior:3:1908,deathKnight:3:477",
+	["rewards"] = "soldierMaterials:deathHand:267:25,soldierMaterials:heroBones:267:25,soldierMaterials:soulStone:267:25,soldierMaterials:magicBox:267:25"
 }
 sections["13_16"] = {
 	["sectionName"] = "13_16",
@@ -2677,7 +2677,7 @@ sections["13_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,sentinel_1_8006,lancer_1_3002,ranger_1_4003,catapult_1_499",
+	["troops"] = "greenDragon:3:22,sentinel_2:2:3192,lancer_2:2:1197,ranger_2:2:1596,catapult_2:2:399",
 	["rewards"] = "resources:wood:134000:25,resources:stone:134000:25,resources:iron:134000:25,resources:food:134000:25"
 }
 sections["13_17"] = {
@@ -2687,7 +2687,7 @@ sections["13_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,horseArcher_1_4031,crossbowman_1_6047,catapult_1_1007,swordsman_1_2015",
+	["troops"] = "greenDragon:3:22,horseArcher_2:2:1602,crossbowman_2:2:2403,catapult_2:2:801,swordsman_2:2:801",
 	["rewards"] = "resources:wood:136000:25,resources:stone:136000:25,resources:iron:136000:25,resources:food:136000:25"
 }
 sections["13_18"] = {
@@ -2697,8 +2697,8 @@ sections["13_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,meatWagon_2_1015,skeletonWarrior_2_3045,deathKnight_2_1015,skeletonArcher_2_1015",
-	["rewards"] = "soldierMaterials:deathHand:68:25,soldierMaterials:heroBones:68:25,soldierMaterials:soulStone:68:25,soldierMaterials:magicBox:68:25"
+	["troops"] = "greenDragon:3:22,meatWagon:3:1930,skeletonWarrior:3:2895,deathKnight:3:965,skeletonArcher:3:965",
+	["rewards"] = "soldierMaterials:deathHand:270:25,soldierMaterials:heroBones:270:25,soldierMaterials:soulStone:270:25,soldierMaterials:magicBox:270:25"
 }
 sections["13_19"] = {
 	["sectionName"] = "13_19",
@@ -2707,7 +2707,7 @@ sections["13_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,crossbowman_1_8177,ballista_1_1532,swordsman_1_4088,lancer_1_1021",
+	["troops"] = "greenDragon:3:22,crossbowman_2:2:3228,ballista_2:2:1210,swordsman_2:2:1614,lancer_2:2:403",
 	["rewards"] = "resources:wood:136000:25,resources:stone:136000:25,resources:iron:136000:25,resources:food:136000:25"
 }
 sections["13_20"] = {
@@ -2717,7 +2717,7 @@ sections["13_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,sentinel_1_8234,horseArcher_1_3088,ranger_1_4117,catapult_1_513",
+	["troops"] = "greenDragon:3:22,sentinel_2:2:3240,horseArcher_2:2:1215,ranger_2:2:1620,catapult_2:2:405",
 	["rewards"] = "resources:wood:136000:25,resources:stone:136000:25,resources:iron:136000:25,resources:food:136000:25"
 }
 sections["13_21"] = {
@@ -2727,8 +2727,8 @@ sections["13_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,deathKnight_2_1941,skeletonArcher_2_3108,meatWagon_2_582,skeletonWarrior_2_1554",
-	["rewards"] = "soldierMaterials:deathHand:69:25,soldierMaterials:heroBones:69:25,soldierMaterials:soulStone:69:25,soldierMaterials:magicBox:69:25"
+	["troops"] = "greenDragon:3:22,deathKnight:3:1951,skeletonArcher:3:2927,meatWagon:3:976,skeletonWarrior:3:976",
+	["rewards"] = "soldierMaterials:deathHand:273:25,soldierMaterials:heroBones:273:25,soldierMaterials:soulStone:273:25,soldierMaterials:magicBox:273:25"
 }
 sections["14_1"] = {
 	["sectionName"] = "14_1",
@@ -2737,7 +2737,7 @@ sections["14_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,ballista_1_2087,sentinel_1_6262,horseArcher_1_2087,ranger_1_2087",
+	["troops"] = "greenDragon:3:22,ballista_2:2:1632,sentinel_2:2:2448,horseArcher_2:2:816,ranger_2:2:816",
 	["rewards"] = "resources:wood:138000:25,resources:stone:138000:25,resources:iron:138000:25,resources:food:138000:25"
 }
 sections["14_2"] = {
@@ -2747,7 +2747,7 @@ sections["14_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,crossbowman_1_8408,ballista_1_1575,sentinel_1_4204,lancer_1_1050",
+	["troops"] = "greenDragon:3:22,crossbowman_2:2:3276,ballista_2:2:1228,sentinel_2:2:1638,lancer_2:2:409",
 	["rewards"] = "resources:wood:138000:25,resources:stone:138000:25,resources:iron:138000:25,resources:food:138000:25"
 }
 sections["14_3"] = {
@@ -2757,8 +2757,8 @@ sections["14_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,skeletonWarrior_2_4233,deathKnight_2_1586,skeletonArcher_2_2116,meatWagon_2_264",
-	["rewards"] = "soldierMaterials:deathHand:69:25,soldierMaterials:heroBones:69:25,soldierMaterials:soulStone:69:25,soldierMaterials:magicBox:69:25"
+	["troops"] = "greenDragon:3:22,skeletonWarrior:3:3946,deathKnight:3:1480,skeletonArcher:3:1973,meatWagon:3:493",
+	["rewards"] = "soldierMaterials:deathHand:276:25,soldierMaterials:heroBones:276:25,soldierMaterials:soulStone:276:25,soldierMaterials:magicBox:276:25"
 }
 sections["14_4"] = {
 	["sectionName"] = "14_4",
@@ -2767,7 +2767,7 @@ sections["14_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,horseArcher_1_4262,crossbowman_1_6393,ballista_1_1064,sentinel_1_2131",
+	["troops"] = "greenDragon:3:22,horseArcher_2:2:1650,crossbowman_2:2:2475,ballista_2:2:825,sentinel_2:2:825",
 	["rewards"] = "resources:wood:140000:25,resources:stone:140000:25,resources:iron:140000:25,resources:food:140000:25"
 }
 sections["14_5"] = {
@@ -2777,7 +2777,7 @@ sections["14_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_22,ballista_1_2145,sentinel_1_6437,horseArcher_1_2145,crossbowman_1_2145",
+	["troops"] = "greenDragon:3:22,ballista_2:2:1656,sentinel_2:2:2484,horseArcher_2:2:828,crossbowman_2:2:828",
 	["rewards"] = "resources:wood:140000:25,resources:stone:140000:25,resources:iron:140000:25,resources:food:140000:25"
 }
 sections["14_6"] = {
@@ -2787,8 +2787,8 @@ sections["14_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,skeletonArcher_2_4321,meatWagon_2_809,skeletonWarrior_2_2160,deathKnight_2_539",
-	["rewards"] = "soldierMaterials:deathHand:70:25,soldierMaterials:heroBones:70:25,soldierMaterials:soulStone:70:25,soldierMaterials:magicBox:70:25"
+	["troops"] = "greenDragon:3:23,skeletonArcher:3:3989,meatWagon:3:1496,skeletonWarrior:3:1995,deathKnight:3:499",
+	["rewards"] = "soldierMaterials:deathHand:279:25,soldierMaterials:heroBones:279:25,soldierMaterials:soulStone:279:25,soldierMaterials:magicBox:279:25"
 }
 sections["14_7"] = {
 	["sectionName"] = "14_7",
@@ -2797,7 +2797,7 @@ sections["14_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,sentinel_1_8701,horseArcher_1_3263,crossbowman_1_4350,ballista_1_543",
+	["troops"] = "greenDragon:3:23,sentinel_2:2:3336,horseArcher_2:2:1251,crossbowman_2:2:1668,ballista_2:2:417",
 	["rewards"] = "resources:wood:140000:25,resources:stone:140000:25,resources:iron:140000:25,resources:food:140000:25"
 }
 sections["14_8"] = {
@@ -2807,7 +2807,7 @@ sections["14_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,lancer_1_4380,ranger_1_6570,catapult_1_1094,swordsman_1_2190",
+	["troops"] = "greenDragon:3:23,lancer_2:2:1674,ranger_2:2:2511,catapult_2:2:837,swordsman_2:2:837",
 	["rewards"] = "resources:wood:142000:25,resources:stone:142000:25,resources:iron:142000:25,resources:food:142000:25"
 }
 sections["14_9"] = {
@@ -2817,8 +2817,8 @@ sections["14_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,meatWagon_2_1102,skeletonWarrior_2_3307,deathKnight_2_1102,skeletonArcher_2_1102",
-	["rewards"] = "soldierMaterials:deathHand:71:25,soldierMaterials:heroBones:71:25,soldierMaterials:soulStone:71:25,soldierMaterials:magicBox:71:25"
+	["troops"] = "greenDragon:3:23,meatWagon:3:2016,skeletonWarrior:3:3024,deathKnight:3:1008,skeletonArcher:3:1008",
+	["rewards"] = "soldierMaterials:deathHand:282:25,soldierMaterials:heroBones:282:25,soldierMaterials:soulStone:282:25,soldierMaterials:magicBox:282:25"
 }
 sections["14_10"] = {
 	["sectionName"] = "14_10",
@@ -2827,7 +2827,7 @@ sections["14_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,ranger_1_8879,catapult_1_1663,swordsman_1_4439,lancer_1_1109",
+	["troops"] = "greenDragon:3:23,ranger_2:2:3372,catapult_2:2:1264,swordsman_2:2:1686,lancer_2:2:421",
 	["rewards"] = "resources:wood:142000:25,resources:stone:142000:25,resources:iron:142000:25,resources:food:142000:25"
 }
 sections["14_11"] = {
@@ -2837,7 +2837,7 @@ sections["14_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,swordsman_1_8939,lancer_1_3352,ranger_1_4469,catapult_1_557",
+	["troops"] = "greenDragon:3:23,swordsman_2:2:3384,lancer_2:2:1269,ranger_2:2:1692,catapult_2:2:423",
 	["rewards"] = "resources:wood:142000:25,resources:stone:142000:25,resources:iron:142000:25,resources:food:142000:25"
 }
 sections["14_12"] = {
@@ -2847,8 +2847,8 @@ sections["14_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,deathKnight_2_2249,skeletonArcher_2_3373,meatWagon_2_561,skeletonWarrior_2_1124",
-	["rewards"] = "soldierMaterials:deathHand:72:25,soldierMaterials:heroBones:72:25,soldierMaterials:soulStone:72:25,soldierMaterials:magicBox:72:25"
+	["troops"] = "greenDragon:3:23,deathKnight:3:2044,skeletonArcher:3:3067,meatWagon:3:1022,skeletonWarrior:3:1023",
+	["rewards"] = "soldierMaterials:deathHand:285:25,soldierMaterials:heroBones:285:25,soldierMaterials:soulStone:285:25,soldierMaterials:magicBox:285:25"
 }
 sections["14_13"] = {
 	["sectionName"] = "14_13",
@@ -2857,7 +2857,7 @@ sections["14_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,ballista_1_2264,swordsman_1_6794,lancer_1_2264,ranger_1_2264",
+	["troops"] = "greenDragon:3:23,ballista_2:2:1715,swordsman_2:2:2574,lancer_2:2:858,ranger_2:2:858",
 	["rewards"] = "resources:wood:144000:25,resources:stone:144000:25,resources:iron:144000:25,resources:food:144000:25"
 }
 sections["14_14"] = {
@@ -2867,7 +2867,7 @@ sections["14_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,crossbowman_1_9119,catapult_1_1708,swordsman_1_4559,lancer_1_1139",
+	["troops"] = "greenDragon:3:23,crossbowman_2:2:3455,catapult_2:2:1295,swordsman_2:2:1728,lancer_2:2:432",
 	["rewards"] = "resources:wood:144000:25,resources:stone:144000:25,resources:iron:144000:25,resources:food:144000:25"
 }
 sections["14_15"] = {
@@ -2877,8 +2877,8 @@ sections["14_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,skeletonWarrior_2_4590,deathKnight_2_1720,skeletonArcher_2_2295,meatWagon_2_285",
-	["rewards"] = "soldierMaterials:deathHand:72:25,soldierMaterials:heroBones:72:25,soldierMaterials:soulStone:72:25,soldierMaterials:magicBox:72:25"
+	["troops"] = "greenDragon:3:23,skeletonWarrior:3:4174,deathKnight:3:1565,skeletonArcher:3:2087,meatWagon:3:522",
+	["rewards"] = "soldierMaterials:deathHand:288:25,soldierMaterials:heroBones:288:25,soldierMaterials:soulStone:288:25,soldierMaterials:magicBox:288:25"
 }
 sections["14_16"] = {
 	["sectionName"] = "14_16",
@@ -2887,7 +2887,7 @@ sections["14_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,horseArcher_1_4620,crossbowman_1_6931,catapult_1_1154,swordsman_1_2310",
+	["troops"] = "greenDragon:3:23,horseArcher_2:2:1751,crossbowman_2:2:2627,catapult_2:2:875,swordsman_2:2:876",
 	["rewards"] = "resources:wood:146000:25,resources:stone:146000:25,resources:iron:146000:25,resources:food:146000:25"
 }
 sections["14_17"] = {
@@ -2897,7 +2897,7 @@ sections["14_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,ballista_1_2325,sentinel_1_6976,lancer_1_2325,ranger_1_2325",
+	["troops"] = "greenDragon:3:23,ballista_2:2:1763,sentinel_2:2:2644,lancer_2:2:881,ranger_2:2:882",
 	["rewards"] = "resources:wood:146000:25,resources:stone:146000:25,resources:iron:146000:25,resources:food:146000:25"
 }
 sections["14_18"] = {
@@ -2907,8 +2907,8 @@ sections["14_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_23,skeletonArcher_2_4681,meatWagon_2_876,skeletonWarrior_2_2340,deathKnight_2_584",
-	["rewards"] = "soldierMaterials:deathHand:73:25,soldierMaterials:heroBones:73:25,soldierMaterials:soulStone:73:25,soldierMaterials:magicBox:73:25"
+	["troops"] = "greenDragon:3:23,skeletonArcher:3:4259,meatWagon:3:1597,skeletonWarrior:3:2130,deathKnight:3:532",
+	["rewards"] = "soldierMaterials:deathHand:291:25,soldierMaterials:heroBones:291:25,soldierMaterials:soulStone:291:25,soldierMaterials:magicBox:291:25"
 }
 sections["14_19"] = {
 	["sectionName"] = "14_19",
@@ -2917,7 +2917,7 @@ sections["14_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,sentinel_1_9424,horseArcher_1_3534,ranger_1_4712,catapult_1_588",
+	["troops"] = "greenDragon:3:24,sentinel_2:2:3573,horseArcher_2:2:1340,ranger_2:2:1787,catapult_2:2:447",
 	["rewards"] = "resources:wood:146000:25,resources:stone:146000:25,resources:iron:146000:25,resources:food:146000:25"
 }
 sections["14_20"] = {
@@ -2927,7 +2927,7 @@ sections["14_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,horseArcher_1_4743,crossbowman_1_7114,ballista_1_1185,swordsman_1_2371",
+	["troops"] = "greenDragon:3:24,horseArcher_2:2:1798,crossbowman_2:2:2698,ballista_2:2:899,swordsman_2:2:900",
 	["rewards"] = "resources:wood:148000:25,resources:stone:148000:25,resources:iron:148000:25,resources:food:148000:25"
 }
 sections["14_21"] = {
@@ -2937,8 +2937,8 @@ sections["14_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,meatWagon_2_1118,skeletonWarrior_2_3580,deathKnight_2_1342,skeletonArcher_2_1790",
-	["rewards"] = "soldierMaterials:deathHand:74:25,soldierMaterials:heroBones:74:25,soldierMaterials:soulStone:74:25,soldierMaterials:magicBox:74:25"
+	["troops"] = "greenDragon:3:24,meatWagon:3:2173,skeletonWarrior:3:3259,deathKnight:3:1086,skeletonArcher:3:1087",
+	["rewards"] = "soldierMaterials:deathHand:294:25,soldierMaterials:heroBones:294:25,soldierMaterials:soulStone:294:25,soldierMaterials:magicBox:294:25"
 }
 sections["15_1"] = {
 	["sectionName"] = "15_1",
@@ -2947,7 +2947,7 @@ sections["15_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,crossbowman_1_9610,ballista_1_1800,sentinel_1_4805,lancer_1_1200",
+	["troops"] = "greenDragon:3:24,crossbowman_2:2:3646,ballista_2:2:1367,sentinel_2:2:1823,lancer_2:2:456",
 	["rewards"] = "resources:wood:148000:25,resources:stone:148000:25,resources:iron:148000:25,resources:food:148000:25"
 }
 sections["15_2"] = {
@@ -2957,7 +2957,7 @@ sections["15_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,sentinel_1_9672,horseArcher_1_3627,crossbowman_1_4836,catapult_1_603",
+	["troops"] = "greenDragon:3:24,sentinel_2:2:3670,horseArcher_2:2:1376,crossbowman_2:2:1835,catapult_2:2:459",
 	["rewards"] = "resources:wood:148000:25,resources:stone:148000:25,resources:iron:148000:25,resources:food:148000:25"
 }
 sections["15_3"] = {
@@ -2967,8 +2967,8 @@ sections["15_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,deathKnight_2_2433,skeletonArcher_2_3649,meatWagon_2_607,skeletonWarrior_2_1216",
-	["rewards"] = "soldierMaterials:deathHand:75:25,soldierMaterials:heroBones:75:25,soldierMaterials:soulStone:75:25,soldierMaterials:magicBox:75:25"
+	["troops"] = "greenDragon:3:24,deathKnight:3:2216,skeletonArcher:3:3325,meatWagon:3:1108,skeletonWarrior:3:1109",
+	["rewards"] = "soldierMaterials:deathHand:297:25,soldierMaterials:heroBones:297:25,soldierMaterials:soulStone:297:25,soldierMaterials:magicBox:297:25"
 }
 sections["15_4"] = {
 	["sectionName"] = "15_4",
@@ -2977,7 +2977,7 @@ sections["15_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,ballista_1_2449,sentinel_1_7348,horseArcher_1_2449,crossbowman_1_2449",
+	["troops"] = "greenDragon:3:24,ballista_2:2:1859,sentinel_2:2:2789,horseArcher_2:2:929,crossbowman_2:2:930",
 	["rewards"] = "resources:wood:150000:25,resources:stone:150000:25,resources:iron:150000:25,resources:food:150000:25"
 }
 sections["15_5"] = {
@@ -2987,7 +2987,7 @@ sections["15_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,crossbowman_1_9860,ballista_1_1847,sentinel_1_4930,horseArcher_1_1231",
+	["troops"] = "greenDragon:3:24,crossbowman_2:2:3743,ballista_2:2:1403,sentinel_2:2:1872,horseArcher_2:2:468",
 	["rewards"] = "resources:wood:150000:25,resources:stone:150000:25,resources:iron:150000:25,resources:food:150000:25"
 }
 sections["15_6"] = {
@@ -2997,8 +2997,8 @@ sections["15_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,skeletonWarrior_2_4961,deathKnight_2_1859,skeletonArcher_2_2480,meatWagon_2_309",
-	["rewards"] = "soldierMaterials:deathHand:75:25,soldierMaterials:heroBones:75:25,soldierMaterials:soulStone:75:25,soldierMaterials:magicBox:75:25"
+	["troops"] = "greenDragon:3:24,skeletonWarrior:3:4521,deathKnight:3:1695,skeletonArcher:3:2261,meatWagon:3:565",
+	["rewards"] = "soldierMaterials:deathHand:300:25,soldierMaterials:heroBones:300:25,soldierMaterials:soulStone:300:25,soldierMaterials:magicBox:300:25"
 }
 sections["15_7"] = {
 	["sectionName"] = "15_7",
@@ -3007,7 +3007,7 @@ sections["15_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,lancer_1_4993,ranger_1_7489,catapult_1_1247,swordsman_1_2496",
+	["troops"] = "greenDragon:3:24,lancer_2:2:1896,ranger_2:2:2844,catapult_2:2:948,swordsman_2:2:948",
 	["rewards"] = "resources:wood:152000:25,resources:stone:152000:25,resources:iron:152000:25,resources:food:152000:25"
 }
 sections["15_8"] = {
@@ -3017,7 +3017,7 @@ sections["15_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,catapult_1_2512,swordsman_1_7537,lancer_1_2512,ranger_1_2512",
+	["troops"] = "greenDragon:3:24,catapult_2:2:1908,swordsman_2:2:2862,lancer_2:2:954,ranger_2:2:954",
 	["rewards"] = "resources:wood:152000:25,resources:stone:152000:25,resources:iron:152000:25,resources:food:152000:25"
 }
 sections["15_9"] = {
@@ -3027,8 +3027,8 @@ sections["15_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,skeletonArcher_2_5056,meatWagon_2_947,skeletonWarrior_2_2528,deathKnight_2_631",
-	["rewards"] = "soldierMaterials:deathHand:76:25,soldierMaterials:heroBones:76:25,soldierMaterials:soulStone:76:25,soldierMaterials:magicBox:76:25"
+	["troops"] = "greenDragon:3:24,skeletonArcher:3:4610,meatWagon:3:1728,skeletonWarrior:3:2305,deathKnight:3:576",
+	["rewards"] = "soldierMaterials:deathHand:303:25,soldierMaterials:heroBones:303:25,soldierMaterials:soulStone:303:25,soldierMaterials:magicBox:303:25"
 }
 sections["15_10"] = {
 	["sectionName"] = "15_10",
@@ -3037,7 +3037,7 @@ sections["15_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_24,swordsman_1_10177,lancer_1_3816,ranger_1_5088,catapult_1_635",
+	["troops"] = "greenDragon:3:24,swordsman_2:2:3866,lancer_2:2:1450,ranger_2:2:1933,catapult_2:2:483",
 	["rewards"] = "resources:wood:152000:25,resources:stone:152000:25,resources:iron:152000:25,resources:food:152000:25"
 }
 sections["15_11"] = {
@@ -3047,7 +3047,7 @@ sections["15_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,horseArcher_1_5120,ranger_1_7681,catapult_1_1279,swordsman_1_2560",
+	["troops"] = "greenDragon:3:25,horseArcher_2:2:1945,ranger_2:2:2919,catapult_2:2:973,swordsman_2:2:973",
 	["rewards"] = "resources:wood:154000:25,resources:stone:154000:25,resources:iron:154000:25,resources:food:154000:25"
 }
 sections["15_12"] = {
@@ -3057,8 +3057,8 @@ sections["15_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,meatWagon_2_1288,skeletonWarrior_2_3864,deathKnight_2_1288,skeletonArcher_2_1288",
-	["rewards"] = "soldierMaterials:deathHand:77:25,soldierMaterials:heroBones:77:25,soldierMaterials:soulStone:77:25,soldierMaterials:magicBox:77:25"
+	["troops"] = "greenDragon:3:25,meatWagon:3:2349,skeletonWarrior:3:3525,deathKnight:3:1175,skeletonArcher:3:1175",
+	["rewards"] = "soldierMaterials:deathHand:306:25,soldierMaterials:heroBones:306:25,soldierMaterials:soulStone:306:25,soldierMaterials:magicBox:306:25"
 }
 sections["15_13"] = {
 	["sectionName"] = "15_13",
@@ -3067,7 +3067,7 @@ sections["15_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,crossbowman_1_10369,catapult_1_1943,swordsman_1_5184,lancer_1_1295",
+	["troops"] = "greenDragon:3:25,crossbowman_2:2:3941,catapult_2:2:1478,swordsman_2:2:1971,lancer_2:2:493",
 	["rewards"] = "resources:wood:154000:25,resources:stone:154000:25,resources:iron:154000:25,resources:food:154000:25"
 }
 sections["15_14"] = {
@@ -3077,7 +3077,7 @@ sections["15_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,sentinel_1_10434,lancer_1_3912,ranger_1_5217,catapult_1_651",
+	["troops"] = "greenDragon:3:25,sentinel_2:2:3966,lancer_2:2:1487,ranger_2:2:1983,catapult_2:2:496",
 	["rewards"] = "resources:wood:154000:25,resources:stone:154000:25,resources:iron:154000:25,resources:food:154000:25"
 }
 sections["15_15"] = {
@@ -3087,8 +3087,8 @@ sections["15_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,deathKnight_2_2624,skeletonArcher_2_3936,meatWagon_2_654,skeletonWarrior_2_1311",
-	["rewards"] = "soldierMaterials:deathHand:78:25,soldierMaterials:heroBones:78:25,soldierMaterials:soulStone:78:25,soldierMaterials:magicBox:78:25"
+	["troops"] = "greenDragon:3:25,deathKnight:3:2395,skeletonArcher:3:3592,meatWagon:3:1197,skeletonWarrior:3:1198",
+	["rewards"] = "soldierMaterials:deathHand:309:25,soldierMaterials:heroBones:309:25,soldierMaterials:soulStone:309:25,soldierMaterials:magicBox:309:25"
 }
 sections["15_16"] = {
 	["sectionName"] = "15_16",
@@ -3097,7 +3097,7 @@ sections["15_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,ballista_1_2641,sentinel_1_7923,lancer_1_2641,ranger_1_2641",
+	["troops"] = "greenDragon:3:25,ballista_2:2:2008,sentinel_2:2:3013,lancer_2:2:1004,ranger_2:2:1005",
 	["rewards"] = "resources:wood:156000:25,resources:stone:156000:25,resources:iron:156000:25,resources:food:156000:25"
 }
 sections["15_17"] = {
@@ -3107,7 +3107,7 @@ sections["15_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,crossbowman_1_10629,ballista_1_1991,swordsman_1_5314,lancer_1_1327",
+	["troops"] = "greenDragon:3:25,crossbowman_2:2:4042,ballista_2:2:1516,swordsman_2:2:2021,lancer_2:2:505",
 	["rewards"] = "resources:wood:156000:25,resources:stone:156000:25,resources:iron:156000:25,resources:food:156000:25"
 }
 sections["15_18"] = {
@@ -3117,8 +3117,8 @@ sections["15_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,skeletonWarrior_2_5347,deathKnight_2_2004,skeletonArcher_2_2673,meatWagon_2_332",
-	["rewards"] = "soldierMaterials:deathHand:78:25,soldierMaterials:heroBones:78:25,soldierMaterials:soulStone:78:25,soldierMaterials:magicBox:78:25"
+	["troops"] = "greenDragon:3:25,skeletonWarrior:3:4881,deathKnight:3:1830,skeletonArcher:3:2441,meatWagon:3:610",
+	["rewards"] = "soldierMaterials:deathHand:312:25,soldierMaterials:heroBones:312:25,soldierMaterials:soulStone:312:25,soldierMaterials:magicBox:312:25"
 }
 sections["15_19"] = {
 	["sectionName"] = "15_19",
@@ -3127,7 +3127,7 @@ sections["15_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,horseArcher_1_5380,crossbowman_1_8070,ballista_1_1344,swordsman_1_2690",
+	["troops"] = "greenDragon:3:25,horseArcher_2:2:2046,crossbowman_2:2:3070,ballista_2:2:1023,swordsman_2:2:1024",
 	["rewards"] = "resources:wood:158000:25,resources:stone:158000:25,resources:iron:158000:25,resources:food:158000:25"
 }
 sections["15_20"] = {
@@ -3137,7 +3137,7 @@ sections["15_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,ballista_1_2706,sentinel_1_8119,horseArcher_1_2706,ranger_1_2706",
+	["troops"] = "greenDragon:3:25,ballista_2:2:2059,sentinel_2:2:3089,horseArcher_2:2:1030,ranger_2:2:1030",
 	["rewards"] = "resources:wood:158000:25,resources:stone:158000:25,resources:iron:158000:25,resources:food:158000:25"
 }
 sections["15_21"] = {
@@ -3147,8 +3147,8 @@ sections["15_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_3_25,skeletonArcher_2_5105,meatWagon_2_1019,skeletonWarrior_2_3062,deathKnight_2_1019",
-	["rewards"] = "soldierMaterials:deathHand:79:25,soldierMaterials:heroBones:79:25,soldierMaterials:soulStone:79:25,soldierMaterials:magicBox:79:25"
+	["troops"] = "greenDragon:3:25,skeletonArcher:3:4974,meatWagon:3:1865,skeletonWarrior:3:2487,deathKnight:3:622",
+	["rewards"] = "soldierMaterials:deathHand:315:25,soldierMaterials:heroBones:315:25,soldierMaterials:soulStone:315:25,soldierMaterials:magicBox:315:25"
 }
 sections["16_1"] = {
 	["sectionName"] = "16_1",
@@ -3157,7 +3157,7 @@ sections["16_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_25,sentinel_1_10958,horseArcher_1_4109,crossbowman_1_5479,catapult_1_684",
+	["troops"] = "redDragon:3:25,sentinel_2:3:4170,horseArcher_2:3:1564,crossbowman_2:3:2085,catapult_2:3:521",
 	["rewards"] = "resources:wood:158000:25,resources:stone:158000:25,resources:iron:158000:25,resources:food:158000:25"
 }
 sections["16_2"] = {
@@ -3167,7 +3167,7 @@ sections["16_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_25,horseArcher_1_5512,crossbowman_1_8268,ballista_1_1377,sentinel_1_2756",
+	["troops"] = "redDragon:3:25,horseArcher_2:3:2098,crossbowman_2:3:3147,ballista_2:3:1049,sentinel_2:3:1049",
 	["rewards"] = "resources:wood:160000:25,resources:stone:160000:25,resources:iron:160000:25,resources:food:160000:25"
 }
 sections["16_3"] = {
@@ -3177,8 +3177,8 @@ sections["16_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,meatWagon_2_1386,skeletonWarrior_2_4159,deathKnight_2_1386,skeletonArcher_2_1386",
-	["rewards"] = "soldierMaterials:deathHand:80:25,soldierMaterials:heroBones:80:25,soldierMaterials:soulStone:80:25,soldierMaterials:magicBox:80:25"
+	["troops"] = "redDragon:3:26,meatWagon:3:2955,skeletonWarrior:3:4434,deathKnight:3:1478,skeletonArcher:3:1478",
+	["rewards"] = "soldierMaterials:deathHand:318:25,soldierMaterials:heroBones:318:25,soldierMaterials:soulStone:318:25,soldierMaterials:magicBox:318:25"
 }
 sections["16_4"] = {
 	["sectionName"] = "16_4",
@@ -3187,7 +3187,7 @@ sections["16_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,crossbowman_1_11158,ballista_1_2090,sentinel_1_5579,horseArcher_1_1393",
+	["troops"] = "redDragon:3:26,crossbowman_2:3:4248,ballista_2:3:1593,sentinel_2:3:2124,horseArcher_2:3:531",
 	["rewards"] = "resources:wood:160000:25,resources:stone:160000:25,resources:iron:160000:25,resources:food:160000:25"
 }
 sections["16_5"] = {
@@ -3197,7 +3197,7 @@ sections["16_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,sentinel_1_11225,horseArcher_1_4209,crossbowman_1_5612,ballista_1_700",
+	["troops"] = "redDragon:3:26,sentinel_2:3:4274,horseArcher_2:3:1603,crossbowman_2:3:2137,ballista_2:3:534",
 	["rewards"] = "resources:wood:160000:25,resources:stone:160000:25,resources:iron:160000:25,resources:food:160000:25"
 }
 sections["16_6"] = {
@@ -3207,8 +3207,8 @@ sections["16_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,deathKnight_2_2823,skeletonArcher_2_4233,meatWagon_2_704,skeletonWarrior_2_1410",
-	["rewards"] = "soldierMaterials:deathHand:81:25,soldierMaterials:heroBones:81:25,soldierMaterials:soulStone:81:25,soldierMaterials:magicBox:81:25"
+	["troops"] = "redDragon:3:26,deathKnight:3:3010,skeletonArcher:3:4516,meatWagon:3:1505,skeletonWarrior:3:1506",
+	["rewards"] = "soldierMaterials:deathHand:321:25,soldierMaterials:heroBones:321:25,soldierMaterials:soulStone:321:25,soldierMaterials:magicBox:321:25"
 }
 sections["16_7"] = {
 	["sectionName"] = "16_7",
@@ -3217,7 +3217,7 @@ sections["16_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,catapult_1_2839,swordsman_1_8519,lancer_1_2839,ranger_1_2839",
+	["troops"] = "redDragon:3:26,catapult_2:3:2163,swordsman_2:3:3245,lancer_2:3:1082,ranger_2:3:1082",
 	["rewards"] = "resources:wood:162000:25,resources:stone:162000:25,resources:iron:162000:25,resources:food:162000:25"
 }
 sections["16_8"] = {
@@ -3227,7 +3227,7 @@ sections["16_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,ranger_1_11427,catapult_1_2141,swordsman_1_5713,lancer_1_1427",
+	["troops"] = "redDragon:3:26,ranger_2:3:4353,catapult_2:3:1632,swordsman_2:3:2177,lancer_2:3:544",
 	["rewards"] = "resources:wood:162000:25,resources:stone:162000:25,resources:iron:162000:25,resources:food:162000:25"
 }
 sections["16_9"] = {
@@ -3237,8 +3237,8 @@ sections["16_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,skeletonWarrior_2_5747,deathKnight_2_2154,skeletonArcher_2_2873,meatWagon_2_358",
-	["rewards"] = "soldierMaterials:deathHand:81:25,soldierMaterials:heroBones:81:25,soldierMaterials:soulStone:81:25,soldierMaterials:magicBox:81:25"
+	["troops"] = "redDragon:3:26,skeletonWarrior:3:6132,deathKnight:3:2299,skeletonArcher:3:3066,meatWagon:3:766",
+	["rewards"] = "soldierMaterials:deathHand:324:25,soldierMaterials:heroBones:324:25,soldierMaterials:soulStone:324:25,soldierMaterials:magicBox:324:25"
 }
 sections["16_10"] = {
 	["sectionName"] = "16_10",
@@ -3247,7 +3247,7 @@ sections["16_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,horseArcher_1_5781,ranger_1_8672,catapult_1_1444,swordsman_1_2890",
+	["troops"] = "redDragon:3:26,horseArcher_2:3:2203,ranger_2:3:3305,catapult_2:3:1101,swordsman_2:3:1102",
 	["rewards"] = "resources:wood:164000:25,resources:stone:164000:25,resources:iron:164000:25,resources:food:164000:25"
 }
 sections["16_11"] = {
@@ -3257,7 +3257,7 @@ sections["16_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,ballista_1_2907,swordsman_1_8723,lancer_1_2907,ranger_1_2907",
+	["troops"] = "redDragon:3:26,ballista_2:3:2216,swordsman_2:3:3325,lancer_2:3:1108,ranger_2:3:1109",
 	["rewards"] = "resources:wood:164000:25,resources:stone:164000:25,resources:iron:164000:25,resources:food:164000:25"
 }
 sections["16_12"] = {
@@ -3267,8 +3267,8 @@ sections["16_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,skeletonArcher_2_5849,meatWagon_2_1096,skeletonWarrior_2_2924,deathKnight_2_730",
-	["rewards"] = "soldierMaterials:deathHand:82:25,soldierMaterials:heroBones:82:25,soldierMaterials:soulStone:82:25,soldierMaterials:magicBox:82:25"
+	["troops"] = "redDragon:3:26,skeletonArcher:3:6243,meatWagon:3:2341,skeletonWarrior:3:3122,deathKnight:3:780",
+	["rewards"] = "soldierMaterials:deathHand:327:25,soldierMaterials:heroBones:327:25,soldierMaterials:soulStone:327:25,soldierMaterials:magicBox:327:25"
 }
 sections["16_13"] = {
 	["sectionName"] = "16_13",
@@ -3277,7 +3277,7 @@ sections["16_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,sentinel_1_11768,lancer_1_4413,ranger_1_5884,catapult_1_734",
+	["troops"] = "redDragon:3:26,sentinel_2:3:4486,lancer_2:3:1682,ranger_2:3:2243,catapult_2:3:561",
 	["rewards"] = "resources:wood:164000:25,resources:stone:164000:25,resources:iron:164000:25,resources:food:164000:25"
 }
 sections["16_14"] = {
@@ -3287,7 +3287,7 @@ sections["16_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,horseArcher_1_5918,crossbowman_1_8878,catapult_1_1478,swordsman_1_2959",
+	["troops"] = "redDragon:3:26,horseArcher_2:3:2256,crossbowman_2:3:3385,catapult_2:3:1128,swordsman_2:3:1129",
 	["rewards"] = "resources:wood:166000:25,resources:stone:166000:25,resources:iron:166000:25,resources:food:166000:25"
 }
 sections["16_15"] = {
@@ -3297,8 +3297,8 @@ sections["16_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_26,meatWagon_2_1488,skeletonWarrior_2_4464,deathKnight_2_1488,skeletonArcher_2_1488",
-	["rewards"] = "soldierMaterials:deathHand:83:25,soldierMaterials:heroBones:83:25,soldierMaterials:soulStone:83:25,soldierMaterials:magicBox:83:25"
+	["troops"] = "redDragon:3:26,meatWagon:3:3178,skeletonWarrior:3:4767,deathKnight:3:1589,skeletonArcher:3:1589",
+	["rewards"] = "soldierMaterials:deathHand:330:25,soldierMaterials:heroBones:330:25,soldierMaterials:soulStone:330:25,soldierMaterials:magicBox:330:25"
 }
 sections["16_16"] = {
 	["sectionName"] = "16_16",
@@ -3307,7 +3307,7 @@ sections["16_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,crossbowman_1_11975,ballista_1_2244,swordsman_1_5987,lancer_1_1496",
+	["troops"] = "redDragon:3:27,crossbowman_2:3:4567,ballista_2:3:1713,swordsman_2:3:2284,lancer_2:3:571",
 	["rewards"] = "resources:wood:166000:25,resources:stone:166000:25,resources:iron:166000:25,resources:food:166000:25"
 }
 sections["16_17"] = {
@@ -3317,7 +3317,7 @@ sections["16_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,sentinel_1_12044,horseArcher_1_4516,ranger_1_6022,catapult_1_751",
+	["troops"] = "redDragon:3:27,sentinel_2:3:4594,horseArcher_2:3:1723,ranger_2:3:2297,catapult_2:3:574",
 	["rewards"] = "resources:wood:166000:25,resources:stone:166000:25,resources:iron:166000:25,resources:food:166000:25"
 }
 sections["16_18"] = {
@@ -3327,8 +3327,8 @@ sections["16_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,deathKnight_2_3028,skeletonArcher_2_4542,meatWagon_2_755,skeletonWarrior_2_1513",
-	["rewards"] = "soldierMaterials:deathHand:84:25,soldierMaterials:heroBones:84:25,soldierMaterials:soulStone:84:25,soldierMaterials:magicBox:84:25"
+	["troops"] = "redDragon:3:27,deathKnight:3:3235,skeletonArcher:3:4852,meatWagon:3:1617,skeletonWarrior:3:1618",
+	["rewards"] = "soldierMaterials:deathHand:333:25,soldierMaterials:heroBones:333:25,soldierMaterials:soulStone:333:25,soldierMaterials:magicBox:333:25"
 }
 sections["16_19"] = {
 	["sectionName"] = "16_19",
@@ -3337,7 +3337,7 @@ sections["16_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,ballista_1_3046,sentinel_1_9138,horseArcher_1_3046,ranger_1_3046",
+	["troops"] = "redDragon:3:27,ballista_2:3:2324,sentinel_2:3:3486,horseArcher_2:3:1162,ranger_2:3:1162",
 	["rewards"] = "resources:wood:168000:25,resources:stone:168000:25,resources:iron:168000:25,resources:food:168000:25"
 }
 sections["16_20"] = {
@@ -3347,7 +3347,7 @@ sections["16_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,crossbowman_1_12254,ballista_1_2296,sentinel_1_6127,lancer_1_1530",
+	["troops"] = "redDragon:3:27,crossbowman_2:3:4676,ballista_2:3:1753,sentinel_2:3:2338,lancer_2:3:584",
 	["rewards"] = "resources:wood:168000:25,resources:stone:168000:25,resources:iron:168000:25,resources:food:168000:25"
 }
 sections["16_21"] = {
@@ -3357,8 +3357,8 @@ sections["16_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,skeletonWarrior_2_5776,deathKnight_2_2309,skeletonArcher_2_3464,meatWagon_2_575",
-	["rewards"] = "soldierMaterials:deathHand:84:25,soldierMaterials:heroBones:84:25,soldierMaterials:soulStone:84:25,soldierMaterials:magicBox:84:25"
+	["troops"] = "redDragon:3:27,skeletonWarrior:3:6584,deathKnight:3:2469,skeletonArcher:3:3292,meatWagon:3:823",
+	["rewards"] = "soldierMaterials:deathHand:336:25,soldierMaterials:heroBones:336:25,soldierMaterials:soulStone:336:25,soldierMaterials:magicBox:336:25"
 }
 sections["17_1"] = {
 	["sectionName"] = "17_1",
@@ -3367,7 +3367,7 @@ sections["17_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,horseArcher_1_6197,crossbowman_1_9296,ballista_1_1548,sentinel_1_3098",
+	["troops"] = "redDragon:3:27,horseArcher_2:3:2365,crossbowman_2:3:3548,ballista_2:3:1183,sentinel_2:3:1183",
 	["rewards"] = "resources:wood:170000:25,resources:stone:170000:25,resources:iron:170000:25,resources:food:170000:25"
 }
 sections["17_2"] = {
@@ -3377,7 +3377,7 @@ sections["17_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,ballista_1_3116,sentinel_1_9349,horseArcher_1_3116,crossbowman_1_3116",
+	["troops"] = "redDragon:3:27,ballista_2:3:2379,sentinel_2:3:3569,horseArcher_2:3:1189,crossbowman_2:3:1190",
 	["rewards"] = "resources:wood:170000:25,resources:stone:170000:25,resources:iron:170000:25,resources:food:170000:25"
 }
 sections["17_3"] = {
@@ -3387,8 +3387,8 @@ sections["17_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,skeletonArcher_2_6268,meatWagon_2_1173,skeletonWarrior_2_3134,deathKnight_2_783",
-	["rewards"] = "soldierMaterials:deathHand:85:25,soldierMaterials:heroBones:85:25,soldierMaterials:soulStone:85:25,soldierMaterials:magicBox:85:25"
+	["troops"] = "redDragon:3:27,skeletonArcher:3:6700,meatWagon:3:2512,skeletonWarrior:3:3350,deathKnight:3:837",
+	["rewards"] = "soldierMaterials:deathHand:339:25,soldierMaterials:heroBones:339:25,soldierMaterials:soulStone:339:25,soldierMaterials:magicBox:339:25"
 }
 sections["17_4"] = {
 	["sectionName"] = "17_4",
@@ -3397,7 +3397,7 @@ sections["17_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,sentinel_1_12607,horseArcher_1_4727,crossbowman_1_6303,ballista_1_787",
+	["troops"] = "redDragon:3:27,sentinel_2:3:4814,horseArcher_2:3:1805,crossbowman_2:3:2407,ballista_2:3:602",
 	["rewards"] = "resources:wood:170000:25,resources:stone:170000:25,resources:iron:170000:25,resources:food:170000:25"
 }
 sections["17_5"] = {
@@ -3407,7 +3407,7 @@ sections["17_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,lancer_1_6339,ranger_1_9508,catapult_1_1583,swordsman_1_3169",
+	["troops"] = "redDragon:3:27,lancer_2:3:2421,ranger_2:3:3631,catapult_2:3:1210,swordsman_2:3:1211",
 	["rewards"] = "resources:wood:172000:25,resources:stone:172000:25,resources:iron:172000:25,resources:food:172000:25"
 }
 sections["17_6"] = {
@@ -3417,8 +3417,8 @@ sections["17_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,meatWagon_2_1593,skeletonWarrior_2_4781,deathKnight_2_1593,skeletonArcher_2_1593",
-	["rewards"] = "soldierMaterials:deathHand:86:25,soldierMaterials:heroBones:86:25,soldierMaterials:soulStone:86:25,soldierMaterials:magicBox:86:25"
+	["troops"] = "redDragon:3:27,meatWagon:3:3408,skeletonWarrior:3:5113,deathKnight:3:1704,skeletonArcher:3:1705",
+	["rewards"] = "soldierMaterials:deathHand:342:25,soldierMaterials:heroBones:342:25,soldierMaterials:soulStone:342:25,soldierMaterials:magicBox:342:25"
 }
 sections["17_7"] = {
 	["sectionName"] = "17_7",
@@ -3427,7 +3427,7 @@ sections["17_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_27,ranger_1_12821,catapult_1_2402,swordsman_1_6410,lancer_1_1601",
+	["troops"] = "redDragon:3:27,ranger_2:3:4897,catapult_2:3:1836,swordsman_2:3:2449,lancer_2:3:612",
 	["rewards"] = "resources:wood:172000:25,resources:stone:172000:25,resources:iron:172000:25,resources:food:172000:25"
 }
 sections["17_8"] = {
@@ -3437,7 +3437,7 @@ sections["17_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,swordsman_1_12893,lancer_1_4835,ranger_1_6446,catapult_1_804",
+	["troops"] = "redDragon:3:28,swordsman_2:3:4925,lancer_2:3:1847,ranger_2:3:2463,catapult_2:3:616",
 	["rewards"] = "resources:wood:172000:25,resources:stone:172000:25,resources:iron:172000:25,resources:food:172000:25"
 }
 sections["17_9"] = {
@@ -3447,8 +3447,8 @@ sections["17_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,deathKnight_2_3241,skeletonArcher_2_4861,meatWagon_2_808,skeletonWarrior_2_1619",
-	["rewards"] = "soldierMaterials:deathHand:87:25,soldierMaterials:heroBones:87:25,soldierMaterials:soulStone:87:25,soldierMaterials:magicBox:87:25"
+	["troops"] = "redDragon:3:28,deathKnight:3:3467,skeletonArcher:3:5201,meatWagon:3:1734,skeletonWarrior:3:1734",
+	["rewards"] = "soldierMaterials:deathHand:345:25,soldierMaterials:heroBones:345:25,soldierMaterials:soulStone:345:25,soldierMaterials:magicBox:345:25"
 }
 sections["17_10"] = {
 	["sectionName"] = "17_10",
@@ -3457,7 +3457,7 @@ sections["17_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,ballista_1_3259,swordsman_1_9778,lancer_1_3259,ranger_1_3259",
+	["troops"] = "redDragon:3:28,ballista_2:3:2491,swordsman_2:3:3736,lancer_2:3:1245,ranger_2:3:1246",
 	["rewards"] = "resources:wood:174000:25,resources:stone:174000:25,resources:iron:174000:25,resources:food:174000:25"
 }
 sections["17_11"] = {
@@ -3467,7 +3467,7 @@ sections["17_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,crossbowman_1_13109,catapult_1_2456,swordsman_1_6554,lancer_1_1637",
+	["troops"] = "redDragon:3:28,crossbowman_2:3:5010,catapult_2:3:1879,swordsman_2:3:2505,lancer_2:3:626",
 	["rewards"] = "resources:wood:174000:25,resources:stone:174000:25,resources:iron:174000:25,resources:food:174000:25"
 }
 sections["17_12"] = {
@@ -3477,8 +3477,8 @@ sections["17_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,skeletonWarrior_2_6591,deathKnight_2_2470,skeletonArcher_2_3295,meatWagon_2_411",
-	["rewards"] = "soldierMaterials:deathHand:87:25,soldierMaterials:heroBones:87:25,soldierMaterials:soulStone:87:25,soldierMaterials:magicBox:87:25"
+	["troops"] = "redDragon:3:28,skeletonWarrior:3:7054,deathKnight:3:2645,skeletonArcher:3:3527,meatWagon:3:882",
+	["rewards"] = "soldierMaterials:deathHand:348:25,soldierMaterials:heroBones:348:25,soldierMaterials:soulStone:348:25,soldierMaterials:magicBox:348:25"
 }
 sections["17_13"] = {
 	["sectionName"] = "17_13",
@@ -3487,7 +3487,7 @@ sections["17_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,horseArcher_1_6627,crossbowman_1_9941,catapult_1_1655,swordsman_1_3313",
+	["troops"] = "redDragon:3:28,horseArcher_2:3:2533,crossbowman_2:3:3800,catapult_2:3:1267,swordsman_2:3:1267",
 	["rewards"] = "resources:wood:176000:25,resources:stone:176000:25,resources:iron:176000:25,resources:food:176000:25"
 }
 sections["17_14"] = {
@@ -3497,7 +3497,7 @@ sections["17_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,ballista_1_3332,sentinel_1_9996,lancer_1_3332,ranger_1_3332",
+	["troops"] = "redDragon:3:28,ballista_2:3:2547,sentinel_2:3:3822,lancer_2:3:1274,ranger_2:3:1274",
 	["rewards"] = "resources:wood:176000:25,resources:stone:176000:25,resources:iron:176000:25,resources:food:176000:25"
 }
 sections["17_15"] = {
@@ -3507,8 +3507,8 @@ sections["17_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,skeletonArcher_2_6700,meatWagon_2_1255,skeletonWarrior_2_3350,deathKnight_2_837",
-	["rewards"] = "soldierMaterials:deathHand:88:25,soldierMaterials:heroBones:88:25,soldierMaterials:soulStone:88:25,soldierMaterials:magicBox:88:25"
+	["troops"] = "redDragon:3:28,skeletonArcher:3:7173,meatWagon:3:2690,skeletonWarrior:3:3587,deathKnight:3:897",
+	["rewards"] = "soldierMaterials:deathHand:351:25,soldierMaterials:heroBones:351:25,soldierMaterials:soulStone:351:25,soldierMaterials:magicBox:351:25"
 }
 sections["17_16"] = {
 	["sectionName"] = "17_16",
@@ -3517,7 +3517,7 @@ sections["17_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,sentinel_1_13474,horseArcher_1_5053,ranger_1_6737,catapult_1_841",
+	["troops"] = "redDragon:3:28,sentinel_2:3:5152,horseArcher_2:3:1932,ranger_2:3:2576,catapult_2:3:644",
 	["rewards"] = "resources:wood:176000:25,resources:stone:176000:25,resources:iron:176000:25,resources:food:176000:25"
 }
 sections["17_17"] = {
@@ -3527,7 +3527,7 @@ sections["17_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,horseArcher_1_6774,crossbowman_1_10161,ballista_1_1692,swordsman_1_3387",
+	["troops"] = "redDragon:3:28,horseArcher_2:3:2590,crossbowman_2:3:3886,ballista_2:3:1295,swordsman_2:3:1296",
 	["rewards"] = "resources:wood:178000:25,resources:stone:178000:25,resources:iron:178000:25,resources:food:178000:25"
 }
 sections["17_18"] = {
@@ -3537,8 +3537,8 @@ sections["17_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,meatWagon_2_1702,skeletonWarrior_2_5108,deathKnight_2_1702,skeletonArcher_2_1702",
-	["rewards"] = "soldierMaterials:deathHand:89:25,soldierMaterials:heroBones:89:25,soldierMaterials:soulStone:89:25,soldierMaterials:magicBox:89:25"
+	["troops"] = "redDragon:3:28,meatWagon:3:3647,skeletonWarrior:3:5471,deathKnight:3:1823,skeletonArcher:3:1824",
+	["rewards"] = "soldierMaterials:deathHand:354:25,soldierMaterials:heroBones:354:25,soldierMaterials:soulStone:354:25,soldierMaterials:magicBox:354:25"
 }
 sections["17_19"] = {
 	["sectionName"] = "17_19",
@@ -3547,7 +3547,7 @@ sections["17_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,crossbowman_1_13696,ballista_1_2566,sentinel_1_6848,lancer_1_1711",
+	["troops"] = "redDragon:3:28,crossbowman_2:3:5239,ballista_2:3:1965,sentinel_2:3:2620,lancer_2:3:655",
 	["rewards"] = "resources:wood:178000:25,resources:stone:178000:25,resources:iron:178000:25,resources:food:178000:25"
 }
 sections["17_20"] = {
@@ -3557,7 +3557,7 @@ sections["17_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_28,sentinel_1_13770,horseArcher_1_5163,crossbowman_1_6885,catapult_1_859",
+	["troops"] = "redDragon:3:28,sentinel_2:3:5268,horseArcher_2:3:1975,crossbowman_2:3:2634,catapult_2:3:658",
 	["rewards"] = "resources:wood:178000:25,resources:stone:178000:25,resources:iron:178000:25,resources:food:178000:25"
 }
 sections["17_21"] = {
@@ -3567,8 +3567,8 @@ sections["17_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,deathKnight_2_3242,skeletonArcher_2_5190,meatWagon_2_971,skeletonWarrior_2_2595",
-	["rewards"] = "soldierMaterials:deathHand:90:25,soldierMaterials:heroBones:90:25,soldierMaterials:soulStone:90:25,soldierMaterials:magicBox:90:25"
+	["troops"] = "redDragon:3:29,deathKnight:3:3708,skeletonArcher:3:5562,meatWagon:3:1854,skeletonWarrior:3:1854",
+	["rewards"] = "soldierMaterials:deathHand:357:25,soldierMaterials:heroBones:357:25,soldierMaterials:soulStone:357:25,soldierMaterials:magicBox:357:25"
 }
 sections["18_1"] = {
 	["sectionName"] = "18_1",
@@ -3577,7 +3577,7 @@ sections["18_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,ballista_1_3479,sentinel_1_10439,horseArcher_1_3479,crossbowman_1_3479",
+	["troops"] = "redDragon:3:29,ballista_2:3:2663,sentinel_2:3:3995,horseArcher_2:3:1331,crossbowman_2:3:1332",
 	["rewards"] = "resources:wood:180000:25,resources:stone:180000:25,resources:iron:180000:25,resources:food:180000:25"
 }
 sections["18_2"] = {
@@ -3587,7 +3587,7 @@ sections["18_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,crossbowman_1_13994,ballista_1_2622,sentinel_1_6997,horseArcher_1_1748",
+	["troops"] = "redDragon:3:29,crossbowman_2:3:5356,ballista_2:3:2008,sentinel_2:3:2678,horseArcher_2:3:669",
 	["rewards"] = "resources:wood:180000:25,resources:stone:180000:25,resources:iron:180000:25,resources:food:180000:25"
 }
 sections["18_3"] = {
@@ -3597,8 +3597,8 @@ sections["18_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,skeletonWarrior_2_7034,deathKnight_2_2637,skeletonArcher_2_3517,meatWagon_2_438",
-	["rewards"] = "soldierMaterials:deathHand:90:25,soldierMaterials:heroBones:90:25,soldierMaterials:soulStone:90:25,soldierMaterials:magicBox:90:25"
+	["troops"] = "redDragon:3:29,skeletonWarrior:3:7539,deathKnight:3:2827,skeletonArcher:3:3770,meatWagon:3:942",
+	["rewards"] = "soldierMaterials:deathHand:360:25,soldierMaterials:heroBones:360:25,soldierMaterials:soulStone:360:25,soldierMaterials:magicBox:360:25"
 }
 sections["18_4"] = {
 	["sectionName"] = "18_4",
@@ -3607,7 +3607,7 @@ sections["18_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,lancer_1_7072,ranger_1_10608,catapult_1_1767,swordsman_1_3536",
+	["troops"] = "redDragon:3:29,lancer_2:3:2707,ranger_2:3:4061,catapult_2:3:1353,swordsman_2:3:1354",
 	["rewards"] = "resources:wood:182000:25,resources:stone:182000:25,resources:iron:182000:25,resources:food:182000:25"
 }
 sections["18_5"] = {
@@ -3617,7 +3617,7 @@ sections["18_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,catapult_1_3554,swordsman_1_10664,lancer_1_3554,ranger_1_3554",
+	["troops"] = "redDragon:3:29,catapult_2:3:2722,swordsman_2:3:4083,lancer_2:3:1361,ranger_2:3:1361",
 	["rewards"] = "resources:wood:182000:25,resources:stone:182000:25,resources:iron:182000:25,resources:food:182000:25"
 }
 sections["18_6"] = {
@@ -3627,8 +3627,8 @@ sections["18_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,skeletonArcher_2_7147,meatWagon_2_1338,skeletonWarrior_2_3573,deathKnight_2_892",
-	["rewards"] = "soldierMaterials:deathHand:91:25,soldierMaterials:heroBones:91:25,soldierMaterials:soulStone:91:25,soldierMaterials:magicBox:91:25"
+	["troops"] = "redDragon:3:29,skeletonArcher:3:7662,meatWagon:3:2873,skeletonWarrior:3:3831,deathKnight:3:958",
+	["rewards"] = "soldierMaterials:deathHand:363:25,soldierMaterials:heroBones:363:25,soldierMaterials:soulStone:363:25,soldierMaterials:magicBox:363:25"
 }
 sections["18_7"] = {
 	["sectionName"] = "18_7",
@@ -3637,7 +3637,7 @@ sections["18_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,swordsman_1_14371,lancer_1_5389,ranger_1_7185,catapult_1_897",
+	["troops"] = "redDragon:3:29,swordsman_2:3:5503,lancer_2:3:2063,ranger_2:3:2752,catapult_2:3:688",
 	["rewards"] = "resources:wood:182000:25,resources:stone:182000:25,resources:iron:182000:25,resources:food:182000:25"
 }
 sections["18_8"] = {
@@ -3647,7 +3647,7 @@ sections["18_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,horseArcher_1_7223,ranger_1_10835,catapult_1_1804,swordsman_1_3611",
+	["troops"] = "redDragon:3:29,horseArcher_2:3:2766,ranger_2:3:4150,catapult_2:3:1383,swordsman_2:3:1384",
 	["rewards"] = "resources:wood:184000:25,resources:stone:184000:25,resources:iron:184000:25,resources:food:184000:25"
 }
 sections["18_9"] = {
@@ -3657,8 +3657,8 @@ sections["18_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,meatWagon_2_1815,skeletonWarrior_2_5446,deathKnight_2_1815,skeletonArcher_2_1815",
-	["rewards"] = "soldierMaterials:deathHand:92:25,soldierMaterials:heroBones:92:25,soldierMaterials:soulStone:92:25,soldierMaterials:magicBox:92:25"
+	["troops"] = "redDragon:3:29,meatWagon:3:3893,skeletonWarrior:3:5841,deathKnight:3:1947,skeletonArcher:3:1947",
+	["rewards"] = "soldierMaterials:deathHand:366:25,soldierMaterials:heroBones:366:25,soldierMaterials:soulStone:366:25,soldierMaterials:magicBox:366:25"
 }
 sections["18_10"] = {
 	["sectionName"] = "18_10",
@@ -3667,7 +3667,7 @@ sections["18_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,crossbowman_1_14599,catapult_1_2735,swordsman_1_7299,lancer_1_1823",
+	["troops"] = "redDragon:3:29,crossbowman_2:3:5592,catapult_2:3:2097,swordsman_2:3:2796,lancer_2:3:699",
 	["rewards"] = "resources:wood:184000:25,resources:stone:184000:25,resources:iron:184000:25,resources:food:184000:25"
 }
 sections["18_11"] = {
@@ -3677,7 +3677,7 @@ sections["18_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,sentinel_1_14713,lancer_1_5517,ranger_1_7356,catapult_1_918",
+	["troops"] = "redDragon:3:29,sentinel_2:3:5622,lancer_2:3:2108,ranger_2:3:2811,catapult_2:3:703",
 	["rewards"] = "resources:wood:184000:25,resources:stone:184000:25,resources:iron:184000:25,resources:food:184000:25"
 }
 sections["18_12"] = {
@@ -3687,8 +3687,8 @@ sections["18_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_29,deathKnight_2_3706,skeletonArcher_2_5559,meatWagon_2_925,skeletonWarrior_2_1852",
-	["rewards"] = "soldierMaterials:deathHand:93:25,soldierMaterials:heroBones:93:25,soldierMaterials:soulStone:93:25,soldierMaterials:magicBox:93:25"
+	["troops"] = "redDragon:3:29,deathKnight:3:3956,skeletonArcher:3:5935,meatWagon:3:1978,skeletonWarrior:3:1979",
+	["rewards"] = "soldierMaterials:deathHand:369:25,soldierMaterials:heroBones:369:25,soldierMaterials:soulStone:369:25,soldierMaterials:magicBox:369:25"
 }
 sections["18_13"] = {
 	["sectionName"] = "18_13",
@@ -3697,7 +3697,7 @@ sections["18_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,ballista_1_3735,sentinel_1_11205,lancer_1_3735,ranger_1_3735",
+	["troops"] = "redDragon:3:30,ballista_2:3:2841,sentinel_2:3:4262,lancer_2:3:1420,ranger_2:3:1421",
 	["rewards"] = "resources:wood:186000:25,resources:stone:186000:25,resources:iron:186000:25,resources:food:186000:25"
 }
 sections["18_14"] = {
@@ -3707,7 +3707,7 @@ sections["18_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,crossbowman_1_15055,ballista_1_2821,swordsman_1_7527,lancer_1_1880",
+	["troops"] = "redDragon:3:30,crossbowman_2:3:5713,ballista_2:3:2142,swordsman_2:3:2857,lancer_2:3:714",
 	["rewards"] = "resources:wood:186000:25,resources:stone:186000:25,resources:iron:186000:25,resources:food:186000:25"
 }
 sections["18_15"] = {
@@ -3717,8 +3717,8 @@ sections["18_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,skeletonWarrior_2_7585,deathKnight_2_2843,skeletonArcher_2_3792,meatWagon_2_473",
-	["rewards"] = "soldierMaterials:deathHand:93:25,soldierMaterials:heroBones:93:25,soldierMaterials:soulStone:93:25,soldierMaterials:magicBox:93:25"
+	["troops"] = "redDragon:3:30,skeletonWarrior:3:8040,deathKnight:3:3015,skeletonArcher:3:4020,meatWagon:3:1005",
+	["rewards"] = "soldierMaterials:deathHand:372:25,soldierMaterials:heroBones:372:25,soldierMaterials:soulStone:372:25,soldierMaterials:magicBox:372:25"
 }
 sections["18_16"] = {
 	["sectionName"] = "18_16",
@@ -3727,7 +3727,7 @@ sections["18_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,horseArcher_1_7642,crossbowman_1_11463,ballista_1_1909,swordsman_1_3821",
+	["troops"] = "redDragon:3:30,horseArcher_2:3:2886,crossbowman_2:3:4330,ballista_2:3:1443,swordsman_2:3:1444",
 	["rewards"] = "resources:wood:188000:25,resources:stone:188000:25,resources:iron:188000:25,resources:food:188000:25"
 }
 sections["18_17"] = {
@@ -3737,7 +3737,7 @@ sections["18_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,ballista_1_3850,sentinel_1_11550,horseArcher_1_3850,ranger_1_3850",
+	["troops"] = "redDragon:3:30,ballista_2:3:2902,sentinel_2:3:4353,horseArcher_2:3:1451,ranger_2:3:1451",
 	["rewards"] = "resources:wood:188000:25,resources:stone:188000:25,resources:iron:188000:25,resources:food:188000:25"
 }
 sections["18_18"] = {
@@ -3747,8 +3747,8 @@ sections["18_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,skeletonArcher_2_7758,meatWagon_2_1453,skeletonWarrior_2_3879,deathKnight_2_969",
-	["rewards"] = "soldierMaterials:deathHand:94:25,soldierMaterials:heroBones:94:25,soldierMaterials:soulStone:94:25,soldierMaterials:magicBox:94:25"
+	["troops"] = "redDragon:3:30,skeletonArcher:3:8168,meatWagon:3:3063,skeletonWarrior:3:4084,deathKnight:3:1021",
+	["rewards"] = "soldierMaterials:deathHand:375:25,soldierMaterials:heroBones:375:25,soldierMaterials:soulStone:375:25,soldierMaterials:magicBox:375:25"
 }
 sections["18_19"] = {
 	["sectionName"] = "18_19",
@@ -3757,7 +3757,7 @@ sections["18_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,sentinel_1_15633,horseArcher_1_5862,crossbowman_1_7816,catapult_1_976",
+	["troops"] = "redDragon:3:30,sentinel_2:3:5865,horseArcher_2:3:2199,crossbowman_2:3:2933,catapult_2:3:733",
 	["rewards"] = "resources:wood:188000:25,resources:stone:188000:25,resources:iron:188000:25,resources:food:188000:25"
 }
 sections["18_20"] = {
@@ -3767,7 +3767,7 @@ sections["18_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,horseArcher_1_7875,crossbowman_1_11812,ballista_1_1967,sentinel_1_3937",
+	["troops"] = "redDragon:3:30,horseArcher_2:3:2948,crossbowman_2:3:4422,ballista_2:3:1474,sentinel_2:3:1474",
 	["rewards"] = "resources:wood:190000:25,resources:stone:190000:25,resources:iron:190000:25,resources:food:190000:25"
 }
 sections["18_21"] = {
@@ -3777,8 +3777,8 @@ sections["18_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "desert",
-	["troops"] = "redDragon_3_30,meatWagon_2_1858,skeletonWarrior_2_5950,deathKnight_2_2230,skeletonArcher_2_2975",
-	["rewards"] = "soldierMaterials:deathHand:95:25,soldierMaterials:heroBones:95:25,soldierMaterials:soulStone:95:25,soldierMaterials:magicBox:95:25"
+	["troops"] = "redDragon:3:30,meatWagon:3:4148,skeletonWarrior:3:6223,deathKnight:3:2074,skeletonArcher:3:2075",
+	["rewards"] = "soldierMaterials:deathHand:378:25,soldierMaterials:heroBones:378:25,soldierMaterials:soulStone:378:25,soldierMaterials:magicBox:378:25"
 }
 sections["19_1"] = {
 	["sectionName"] = "19_1",
@@ -3787,7 +3787,7 @@ sections["19_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_3_30,crossbowman_1_15984,ballista_1_2995,sentinel_1_7992,horseArcher_1_1997",
+	["troops"] = "blueDragon:3:30,crossbowman_3:1:5957,ballista_3:1:2234,sentinel_3:1:2979,horseArcher_3:1:745",
 	["rewards"] = "resources:wood:190000:25,resources:stone:190000:25,resources:iron:190000:25,resources:food:190000:25"
 }
 sections["19_2"] = {
@@ -3797,7 +3797,7 @@ sections["19_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_3_30,sentinel_1_16102,horseArcher_1_6038,crossbowman_1_8051,ballista_1_1005",
+	["troops"] = "blueDragon:3:30,sentinel_3:1:5988,horseArcher_3:1:2245,crossbowman_3:1:2994,ballista_3:1:748",
 	["rewards"] = "resources:wood:190000:25,resources:stone:190000:25,resources:iron:190000:25,resources:food:190000:25"
 }
 sections["19_3"] = {
@@ -3807,8 +3807,8 @@ sections["19_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_3_30,deathKnight_2_4055,skeletonArcher_2_6081,meatWagon_2_1012,skeletonWarrior_2_2026",
-	["rewards"] = "soldierMaterials:deathHand:96:25,soldierMaterials:heroBones:96:25,soldierMaterials:soulStone:96:25,soldierMaterials:magicBox:96:25"
+	["troops"] = "blueDragon:3:30,deathKnight:3:4815,skeletonArcher:3:7223,meatWagon:3:2407,skeletonWarrior:3:2408",
+	["rewards"] = "soldierMaterials:deathHand:381:25,soldierMaterials:heroBones:381:25,soldierMaterials:soulStone:381:25,soldierMaterials:magicBox:381:25"
 }
 sections["19_4"] = {
 	["sectionName"] = "19_4",
@@ -3817,7 +3817,7 @@ sections["19_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_3_30,catapult_1_4085,swordsman_1_12255,lancer_1_4085,ranger_1_4085",
+	["troops"] = "blueDragon:3:30,catapult_3:1:3025,swordsman_3:1:4538,lancer_3:1:1512,ranger_3:1:1513",
 	["rewards"] = "resources:wood:192000:25,resources:stone:192000:25,resources:iron:192000:25,resources:food:192000:25"
 }
 sections["19_5"] = {
@@ -3827,7 +3827,7 @@ sections["19_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,ranger_1_16459,catapult_1_3084,swordsman_1_8229,lancer_1_2056",
+	["troops"] = "blueDragon:4:31,ranger_3:1:6081,catapult_3:1:2280,swordsman_3:1:3041,lancer_3:1:760",
 	["rewards"] = "resources:wood:192000:25,resources:stone:192000:25,resources:iron:192000:25,resources:food:192000:25"
 }
 sections["19_6"] = {
@@ -3837,8 +3837,8 @@ sections["19_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,skeletonWarrior_2_8289,deathKnight_2_3107,skeletonArcher_2_4144,meatWagon_2_516",
-	["rewards"] = "soldierMaterials:deathHand:96:25,soldierMaterials:heroBones:96:25,soldierMaterials:soulStone:96:25,soldierMaterials:magicBox:96:25"
+	["troops"] = "blueDragon:4:31,skeletonWarrior:3:9780,deathKnight:3:3667,skeletonArcher:3:4890,meatWagon:3:1222",
+	["rewards"] = "soldierMaterials:deathHand:384:25,soldierMaterials:heroBones:384:25,soldierMaterials:soulStone:384:25,soldierMaterials:magicBox:384:25"
 }
 sections["19_7"] = {
 	["sectionName"] = "19_7",
@@ -3847,7 +3847,7 @@ sections["19_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,horseArcher_1_8349,ranger_1_12524,catapult_1_2086,swordsman_1_4174",
+	["troops"] = "blueDragon:4:31,horseArcher_3:1:3072,ranger_3:1:4608,catapult_3:1:1536,swordsman_3:1:1536",
 	["rewards"] = "resources:wood:194000:25,resources:stone:194000:25,resources:iron:194000:25,resources:food:194000:25"
 }
 sections["19_8"] = {
@@ -3857,7 +3857,7 @@ sections["19_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,ballista_1_4204,swordsman_1_12614,lancer_1_4204,ranger_1_4204",
+	["troops"] = "blueDragon:4:31,ballista_3:1:3087,swordsman_3:1:4632,lancer_3:1:1544,ranger_3:1:1544",
 	["rewards"] = "resources:wood:194000:25,resources:stone:194000:25,resources:iron:194000:25,resources:food:194000:25"
 }
 sections["19_9"] = {
@@ -3867,8 +3867,8 @@ sections["19_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,skeletonArcher_2_8470,meatWagon_2_1586,skeletonWarrior_2_4235,deathKnight_2_1058",
-	["rewards"] = "soldierMaterials:deathHand:97:25,soldierMaterials:heroBones:97:25,soldierMaterials:soulStone:97:25,soldierMaterials:magicBox:97:25"
+	["troops"] = "blueDragon:4:31,skeletonArcher:3:9930,meatWagon:3:3724,skeletonWarrior:3:4965,deathKnight:3:1241",
+	["rewards"] = "soldierMaterials:deathHand:387:25,soldierMaterials:heroBones:387:25,soldierMaterials:soulStone:387:25,soldierMaterials:magicBox:387:25"
 }
 sections["19_10"] = {
 	["sectionName"] = "19_10",
@@ -3877,7 +3877,7 @@ sections["19_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,sentinel_1_17061,lancer_1_6397,ranger_1_8530,catapult_1_1065",
+	["troops"] = "blueDragon:4:31,sentinel_3:1:6238,lancer_3:1:2339,ranger_3:1:3119,catapult_3:1:780",
 	["rewards"] = "resources:wood:194000:25,resources:stone:194000:25,resources:iron:194000:25,resources:food:194000:25"
 }
 sections["19_11"] = {
@@ -3887,7 +3887,7 @@ sections["19_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,horseArcher_1_8591,crossbowman_1_12887,catapult_1_2146,swordsman_1_4295",
+	["troops"] = "blueDragon:4:31,horseArcher_3:1:3135,crossbowman_3:1:4703,catapult_3:1:1567,swordsman_3:1:1568",
 	["rewards"] = "resources:wood:196000:25,resources:stone:196000:25,resources:iron:196000:25,resources:food:196000:25"
 }
 sections["19_12"] = {
@@ -3897,8 +3897,8 @@ sections["19_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,meatWagon_2_2163,skeletonWarrior_2_6489,deathKnight_2_2163,skeletonArcher_2_2163",
-	["rewards"] = "soldierMaterials:deathHand:98:25,soldierMaterials:heroBones:98:25,soldierMaterials:soulStone:98:25,soldierMaterials:magicBox:98:25"
+	["troops"] = "blueDragon:4:31,meatWagon:3:5041,skeletonWarrior:3:7562,deathKnight:3:2520,skeletonArcher:3:2521",
+	["rewards"] = "soldierMaterials:deathHand:390:25,soldierMaterials:heroBones:390:25,soldierMaterials:soulStone:390:25,soldierMaterials:magicBox:390:25"
 }
 sections["19_13"] = {
 	["sectionName"] = "19_13",
@@ -3907,7 +3907,7 @@ sections["19_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,crossbowman_1_17427,ballista_1_3265,swordsman_1_8713,lancer_1_2177",
+	["troops"] = "blueDragon:4:31,crossbowman_3:1:6334,ballista_3:1:2375,swordsman_3:1:3167,lancer_3:1:792",
 	["rewards"] = "resources:wood:196000:25,resources:stone:196000:25,resources:iron:196000:25,resources:food:196000:25"
 }
 sections["19_14"] = {
@@ -3917,7 +3917,7 @@ sections["19_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,sentinel_1_17550,horseArcher_1_6581,ranger_1_8775,catapult_1_1095",
+	["troops"] = "blueDragon:4:31,sentinel_3:1:6365,horseArcher_3:1:2387,ranger_3:1:3183,catapult_3:1:796",
 	["rewards"] = "resources:wood:196000:25,resources:stone:196000:25,resources:iron:196000:25,resources:food:196000:25"
 }
 sections["19_15"] = {
@@ -3927,8 +3927,8 @@ sections["19_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,deathKnight_2_4418,skeletonArcher_2_6626,meatWagon_2_1102,skeletonWarrior_2_2208",
-	["rewards"] = "soldierMaterials:deathHand:99:25,soldierMaterials:heroBones:99:25,soldierMaterials:soulStone:99:25,soldierMaterials:magicBox:99:25"
+	["troops"] = "blueDragon:4:31,deathKnight:3:5118,skeletonArcher:3:7677,meatWagon:3:2559,skeletonWarrior:3:2559",
+	["rewards"] = "soldierMaterials:deathHand:393:25,soldierMaterials:heroBones:393:25,soldierMaterials:soulStone:393:25,soldierMaterials:magicBox:393:25"
 }
 sections["19_16"] = {
 	["sectionName"] = "19_16",
@@ -3937,7 +3937,7 @@ sections["19_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,ballista_1_4449,sentinel_1_13347,horseArcher_1_4449,ranger_1_4449",
+	["troops"] = "blueDragon:4:31,ballista_3:1:3214,sentinel_3:1:4822,horseArcher_3:1:1607,ranger_3:1:1608",
 	["rewards"] = "resources:wood:198000:25,resources:stone:198000:25,resources:iron:198000:25,resources:food:198000:25"
 }
 sections["19_17"] = {
@@ -3947,7 +3947,7 @@ sections["19_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_31,crossbowman_1_17920,ballista_1_3358,sentinel_1_8960,lancer_1_2238",
+	["troops"] = "blueDragon:4:31,crossbowman_3:1:6462,ballista_3:1:2423,sentinel_3:1:3231,lancer_3:1:808",
 	["rewards"] = "resources:wood:198000:25,resources:stone:198000:25,resources:iron:198000:25,resources:food:198000:25"
 }
 sections["19_18"] = {
@@ -3957,8 +3957,8 @@ sections["19_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,skeletonWarrior_2_9022,deathKnight_2_3382,skeletonArcher_2_4511,meatWagon_2_563",
-	["rewards"] = "soldierMaterials:deathHand:99:25,soldierMaterials:heroBones:99:25,soldierMaterials:soulStone:99:25,soldierMaterials:magicBox:99:25"
+	["troops"] = "blueDragon:4:32,skeletonWarrior:3:10390,deathKnight:3:3896,skeletonArcher:3:5195,meatWagon:3:1299",
+	["rewards"] = "soldierMaterials:deathHand:396:25,soldierMaterials:heroBones:396:25,soldierMaterials:soulStone:396:25,soldierMaterials:magicBox:396:25"
 }
 sections["19_19"] = {
 	["sectionName"] = "19_19",
@@ -3967,7 +3967,7 @@ sections["19_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,horseArcher_1_9085,crossbowman_1_13627,ballista_1_2270,sentinel_1_4542",
+	["troops"] = "blueDragon:4:32,horseArcher_3:1:3263,crossbowman_3:1:4895,ballista_3:1:1631,sentinel_3:1:1632",
 	["rewards"] = "resources:wood:200000:25,resources:stone:200000:25,resources:iron:200000:25,resources:food:200000:25"
 }
 sections["19_20"] = {
@@ -3977,7 +3977,7 @@ sections["19_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,ballista_1_4573,sentinel_1_13721,horseArcher_1_4573,crossbowman_1_4573",
+	["troops"] = "blueDragon:4:32,ballista_3:1:3279,sentinel_3:1:4919,horseArcher_3:1:1639,crossbowman_3:1:1640",
 	["rewards"] = "resources:wood:200000:25,resources:stone:200000:25,resources:iron:200000:25,resources:food:200000:25"
 }
 sections["19_21"] = {
@@ -3987,8 +3987,8 @@ sections["19_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,skeletonArcher_2_8632,meatWagon_2_1726,skeletonWarrior_2_5178,deathKnight_2_1726",
-	["rewards"] = "soldierMaterials:deathHand:100:25,soldierMaterials:heroBones:100:25,soldierMaterials:soulStone:100:25,soldierMaterials:magicBox:100:25"
+	["troops"] = "blueDragon:4:32,skeletonArcher:3:10545,meatWagon:3:3954,skeletonWarrior:3:5273,deathKnight:3:1318",
+	["rewards"] = "soldierMaterials:deathHand:399:25,soldierMaterials:heroBones:399:25,soldierMaterials:soulStone:399:25,soldierMaterials:magicBox:399:25"
 }
 sections["20_1"] = {
 	["sectionName"] = "20_1",
@@ -3997,7 +3997,7 @@ sections["20_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,sentinel_1_18546,horseArcher_1_6955,crossbowman_1_9273,ballista_1_1158",
+	["troops"] = "blueDragon:4:32,sentinel_3:1:6623,horseArcher_3:1:2484,crossbowman_3:1:3312,ballista_3:1:828",
 	["rewards"] = "resources:wood:200000:25,resources:stone:200000:25,resources:iron:200000:25,resources:food:200000:25"
 }
 sections["20_2"] = {
@@ -4007,7 +4007,7 @@ sections["20_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,lancer_1_9336,ranger_1_14004,catapult_1_2332,swordsman_1_4668",
+	["troops"] = "blueDragon:4:32,lancer_3:1:3328,ranger_3:1:4992,catapult_3:1:1664,swordsman_3:1:1664",
 	["rewards"] = "resources:wood:202000:25,resources:stone:202000:25,resources:iron:202000:25,resources:food:202000:25"
 }
 sections["20_3"] = {
@@ -4017,8 +4017,8 @@ sections["20_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,meatWagon_2_2350,skeletonWarrior_2_7050,deathKnight_2_2350,skeletonArcher_2_2350",
-	["rewards"] = "soldierMaterials:deathHand:101:25,soldierMaterials:heroBones:101:25,soldierMaterials:soulStone:101:25,soldierMaterials:magicBox:101:25"
+	["troops"] = "blueDragon:4:32,meatWagon:3:5350,skeletonWarrior:3:8026,deathKnight:3:2675,skeletonArcher:3:2676",
+	["rewards"] = "soldierMaterials:deathHand:402:25,soldierMaterials:heroBones:402:25,soldierMaterials:soulStone:402:25,soldierMaterials:magicBox:402:25"
 }
 sections["20_4"] = {
 	["sectionName"] = "20_4",
@@ -4027,7 +4027,7 @@ sections["20_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,ranger_1_18927,catapult_1_3547,swordsman_1_9463,lancer_1_2364",
+	["troops"] = "blueDragon:4:32,ranger_3:1:6721,catapult_3:1:2520,swordsman_3:1:3361,lancer_3:1:840",
 	["rewards"] = "resources:wood:202000:25,resources:stone:202000:25,resources:iron:202000:25,resources:food:202000:25"
 }
 sections["20_5"] = {
@@ -4037,7 +4037,7 @@ sections["20_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,swordsman_1_19054,lancer_1_7145,ranger_1_9527,catapult_1_1189",
+	["troops"] = "blueDragon:4:32,swordsman_3:1:6754,lancer_3:1:2533,ranger_3:1:3377,catapult_3:1:844",
 	["rewards"] = "resources:wood:202000:25,resources:stone:202000:25,resources:iron:202000:25,resources:food:202000:25"
 }
 sections["20_6"] = {
@@ -4047,8 +4047,8 @@ sections["20_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,deathKnight_2_4795,skeletonArcher_2_7192,meatWagon_2_1197,skeletonWarrior_2_2396",
-	["rewards"] = "soldierMaterials:deathHand:102:25,soldierMaterials:heroBones:102:25,soldierMaterials:soulStone:102:25,soldierMaterials:magicBox:102:25"
+	["troops"] = "blueDragon:4:32,deathKnight:3:5429,skeletonArcher:3:8145,meatWagon:3:2715,skeletonWarrior:3:2715",
+	["rewards"] = "soldierMaterials:deathHand:405:25,soldierMaterials:heroBones:405:25,soldierMaterials:soulStone:405:25,soldierMaterials:magicBox:405:25"
 }
 sections["20_7"] = {
 	["sectionName"] = "20_7",
@@ -4057,7 +4057,7 @@ sections["20_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,ballista_1_4827,swordsman_1_14483,lancer_1_4827,ranger_1_4827",
+	["troops"] = "blueDragon:4:32,ballista_3:1:3410,swordsman_3:1:5115,lancer_3:1:1705,ranger_3:1:1705",
 	["rewards"] = "resources:wood:204000:25,resources:stone:204000:25,resources:iron:204000:25,resources:food:204000:25"
 }
 sections["20_8"] = {
@@ -4067,7 +4067,7 @@ sections["20_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,crossbowman_1_19440,catapult_1_3643,swordsman_1_9720,lancer_1_2428",
+	["troops"] = "blueDragon:4:32,crossbowman_3:1:6853,catapult_3:1:2570,swordsman_3:1:3427,lancer_3:1:857",
 	["rewards"] = "resources:wood:204000:25,resources:stone:204000:25,resources:iron:204000:25,resources:food:204000:25"
 }
 sections["20_9"] = {
@@ -4077,8 +4077,8 @@ sections["20_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_32,skeletonWarrior_2_9784,deathKnight_2_3668,skeletonArcher_2_4892,meatWagon_2_609",
-	["rewards"] = "soldierMaterials:deathHand:102:25,soldierMaterials:heroBones:102:25,soldierMaterials:soulStone:102:25,soldierMaterials:magicBox:102:25"
+	["troops"] = "blueDragon:4:32,skeletonWarrior:3:11018,deathKnight:3:4132,skeletonArcher:3:5509,meatWagon:3:1377",
+	["rewards"] = "soldierMaterials:deathHand:408:25,soldierMaterials:heroBones:408:25,soldierMaterials:soulStone:408:25,soldierMaterials:magicBox:408:25"
 }
 sections["20_10"] = {
 	["sectionName"] = "20_10",
@@ -4087,7 +4087,7 @@ sections["20_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,horseArcher_1_9849,crossbowman_1_14774,catapult_1_2461,swordsman_1_4924",
+	["troops"] = "blueDragon:4:33,horseArcher_3:1:3460,crossbowman_3:1:5190,catapult_3:1:1730,swordsman_3:1:1730",
 	["rewards"] = "resources:wood:206000:25,resources:stone:206000:25,resources:iron:206000:25,resources:food:206000:25"
 }
 sections["20_11"] = {
@@ -4097,7 +4097,7 @@ sections["20_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,ballista_1_4957,sentinel_1_14871,lancer_1_4957,ranger_1_4957",
+	["troops"] = "blueDragon:4:33,ballista_3:1:3476,sentinel_3:1:5215,lancer_3:1:1738,ranger_3:1:1739",
 	["rewards"] = "resources:wood:206000:25,resources:stone:206000:25,resources:iron:206000:25,resources:food:206000:25"
 }
 sections["20_12"] = {
@@ -4107,8 +4107,8 @@ sections["20_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,skeletonArcher_2_9979,meatWagon_2_1869,skeletonWarrior_2_4989,deathKnight_2_1246",
-	["rewards"] = "soldierMaterials:deathHand:103:25,soldierMaterials:heroBones:103:25,soldierMaterials:soulStone:103:25,soldierMaterials:magicBox:103:25"
+	["troops"] = "blueDragon:4:33,skeletonArcher:3:11178,meatWagon:3:4191,skeletonWarrior:3:5589,deathKnight:3:1397",
+	["rewards"] = "soldierMaterials:deathHand:411:25,soldierMaterials:heroBones:411:25,soldierMaterials:soulStone:411:25,soldierMaterials:magicBox:411:25"
 }
 sections["20_13"] = {
 	["sectionName"] = "20_13",
@@ -4117,7 +4117,7 @@ sections["20_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,sentinel_1_20090,horseArcher_1_7533,ranger_1_10045,catapult_1_1254",
+	["troops"] = "blueDragon:4:33,sentinel_3:1:7020,horseArcher_3:1:2632,ranger_3:1:3510,catapult_3:1:877",
 	["rewards"] = "resources:wood:206000:25,resources:stone:206000:25,resources:iron:206000:25,resources:food:206000:25"
 }
 sections["20_14"] = {
@@ -4127,7 +4127,7 @@ sections["20_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,horseArcher_1_10110,crossbowman_1_15165,ballista_1_2526,swordsman_1_5055",
+	["troops"] = "blueDragon:4:33,horseArcher_3:1:3526,crossbowman_3:1:5290,ballista_3:1:1763,swordsman_3:1:1764",
 	["rewards"] = "resources:wood:208000:25,resources:stone:208000:25,resources:iron:208000:25,resources:food:208000:25"
 }
 sections["20_15"] = {
@@ -4137,8 +4137,8 @@ sections["20_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,meatWagon_2_2544,skeletonWarrior_2_7632,deathKnight_2_2544,skeletonArcher_2_2544",
-	["rewards"] = "soldierMaterials:deathHand:104:25,soldierMaterials:heroBones:104:25,soldierMaterials:soulStone:104:25,soldierMaterials:magicBox:104:25"
+	["troops"] = "blueDragon:4:33,meatWagon:3:5669,skeletonWarrior:3:8504,deathKnight:3:2835,skeletonArcher:3:2835",
+	["rewards"] = "soldierMaterials:deathHand:414:25,soldierMaterials:heroBones:414:25,soldierMaterials:soulStone:414:25,soldierMaterials:magicBox:414:25"
 }
 sections["20_16"] = {
 	["sectionName"] = "20_16",
@@ -4147,7 +4147,7 @@ sections["20_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,crossbowman_1_20484,ballista_1_3839,sentinel_1_10242,lancer_1_2559",
+	["troops"] = "blueDragon:4:33,crossbowman_3:1:7121,ballista_3:1:2670,sentinel_3:1:3561,lancer_3:1:890",
 	["rewards"] = "resources:wood:208000:25,resources:stone:208000:25,resources:iron:208000:25,resources:food:208000:25"
 }
 sections["20_17"] = {
@@ -4157,7 +4157,7 @@ sections["20_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,sentinel_1_20617,horseArcher_1_7731,crossbowman_1_10308,catapult_1_1287",
+	["troops"] = "blueDragon:4:33,sentinel_3:1:7154,horseArcher_3:1:2683,crossbowman_3:1:3577,catapult_3:1:894",
 	["rewards"] = "resources:wood:208000:25,resources:stone:208000:25,resources:iron:208000:25,resources:food:208000:25"
 }
 sections["20_18"] = {
@@ -4167,8 +4167,8 @@ sections["20_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,deathKnight_2_5187,skeletonArcher_2_7780,meatWagon_2_1295,skeletonWarrior_2_2592",
-	["rewards"] = "soldierMaterials:deathHand:105:25,soldierMaterials:heroBones:105:25,soldierMaterials:soulStone:105:25,soldierMaterials:magicBox:105:25"
+	["troops"] = "blueDragon:4:33,deathKnight:3:5750,skeletonArcher:3:8626,meatWagon:3:2875,skeletonWarrior:3:2876",
+	["rewards"] = "soldierMaterials:deathHand:417:25,soldierMaterials:heroBones:417:25,soldierMaterials:soulStone:417:25,soldierMaterials:magicBox:417:25"
 }
 sections["20_19"] = {
 	["sectionName"] = "20_19",
@@ -4177,7 +4177,7 @@ sections["20_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,ballista_1_5220,sentinel_1_15662,horseArcher_1_5220,crossbowman_1_5220",
+	["troops"] = "blueDragon:4:33,ballista_3:1:3611,sentinel_3:1:5417,horseArcher_3:1:1805,crossbowman_3:1:1806",
 	["rewards"] = "resources:wood:210000:25,resources:stone:210000:25,resources:iron:210000:25,resources:food:210000:25"
 }
 sections["20_20"] = {
@@ -4187,7 +4187,7 @@ sections["20_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,crossbowman_1_21016,ballista_1_3938,sentinel_1_10508,horseArcher_1_2625",
+	["troops"] = "blueDragon:4:33,crossbowman_3:1:7256,ballista_3:1:2721,sentinel_3:1:3628,horseArcher_3:1:907",
 	["rewards"] = "resources:wood:210000:25,resources:stone:210000:25,resources:iron:210000:25,resources:food:210000:25"
 }
 sections["20_21"] = {
@@ -4197,8 +4197,8 @@ sections["20_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,skeletonWarrior_2_9912,deathKnight_2_3964,skeletonArcher_2_5948,meatWagon_2_989",
-	["rewards"] = "soldierMaterials:deathHand:105:25,soldierMaterials:heroBones:105:25,soldierMaterials:soulStone:105:25,soldierMaterials:magicBox:105:25"
+	["troops"] = "blueDragon:4:33,skeletonWarrior:3:11664,deathKnight:3:4374,skeletonArcher:3:5832,meatWagon:3:1458",
+	["rewards"] = "soldierMaterials:deathHand:420:25,soldierMaterials:heroBones:420:25,soldierMaterials:soulStone:420:25,soldierMaterials:magicBox:420:25"
 }
 sections["21_1"] = {
 	["sectionName"] = "21_1",
@@ -4207,7 +4207,7 @@ sections["21_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_33,lancer_1_10642,ranger_1_15963,catapult_1_2659,swordsman_1_5321",
+	["troops"] = "blueDragon:4:33,lancer_3:2:3662,ranger_3:2:5494,catapult_3:2:1831,swordsman_3:2:1832",
 	["rewards"] = "resources:wood:212000:25,resources:stone:212000:25,resources:iron:212000:25,resources:food:212000:25"
 }
 sections["21_2"] = {
@@ -4217,7 +4217,7 @@ sections["21_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,catapult_1_5355,swordsman_1_16065,lancer_1_5355,ranger_1_5355",
+	["troops"] = "blueDragon:4:34,catapult_3:2:3679,swordsman_3:2:5519,lancer_3:2:1840,ranger_3:2:1840",
 	["rewards"] = "resources:wood:212000:25,resources:stone:212000:25,resources:iron:212000:25,resources:food:212000:25"
 }
 sections["21_3"] = {
@@ -4227,8 +4227,8 @@ sections["21_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,skeletonArcher_2_10777,meatWagon_2_2019,skeletonWarrior_2_5388,deathKnight_2_1346",
-	["rewards"] = "soldierMaterials:deathHand:106:25,soldierMaterials:heroBones:106:25,soldierMaterials:soulStone:106:25,soldierMaterials:magicBox:106:25"
+	["troops"] = "blueDragon:4:34,skeletonArcher:3:13308,meatWagon:3:4990,skeletonWarrior:3:6654,deathKnight:3:1663",
+	["rewards"] = "soldierMaterials:deathHand:423:25,soldierMaterials:heroBones:423:25,soldierMaterials:soulStone:423:25,soldierMaterials:magicBox:423:25"
 }
 sections["21_4"] = {
 	["sectionName"] = "21_4",
@@ -4237,7 +4237,7 @@ sections["21_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,swordsman_1_21690,lancer_1_8134,ranger_1_10845,catapult_1_1354",
+	["troops"] = "blueDragon:4:34,swordsman_3:2:7428,lancer_3:2:2785,ranger_3:2:3714,catapult_3:2:928",
 	["rewards"] = "resources:wood:212000:25,resources:stone:212000:25,resources:iron:212000:25,resources:food:212000:25"
 }
 sections["21_5"] = {
@@ -4247,7 +4247,7 @@ sections["21_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,horseArcher_1_10913,ranger_1_16370,catapult_1_2727,swordsman_1_5456",
+	["troops"] = "blueDragon:4:34,horseArcher_3:2:3731,ranger_3:2:5597,catapult_3:2:1865,swordsman_3:2:1866",
 	["rewards"] = "resources:wood:214000:25,resources:stone:214000:25,resources:iron:214000:25,resources:food:214000:25"
 }
 sections["21_6"] = {
@@ -4257,8 +4257,8 @@ sections["21_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,meatWagon_2_2745,skeletonWarrior_2_8236,deathKnight_2_2745,skeletonArcher_2_2745",
-	["rewards"] = "soldierMaterials:deathHand:107:25,soldierMaterials:heroBones:107:25,soldierMaterials:soulStone:107:25,soldierMaterials:magicBox:107:25"
+	["troops"] = "blueDragon:4:34,meatWagon:3:6747,skeletonWarrior:3:10121,deathKnight:3:3373,skeletonArcher:3:3374",
+	["rewards"] = "soldierMaterials:deathHand:426:25,soldierMaterials:heroBones:426:25,soldierMaterials:soulStone:426:25,soldierMaterials:magicBox:426:25"
 }
 sections["21_7"] = {
 	["sectionName"] = "21_7",
@@ -4267,7 +4267,7 @@ sections["21_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,crossbowman_1_22100,catapult_1_4141,swordsman_1_11050,lancer_1_2761",
+	["troops"] = "blueDragon:4:34,crossbowman_3:2:7532,catapult_3:2:2824,swordsman_3:2:3766,lancer_3:2:941",
 	["rewards"] = "resources:wood:214000:25,resources:stone:214000:25,resources:iron:214000:25,resources:food:214000:25"
 }
 sections["21_8"] = {
@@ -4277,7 +4277,7 @@ sections["21_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,sentinel_1_22237,lancer_1_8338,ranger_1_11118,catapult_1_1388",
+	["troops"] = "blueDragon:4:34,sentinel_3:2:7566,lancer_3:2:2837,ranger_3:2:3783,catapult_3:2:946",
 	["rewards"] = "resources:wood:214000:25,resources:stone:214000:25,resources:iron:214000:25,resources:food:214000:25"
 }
 sections["21_9"] = {
@@ -4287,8 +4287,8 @@ sections["21_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,deathKnight_2_5593,skeletonArcher_2_8389,meatWagon_2_1396,skeletonWarrior_2_2795",
-	["rewards"] = "soldierMaterials:deathHand:108:25,soldierMaterials:heroBones:108:25,soldierMaterials:soulStone:108:25,soldierMaterials:magicBox:108:25"
+	["troops"] = "blueDragon:4:34,deathKnight:3:6841,skeletonArcher:3:10261,meatWagon:3:3420,skeletonWarrior:3:3421",
+	["rewards"] = "soldierMaterials:deathHand:429:25,soldierMaterials:heroBones:429:25,soldierMaterials:soulStone:429:25,soldierMaterials:magicBox:429:25"
 }
 sections["21_10"] = {
 	["sectionName"] = "21_10",
@@ -4297,7 +4297,7 @@ sections["21_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,ballista_1_5628,sentinel_1_16884,lancer_1_5628,ranger_1_5628",
+	["troops"] = "blueDragon:4:34,ballista_3:2:3818,sentinel_3:2:5727,lancer_3:2:1909,ranger_3:2:1909",
 	["rewards"] = "resources:wood:216000:25,resources:stone:216000:25,resources:iron:216000:25,resources:food:216000:25"
 }
 sections["21_11"] = {
@@ -4307,7 +4307,7 @@ sections["21_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,crossbowman_1_22651,ballista_1_4245,swordsman_1_11325,lancer_1_2830",
+	["troops"] = "blueDragon:4:34,crossbowman_3:2:7671,ballista_3:2:2877,swordsman_3:2:3836,lancer_3:2:959",
 	["rewards"] = "resources:wood:216000:25,resources:stone:216000:25,resources:iron:216000:25,resources:food:216000:25"
 }
 sections["21_12"] = {
@@ -4317,8 +4317,8 @@ sections["21_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,skeletonWarrior_2_11395,deathKnight_2_4271,skeletonArcher_2_5697,meatWagon_2_710",
-	["rewards"] = "soldierMaterials:deathHand:108:25,soldierMaterials:heroBones:108:25,soldierMaterials:soulStone:108:25,soldierMaterials:magicBox:108:25"
+	["troops"] = "blueDragon:4:34,skeletonWarrior:3:13871,deathKnight:3:5201,skeletonArcher:3:6936,meatWagon:3:1734",
+	["rewards"] = "soldierMaterials:deathHand:432:25,soldierMaterials:heroBones:432:25,soldierMaterials:soulStone:432:25,soldierMaterials:magicBox:432:25"
 }
 sections["21_13"] = {
 	["sectionName"] = "21_13",
@@ -4327,7 +4327,7 @@ sections["21_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,horseArcher_1_11464,crossbowman_1_17196,ballista_1_2864,swordsman_1_5732",
+	["troops"] = "blueDragon:4:34,horseArcher_3:2:3870,crossbowman_3:2:5806,ballista_3:2:1935,swordsman_3:2:1936",
 	["rewards"] = "resources:wood:218000:25,resources:stone:218000:25,resources:iron:218000:25,resources:food:218000:25"
 }
 sections["21_14"] = {
@@ -4337,7 +4337,7 @@ sections["21_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_34,ballista_1_5767,sentinel_1_17301,horseArcher_1_5767,ranger_1_5767",
+	["troops"] = "blueDragon:4:34,ballista_3:2:3888,sentinel_3:2:5832,horseArcher_3:2:1944,ranger_3:2:1944",
 	["rewards"] = "resources:wood:218000:25,resources:stone:218000:25,resources:iron:218000:25,resources:food:218000:25"
 }
 sections["21_15"] = {
@@ -4347,8 +4347,8 @@ sections["21_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_35,skeletonArcher_2_11604,meatWagon_2_2173,skeletonWarrior_2_5802,deathKnight_2_1449",
-	["rewards"] = "soldierMaterials:deathHand:109:25,soldierMaterials:heroBones:109:25,soldierMaterials:soulStone:109:25,soldierMaterials:magicBox:109:25"
+	["troops"] = "blueDragon:4:35,skeletonArcher:3:14061,meatWagon:3:5273,skeletonWarrior:3:7031,deathKnight:3:1758",
+	["rewards"] = "soldierMaterials:deathHand:435:25,soldierMaterials:heroBones:435:25,soldierMaterials:soulStone:435:25,soldierMaterials:magicBox:435:25"
 }
 sections["21_16"] = {
 	["sectionName"] = "21_16",
@@ -4357,7 +4357,7 @@ sections["21_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_35,sentinel_1_23349,horseArcher_1_8755,crossbowman_1_11674,catapult_1_1457",
+	["troops"] = "blueDragon:4:35,sentinel_3:2:7847,horseArcher_3:2:2943,crossbowman_3:2:3924,catapult_3:2:981",
 	["rewards"] = "resources:wood:218000:25,resources:stone:218000:25,resources:iron:218000:25,resources:food:218000:25"
 }
 sections["21_17"] = {
@@ -4367,7 +4367,7 @@ sections["21_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_35,horseArcher_1_11745,crossbowman_1_17617,ballista_1_2934,sentinel_1_5872",
+	["troops"] = "blueDragon:4:35,horseArcher_3:2:3941,crossbowman_3:2:5912,ballista_3:2:1971,sentinel_3:2:1971",
 	["rewards"] = "resources:wood:220000:25,resources:stone:220000:25,resources:iron:220000:25,resources:food:220000:25"
 }
 sections["21_18"] = {
@@ -4377,8 +4377,8 @@ sections["21_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_35,meatWagon_2_2953,skeletonWarrior_2_8861,deathKnight_2_2953,skeletonArcher_2_2953",
-	["rewards"] = "soldierMaterials:deathHand:110:25,soldierMaterials:heroBones:110:25,soldierMaterials:soulStone:110:25,soldierMaterials:magicBox:110:25"
+	["troops"] = "blueDragon:4:35,meatWagon:3:7126,skeletonWarrior:3:10689,deathKnight:3:3563,skeletonArcher:3:3563",
+	["rewards"] = "soldierMaterials:deathHand:438:25,soldierMaterials:heroBones:438:25,soldierMaterials:soulStone:438:25,soldierMaterials:magicBox:438:25"
 }
 sections["21_19"] = {
 	["sectionName"] = "21_19",
@@ -4387,7 +4387,7 @@ sections["21_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_35,crossbowman_1_23772,ballista_1_4455,sentinel_1_11886,horseArcher_1_2970",
+	["troops"] = "blueDragon:4:35,crossbowman_3:2:7954,ballista_3:2:2983,sentinel_3:2:3977,horseArcher_3:2:994",
 	["rewards"] = "resources:wood:220000:25,resources:stone:220000:25,resources:iron:220000:25,resources:food:220000:25"
 }
 sections["21_20"] = {
@@ -4397,7 +4397,7 @@ sections["21_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_35,sentinel_1_23914,horseArcher_1_8968,crossbowman_1_11957,ballista_1_1493",
+	["troops"] = "blueDragon:4:35,sentinel_3:2:7990,horseArcher_3:2:2996,crossbowman_3:2:3995,ballista_3:2:999",
 	["rewards"] = "resources:wood:220000:25,resources:stone:220000:25,resources:iron:220000:25,resources:food:220000:25"
 }
 sections["21_21"] = {
@@ -4407,8 +4407,8 @@ sections["21_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "iceField",
-	["troops"] = "blueDragon_4_35,deathKnight_2_5636,skeletonArcher_2_9020,meatWagon_2_1690,skeletonWarrior_2_4510",
-	["rewards"] = "soldierMaterials:deathHand:111:25,soldierMaterials:heroBones:111:25,soldierMaterials:soulStone:111:25,soldierMaterials:magicBox:111:25"
+	["troops"] = "blueDragon:4:35,deathKnight:3:7223,skeletonArcher:3:10834,meatWagon:3:3611,skeletonWarrior:3:3612",
+	["rewards"] = "soldierMaterials:deathHand:441:25,soldierMaterials:heroBones:441:25,soldierMaterials:soulStone:441:25,soldierMaterials:magicBox:441:25"
 }
 sections["22_1"] = {
 	["sectionName"] = "22_1",
@@ -4417,7 +4417,7 @@ sections["22_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_35,catapult_1_6050,swordsman_1_18150,lancer_1_6050,ranger_1_6050",
+	["troops"] = "greenDragon:4:35,catapult_3:2:4030,swordsman_3:2:6046,lancer_3:2:2015,ranger_3:2:2016",
 	["rewards"] = "resources:wood:222000:25,resources:stone:222000:25,resources:iron:222000:25,resources:food:222000:25"
 }
 sections["22_2"] = {
@@ -4427,7 +4427,7 @@ sections["22_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_35,ranger_1_24343,catapult_1_4562,swordsman_1_12171,lancer_1_3041",
+	["troops"] = "greenDragon:4:35,ranger_3:2:8097,catapult_3:2:3036,swordsman_3:2:4049,lancer_3:2:1012",
 	["rewards"] = "resources:wood:222000:25,resources:stone:222000:25,resources:iron:222000:25,resources:food:222000:25"
 }
 sections["22_3"] = {
@@ -4437,8 +4437,8 @@ sections["22_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_35,skeletonWarrior_2_12243,deathKnight_2_4589,skeletonArcher_2_6121,meatWagon_2_764",
-	["rewards"] = "soldierMaterials:deathHand:111:25,soldierMaterials:heroBones:111:25,soldierMaterials:soulStone:111:25,soldierMaterials:magicBox:111:25"
+	["troops"] = "greenDragon:4:35,skeletonWarrior:3:14640,deathKnight:3:5490,skeletonArcher:3:7320,meatWagon:3:1830",
+	["rewards"] = "soldierMaterials:deathHand:444:25,soldierMaterials:heroBones:444:25,soldierMaterials:soulStone:444:25,soldierMaterials:magicBox:444:25"
 }
 sections["22_4"] = {
 	["sectionName"] = "22_4",
@@ -4447,7 +4447,7 @@ sections["22_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_35,horseArcher_1_12315,ranger_1_18473,catapult_1_3077,swordsman_1_6157",
+	["troops"] = "greenDragon:4:35,horseArcher_3:2:4085,ranger_3:2:6127,catapult_3:2:2042,swordsman_3:2:2043",
 	["rewards"] = "resources:wood:224000:25,resources:stone:224000:25,resources:iron:224000:25,resources:food:224000:25"
 }
 sections["22_5"] = {
@@ -4457,7 +4457,7 @@ sections["22_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_35,ballista_1_6193,swordsman_1_18581,lancer_1_6193,ranger_1_6193",
+	["troops"] = "greenDragon:4:35,ballista_3:2:4103,swordsman_3:2:6154,lancer_3:2:2051,ranger_3:2:2052",
 	["rewards"] = "resources:wood:224000:25,resources:stone:224000:25,resources:iron:224000:25,resources:food:224000:25"
 }
 sections["22_6"] = {
@@ -4467,8 +4467,8 @@ sections["22_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_35,skeletonArcher_2_12460,meatWagon_2_2335,skeletonWarrior_2_6230,deathKnight_2_1556",
-	["rewards"] = "soldierMaterials:deathHand:112:25,soldierMaterials:heroBones:112:25,soldierMaterials:soulStone:112:25,soldierMaterials:magicBox:112:25"
+	["troops"] = "greenDragon:4:35,skeletonArcher:3:14835,meatWagon:3:5563,skeletonWarrior:3:7418,deathKnight:3:1854",
+	["rewards"] = "soldierMaterials:deathHand:447:25,soldierMaterials:heroBones:447:25,soldierMaterials:soulStone:447:25,soldierMaterials:magicBox:447:25"
 }
 sections["22_7"] = {
 	["sectionName"] = "22_7",
@@ -4477,7 +4477,7 @@ sections["22_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,sentinel_1_25065,lancer_1_9399,ranger_1_12532,catapult_1_1565",
+	["troops"] = "greenDragon:4:36,sentinel_3:2:8278,lancer_3:2:3104,ranger_3:2:4139,catapult_3:2:1035",
 	["rewards"] = "resources:wood:224000:25,resources:stone:224000:25,resources:iron:224000:25,resources:food:224000:25"
 }
 sections["22_8"] = {
@@ -4487,7 +4487,7 @@ sections["22_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,horseArcher_1_12605,crossbowman_1_18908,catapult_1_3149,swordsman_1_6302",
+	["troops"] = "greenDragon:4:36,horseArcher_3:2:4157,crossbowman_3:2:6236,catapult_3:2:2079,swordsman_3:2:2079",
 	["rewards"] = "resources:wood:226000:25,resources:stone:226000:25,resources:iron:226000:25,resources:food:226000:25"
 }
 sections["22_9"] = {
@@ -4497,8 +4497,8 @@ sections["22_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,meatWagon_2_3169,skeletonWarrior_2_9508,deathKnight_2_3169,skeletonArcher_2_3169",
-	["rewards"] = "soldierMaterials:deathHand:113:25,soldierMaterials:heroBones:113:25,soldierMaterials:soulStone:113:25,soldierMaterials:magicBox:113:25"
+	["troops"] = "greenDragon:4:36,meatWagon:3:7516,skeletonWarrior:3:11274,deathKnight:3:3758,skeletonArcher:3:3758",
+	["rewards"] = "soldierMaterials:deathHand:450:25,soldierMaterials:heroBones:450:25,soldierMaterials:soulStone:450:25,soldierMaterials:magicBox:450:25"
 }
 sections["22_10"] = {
 	["sectionName"] = "22_10",
@@ -4507,7 +4507,7 @@ sections["22_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,crossbowman_1_25503,ballista_1_4779,swordsman_1_12751,lancer_1_3186",
+	["troops"] = "greenDragon:4:36,crossbowman_3:2:8388,ballista_3:2:3145,swordsman_3:2:4194,lancer_3:2:1048",
 	["rewards"] = "resources:wood:226000:25,resources:stone:226000:25,resources:iron:226000:25,resources:food:226000:25"
 }
 sections["22_11"] = {
@@ -4517,7 +4517,7 @@ sections["22_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,sentinel_1_25650,horseArcher_1_9618,ranger_1_12825,catapult_1_1601",
+	["troops"] = "greenDragon:4:36,sentinel_3:2:8424,horseArcher_3:2:3159,ranger_3:2:4212,catapult_3:2:1053",
 	["rewards"] = "resources:wood:226000:25,resources:stone:226000:25,resources:iron:226000:25,resources:food:226000:25"
 }
 sections["22_12"] = {
@@ -4527,8 +4527,8 @@ sections["22_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,deathKnight_2_6449,skeletonArcher_2_9672,meatWagon_2_1610,skeletonWarrior_2_3223",
-	["rewards"] = "soldierMaterials:deathHand:114:25,soldierMaterials:heroBones:114:25,soldierMaterials:soulStone:114:25,soldierMaterials:magicBox:114:25"
+	["troops"] = "greenDragon:4:36,deathKnight:3:7615,skeletonArcher:3:11423,meatWagon:3:3807,skeletonWarrior:3:3808",
+	["rewards"] = "soldierMaterials:deathHand:453:25,soldierMaterials:heroBones:453:25,soldierMaterials:soulStone:453:25,soldierMaterials:magicBox:453:25"
 }
 sections["22_13"] = {
 	["sectionName"] = "22_13",
@@ -4537,7 +4537,7 @@ sections["22_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,ballista_1_6486,sentinel_1_19458,horseArcher_1_6486,ranger_1_6486",
+	["troops"] = "greenDragon:4:36,ballista_3:2:4249,sentinel_3:2:6374,horseArcher_3:2:2124,ranger_3:2:2125",
 	["rewards"] = "resources:wood:228000:25,resources:stone:228000:25,resources:iron:228000:25,resources:food:228000:25"
 }
 sections["22_14"] = {
@@ -4547,7 +4547,7 @@ sections["22_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,crossbowman_1_26092,ballista_1_4890,sentinel_1_13046,lancer_1_3260",
+	["troops"] = "greenDragon:4:36,crossbowman_3:2:8535,ballista_3:2:3201,sentinel_3:2:4268,lancer_3:2:1067",
 	["rewards"] = "resources:wood:228000:25,resources:stone:228000:25,resources:iron:228000:25,resources:food:228000:25"
 }
 sections["22_15"] = {
@@ -4557,8 +4557,8 @@ sections["22_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,skeletonWarrior_2_13120,deathKnight_2_4918,skeletonArcher_2_6560,meatWagon_2_817",
-	["rewards"] = "soldierMaterials:deathHand:114:25,soldierMaterials:heroBones:114:25,soldierMaterials:soulStone:114:25,soldierMaterials:magicBox:114:25"
+	["troops"] = "greenDragon:4:36,skeletonWarrior:3:15429,deathKnight:3:5786,skeletonArcher:3:7715,meatWagon:3:1929",
+	["rewards"] = "soldierMaterials:deathHand:456:25,soldierMaterials:heroBones:456:25,soldierMaterials:soulStone:456:25,soldierMaterials:magicBox:456:25"
 }
 sections["22_16"] = {
 	["sectionName"] = "22_16",
@@ -4567,7 +4567,7 @@ sections["22_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,horseArcher_1_13195,crossbowman_1_19792,ballista_1_3297,sentinel_1_6597",
+	["troops"] = "greenDragon:4:36,horseArcher_3:2:4304,crossbowman_3:2:6457,ballista_3:2:2152,sentinel_3:2:2153",
 	["rewards"] = "resources:wood:230000:25,resources:stone:230000:25,resources:iron:230000:25,resources:food:230000:25"
 }
 sections["22_17"] = {
@@ -4577,7 +4577,7 @@ sections["22_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,ballista_1_6634,sentinel_1_19904,horseArcher_1_6634,crossbowman_1_6634",
+	["troops"] = "greenDragon:4:36,ballista_3:2:4323,sentinel_3:2:6485,horseArcher_3:2:2161,crossbowman_3:2:2162",
 	["rewards"] = "resources:wood:230000:25,resources:stone:230000:25,resources:iron:230000:25,resources:food:230000:25"
 }
 sections["22_18"] = {
@@ -4587,8 +4587,8 @@ sections["22_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,skeletonArcher_2_13344,meatWagon_2_2499,skeletonWarrior_2_6672,deathKnight_2_1667",
-	["rewards"] = "soldierMaterials:deathHand:115:25,soldierMaterials:heroBones:115:25,soldierMaterials:soulStone:115:25,soldierMaterials:magicBox:115:25"
+	["troops"] = "greenDragon:4:36,skeletonArcher:3:15630,meatWagon:3:5861,skeletonWarrior:3:7815,deathKnight:3:1954",
+	["rewards"] = "soldierMaterials:deathHand:459:25,soldierMaterials:heroBones:459:25,soldierMaterials:soulStone:459:25,soldierMaterials:magicBox:459:25"
 }
 sections["22_19"] = {
 	["sectionName"] = "22_19",
@@ -4597,7 +4597,7 @@ sections["22_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_36,sentinel_1_26838,horseArcher_1_10064,crossbowman_1_13419,ballista_1_1675",
+	["troops"] = "greenDragon:4:36,sentinel_3:2:8721,horseArcher_3:2:3270,crossbowman_3:2:4361,ballista_3:2:1090",
 	["rewards"] = "resources:wood:230000:25,resources:stone:230000:25,resources:iron:230000:25,resources:food:230000:25"
 }
 sections["22_20"] = {
@@ -4607,7 +4607,7 @@ sections["22_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,lancer_1_13494,ranger_1_20241,catapult_1_3372,swordsman_1_6747",
+	["troops"] = "greenDragon:4:37,lancer_3:2:4379,ranger_3:2:6569,catapult_3:2:2189,swordsman_3:2:2190",
 	["rewards"] = "resources:wood:232000:25,resources:stone:232000:25,resources:iron:232000:25,resources:food:232000:25"
 }
 sections["22_21"] = {
@@ -4617,8 +4617,8 @@ sections["22_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,meatWagon_2_3177,skeletonWarrior_2_10177,deathKnight_2_3814,skeletonArcher_2_5088",
-	["rewards"] = "soldierMaterials:deathHand:116:25,soldierMaterials:heroBones:116:25,soldierMaterials:soulStone:116:25,soldierMaterials:magicBox:116:25"
+	["troops"] = "greenDragon:4:37,meatWagon:3:7916,skeletonWarrior:3:11874,deathKnight:3:3958,skeletonArcher:3:3958",
+	["rewards"] = "soldierMaterials:deathHand:462:25,soldierMaterials:heroBones:462:25,soldierMaterials:soulStone:462:25,soldierMaterials:magicBox:462:25"
 }
 sections["23_1"] = {
 	["sectionName"] = "23_1",
@@ -4627,7 +4627,7 @@ sections["23_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,ranger_1_27291,catapult_1_5114,swordsman_1_13645,lancer_1_3409",
+	["troops"] = "greenDragon:4:37,ranger_3:3:8833,catapult_3:3:3312,swordsman_3:3:4417,lancer_3:3:1104",
 	["rewards"] = "resources:wood:232000:25,resources:stone:232000:25,resources:iron:232000:25,resources:food:232000:25"
 }
 sections["23_2"] = {
@@ -4637,7 +4637,7 @@ sections["23_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,swordsman_1_27442,lancer_1_10291,ranger_1_13721,catapult_1_1713",
+	["troops"] = "greenDragon:4:37,swordsman_3:3:8871,lancer_3:3:3326,ranger_3:3:4436,catapult_3:3:1109",
 	["rewards"] = "resources:wood:232000:25,resources:stone:232000:25,resources:iron:232000:25,resources:food:232000:25"
 }
 sections["23_3"] = {
@@ -4647,8 +4647,8 @@ sections["23_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,deathKnight_2_6898,skeletonArcher_2_10346,meatWagon_2_1722,skeletonWarrior_2_3447",
-	["rewards"] = "soldierMaterials:deathHand:117:25,soldierMaterials:heroBones:117:25,soldierMaterials:soulStone:117:25,soldierMaterials:magicBox:117:25"
+	["troops"] = "greenDragon:4:37,deathKnight:3:8908,skeletonArcher:3:13363,meatWagon:3:4454,skeletonWarrior:3:4455",
+	["rewards"] = "soldierMaterials:deathHand:465:25,soldierMaterials:heroBones:465:25,soldierMaterials:soulStone:465:25,soldierMaterials:magicBox:465:25"
 }
 sections["23_4"] = {
 	["sectionName"] = "23_4",
@@ -4657,7 +4657,7 @@ sections["23_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,ballista_1_6936,swordsman_1_20810,lancer_1_6936,ranger_1_6936",
+	["troops"] = "greenDragon:4:37,ballista_3:3:4473,swordsman_3:3:6710,lancer_3:3:2236,ranger_3:3:2237",
 	["rewards"] = "resources:wood:234000:25,resources:stone:234000:25,resources:iron:234000:25,resources:food:234000:25"
 }
 sections["23_5"] = {
@@ -4667,7 +4667,7 @@ sections["23_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,crossbowman_1_27900,catapult_1_5229,swordsman_1_13950,lancer_1_3486",
+	["troops"] = "greenDragon:4:37,crossbowman_3:3:8984,catapult_3:3:3369,swordsman_3:3:4492,lancer_3:3:1123",
 	["rewards"] = "resources:wood:234000:25,resources:stone:234000:25,resources:iron:234000:25,resources:food:234000:25"
 }
 sections["23_6"] = {
@@ -4677,8 +4677,8 @@ sections["23_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,skeletonWarrior_2_14026,deathKnight_2_5258,skeletonArcher_2_7013,meatWagon_2_875",
-	["rewards"] = "soldierMaterials:deathHand:117:25,soldierMaterials:heroBones:117:25,soldierMaterials:soulStone:117:25,soldierMaterials:magicBox:117:25"
+	["troops"] = "greenDragon:4:37,skeletonWarrior:3:18044,deathKnight:3:6766,skeletonArcher:3:9022,meatWagon:3:2255",
+	["rewards"] = "soldierMaterials:deathHand:468:25,soldierMaterials:heroBones:468:25,soldierMaterials:soulStone:468:25,soldierMaterials:magicBox:468:25"
 }
 sections["23_7"] = {
 	["sectionName"] = "23_7",
@@ -4687,7 +4687,7 @@ sections["23_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,horseArcher_1_14103,crossbowman_1_21155,catapult_1_3524,swordsman_1_7051",
+	["troops"] = "greenDragon:4:37,horseArcher_3:3:4530,crossbowman_3:3:6795,catapult_3:3:2265,swordsman_3:3:2265",
 	["rewards"] = "resources:wood:236000:25,resources:stone:236000:25,resources:iron:236000:25,resources:food:236000:25"
 }
 sections["23_8"] = {
@@ -4697,7 +4697,7 @@ sections["23_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,ballista_1_7090,sentinel_1_21270,lancer_1_7090,ranger_1_7090",
+	["troops"] = "greenDragon:4:37,ballista_3:3:4549,sentinel_3:3:6824,lancer_3:3:2274,ranger_3:3:2275",
 	["rewards"] = "resources:wood:236000:25,resources:stone:236000:25,resources:iron:236000:25,resources:food:236000:25"
 }
 sections["23_9"] = {
@@ -4707,8 +4707,8 @@ sections["23_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,skeletonArcher_2_14257,meatWagon_2_2672,skeletonWarrior_2_7128,deathKnight_2_1781",
-	["rewards"] = "soldierMaterials:deathHand:118:25,soldierMaterials:heroBones:118:25,soldierMaterials:soulStone:118:25,soldierMaterials:magicBox:118:25"
+	["troops"] = "greenDragon:4:37,skeletonArcher:3:18273,meatWagon:3:6852,skeletonWarrior:3:9137,deathKnight:3:2284",
+	["rewards"] = "soldierMaterials:deathHand:471:25,soldierMaterials:heroBones:471:25,soldierMaterials:soulStone:471:25,soldierMaterials:magicBox:471:25"
 }
 sections["23_10"] = {
 	["sectionName"] = "23_10",
@@ -4717,7 +4717,7 @@ sections["23_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,sentinel_1_28670,horseArcher_1_10751,ranger_1_14335,catapult_1_1790",
+	["troops"] = "greenDragon:4:37,sentinel_3:3:9175,horseArcher_3:3:3440,ranger_3:3:4588,catapult_3:3:1147",
 	["rewards"] = "resources:wood:236000:25,resources:stone:236000:25,resources:iron:236000:25,resources:food:236000:25"
 }
 sections["23_11"] = {
@@ -4727,7 +4727,7 @@ sections["23_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_37,horseArcher_1_14412,crossbowman_1_21618,ballista_1_3601,swordsman_1_7206",
+	["troops"] = "greenDragon:4:37,horseArcher_3:3:4606,crossbowman_3:3:6910,ballista_3:3:2303,swordsman_3:3:2304",
 	["rewards"] = "resources:wood:238000:25,resources:stone:238000:25,resources:iron:238000:25,resources:food:238000:25"
 }
 sections["23_12"] = {
@@ -4737,8 +4737,8 @@ sections["23_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,meatWagon_2_3622,skeletonWarrior_2_10867,deathKnight_2_3622,skeletonArcher_2_3622",
-	["rewards"] = "soldierMaterials:deathHand:119:25,soldierMaterials:heroBones:119:25,soldierMaterials:soulStone:119:25,soldierMaterials:magicBox:119:25"
+	["troops"] = "greenDragon:4:38,meatWagon:3:9251,skeletonWarrior:3:13877,deathKnight:3:4626,skeletonArcher:3:4626",
+	["rewards"] = "soldierMaterials:deathHand:474:25,soldierMaterials:heroBones:474:25,soldierMaterials:soulStone:474:25,soldierMaterials:magicBox:474:25"
 }
 sections["23_13"] = {
 	["sectionName"] = "23_13",
@@ -4747,7 +4747,7 @@ sections["23_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,crossbowman_1_29136,ballista_1_5460,sentinel_1_14568,lancer_1_3640",
+	["troops"] = "greenDragon:4:38,crossbowman_3:3:9290,ballista_3:3:3484,sentinel_3:3:4645,lancer_3:3:1161",
 	["rewards"] = "resources:wood:238000:25,resources:stone:238000:25,resources:iron:238000:25,resources:food:238000:25"
 }
 sections["23_14"] = {
@@ -4757,7 +4757,7 @@ sections["23_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,sentinel_1_29293,horseArcher_1_10984,crossbowman_1_14646,catapult_1_1829",
+	["troops"] = "greenDragon:4:38,sentinel_3:3:9329,horseArcher_3:3:3498,crossbowman_3:3:4665,catapult_3:3:1166",
 	["rewards"] = "resources:wood:238000:25,resources:stone:238000:25,resources:iron:238000:25,resources:food:238000:25"
 }
 sections["23_15"] = {
@@ -4767,8 +4767,8 @@ sections["23_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,deathKnight_2_7362,skeletonArcher_2_11042,meatWagon_2_1838,skeletonWarrior_2_3679",
-	["rewards"] = "soldierMaterials:deathHand:120:25,soldierMaterials:heroBones:120:25,soldierMaterials:soulStone:120:25,soldierMaterials:magicBox:120:25"
+	["troops"] = "greenDragon:4:38,deathKnight:3:9367,skeletonArcher:3:14051,meatWagon:3:4683,skeletonWarrior:3:4684",
+	["rewards"] = "soldierMaterials:deathHand:477:25,soldierMaterials:heroBones:477:25,soldierMaterials:soulStone:477:25,soldierMaterials:magicBox:477:25"
 }
 sections["23_16"] = {
 	["sectionName"] = "23_16",
@@ -4777,7 +4777,7 @@ sections["23_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,ballista_1_7401,sentinel_1_22205,horseArcher_1_7401,crossbowman_1_7401",
+	["troops"] = "greenDragon:4:38,ballista_3:3:4703,sentinel_3:3:7055,horseArcher_3:3:2351,crossbowman_3:3:2352",
 	["rewards"] = "resources:wood:240000:25,resources:stone:240000:25,resources:iron:240000:25,resources:food:240000:25"
 }
 sections["23_17"] = {
@@ -4787,7 +4787,7 @@ sections["23_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,crossbowman_1_29764,ballista_1_5578,sentinel_1_14882,horseArcher_1_3719",
+	["troops"] = "greenDragon:4:38,crossbowman_3:3:9445,ballista_3:3:3542,sentinel_3:3:4723,horseArcher_3:3:1181",
 	["rewards"] = "resources:wood:240000:25,resources:stone:240000:25,resources:iron:240000:25,resources:food:240000:25"
 }
 sections["23_18"] = {
@@ -4797,8 +4797,8 @@ sections["23_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,skeletonWarrior_2_14961,deathKnight_2_5608,skeletonArcher_2_7480,meatWagon_2_932",
-	["rewards"] = "soldierMaterials:deathHand:120:25,soldierMaterials:heroBones:120:25,soldierMaterials:soulStone:120:25,soldierMaterials:magicBox:120:25"
+	["troops"] = "greenDragon:4:38,skeletonWarrior:3:18968,deathKnight:3:7113,skeletonArcher:3:9484,meatWagon:3:2371",
+	["rewards"] = "soldierMaterials:deathHand:480:25,soldierMaterials:heroBones:480:25,soldierMaterials:soulStone:480:25,soldierMaterials:magicBox:480:25"
 }
 sections["23_19"] = {
 	["sectionName"] = "23_19",
@@ -4807,7 +4807,7 @@ sections["23_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,lancer_1_15040,ranger_1_22560,catapult_1_3758,swordsman_1_7520",
+	["troops"] = "greenDragon:4:38,lancer_3:3:4761,ranger_3:3:7143,catapult_3:3:2381,swordsman_3:3:2381",
 	["rewards"] = "resources:wood:242000:25,resources:stone:242000:25,resources:iron:242000:25,resources:food:242000:25"
 }
 sections["23_20"] = {
@@ -4817,7 +4817,7 @@ sections["23_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,catapult_1_7560,swordsman_1_22680,lancer_1_7560,ranger_1_7560",
+	["troops"] = "greenDragon:4:38,catapult_3:3:4781,swordsman_3:3:7172,lancer_3:3:2390,ranger_3:3:2391",
 	["rewards"] = "resources:wood:242000:25,resources:stone:242000:25,resources:iron:242000:25,resources:food:242000:25"
 }
 sections["23_21"] = {
@@ -4827,8 +4827,8 @@ sections["23_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,skeletonArcher_2_14276,meatWagon_2_2853,skeletonWarrior_2_8566,deathKnight_2_2853",
-	["rewards"] = "soldierMaterials:deathHand:121:25,soldierMaterials:heroBones:121:25,soldierMaterials:soulStone:121:25,soldierMaterials:magicBox:121:25"
+	["troops"] = "greenDragon:4:38,skeletonArcher:3:19242,meatWagon:3:7216,skeletonWarrior:3:9621,deathKnight:3:2405",
+	["rewards"] = "soldierMaterials:deathHand:450:25,soldierMaterials:heroBones:450:25,soldierMaterials:soulStone:450:25,soldierMaterials:magicBox:450:25"
 }
 sections["24_1"] = {
 	["sectionName"] = "24_1",
@@ -4837,7 +4837,7 @@ sections["24_1"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,swordsman_1_30558,lancer_1_11459,ranger_1_15279,catapult_1_1908",
+	["troops"] = "greenDragon:4:38,swordsman_3:3:9640,lancer_3:3:3615,ranger_3:3:4820,catapult_3:3:1205",
 	["rewards"] = "resources:wood:242000:25,resources:stone:242000:25,resources:iron:242000:25,resources:food:242000:25"
 }
 sections["24_2"] = {
@@ -4847,7 +4847,7 @@ sections["24_2"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,horseArcher_1_15359,ranger_1_23039,catapult_1_3838,swordsman_1_7679",
+	["troops"] = "greenDragon:4:38,horseArcher_3:3:4854,ranger_3:3:7282,catapult_3:3:2427,swordsman_3:3:2428",
 	["rewards"] = "resources:wood:244000:25,resources:stone:244000:25,resources:iron:244000:25,resources:food:244000:25"
 }
 sections["24_3"] = {
@@ -4857,8 +4857,8 @@ sections["24_3"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_38,meatWagon_2_3859,skeletonWarrior_2_11579,deathKnight_2_3859,skeletonArcher_2_3859",
-	["rewards"] = "soldierMaterials:deathHand:122:25,soldierMaterials:heroBones:122:25,soldierMaterials:soulStone:122:25,soldierMaterials:magicBox:122:25"
+	["troops"] = "greenDragon:4:38,meatWagon:3:9777,skeletonWarrior:3:14666,deathKnight:3:4888,skeletonArcher:3:4889",
+	["rewards"] = "soldierMaterials:deathHand:480:25,soldierMaterials:heroBones:480:25,soldierMaterials:soulStone:480:25,soldierMaterials:magicBox:480:25"
 }
 sections["24_4"] = {
 	["sectionName"] = "24_4",
@@ -4867,7 +4867,7 @@ sections["24_4"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,crossbowman_1_31040,catapult_1_5817,swordsman_1_15520,lancer_1_3878",
+	["troops"] = "greenDragon:4:39,crossbowman_3:3:9846,catapult_3:3:3692,swordsman_3:3:4923,lancer_3:3:1231",
 	["rewards"] = "resources:wood:244000:25,resources:stone:244000:25,resources:iron:244000:25,resources:food:244000:25"
 }
 sections["24_5"] = {
@@ -4877,7 +4877,7 @@ sections["24_5"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,sentinel_1_31201,lancer_1_11700,ranger_1_15600,catapult_1_1948",
+	["troops"] = "greenDragon:4:39,sentinel_3:3:9915,lancer_3:3:3718,ranger_3:3:4958,catapult_3:3:1239",
 	["rewards"] = "resources:wood:244000:25,resources:stone:244000:25,resources:iron:244000:25,resources:food:244000:25"
 }
 sections["24_6"] = {
@@ -4887,8 +4887,8 @@ sections["24_6"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,deathKnight_2_7840,skeletonArcher_2_11759,meatWagon_2_1957,skeletonWarrior_2_3918",
-	["rewards"] = "soldierMaterials:deathHand:123:25,soldierMaterials:heroBones:123:25,soldierMaterials:soulStone:123:25,soldierMaterials:magicBox:123:25"
+	["troops"] = "greenDragon:4:39,deathKnight:3:9984,skeletonArcher:3:14976,meatWagon:3:4992,skeletonWarrior:3:4992",
+	["rewards"] = "soldierMaterials:deathHand:510:25,soldierMaterials:heroBones:510:25,soldierMaterials:soulStone:510:25,soldierMaterials:magicBox:510:25"
 }
 sections["24_7"] = {
 	["sectionName"] = "24_7",
@@ -4897,7 +4897,7 @@ sections["24_7"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,ballista_1_7881,sentinel_1_23643,lancer_1_7881,ranger_1_7881",
+	["troops"] = "greenDragon:4:39,ballista_3:3:5026,sentinel_3:3:7540,lancer_3:3:2513,ranger_3:3:2514",
 	["rewards"] = "resources:wood:246000:25,resources:stone:246000:25,resources:iron:246000:25,resources:food:246000:25"
 }
 sections["24_8"] = {
@@ -4907,7 +4907,7 @@ sections["24_8"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,crossbowman_1_31687,ballista_1_5938,swordsman_1_15843,lancer_1_3959",
+	["troops"] = "greenDragon:4:39,crossbowman_3:3:10123,ballista_3:3:3796,swordsman_3:3:5062,lancer_3:3:1265",
 	["rewards"] = "resources:wood:246000:25,resources:stone:246000:25,resources:iron:246000:25,resources:food:246000:25"
 }
 sections["24_9"] = {
@@ -4917,8 +4917,8 @@ sections["24_9"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,skeletonWarrior_2_15925,deathKnight_2_5970,skeletonArcher_2_7962,meatWagon_2_994",
-	["rewards"] = "soldierMaterials:deathHand:123:25,soldierMaterials:heroBones:123:25,soldierMaterials:soulStone:123:25,soldierMaterials:magicBox:123:25"
+	["troops"] = "greenDragon:4:39,skeletonWarrior:3:20384,deathKnight:3:7644,skeletonArcher:3:10192,meatWagon:3:2548",
+	["rewards"] = "soldierMaterials:deathHand:540:25,soldierMaterials:heroBones:540:25,soldierMaterials:soulStone:540:25,soldierMaterials:magicBox:540:25"
 }
 sections["24_10"] = {
 	["sectionName"] = "24_10",
@@ -4927,7 +4927,7 @@ sections["24_10"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,horseArcher_1_16006,crossbowman_1_24009,ballista_1_4000,swordsman_1_8003",
+	["troops"] = "greenDragon:4:39,horseArcher_3:3:5131,crossbowman_3:3:7697,ballista_3:3:2565,swordsman_3:3:2566",
 	["rewards"] = "resources:wood:248000:25,resources:stone:248000:25,resources:iron:248000:25,resources:food:248000:25"
 }
 sections["24_11"] = {
@@ -4937,7 +4937,7 @@ sections["24_11"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,ballista_1_8044,sentinel_1_24132,horseArcher_1_8044,ranger_1_8044",
+	["troops"] = "greenDragon:4:39,ballista_3:3:5166,sentinel_3:3:7749,horseArcher_3:3:2583,ranger_3:3:2583",
 	["rewards"] = "resources:wood:248000:25,resources:stone:248000:25,resources:iron:248000:25,resources:food:248000:25"
 }
 sections["24_12"] = {
@@ -4947,8 +4947,8 @@ sections["24_12"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,skeletonArcher_2_16170,meatWagon_2_3030,skeletonWarrior_2_8085,deathKnight_2_2020",
-	["rewards"] = "soldierMaterials:deathHand:124:25,soldierMaterials:heroBones:124:25,soldierMaterials:soulStone:124:25,soldierMaterials:magicBox:124:25"
+	["troops"] = "greenDragon:4:39,skeletonArcher:3:20805,meatWagon:3:7802,skeletonWarrior:3:10403,deathKnight:3:2601",
+	["rewards"] = "soldierMaterials:deathHand:570:25,soldierMaterials:heroBones:570:25,soldierMaterials:soulStone:570:25,soldierMaterials:magicBox:570:25"
 }
 sections["24_13"] = {
 	["sectionName"] = "24_13",
@@ -4957,7 +4957,7 @@ sections["24_13"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,sentinel_1_32505,horseArcher_1_12189,crossbowman_1_16252,catapult_1_2029",
+	["troops"] = "greenDragon:4:39,sentinel_3:3:10473,horseArcher_3:3:3927,crossbowman_3:3:5237,catapult_3:3:1309",
 	["rewards"] = "resources:wood:248000:25,resources:stone:248000:25,resources:iron:248000:25,resources:food:248000:25"
 }
 sections["24_14"] = {
@@ -4967,7 +4967,7 @@ sections["24_14"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,horseArcher_1_16335,crossbowman_1_24502,ballista_1_4082,sentinel_1_8167",
+	["troops"] = "greenDragon:4:39,horseArcher_3:3:5272,crossbowman_3:3:7908,ballista_3:3:2636,sentinel_3:3:2636",
 	["rewards"] = "resources:wood:250000:25,resources:stone:250000:25,resources:iron:250000:25,resources:food:250000:25"
 }
 sections["24_15"] = {
@@ -4977,8 +4977,8 @@ sections["24_15"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,meatWagon_2_4104,skeletonWarrior_2_12313,deathKnight_2_4104,skeletonArcher_2_4104",
-	["rewards"] = "soldierMaterials:deathHand:125:25,soldierMaterials:heroBones:125:25,soldierMaterials:soulStone:125:25,soldierMaterials:magicBox:125:25"
+	["troops"] = "greenDragon:4:39,meatWagon:3:10614,skeletonWarrior:3:15922,deathKnight:3:5307,skeletonArcher:3:5308",
+	["rewards"] = "soldierMaterials:deathHand:600:25,soldierMaterials:heroBones:600:25,soldierMaterials:soulStone:600:25,soldierMaterials:magicBox:600:25"
 }
 sections["24_16"] = {
 	["sectionName"] = "24_16",
@@ -4987,7 +4987,7 @@ sections["24_16"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_39,crossbowman_1_33000,ballista_1_6185,sentinel_1_16500,horseArcher_1_4123",
+	["troops"] = "greenDragon:4:39,crossbowman_3:3:10686,ballista_3:3:4007,sentinel_3:3:5343,horseArcher_3:3:1336",
 	["rewards"] = "resources:wood:250000:25,resources:stone:250000:25,resources:iron:250000:25,resources:food:250000:25"
 }
 sections["24_17"] = {
@@ -4997,7 +4997,7 @@ sections["24_17"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_40,sentinel_1_33166,horseArcher_1_12437,crossbowman_1_16583,ballista_1_2071",
+	["troops"] = "greenDragon:4:40,sentinel_3:3:10757,horseArcher_3:3:4034,crossbowman_3:3:5379,ballista_3:3:1345",
 	["rewards"] = "resources:wood:250000:25,resources:stone:250000:25,resources:iron:250000:25,resources:food:250000:25"
 }
 sections["24_18"] = {
@@ -5007,8 +5007,8 @@ sections["24_18"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_40,deathKnight_2_8333,skeletonArcher_2_12498,meatWagon_2_2080,skeletonWarrior_2_4164",
-	["rewards"] = "soldierMaterials:deathHand:126:25,soldierMaterials:heroBones:126:25,soldierMaterials:soulStone:126:25,soldierMaterials:magicBox:126:25"
+	["troops"] = "greenDragon:4:40,deathKnight:3:10828,skeletonArcher:3:16243,meatWagon:3:5414,skeletonWarrior:3:5415",
+	["rewards"] = "soldierMaterials:deathHand:630:25,soldierMaterials:heroBones:630:25,soldierMaterials:soulStone:630:25,soldierMaterials:magicBox:630:25"
 }
 sections["24_19"] = {
 	["sectionName"] = "24_19",
@@ -5017,7 +5017,7 @@ sections["24_19"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_40,catapult_1_8375,swordsman_1_25125,lancer_1_8375,ranger_1_8375",
+	["troops"] = "greenDragon:4:40,catapult_3:3:5450,swordsman_3:3:8175,lancer_3:3:2725,ranger_3:3:2725",
 	["rewards"] = "resources:wood:252000:25,resources:stone:252000:25,resources:iron:252000:25,resources:food:252000:25"
 }
 sections["24_20"] = {
@@ -5027,7 +5027,7 @@ sections["24_20"] = {
 	["staminaUsed"] = 4,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_40,ranger_1_33667,catapult_1_6310,swordsman_1_16833,lancer_1_4206",
+	["troops"] = "greenDragon:4:40,ranger_3:3:10972,catapult_3:3:4114,swordsman_3:3:5486,lancer_3:3:1371",
 	["rewards"] = "resources:wood:252000:25,resources:stone:252000:25,resources:iron:252000:25,resources:food:252000:25"
 }
 sections["24_21"] = {
@@ -5037,6 +5037,6 @@ sections["24_21"] = {
 	["staminaUsed"] = 8,
 	["maxFightCount"] = 10,
 	["terrain"] = "grassLand",
-	["troops"] = "greenDragon_4_40,skeletonWarrior_2_15906,deathKnight_2_6361,skeletonArcher_2_9541,meatWagon_2_1588",
-	["rewards"] = "soldierMaterials:deathHand:126:25,soldierMaterials:heroBones:126:25,soldierMaterials:soulStone:126:25,soldierMaterials:magicBox:126:25"
+	["troops"] = "greenDragon:4:40,skeletonWarrior:3:22089,deathKnight:3:8283,skeletonArcher:3:11045,meatWagon:3:2761",
+	["rewards"] = "soldierMaterials:deathHand:5000:25,soldierMaterials:heroBones:5000:25,soldierMaterials:soulStone:5000:25,soldierMaterials:magicBox:5000:25"
 }

@@ -35,11 +35,6 @@ intInit["allianceFightTotalFightMinutes"] = {
 	["value"] = 60,
 	["desc"] = "联盟战战争期时间"
 }
-intInit["allianceHelpDefenceTroopsMaxCount"] = {
-	["type"] = "allianceHelpDefenceTroopsMaxCount",
-	["value"] = 2,
-	["desc"] = "协防玩家最大数量"
-}
 intInit["allianceRevengeMaxMinutes"] = {
 	["type"] = "allianceRevengeMaxMinutes",
 	["value"] = 1440,
@@ -77,7 +72,7 @@ intInit["allianceFightSuccessProtectMinutes"] = {
 }
 intInit["KilledCitizenPerDragonExp"] = {
 	["type"] = "KilledCitizenPerDragonExp",
-	["value"] = 2,
+	["value"] = 4,
 	["desc"] = "多少击杀积分获得一点龙经验"
 }
 intInit["KilledCitizenPerBlood"] = {
@@ -97,13 +92,18 @@ intInit["villageRefreshMinutes"] = {
 }
 intInit["monsterRefreshMinutes"] = {
 	["type"] = "monsterRefreshMinutes",
-	["value"] = 240,
+	["value"] = 120,
 	["desc"] = "区域地图野怪多少分钟后刷新"
 }
-intInit["monstersPerPlayer"] = {
-	["type"] = "monstersPerPlayer",
-	["value"] = 2,
-	["desc"] = "每个联盟玩家创建多少个野怪"
+intInit["villageRefreshTime"] = {
+	["type"] = "villageRefreshTime",
+	["value"] = 240,
+	["desc"] = "区域地图村落多少分钟后刷新"
+}
+intInit["monsterCount"] = {
+	["type"] = "monsterCount",
+	["value"] = 40,
+	["desc"] = "每个联盟多少个野怪"
 }
 intInit["soldierFightWoundedPercent"] = {
 	["type"] = "soldierFightWoundedPercent",

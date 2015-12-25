@@ -19,7 +19,8 @@ end
 
 function GameUIAllianceJoinTips:onEnter()
 	GameUIAllianceJoinTips.super.onEnter(self)
-	local bg = display.newSprite("join_alliance_tips_bg_572x536.jpg"):align(display.BOTTOM_CENTER, 304,112):addTo(self:GetBody())
+	local join_alliance_tips_bg_572x536 = device.platform == 'winrt' and "join_alliance_tips_bg_572x536.png" or "join_alliance_tips_bg_572x536.jpg" 
+	local bg = display.newSprite(join_alliance_tips_bg_572x536):align(display.BOTTOM_CENTER, 304,112):addTo(self:GetBody())
 	local green_title = display.newSprite("green_title_639x69.png"):addTo(self:GetBody()):align(display.TOP_CENTER,304,700)
 	UIKit:ttfLabel({text = _("联盟强大功能!"),size = 24,color = 0xffedae,shadow = true }):align(display.CENTER,319, 40):addTo(green_title)
 	local list_bg = display.newSprite("join_tips_list_bg_572x313.png"):align(display.LEFT_BOTTOM, 0, 0):addTo(bg)
@@ -149,6 +150,7 @@ function GameUIAllianceJoinTips:onCleanup()
 	User:RemoveListenerOnType(self, "countInfo")
 	GameUIAllianceJoinTips.super.onCleanup(self)
 	cc.Director:getInstance():getTextureCache():removeTextureForKey("join_alliance_tips_bg_572x536.jpg")
+	cc.Director:getInstance():getTextureCache():removeTextureForKey("join_alliance_tips_bg_572x536.png")
 end
 
 return GameUIAllianceJoinTips

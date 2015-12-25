@@ -146,14 +146,9 @@ function GameUIDragonEyrieDetail:BuildDragonContent()
     local dragon_content = self.dragon_base:getChildByTag(101)
     if dragon_content then dragon_content:removeFromParent() end
     if self:GetDragon():Ishated() then
-        local x,y = 257,250
-        if self:GetDragon():Type() == 'redDragon' then
-            x = 307
-            y = 250
-        end
         local dragon = DragonSprite.new(display.getRunningScene():GetSceneLayer(),self:GetDragon():Type())
             :addTo(self.dragon_base)
-            :align(display.CENTER, x,y)
+            :align(display.CENTER, 300,150)
         dragon:setTag(101)
         local bound = dragon:getBoundingBox()
         local nodePoint = self.dragon_base:convertToWorldSpace(cc.p(bound.x, bound.y))

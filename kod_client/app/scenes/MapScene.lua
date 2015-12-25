@@ -40,6 +40,7 @@ function MapScene:OnUserDataChanged_basicInfo(userData, deltaData)
         self.level = level
     end
 end
+local animation = import("..animation")
 function MapScene:onEnter()
     if self.PreLoadImages then
         self:PreLoadImages()
@@ -67,6 +68,12 @@ function MapScene:onEnter()
             self:DisableWaring()
         end
     end, 1)
+
+    -- collectgarbage("collect")
+    -- scheduleAt(self, function()
+    --     -- showMemoryUsage("collect")
+    --     print("getAppMemoryUsage", ext.getAppMemoryUsage())
+    -- end, 2)
 end
 function MapScene:onExit()
     if self.UnloadImages then

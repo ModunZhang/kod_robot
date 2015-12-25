@@ -78,7 +78,7 @@ function UtilsForEvent:GetMarchEventPrefix(event, eventType)
     elseif event.marchType == "monster" then
         local corps = string.split(monsters[event.defenceMonsterData.level].soldiers, ";")
         local soldiers = string.split(corps[event.defenceMonsterData.index + 1], ",")
-        local soldierName = string.split(soldiers[1],"_")[1]
+        local soldierName = string.split(soldiers[1],":")[1]
         local target_str = string.format("%sLv%s",
             Localize.soldier_name[soldierName],
             event.defenceMonsterData.level)
@@ -155,7 +155,7 @@ function UtilsForEvent:GetDestination(event)
         elseif event.marchType == 'monster' then
             local corps = string.split(monsters[event.defenceMonsterData.level].soldiers, ";")
             local soldiers = string.split(corps[event.defenceMonsterData.index + 1], ",")
-            local infos = string.split(soldiers[1],"_")
+            local infos = string.split(soldiers[1],":")
             return string.format("%s Lv%s",Localize.soldier_name[infos[1]], event.defenceMonsterData.level)
         end
     elseif eventType == "strikeMarchReturnEvents" or eventType == "attackMarchReturnEvents" then

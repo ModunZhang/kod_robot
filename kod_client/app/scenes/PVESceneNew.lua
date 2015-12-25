@@ -15,10 +15,12 @@ function PVESceneNew:onEnter()
     self:GetSceneLayer():ZoomTo(1)
     self:GetSceneLayer():GotoPve()
     app:GetAudioManager():PlayGameMusicOnSceneEnter("PVEScene",true)
+
+    showMemoryUsage()
 end
 function PVESceneNew:GetPreloadImages()
     return {
-        {image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
+        -- {image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
     }
 end
 function PVESceneNew:GetHomePage()

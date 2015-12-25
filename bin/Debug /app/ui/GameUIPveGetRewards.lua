@@ -4,9 +4,6 @@ function GameUIPveGetRewards:ctor(x, y)
     GameUIPveGetRewards.super.ctor(self)
     self.__type  = UIKit.UITYPE.BACKGROUND
 
-    local manager = ccs.ArmatureDataManager:getInstance()
-    manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH("animations/lanse.ExportJson"))
-
     local node = display.newNode()
     local box = ccs.Armature:create("lanse"):addTo(node)
         :align(display.CENTER, x, y):scale(0.5)

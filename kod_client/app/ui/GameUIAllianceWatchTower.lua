@@ -266,7 +266,7 @@ function GameUIAllianceWatchTower:CreateBeStrikedContent()
         elseif beStriked_event.defenceMonsterData then
             local corps = string.split(monsters[beStriked_event.defenceMonsterData.level].soldiers, ";")
             local soldiers = string.split(corps[beStriked_event.defenceMonsterData.index + 1], ",")
-            local soldierName = string.split(soldiers[1], "_")[1]
+            local soldierName = string.split(soldiers[1], ":")[1]
             defencer = Localize.soldier_name[soldierName] .. "Lv" .. beStriked_event.defenceMonsterData.level
         end
         if beStriked_event.marchType == "helpDefence" then
@@ -458,7 +458,7 @@ function GameUIAllianceWatchTower:CreateAttackContent()
         elseif att_event.defenceMonsterData then
             local corps = string.split(monsters[att_event.defenceMonsterData.level].soldiers, ";")
             local soldiers = string.split(corps[att_event.defenceMonsterData.index + 1], ",")
-            local soldierName = string.split(soldiers[1], "_")[1]
+            local soldierName = string.split(soldiers[1], ":")[1]
             defencer = Localize.soldier_name[soldierName] .. "Lv" .. att_event.defenceMonsterData.level
         end
         local fromAlliance = att_event.fromAlliance

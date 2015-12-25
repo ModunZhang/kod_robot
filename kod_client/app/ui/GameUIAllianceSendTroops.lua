@@ -16,13 +16,25 @@ local SPECIAL = GameDatas.Soldiers.special
 
 local GameUIAllianceSendTroops = UIKit:createUIClass("GameUIAllianceSendTroops","GameUIWithCommonHeader")
 local soldier_arrange = {
-    swordsman = {row = 4, col = 2},
-    ranger = {row = 4, col = 2},
-    lancer = {row = 3, col = 1},
-    catapult = {row = 2, col = 1},
+    swordsman_1 = {row = 4, col = 2},
+    swordsman_2 = {row = 4, col = 2},
+    swordsman_3 = {row = 4, col = 2},
+    ranger_1 = {row = 4, col = 2},
+    ranger_2 = {row = 4, col = 2},
+    ranger_3 = {row = 4, col = 2},
+    lancer_1 = {row = 3, col = 1},
+    lancer_2 = {row = 3, col = 1},
+    lancer_3 = {row = 3, col = 1},
+    catapult_1 = {row = 2, col = 1},
+    catapult_2 = {row = 2, col = 1},
+    catapult_3 = {row = 2, col = 1},
 
-    horseArcher = {row = 3, col = 1},
-    ballista = {row = 2, col = 1},
+    horseArcher_1 = {row = 3, col = 1},
+    horseArcher_2 = {row = 3, col = 1},
+    horseArcher_3 = {row = 3, col = 1},
+    ballista_1 = {row = 2, col = 1},
+    ballista_2 = {row = 2, col = 1},
+    ballista_3 = {row = 2, col = 1},
     skeletonWarrior = {row = 4, col = 2},
     skeletonArcher = {row = 4, col = 2},
 
@@ -33,19 +45,39 @@ local soldier_arrange = {
 
     paladin = {row = 4, col = 2},
     steamTank = {row = 2, col = 1},
-    sentinel = {row = 4, col = 2},
-    crossbowman = {row = 4, col = 2},
+    sentinel_1 = {row = 4, col = 2},
+    sentinel_2 = {row = 4, col = 2},
+    sentinel_3 = {row = 4, col = 2},
+    crossbowman_1 = {row = 4, col = 2},
+    crossbowman_2 = {row = 4, col = 2},
+    crossbowman_3 = {row = 4, col = 2},
 }
 local soldier_ani_width = {
-    swordsman = 180,
-    ranger = 180,
-    lancer = 180,
-    catapult = 180,
+    swordsman_1 = 180,
+    swordsman_2 = 180,
+    swordsman_3 = 180,
+    ranger_1 = 180,
+    ranger_2 = 180,
+    ranger_3 = 180,
+    lancer_1 = 180,
+    lancer_2 = 180,
+    lancer_3 = 180,
+    catapult_1 = 180,
+    catapult_2 = 180,
+    catapult_3 = 180,
 
-    sentinel = 180,
-    crossbowman = 180,
-    horseArcher = 180,
-    ballista = 180,
+    sentinel_1 = 180,
+    sentinel_2 = 180,
+    sentinel_3 = 180,
+    crossbowman_1 = 180,
+    crossbowman_2 = 180,
+    crossbowman_3 = 180,
+    horseArcher_1 = 180,
+    horseArcher_2 = 180,
+    horseArcher_3 = 180,
+    ballista_1 = 180,
+    ballista_2 = 180,
+    ballista_3 = 180,
 
     skeletonWarrior = 180,
     skeletonArcher = 180,
@@ -88,15 +120,9 @@ function GameUIAllianceSendTroops:ctor(march_callback,params)
     self.returnCloseAction = type(params.returnCloseAction) == 'boolean' and params.returnCloseAction or false
     self.toLocation = params.toLocation or cc.p(0,0)
     self.targetAlliance = params.targetAlliance
-    self.terrain = params.terrain or User.basicInfo.terrain 
+    self.terrain = params.terrain or User.basicInfo.terrain
     self.military_soldiers = params.military_soldiers -- 编辑驻防部队时传入当前驻防部队信息
     GameUIAllianceSendTroops.super.ctor(self,City,params.title or _("准备进攻"))
-    local manager = ccs.ArmatureDataManager:getInstance()
-    for _, anis in pairs(UILib.soldier_animation_files) do
-        for _, v in pairs(anis) do
-            manager:addArmatureFileInfo(v)
-        end
-    end
     self.alliance = Alliance_Manager:GetMyAlliance()
     self.dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
     self.soldiers_table = {}
@@ -176,7 +202,7 @@ function GameUIAllianceSendTroops:OnMoveInStage()
     end):align(display.LEFT_CENTER,window.left+50,window.top-910):addTo(self:GetView())
     self.max_btn = max_btn
 
-    local march_btn = WidgetPushButton.new({normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},nil,nil)
+    self.march_btn = WidgetPushButton.new({normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"},nil,nil)
         :setButtonLabel(UIKit:ttfLabel({
             text = self.isMilitary and _("驻防") or _("行军"),
             size = 24,
@@ -231,9 +257,24 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                     return
                 end
                 if self.dragon:IsDefenced() then
-                    NetManager:getCancelDefenceDragonPromise():done(function()
-                        self:CallFuncMarch_Callback(dragonType,soldiers)
-                    end)
+                    UIKit:showMessageDialog(_("提示"),_("当前选择的龙处于驻防状态，是否取消驻防将这条龙派出")):CreateCancelButton(
+                        {
+                            listener = function ()
+                                NetManager:getCancelDefenceTroopPromise():done(function()
+                                    self:CallFuncMarch_Callback(dragonType,soldiers)
+                                    self:LeftButtonClicked()
+                                end)
+                            end,
+                            btn_name= _("派出"),
+                            btn_images = {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"}
+                        }
+                    ):CreateOKButton({
+                        listener = function ()
+                        end,
+                        btn_name= _("取消"),
+                        btn_images = {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"}
+                    })
+
                 else
                     self:CallFuncMarch_Callback(dragonType,soldiers)
                 end
@@ -378,7 +419,7 @@ function GameUIAllianceSendTroops:SelectSoldiers()
             button = "slider_btn_66x66.png"}, {max = item.max_soldier}):addTo(content)
             :align(display.RIGHT_CENTER, w-5, 35)
             :scale(0.95)
-        
+
         -- soldier name
         local soldier_name_label = UIKit:ttfLabel({
             text = Localize.soldier_name[name],
@@ -459,7 +500,7 @@ function GameUIAllianceSendTroops:SelectSoldiers()
             :align(display.LEFT_CENTER, 440,90)
 
         -- 士兵头像
-        local soldier_ui_config = UILib.soldier_image[name][star]
+        local soldier_ui_config = UILib.soldier_image[name]
         WidgetPushButton.new({normal = UILib.soldier_color_bg_images[name],pressed = UILib.soldier_color_bg_images[name]})
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
@@ -507,14 +548,30 @@ function GameUIAllianceSendTroops:SelectSoldiers()
     local User = User
     local soldiers = {}
     local soldier_map = {
-        "swordsman",
-        "ranger",
-        "lancer",
-        "catapult",
-        "sentinel",
-        "crossbowman",
-        "horseArcher",
-        "ballista",
+        "swordsman_1",
+        "ranger_1",
+        "lancer_1",
+        "catapult_1",
+        "sentinel_1",
+        "crossbowman_1",
+        "horseArcher_1",
+        "ballista_1",
+        "swordsman_2",
+        "ranger_2",
+        "lancer_2",
+        "catapult_2",
+        "sentinel_2",
+        "crossbowman_2",
+        "horseArcher_2",
+        "ballista_2",
+        "swordsman_3",
+        "ranger_3",
+        "lancer_3",
+        "catapult_3",
+        "sentinel_3",
+        "crossbowman_3",
+        "horseArcher_3",
+        "ballista_3",
         "skeletonWarrior",
         "skeletonArcher",
         "deathKnight",
@@ -527,19 +584,30 @@ function GameUIAllianceSendTroops:SelectSoldiers()
     local map_s = User.soldiers
     for _,name in pairs(soldier_map) do
         local soldier_num = map_s[name]
-        if soldier_num > 0 then
-            table.insert(soldiers, {name = name,level = User:SoldierStarByName(name), max_num = soldier_num})
+        local defence_soldier_count = 0
+        if self.military_soldiers and User.defenceTroop and User.defenceTroop ~= json.null then
+            for i,v in ipairs(User.defenceTroop.soldiers) do
+                if v.name == name then
+                    defence_soldier_count = v.count
+                end
+            end
+        end
+        if soldier_num + defence_soldier_count > 0 then
+            table.insert(soldiers, {name = name,level = User:SoldierStarByName(name), max_num = soldier_num + defence_soldier_count})
         end
     end
     for k,v in pairs(soldiers) do
         local military_soldiers = self.military_soldiers
+        local added = false
         if military_soldiers then
             for i,soldier in ipairs(military_soldiers) do
                 if soldier.name == v.name then
                     table.insert(self.soldiers_table, addListItem(v.name,v.level,v.max_num,soldier.count))
+                    added = true
                 end
             end
-        else
+        end
+        if not added then
             table.insert(self.soldiers_table, addListItem(v.name,v.level,v.max_num))
         end
     end
@@ -768,7 +836,7 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
         self.soldier_crops = {}
         for index,v in pairs(soldiers) do
             local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
-            if v.soldier_type ~= "catapult" and v.soldier_type ~= "ballista" and v.soldier_type ~= "meatWagon" then
+            if not string.find(v.soldier_type , "catapult") and not string.find(v.soldier_type , "ballista") and not string.find(v.soldier_type , "meatWagon") then
                 corp:PlayAnimation("idle_90")
             else
                 corp:PlayAnimation("move_90")
@@ -803,12 +871,26 @@ function GameUIAllianceSendTroops:OnUserDataChanged_soldiers(userData, deltaData
         end
     end
 end
+local animation = import("..animation")
 function GameUIAllianceSendTroops:onExit()
     User:RemoveListenerOnType(self, "soldiers")
+    display.getRunningScene():performWithDelay(function()
+        local manager = ccs.ArmatureDataManager:getInstance()
+        for k,v in pairs(animation) do
+            if string.find(k, "_90") then
+                local path = DEBUG_GET_ANIMATION_PATH(string.format("animations/%s.ExportJson", k))
+                print("removeArmatureFileInfo", path)
+                manager:removeArmatureFileInfo(path)
+            end
+        end
+        cc.Director:getInstance():purgeCachedData()
+    end, 0.1)
     GameUIAllianceSendTroops.super.onExit(self)
 end
 
 return GameUIAllianceSendTroops
+
+
 
 
 

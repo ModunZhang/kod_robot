@@ -71,6 +71,7 @@ function GameUIFteDragonEyrieMain:PormiseOfDefence()
 
     self:FindGarrisonBtn():removeEventListenersByEvent("CLICKED_EVENT")
     self:FindGarrisonBtn():onButtonClicked(function()
+        self:Defence()
         self:FindGarrisonBtn():setButtonEnabled(false)
         mockData.DefenceDragon()
     end)
@@ -84,7 +85,14 @@ function GameUIFteDragonEyrieMain:PormiseOfDefence()
         self:DestroyFteLayer()
     end)
 end
-
+function GameUIFteDragonEyrieMain:Defence()
+    UIKit:newGameUI('GameUIFteDefenceDragon',function(dragonType,soldiers)
+    end,{
+    isMilitary = true, 
+    terrain = User.basicInfo.terrain, 
+    title = _("驻防部队"), 
+    military_soldiers = {{name = "swordsman_1", count = 10}}}):AddToCurrentScene(true)
+end
 
 
 return GameUIFteDragonEyrieMain

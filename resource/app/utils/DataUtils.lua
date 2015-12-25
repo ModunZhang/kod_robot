@@ -663,7 +663,7 @@ function DataUtils:GetVSFromSoldierName(name1, name2)
 end
 function DataUtils:GetSoldierTypeByName(name)
     for k, v in pairs(normal_soldier) do
-        if v.name == name then
+        if string.find(v.name,name) then
             return v.type
         end
     end

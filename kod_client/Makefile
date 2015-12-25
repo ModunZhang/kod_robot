@@ -1,7 +1,7 @@
 GCC=gcc
 OBJDIR=./obj
-CFLAGS= -Wall -c -I../lua_engine/ -I../tolua/ -I../lua/ -I../libpomelo/deps/jansson/src \
- -I../libpomelo/include -I../libpomelo/deps/uv/include
+CFLAGS= -Wall -c -I../lua_engine/ -I../tolua/ -I../lua/ -I../pomelolib/libpomelo/deps/jansson/src \
+ -I../pomelolib/libpomelo/include -I../pomelolib/libpomelo/deps/uv/include -I../
 
 libjansson_la_obj = dump.o error.o hashtable.o load.o \
 memory.o pack_unpack.o strbuffer.o strconv.o utf.o value.o
@@ -26,7 +26,7 @@ all: kod_client
 	@$(MAKE) clean
 
 kod_client: $(objects)
-	$(GCC) $(objects) -o kod_client -L .. -L ../lua -L ../libpomelo/out/Default/obj.target/ -L ../libpomelo/out/Default/obj.target/deps/jansson -L ../libpomelo/out/Default/obj.target/deps/uv -pthread -std=c++11 -lstdc++ -lresolv  -lpomelo -luv -ljansson -llua -lm -ldl  
+	$(GCC) $(objects) -o kod_client -g -L ../lua -L ../pomelolib/libpomelo/out/Default/obj.target/ -L ../pomelolib/libpomelo/out/Default/obj.target/deps/jansson -L ../pomelolib/libpomelo/out/Default/obj.target/deps/uv -L ../libopenssl -pthread -std=c++11 -lstdc++ -lresolv  -lpomelo -lcrypto -luv -ljansson -llua -lm -ldl 
 
 # %.o: ../lua/%.c 
 # 	$(GCC) $(CFLAGS) -o $@ $<  

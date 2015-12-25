@@ -39,6 +39,7 @@ function PlatformAdapter:android()
             local t = {}
             for i,v in ipairs({...}) do
                 if type(v) == 'nil' then v = "nil" end
+                if type(v) == 'userdata' then v = "userdata" end
                 table.insert(t,tostring(v))
             end
             ext.__logFile(table.concat(t,"\t") .. "\n")
@@ -59,6 +60,7 @@ function PlatformAdapter:ios()
             local t = {}
             for i,v in ipairs({...}) do
                 if type(v) == 'nil' then v = "nil" end
+                if type(v) == 'userdata' then v = "userdata" end
                 table.insert(t,tostring(v))
             end
             ext.__logFile(table.concat(t,"\t") .. "\n")
@@ -116,10 +118,15 @@ function PlatformAdapter:winrt()
             local t = {}
             for i,v in ipairs({...}) do
                 if type(v) == 'nil' then v = "nil" end
+                if type(v) == 'userdata' then v = "userdata" end
                 table.insert(t,tostring(v))
             end
             ext.__logFile(table.concat(t,"\t") .. "\n")
         end
+    end
+
+    ext.getDeviceLanguage = function()
+        return cc.Application:getInstance():getCurrentLanguageCode()
     end
 end
 
@@ -160,6 +167,12 @@ function PlatformAdapter:mac()
     end
     ext.getBatteryLevel = function()
         return 1
+    end
+    ext.isLowMemoryDevice = function()
+        return false
+    end
+    ext.getAppMemoryUsage = function()
+        return 0
     end
 
     DEBUG_GET_ANIMATION_PATH = function(filePath)
@@ -260,6 +273,51 @@ function PlatformAdapter:mac()
     end
 end
 
+function PlatformAdapter:windows()
+    ccui.UITextView = {}
+    setmetatable(ccui.UITextView,{
+        __index= function( ... )
+            assert(false,"\n--- ccui.UITextView not support for Player!\n")
+        end
+    })
+    --search path
+    --player 特殊处理
+    local fileutils = cc.FileUtils:getInstance()
+    fileutils:addSearchPath("dev/res/")
+    fileutils:addSearchPath("dev/res/fonts/")
+    fileutils:addSearchPath("dev/res/images/")
+    fileutils:addSearchPath("dev/res/fonts/")
+    fileutils:addSearchPath("dev/res/images/rgba444_single/")
+    fileutils:addSearchPath("dev/res/images/_Compressed_mac/")
+    fileutils:addSearchPath("dev/res/images/_CanCompress/")
+    ext.getDeviceToken = function ()end
+    ext.market_sdk = {}
+    setmetatable(ext.market_sdk,{
+        __index= function(t,key)
+            return function ( ... )
+                print("\nfunction: ext.market_sdk." .. key .. "\n","args: ",...)
+            end
+        end
+    })
+    ext.getAppVersion = function()
+        return "Debug Version"
+    end
+    ext.getDeviceLanguage = function()
+        return "zh-Hans"
+    end
+    ext.getInternetConnectionStatus = function()
+        return nil
+    end
+    ext.getBatteryLevel = function()
+        return 1
+    end
+
+    DEBUG_GET_ANIMATION_PATH = function(filePath)
+        filePath = string.gsub(filePath,".pvr.ccz",".png")
+        filePath = string.gsub(filePath,"animations/","animations_mac/")
+        return filePath
+    end
+end
 
 function PlatformAdapter:common()
     --打开文件搜索路径日志
@@ -273,7 +331,7 @@ function PlatformAdapter:common()
             printError__(...)
             if device.platform ~= 'winrt' then
                 local errDesc =   debug.traceback("", 2)
-                device.showAlert("☠Quick Framework错误☠",errDesc,"复制！",function()
+                device.showAlert("☠Quick Framework错误☠",errDesc,{"复制！"},function()
                     ext.copyText(errDesc)
                 end)
             end

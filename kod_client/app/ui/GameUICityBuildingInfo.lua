@@ -316,17 +316,12 @@ function GameUICityBuildingInfo:CreateDetails()
             end
             table.insert(details, value)
         elseif parent.building_name == "barracks" then
-            local unlockedSoldiers_current = string.split(parent.config[idx].unlockedSoldiers, ",")
-            if idx > 1 then
-                local unlockedSoldiers_perious = parent.config[idx-1].unlockedSoldiers
-                for i,v in ipairs(unlockedSoldiers_current) do
-                    if not string.find(unlockedSoldiers_perious,v) then
-                        table.insert(details, Localize.soldier_name[v])
-                    end
-                end
-            else
-                for i,v in ipairs(unlockedSoldiers_current) do
-                    table.insert(details, Localize.soldier_name[v])
+            local normal = GameDatas.Soldiers.normal
+            for k,soldier in pairs(normal) do
+                if soldier.needBarracksLevel == idx then
+                    local soldier_type = string.sub(soldier.name,1,-3)
+                    table.insert(details, Localize.soldier_name[soldier_type])
+                    break
                 end
             end
         elseif parent.building_name == "blackSmith" or parent.building_name == "townHall"

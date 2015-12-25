@@ -8,11 +8,13 @@ end)
 function LogoScene:ctor()
     self:loadSplashResources()
 end
+
 function LogoScene:onEnter()
     --关闭屏幕锁定定时器
     if ext.disableIdleTimer then
         ext.disableIdleTimer(true)
     end
+    
     self.layer = cc.LayerColor:create(cc.c4b(255,255,255,255)):addTo(self)
     self.sprite = display.newSprite("batcat_logo_368x507.png", display.cx, display.cy):addTo(self.layer)
     self:performWithDelay(function() self:beginAnimate() end,0.5)

@@ -412,7 +412,8 @@ end
 function GameUIGacha:InitOrdinary()
     local main = self
     local layer = self.ordinary_layer
-    self.isOrdinaryInit = display.newSprite("background_gacha_1.jpg"):addTo(layer)
+    local background_gacha_1 = device.platform == 'winrt' and "background_gacha_1.png" or "background_gacha_1.jpg" 
+    self.isOrdinaryInit = display.newSprite(background_gacha_1):addTo(layer)
         :align(display.TOP_CENTER, window.cx, window.top_bottom+36)
     UIKit:ttfLabel({
         text = _("每日获得免费抽奖机会，激活VIP5 以上，每日可获得额外的免费抽奖机会"),
@@ -507,7 +508,8 @@ end
 function GameUIGacha:InitDeluxe()
     local main = self
     local layer = self.deluxe_layer
-    self.isDeluxeInit = display.newSprite("background_gacha_2.jpg"):addTo(layer)
+    local background_gacha_2 = device.platform == 'winrt' and "background_gacha_2.png" or "background_gacha_2.jpg" 
+    self.isDeluxeInit = display.newSprite(background_gacha_2):addTo(layer)
         :align(display.TOP_CENTER, window.cx, window.top_bottom+36)
     UIKit:ttfLabel({
         text = _("购买任意金额的金龙币可以解锁高级抽奖,高级抽奖一次可以获得三种不同的道具"),
@@ -627,7 +629,9 @@ end
 
 function GameUIGacha:onCleanup()
     GameUIGacha.super.onCleanup(self)
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("background_gacha_1.png")
     cc.Director:getInstance():getTextureCache():removeTextureForKey("background_gacha_1.jpg")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("background_gacha_2.png")
     cc.Director:getInstance():getTextureCache():removeTextureForKey("background_gacha_2.jpg")
 end
 

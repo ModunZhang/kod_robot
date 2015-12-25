@@ -4,7 +4,6 @@
 --
 local promise = import("..utils.promise")
 local WidgetPushButton = import("..widget.WidgetPushButton")
-local manager = ccs.ArmatureDataManager:getInstance()
 local UILib = import(".UILib")
 local GameUIShowDragonUpStarAnimation = UIKit:createUIClass("GameUIShowDragonUpStarAnimation","UIAutoClose")
 
@@ -19,7 +18,6 @@ function GameUIShowDragonUpStarAnimation:ctor(dragon)
 	}
 	self.dragon_iamge = UILib.dragon_head[dragon:Type()]
 	self:setNodeEventEnabled(true)
-	manager:addArmatureFileInfo(DEBUG_GET_ANIMATION_PATH("animations/jinjichenggong.ExportJson"))
 	self.star_val = dragon:Star()
 end
 
@@ -104,7 +102,6 @@ end
 
 function GameUIShowDragonUpStarAnimation:onCleanup()
 	GameUIShowDragonUpStarAnimation.super.onCleanup(self)
-	manager:removeArmatureFileInfo(DEBUG_GET_ANIMATION_PATH("animations/jinjichenggong.ExportJson"))
 end
 
 

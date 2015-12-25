@@ -45,15 +45,15 @@ function WorldLayer:onEnter()
 end
 function WorldLayer:onExit()
     local cache = cc.Director:getInstance():getTextureCache()
-    cache:removeTextureForKey("world_bg.jpg")
-    cache:removeTextureForKey("world_title2.jpg")
-    cache:removeTextureForKey("world_title1.jpg")
-    cache:removeTextureForKey("world_terrain.jpg")
+    cache:removeTextureForKey("world_bg.png")
+    cache:removeTextureForKey("world_title2.png")
+    cache:removeTextureForKey("world_title1.png")
+    cache:removeTextureForKey("world_terrain.png")
 end
 function WorldLayer:CreateBg()
     local sx, sy = 12, 7
     local offsetY = - 400
-    local sprite = display.newFilteredSprite("world_bg.jpg", "CUSTOM", json.encode({
+    local sprite = display.newFilteredSprite("world_bg.png", "CUSTOM", json.encode({
         frag = "shaders/plane.fs",
         shaderName = "plane1",
         param = {1/sx, 1/sy, sx, sy}
@@ -64,13 +64,13 @@ function WorldLayer:CreateBg()
     worldsize.width = size.width * sx - 235
     worldsize.height = size.height * sy + offsetY
 
-    display.newFilteredSprite("world_title2.jpg", "CUSTOM", json.encode({
+    display.newFilteredSprite("world_title2.png", "CUSTOM", json.encode({
         frag = "shaders/plane.fs",
         shaderName = "plane2",
         param = {1/sx, 1, sx, 1}
     })):addTo(self):align(display.LEFT_TOP,0,size.height * sy + offsetY):setScaleX(sx)
 
-    display.newSprite("world_title1.jpg")
+    display.newSprite("world_title1.png")
     :addTo(self):align(display.LEFT_TOP,0,size.height * sy + offsetY):scale(0.7)
 end
 function WorldLayer:CreateCorner()
@@ -126,7 +126,7 @@ function WorldLayer:CreateMap()
     local clip = display.newNode():addTo(self.scene_node)
                  :align(display.LEFT_BOTTOM,CORNER_LENGTH,CORNER_LENGTH)
 
-    local map = display.newFilteredSprite("world_terrain.jpg", "CUSTOM", json.encode({
+    local map = display.newFilteredSprite("world_terrain.png", "CUSTOM", json.encode({
         frag = "shaders/maptex.fs",
         shaderName = "maptex",
         size = {
@@ -213,7 +213,7 @@ function WorldLayer:MoveAllianceFromTo(fromIndex, toIndex)
         table.insert(actions, cc.DelayTime:create(step_time))
     end
     local gap, scal, ft, offset = -65, 0.8, 0.5, -40
-    UIKit:CreateMoveSoldiers(degree, {name = "ranger", star = 3}, scal)
+    UIKit:CreateMoveSoldiers(degree, {name = "ranger_1", star = 3}, scal)
     :addTo(self.moveLayer)
     :pos(sour.x + normal.x * (2 * gap + offset), sour.y + normal.y * (2 * gap + offset))
     :runAction(transition.sequence{
@@ -224,7 +224,7 @@ function WorldLayer:MoveAllianceFromTo(fromIndex, toIndex)
         cc.RemoveSelf:create(),
     })
 
-    UIKit:CreateMoveSoldiers(degree, {name = "swordsman", star = 3}, scal)
+    UIKit:CreateMoveSoldiers(degree, {name = "swordsman_1", star = 3}, scal)
     :addTo(self.moveLayer)
     :pos(sour.x + normal.x * (gap + offset), sour.y + normal.y * (gap + offset))
     :runAction(transition.sequence{
@@ -235,7 +235,7 @@ function WorldLayer:MoveAllianceFromTo(fromIndex, toIndex)
         cc.RemoveSelf:create(),
     })
 
-    UIKit:CreateMoveSoldiers(degree, {name = "lancer", star = 3}, scal)
+    UIKit:CreateMoveSoldiers(degree, {name = "lancer_1", star = 3}, scal)
     :addTo(self.moveLayer)
     :pos(sour.x + normal.x * (offset + 10), sour.y + normal.y * (offset + 10))
     :runAction(transition.sequence{

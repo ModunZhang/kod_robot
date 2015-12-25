@@ -26,7 +26,7 @@ function WidgetMaskFilter:FocusOnRect(rect)
     end
     self:setFilter(filter.newFilter("CUSTOM", json.encode({
         frag = "shaders/mask.fs",
-        shaderName = "mask2",
+        shaderName = "mask2"..math.floor(rect.x or 1),
         rect = {
             clamp(0, display.width, rect.x) / display.width,
             1 - clamp(0, display.height, rect.y + rect.height) / display.height,

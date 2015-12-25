@@ -564,7 +564,7 @@ end
 function GameUIMonsterReport:CreateSoldiersInfo(soldier,isSelf)
     local soldier_level = soldier.star
     local soldier_type = soldier.name
-    local soldier_ui_config = isSelf and UILib.soldier_image[soldier_type][soldier_level] or UILib.black_soldier_image[soldier_type][soldier_level]
+    local soldier_ui_config = isSelf and UILib.soldier_image[soldier_type] or UILib.black_soldier_image[soldier_type]
     local color_bg = display.newSprite(UILib.soldier_color_bg_images[soldier_type])
         :scale(104/128)
         :align(display.LEFT_BOTTOM)

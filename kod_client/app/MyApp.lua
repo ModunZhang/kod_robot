@@ -138,9 +138,11 @@ function MyApp:run()
     end
     NetManager:getConnectGateServerPromise():next(function()
         return NetManager:getLogicServerInfoPromise()
-    end):next(function()
+    end)
+    :next(function()
         return NetManager:getConnectLogicServerPromise()
-    end):next(function()
+    end)
+    :next(function()
         return NetManager:getLoginPromise(device.getOpenUDID())
     end):next(function()
         if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
@@ -167,8 +169,8 @@ function MyApp:run()
         -- local content, title = err:reason()
         -- local code = content.code
         -- if content.code == 684 then
-        NetManager:disconnect()
-        self:run()
+        -- NetManager:disconnect()
+        -- self:run()
         -- else
         -- threadExit()
         -- end

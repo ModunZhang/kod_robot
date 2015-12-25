@@ -94,7 +94,7 @@ pc_msg_t *pc__default_msg_parse_cb(pc_client_t *client, const char *data,
     
     if(client->secret){
         char* encrypt = rc4(client->secret, data, len);
-        memcpy(data, encrypt, len);
+        memcpy((void *)data, encrypt, len);
         free(encrypt);
         printf("%s\n", data);
     }

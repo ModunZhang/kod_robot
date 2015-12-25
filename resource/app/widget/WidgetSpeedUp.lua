@@ -31,15 +31,12 @@ function WidgetSpeedUp:ctor()
         normal = "purple_btn_up_148x76.png",
         pressed = "purple_btn_down_148x76.png",
     }
+    
     self.free_speedUp_btn = WidgetPushButton.new(IMAGES, {scale9 = false},
         {
             disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
         })
-        :setButtonLabel(ui.newTTFLabel({
-            text = _("免费加速"),
-            size = 24,
-            color = UIKit:hex2c3b(0xffedae)
-        }))
+        :setButtonLabel(UIKit:commonButtonLable({text = _("免费加速")}))
        :align(display.CENTER, 510,468):addTo(body)
     -- 默认不可用
     self.free_speedUp_btn:setButtonEnabled(false)

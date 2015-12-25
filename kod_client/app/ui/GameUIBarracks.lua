@@ -91,17 +91,37 @@ function GameUIBarracks:CreateSoldierUI()
     -- self.list_view = self:CreateVerticalListViewDetached(rect.x, window.bottom + 70, rect.x + rect.width, rect.y - 20):addTo(recruit)
     local titles ={
         {
-            title = _("防守型部队"),
+            title = _("防守型部队Ⅰ"),
             title_img = "title_blue_554x34.png",
         },
         {
-            title = _("攻击型部队"),
+            title = _("攻击型部队Ⅰ"),
+            title_img = "title_red_556x34.png",
+        },
+         {
+            title = _("防守型部队Ⅱ"),
+            title_img = "title_blue_554x34.png",
+        },
+        {
+            title = _("攻击型部队Ⅱ"),
+            title_img = "title_red_556x34.png",
+        },
+         {
+            title = _("防守型部队Ⅲ"),
+            title_img = "title_blue_554x34.png",
+        },
+        {
+            title = _("攻击型部队Ⅲ"),
             title_img = "title_red_556x34.png",
         },
     }
     for i, v in ipairs({
-        {"swordsman", "ranger", "lancer", "catapult"},
-        {"sentinel", "crossbowman", "horseArcher", "ballista"}
+        {"swordsman_1", "ranger_1", "lancer_1", "catapult_1"},
+        {"sentinel_1", "crossbowman_1", "horseArcher_1", "ballista_1"},
+        {"swordsman_2", "ranger_2", "lancer_2", "catapult_2"},
+        {"sentinel_2", "crossbowman_2", "horseArcher_2", "ballista_2"},
+        {"swordsman_3", "ranger_3", "lancer_3", "catapult_3"},
+        {"sentinel_3", "crossbowman_3", "horseArcher_3", "ballista_3"},
     }) do
         local item = self:CreateSpecialItemWithListView(self.list_view, v,titles[i].title, titles[i].title_img,i == 1 and _("此系列单位生命属性较高") or _("此系列单位攻击属性较高"))
         self.list_view:addItem(item)
@@ -319,14 +339,14 @@ function GameUIBarracks:OnUserDataChanged_soldierEvents(userData, deltaData)
     end
 end
 function GameUIBarracks:RefershUnlockInfo()
-    local unlock_soldiers = self.barracks:GetUnlockSoldiers()
     local level = self.barracks:GetLevel()
     for k,v in pairs(self.soldier_map) do
-        if unlock_soldiers[k] then
-            local is_unlock = unlock_soldiers[k] <= level
+        local needBarracksLevel = User:GetSoldierConfig(k).needBarracksLevel
+        if needBarracksLevel then
+            local is_unlock = needBarracksLevel <= level
             v:Enable(is_unlock)
             if not is_unlock then
-                v:SetCondition(string.format(_("兵营%d级解锁"), unlock_soldiers[k]))
+                v:SetCondition(string.format(_("兵营%d级解锁"), needBarracksLevel))
             end
         end
     end

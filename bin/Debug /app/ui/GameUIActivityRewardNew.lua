@@ -22,7 +22,7 @@ local Localize_item = import("..utils.Localize_item")
 local lights = import("..particles.lights")
 
 local height_config = {
-    EVERY_DAY_LOGIN = 762,
+    EVERY_DAY_LOGIN = 850,
     CONTINUITY = 762,
     ONLINE = 762,
     FIRST_IN_PURGURE = 720,
@@ -88,12 +88,12 @@ end
 
 function GameUIActivityRewardNew:onExit()
     User:RemoveListenerOnType(self, "countInfo")
+    removeImageByKey("background_608x678.png")
     GameUIActivityRewardNew.super.onExit(self)
 end
 
 function GameUIActivityRewardNew:onCleanup()
     GameUIActivityRewardNew.super.onCleanup(self)
-    cc.Director:getInstance():getTextureCache():removeTextureForKey("activity_first_purgure_588x176.jpg")
 end
 
 function GameUIActivityRewardNew:OnUserDataChanged_countInfo()
@@ -182,7 +182,7 @@ function GameUIActivityRewardNew:BuildUI()
     local bg = WidgetUIBackGround.new({height=height})
     self:addTouchAbleChild(bg)
     self.bg = bg
-    bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top)
+    bg:pos(((display.width - bg:getContentSize().width)/2),window.bottom_top - (self:GetRewardType() == self.REWARD_TYPE.EVERY_DAY_LOGIN and 60 or 0))
     local is_first_in_purgure = self:GetRewardType() == self.REWARD_TYPE.FIRST_IN_PURGURE
     local titleBar = display.newSprite(is_first_in_purgure and "title_red_634x134.png" or "title_blue_600x56.png")
         :align(display.LEFT_BOTTOM,is_first_in_purgure and -13 or 3,is_first_in_purgure and height - 80 or height - 15):addTo(bg):zorder(2)
@@ -235,29 +235,28 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
     }):align(display.CENTER_TOP,304,self.height - 20):addTo(self.bg)
     local content_bg = UIKit:CreateBoxPanelWithBorder({
         width = 556,
-        height= 668
-    }):align(display.CENTER_BOTTOM, 304, 22):addTo(self.bg)
-    local x,y = 3,668 - 10
+        height= 786
+    }):align(display.CENTER_BOTTOM, 304, 16):addTo(self.bg)
+    local x,y = 3,786 - 10
     for i=1,30 do
-        local button = WidgetPushButton.new({normal = 'box_118x118.png'})
+        local button = display.newSprite('box_118x118.png')
             :align(display.LEFT_TOP, x, y)
             :addTo(content_bg)
-            :onButtonClicked(function()
-                self:On_EVERY_DAY_LOGIN_GetReward(i,rewards[i])
-            end)
             :scale(110/118)
-        UIKit:addTipsToNode(button,Localize_item.item_name[rewards[i].reward],self)
+        UIKit:addTipsToNode(button,Localize_item.item_name[rewards[i].reward],self,nil,56,-59)
         table.insert(self.rewards_buttons,button)
-        local enable = display.newSprite(UILib.item[rewards[i].reward], 59, -59, {class=cc.FilteredSpriteWithOne}):addTo(button)
+        local enable = display.newSprite(UILib.item[rewards[i].reward], 59, -59 + 118, {class=cc.FilteredSpriteWithOne}):addTo(button)
         local size = enable:getContentSize()
         enable:scale(90/math.max(size.width,size.height))
-        local check_bg = display.newSprite("activity_check_bg_55x51.png"):align(display.RIGHT_BOTTOM,105,-105):addTo(button,2):scale(34/55)
+        local check_bg = display.newSprite("activity_check_bg_55x51.png"):align(display.RIGHT_BOTTOM,105,-105 + 118):addTo(button,2):scale(34/55)
         button.icon = enable
         button.check_bg = check_bg
         display.newSprite("activity_check_body_55x51.png"):addTo(check_bg):pos(27,17)
+        local could_get = false
         if i > flag then -- other day
             check_bg:hide()
             enable:clearFilter()
+            could_get = auto_get_reward == 0 and (i - flag) == 1
         else
 
             if flag == i then
@@ -265,6 +264,7 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
                     check_bg:hide()
                     enable:clearFilter()
                     auto_get_reward = i
+                    could_get = true
                 else
                     check_bg:show()
                     if not enable:getFilter() then
@@ -278,7 +278,33 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
                 end
             end
         end
-        local num_bg = display.newSprite("activity_num_bg_28x28.png",20,-18):addTo(button)
+        if could_get then
+            display.newSprite("icon_daily_box_118x118.png"):align(display.LEFT_TOP,0, 118):addTo(button,2)
+            local reward_info = display.newNode()
+            reward_info:setContentSize(cc.size(536,118))
+            reward_info:align(display.LEFT_TOP, 0, y)
+                :addTo(content_bg)
+            local get_btn = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png",disabled = "grey_btn_148x58.png"})
+                :setButtonLabel(UIKit:commonButtonLable({
+                    text = _("领取"),
+                    color = 0xfff3c7
+                })):align(display.RIGHT_CENTER,540, -59):onButtonClicked(function(event)
+                    self:On_EVERY_DAY_LOGIN_GetReward(auto_get_reward,rewards[auto_get_reward])
+                end):addTo(reward_info)
+            get_btn:setButtonEnabled(auto_get_reward ~= 0)
+            UIKit:ttfLabel({
+                text = Localize_item.item_name[rewards[i].reward],
+                size = 22,
+                color= 0x403c2f
+            }):align(display.LEFT_CENTER, 14, -20):addTo(reward_info)
+            UIKit:ttfLabel({
+                text = Localize_item.item_desc[rewards[i].reward],
+                size = 20,
+                color= 0x615b44,
+                dimensions = cc.size(400,0)
+            }):align(display.LEFT_TOP, 14, -40):addTo(reward_info)
+        end
+        local num_bg = display.newSprite("activity_num_bg_28x28.png",20,-18 + 118):addTo(button)
         UIKit:ttfLabel({
             text = i,
             size = 15,
@@ -287,11 +313,12 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
         x = x + 110
         if i % 5 == 0 then
             x = 3
-            y = y - 108
+            if i - flag < 5 then
+                y = y - 222
+            else
+                y = y - 108
+            end
         end
-    end
-    if auto_get_reward ~= 0 then
-        self:On_EVERY_DAY_LOGIN_GetReward(auto_get_reward,rewards[auto_get_reward])
     end
 end
 
@@ -303,6 +330,7 @@ function GameUIActivityRewardNew:On_EVERY_DAY_LOGIN_GetReward(index,reward)
         NetManager:getDay60RewardPromise():done(function()
             GameGlobalUI:showTips(_("提示"),string.format(_("恭喜您获得 %s x %d"),Localize_item.item_name[reward.reward],reward.count))
             app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
+            self:LeftButtonClicked()
         end)
     else
         if index > real_index then
@@ -564,7 +592,7 @@ function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
         color = 0xfed36c,
         shadow = true
     }):addTo(bar):align(display.RIGHT_CENTER,580,622)
-     UIKit:ttfLabel({
+    UIKit:ttfLabel({
         text = _("永久激活第二条建筑队列并可领取下列丰厚奖励"),
         size = 22,
         color = 0xffedae,
@@ -573,7 +601,7 @@ function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
         dimensions = cc.size(300,0),
         shadow = true
     }):addTo(bar):align(display.CENTER,440,540)
-      
+
     local countInfo = User.countInfo
     local rewards = self:GetFirstPurgureRewards()
     local x,y = 300,500
@@ -1047,7 +1075,7 @@ function GameUIActivityRewardNew:GetOnLineTimePointData()
         end
         local reward_type,item_key,count = unpack(string.split(v.rewards,":"))
         local name = self:GetRewardName(reward_type,item_key)
-        table.insert(r,{reward_type,item_key,string.format(_("在线%s分钟"),v.onLineMinutes),name .. "x" .. count,flag,v.timePoint})
+        table.insert(r,{reward_type,item_key,string.format(_("在线%s分钟"),v.onLineMinutes),name .. " x" .. count,flag,v.timePoint})
     end
     return r
 end
@@ -1073,6 +1101,8 @@ function GameUIActivityRewardNew:GetNextOnlineTimePoint()
 end
 
 return GameUIActivityRewardNew
+
+
 
 
 

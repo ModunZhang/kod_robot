@@ -716,17 +716,17 @@ end
 function NetManager:getLogicServerInfoPromise()
     local device_id = device.getOpenUDID()
     local platform = ''
-    if device.platform == "windows" then
+    if device.platform == 'windows' then
         platform = 'wp'
-    elseif device.platform == "mac" then
+    elseif device.platform == 'mac' then
         platform = 'ios'
     elseif device.platform == "android" then
-        platform = 'android'
+        platform = 'ios'
     elseif device.platform == "ios" then
         platform = 'ios'
-    elseif device.platform == "winrt" then
+    elseif device.platform == 'winrt' then
         platform = 'wp'
-    elseif device.platform == "wp8" then
+    elseif device.platform == 'wp8' then
         platform = 'wp'
     end
     local device_tag = app.client_tag
@@ -820,7 +820,7 @@ function NetManager:initPlayerData(terrain, language)
         terrain == "iceField" )
     return get_blocking_request_promise("logic.playerHandler.initPlayerData", {
         terrain = terrain,
-        language = language or app:GetGameLanguage(),
+        language = language or GameUtils:GetGameLanguage(),
     }, "初始化玩家数据失败!"):done(get_player_response_msg)
 end
 -- 个人修改地形
@@ -973,7 +973,8 @@ end
 local function get_recruitNormalSoldier_promise(soldierName, count, finish_now)
     local task = City:GetRecommendTask()
     if task then
-        if task:TaskType() == "recruit" and task.name == soldierName then
+        if task:TaskType() == "recruit"
+            and string.find(soldierName, task.name) then
             City:SetBeginnersTaskFlag(task:Index())
         end
     end
@@ -1590,14 +1591,16 @@ function NetManager:getAttackPlayerCityPromise(dragonType, soldiers, defenceAlli
 end
 
 --设置驻防使用的龙
-function NetManager:getSetDefenceDragonPromise(dragonType)
-    return get_none_blocking_request_promise("logic.playerHandler.setDefenceDragon",
-        {dragonType=dragonType},
-        "设置驻防使用的龙失败!"):done(get_player_response_msg)
+function NetManager:getSetDefenceTroopPromise(dragonType,soldiers)
+    return get_none_blocking_request_promise("logic.playerHandler.setDefenceTroop",
+        {dragonType=dragonType,soldiers=soldiers},
+        "设置驻防使用的龙失败!"):done(get_player_response_msg):done(function()
+            GameGlobalUI:showTips(_("提示"),_("驻防成功"))
+        end)
 end
 --取消龙驻防
-function NetManager:getCancelDefenceDragonPromise()
-    return get_none_blocking_request_promise("logic.playerHandler.cancelDefenceDragon",
+function NetManager:getCancelDefenceTroopPromise()
+    return get_none_blocking_request_promise("logic.playerHandler.cancelDefenceTroop",
         nil,
         "取消龙驻防失败!"):done(get_player_response_msg)
 end
@@ -1691,9 +1694,9 @@ function NetManager:getUpgradeProductionTechPromise(techName,finishNow)
     }, "升级生产科技失败!"):done(get_player_response_msg):done(function()
         if finishNow then
             GameGlobalUI:showTips(
-                    _("生产科技升级完成"), 
-                    Localize.productiontechnology_name[techName]
-                    .."Lv"..User.productionTechs[techName].level)  
+                _("生产科技升级完成"),
+                Localize.productiontechnology_name[techName]
+                .."Lv"..User.productionTechs[techName].level)
         end
         app:GetAudioManager():PlayeEffectSoundWithKey("TECHNOLOGY")
     end)
@@ -1706,9 +1709,9 @@ local function upgrade_military_tech_promise(techName,finishNow)
     }, "升级军事科技失败!"):done(get_player_response_msg):done(function()
         if finishNow then
             GameGlobalUI:showTips(_("军事科技升级完成"),
-                    UtilsForTech:GetTechLocalize(techName)
-                    .."Lv"..
-                    User.militaryTechs[techName].level)
+                UtilsForTech:GetTechLocalize(techName)
+                .."Lv"..
+                User.militaryTechs[techName].level)
             app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
         end
     end)
@@ -1854,11 +1857,11 @@ function NetManager:getVerifyIAPPromise(transactionId,receiptData)
 end
 -- WindowsPhone内购
 function NetManager:getVerifyAdeasygoIAPPromise(transactionIdentifier)
-   if not self.__AdeasygoUID  then
+    if not self.__AdeasygoUID  then
         self.__AdeasygoUID = ext.adeasygo.getUid()
-   end
-   local uid = self.__AdeasygoUID
-   return get_none_blocking_request_promise("logic.playerHandler.addWpAdeasygoPlayerBillingData",
+    end
+    local uid = self.__AdeasygoUID
+    return get_none_blocking_request_promise("logic.playerHandler.addWpAdeasygoPlayerBillingData",
         {
             transactionId=transactionIdentifier,
             uid = uid,
@@ -1940,9 +1943,9 @@ function NetManager:getGrowUpTaskRewardsPromise(taskType, taskId)
 end
 
 -- 领取日常任务奖励
-function NetManager:getDailyTaskRewards(taskType)
+function NetManager:getDailyTaskRewards()
     return get_blocking_request_promise("logic.playerHandler.getDailyTaskRewards",
-        {taskType = taskType},
+        {},
         "领取日常任务奖励!"):done(get_player_response_msg)
 end
 
@@ -1971,8 +1974,8 @@ function NetManager:getBindGcPromise(type,gcId,gcName)
         type=type,
         gcId=gcId,
         gcName=gcName,
-        },
-        "设置gc失败"):done(get_player_response_msg)
+    },
+    "设置gc失败"):done(get_player_response_msg)
 end
 -- 更新GcName
 function NetManager:getUpdateGcNamePromise(gcName)
@@ -2065,7 +2068,7 @@ function NetManager:getMoveAlliancePromise(targetMapIndex)
         targetMapIndex = targetMapIndex,
     },"移联盟失败!"):done(function(response)
         -- LuaUtils:outputTable(response)
-    end)
+        end)
 end
 function NetManager:getEnterMapIndexPromise(mapIndex)
     return get_none_blocking_request_promise("logic.allianceHandler.enterMapIndex",{
@@ -2133,6 +2136,8 @@ function NetManager:downloadFile(fileInfo, cb, progressCb)
         progressCb(totalSize, currentSize)
     end)
 end
+
+
 
 
 

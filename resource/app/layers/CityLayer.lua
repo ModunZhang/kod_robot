@@ -203,6 +203,10 @@ function CityLayer:OnUserDataChanged_buildings(userData, deltaData)
         v:RefreshSprite()
     end
     self:CheckUpgradeCondition()
+
+    if deltaData("buildings.location_2.level") then
+        self:RefreshSoldiers()
+    end
 end
 function CityLayer:OnUserDataChanged_houseEvents(userData, deltaData)
     local ok, value = deltaData("houseEvents.remove")
@@ -388,17 +392,21 @@ function CityLayer:ReloadSceneBackground()
         self.background:removeFromParent()
     end
     self.background = display.newNode():addTo(self, SCENE_ZORDER.SCENE_BACKGROUND)
+    local suffix = device.platform == "winrt" and "png" or "jpg"
+    local s = suffix == "png" and (1316 / 1024) or 1
     local terrain = self:Terrain()
-    local left_1 = string.format("left_background_1_%s.jpg", terrain)
-    local left_2 = string.format("left_background_2_%s.jpg", terrain)
-    local right_1 = string.format("right_background_1_%s.jpg", terrain)
-    local right_2 = string.format("right_background_2_%s.jpg", terrain)
-    local left1 = display.newSprite(left_1):addTo(self.background):align(display.LEFT_BOTTOM)
-    -- local left2 = display.newSprite(left_2):addTo(self.background):align(display.LEFT_BOTTOM, 0, left1:getContentSize().height)
-    local square = display.newSprite(left_2, nil, nil, {class=cc.FilteredSpriteWithOne}):addTo(self.background)
-        :align(display.LEFT_BOTTOM, 0, left1:getContentSize().height)
-    local right1 = display.newSprite(right_1):addTo(self.background):align(display.LEFT_BOTTOM, square:getContentSize().width, 0)
-    local right2 = display.newSprite(right_2):addTo(self.background):align(display.LEFT_BOTTOM, square:getContentSize().width, right1:getContentSize().height)
+    local left_1 = string.format("left_background_1_%s.%s", terrain, suffix)
+    local left_2 = string.format("left_background_2_%s.%s", terrain, suffix)
+    local right_1 = string.format("right_background_1_%s.%s", terrain, suffix)
+    local right_2 = string.format("right_background_2_%s.%s", terrain, suffix)
+    local left1 = display.newSprite(left_1):addTo(self.background):scale(s):align(display.LEFT_BOTTOM)
+    local square = display.newSprite(left_2):addTo(self.background):scale(s):align(display.LEFT_BOTTOM, 0, left1:getContentSize().height * s)
+    local right1 = display.newSprite(right_1):addTo(self.background):scale(s):align(display.LEFT_BOTTOM, square:getContentSize().width * s, 0)
+    local right2 = display.newSprite(right_2):addTo(self.background):scale(s):align(display.LEFT_BOTTOM, square:getContentSize().width * s, right1:getContentSize().height * s)
+    setAliasTexParametersForKey(left_1)
+    setAliasTexParametersForKey(left_2)
+    setAliasTexParametersForKey(right_1)
+    setAliasTexParametersForKey(right_2)
 
     function square:GetEntity()
         return {
@@ -410,42 +418,30 @@ function CityLayer:ReloadSceneBackground()
             end,
         }
     end
-    function square:BeginFlash(time)
-        local start = 0
-        self:setFilter(filter.newFilter("CUSTOM", json.encode({
-            frag = "shaders/flashAt.fs",
-            shaderName = "flashAt",
-            startTime = start,
-            curTime = start,
-            lastTime = time,
-            rect = {0.815,0.543,0.21,0.26},
-            srm = {1.0, 1.54, -45, 0.4},
-        })))
-        self:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
-            start = start + dt
-            if start > time then
-                self:ResetFlashStatus()
-            else
-                self:getFilter():getGLProgramState():setUniformFloat("curTime", start)
-            end
-        end)
-        self:scheduleUpdate()
-    end
+    local background = self.background
     function square:Flash(time)
-        self:ResetFlashStatus()
-        self:BeginFlash(time)
-    end
-    function square:ResetFlashStatus()
-        self:unscheduleUpdate()
-        self:removeNodeEventListenersByEvent(cc.NODE_ENTER_FRAME_EVENT)
-        self:clearFilter()
+        -- local sprite = display.newSprite("click_empty.png")
+        -- :addTo(background):opacity(0)
+        -- if device.platform == "ios" then
+        --     sprite:pos(1050, 440 + 1224)
+        -- else
+        --     sprite:pos(1050 + 150, 440 + 1224 - 150)
+        -- end
+        -- sprite:setScaleX(1.8)
+        -- sprite:setScaleY(1.3)
+        -- sprite:rotation(-30)
+        -- sprite:setSkewX(-23)
+        -- sprite:runAction(transition.sequence({
+        --     cc.FadeIn:create(time/2),
+        --     cc.FadeOut:create(time/2),
+        --     cc.RemoveSelf:create(),
+        -- }))
     end
     self.square = square
 end
 function CityLayer:InitWithCity(city)
     city:AddListenOnType(self, city.LISTEN_TYPE.UNLOCK_TILE)
     city:AddListenOnType(self, city.LISTEN_TYPE.LOCK_TILE)
-    -- city:AddListenOnType(self, city.LISTEN_TYPE.UNLOCK_ROUND)
     city:AddListenOnType(self, city.LISTEN_TYPE.OCCUPY_RUINS)
     city:AddListenOnType(self, city.LISTEN_TYPE.CREATE_DECORATOR)
     city:AddListenOnType(self, city.LISTEN_TYPE.DESTROY_DECORATOR)
@@ -734,10 +730,6 @@ function CityLayer:UpdateTowersWithCity(city)
     end
     self.towers = new_towers
 
-    -- self:NotifyObservers(function(listener)
-    --     listener:OnTowersChanged(old_towers, new_towers)
-    -- end)
-
     for k, v in pairs(old_towers) do
         self:DeleteLevelArrowBy(v)
         v:DestorySelf()
@@ -749,24 +741,17 @@ end
 function CityLayer:UpdateSoldiersVisible()
     local map = self.scene:GetCity():GetUser().soldiers
     self:IteratorSoldiers(function(_, v)
-        local type_, star = v:GetSoldierTypeAndStar()
-        local is_visible = map[type_] > 0
+        local soldier_type, level = unpack(string.split(v:GetSoldierType(), "_"))
+        local is_visible
+        if level then
+            is_visible = map[string.format("%s_%d", soldier_type, 1)] > 0 
+                      or map[string.format("%s_%d", soldier_type, 2)] > 0 
+                      or map[string.format("%s_%d", soldier_type, 3)] > 0 
+        else
+            is_visible = map[soldier_type] > 0 
+        end
         v:setVisible(is_visible)
     end)
-end
-function CityLayer:UpdateSoldiersStar()
-    local User = self.scene:GetCity():GetUser()
-    local need_refresh = false
-    self:IteratorSoldiers(function(_, v)
-        local type_, star_old = v:GetSoldierTypeAndStar()
-        local star_now = User:SoldierStarByName(type_)
-        if star_now ~= star_old then
-            need_refresh = true
-        end
-    end)
-    if need_refresh then
-        self:RefreshSoldiers()
-    end
 end
 function CityLayer:RefreshSoldiers()
     local User = self.scene:GetCity():GetUser()
@@ -775,26 +760,35 @@ function CityLayer:RefreshSoldiers()
     end
     local soldiers = {}
     for i, v in ipairs({
-        {x = 6, y = 18, soldier_type = "skeletonWarrior", scale = 1},
-        {x = 4, y = 18, soldier_type = "skeletonArcher", scale = 1},
-        {x = 8, y = 18, soldier_type = "deathKnight", scale = 1},
-        {x = 2, y = 18, soldier_type = "meatWagon", scale = 1},
+        {x = 6, y = 18, soldier_type = "skeletonWarrior"},
+        {x = 4, y = 18, soldier_type = "skeletonArcher"},
+        {x = 8, y = 18, soldier_type = "deathKnight"},
+        {x = 2, y = 18, soldier_type = "meatWagon"},
 
-        {x = 8, y = 15.5, soldier_type = "lancer", scale = 1},
-        {x = 6, y = 15.5, soldier_type = "swordsman", scale = 1},
-        {x = 4, y = 15.5, soldier_type = "ranger", scale = 1},
-        {x = 2, y = 15.5, soldier_type = "catapult", scale = 0.8},
+        {x = 8, y = 15.5, soldier_type = "lancer"},
+        {x = 6, y = 15.5, soldier_type = "swordsman"},
+        {x = 4, y = 15.5, soldier_type = "ranger"},
+        {x = 2, y = 15.5, soldier_type = "catapult"},
 
-        {x = 8, y = 13, soldier_type = "horseArcher", scale = 1},
-        {x = 6, y = 13, soldier_type = "sentinel", scale = 1},
-        {x = 4, y = 13, soldier_type = "crossbowman", scale = 1},
-        {x = 2, y = 13, soldier_type = "ballista", scale = 0.8},
+        {x = 8, y = 13, soldier_type = "horseArcher"},
+        {x = 6, y = 13, soldier_type = "sentinel"},
+        {x = 4, y = 13, soldier_type = "crossbowman"},
+        {x = 2, y = 13, soldier_type = "ballista"},
     }) do
-        local star = User:SoldierStarByName(v.soldier_type)
-        assert(star < 4)
-        local soldier = self:CreateSoldier(v.soldier_type, star, v.x, v.y):addTo(self:GetCityNode())
+        local soldier 
+        if UtilsForSoldier:IsSpecial(v.soldier_type) then
+            soldier = self:CreateSoldier(v.soldier_type, v.x, v.y):addTo(self:GetCityNode())
+        else
+            if User:IsSoldierUnlocked(v.soldier_type.."_3") then
+                soldier = self:CreateSoldier(v.soldier_type.."_3", v.x, v.y):addTo(self:GetCityNode())
+            elseif User:IsSoldierUnlocked(v.soldier_type.."_2") then
+                soldier = self:CreateSoldier(v.soldier_type.."_2", v.x, v.y):addTo(self:GetCityNode())
+            else
+                soldier = self:CreateSoldier(v.soldier_type.."_1", v.x, v.y):addTo(self:GetCityNode())
+            end
+        end
         local x, y = soldier:getPosition()
-        soldier:pos(x, y + 25):scale(v.scale)
+        soldier:pos(x, y + 25)
         table.insert(soldiers, soldier)
     end
     self.soldiers = soldiers
@@ -816,6 +810,7 @@ function CityLayer:UpdateCitizen(city)
             count = count + 2
         end
     end)
+    count = device.platform == "winrt" and count * 0.2 or count
     for i = #self.citizens + 1, count do
         table.insert(self.citizens, self:CreateCitizen(city, 0, 0):addTo(self:GetCityNode()))
     end
@@ -1015,8 +1010,8 @@ end
 function CityLayer:CreateBarracksSoldier(soldier_type, star)
     return BarracksSoldierSprite.new(self, soldier_type, star)
 end
-function CityLayer:CreateSoldier(soldier_type, star, logic_x, logic_y)
-    return SoldierSprite.new(self, soldier_type, star, logic_x, logic_y)
+function CityLayer:CreateSoldier(soldier_type, logic_x, logic_y)
+    return SoldierSprite.new(self, soldier_type, logic_x, logic_y)
 end
 
 ----- override

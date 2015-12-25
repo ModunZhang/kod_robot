@@ -201,6 +201,11 @@ function GameUIVipNew:onExit()
     User:RemoveListenerOnType(self, "basicInfo")
     GameUIVipNew.super.onExit(self)
 end
+function GameUIVipNew:onCleanup()
+    GameUIVipNew.super.onCleanup(self)
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("back_ground_vip_608x164.png")
+    cc.Director:getInstance():getTextureCache():removeTextureForKey("back_ground_vip_608x164.jpg")
+end
 function GameUIVipNew:InitVip()
     self:InitVipTop()
     self:CreateVipEff()
@@ -210,7 +215,8 @@ function GameUIVipNew:InitVipTop()
     local shadow = display.newColorLayer(UIKit:hex2c4b(0xff000000))
     shadow:setContentSize(cc.size(620,164))
     shadow:pos((display.width - 620) / 2, window.top_bottom - 146):addTo(vip_layer)
-    local top_bg = display.newSprite("back_ground_vip_608x164.jpg"):align(display.TOP_CENTER, window.cx, window.top_bottom + 16):addTo(vip_layer)
+    local back_ground_vip_608x164 = device.platform == 'winrt' and "back_ground_vip_608x164.png" or "back_ground_vip_608x164.jpg" 
+    local top_bg = display.newSprite(back_ground_vip_608x164):align(display.TOP_CENTER, window.cx, window.top_bottom + 16):addTo(vip_layer)
     local bg_size = top_bg:getContentSize()
     local line = display.newSprite("line_624x58.png"):align(display.TOP_CENTER, bg_size.width/2, 16):addTo(top_bg)
 

@@ -18,7 +18,6 @@ end
 function GameUIChest:onEnter()
     GameUIChest.super.onEnter(self)
     local box = ccs.Armature:create(self.ani):addTo(self):align(display.CENTER, display.cx-50, display.cy+35)
-        :scale(0.65)
     box:getAnimation():setMovementEventCallFunc(function (armatureBack, movementType, movementID)
         if movementType == ccs.MovementEventType.start then
         elseif movementType == ccs.MovementEventType.complete then
@@ -29,7 +28,6 @@ function GameUIChest:onEnter()
     box:getAnimation():play("Animation1", -1, 0)
 
     local guang_box = ccs.Armature:create("Box_guang"):addTo(self):align(display.CENTER, display.cx, display.cy+100)
-        :scale(0.65)
 
     guang_box:getAnimation():setMovementEventCallFunc(function (armatureBack, movementType, movementID)
         if movementType == ccs.MovementEventType.start then

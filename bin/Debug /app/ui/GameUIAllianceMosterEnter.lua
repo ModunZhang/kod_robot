@@ -27,7 +27,7 @@ function GameUIAllianceMosterEnter:ctor(mapObj,alliance)
     local soldiers = string.split(corps[moster.index + 1], ",")
 
     local moster_config = self.moster_config
-    local icon = string.split(soldiers[1],"_")
+    local icon = string.split(soldiers[1],":")
     local soldier_type = icon[1]
     GameUIAllianceMosterEnter.super.ctor(self,286,Localize.soldier_name[soldier_type],window.top - 200,"title_red_600x56.png")
     display.newNode():addTo(self):schedule(function()
@@ -63,7 +63,7 @@ function GameUIAllianceMosterEnter:onEnter()
     local corps = string.split(monsterConfig[moster.level].soldiers, ";")
     local soldiers = string.split(corps[moster.index + 1], ",")
 
-    local icon = string.split(soldiers[1],"_")
+    local icon = string.split(soldiers[1],":")
     local soldier_type = icon[1]
     local soldier_star = tonumber(icon[2])
     local level = moster_config.level
@@ -79,7 +79,7 @@ function GameUIAllianceMosterEnter:onEnter()
         size = 22,
     }):addTo(header_bg):align(display.CENTER, header_bg:getContentSize().width/2, header_bg:getContentSize().height/2)
     -- 怪物士兵头像
-    local soldier_ui_config = UILib.black_soldier_image[soldier_type][soldier_star]
+    local soldier_ui_config = UILib.black_soldier_image[soldier_type]
     display.newSprite(UILib.black_soldier_color_bg_images[soldier_type]):addTo(body)
         :align(display.CENTER_TOP,94, b_height-94):scale(130/128)
 

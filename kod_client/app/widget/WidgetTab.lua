@@ -92,18 +92,17 @@ end
 function WidgetTab:EnableTag(b)
     local size = self.back_ground:getContentSize()
     local bg = display.newSprite("tab_background_40x24.png"):addTo(self,1):pos(size.width - 40/2, size.height)
-    self.active = cc.ui.UILabel.new({
-        UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
+    self.active = UIKit:CreateNumberImageNode({
         size = 16,
-        font = UIKit:getFontFilePath(),
-        color = UIKit:hex2c3b(0xfffeb3)}):addTo(bg):align(display.CENTER,40/2,24/2 + 2)
+        color = 0xfffeb3}):addTo(bg):align(display.CENTER,40/2,24/2 + 2)
+    
     return self
 end
 function WidgetTab:SetActiveNumber(active, total)
     self.current = active
     self.total = total
     self.active:getParent():setVisible(total > 0)
-    self.active:setString(string.format("%d/%d", active, total))
+    self.active:SetNumString(string.format("%d/%d", active, total))
     return self
 end
 function WidgetTab:IsChanged(active, total)

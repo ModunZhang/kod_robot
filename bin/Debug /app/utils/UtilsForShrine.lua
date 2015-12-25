@@ -129,7 +129,7 @@ function UtilsForShrine:FormatShrineTroops(stageinfo)
 	local r = {}
 	local troops_temp = string.split(stageinfo.troops,",")
 	for i,suntroops in ipairs(troops_temp) do
-		local troops = string.split(suntroops,"_")
+		local troops = string.split(suntroops,":")
 		local troop_type,star = troops[1],troops[2]
 		local count =  checknumber(troops[3])
 		local count_str = math.ceil(count*0.9) * stageinfo.suggestPlayer .. "~" .. math.ceil(count*1.1)* stageinfo.suggestPlayer

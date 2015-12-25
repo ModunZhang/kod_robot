@@ -30,12 +30,12 @@ function GameUISettingLanguage:BuildUI()
 		shadow = true,
 		color = 0xffedae
 	}):addTo(titleBar):align(display.CENTER,300,28)
-	local code = app:GetGameLanguage()
+	local code = GameUtils:GetGameLanguage()
 	print(code,"code------>")
 	local languages = {
 		{image = 'flag_zh_Hant_83x83.png',code = 'tw'},
 		{image = 'flag_zh_83x83.png',code = 'cn'},
-		-- {image = 'flag_en_83x83.png',code = 'en'},
+		{image = 'flag_en_83x83.png',code = 'en'},
 	}
 	local x,y = 20,732
 	for i,v in ipairs(languages) do
@@ -56,7 +56,7 @@ function GameUISettingLanguage:GetItem(iamge,language_code,selected)
 	local check_body = display.newSprite("activity_check_body_55x51.png"):addTo(check_bg):pos(27,25)
 	check_body:setVisible(selected)
 	WidgetPushTransparentButton.new(cc.rect(0,0,130,168)):addTo(sp):align(display.LEFT_BOTTOM, 0, 0):onButtonClicked(function()
-		local code = app:GetGameLanguage()
+		local code = GameUtils:GetGameLanguage()
 		if code ~= language_code then
 			UIKit:showMessageDialog(_("提示"),string.format(_("修改游戏语言为%s?\n确认后游戏将重新启动"),Localize.game_language[language_code]),function()
 				self:SendCodeToServer(language_code)
@@ -68,7 +68,8 @@ end
 
 function GameUISettingLanguage:SendCodeToServer(code)
 	NetManager:getSetPlayerLanguagePromise(code):done(function(response)
-		app:SetGameLanguage(code)
+		GameUtils:SetGameLanguage(code)
+		app:restart()
 	end)
 end
 

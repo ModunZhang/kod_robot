@@ -105,17 +105,11 @@ function AudioManager:ctor(game_default)
 	self.game_default = game_default
 	self.is_bg_auido_on = self:GetGameDefault():getBasicInfoValueForKey(BACKGROUND_MUSIC_KEY,true)
 	self.is_effect_audio_on = self:GetGameDefault():getBasicInfoValueForKey(EFFECT_MUSIC_KEY,true)
-	self:PreLoadAudio()
 	self:SetEffectsVolume(0.4)
 end
 
 function AudioManager:GetGameDefault()
 	return self.game_default
-end
-
---预加载音乐到内存(android)
-function AudioManager:PreLoadAudio()
-
 end
 
 function AudioManager:PlayBgMusicWithFileKey(file_key,isLoop)
@@ -144,19 +138,20 @@ end
 
 function AudioManager:PlayeBgSound(filename)
 	if self.is_bg_auido_on then
-		-- audio.playSound("audios/" .. filename,true)
+		audio.playSound("audios/" .. filename,true)
 	end
 end
 
 function AudioManager:PlayeEffectSound(filename)
 	printLog("AudioManager","PlayeEffectSound:%s",filename)
 	if self.is_effect_audio_on then
-		-- audio.playSound("audios/" .. filename,false)
+		audio.playSound("audios/" .. filename,false)
 	end
 end
 
 function AudioManager:PlayeAttackSoundBySoldierName(soldier_name)
-	local audio_name = string.format("sfx_%s_attack.mp3", soldier_name)
+	local soldier = unpack(string.split(soldier_name, "_"))
+	local audio_name = string.format("sfx_%s_attack.mp3", soldier)
 	assert(audio_name, audio_name.." 音乐不存在")
 	self:PlayeEffectSound(audio_name)
 end
@@ -374,6 +369,14 @@ function AudioManager:PlayGameMusicOnSceneEnter(scene_name,loop)
 	end
 end
 
+function AudioManager:PreLoadAudios()
+	if device.platform ~= 'android' then return end
+	for __,v in pairs(building_sfx_map) do
+		for __,filename in ipairs(v) do
+			audio.preloadSound("audios/" .. filename)
+		end
+	end
+end
 
 function AudioManager:OnBackgroundMusicCompletion()
 	if self.last_music_loop then return end -- 如果上次是循环的背景音乐 忽略

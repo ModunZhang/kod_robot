@@ -4,6 +4,7 @@ end)
 
 function MainScene:ctor()
     self.ui = UIKit:newGameUI('GameUILoginBeta')
+    showMemoryUsage()
 end
 
 function MainScene:onEnter()

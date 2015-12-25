@@ -9,7 +9,7 @@ local UIListView = import(".UIListView")
 local Localize = import("..utils.Localize")
 local LOCAL_RESOURCES_PERCENT = 100
 local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
-
+local animation = import("..animation")
 function GameUILoginBeta:ctor()
     GameUILoginBeta.super.ctor(self)
     self.m_localJson = nil
@@ -18,37 +18,13 @@ function GameUILoginBeta:ctor()
     self.m_totalSize = 0
     self.m_currentSize = 0
     self.local_resources = {
-        {image = "animations/building_animation.pvr.ccz",list = "animations/building_animation.plist"},
-        {image = "animations/dragon_animation_0.pvr.ccz",list = "animations/dragon_animation_0.plist"},
-        {image = "animations/dragon_animation_1.pvr.ccz",list = "animations/dragon_animation_1.plist"},
-        {image = "animations/dragon_animation_2.pvr.ccz",list = "animations/dragon_animation_2.plist"},
-        {image = "animations/dragon_animation_3.pvr.ccz",list = "animations/dragon_animation_3.plist"},
-        {image = "animations/dragon_animation_4.pvr.ccz",list = "animations/dragon_animation_4.plist"},
-        {image = "animations/dragon_animation_5.pvr.ccz",list = "animations/dragon_animation_5.plist"},
-        {image = "animations/dragon_animation_6.pvr.ccz",list = "animations/dragon_animation_6.plist"},
-        {image = "animations/soldiers_animation_0.pvr.ccz",list = "animations/soldiers_animation_0.plist"},
-        {image = "animations/soldiers_animation_1.pvr.ccz",list = "animations/soldiers_animation_1.plist"},
-        {image = "animations/soldiers_animation_2.pvr.ccz",list = "animations/soldiers_animation_2.plist"},
-        {image = "animations/soldiers_animation_3.pvr.ccz",list = "animations/soldiers_animation_3.plist"},
-        {image = "animations/ui_animation_0.pvr.ccz",list = "animations/ui_animation_0.plist"},
-        {image = "animations/ui_animation_1.pvr.ccz",list = "animations/ui_animation_1.plist"},
-        {image = "animations/ui_animation_2.pvr.ccz",list = "animations/ui_animation_2.plist"},
-        {image = "ui_png_bg0.pvr.ccz",list = "ui_png_bg0.plist"},
-        {image = "ui_png_bg1.pvr.ccz",list = "ui_png_bg1.plist"},
-        {image = "ui_png_button0.pvr.ccz",list = "ui_png_button0.plist"},
-        {image = "ui_png_button1.pvr.ccz",list = "ui_png_button1.plist"},
-        {image = "ui_png.pvr.ccz",list = "ui_png.plist"},
-        {image = "ui_pvr_0.pvr.ccz",list = "ui_pvr_0.plist"},
-        {image = "ui_pvr_1.pvr.ccz",list = "ui_pvr_1.plist"},
-
-
-    -- {image = "emoji.png",list = "emoji.plist"},
-
-
-    -- {image = "animations/heihua_animation_0.pvr.ccz",list = "animations/heihua_animation_0.plist"},
-    -- {image = "animations/heihua_animation_1.pvr.ccz",list = "animations/heihua_animation_1.plist"},
-    -- {image = "animations/heihua_animation_2.pvr.ccz",list = "animations/heihua_animation_2.plist"},
-    -- {image = "animations/region_animation_0.pvr.ccz",list = "animations/region_animation_0.plist"},
+        {image = "animations/building_animation0.pvr.ccz",list = "animations/building_animation0.plist"},
+        -- {image = "animations/ui_animation_0.pvr.ccz",list = "animations/ui_animation_0.plist"},
+        -- {image = "animations/ui_animation_1.pvr.ccz",list = "animations/ui_animation_1.plist"},
+        -- {image = "animations/ui_animation_2.pvr.ccz",list = "animations/ui_animation_2.plist"},
+        -- {image = "ui_pvr0.pvr.ccz",list = "ui_pvr0.plist"},
+        -- {image = "ui_pvr1.pvr.ccz",list = "ui_pvr1.plist"},
+        -- {image = "ui_pvr2.pvr.ccz",list = "ui_pvr2.plist"},
     }
     self.local_resources_percent_per = LOCAL_RESOURCES_PERCENT / #self.local_resources
 end
@@ -183,7 +159,6 @@ function GameUILoginBeta:startGame()
             self.user_agreement_label:fadeOut(0.5)
             self.user_agreement_button:hide()
             self:RunFte(function()
-                self.passed_splash = true
                 self:loginAction()
             end)
         end
@@ -277,7 +252,7 @@ function GameUILoginBeta:createVerLabel()
 end
 
 function GameUILoginBeta:showVersion()
-    if CONFIG_IS_NOT_UPDATE or device.platform == 'mac' then
+    if CONFIG_IS_NOT_UPDATE or device.platform == 'mac' or device.platform == 'windows' then
         local __debugVer = require("debug_version")
         self.verLabel:setString("测试"..string.format(_("版本%s(%s)"), ext.getAppVersion(), __debugVer))
         -- app.client_tag = __debugVer
@@ -319,18 +294,19 @@ function GameUILoginBeta:GetServerInfo(callback)
                 callback()
             end
         else
+            local SIMULATION_WORKING_TIME = 3
             self:performWithDelay(function()
                 self:showError(_("获取服务器信息失败!"),function()
                     self:GetServerInfo(function()
                         self:LoadServerInfo()
                     end)
                 end)
-            end, 3)
+            end, SIMULATION_WORKING_TIME)
         end
     end)
 end
 function GameUILoginBeta:LoadServerInfo()
-    if CONFIG_IS_NOT_UPDATE or device.platform == 'mac' then
+    if CONFIG_IS_NOT_UPDATE or device.platform == 'mac' or device.platform == 'windows' then
         if not app.client_tag then
             NetManager:getUpdateFileList(function(success, msg)
                 if not success then
@@ -370,7 +346,7 @@ function GameUILoginBeta:loadLocalResources()
     for i,v in ipairs(self.local_resources) do
         self:__loadToTextureCache(v,i == count)
     end
-
+    -- app:GetAudioManager():PreLoadAudios()
 end
 
 function GameUILoginBeta:__loadToTextureCache(config,shouldLogin)
@@ -692,8 +668,8 @@ function GameUILoginBeta:checkFte()
     if check("FinishUpgradingBuilding_barracks_1") then
         mockData.FinishUpgradingBuilding("barracks",1)
     end
-    if check("InstantRecruitSoldier_swordsman") then
-        mockData.InstantRecruitSoldier("swordsman", 10)
+    if check("InstantRecruitSoldier_swordsman_1") then
+        mockData.InstantRecruitSoldier("swordsman_1", 10)
     end
     if check("BuildHouseAt_5_3") then
         mockData.BuildHouseAt(5,3,"farmer")
@@ -718,7 +694,7 @@ function GameUILoginBeta:checkFte()
         mockData.FinishUpgradingBuilding("hospital",1)
     end
     if check("TreatSoldier") then
-        mockData.TreatSoldier("swordsman", 12)
+        mockData.TreatSoldier("swordsman_1", 12)
     end
     if check("BuildHouseAt_6_3") then
         mockData.BuildHouseAt(6,3,"woodcutter")

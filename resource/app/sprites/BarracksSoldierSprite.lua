@@ -2,6 +2,41 @@ local UILib = import("..ui.UILib")
 local Sprite = import(".Sprite")
 local BarracksSoldierSprite = class("BarracksSoldierSprite", Sprite)
 local min = math.min
+
+
+local move_ani_map = {
+    ranger_1 = "gongjianshou_1_45",
+    ranger_2 = "gongjianshou_2_45",
+    ranger_3 = "gongjianshou_3_45",
+    crossbowman_1 = "nugongshou_1_45",
+    crossbowman_2 = "nugongshou_2_45",
+    crossbowman_3 = "nugongshou_3_45",
+    catapult_1 = "toushiche_45",
+    catapult_2 = "toushiche_2_45",
+    catapult_3 = "toushiche_3_45",
+    ballista_1 = "nuche_1_45",
+    ballista_2 = "nuche_2_45",
+    ballista_3 = "nuche_3_45",
+    lancer_1 = "qibing_1_45",
+    lancer_2 = "qibing_2_45",
+    lancer_3 = "qibing_3_45",
+    horseArcher_1 = "youqibing_1_45",
+    horseArcher_2 = "youqibing_2_45",
+    horseArcher_3 = "youqibing_3_45",
+    swordsman_1 = "bubing_1_45",
+    swordsman_2 = "bubing_2_45",
+    swordsman_3 = "bubing_3_45",
+    sentinel_1 = "shaobing_1_45",
+    sentinel_2 = "shaobing_2_45",
+    sentinel_3 = "shaobing_3_45",
+    skeletonWarrior = "kulouyongshi_45",
+    skeletonArcher = "kulousheshou_45",
+    deathKnight = "siwangqishi_45",
+    meatWagon = "jiaorouche_45",
+}
+
+
+
 function BarracksSoldierSprite:ctor(city_layer, soldier_type, star)
     self.soldier_type = soldier_type
     self.soldier_star = star
@@ -52,7 +87,7 @@ function BarracksSoldierSprite:SetupAniConfig(act, isFlip)
     sprite:getAnimation():play(act)
 end
 function BarracksSoldierSprite:GetAniName()
-    return UILib.soldier_animation[self.soldier_type][self.soldier_star]
+    return move_ani_map[self.soldier_type]
 end
 function BarracksSoldierSprite:GetSpriteOffset()
     return 0,0

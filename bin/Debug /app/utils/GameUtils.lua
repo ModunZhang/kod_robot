@@ -1,6 +1,4 @@
-GameUtils = {
-
-    }
+GameUtils = {}
 local string = string
 local pow = math.pow
 local ceil = math.ceil
@@ -164,7 +162,7 @@ end
 
 -- https://sites.google.com/site/tomihasa/google-language-codes
 function GameUtils:ConvertLocaleToGoogleCode()
-    local locale = self:getCurrentLanguage()
+    local locale = self:GetGameLanguage()
     if  locale == 'en' then
         return "en"
     elseif locale == 'cn' then
@@ -234,7 +232,7 @@ function GameUtils:ConvertLocaleToBaiduCode()
     德语  de  意大利语    it
     ]]--
 
-    local localCode  = self:getCurrentLanguage()
+    local localCode  = self:GetGameLanguage()
     if localCode == 'en' then
         localCode = 'en'
     elseif localCode == 'cn' or localCode == 'tw' then
@@ -260,7 +258,7 @@ function GameUtils:Translate(text,cb)
         cb(" ")
         return
     end
-    local language = self:getCurrentLanguage()
+    local language = self:GetGameLanguage()
     if language == 'en' or language == 'tw' then
         self:Baidu_Translate(text,cb)
     else
@@ -296,8 +294,11 @@ end
 
 function GameUtils:getPlatformForServer()
     local platform = device.platform
-    if platform == 'winrt' or platform == 'wp8' then
+    if platform == 'winrt' or platform == 'wp8' or platform == 'windows' then
         platform = 'wp'
+    end
+    if platform == 'android' then
+        platform = 'ios'
     end
     return platform
 end
@@ -307,12 +308,13 @@ function GameUtils:GetServerInfo(param, callback)
     local request = network.createHTTPRequest(function(event)
         if event.name == "completed" then
             callback(true, json.decode(event.request:getResponseData()))
-        elseif event.name == "failed" then
+        elseif event.name == "progress" then
+        else
             callback(false)
         end
     end, 
     string.format("http://gate.batcatstudio.com/dragonfall/query-entry?env=%s&version=%s&platform=%s", string.urlencode(param.env), string.urlencode(param.version),platform), "GET")
-    request:setTimeout(180)
+    request:setTimeout(60)
     request:start()
 end
 
@@ -352,57 +354,6 @@ function GameUtils:UploadErrors(error)
         requestPost:start()
     end, url, "GET")
     requestGet:start()
-end
-
-
-
---ver 2.2.4
---TODO:return po文件对应的语言代码！
-function GameUtils:getCurrentLanguage()
-    local mapping = {
-        "en",
-        "cn",
-        "fr",
-        "it",
-        "de",
-        "es",
-        "nl", -- dutch
-        "ru",
-        "ko",
-        "ja",
-        "hu",
-        "pt",
-        "ar",
-        "tw"
-    }
-    return mapping[cc.Application:getInstance():getCurrentLanguage() + 1]
-end
-local apple_lang_map = {
-    ['zh-Hans'] = 'cn',
-    ['zh-Hant'] = 'tw',
-    -- ['en'] = 'en',
-}
-local lang_map = {
-    cn = { po = 'zh_CN', code = 'cn' },
-    tw = { po = 'zh_TW', code = 'tw' },
-    -- en = { po = 'en', code = 'en' },
-}
-function GameUtils:GetAppleLanguageCode()
-    local code = ext.getDeviceLanguage()
-    if apple_lang_map[code] then
-        return apple_lang_map[code]
-    else
-        return 'tw'
-    end
-end
-function GameUtils:GetPoFileLanguageCode(language_code)
-    local currentLanguage = language_code or self:getCurrentLanguage()
-    if lang_map[language_code] then
-        local t = lang_map[language_code]
-        return t.po, t.code
-    else
-        return "zh_TW",'tw'
-    end
 end
 
 function GameUtils:Event_Handler_Func(events,add_func,edit_func,remove_func)
@@ -531,26 +482,123 @@ function GameUtils:LoadImagesWithFormat(func, format)
     cc.Texture2D:setDefaultAlphaPixelFormat(cc.TEXTURE2D_PIXEL_FORMAT_RGBA8888)
 end
 
+------------------------------------------------------------------
+-- game language 
+--[[ 
+    define all language codes in game
+    codes:
+        "en",
+        "cn",
+        "fr",
+        "it",
+        "de",
+        "es",
+        "nl", -- dutch
+        "ru",
+        "ko",
+        "ja",
+        "hu",
+        "pt",
+        "ar",
+        "tw"
+--]]
 
+-- get game language through native setting 
+function GameUtils:GetGameLanguageFromNative()
+    -- define the native language map
+    local apple_language_map = 
+    {
+        ['zh-Hans'] = 'cn',
+        ['zh-Hant'] = 'tw',
+        ['en'] = 'en',
+    }
+    local windowsrt_language_map = 
+    {
+        ['zh-Hans-CN'] = 'cn',
+        ['zh-Hant-TW'] = 'tw',
+        ['en'] = 'en',
+    }
+    -- android: http://developer.android.com/reference/java/util/Locale.html
+    local android_language_map = 
+    {
+        ['zh_CN'] = 'cn',
+        ['zh_TW'] = 'tw',
+        ['en'] = 'en',
+    }
+    local target_map
+    if device.platform == 'ios' or device.platform == 'mac' then
+        target_map = apple_language_map
+    elseif device.platform == 'winrt' then
+        target_map = windowsrt_language_map
+    elseif device.platform == 'android' then
+        target_map = android_language_map
+    end
+    local code = ext.getDeviceLanguage()
+    if string.find(code,'en') then
+        code = 'en'
+    end
+    return target_map[code] or 'en' -- we can not find the right language ,'en' as the default value
+end
 
+-- get po file name with game language code
+function GameUtils:GetPoFileNameWithCode(code)
+    code = code or 'en' -- we can not find the right language ,'en' as the default value
+    local game_language_to_po_file = 
+    {
+        en = 'en',
+        cn = 'zh_CN',
+        tw = 'zh_TW'
+    }
+    return game_language_to_po_file[code]
+end
+
+function GameUtils:GetGameLanguage()
+    return self.gameLanguage_
+end
+
+function GameUtils:getSupportMailFormat(category,logMsg)
+    local UTCTime    = "UTC Time:" .. os.date('!%Y-%m-%d %H:%M:%S', app.timer:GetServerTime())
+    local GameName   = "Game:" .. "Dragonfall"
+    local Version    = "Version:" .. ext.getAppVersion()
+    local UserID     = "User ID:" .. DataManager:getUserData()._id
+    local Username   = "User name:" .. DataManager:getUserData().basicInfo.name
+    local Server     = "Server:" .. "World"
+    local OpenUDID   = "Open UDID:" .. device.getOpenUDID()
+    local Category   = "Category:" .. category or ""
+    local Language   = "Language:" .. GameUtils:GetGameLanguage()
+    local DeviceType = "Device Type:" ..ext.getDeviceModel()
+    local OSVersion  = "OS Version:" .. ext.getOSVersion()
+
+    local format_str = "\n\n\n\n\n---------------%s---------------\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
+    local result_str = string.format(format_str,_("不能删除"),UTCTime,GameName,Version,Username,UserID,Server,OpenUDID,Category,Language,DeviceType,OSVersion)
+    if logMsg then
+        result_str = string.format("%s\n---------------Log---------------\n%s",result_str,logMsg)
+    end
+    return "[Dragonfall]" .. category ,result_str
+end
+
+function GameUtils:SetGameLanguage(lang)
+    cc.UserDefault:getInstance():setStringForKey("GAME_LANGUAGE", lang)
+    cc.UserDefault:getInstance():flush()
+    self.gameLanguage_ = lang
+end
+
+function GameUtils:InitGamei18N()
+    local game_language = cc.UserDefault:getInstance():getStringForKey("GAME_LANGUAGE")
+
+    if not game_language or string.len(game_language) == 0 then
+        game_language = self:GetGameLanguageFromNative()
+    end
+
+    local i18NFileName = GameUtils:GetPoFileNameWithCode(game_language)
+    local currentLanFilePath = cc.FileUtils:getInstance():fullPathForFilename(string.format("i18n/%s.mo", i18NFileName))
+    if cc.FileUtils:getInstance():isFileExist(currentLanFilePath) then
+        _ = require("app.utils.Gettext").gettextFromFile(currentLanFilePath)
+        cc.UserDefault:getInstance():setStringForKey("GAME_LANGUAGE", game_language)
+        self.gameLanguage_ = game_language
+        printLog("i18N","po file load success : %s",currentLanFilePath)
+    end
+end
+-- init the i18n file after requeired this file
+GameUtils:InitGamei18N()
 return GameUtils
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

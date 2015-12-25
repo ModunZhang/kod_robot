@@ -133,7 +133,7 @@ int pc__handshake_resp(pc_client_t *client,
     fprintf(stderr, "Handshake fail, code: %d.\n", (int)code);
     goto error;
   }
-    unsigned char *encrypt_challenge = NULL;
+    char *encrypt_challenge = NULL;
   json_t *sys = json_object_get(res, "sys");
   if(sys) {
       json_t * serverkey = json_object_get(sys, "serverKey");
@@ -145,13 +145,13 @@ int pc__handshake_resp(pc_client_t *client,
           char * secret = computesecret(client->dh, out, len);
           free(out);
           
-          unsigned char *secret_b64 = NULL;
+          char *secret_b64 = NULL;
           base64Encode((const unsigned char *)secret, strlen(secret), &secret_b64);
-          client->secret = (char *)secret_b64;
+          client->secret = secret_b64;
           free(secret);
           
           const unsigned char * challenge = (const unsigned char *)(json_string_value(challenge_docs));
-          char * encrypt = rc4(client->secret, challenge, strlen(challenge));
+          char * encrypt = rc4(client->secret, (char *)challenge, strlen(challenge));
           base64Encode((const unsigned char *)encrypt, strlen(encrypt), &encrypt_challenge);
           free(encrypt);
       }

@@ -53,7 +53,7 @@ function GameUIDragonEyrieMain:OnDragonHatched(dragon)
     local eyrie = self.draongContentNode:GetItemByIndex(localIndex)
     eyrie.dragon_image:hide()
     eyrie.armature:show()
-    eyrie.armature:PlayAnimation("idle")
+    eyrie.armature:Resume()
     self:RefreshUI()
 end
 
@@ -370,6 +370,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
             :setButtonSelected(dragon:IsDefenced())
             :onButtonClicked(function()
                 local target = self.garrison_button:isButtonSelected()
+                self.garrison_button:setButtonSelected(false)
                 local dragon = self:GetCurrentDragon()
                 if target then
                     if not dragon:Ishated() then
@@ -383,20 +384,67 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
                         return
                     end
                     if dragon:IsFree() then
-                        NetManager:getSetDefenceDragonPromise(dragon:Type()):done(function()
-                            GameGlobalUI:showTips(_("提示"),_("设置龙驻防成功"))
-                        end)
+                        -- local total_soldiers = {}
+                        -- local final_soldiers = {}
+                        -- local max_soldiers_citizen = 0
+                        -- for soldier_name,count in pairs(User.soldiers) do
+                        --     max_soldiers_citizen = max_soldiers_citizen + User:GetSoldierConfig(soldier_name).citizen * count
+                        --     table.insert(total_soldiers, {name = soldier_name,count = count})
+                        -- end
+                        -- if User.defenceTroop and User.defenceTroop ~= json.null then
+                        --     for __,soldier in ipairs(User.defenceTroop.soldiers) do
+                        --         max_soldiers_citizen = max_soldiers_citizen + User:GetSoldierConfig(soldier.name).citizen * soldier.count
+                        --         for i,t_soldier in ipairs(total_soldiers) do
+                        --             if soldier.name == t_soldier.name then
+                        --                 t_soldier.count = t_soldier.count + count
+                        --             end
+                        --         end
+                        --     end
+                        -- end
+
+                        -- if dragon:LeadCitizen()<max_soldiers_citizen then
+                        --     -- 拥有士兵数量大于派兵数量上限时，首先选取power最高的兵种，依次到达最大派兵上限为止
+                        --     table.sort(total_soldiers, function(a, b)
+                        --         return User:GetSoldierConfig(a.name).power > User:GetSoldierConfig(b.name).power
+                        --     end)
+                        --     local max_troop_num = dragon:LeadCitizen()
+                        --     for k,item in ipairs(total_soldiers) do
+                        --         local max_citizen = User:GetSoldierConfig(item.name).citizen * item.count
+                        --         if max_citizen <= max_troop_num then
+                        --             max_troop_num = max_troop_num - max_citizen
+                        --             table.insert(final_soldiers, item)
+                        --         else
+                        --             local num = math.floor(max_troop_num/User:GetSoldierConfig(item.name).citizen)
+                        --             table.insert(final_soldiers, {name = item.name,count = num})
+                        --             break
+                        --         end
+                        --     end
+                        -- else
+                        --     final_soldiers = total_soldiers
+                        -- end
+                        -- NetManager:getSetDefenceTroopPromise(dragon:Type(),final_soldiers):done(function()
+                        --     GameGlobalUI:showTips(_("提示"),_("设置驻防成功"))
+                        -- end)
+                        UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers)
+                            if self.dragon_manager:GetDragon(dragonType):IsDead() then
+                                UIKit:showMessageDialog(nil,_("选择的龙已经死亡"))
+                                return
+                            end
+                            NetManager:getSetDefenceTroopPromise(dragonType,soldiers):done(function ()
+                                self.garrison_button:setButtonSelected(true)
+                            end)    
+                        end,{isMilitary = true,terrain = Alliance_Manager:GetMyAlliance().basicInfo.terrain,title = _("驻防部队")}):AddToCurrentScene(true)
                     else
                         UIKit:showMessageDialog(nil,_("龙未处于空闲状态"))
                         self.garrison_button:setButtonSelected(not target,false)
                     end
                 else
                     if dragon:IsDefenced() then
-                        NetManager:getCancelDefenceDragonPromise():done(function()
-                            GameGlobalUI:showTips(_("提示"),_("取消龙驻防成功"))
+                        NetManager:getCancelDefenceTroopPromise():done(function()
+                            GameGlobalUI:showTips(_("提示"),_("取消驻防成功"))
                         end)
                     else
-                        UIKit:showMessageDialog(nil,_("还没有龙驻防"))
+                        UIKit:showMessageDialog(nil,_("还没有驻防"))
                         self.garrison_button:setButtonSelected(not target,false)
                     end
                 end
@@ -586,16 +634,16 @@ function GameUIDragonEyrieMain:CreateDragonScrollNode()
     for i,v in ipairs(contenNode:GetItems()) do
         local dragon = self.dragon_manager:GetDragonByIndex(i)
         local dragon_image = display.newSprite(string.format("%s_egg_176x192.png",dragon:Type()))
-            :align(display.CENTER, 290,355)
+            :align(display.CENTER, 300,355)
             :addTo(v)
         v.dragon_image = dragon_image
         dragon_image.resolution = {dragon_image:getContentSize().width,dragon_image:getContentSize().height}
         local dragon_armature = DragonSprite.new(display.getRunningScene():GetSceneLayer(),dragon:Type())
             :addTo(v)
-            :pos(240,440)
+            :pos(300,350)
             :hide():scale(0.9)
         v.armature = dragon_armature
-        dragon_armature:GetSprite():getAnimation():stop()
+        v.armature:Pause()
         if dragon:Ishated() then
             v.armature:show()
             v.dragon_image:hide()
@@ -614,7 +662,7 @@ function GameUIDragonEyrieMain:OnEnterIndexEvent(index)
         end
         eyrie.dragon_image:hide()
         eyrie.armature:show()
-        eyrie.armature:PlayAnimation("idle")
+        eyrie.armature:Resume()
     end
 end
 
@@ -632,7 +680,7 @@ function GameUIDragonEyrieMain:OnLeaveIndexEvent(index)
     if self.draongContentNode then
         local eyrie = self.draongContentNode:GetItemByIndex(index)
         if not self:GetCurrentDragon():Ishated() then return end
-        eyrie.armature:GetSprite():getAnimation():stop()
+        eyrie.armature:Pause()
         -- eyrie.armature:hide()
         -- eyrie.dragon_image:show()
     end
@@ -681,6 +729,9 @@ end
 
 
 return GameUIDragonEyrieMain
+
+
+
 
 
 

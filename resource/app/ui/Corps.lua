@@ -8,113 +8,76 @@ local normal = GameDatas.Soldiers.normal
 local special = GameDatas.Soldiers.special
 
 local soldier_config = {
-    ["swordsman"] = {
-        {"bubing_1", -90, -150, 0.8},
-        {"bubing_2", -80, -135, 0.8},
-        {"bubing_3", -80, -130, 0.8},
-    },
-    ["ranger"] = {
-        {"gongjianshou_1", -90, -150, 0.8},
-        {"gongjianshou_2", -75, -145, 0.8},
-        {"gongjianshou_3", -75, -145, 0.8},
-    },
-    ["lancer"] = {
-        {"qibing_1", -70, -150, 0.8},
-        {"qibing_2", -70, -150, 0.8},
-        {"qibing_3", -50, -150, 0.8},
-    },
-    ["catapult"] = {
-        {  "toushiche", 30, -80, 1},
-        {"toushiche_2", 30, -80, 1},
-        {"toushiche_3", 20, -80, 1},
-    },
+    ["swordsman_1"] = {"bubing_1_90", -90, -150, 0.8},
+    ["swordsman_2"] = {"bubing_2_90", -80, -135, 0.8},
+    ["swordsman_3"] = {"bubing_3_90", -80, -130, 0.8},
 
-    -----
-    ["sentinel"] = {
-        {"shaobing_1", -60, -140, 0.8},
-        {"shaobing_2", -60, -140, 0.8},
-        {"shaobing_3", -60, -140, 0.8},
-    },
-    ["crossbowman"] = {
-        {"nugongshou_1", -90, -160, 0.8},
-        {"nugongshou_2", -90, -160, 0.8},
-        {"nugongshou_3", -105, -160, 0.8},
-    },
-    ["horseArcher"] = {
-        {"youqibing_1", -70, -140, 0.8},
-        {"youqibing_2", -60, -140, 0.8},
-        {"youqibing_3", -60, -140, 0.8},
-    },
-    ["ballista"] = {
-        {"nuche_1", 75, -100, 1},
-        {"nuche_2", 85, -95, 1},
-        {"nuche_3", 90, -80, 1},
-    },
+    ["ranger_1"] = {"gongjianshou_1_90", -90, -150, 0.8},
+    ["ranger_2"] = {"gongjianshou_2_90", -75, -145, 0.8},
+    ["ranger_3"] = {"gongjianshou_3_90", -75, -145, 0.8},
+    
+    ["lancer_1"] = {"qibing_1_90", -70, -150, 0.8},
+    ["lancer_2"] = {"qibing_2_90", -70, -150, 0.8},
+    ["lancer_3"] = {"qibing_3_90", -50, -150, 0.8},
+    
+    ["catapult_1"] = {  "toushiche_90", 30, -80, 1},
+    ["catapult_2"] = {"toushiche_2_90", 30, -80, 1},
+    ["catapult_3"] = {"toushiche_3_90", 20, -80, 1},
+
+    ["sentinel_1"] = {"shaobing_1_90", -60, -140, 0.8},
+    ["sentinel_2"] = {"shaobing_2_90", -60, -140, 0.8},
+    ["sentinel_3"] = {"shaobing_3_90", -60, -140, 0.8},
+
+    ["crossbowman_1"] = {"nugongshou_1_90", -90, -160, 0.8},
+    ["crossbowman_2"] = {"nugongshou_2_90", -90, -160, 0.8},
+    ["crossbowman_3"] = {"nugongshou_3_90", -105, -160, 0.8},
+   
+    ["horseArcher_1"] = {"youqibing_1_90", -70, -140, 0.8},
+    ["horseArcher_2"] = {"youqibing_2_90", -60, -140, 0.8},
+    ["horseArcher_3"] = {"youqibing_3_90", -60, -140, 0.8},
+    
+    ["ballista_1"] = {"nuche_1_90", 75, -100, 1},
+    ["ballista_2"] = {"nuche_2_90", 85, -95, 1},
+    ["ballista_3"] = {"nuche_3_90", 90, -80, 1},
+
     ----
-    ["skeletonWarrior"] = {
-        {"kulouyongshi", -80, -160, 0.8},
-        {"kulouyongshi", -80, -160, 0.8},
-        {"kulouyongshi", -80, -160, 0.8},
-    },
-    ["skeletonArcher"] = {
-        {"kulousheshou", -100, -150, 0.8},
-        {"kulousheshou", -100, -150, 0.8},
-        {"kulousheshou", -100, -150, 0.8},
-    },
-    ["deathKnight"] = {
-        {"siwangqishi", -70, -145, 0.8},
-        {"siwangqishi", -70, -145, 0.8},
-        {"siwangqishi", -70, -145, 0.8},
-    },
-    ["meatWagon"] = {
-        {"jiaorouche", 20, -100, 0.8},
-        {"jiaorouche", 20, -100, 0.8},
-        {"jiaorouche", 20, -100, 0.8},
-    },
+    ["skeletonWarrior"] = {"kulouyongshi_90", -80, -160, 0.8},
+    ["skeletonArcher"] = {"kulousheshou_90", -100, -150, 0.8},
+    ["deathKnight"] = {"siwangqishi_90", -70, -145, 0.8},
+    ["meatWagon"] = {"jiaorouche_90", 20, -100, 0.8},
 }
 local pve_soldier_config = {
-    ["swordsman"] = {
-        {"bubing_1", -90, -150, 0.8},
-        {"heihua_bubing_2", -100, -150, 0.8},
-        {"heihua_bubing_3", -100, -145, 0.8},
-    },
-    ["ranger"] = {
-        {"gongjianshou_1", -90, -150, 0.8},
-        {"heihua_gongjianshou_2", -125, -150, 0.8},
-        {"heihua_gongjianshou_3", -70, -145, 0.8},
-    },
-    ["lancer"] = {
-        {"qibing_1", -70, -150, 0.8},
-        {"heihua_qibing_2", -100, -150, 0.8},
-        {"heihua_qibing_3", -50, -150, 0.8},
-    },
-    ["catapult"] = {
-        {  "toushiche", 30, -80, 1},
-        {"heihua_toushiche_2", 20, -100, 1},
-        {"heihua_toushiche_3", 20, -100, 1},
-    },
+    ["swordsman_1"] = {"bubing_1_90", -90, -150, 0.8},
+    ["swordsman_2"] = {"heihua_bubing_2_90", -100, -150, 0.8},
+    ["swordsman_3"] = {"heihua_bubing_3_90", -100, -145, 0.8},
 
-    -----
-    ["sentinel"] = {
-        {"shaobing_1", -60, -140, 0.8},
-        {"heihua_shaobing_2", -110, -130, 0.8},
-        {"heihua_shaobing_3", -110, -130, 0.8},
-    },
-    ["crossbowman"] = {
-        {"nugongshou_1", -90, -160, 0.8},
-        {"heihua_nugongshou_2", -110, -160, 0.8},
-        {"heihua_nugongshou_3", -105, -150, 0.8},
-    },
-    ["horseArcher"] = {
-        {"youqibing_1", -70, -140, 0.8},
-        {"heihua_youqibing_2", -70, -140, 0.8},
-        {"heihua_youqibing_3", -65, -140, 0.8},
-    },
-    ["ballista"] = {
-        {"nuche_1", 75, -100, 1},
-        {"heihua_nuche_2", 0, -130, 1},
-        {"heihua_nuche_3", 20, -120, 1},
-    },
+    ["ranger_1"] = {"gongjianshou_1_90", -90, -150, 0.8},
+    ["ranger_2"] = {"heihua_gongjianshou_2_90", -125, -150, 0.8},
+    ["ranger_3"] = {"heihua_gongjianshou_3_90", -70, -145, 0.8},
+    
+    ["lancer_1"] = {"qibing_1_90", -70, -150, 0.8},
+    ["lancer_2"] = {"heihua_qibing_2_90", -100, -150, 0.8},
+    ["lancer_3"] = {"heihua_qibing_3_90", -50, -150, 0.8},
+    
+    ["catapult_1"] = {  "toushiche_90", 30, -80, 1},
+    ["catapult_2"] = {"heihua_toushiche_2_90", 20, -100, 1},
+    ["catapult_3"] = {"heihua_toushiche_3_90", 20, -100, 1},
+
+    ["sentinel_1"] = {"shaobing_1_90", -60, -140, 0.8},
+    ["sentinel_2"] = {"heihua_shaobing_2_90", -110, -130, 0.8},
+    ["sentinel_3"] = {"heihua_shaobing_3_90", -110, -130, 0.8},
+
+    ["crossbowman_1"] = {"nugongshou_1_90", -90, -160, 0.8},
+    ["crossbowman_2"] = {"heihua_nugongshou_2_90", -110, -160, 0.8},
+    ["crossbowman_3"] = {"heihua_nugongshou_3_90", -105, -150, 0.8},
+   
+    ["horseArcher_1"] = {"youqibing_1_90", -70, -140, 0.8},
+    ["horseArcher_2"] = {"heihua_youqibing_2_90", -70, -140, 0.8},
+    ["horseArcher_3"] = {"heihua_youqibing_3_90", -65, -140, 0.8},
+    
+    ["ballista_1"] = {"nuche_1_90", 75, -100, 1},
+    ["ballista_2"] = {"heihua_nuche_2_90", 0, -130, 1},
+    ["ballista_3"] = {"heihua_nuche_3_90", 20, -120, 1},
 }
 setmetatable(pve_soldier_config, {
     __index = soldier_config
@@ -131,10 +94,12 @@ function Corps:ctor(soldier, star, row, col, width, height, is_pve_soldier, ui_r
     Corps.super.ctor(self, ui_replay)
     self.soldier = soldier
     self.config = special[self.soldier] or normal[self.soldier.."_"..star]
-    self.star = self.config.star
+    self.star =star
     
     local corps_config = is_pve_soldier and pve_soldier_config or soldier_config
-    local cur_config = corps_config[self.soldier][self.star]
+    local cur_config = corps_config[self.soldier]
+    print("self.soldier=",self.soldier)
+    dump(cur_config,"cur_config")
     local ani_name, start_x, start_y,_ = unpack(cur_config)
 
     width = width or 180

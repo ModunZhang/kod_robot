@@ -124,7 +124,7 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
         end
     end
     local blue_bg = display.newSprite(UILib.soldier_color_bg_images[soldier_type], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
-    local soldier_icon = display.newSprite(UILib.soldier_image[soldier_type][index], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
+    local soldier_icon = display.newSprite(UILib.soldier_image[soldier_type], soldier_box:getContentSize().width/2, soldier_box:getContentSize().height/2, {class=cc.FilteredSpriteWithOne}):addTo(soldier_box)
     soldier_icon:scale(124/math.max(soldier_icon:getContentSize().width,soldier_icon:getContentSize().height))
     local soldier_star_bg = display.newSprite("tmp_back_ground_102x22.png"):addTo(soldier_icon):align(display.BOTTOM_CENTER,soldier_icon:getContentSize().width/2-10, 3)
     StarBar.new({

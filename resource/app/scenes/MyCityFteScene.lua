@@ -267,9 +267,9 @@ function MyCityFteScene:RunFte()
             return self:GetHomePage():PromiseOfFteInstantSpeedUp()
         end
     end):next(function()
-        if not check("InstantRecruitSoldier_swordsman") then
+        if not check("InstantRecruitSoldier_swordsman_1") then
             self:GetFteLayer():UnlockAll()
-            return self:PromiseOfRecruitSoldier("swordsman")
+            return self:PromiseOfRecruitSoldier()
         end
     end):next(function()
         if not check("BuildHouseAt_5_3") then
@@ -495,8 +495,8 @@ function MyCityFteScene:PromiseOfExplorePve()
         mockData.GetSoldier()
         GameGlobalUI:showTips(
             _("获得奖励"),
-            NotifyItem.new({type = "soldiers", name = "swordsman", count = 100},
-                {type = "soldiers", name = "ranger", count = 100})
+            NotifyItem.new({type = "soldiers", name = "swordsman_1", count = 100},
+                {type = "soldiers", name = "ranger_1", count = 100})
         )
     end):next(function()
         return GameUINpc:PromiseOfSay(

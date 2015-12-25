@@ -68,6 +68,9 @@ end
 function Gettext.gettext(mo_data)
     local __hash = Gettext.parseData(mo_data)
     return function(text)
+        if not __hash then
+            return text
+        end
         return __hash[text] or text
     end
 end

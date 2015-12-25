@@ -6,7 +6,7 @@ local Wall = class("Wall", BattleObject)
 
 function Wall:ctor(ui_replay)
     Wall.super.ctor(self, ui_replay)
-    self.wall = ccs.Armature:create(UILib.soldier_animation.wall[1]):addTo(self):align(display.CENTER, 0 ,0)
+    self.wall = ccs.Armature:create("chengqiang_1"):addTo(self):align(display.CENTER, 0 ,0)
     self.wall:getAnimation():setMovementEventCallFunc(handler(self, self.OnAnimationCallback))
 end
 function Wall:PlayAnimation(ani, loop_time)

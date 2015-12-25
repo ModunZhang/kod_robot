@@ -207,21 +207,14 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
         -- gem icon
         local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(num_bg):align(display.CENTER, 20, num_bg:getContentSize().height/2):scale(0.6)
         local price = UIKit:ttfLabel({
-            text = self:GetUnlockPlayerSecondMarchQueuePrice(),
+            text = self:GetUnlockPlayerSecondMarchQueuePrice() >= 0 and self:GetUnlockPlayerSecondMarchQueuePrice() or 0,
             size = 18,
             color = 0xffd200,
         }):align(display.LEFT_CENTER, 50 , num_bg:getContentSize().height/2)
             :addTo(num_bg)
 
-
-        local day = #config_day14
-        for i,v in ipairs(config_day14) do
-            if string.find(v.rewards, "marchQueue") then
-                day = i
-            end
-        end
         UIKit:ttfLabel({
-            text =  string.format(_("累计签到%s天，永久+1进攻队列"), day),
+            text =  string.format(_("累计签到%s天，永久+1进攻队列"), 7),
             size = 22,
             color= 0x403c2f
         }):addTo(bg):align(display.LEFT_TOP, 164, event_bg:getPositionY() + 118)

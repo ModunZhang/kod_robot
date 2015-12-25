@@ -228,12 +228,18 @@ function GameUIAllianceHome:InitArrow()
                 end)
             end
         end
-    end):addTo(self, 10):align(display.TOP_CENTER):hide():scale(0.8)
+    end):addTo(self, 10):align(display.TOP_CENTER):hide()
+    if device.platform ~= 'winrt' then
+        self.arrow_enemy:scale(0.8)
+    end
     self.arrow_enemy.icon:scale(0.68)
 
     self.arrow = UIKit:CreateArrow({}, function()
         self:ReturnMyCity()
-    end):addTo(self, 10):align(display.TOP_CENTER):hide():scale(0.8)
+    end):addTo(self, 10):align(display.TOP_CENTER):hide()
+    if device.platform ~= 'winrt' then
+        self.arrow:scale(0.8)
+    end
     -- self.arrow_label = cc.ui.UILabel.new({
     --     size = 20,
     --     font = UIKit:getFontFilePath(),
@@ -585,7 +591,11 @@ function GameUIAllianceHome:RefreshTop(force_refresh)
         local round_bg = display.newScale9Sprite("background_98x70.png",0 , 0,cc.size(190,28),cc.rect(15,10,68,50))
             :align(display.RIGHT_TOP,-24,-12)
             :addTo(top_enemy_bg)
-        display.newSprite("icon_world_88x88.png"):align(display.LEFT_CENTER, -10,14):addTo(round_bg):scale(0.4)
+        if device.platform == 'winrt' then
+            display.newSprite("icon_world_28x38.png"):align(display.LEFT_CENTER, -10,14):addTo(round_bg)
+        else
+            display.newSprite("icon_world_88x88.png"):align(display.LEFT_CENTER, -10,14):addTo(round_bg):scale(0.4)
+        end
         UIKit:ttfLabel({
             text = _("圈数"),
             size = 18,
@@ -610,7 +620,11 @@ function GameUIAllianceHome:RefreshTop(force_refresh)
             size = 20,
             color = 0xa1dd00
         }):align(display.RIGHT_CENTER, 180, 14):addTo(buff_bg)
-        display.newSprite("buff_68x68.png"):align(display.LEFT_CENTER, -5,14):addTo(buff_bg):scale(0.4)
+        if device.platform == 'winrt' then
+            display.newSprite("buff_28x28.png"):align(display.LEFT_CENTER, -5,14):addTo(buff_bg)
+        else
+            display.newSprite("buff_68x68.png"):align(display.LEFT_CENTER, -5,14):addTo(buff_bg):scale(0.4)
+        end
     end
     self:TopTabButtons()
 

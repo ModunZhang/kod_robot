@@ -50,9 +50,9 @@ function GameUISelectTerrain:OnMoveInStage()
     end)
 end
 local terrain_map = {
-    grassLand = {"green_long", 0, 50},
-    desert = {"red_long", 20, 50},
-    iceField = {"blue_long", 0, 50},
+    grassLand = "greenDragon",
+    desert    = "redDragon",
+    iceField  = "blueDragon",
 }
 local desc_map = {
     grassLand = {
@@ -78,17 +78,13 @@ local desc_map = {
     },
 }
 function GameUISelectTerrain:RefreshDragon(terrainType)
-    UILib.loadDragonAnimation()
     self.ui_map.dragon_background:setTexture(string.format("fte_select_dragon_%s.jpg", terrainType))
     self.ui_map.dragon_background:removeAllChildren()
-    local ani_name, ox, oy = unpack(terrain_map[terrainType])
     local s1 = self.ui_map.dragon_background:getContentSize()
-    local dragon = ccs.Armature:create(ani_name)
-        :addTo(self.ui_map.dragon_background)
-        :pos(s1.width / 2 + ox, s1.height / 2 + oy)
-    dragon:setScaleX(-0.5)
-    dragon:setScaleY(0.5)
-    dragon:getAnimation():play("idle")
+    UIKit:CreateDragonBreathAni(terrain_map[terrainType], true)
+    :addTo(self.ui_map.dragon_background)
+    :pos(s1.width / 2 + 10, s1.height / 2 + 10):scale(0.45)
+
     self.ui_map.title:setString(desc_map[terrainType].title)
     self.ui_map.desc1:setString(desc_map[terrainType].desc1)
     self.ui_map.desc2:setString(desc_map[terrainType].desc2)

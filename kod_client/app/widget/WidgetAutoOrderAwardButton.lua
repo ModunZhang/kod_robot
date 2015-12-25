@@ -22,16 +22,16 @@ end
 function WidgetAutoOrderAwardButton:SetTimeInfo(time) 
 	if self.time_bg then
 		if math.floor(time) > 0 then
-			self.time_label:setString(os.date("!%H:%M:%S",time))
+			self.time_label:SetNumString(os.date("!%H:%M:%S",time))
 			self.time_bg:show()
 		else
 			self.time_bg:hide()
 		end
 	else
-		local label = UIKit:ttfLabel({
+		local label =UIKit:CreateNumberImageNode({
 			text = os.date("!%H:%M:%S",time),
 			size = 20,
-			align = cc.TEXT_ALIGNMENT_CENTER,
+			color = 0xffffffff,
 		})
 		local time_bg = display.newSprite("online_time_bg_96x36.png"):addTo(self):align(display.CENTER,0,-55):scale(0.7)
 		label:addTo(time_bg):align(display.CENTER,48,18)

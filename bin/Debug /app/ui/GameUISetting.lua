@@ -87,7 +87,7 @@ function GameUISetting:BuildUI()
 		x = x + 30 + 112
 	end
 	local version_info = string.format("Dragonfall %s (%s)", ext.getAppVersion(), app.client_tag or "0")
-	if  CONFIG_IS_NOT_UPDATE or device.platform == 'mac' then
+	if  CONFIG_IS_NOT_UPDATE or device.platform == 'mac' or device.platform == 'windows' then
 		local __debugVer = require("debug_version")
 		version_info = string.format("Dragonfall %s (%s)", ext.getAppVersion(), __debugVer)
 	end

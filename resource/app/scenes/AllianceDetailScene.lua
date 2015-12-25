@@ -32,7 +32,7 @@ function AllianceDetailScene:OnAllianceDataChanged_members(allianceData, deltaDa
             local mapObj = Alliance.FindMapObjectById(allianceData, v.mapId)
             if mapObj then
                 self:GetSceneLayer()
-                :RefreshMapObjectByIndex(allianceData.mapIndex, mapObj, allianceData)
+                    :RefreshMapObjectByIndex(allianceData.mapIndex, mapObj, allianceData)
             end
         end
     end
@@ -42,7 +42,7 @@ function AllianceDetailScene:OnAllianceDataChanged_buildings(allianceData, delta
     if ok then
         for i,v in ipairs(value) do
             self:GetSceneLayer()
-            :RefreshBuildingByIndex(allianceData.mapIndex, v, allianceData)
+                :RefreshBuildingByIndex(allianceData.mapIndex, v, allianceData)
         end
     end
 end
@@ -71,13 +71,13 @@ function AllianceDetailScene:OnAllianceDataChanged_shrineEvents(allianceData, de
     for _,v in ipairs(allianceData.buildings) do
         if v.name == "shrine" then
             self:GetSceneLayer()
-            :RefreshBuildingByIndex(allianceData.mapIndex, v, allianceData)
+                :RefreshBuildingByIndex(allianceData.mapIndex, v, allianceData)
             return
         end
     end
 end
 
--- 
+--
 function AllianceDetailScene:OnAllianceDataChanged_marchEvents(allianceData, deltaData)
     -- 进攻
     self:HandleEvents("remove", false, deltaData("marchEvents.attackMarchEvents.remove"))
@@ -98,8 +98,8 @@ function AllianceDetailScene:OnAllianceDataChanged_marchEvents(allianceData, del
 end
 function AllianceDetailScene:HandleEvents(op, isReturn, ok, value)
     if not ok then return end
-    if op == "add" 
-    or op == "edit" then
+    if op == "add"
+        or op == "edit" then
         if isReturn then
             for _,event in pairs(value) do
                 self:CreateOrUpdateOrDeleteCorpsByReturnEvent(event.id, event)
@@ -126,7 +126,7 @@ function AllianceDetailScene:HandleVillage(allianceData, ok, value)
         local mapObj = Alliance.FindMapObjectById(allianceData, v.villageData.id)
         if mapObj then
             self:GetSceneLayer()
-            :RefreshMapObjectByIndex(allianceData.mapIndex, mapObj, allianceData)
+                :RefreshMapObjectByIndex(allianceData.mapIndex, mapObj, allianceData)
         end
     end
 end
@@ -172,7 +172,7 @@ function AllianceDetailScene:OnMapDataChanged(allianceData, mapData, deltaData)
             local mapObj = Alliance.FindMapObjectById(allianceData, v.villageData.id)
             if mapObj then
                 self:GetSceneLayer()
-                :RefreshMapObjectByIndex(allianceData.mapIndex, mapObj, allianceData)
+                    :RefreshMapObjectByIndex(allianceData.mapIndex, mapObj, allianceData)
             end
         end
         local ok, value = deltaData("villageEvents")
@@ -183,7 +183,7 @@ function AllianceDetailScene:OnMapDataChanged(allianceData, mapData, deltaData)
                     local mapObj = Alliance.FindMapObjectById(allianceData, event.villageData.id)
                     if mapObj then
                         self:GetSceneLayer()
-                        :RefreshMapObjectByIndex(allianceData.mapIndex, mapObj, allianceData)
+                            :RefreshMapObjectByIndex(allianceData.mapIndex, mapObj, allianceData)
                     end
                 end
             end
@@ -192,7 +192,7 @@ function AllianceDetailScene:OnMapDataChanged(allianceData, mapData, deltaData)
             for _,v in ipairs(allianceData.buildings) do
                 if v.name == "watchTower" then
                     self:GetSceneLayer()
-                    :RefreshBuildingByIndex(allianceData.mapIndex, v, allianceData)
+                        :RefreshBuildingByIndex(allianceData.mapIndex, v, allianceData)
                     break
                 end
             end
@@ -202,25 +202,25 @@ end
 function AllianceDetailScene:OnMapAllianceChanged(allianceData, deltaData)
     if deltaData == json.null then
         self:GetSceneLayer():LoadAllianceByIndex(allianceData.mapIndex, nil)
-        return 
+        return
     end
     if deltaData("basicInfo") then
-       self:OnAllianceDataChanged_basicInfo(allianceData, deltaData) 
+        self:OnAllianceDataChanged_basicInfo(allianceData, deltaData)
     end
     if deltaData("members") then
-       self:OnAllianceDataChanged_members(allianceData, deltaData) 
+        self:OnAllianceDataChanged_members(allianceData, deltaData)
     end
     if deltaData("buildings") then
-       self:OnAllianceDataChanged_buildings(allianceData, deltaData) 
+        self:OnAllianceDataChanged_buildings(allianceData, deltaData)
     end
     if deltaData("mapObjects") then
         self:OnAllianceDataChanged_mapObjects(allianceData, deltaData)
     end
     if deltaData("marchEvents") then
-       self:OnAllianceDataChanged_marchEvents(allianceData, deltaData) 
+        self:OnAllianceDataChanged_marchEvents(allianceData, deltaData)
     end
     if deltaData("villageEvents") then
-       self:OnAllianceDataChanged_villageEvents(allianceData, deltaData) 
+        self:OnAllianceDataChanged_villageEvents(allianceData, deltaData)
     end
 end
 
@@ -253,7 +253,7 @@ function AllianceDetailScene:RefreshVillageEvents(alliance, villageEvents)
             local mapObj = Alliance.FindMapObjectById(alliance, event.villageData.id)
             if mapObj then
                 self:GetSceneLayer()
-                :RefreshMapObjectByIndex(alliance.mapIndex, mapObj, alliance)
+                    :RefreshMapObjectByIndex(alliance.mapIndex, mapObj, alliance)
             end
         end
     end
@@ -304,7 +304,7 @@ function AllianceDetailScene:ctor(location)
 end
 function AllianceDetailScene:onEnter()
     AllianceDetailScene.super.onEnter(self)
-    
+
     Alliance_Manager:ClearCache()
     Alliance_Manager:UpdateAllianceBy(Alliance_Manager:GetMyAlliance().mapIndex, Alliance_Manager:GetMyAlliance())
 
@@ -355,8 +355,8 @@ function AllianceDetailScene:onEnter()
 end
 function AllianceDetailScene:onExit()
     self.fetchtimer:stopAllActions()
-    if self.current_allinace_index 
-   and not Alliance_Manager:GetMyAlliance():IsDefault() then
+    if self.current_allinace_index
+        and not Alliance_Manager:GetMyAlliance():IsDefault() then
         NetManager:getLeaveMapIndexPromise(self.current_allinace_index)
     end
     Alliance_Manager:ClearAllHandles()
@@ -447,30 +447,30 @@ function AllianceDetailScene:OnTouchClicked(pre_x, pre_y, x, y)
             app:GetAudioManager():PlayeEffectSoundWithKey("HOME_PAGE")
             local type_ = Alliance:GetMapObjectType(mapObj)
             if type_ == "member"
-            or type_ == "village"
-            or type_ == "building" then
+                or type_ == "village"
+                or type_ == "building" then
                 app:lockInput(true)
                 self.util_node:performWithDelay(function()app:lockInput(false)end,0.5)
                 Sprite:PromiseOfFlash(mapObj.obj):next(function()
                     self:OpenUI(alliance, mapObj)
                 end)
-            elseif type_ == "empty" 
-               and mapObj.index == Alliance_Manager:GetMyAlliance().mapIndex then
+            elseif type_ == "empty"
+                and mapObj.index == Alliance_Manager:GetMyAlliance().mapIndex then
                 app:lockInput(true)
                 self.util_node:performWithDelay(function()app:lockInput(false)end,0.5)
                 self:GetSceneLayer()
-                :PromiseOfFlashEmptyGround(mapObj.index, mapObj.x, mapObj.y)
-                :next(function()
-                    self:OpenUI(alliance, mapObj)
-                end)
+                    :PromiseOfFlashEmptyGround(mapObj.index, mapObj.x, mapObj.y)
+                    :next(function()
+                        self:OpenUI(alliance, mapObj)
+                    end)
             elseif type_ == "monster" then
                 app:lockInput(true)
                 self.util_node:performWithDelay(function()app:lockInput(false)end,0.5)
                 self:GetSceneLayer()
-                :PromiseOfFlashEmptyGround(mapObj.index, mapObj.x, mapObj.y)
-                :next(function()
-                    self:OpenUI(alliance, mapObj)
-                end)
+                    :PromiseOfFlashEmptyGround(mapObj.index, mapObj.x, mapObj.y)
+                    :next(function()
+                        self:OpenUI(alliance, mapObj)
+                    end)
             elseif type_ == "nouse" then
                 return
             else
@@ -567,7 +567,18 @@ function AllianceDetailScene:EnterNotAllianceBuilding(alliance,mapObj)
     UIKit:newGameUI(class_name,mapObj or type_,alliance):AddToCurrentScene(true)
 
 end
+function AllianceDetailScene:TwinkleShrine()
+    local mapObject = self:GetSceneLayer():FindMapObject(Alliance_Manager:GetMyAlliance().mapIndex, 13, 17)
+    self:performWithDelay(function()
+        Sprite:PromiseOfFlash(mapObject.obj):next(function()
+            Sprite:PromiseOfFlash(mapObject.obj):next(function()
+                end)Sprite:PromiseOfFlash(mapObject.obj)
+        end)
+    end, 1)
+end
 return AllianceDetailScene
+
+
 
 
 

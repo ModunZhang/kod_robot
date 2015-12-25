@@ -30,7 +30,7 @@ end
 
 function WidgetSoldierBox:SetSoldier(soldier_type, star)
     star = checknumber(star)
-    local soldier_ui_config = UILib.soldier_image[soldier_type][star]
+    local soldier_ui_config = UILib.soldier_image[soldier_type]
     if soldier_ui_config then
         if self.soldier then
             self.soldier_bg:removeChild(self.soldier)
@@ -87,7 +87,7 @@ function WidgetSoldierBox:SetCondition(text)
     if not self.lock_icon then
         self.lock_icon = display.newSprite("icon_lock_14x18.png"):addTo(self.number:getParent()):align(display.LEFT_CENTER, 10, self.number:getParent():getContentSize().height/2-1)
     end
-    UIKit:addTipsToNode(self.number,text,self)
+    UIKit:addTipsToNode(self,text,self:getParent())
     return self
 end
 function WidgetSoldierBox:IsLocked()

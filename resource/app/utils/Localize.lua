@@ -760,7 +760,7 @@ local SOLDIER_CATEGORY_MAP = {
     ["wall"] = "wall"
 }
 for k,v in pairs(GameDatas.Soldiers.normal) do
-    SOLDIER_CATEGORY_MAP[v.name] = v.type
+    SOLDIER_CATEGORY_MAP[string.sub(v.name,1,-3)] = v.type
 end
 for k,v in pairs(GameDatas.Soldiers.special) do
     SOLDIER_CATEGORY_MAP[v.name] = v.type
@@ -810,13 +810,38 @@ local SOLDIER_CATEGORY = {
 }
 local SOLDIER_NAME = {
     ["swordsman"] = _("剑士"),
+    ["swordsman_1"] = _("剑士"),
+    ["swordsman_2"] = _("精英剑士"),
+    ["swordsman_3"] = _("皇家剑士"),
     ["sentinel"] = _("哨兵"),
+    ["sentinel_1"] = _("哨兵"),
+    ["sentinel_2"] = _("精英哨兵"),
+    ["sentinel_3"] = _("皇家哨兵"),
     ["ranger"] = _("弓箭手"),
+    ["ranger_1"] = _("弓箭手"),
+    ["ranger_2"] = _("精英弓箭手"),
+    ["ranger_3"] = _("皇家弓箭手"),
     ["crossbowman"] = _("弩弓手"),
+    ["crossbowman_1"] = _("弩弓手"),
+    ["crossbowman_2"] = _("精英弩弓手"),
+    ["crossbowman_3"] = _("皇家弩弓手"),
     ["lancer"] = _("枪骑兵"),
+    ["lancer_1"] = _("枪骑兵"),
+    ["lancer_2"] = _("精英枪骑兵"),
+    ["lancer_3"] = _("皇家枪骑兵"),
     ["horseArcher"] = _("弓骑兵"),
+    ["horseArcher"] = _("弓骑兵"),
+    ["horseArcher_1"] = _("弓骑兵"),
+    ["horseArcher_2"] = _("精英弓骑兵"),
+    ["horseArcher_3"] = _("皇家弓骑兵"),
     ["catapult"] = _("投石车"),
+    ["catapult_1"] = _("投石车"),
+    ["catapult_2"] = _("精英投石车"),
+    ["catapult_3"] = _("皇家投石车"),
     ["ballista"] = _("弩车"),
+    ["ballista_1"] = _("弩车"),
+    ["ballista_2"] = _("精英弩车"),
+    ["ballista_3"] = _("皇家弩车"),
 
     ["skeletonWarrior"] = _("骷髅勇士"),
     ["skeletonArcher"] = _("骷髅射手"),
@@ -1120,22 +1145,24 @@ local GAME_LANGUAGE = {
 }
 
 local DAILY_TASKS = {
-    empireRise = {
-        title = _("帝国崛起"),
-        desc  = _("处理城市中的政务,获得奖励")
-    },
-    conqueror = {
-        title = _("征服者"),
-        desc  = _("用武力赢取荣耀和奖励"),
-    },
-    brotherClub = {
-        title = _("兄弟会"),
-        desc  = _("为了联盟兄弟两肋插刀"),
-    },
-    growUp = {
-        title = _("超凡之路"),
-        desc  = _("使用特殊能力提升成长速度")
-    }
+    upgradeBuilding = _("建造或升级任意建筑"),
+    upgradeProudctionTech = _("升级任意学院科技"),
+    upgradeMilitaryTech = _("升级任意军事科技"),
+    makeBuildingMaterial = _("制造一批建筑材料"),
+    makeTechnologyMaterial = _("制造一批军事材料"),
+    attackShrine = _("参加一次圣地战"),
+    attackCity = _("进攻敌方城市"),
+    attackVillage = _("占领任意一座村落"),
+    pve = _("进行一次飞艇探索（扫荡不计入）"),
+    donate = _("进行一次联盟捐赠"),
+    buyAllianceItem = _("在联盟商店购买一次道具"),
+    helpSpeedup = _("协助盟友加速（需点击协助加速全部）"),
+    helpDefence = _("对盟友进行一次协防"),
+    speedupBuildingUpgrade = _("加速一次正在升级的建筑"),
+    speedupSoldierRecruit = _("加速一次正在招募的兵种"),
+    treatSoldiers = _("治疗一批伤兵"),
+    makeDragonEquipment = _("打造一件龙的装备"),
+    buyShopItem = _("在商店购买任意一件道具"),
 }
 
 local SELENAQUESTION_TIPS = {

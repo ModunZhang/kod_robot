@@ -39,8 +39,9 @@ local function newProgress()
 end
 
 
-function WidgetManufactureNew:ctor(toolShop)
+function WidgetManufactureNew:ctor(toolShop,sub_tab)
     self.toolShop = toolShop
+    self.sub_tab = sub_tab
 end
 --
 function WidgetManufactureNew:onEnter()
@@ -53,14 +54,18 @@ function WidgetManufactureNew:onEnter()
     end):align(display.TOP_CENTER,window.cx,window.top-84):addTo(self)
 
     local User = self.toolShop:BelongCity():GetUser()
-    local making_event = User:GetMakingMaterialsEvent()
-    local store_event = User:GetStoreMaterialsEvent()
-    if making_event then
-        self.material_tab:SelectTab(making_event.type)
-    elseif store_event then
-        self.material_tab:SelectTab(store_event.type)
+    if self.sub_tab then
+        self.material_tab:SelectTab(self.sub_tab )
     else
-        self.material_tab:SelectTab("buildingMaterials")
+        local making_event = User:GetMakingMaterialsEvent()
+        local store_event = User:GetStoreMaterialsEvent()
+        if making_event then
+            self.material_tab:SelectTab(making_event.type)
+        elseif store_event then
+            self.material_tab:SelectTab(store_event.type)
+        else
+            self.material_tab:SelectTab("buildingMaterials")
+        end
     end
     User:AddListenOnType(self, "buildingMaterials")
     User:AddListenOnType(self, "technologyMaterials")

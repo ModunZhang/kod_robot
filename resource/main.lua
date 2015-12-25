@@ -95,11 +95,44 @@ ext.market_sdk = {
     onPlayerUseGameItems = function ( ... )
     end
 }
+ext.getAppVersion = function()
+    return "Debug Version"
+end
+ext.getDeviceLanguage = function()
+    return "zh-Hans"
+end
+ext.getInternetConnectionStatus = function()
+    return nil
+end
+ext.getBatteryLevel = function()
+    return 1
+end
+ext.isLowMemoryDevice = function()
+    return false
+end
+ext.getAppMemoryUsage = function()
+    return 0
+end
 printLog = function ( ... )
 end
 printInfo = function ( ... )
 end
-
+cc.FileUtils = {
+    getInstance = function()
+        return {
+            fullPathForFilename = function()
+                return ""
+            end,
+            isFileExist = _,
+            setStringForKey = _
+        }
+    end
+}
+cc.HelperFunc = {
+    getFileData = function()
+        return ""
+    end,
+}
 require("config")
 require("functions")
 require("json")
@@ -136,6 +169,8 @@ function Run()
         app:RunAI()
     end
 end
+
+
 
 
 

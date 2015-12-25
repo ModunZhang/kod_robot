@@ -10,14 +10,30 @@ local GameUITreatSoldierSpeedUp = import(".GameUITreatSoldierSpeedUp")
 local window = import("..utils.window")
 local GameUIHospital = UIKit:createUIClass('GameUIHospital',"GameUIUpgradeBuilding")
 GameUIHospital.SOLDIERS_NAME = {
-    [1] = "swordsman",
-    [2] = "ranger",
-    [3] = "lancer",
-    [4] = "catapult",
-    [5] = "sentinel",
-    [6] = "crossbowman",
-    [7] = "horseArcher",
-    [8] = "ballista",
+    [1] = "swordsman_1",
+    [2] = "ranger_1",
+    [3] = "lancer_1",
+    [4] = "catapult_1",
+    [5] = "sentinel_1",
+    [6] = "crossbowman_1",
+    [7] = "horseArcher_1",
+    [8] = "ballista_1",
+    [9] = "swordsman_2",
+    [10] = "ranger_2",
+    [11] = "lancer_2",
+    [12] = "catapult_2",
+    [13] = "sentinel_2",
+    [14] = "crossbowman_2",
+    [15] = "horseArcher_2",
+    [16] = "ballista_2",
+    [17] = "swordsman_3",
+    [18] = "ranger_3",
+    [19] = "lancer_3",
+    [20] = "catapult_3",
+    [21] = "sentinel_3",
+    [22] = "crossbowman_3",
+    [23] = "horseArcher_3",
+    [24] = "ballista_3",
 -- [9] = "skeletonWarrior",
 -- [10] = "skeletonArcher",
 -- [11] = "deathKnight",
@@ -405,8 +421,12 @@ function GameUIHospital:CreateItemWithListView(list_view)
     local treat_soldier_map = self.city:GetUser().woundedSoldiers
     local row_count = -1
     for i, soldier_name in ipairs({
-        "swordsman", "ranger", "lancer", "catapult",
-        "sentinel", "crossbowman", "horseArcher", "ballista",
+        "swordsman_1", "ranger_1", "lancer_1", "catapult_1",
+        "sentinel_1", "crossbowman_1", "horseArcher_1", "ballista_1",
+        "swordsman_2", "ranger_2", "lancer_2", "catapult_2",
+        "sentinel_2", "crossbowman_2", "horseArcher_2", "ballista_2",
+        "swordsman_3", "ranger_3", "lancer_3", "catapult_3",
+        "sentinel_3", "crossbowman_3", "horseArcher_3", "ballista_3",
         "skeletonWarrior", "skeletonArcher", "deathKnight", "meatWagon",
     }) do
         local soldier_number = treat_soldier_map[soldier_name] or 0

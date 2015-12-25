@@ -48,6 +48,12 @@ function GameUIAlliance:OnAllianceDataChanged_basicInfo(alliance, deltaData)
         self:RefreshInfomationView()
     end
 end
+function GameUIAlliance:OnAllianceDataChanged_notice(alliance, deltaData)
+    if Alliance_Manager:GetMyAlliance():IsDefault() then return end
+    if deltaData("notice") then
+        self:RefreshOverViewUI()
+    end
+end
 
 function GameUIAlliance:OnAllianceDataChanged_joinRequestEvents(alliance)
     if Alliance_Manager:GetMyAlliance():GetSelf():IsTitleEqualOrGreaterThan("quartermaster") then
@@ -80,6 +86,7 @@ function GameUIAlliance:AddListenerOfMyAlliance()
     -- join or quit
     myAlliance:AddListenOnType(self, "operation")
     myAlliance:AddListenOnType(self, "basicInfo")
+    myAlliance:AddListenOnType(self, "notice")
     myAlliance:AddListenOnType(self, "members")
     myAlliance:AddListenOnType(self, "events")
     myAlliance:AddListenOnType(self, "joinRequestEvents")
@@ -128,6 +135,7 @@ function GameUIAlliance:OnMoveOutStage()
     local myAlliance = Alliance_Manager:GetMyAlliance()
     myAlliance:RemoveListenerOnType(self, "operation")
     myAlliance:RemoveListenerOnType(self, "basicInfo")
+    myAlliance:RemoveListenerOnType(self, "notice")
     myAlliance:RemoveListenerOnType(self, "members")
     myAlliance:RemoveListenerOnType(self, "events")
     myAlliance:RemoveListenerOnType(self, "joinRequestEvents")
@@ -1753,6 +1761,7 @@ end
 
 
 return GameUIAlliance
+
 
 
 

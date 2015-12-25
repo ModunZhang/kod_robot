@@ -36,19 +36,29 @@ function GameUISquare:CreateSoldierUI()
         end
     end
     self.soldier_map = {}
-    local view_size = view:getContentSize()
-    local total_width = 600
+    local list,list_node = UIKit:commonListView({
+        direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
+        viewRect = cc.rect(0, 0,568,740),
+    })
+    list_node:addTo(view):align(display.BOTTOM_CENTER, window.cx, window.bottom + 40)
+    local content = display.newNode()
+    content:setContentSize(cc.size(568,7 * 166 + 6 * 10))
+    local total_width = 568
     local unit_width = 130
     local unit_height = 166
-    local origin_y = window.top_bottom - 160
-    local origin_x = window.left + 40 + unit_width/2
-    local gap_x = (total_width - unit_width * 4 - 20 * 2) / 3
+    local origin_y = 7 * 166 + 6 * 10 - unit_height/2
+    local origin_x =  unit_width/2
+    local gap_x = (total_width - unit_width * 4) / 3
     local add_count = 0
     local total_citizen = 0
     for i, soldier_name in ipairs({
-        "swordsman", "ranger", "lancer", "catapult",
-        "sentinel", "crossbowman", "horseArcher", "ballista",
-        "skeletonWarrior", "skeletonArcher", "deathKnight", "meatWagon"
+        "swordsman_1", "ranger_1", "lancer_1", "catapult_1",
+        "sentinel_1", "crossbowman_1", "horseArcher_1", "ballista_1",
+        "swordsman_2", "ranger_2", "lancer_2", "catapult_2",
+        "sentinel_2", "crossbowman_2", "horseArcher_2", "ballista_2",
+        "swordsman_3", "ranger_3", "lancer_3", "catapult_3",
+        "sentinel_3", "crossbowman_3", "horseArcher_3", "ballista_3",
+        "skeletonWarrior", "skeletonArcher", "deathKnight", "meatWagon",
     }) do
     
         local soldier_star = User:SoldierStarByName(soldier_name)
@@ -56,7 +66,7 @@ function GameUISquare:CreateSoldierUI()
         if soldier_num > 0 then
             self.soldier_map[soldier_name] = WidgetSoldierBox.new(nil, function()
                 WidgetSoldierDetails.new(soldier_name, soldier_star):addTo(self)
-            end):addTo(view)
+            end):addTo(content)
                 :alignByPoint(cc.p(0.5, 0.5), origin_x + (unit_width + gap_x) * (add_count % 4) , origin_y - math.floor(add_count/4) *(unit_height + 10))
                 :SetSoldier(soldier_name, soldier_star)
                 :SetNumber(soldier_num)
@@ -65,7 +75,11 @@ function GameUISquare:CreateSoldierUI()
             total_citizen = total_citizen + User:GetSoldierConfig(soldier_name).citizen * soldier_num
         end
     end
-
+    local item = list:newItem()
+    item:setItemSize(568,7 * 166 + 6 * 10)
+    item:addContent(content)
+    list:addItem(item)
+    list:reload()
     -- 士兵占用人口
     local bg = WidgetUIBackGround.new({width = 556,height = 58},WidgetUIBackGround.STYLE_TYPE.STYLE_5)
         :align(display.TOP_CENTER, window.cx, window.top - 93)

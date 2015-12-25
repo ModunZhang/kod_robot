@@ -247,15 +247,15 @@ local function FinishRecruitSoldier()
     end
 end
 
-local function RecruitSoldier(type_, count)
-    local soldier_config = special[type_] or normal[type_.."_1"]
+local function RecruitSoldier(name, count)
+    local soldier_config = special[name] or normal[name.."_1"]
     local recruitTime = 30
     mock{
         {
             "soldierEvents.0",
             {
                 id = 1,
-                name = type_,
+                name = name,
                 count = count,
                 startTime = NetManager:getServerTime(),
                 finishTime = NetManager:getServerTime() + recruitTime * 1000
@@ -271,10 +271,10 @@ local function RecruitSoldier(type_, count)
         DataManager.handle_soldier__ = nil
     end, recruitTime)
 
-    local key = string.format("RecruitSoldier_%s", type_)
+    local key = string.format("RecruitSoldier_%s", name)
     if not check(key) then
         mark(key)
-        ext.market_sdk.onPlayerEvent("招募士兵:"..type_, "empty")
+        ext.market_sdk.onPlayerEvent("招募士兵:"..name, "empty")
     end
 end
 
@@ -296,8 +296,8 @@ end
 
 local function GetSoldier()
     mock{
-        {"soldiers.swordsman", 100},
-        {"soldiers.ranger", 100}
+        {"soldiers.swordsman_1", 100},
+        {"soldiers.ranger_1", 100}
     }
 
     local key = string.format("GetSoldier")
@@ -361,7 +361,7 @@ local function FightWithNpc(pve_name)
             {"soldierMaterials.magicBox", 1},
             {"soldierMaterials.deathHand", 1},
             {"soldierMaterials.soulStone", 1},
-            {"soldierMaterials.heroBones", 1},
+            {"soldierMaterials.heroBones", 2},
         }
     end
 
@@ -394,18 +394,18 @@ local function FinishTreatSoldier()
 end
 
 
-local function TreatSoldier(type_, count)
+local function TreatSoldier(name, count)
     local start_time = NetManager:getServerTime()
-    local treatTime = normal[type_.."_1"].treatTime * count
+    local treatTime = normal[name.."_1"].treatTime * count
     mock{
-        {string.format("woundedSoldiers.%s", type_), 0},
+        {string.format("woundedSoldiers.%s", name), 0},
         {
             "treatSoldierEvents.0",
             {
                 id = 1,
                 soldiers = {
                     {
-                        name = type_,
+                        name = name,
                         count = count
                     }
                 },

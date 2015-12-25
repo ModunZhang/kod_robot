@@ -4,7 +4,6 @@ local Localize = import("..utils.Localize")
 local property = import("..utils.property")
 local MultiObserver = import(".MultiObserver")
 local Alliance = class("Alliance", MultiObserver)
-local buildingName = GameDatas.AllianceMap.buildingName
 Alliance.LISTEN_TYPE = Enum(
     "operation", -- 自己加的
     "mapIndex",
@@ -27,7 +26,8 @@ Alliance.LISTEN_TYPE = Enum(
     "helpEvents",
     "marchEvents",
     "buildings",
-    "allianceFight")
+    "allianceFight",
+    "notice")
 property(Alliance, "_id", nil)
 property(Alliance, "mapIndex", nil)
 property(Alliance, "desc", "")
@@ -283,6 +283,7 @@ function Alliance:GetOtherRequestEventsNum()
     end
     return request_num
 end
+local buildingName = GameDatas.AllianceMap.buildingName
 function Alliance:GetMapObjectType(mapobj)
     return buildingName[mapobj.name] and buildingName[mapobj.name].type or mapobj.name
 end
@@ -674,6 +675,7 @@ local before_map = {
     buildings = function()end,
     joinRequestEvents = function()end,
     allianceFight = function()end,
+    notice = function()end,
     helpEvents = function(allianceData, deltaData)
         if allianceData:IsMyAlliance() then
             allianceData:NotifyHelpEvents(deltaData)
