@@ -26,7 +26,7 @@ all: kod_client
 	@$(MAKE) clean
 
 kod_client: $(objects)
-	$(GCC) $(objects) -o kod_client -g -L ../lua -L ../pomelolib/libpomelo/out/Default/obj.target/ -L ../pomelolib/libpomelo/out/Default/obj.target/deps/jansson -L ../pomelolib/libpomelo/out/Default/obj.target/deps/uv -L ../libopenssl -pthread -std=c++11 -lstdc++ -lresolv  -lpomelo -lcrypto -luv -ljansson -llua -lm -ldl 
+	$(GCC) $(objects) -o kod_client -g -L ../lua -L ../pomelolib/libpomelo/out/Default/obj.target/ -L ../pomelolib/libpomelo/out/Default/obj.target/deps/jansson -L ../pomelolib/libpomelo/out/Default/obj.target/deps/uv -L ../libopenssl/openssl-1.0.2d -pthread -std=c++11 -lstdc++ -lresolv  -lpomelo -lcrypto -luv -ljansson -llua -lm -ldl 
 
 # %.o: ../lua/%.c 
 # 	$(GCC) $(CFLAGS) -o $@ $<  
