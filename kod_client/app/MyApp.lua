@@ -118,7 +118,7 @@ function MyApp:GetChatManager()
     return self.ChatManager_
 end
 function MyApp:GetUpdateFile()
-    local t = io.popen("curl 54.223.172.65:3000/update/res/fileList.json")
+    local t = io.popen("curl 192.168.0.30:3000/update/res/fileList.json")
     local msg = t:read("*all")
     t:close()
     local serverFileList = json.decode(msg)
