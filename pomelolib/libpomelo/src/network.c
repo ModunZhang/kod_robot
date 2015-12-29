@@ -211,7 +211,7 @@ int pc_notify(pc_client_t *client, pc_notify_t *req, const char *route,
   req->cb = cb;
   return pc__async_write(client->transport, (pc_tcp_req_t *)req, route, msg);
 }
-char * rc4(char * key_buf, char * in, int in_len);
+char * rc4(char *, const char *, int);
 static void pc__request(pc_request_t *req, int status) {
   if(status == -1) {
     req->cb(req, status, NULL);

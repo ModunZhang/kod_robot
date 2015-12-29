@@ -25,10 +25,10 @@ static void pc__handshake_timeout_cb(uv_timer_t* handshake_timer, int status) {
 #define HANDSHAKE_TIMEOUT (10 * 1000) // 10 seconds
 void * createdh();
 unsigned char * getpublickey(void *, int *);
-int base64Encode(const unsigned char *in, unsigned int inLength, char **out);
-int base64Decode(const unsigned char *in, unsigned int inLength, unsigned char **out);
-char * rc4(char * key_buf, char * in, int in_len);
-char * computesecret(void *, const char * buffer, int);
+int base64Encode(const unsigned char *, unsigned int, char **);
+int base64Decode(const unsigned char *, unsigned int, unsigned char **);
+char * rc4(char *, const char *, int);
+char * computesecret(void *, const char *, int);
 int pc__handshake_req(pc_client_t *client) {
   json_t *handshake_opts = client->handshake_opts;
   json_t *body = json_object();
@@ -151,7 +151,7 @@ int pc__handshake_resp(pc_client_t *client,
           free(secret);
           
           const unsigned char * challenge = (const unsigned char *)(json_string_value(challenge_docs));
-          char * encrypt = rc4(client->secret, (char *)challenge, strlen(challenge));
+          char * encrypt = rc4(client->secret, (const char *)challenge, strlen(challenge));
           base64Encode((const unsigned char *)encrypt, strlen(encrypt), &encrypt_challenge);
           free(encrypt);
       }

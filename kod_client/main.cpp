@@ -215,7 +215,8 @@ static const unsigned char group_modp5[] = {
 static const unsigned char two_generator[] = { 2 };
 typedef struct dh_st DH;
 
-void freeDh(void *d) {
+void 
+freeDh(void *d) {
     if(d) {
         DH_free((DH*)d);
     }

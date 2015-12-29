@@ -210,7 +210,7 @@ pc_client_state pc_client_get_state(pc_client_t *client) {
 /**
  * Clear all inner resource of Pomelo client
  */
-void freeDh(void *d);
+void freeDh(void *);
 void pc__client_clear(pc_client_t *client) {
   if(client->listeners) {
     pc_map_destroy(client->listeners);
