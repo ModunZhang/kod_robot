@@ -130,6 +130,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3F3F7D231C5B1302005C1023 /* CTimerHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CTimerHandle.h; sourceTree = "<group>"; };
+		3F3F7D271C5B1317005C1023 /* CTimerHandleDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CTimerHandleDelegate.h; sourceTree = "<group>"; };
 		DB60CBBF1A6CE5F3000DC25A /* kod_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = kod_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB60CBC21A6CE5F3000DC25A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		DB60CBC91A6CE65B000DC25A /* list_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list_timer.h; sourceTree = "<group>"; };
@@ -271,12 +273,14 @@
 		DB60CBC11A6CE5F3000DC25A /* kod_client */ = {
 			isa = PBXGroup;
 			children = (
+				3F3F7D231C5B1302005C1023 /* CTimerHandle.h */,
 				DB60CC601A6CFFE8000DC25A /* LuaExtension.cpp */,
 				DB60CC611A6CFFE8000DC25A /* LuaExtension.h */,
 				DB60CC591A6CF0EC000DC25A /* CCPomelo.cpp */,
 				DB60CC251A6CE95F000DC25A /* CCPomelo.h */,
 				DB60CBC91A6CE65B000DC25A /* list_timer.h */,
 				DB60CBC21A6CE5F3000DC25A /* main.cpp */,
+				3F3F7D271C5B1317005C1023 /* CTimerHandleDelegate.h */,
 			);
 			path = kod_client;
 			sourceTree = "<group>";
