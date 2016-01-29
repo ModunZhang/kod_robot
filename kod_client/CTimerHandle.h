@@ -1,9 +1,9 @@
-#include "CCPomelo.h"
+#include "CTimerHandleDelegate.h"
 
 class CTimerHandle
 {
 public:
-	CTimerHandle(CCPomelo *p) : pomelo(p), running(false)
+	CTimerHandle(CTimerHandleDelegate *p) : pomelo(p), running(false)
 	{}
 	~CTimerHandle(){}
 	void pause(){
@@ -22,6 +22,6 @@ public:
 	}
 
 private:
-	CCPomelo *pomelo;
+	CTimerHandleDelegate *pomelo;
 	bool running;
 };

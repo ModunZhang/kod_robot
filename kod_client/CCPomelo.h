@@ -15,7 +15,7 @@
 #include <string>
 #include <queue>
 #include <sys/socket.h>
-
+#include "CTimerHandleDelegate.h"
 
 class CTimerHandle;
 class CCPomeloContent_;
@@ -40,7 +40,7 @@ public:
 
 
 
-class CCPomelo{
+class CCPomelo : public CTimerHandleDelegate{
 public:
     // static CCPomelo *getInstance();
     // static void destroyInstance();
@@ -96,7 +96,7 @@ public:
     void cleanupNotifyContent();
     void cleanupRequestContent();
     
-    void dispatchCallbacks(float delta);
+    virtual void dispatchCallbacks(float delta) override;
     
     
     void lockReponsQeueue();
