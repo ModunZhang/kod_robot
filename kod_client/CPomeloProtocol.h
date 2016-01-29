@@ -8,10 +8,10 @@
 
 #ifndef CTimerHandleDelegate_h
 #define CTimerHandleDelegate_h
-class CTimerHandleDelegate
+class CPomeloProtocol
 {
 public:
-    virtual ~CTimerHandleDelegate(){};
+    virtual ~CPomeloProtocol(){};
     virtual void dispatchCallbacks(float delta){};
 };
 

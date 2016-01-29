@@ -15,7 +15,7 @@
 #include <string>
 #include <queue>
 #include <sys/socket.h>
-#include "CTimerHandleDelegate.h"
+#include "CPomeloProtocol.h"
 
 class CTimerHandle;
 class CCPomeloContent_;
@@ -40,7 +40,7 @@ public:
 
 
 
-class CCPomelo : public CTimerHandleDelegate{
+class CCPomelo : public CPomeloProtocol{
 public:
     // static CCPomelo *getInstance();
     // static void destroyInstance();
