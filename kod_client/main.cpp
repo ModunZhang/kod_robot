@@ -310,7 +310,6 @@ rc4(char * key_buf, const char * in, int in_len) {
     memmove(out, in, datalen);
     
     unsigned char *md = (unsigned char *)md5((char *)key_buf, key_buf_len);
-    
     RC4_KEY rc4_key;
     RC4_set_key(&rc4_key, 16, md);
     RC4(&rc4_key, datalen, (const unsigned char *)in, (unsigned char *)out);
@@ -724,6 +723,7 @@ run()
 int 
 main(int argc, char *argv[])
 {
+    // char * encrypt = rc4("hello", "123456", 6);
 	if ( argc <= 1 )
 	{
 		device_id_string = "1";

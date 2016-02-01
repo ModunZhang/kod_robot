@@ -239,6 +239,7 @@ static void pc__request(pc_request_t *req, int status) {
 
   msg_buf = client->encode_msg(client, req->id, req->route, req->msg);
     if(client->secret){
+        printf("encrypt rc4\n");
         char* encrypt = rc4(client->secret, msg_buf.base, msg_buf.len);
         memmove(msg_buf.base, encrypt, msg_buf.len);
         free(encrypt);

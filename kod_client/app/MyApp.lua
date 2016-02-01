@@ -118,12 +118,12 @@ function MyApp:GetChatManager()
     return self.ChatManager_
 end
 function MyApp:GetUpdateFile()
-    local t = io.popen("curl 54.223.172.65:3000/update/res/fileList.json")
-    local msg = t:read("*all")
-    t:close()
-    local serverFileList = json.decode(msg)
+    -- local t = io.popen("curl 54.223.172.65:3000/update/res/fileList.json")
+    -- local msg = t:read("*all")
+    -- t:close()
+    -- local serverFileList = json.decode(msg)
 
-    self.client_tag = serverFileList.tag
+    self.client_tag = -1
     --注意这里debug模式和mac上再次重写了ext.getAppVersion
     ext.getAppVersion = function()
         return serverFileList.appVersion
@@ -136,45 +136,16 @@ function MyApp:run()
         file:write("login : "..device.getOpenUDID().."\n")
         io.close(file)
     end
-    NetManager:getConnectGateServerPromise():next(function()
-        return NetManager:getLogicServerInfoPromise()
-    end)
-    :next(function()
-        return NetManager:getConnectLogicServerPromise()
-    end)
-    :next(function()
-        return NetManager:getLoginPromise(device.getOpenUDID())
-    end):next(function()
-        if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
-            local terrains = {
-                "grassLand",
-                "desert",
-                "iceField",
-            }
-            return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
-        end
-    end):next(function()
-        return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
-    end):next(function()
-        return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
-    end):next(function()
-        return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
-    end):next(function()
-        return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
-    end):next(function()
-        print("登录游戏成功!")
-        return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
-    end):catch(function(err)
-        dump(err:reason())
-        -- local content, title = err:reason()
-        -- local code = content.code
-        -- if content.code == 684 then
-        -- NetManager:disconnect()
-        -- self:run()
-        -- else
-        -- threadExit()
-        -- end
-    end)
+    self.couldLogin = false
+    NetManager:getConnectGateServerPromise()
+        :next(function()
+            return NetManager:getLogicServerInfoPromise()
+        end)
+        :next(function()
+            return NetManager:getConnectLogicServerPromise()
+        end):done(function ()
+            self.couldLogin = true
+        end)
 end
 
 running = true
@@ -202,6 +173,42 @@ func_map = {
 api_group_index = 1
 api_index = 1
 function MyApp:RunAI()
+    if self.couldLogin then
+        self.couldLogin = false
+        print("·couldLogin·")
+        NetManager:getLoginPromise(device.getOpenUDID()):next(function()
+            if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
+                local terrains = {
+                    "grassLand",
+                    "desert",
+                    "iceField",
+                }
+                return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
+            end
+        end):next(function()
+            return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
+        end):next(function()
+            return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
+        end):next(function()
+            return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
+        end):next(function()
+            return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
+        end):next(function()
+            print("登录游戏成功!")
+            return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
+        end):catch(function(err)
+            dump(err:reason())
+            -- local content, title = err:reason()
+            -- local code = content.code
+            -- if content.code == 684 then
+            -- NetManager:disconnect()
+            -- self:run()
+            -- else
+            -- threadExit()
+            -- end
+        end)
+        return
+    end
     print("RunAI robot id:", device.getOpenUDID(),running)
     if running then
         running = false
@@ -228,6 +235,8 @@ function MyApp:IsBuildingUnLocked(location_id)
 end
 
 return MyApp
+
+
 
 
 

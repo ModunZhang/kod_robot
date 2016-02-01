@@ -738,7 +738,7 @@ function NetManager:getLogicServerInfoPromise()
             end)
         end
     end
-    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {platform = platform,deviceId = device_id,tag = device_tag}, "获取逻辑服务器失败",true)
+    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {platform = platform,deviceId = device_id,tag = -1}, "获取逻辑服务器失败",true)
         :done(function(result)
             self:CleanAllEventListeners()
             self.m_netService:disconnect()

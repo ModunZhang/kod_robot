@@ -93,6 +93,7 @@ pc_msg_t *pc__default_msg_parse_cb(pc_client_t *client, const char *data,
   pc_msg_t *msg = NULL;
     
     if(client->secret){
+        printf("encrypt protocol\n");
         char* encrypt = rc4(client->secret, data, len);
         memcpy((void *)data, encrypt, len);
         free(encrypt);
