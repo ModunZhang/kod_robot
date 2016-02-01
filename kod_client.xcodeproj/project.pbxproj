@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3FA0EDD71C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FA0EDD41C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp */; };
+		3FA0EDDC1C5B549A00CC35A8 /* libwebsockets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FA0EDDB1C5B549A00CC35A8 /* libwebsockets.a */; };
+		3FA0EDDF1C5B54B000CC35A8 /* WebSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FA0EDDD1C5B54B000CC35A8 /* WebSocket.cpp */; };
+		3FA0EDE11C5B557D00CC35A8 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FA0EDE01C5B557D00CC35A8 /* libz.tbd */; };
 		DB60CBC31A6CE5F3000DC25A /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DB60CBC21A6CE5F3000DC25A /* main.cpp */; };
 		DB60CC5A1A6CF0EC000DC25A /* CCPomelo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DB60CC591A6CF0EC000DC25A /* CCPomelo.cpp */; };
 		DB60CC621A6CFFE8000DC25A /* LuaExtension.cpp in Sources */ = {isa = PBXBuildFile; fileRef = DB60CC601A6CFFE8000DC25A /* LuaExtension.cpp */; };
@@ -132,6 +136,13 @@
 /* Begin PBXFileReference section */
 		3F3F7D231C5B1302005C1023 /* CTimerHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CTimerHandle.h; sourceTree = "<group>"; };
 		3F3F7D271C5B1317005C1023 /* CPomeloProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPomeloProtocol.h; sourceTree = "<group>"; };
+		3FA0EDD41C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCPomeloWebSocket.cpp; sourceTree = "<group>"; };
+		3FA0EDD51C5B53FE00CC35A8 /* CCPomeloWebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCPomeloWebSocket.h; sourceTree = "<group>"; };
+		3FA0EDD61C5B53FE00CC35A8 /* Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Common.h; sourceTree = "<group>"; };
+		3FA0EDDB1C5B549A00CC35A8 /* libwebsockets.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libwebsockets.a; sourceTree = "<group>"; };
+		3FA0EDDD1C5B54B000CC35A8 /* WebSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebSocket.cpp; sourceTree = "<group>"; };
+		3FA0EDDE1C5B54B000CC35A8 /* WebSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebSocket.h; sourceTree = "<group>"; };
+		3FA0EDE01C5B557D00CC35A8 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		DB60CBBF1A6CE5F3000DC25A /* kod_client */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = kod_client; sourceTree = BUILT_PRODUCTS_DIR; };
 		DB60CBC21A6CE5F3000DC25A /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		DB60CBC91A6CE65B000DC25A /* list_timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = list_timer.h; sourceTree = "<group>"; };
@@ -236,8 +247,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3FA0EDE11C5B557D00CC35A8 /* libz.tbd in Frameworks */,
 				DBBBB4861C27D4B200E2E843 /* libuv.a in Frameworks */,
 				DBBBB4721C27D38900E2E843 /* libjansson.a in Frameworks */,
+				3FA0EDDC1C5B549A00CC35A8 /* libwebsockets.a in Frameworks */,
 				DBBBB4731C27D38900E2E843 /* libpomelo.a in Frameworks */,
 				FF7E0D021C07370B00676746 /* libcrypto.a in Frameworks */,
 			);
@@ -249,6 +262,8 @@
 		DB60CBB61A6CE5F3000DC25A = {
 			isa = PBXGroup;
 			children = (
+				3FA0EDE01C5B557D00CC35A8 /* libz.tbd */,
+				3FA0EDDB1C5B549A00CC35A8 /* libwebsockets.a */,
 				DBBBB47B1C27D4A600E2E843 /* uv.xcodeproj */,
 				DBBBB4661C27D34E00E2E843 /* jansson.xcodeproj */,
 				DBBBB44E1C27D33E00E2E843 /* pomelo.xcodeproj */,
@@ -273,6 +288,11 @@
 		DB60CBC11A6CE5F3000DC25A /* kod_client */ = {
 			isa = PBXGroup;
 			children = (
+				3FA0EDDD1C5B54B000CC35A8 /* WebSocket.cpp */,
+				3FA0EDDE1C5B54B000CC35A8 /* WebSocket.h */,
+				3FA0EDD41C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp */,
+				3FA0EDD51C5B53FE00CC35A8 /* CCPomeloWebSocket.h */,
+				3FA0EDD61C5B53FE00CC35A8 /* Common.h */,
 				3F3F7D271C5B1317005C1023 /* CPomeloProtocol.h */,
 				3F3F7D231C5B1302005C1023 /* CTimerHandle.h */,
 				DB60CC601A6CFFE8000DC25A /* LuaExtension.cpp */,
@@ -524,6 +544,7 @@
 				DB60CD151A6D053C000DC25A /* linit.c in Sources */,
 				DB60CD0F1A6D053C000DC25A /* ldblib.c in Sources */,
 				DB60CD821A6DDF68000DC25A /* CCLuaValue.cpp in Sources */,
+				3FA0EDD71C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp in Sources */,
 				DB60CD221A6D053C000DC25A /* ltable.c in Sources */,
 				DB60CD741A6D46D1000DC25A /* tolua_fix.cpp in Sources */,
 				DB60CD231A6D053C000DC25A /* ltablib.c in Sources */,
@@ -560,6 +581,7 @@
 				DB60CD1D1A6D053C000DC25A /* loslib.c in Sources */,
 				DB60CD801A6DDF68000DC25A /* CCLuaEngine.cpp in Sources */,
 				DB60CD1F1A6D053C000DC25A /* lstate.c in Sources */,
+				3FA0EDDF1C5B54B000CC35A8 /* WebSocket.cpp in Sources */,
 				DB60CD201A6D053C000DC25A /* lstring.c in Sources */,
 				DB60CD161A6D053C000DC25A /* liolib.c in Sources */,
 			);
