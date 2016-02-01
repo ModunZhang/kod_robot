@@ -143,8 +143,40 @@ function MyApp:run()
         end)
         :next(function()
             return NetManager:getConnectLogicServerPromise()
+        end):next(function ()
+            return NetManager:getLoginPromise(device.getOpenUDID())
+        end):next(function ()
+            if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
+                local terrains = {
+                    "grassLand",
+                    "desert",
+                    "iceField",
+                }
+                return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
+            end
+        end):next(function()
+            return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
+        end):next(function()
+            return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
+        end):next(function()
+            return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
+        end):next(function()
+            return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
+        end):next(function()
+            print("登录游戏成功!")
+            return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
         end):done(function ()
-            self.couldLogin = true
+            self:setRun()
+        end):catch(function(err)
+            dump(err:reason())
+            -- local content, title = err:reason()
+            -- local code = content.code
+            -- if content.code == 684 then
+            -- NetManager:disconnect()
+            -- self:run()
+            -- else
+            -- threadExit()
+            -- end
         end)
 end
 
@@ -173,42 +205,42 @@ func_map = {
 api_group_index = 1
 api_index = 1
 function MyApp:RunAI()
-    if self.couldLogin then
-        self.couldLogin = false
-        print("·couldLogin·",couldLogin)
-        NetManager:getLoginPromise(device.getOpenUDID()):next(function()
-            if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
-                local terrains = {
-                    "grassLand",
-                    "desert",
-                    "iceField",
-                }
-                return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
-            end
-        end):next(function()
-            return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
-        end):next(function()
-            return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
-        end):next(function()
-            return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
-        end):next(function()
-            return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
-        end):next(function()
-            print("登录游戏成功!")
-            return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
-        end):catch(function(err)
-            dump(err:reason())
-            -- local content, title = err:reason()
-            -- local code = content.code
-            -- if content.code == 684 then
-            -- NetManager:disconnect()
-            -- self:run()
-            -- else
-            -- threadExit()
-            -- end
-        end)
-        return
-    end
+    -- if self.couldLogin then
+    --     self.couldLogin = false
+    --     print("·couldLogin·",couldLogin)
+    --     NetManager:getLoginPromise(device.getOpenUDID()):next(function()
+    --         if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
+    --             local terrains = {
+    --                 "grassLand",
+    --                 "desert",
+    --                 "iceField",
+    --             }
+    --             return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
+    --         end
+    --     end):next(function()
+    --         return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
+    --     end):next(function()
+    --         return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
+    --     end):next(function()
+    --         return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
+    --     end):next(function()
+    --         return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
+    --     end):next(function()
+    --         print("登录游戏成功!")
+    --         return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
+    --     end):catch(function(err)
+    --         dump(err:reason())
+    --         -- local content, title = err:reason()
+    --         -- local code = content.code
+    --         -- if content.code == 684 then
+    --         -- NetManager:disconnect()
+    --         -- self:run()
+    --         -- else
+    --         -- threadExit()
+    --         -- end
+    --     end)
+    --     return
+    -- end
     print("RunAI robot id:", device.getOpenUDID(),running)
     if running then
         running = false
