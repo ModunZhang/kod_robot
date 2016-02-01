@@ -150,7 +150,7 @@ end
 
 
 require("app.MyApp").new():run()
--- running = false
+running = false
 local run_count = 0
 -- 随机种子设置
 local d_id = string.split(device.getOpenUDID(), "_")
