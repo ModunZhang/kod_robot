@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3F02A2B81C5EF020003B17D4 /* Lua_web_socket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F02A2B61C5EF020003B17D4 /* Lua_web_socket.cpp */; };
+		3F02A2BF1C5EF1BF003B17D4 /* bit.c in Sources */ = {isa = PBXBuildFile; fileRef = 3F02A2BD1C5EF1BF003B17D4 /* bit.c */; };
+		3F02A2C01C5EF1BF003B17D4 /* lua_dhcrypt.c in Sources */ = {isa = PBXBuildFile; fileRef = 3F02A2BE1C5EF1BF003B17D4 /* lua_dhcrypt.c */; };
 		3FA0EDD71C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FA0EDD41C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp */; };
 		3FA0EDDC1C5B549A00CC35A8 /* libwebsockets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3FA0EDDB1C5B549A00CC35A8 /* libwebsockets.a */; };
 		3FA0EDDF1C5B54B000CC35A8 /* WebSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FA0EDDD1C5B54B000CC35A8 /* WebSocket.cpp */; };
@@ -134,6 +137,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3F02A2B61C5EF020003B17D4 /* Lua_web_socket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Lua_web_socket.cpp; sourceTree = "<group>"; };
+		3F02A2B71C5EF020003B17D4 /* Lua_web_socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Lua_web_socket.h; sourceTree = "<group>"; };
+		3F02A2BD1C5EF1BF003B17D4 /* bit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bit.c; sourceTree = "<group>"; };
+		3F02A2BE1C5EF1BF003B17D4 /* lua_dhcrypt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = lua_dhcrypt.c; sourceTree = "<group>"; };
 		3F3F7D231C5B1302005C1023 /* CTimerHandle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CTimerHandle.h; sourceTree = "<group>"; };
 		3F3F7D271C5B1317005C1023 /* CPomeloProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CPomeloProtocol.h; sourceTree = "<group>"; };
 		3FA0EDD41C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCPomeloWebSocket.cpp; sourceTree = "<group>"; };
@@ -288,6 +295,10 @@
 		DB60CBC11A6CE5F3000DC25A /* kod_client */ = {
 			isa = PBXGroup;
 			children = (
+				3F02A2BD1C5EF1BF003B17D4 /* bit.c */,
+				3F02A2BE1C5EF1BF003B17D4 /* lua_dhcrypt.c */,
+				3F02A2B61C5EF020003B17D4 /* Lua_web_socket.cpp */,
+				3F02A2B71C5EF020003B17D4 /* Lua_web_socket.h */,
 				3FA0EDDD1C5B54B000CC35A8 /* WebSocket.cpp */,
 				3FA0EDDE1C5B54B000CC35A8 /* WebSocket.h */,
 				3FA0EDD41C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp */,
@@ -547,6 +558,7 @@
 				3FA0EDD71C5B53FE00CC35A8 /* CCPomeloWebSocket.cpp in Sources */,
 				DB60CD221A6D053C000DC25A /* ltable.c in Sources */,
 				DB60CD741A6D46D1000DC25A /* tolua_fix.cpp in Sources */,
+				3F02A2BF1C5EF1BF003B17D4 /* bit.c in Sources */,
 				DB60CD231A6D053C000DC25A /* ltablib.c in Sources */,
 				DB60CD271A6D053C000DC25A /* lundump.c in Sources */,
 				DB60CD761A6D46D1000DC25A /* tolua_map.c in Sources */,
@@ -559,11 +571,13 @@
 				DB60CD2B1A6D053C000DC25A /* print.c in Sources */,
 				DB60CBC31A6CE5F3000DC25A /* main.cpp in Sources */,
 				DB60CD291A6D053C000DC25A /* lzio.c in Sources */,
+				3F02A2B81C5EF020003B17D4 /* Lua_web_socket.cpp in Sources */,
 				DB60CD731A6D46D1000DC25A /* tolua_event.c in Sources */,
 				DB60CD101A6D053C000DC25A /* ldebug.c in Sources */,
 				DB60CD1B1A6D053C000DC25A /* lobject.c in Sources */,
 				DB60CD141A6D053C000DC25A /* lgc.c in Sources */,
 				DB60CD1E1A6D053C000DC25A /* lparser.c in Sources */,
+				3F02A2C01C5EF1BF003B17D4 /* lua_dhcrypt.c in Sources */,
 				DB60CD111A6D053C000DC25A /* ldo.c in Sources */,
 				DB60CD0C1A6D053C000DC25A /* lauxlib.c in Sources */,
 				DB60CD1A1A6D053C000DC25A /* loadlib.c in Sources */,
@@ -634,7 +648,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
-					"USE_LUA_WEBSOCKET=1",
+					"USE_LUA_WEBSOCKET=0",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

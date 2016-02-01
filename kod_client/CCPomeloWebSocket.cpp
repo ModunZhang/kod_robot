@@ -25,13 +25,14 @@ CCPomeloWebSocket::CCPomeloWebSocket() : pipe_fd(-1)
 
 CCPomeloWebSocket::~CCPomeloWebSocket()
 {
+    event_function_id_map.clear();
     delete timer_handle;
     timer_handle = nullptr;
 }
 
 void CCPomeloWebSocket::dispatchCallbacks(float delta)
 {
-    CCLOG("\n---dispatchCallbacks:%f---\n",delta);
+    CCLOG("[CCPomeloWebSocket:dispatchCallbacks:]%f",delta);
     if (nullptr!=m_socket) {
         m_socket->update(delta);
     }

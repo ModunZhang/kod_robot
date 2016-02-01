@@ -1,5 +1,5 @@
 _ = function(...) return ... end
-cc = {}
+cc = cc or {}
 cc.PACKAGE_NAME = "app.cc"
 cc.UserDefault = {
     getInstance = function()
@@ -133,6 +133,23 @@ cc.HelperFunc = {
         return ""
     end,
 }
+-- for websocket
+cc.WEBSOCKET_OPEN     = 0
+cc.WEBSOCKET_MESSAGE  = 1
+cc.WEBSOCKET_CLOSE    = 2
+cc.WEBSOCKET_ERROR    = 3
+
+cc.WEBSOCKET_STATE_CONNECTING = 0
+cc.WEBSOCKET_STATE_OPEN       = 1
+cc.WEBSOCKET_STATE_CLOSING    = 2
+cc.WEBSOCKET_STATE_CLOSED     = 3
+
+cc.XMLHTTPREQUEST_RESPONSE_STRING       = 0
+cc.XMLHTTPREQUEST_RESPONSE_ARRAY_BUFFER = 1
+cc.XMLHTTPREQUEST_RESPONSE_BLOB         = 2
+cc.XMLHTTPREQUEST_RESPONSE_DOCUMENT     = 3
+cc.XMLHTTPREQUEST_RESPONSE_JSON         = 4
+--websocket end
 require("config")
 require("functions")
 require("json")
@@ -171,18 +188,60 @@ function Run()
 end
 
 
+-- test websoket
+-------------------------------------
+
+-- local sendFlag,closeFlag = false,false
+-- function Run()
+--     if not websocket then return end
+--     if(websocket:getReadyState() == cc.WEBSOCKET_STATE_OPEN and not closeFlag and sendFlag) then
+--         closeFlag = true
+--         websocket:close()
+--     end
+--     if websocket:getReadyState() == cc.WEBSOCKET_STATE_OPEN and not sendFlag then
+--             sendFlag = true
+--             websocket:sendString("Hello Websocket")
+--     end
+-- end
 
 
 
+-- function _checkEnv()
+--     print("LuaBitOp:",type(LuaBitOp))
+--     print("cc2:",type(cc))
+--     print("cc.WebSocket:",type(cc.WebSocket))
+--     print("cc.WEBSOCKET_OPEN:",cc.WEBSOCKET_OPEN)
+--     print("dhcrypt:",type(dhcrypt))
+--     for k,v in pairs(dhcrypt) do
+--         print(k,v)
+--     end
+--     for k,v in pairs(cc) do
+--         print(k,v)
+--     end
+-- end
+-- _checkEnv()
 
+-- function onOpen()
+--     print("[WebSockets]:open")
+-- end
 
+-- function onMessage(message)
+--     print("[WebSockets]:onMessage",message)
+-- end
 
+-- function onClose()
+--    print("[WebSockets]:onClose") 
+-- end
 
+-- function onError()
+--    print("[WebSockets]:onError") 
+-- end
 
-
-
-
-
-
-
-
+-- function TestWS()
+--     websocket = cc.WebSocket:create("ws://echo.websocket.org")
+--     websocket:registerScriptHandler(onOpen, cc.WEBSOCKET_OPEN)
+--     websocket:registerScriptHandler(onMessage,cc.WEBSOCKET_MESSAGE)
+--     websocket:registerScriptHandler(onClose,cc.WEBSOCKET_CLOSE)
+--     websocket:registerScriptHandler(onError,cc.WEBSOCKET_ERROR)
+-- end
+-- TestWS()

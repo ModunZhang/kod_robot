@@ -42,8 +42,9 @@ extern "C"{
 #include "../lua_engine/CCLuaEngine.h"
 #if USE_LUA_WEBSOCKET
 #include "CCPomeloWebSocket.h"
+#include "Lua_web_socket.h"
 #endif
-
+#if (USE_LUA_WEBSOCKET == 0)
 extern "C" {
 typedef union uwb {
     unsigned w;
@@ -486,7 +487,7 @@ base64Encode(const unsigned char *in, unsigned int inLength, char **out) {
 //}
 
 
-#if (USE_LUA_WEBSOCKET == 0)
+
 std::map<CCPomelo*, LuaEngine*> GlobalPomeloToLuaEngine;
 #else
 std::map<CCPomeloWebSocket*, LuaEngine*> GlobalPomeloToLuaEngine;
@@ -578,6 +579,9 @@ client(void * data)
 	open_tolua_fix(L);
 #if (USE_LUA_WEBSOCKET == 0)
 	tolua_cc_pomelo_open(L);
+#else
+    tolua_web_socket_open(L);
+    register_web_socket_manual(L);
 #endif
 	tolua_cc_lua_extension(L);
 
