@@ -11,14 +11,15 @@
 #include "../tolua/tolua_fix.h"
 #include <sys/time.h>
 #include <assert.h>
-#define CCLOG(format, ...) fprintf(stdout, format, ##__VA_ARGS__);printf("\n")
 
 typedef int LUA_FUNCTION;
 typedef int LUA_TABLE;
 typedef int LUA_STRING;
 
 
-
+#if USE_LUA_WEBSOCKET
+//FIXME:
+#else
 static void tolua_reg_pomelo_type(lua_State* tolua_S)
 {
     tolua_usertype(tolua_S, "CCPomelo");
@@ -399,7 +400,7 @@ TOLUA_API int tolua_cc_pomelo_open(lua_State* tolua_S)
     
 	return 1;
 }
-
+#endif
 static void tolua_reg_ext_type(lua_State* tolua_S)
 {
     tolua_usertype(tolua_S, "ext");

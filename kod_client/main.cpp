@@ -40,8 +40,9 @@ extern "C"{
 #include "Common.h"
 #include "CTimerHandle.h"
 #include "../lua_engine/CCLuaEngine.h"
-
-
+#if USE_LUA_WEBSOCKET
+#include "CCPomeloWebSocket.h"
+#endif
 
 extern "C" {
 typedef union uwb {
@@ -485,9 +486,11 @@ base64Encode(const unsigned char *in, unsigned int inLength, char **out) {
 //}
 
 
-
+#if (USE_LUA_WEBSOCKET == 0)
 std::map<CCPomelo*, LuaEngine*> GlobalPomeloToLuaEngine;
-
+#else
+std::map<CCPomeloWebSocket*, LuaEngine*> GlobalPomeloToLuaEngine;
+#endif
 #ifndef MULTI_THREAD
 #define MULTI_THREAD 0
 #endif
@@ -548,14 +551,15 @@ l_device_id(lua_State *L){
 
 static int 
 thread_exit(lua_State *L){
-    if(MULTI_THREAD)
+#if MULTI_THREAD
     {
         pthread_exit(0);
     }
-    else
+#else
     {
         exit(0);
     }
+#endif
 	return 0;
 }
 //
@@ -564,16 +568,22 @@ static bool stop_server = false;
 void *
 client(void * data)
 {
+#if (USE_LUA_WEBSOCKET == 0)
 	CCPomelo *pomelo = static_cast<CCPomelo*>(data);
+#else
+    CCPomeloWebSocket *pomelo = static_cast<CCPomeloWebSocket*>(data);
+#endif
 	lua_State* L = GlobalPomeloToLuaEngine[pomelo]->getLuaStack()->getLuaState();
 	luaL_openlibs(L);
 	open_tolua_fix(L);
+#if (USE_LUA_WEBSOCKET == 0)
 	tolua_cc_pomelo_open(L);
+#endif
 	tolua_cc_lua_extension(L);
 
 	int n = pomelo->GetSelfIndex();
-    stringstream ss;
-    string s;
+    std::stringstream ss;
+    std::string s;
     ss << device_id_string;
     ss << "_";
     ss << n;
@@ -581,7 +591,7 @@ client(void * data)
 	lua_pushstring(L, s.c_str());
 	lua_setglobal(L, "GlobalDeviceId");
 	lua_pushcfunction(L, thread_exit);
-	lua_setglobal(L, "threadExit");
+	lua_setglobal(L, "threa dExit");
 	if (luaL_loadfile(L, "main.lua") || lua_pcall(L, 0, 0, 0)){
 		printf("cannot run *.lua %s", lua_tostring(L, -1));
 	}
@@ -661,7 +671,7 @@ client(void * data)
 	}
 	return 0;
 }
-
+#if MULTI_THREAD
 void
 run()
 {
@@ -720,7 +730,7 @@ run()
    		}
   	}   
 }
-
+#endif
 int 
 main(int argc, char *argv[])
 {
@@ -737,8 +747,8 @@ main(int argc, char *argv[])
 	int ret = socketpair( PF_UNIX, SOCK_STREAM, 0, pipefd );
 	assert( ret != -1 );
 
-	 // 多线程模式
-	if(MULTI_THREAD)
+// 多线程模式
+#if MULTI_THREAD
 	{
 		pthread_t clients[MAX_CLIENT] = {};
 		CCPomelo *pomelos[MAX_CLIENT] = {};
@@ -775,15 +785,19 @@ main(int argc, char *argv[])
 			}
 		}
 	}
-	else // 单线程模式
+#else /* MULTI_THREAD */
 	{
+#if (USE_LUA_WEBSOCKET == 0)
 		CCPomelo * pomelo = new CCPomelo();
+#else
+        CCPomeloWebSocket * pomelo = new CCPomeloWebSocket();
+#endif
 		pomelo->setWirtePipeFd(pipefd[1]);
 		pomelo->setReadPipeFd(pipefd[0]);
 		GlobalPomeloToLuaEngine.insert(std::make_pair(pomelo, new LuaEngine()));
 		client(pomelo);
 	}
-	
+#endif
 
 
 	for ( auto item : GlobalPomeloToLuaEngine )

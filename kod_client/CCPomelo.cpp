@@ -5,9 +5,9 @@
 //  Created by xudexin on 13-4-17.
 //
 //
-
-#include "CTimerHandle.h"
 #include "CCPomelo.h"
+#if (USE_LUA_WEBSOCKET == 0)
+#include "CTimerHandle.h"
 #include <errno.h>
 #include <assert.h>
 
@@ -650,3 +650,4 @@ CCPomeloNotify_*CCPomelo::popNotify(){
         return  NULL;
     }
 }
+#endif

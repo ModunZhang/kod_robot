@@ -3,7 +3,7 @@
 //  Created by xudexin on 13-4-17.
 //
 //
-
+#if (USE_LUA_WEBSOCKET == 0)
 #ifndef __CCPomelo__
 #define __CCPomelo__
 
@@ -158,3 +158,4 @@ private:
 };
 
 #endif /* defined(__CCPomelo__) */
+#endif /*USE_LUA_WEBSOCKET*/
