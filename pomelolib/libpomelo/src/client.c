@@ -261,6 +261,7 @@ void pc__client_clear(pc_client_t *client) {
         client->secret = NULL;
     }
     if(client->dh) {
+        printf("freeDh\n" );
         freeDh(client->dh);
         client->dh = NULL;
     }

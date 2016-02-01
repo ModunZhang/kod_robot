@@ -167,7 +167,7 @@ end
 
 
 require("app.MyApp").new():run()
-running = false
+-- running = false
 local run_count = 0
 -- 随机种子设置
 local d_id = string.split(device.getOpenUDID(), "_")
@@ -179,7 +179,7 @@ local count_limit = 1
 function Run()
     run_count = (run_count + 1) > count_limit and 1 or (run_count + 1)
     -- print("main run id =",device.getOpenUDID(),"run_count=",run_count,"count_limit",count_limit)
-
+    print("··running·",running)
     if running and app and run_count == 1 then
         -- if running and app then
         app.timer:OnTimer()

@@ -151,7 +151,9 @@ int pc__handshake_resp(pc_client_t *client,
           free(secret);
           
           const unsigned char * challenge = (const unsigned char *)(json_string_value(challenge_docs));
+          printf("encrypt xxxx>>>>>>>>>>\n" );
           char * encrypt = rc4(client->secret, (const char *)challenge, strlen(challenge));
+          printf("rc4 9999>>>>>>>>>>\n" );
           base64Encode((const unsigned char *)encrypt, strlen(encrypt), &encrypt_challenge);
           free(encrypt);
       }
