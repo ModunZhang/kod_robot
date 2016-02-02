@@ -8,7 +8,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
-
+void setLuaDH(DH* dh,lua_State *tolua_S);
+DH* getLuaDH(lua_State *tolua_S);
 
 typedef union uwb {
 	unsigned w;
@@ -182,15 +183,15 @@ static const unsigned char two_generator[] = { 2 };
 
 typedef struct dh_st DH;
 
-static DH* dh = NULL;
+//static DH* dh = NULL;
 
 static int
 lcreatedh(lua_State *L) {
-	if(dh) {
-		DH_free(dh);
-		dh = NULL;
-	}
-	dh = DH_new();
+//	if(dh) {
+//		DH_free(dh);
+//		dh = NULL;
+//	}
+	DH* dh = DH_new();
 	dh->p = BN_bin2bn((const unsigned char*)group_modp1, sizeof(group_modp1), 0);
 	dh->g = BN_bin2bn((const unsigned char*)two_generator, 1, 0);
 	int codes;
@@ -200,11 +201,13 @@ lcreatedh(lua_State *L) {
 	if (!DH_generate_key(dh)) {
 		assert(0);
 	}
+    setLuaDH(dh, L);
 	return 0;
 }
 
 static int
 lgetpublickey(lua_State *L) {
+    DH* dh = getLuaDH(L);
 	if (!dh) {
 		assert(0);
 	}
@@ -221,6 +224,7 @@ lgetpublickey(lua_State *L) {
 
 static int
 lcomputesecret(lua_State *L) {
+    DH* dh = getLuaDH(L);
 	if (!dh) {
 		assert(0);
 	}

@@ -13,6 +13,7 @@
 #include "WebSocket.h"
 #define TEST_WEBSOCKET 0 //测试websocket基本功能
 #include <map>
+#include "openssl/dh.h"
 
 class CTimerHandle;
 
@@ -181,10 +182,23 @@ public:
     
     virtual void onError(WebSocket* ws, const WebSocket::ErrorCode& error)override;
 #endif
+    DH* dh;
+    void setLuaDH(DH* h){
+        if(nullptr!=dh) {
+            DH_free(dh);
+            dh = nullptr;
+        }
+        dh = h;
+    }
+    
+    DH* getLuaDH(){return dh;}
+        
+    void setSelfIndex(int index);
 private:
     CTimerHandle *timer_handle;
     int pipe_fd;
     int read_fd;
+    int index;
     WebSocket * m_socket;
     std::map<HandlerType, int> event_function_id_map; // type->function
 };

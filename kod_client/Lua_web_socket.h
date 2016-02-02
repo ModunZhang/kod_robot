@@ -33,9 +33,11 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
 #include "WebSocket.h"
+#include "openssl/dh.h"
 
+extern "C" void setLuaDH(DH* dh,lua_State *tolua_S);
+extern "C" DH* getLuaDH(lua_State *tolua_S);
 ///@cond
 class LuaWebSocket: public WebSocket,public WebSocket::Delegate
 {

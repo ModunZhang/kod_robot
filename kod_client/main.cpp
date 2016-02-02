@@ -755,11 +755,21 @@ main(int argc, char *argv[])
 #if MULTI_THREAD
 	{
 		pthread_t clients[MAX_CLIENT] = {};
-		CCPomelo *pomelos[MAX_CLIENT] = {};
+#if (USE_LUA_WEBSOCKET == 0)
+        CCPomelo *pomelos[MAX_CLIENT] = {};
+#else
+        CCPomeloWebSocket *pomelos[MAX_CLIENT] = {};
+#endif
+		
 		for (int i = 0; i < MAX_CLIENT; ++i)
 		{
 			// sleep(1);
+#if (USE_LUA_WEBSOCKET == 0)
 			CCPomelo * pomelo = new CCPomelo();
+#else
+            CCPomeloWebSocket * pomelo = new CCPomeloWebSocket();
+            pomelo->setSelfIndex(i);
+#endif
 			int ret = socketpair( PF_UNIX, SOCK_STREAM, 0, &pipefds[i] );
 			assert( ret != -1 );
 		    pomelo->setWirtePipeFd(pipefds[i + 1]);

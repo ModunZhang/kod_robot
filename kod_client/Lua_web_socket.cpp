@@ -478,4 +478,20 @@ TOLUA_API int register_web_socket_manual(lua_State* tolua_S)
     
     return 1;
 }
+void setLuaDH(DH* dh,lua_State *tolua_S)
+{
+    CCPomeloWebSocket* socket = GetCCPomeloWebSocketPool(tolua_S);
+    if (NULL != socket && NULL != dh) {
+        socket->setLuaDH(dh);
+    }
+}
+
+DH* getLuaDH(lua_State *tolua_S)
+{
+    CCPomeloWebSocket* socket = GetCCPomeloWebSocketPool(tolua_S);
+    if (NULL!=socket) {
+        return socket->getLuaDH();
+    }
+    return nullptr;
+}
 #endif//(CC_TARGET_PLATFORM == CC_PLATFORM_IOS ...

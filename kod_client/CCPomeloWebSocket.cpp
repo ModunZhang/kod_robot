@@ -13,6 +13,8 @@
 
 CCPomeloWebSocket::CCPomeloWebSocket() : pipe_fd(-1)
 ,m_socket(nullptr)
+,dh(NULL)
+,index(0)
 {
     timer_handle = new CTimerHandle(this);
     timer_handle->resume();
@@ -32,7 +34,6 @@ CCPomeloWebSocket::~CCPomeloWebSocket()
 
 void CCPomeloWebSocket::dispatchCallbacks(float delta)
 {
-    CCLOG("[CCPomeloWebSocket:dispatchCallbacks:]%f",delta);
     if (nullptr!=m_socket) {
         m_socket->update(delta);
     }
@@ -50,7 +51,12 @@ void CCPomeloWebSocket::setReadPipeFd(int fd)
 
 int CCPomeloWebSocket::GetSelfIndex()
 {
-    return 0;
+    return index;
+}
+
+void CCPomeloWebSocket::setSelfIndex(int id)
+{
+    index = id;
 }
 
 int CCPomeloWebSocket::GetReadFd()
