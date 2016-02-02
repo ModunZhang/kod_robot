@@ -1,6 +1,6 @@
 -- 需要有一个消息pool 定时取消息处理,否则容易卡UI
 -- 再封装一层connector, 切换使用tcp, udp websocket
-local scheduler = require("framework.scheduler")
+-- local scheduler = require("framework.scheduler")
 local Protobuf = require("libs.pomelo.Protobuf")
 local Protocol = require("libs.pomelo.Protocol")
 local Package = require("libs.pomelo.Package")
@@ -589,12 +589,12 @@ function Pomelo:_initData(data)
 end
 
 function Pomelo:_setTimeout(fn,delay)
-    return scheduler.performWithDelayGlobal(fn,delay)
+    return TimerUtil:getInstance():performWithDelayGlobal(fn,delay)
 end
 
 function Pomelo:_clearTimeout(fn)
     if fn and fn ~= 0 then
-        scheduler.unscheduleGlobal(fn)
+        TimerUtil:getInstance():unscheduleGlobal(fn)
     end
 end
 

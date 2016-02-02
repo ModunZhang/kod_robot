@@ -164,7 +164,7 @@ function GameGlobalUIUtils:showTips()
 end
 function GameGlobalUIUtils:showNotice()
 end
-
+TimerUtil = require("libs.TimerUtil")
 
 require("app.MyApp").new():run()
 running = false
@@ -182,6 +182,7 @@ function Run()
     print("··running·",running)
     if running and app and run_count == 1 then
         -- if running and app then
+        TimerUtil:getInstance():update()
         app.timer:OnTimer()
         app:RunAI()
     end
