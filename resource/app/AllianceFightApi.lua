@@ -30,10 +30,21 @@ function AllianceFightApi:RecruitNormalSoldier()
         local barracks = City:GetFirstBuildingByType("barracks")
         local unlock_soldiers = {}
         local level = barracks:GetLevel()
-
-        for k,v in pairs(barracks:GetUnlockSoldiers()) do
-            if v <= level then
-                table.insert(unlock_soldiers, k)
+        local soldiers_type = {
+            "swordsman_1", "ranger_1", "lancer_1", "catapult_1",
+            "sentinel_1", "crossbowman_1", "horseArcher_1", "ballista_1",
+            "swordsman_2", "ranger_2", "lancer_2", "catapult_2",
+            "sentinel_2", "crossbowman_2", "horseArcher_2", "ballista_2",
+            "swordsman_3", "ranger_3", "lancer_3", "catapult_3",
+            "sentinel_3", "crossbowman_3", "horseArcher_3", "ballista_3",
+        }
+        for i,v in ipairs(soldiers_type) do
+            local needBarracksLevel = UtilsForSoldier:GetSoldierConfig(User, v).needBarracksLevel
+            if needBarracksLevel then
+                local is_unlock = needBarracksLevel <= level
+                if is_unlock then
+                    table.insert(unlock_soldiers, v)
+                end
             end
         end
         local soldier_type = unlock_soldiers[math.random(#unlock_soldiers)]
@@ -50,41 +61,39 @@ function AllianceFightApi:RecruitSpecialSoldier()
     -- 兵营是否已解锁
     if app:IsBuildingUnLocked(5) then
         local barracks = City:GetFirstBuildingByType("barracks")
-        local re_time = DataUtils:GetNextRecruitTime()
-        if tolua.type(re_time) == "boolean" then
-            -- 检查材料是否足够
-            local soldier_types = {
-                "skeletonWarrior",
-                "skeletonArcher",
-                "deathKnight",
-                "meatWagon",
-            }
-            local soldier_type = soldier_types[math.random(#soldier_types)]
-            local soldier_config = User:GetSoldierConfig(soldier_type)
-            local count = 1 -- 招募一个
-            local specialMaterials = string.split(soldier_config.specialMaterials,",")
-            local is_enough = true
-            for k,v in pairs(specialMaterials) do
-                local temp = string.split(v, "_")
-                local total = User.soldierMaterials[temp[1]]
-                if total < count then
-                    is_enough = false
-                    break
-                end
+        -- 检查材料是否足够
+        local soldier_types = {
+            "skeletonWarrior",
+            "skeletonArcher",
+            "deathKnight",
+            "meatWagon",
+        }
+        local soldier_type = soldier_types[math.random(#soldier_types)]
+        local soldier_config = UtilsForSoldier:GetSoldierConfig(User, soldier_type)
+        local count = 1 -- 招募一个
+        local specialMaterials = string.split(soldier_config.specialMaterials,",")
+        local is_enough = true
+        for k,v in pairs(specialMaterials) do
+            local temp = string.split(v, "_")
+            local total = User.soldierMaterials[temp[1]]
+            if total < count then
+                is_enough = false
+                break
             end
-            if is_enough then
-                print("招募特殊士兵：",soldier_type)
-                if math.random(2) == 2 then
-                    return NetManager:getRecruitSpecialSoldierPromise(soldier_type, count)
-                else
-                    return NetManager:getInstantRecruitSpecialSoldierPromise(soldier_type, count)
-                end
+        end
+        if is_enough then
+            print("招募特殊士兵：",soldier_type)
+            if math.random(2) == 2 then
+                return NetManager:getRecruitSpecialSoldierPromise(soldier_type, count)
+            else
+                return NetManager:getInstantRecruitSpecialSoldierPromise(soldier_type, count)
             end
         end
     end
 end
 local function RandomMapIndex()
-    return math.random(0,35 * 35 - 1)
+    local bigMapLength = GameDatas.AllianceInitData.intInit.bigMapLength.value
+    return math.random(0,bigMapLength * bigMapLength - 1)
 end
 local function EnterMapIndexAndFunc(mapIndex,func)
     return NetManager:getEnterMapIndexPromise(mapIndex):done(function ( response )
@@ -127,12 +136,7 @@ function AllianceFightApi:March()
         if User.basicInfo.marchQueue < 2 then
             return NetManager:getUnlockPlayerSecondMarchQueuePromise()
         end
-        local function __getSoldierConfig(soldier_type,level)
-            local normal = GameDatas.Soldiers.normal
-            local SPECIAL = GameDatas.Soldiers.special
-            local level = level or 1
-            return normal[soldier_type.."_"..level] or SPECIAL[soldier_type]
-        end
+        
         -- 首先检查是否有条件攻打，龙，兵
         local dragonType
         local dragonWidget = 0
@@ -154,7 +158,7 @@ function AllianceFightApi:March()
             for k,v in pairs(User.soldiers) do
                 if v > 0 then
                     local count = math.random(v)
-                    soldiers_citizen = soldiers_citizen+count*__getSoldierConfig(k,User:SoldierStarByName(k)).citizen
+                    soldiers_citizen = soldiers_citizen+count*UtilsForSoldier:GetSoldierConfig(User, k).citizen
 
                     if leadCitizen >= soldiers_citizen then
                         table.insert(fight_soldiers,{ name = k, count = count})
@@ -443,6 +447,12 @@ return {
     March,
     SpeedUpMarchEvent,
 }
+
+
+
+
+
+
 
 
 

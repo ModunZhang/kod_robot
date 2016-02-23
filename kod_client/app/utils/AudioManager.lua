@@ -254,7 +254,7 @@ function AudioManager:FadeInBgMusicVolume()
     end, 0.04, false)
 end
 
- --OtherCityScene OtherAllianceScene FriendCityScene
+ --OtherCityScene  FriendCityScene
 local get_scene_name_in_enter_music_map = function(sceneName)
 	if sceneName == 'FteScene' then
 		return "MyCityScene" 

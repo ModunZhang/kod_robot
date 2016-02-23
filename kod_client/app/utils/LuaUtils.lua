@@ -83,8 +83,10 @@ function LuaUtils:printTable(t, depth)
 end
 
 function LuaUtils:outputTable(name, t) 
-    io.write((type(name) == "table" and "name" or name) .. ' = ')
-    self:printTable(type(name) == "table" and name or t)
+    if CONFIG_LOG_DEBUG_FILE then
+        io.write((type(name) == "table" and "name" or name) .. ' = ')
+        self:printTable(type(name) == "table" and name or t)
+    end
 end
 
 

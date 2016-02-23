@@ -1,6 +1,13 @@
 UtilsForEvent = {}
 local Localize = import(".Localize")
-local monsters = GameDatas.AllianceInitData.monsters
+
+function UtilsForEvent:IsHouseEvent(event)
+    return event.buildingLocation
+end
+function UtilsForEvent:IsBuildingEvent(event)
+    return event.location
+end
+
 function UtilsForEvent:GetEventInfo(event)
     local start = event.startTime/1000
     local finish = (event.finishTime or event.arriveTime) / 1000
@@ -13,7 +20,7 @@ function UtilsForEvent:GetEventInfo(event)
 end
 function UtilsForEvent:GetMilitaryTechEventLocalize(tech_name, level)
     local category, tech_type = unpack(string.split(tech_name, "_"))
-    if not tech_type then
+    if tonumber(tech_type) then
         return string.format(_("晋升%s的星级 star %d"),
             Localize.soldier_name[tech_name], level + 1)
     end
@@ -30,7 +37,7 @@ function UtilsForEvent:GetMilitaryTechEventLocalize(tech_name, level)
         level + 1)
 end
 
-
+local monsters = GameDatas.AllianceInitData.monsters
 function UtilsForEvent:GetMarchEventPrefix(event, eventType)
     if eventType == "shrineEvents" then
         local location = event.playerTroops[1].location

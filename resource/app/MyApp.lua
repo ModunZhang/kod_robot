@@ -7,6 +7,7 @@ require("app.utils.UtilsForEvent")
 require("app.utils.UtilsForTask")
 require("app.utils.UtilsForItem")
 require("app.utils.UtilsForTech")
+require("app.utils.UtilsForVip")
 require("app.utils.UtilsForSoldier")
 require("app.utils.UtilsForBuilding")
 require("app.utils.UtilsForShrine")
@@ -136,7 +137,6 @@ function MyApp:run()
         file:write("login : "..device.getOpenUDID().."\n")
         io.close(file)
     end
-    self.couldLogin = false
     NetManager:getConnectGateServerPromise()
         :next(function()
             return NetManager:getLogicServerInfoPromise()
@@ -180,9 +180,9 @@ function MyApp:run()
         end)
 end
 
-running = true
+running_1 = true
 function MyApp:setRun()
-    running = true
+    running_1 = true
 end
 local function setRun()
     app:setRun()
@@ -205,45 +205,9 @@ func_map = {
 api_group_index = 1
 api_index = 1
 function MyApp:RunAI()
-    -- if self.couldLogin then
-    --     self.couldLogin = false
-    --     print("·couldLogin·",couldLogin)
-    --     NetManager:getLoginPromise(device.getOpenUDID()):next(function()
-    --         if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
-    --             local terrains = {
-    --                 "grassLand",
-    --                 "desert",
-    --                 "iceField",
-    --             }
-    --             return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
-    --         end
-    --     end):next(function()
-    --         return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
-    --     end):next(function()
-    --         return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
-    --     end):next(function()
-    --         return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
-    --     end):next(function()
-    --         return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
-    --     end):next(function()
-    --         print("登录游戏成功!")
-    --         return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
-    --     end):catch(function(err)
-    --         dump(err:reason())
-    --         -- local content, title = err:reason()
-    --         -- local code = content.code
-    --         -- if content.code == 684 then
-    --         -- NetManager:disconnect()
-    --         -- self:run()
-    --         -- else
-    --         -- threadExit()
-    --         -- end
-    --     end)
-    --     return
-    -- end
-    print("RunAI robot id:", device.getOpenUDID(),running)
-    if running then
-        running = false
+    print("RunAI robot id:", device.getOpenUDID(),running_1)
+    if running_1 then
+        running_1 = false
         local group = func_map[api_group_index]
         print("run func index",api_group_index,api_index)
         group[api_index]()

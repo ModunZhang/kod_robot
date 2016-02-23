@@ -42,12 +42,12 @@ intInit["allianceRevengeMaxMinutes"] = {
 }
 intInit["allianceRegionMapWidth"] = {
 	["type"] = "allianceRegionMapWidth",
-	["value"] = 31,
+	["value"] = 21,
 	["desc"] = "联盟地图宽度"
 }
 intInit["allianceRegionMapHeight"] = {
 	["type"] = "allianceRegionMapHeight",
-	["value"] = 31,
+	["value"] = 21,
 	["desc"] = "联盟地图高度"
 }
 intInit["citizenPerLeadership"] = {
@@ -122,7 +122,7 @@ intInit["allianceMoveColdMinutes"] = {
 }
 intInit["bigMapLength"] = {
 	["type"] = "bigMapLength",
-	["value"] = 35,
+	["value"] = 41,
 	["desc"] = "大地图的大小"
 }
 intInit["allianceFightRewardHonour"] = {

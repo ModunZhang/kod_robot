@@ -44,29 +44,132 @@ end
 end
 ]]
 
+local staminaMax_value = GameDatas.PlayerInitData.intInit.staminaMax.value
+local staminaRecoverPerHour_value = GameDatas.PlayerInitData.intInit.staminaRecoverPerHour.value
+function getresoutput()
+    return {
+        gem         = {limit =        math.huge, output = 0},
+        blood       = {limit =        math.huge, output = 0},
+        casinoToken = {limit =        math.huge, output = 0},
+        stamina     = {limit = staminaMax_value, output = staminaRecoverPerHour_value},
+        cart        = {limit =        math.huge, output = 0},
+        wallHp      = {limit =        math.huge, output = 0},
+        coin        = {limit =        math.huge, output = 0},
+        wood        = {limit =        math.huge, output = 0},
+        food        = {limit =        math.huge, output = 0},
+        iron        = {limit =        math.huge, output = 0},
+        stone       = {limit =        math.huge, output = 0},
+        citizen     = {limit =        math.huge, output = 0},
+    }
+end
+local playerCitizenRecoverFullNeedHours_value = GameDatas.
+    PlayerInitData.
+    intInit.
+    playerCitizenRecoverFullNeedHours.value
+function DataUtils:GetResOutput(userData)
+    local reses = getresoutput()
+
+    local production    = UtilsForBuilding:GetHouseProductions(userData)
+    local buff_building = UtilsForBuilding:GetBuildingsBuff(userData)
+    local buff_terrain  = UtilsForBuilding:GetTerrainResourceBuff(userData)
+    local buff_tech     = UtilsForTech:GetBuff(userData)
+    local buff_item     = UtilsForItem:GetBuff(userData)
+    local buff_vip      = UtilsForVip:GetVipBuff(userData)
+
+    local wall_info     = UtilsForBuilding:GetWallInfo(userData)
+    production.wallHp   = wall_info.wallRecovery
+
+    production = production * (1 + buff_building + buff_item + buff_tech + buff_vip + buff_terrain)
+
+    local limits = UtilsForBuilding:GetWarehouseLimit(userData)
+    local limits_map = setmetatable({
+        coin = math.huge,
+        wood = limits.maxWood,
+        food = limits.maxFood,
+        iron = limits.maxIron,
+        stone= limits.maxStone,
+        wallHp = wall_info.wallHp,
+        citizen= UtilsForBuilding:GetCitizenLimit(userData),
+    }, BUFF_META)
+    local buff_limit = UtilsForTech:GetLimitBuff(userData)
+    limits_map = limits_map * (1 + buff_limit)
+
+    for k,v in pairs(limits_map) do
+        local res = reses[k]
+        if k == "citizen" then
+            res.limit = v - UtilsForBuilding:GetCitizenMap(userData).total
+        else
+            res.limit = v
+        end
+    end
+    
+    for k,v in pairs(production) do
+        local res = reses[k]
+        if k == "food" then
+            res.output = math.floor(v - UtilsForSoldier:GetSoldierUpkeep(userData))
+        else
+            res.output = math.floor(v)
+        end
+    end
+    local citizen = reses.citizen
+    citizen.output = math.floor(citizen.limit / playerCitizenRecoverFullNeedHours_value)
+    local cart = reses.cart
+    local tradeGuild_info = UtilsForBuilding:GetTradeGuildInfo(userData)
+    cart.limit = tradeGuild_info.maxCart
+    cart.output = tradeGuild_info.cartRecovery
+    return reses
+end
+
+--[[
+end
+]]
+
 
 --[[
   获取建筑升级时,需要的资源和道具
 ]]
 function DataUtils:getBuildingUpgradeRequired(buildingType, buildingLevel)
-    local temp = BuildingLevelUp[buildingType] or HouseLevelUp[buildingType]
-    local config = temp[buildingLevel]
-    local required = {
-        resources={
-            wood=config.wood,
-            stone=config.stone,
-            iron=config.iron,
-            citizen=config.citizen
-        },
-        materials={
-            blueprints=config.blueprints,
-            tools=config.tools,
-            tiles=config.tiles,
-            pulley=config.pulley
-        },
-        buildTime=config.buildTime
-    }
-    return required
+    local house_configs = HouseLevelUp[buildingType]
+    local building_configs = BuildingLevelUp[buildingType]
+    if building_configs then
+        local config = building_configs[buildingLevel]
+        return {
+            resources={
+                wood=config.wood,
+                stone=config.stone,
+                iron=config.iron,
+            },
+            materials={
+                blueprints=config.blueprints,
+                tools=config.tools,
+                tiles=config.tiles,
+                pulley=config.pulley
+            },
+            buildTime=config.buildTime
+        }
+    elseif house_configs then
+        local config = house_configs[buildingLevel]
+        local next_level = buildingLevel + 1
+        next_level = next_level > #house_configs and #house_configs or next_level
+        local next_config = house_configs[next_level]
+        return {
+            resources={
+                wood=config.wood,
+                stone=config.stone,
+                iron=config.iron,
+                citizen=next_config.citizen - config.citizen
+            },
+            materials={
+                blueprints=config.blueprints,
+                tools=config.tools,
+                tiles=config.tiles,
+                pulley=config.pulley
+            },
+            buildTime=config.buildTime
+        }
+    else
+        assert(false)
+    end
 end
 
 --[[
@@ -282,7 +385,7 @@ end
 function DataUtils:getAllSoldierVipBuffValue()
     local buff_table = {}
     --攻击力加成
-    local attck_buff = User:GetVIPSoldierAttackPowerAdd()
+    local attck_buff = UtilsForVip:GetVipBuffByName(User, "soldierAttackPowerAdd")
     if attck_buff > 0 then
         buff_table = {
             {"*","infantry",attck_buff},
@@ -293,17 +396,17 @@ function DataUtils:getAllSoldierVipBuffValue()
         }
     end
     --防御
-    local defence_buff = User:GetVIPSoldierHpAdd()
+    local defence_buff = UtilsForVip:GetVipBuffByName(User, "soldierHpAdd")
     if defence_buff > 0 then
         table.insert(buff_table,{"*","hp",defence_buff})
     end
     --维护费用
-    local consumeFood_buff = User:GetVIPSoldierConsumeSub()
+    local consumeFood_buff = UtilsForVip:GetVipBuffByName(User, "soldierConsumeSub")
     if consumeFood_buff > 0 then
         table.insert(buff_table,{"*","consumeFoodPerHour",consumeFood_buff})
     end
     --行军速度
-    local march_buff = User:GetVIPMarchSpeedAdd()
+    local march_buff = UtilsForVip:GetVipBuffByName(User, "marchSpeedAdd")
     if march_buff > 0 then
         table.insert(buff_table,{"*","march",march_buff})
     end
@@ -420,11 +523,11 @@ end
 
 function DataUtils:getPlayerMarchTimeBuffEffectValue()
     local effect = 0
-    if User:IsItemEventActive("marchSpeedBonus") then
+    if UtilsForItem:IsItemEventActive(User, "marchSpeedBonus") then
         effect = effect + UtilsForItem:GetItemBuff("marchSpeedBonus")
     end
     -- vip buffer
-    effect = effect + User:GetVIPMarchSpeedAdd()
+    effect = effect + UtilsForVip:GetVipBuffByName(User, "marchSpeedAdd")
     -- 联盟行军buff
     effect = effect + buff[self:getMapRoundByMapIndex(Alliance_Manager:GetMyAlliance().mapIndex)].marchSpeedAddPercent / 100
     return effect
@@ -484,7 +587,7 @@ function DataUtils:getBuffEfffectTime(time,decreasePercent)
 end
 -- 各种升级事件免费加速门坎 单位：秒
 function DataUtils:getFreeSpeedUpLimitTime()
-    return User:GetVIPFreeSpeedUpTime() * 60
+    return UtilsForVip:GetVipFreeSpeedUpTime(User) * 60
 end
 
 local config_online = GameDatas.Activities.online
@@ -519,10 +622,10 @@ end
 --龙的生命值恢复buff
 function DataUtils:GetDragonHpBuffTotal()
     local effect = 0
-    if User:IsItemEventActive("dragonHpBonus") then
+    if UtilsForItem:IsItemEventActive(User, "dragonHpBonus") then
         effect = effect + UtilsForItem:GetItemBuff("dragonHpBonus")
     end
-    effect = effect + User:GetVIPDragonHpRecoveryAdd()
+    effect = effect + UtilsForVip:GetVipBuffByName(User, "dragonHpRecoveryAdd")
     return effect
 end
 --龙的生命值恢复buff
@@ -700,7 +803,7 @@ local function getPlayerSoldierAtkBuff(soldierName, soldierStar, dragon, terrain
     local soldierType = getSoldiersConfig(soldierName, soldierStar).type
 
     local eventType = soldierType.."AtkBonus"
-    if User:IsItemEventActive(eventType) then
+    if UtilsForItem:IsItemEventActive(User, eventType) then
         local effect1 = UtilsForItem:GetItemBuff(eventType)
         itemBuff = effect1
     end
@@ -732,7 +835,7 @@ local function getPlayerSoldierHpBuff(soldierName, soldierStar, dragon, terrain,
     local skillBuff = 0
     local equipmentBuff = 0
 
-    if User:IsItemEventActive("unitHpBonus") then
+    if UtilsForItem:IsItemEventActive(User, "unitHpBonus") then
         local effect1 = UtilsForItem:GetItemBuff("unitHpBonus")
         itemBuff = effect1
     end
@@ -758,26 +861,6 @@ local function getPlayerSoldierHpBuff(soldierName, soldierStar, dragon, terrain,
 end
 local function createPlayerSoldiersForFight(soldiers, dragon, terrain, is_dragon_win)
     return LuaUtils:table_map(soldiers, function(k, soldier)
-        -- local soldier_man = City:GetSoldierManager()
-        -- local config = getSoldiersConfig(soldier.name, soldier.star)
-        -- local atkBuff = getPlayerSoldierAtkBuff(soldier.name, soldier.star, dragon, terrain, is_dragon_win)
-        -- var atkWallBuff = self.getDragonAtkWallBuff(dragon)
-        -- local hpBuff = getPlayerSoldierHpBuff(soldier.name, soldier.star, dragon, terrain, is_dragon_win)
-        -- local techBuffToInfantry = soldier_man:GetMilitaryTechsByName(config.type.."_".."infantry"):GetAtkEff()
-        -- local techBuffToArcher = soldier_man:GetMilitaryTechsByName(config.type.."_".."archer"):GetAtkEff()
-        -- local techBuffToCavalry = soldier_man:GetMilitaryTechsByName(config.type.."_".."cavalry"):GetAtkEff()
-        -- local techBuffToSiege = soldier_man:GetMilitaryTechsByName(config.type.."_".."siege"):GetAtkEff()
-        -- local techBuffHpAdd = soldier_man:GetMilitaryTechsByName(config.type.."_".."hpAdd"):GetAtkEff()
-        -- local vipAttackBuff = User:GetVIPSoldierAttackPowerAdd()
-        -- local vipHpBuff = User:GetVIPSoldierHpAdd()
-        -- dump(hpBuff, "hpBuff")
-        -- dump(vipHpBuff, "vipHpBuff")
-        -- dump(atkBuff, "atkBuff")
-        -- dump(vipAttackBuff, "vipAttackBuff")
-        -- dump(techBuffToInfantry, "techBuffToInfantry")
-        -- dump(techBuffToArcher, "techBuffToArcher")
-        -- dump(techBuffToCavalry, "techBuffToCavalry")
-        -- dump(techBuffToSiege, "techBuffToSiege")
         return k, {
             name = soldier.name,
             star = soldier.star,
@@ -800,8 +883,8 @@ local function createPlayerSoldiersForFight(soldiers, dragon, terrain, is_dragon
 end
 local function getPlayerDragonExpAdd(dragon)
     local itemBuff = 0
-    local vipBuff = User:GetVIPDragonExpAdd()
-    if User:IsItemEventActive("dragonExpBonus") then
+    local vipBuff = UtilsForVip:GetVipBuffByName(User, "dragonExpAdd")
+    if UtilsForItem:IsItemEventActive(User, "dragonExpBonus") then
         local effect1 = UtilsForItem:GetItemBuff("dragonExpBonus")
         itemBuff = effect1
     end
@@ -1163,20 +1246,16 @@ function DataUtils:DoBattle(attacker, defencer, terrain, enemy_name)
     return report
 end
 -- 获取资源保护百分比
+local resourceBuildingMap = {
+    wood = "lumbermill",
+    stone = "stoneMason",
+    iron = "foundry",
+    food = "mill"
+}
 local function getBuildingBuffForResourceProtectPercent(resourceName)
-    local resourceBuildingMap = {
-        wood = "lumbermill",
-        stone = "stoneMason",
-        iron = "foundry",
-        food = "mill"
-    }
-    local buildingName = resourceBuildingMap[resourceName]
-    local buildings = City:GetFirstBuildingByType(buildingName)
-    local protectPercent = 0
-    if buildings and buildings:GetLevel() > 0 then
-        protectPercent = protectPercent + buildings:GetProtection()
-    end
-    return protectPercent
+    return UtilsForBuilding:GetBuildingProtection(User,
+                resourceBuildingMap[resourceName]
+            )
 end
 -- local function getPlayerItemBuffForResourceLootPercentSubtract()
 --     local itemBuff = 0
@@ -1187,7 +1266,7 @@ end
 -- end
 local function getPlayerVipForResourceLootPercentSubtract()
     local vipBuffAddPercent = 0
-    if User:IsVIPActived() then
+    if UtilsForVip:IsVipActived(User) then
         vipBuffAddPercent = VipLevel[User:GetVipLevel()].storageProtectAdd
     end
     return vipBuffAddPercent
@@ -1199,7 +1278,7 @@ function DataUtils:GetResourceProtectPercent( resource_name )
     local vipBuffAddPercent = getPlayerVipForResourceLootPercentSubtract()
     local tech_effect = UtilsForTech:GetEffect("hideout", User.productionTechs["hideout"])
     local finalPercent = basePercent + buildingBuffAddPercent + vipBuffAddPercent + tech_effect
-    finalPercent = finalPercent > 0.9 and 0.9 or finalPercent < 0.1 and 0.1 or finalPercent
+    finalPercent = finalPercent > 0.9 and 0.9 or finalPercent < basePercent/100 and basePercent/100 or finalPercent
     return finalPercent
 end
 --根据MapIndex获取MapRound
@@ -1249,7 +1328,7 @@ function DataUtils:getMapRoundByMapIndex( mapIndex )
     for round,location in ipairs(locations) do
         for i,v in ipairs(location) do
             if v.from.x <= locationX and v.from.y <= locationY and v.to.x >= locationX and v.to.y >= locationY then
-                theRound = round - 1 
+                theRound = round - 1
             end
         end
     end
@@ -1257,15 +1336,15 @@ function DataUtils:getMapRoundByMapIndex( mapIndex )
 end
 --根据MapIndex获取对应buff增益数量
 function DataUtils:getMapBuffNumByMapIndex( mapIndex )
-        local map_round = self:getMapRoundByMapIndex(mapIndex)
-        local buff_1 = buff[map_round]
-        local buff_num = 0
-        for i,v in pairs(buff_1) do
-            if i ~="monsterLevel" and i ~= "round" and v > 0 then
-                buff_num = buff_num + 1
-            end
+    local map_round = self:getMapRoundByMapIndex(mapIndex)
+    local buff_1 = buff[map_round]
+    local buff_num = 0
+    for i,v in pairs(buff_1) do
+        if i ~="monsterLevel" and i ~= "round" and v > 0 then
+            buff_num = buff_num + 1
         end
-        return buff_num
+    end
+    return buff_num
 end
 
 function DataUtils:GetAllianceMapBuffByRound(round)
@@ -1290,6 +1369,7 @@ function DataUtils:GetAllianceMapBuffByRound(round)
 end
 
 return DataUtils
+
 
 
 

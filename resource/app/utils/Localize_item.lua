@@ -189,6 +189,9 @@ local ITEM_NAME = {
     vipPoint_3 = string.format(_("%sVIP点数"),string.formatnumberthousands(tonumber(special.vipPoint_3.effect))),
     vipPoint_4 = string.format(_("%sVIP点数"),string.formatnumberthousands(tonumber(special.vipPoint_4.effect))),
     sweepScroll = _("扫荡卷"),
+    redbag_1 = _("红包(小)"),
+    redbag_2 = _("红包(中)"),
+    redbag_3 = _("红包(大)"),
 
     -- speedup
     speedup_1 = string.format(_("%s加速"),formatMin(speedup.speedup_1.effect)),

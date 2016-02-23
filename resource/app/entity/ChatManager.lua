@@ -182,7 +182,6 @@ end
 
 function ChatManager:callEventsChangedListeners_(LISTEN_TYPE,tabel_param)
     tabel_param = tabel_param or {}
-    dump(tabel_param)
     self:NotifyListeneOnType(LISTEN_TYPE, function(listener)
         listener[self.LISTEN_TYPE[LISTEN_TYPE]](listener,unpack(tabel_param))
     end)

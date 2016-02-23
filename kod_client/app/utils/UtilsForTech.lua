@@ -46,7 +46,7 @@ local ProductionTechLevelUp = GameDatas.ProductionTechLevelUp
 local MilitaryTechLevelUp = GameDatas.MilitaryTechLevelUp
 function UtilsForTech:GetTechInfo(tech_name, level)
     local config = ProductionTechLevelUp[tech_name] or MilitaryTechLevelUp[tech_name]
-    return config[level]
+    return level > #config and config[#config] or config[level]
 end
 function UtilsForTech:IsMaxLevel(tech_name, tech)
     return tech.level == self:MaxLevel(tech_name)

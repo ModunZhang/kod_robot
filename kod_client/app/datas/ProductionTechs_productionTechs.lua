@@ -14,7 +14,7 @@ productionTechs["stoneCarving"] = {
 	["unlockBy"] = 3,
 	["unlockLevel"] = 2,
 	["academyLevel"] = 2,
-	["effectPerLevel"] = 0.005000
+	["effectPerLevel"] = 0.010000
 }
 productionTechs["forestation"] = {
 	["name"] = "forestation",
@@ -22,7 +22,7 @@ productionTechs["forestation"] = {
 	["unlockBy"] = 3,
 	["unlockLevel"] = 0,
 	["academyLevel"] = 1,
-	["effectPerLevel"] = 0.005000
+	["effectPerLevel"] = 0.010000
 }
 productionTechs["fastFix"] = {
 	["name"] = "fastFix",
@@ -38,7 +38,7 @@ productionTechs["ironSmelting"] = {
 	["unlockBy"] = 2,
 	["unlockLevel"] = 2,
 	["academyLevel"] = 4,
-	["effectPerLevel"] = 0.005000
+	["effectPerLevel"] = 0.010000
 }
 productionTechs["cropResearch"] = {
 	["name"] = "cropResearch",
@@ -46,7 +46,7 @@ productionTechs["cropResearch"] = {
 	["unlockBy"] = 5,
 	["unlockLevel"] = 2,
 	["academyLevel"] = 8,
-	["effectPerLevel"] = 0.005000
+	["effectPerLevel"] = 0.010000
 }
 productionTechs["reinforcing"] = {
 	["name"] = "reinforcing",
@@ -118,7 +118,7 @@ productionTechs["sketching"] = {
 	["unlockBy"] = 12,
 	["unlockLevel"] = 2,
 	["academyLevel"] = 22,
-	["effectPerLevel"] = 0.005000
+	["effectPerLevel"] = 0.010000
 }
 productionTechs["recruitment"] = {
 	["name"] = "recruitment",
@@ -142,5 +142,5 @@ productionTechs["mintedCoin"] = {
 	["unlockBy"] = 17,
 	["unlockLevel"] = 2,
 	["academyLevel"] = 32,
-	["effectPerLevel"] = 0.005000
+	["effectPerLevel"] = 0.010000
 }

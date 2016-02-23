@@ -15,12 +15,11 @@ local function clamp(a,b,x)
     return x < a and a or (x > b and b or x)
 end
 function GameUtils:GetCurrentProduction(value,refreshTime,limit,output,currentTime)
-    local trv = value + (currentTime - refreshTime) * output * 0.00027777777777778 --[[ 1 / 3600 = 0.00027777777777778]]
-    return floor(clamp(
-        0, 
-        output >= 0 and ((value >= limit and trv >= limit) and value or limit) or math.huge, 
-        trv
-        ))
+    local totalPerSecond = output / 60 / 60
+    local production = floor((currentTime - refreshTime) * totalPerSecond)
+    local total = value + production
+    local limit = output >= 0 and ((value >= limit and total >= limit) and value or limit) or math.huge
+    return floor(clamp(0,limit,total))
 end
 function GameUtils:formatTimeStyle1(time)
     local seconds = floor(time) % 60
@@ -300,6 +299,9 @@ function GameUtils:getPlatformForServer()
     if platform == 'android' then
         platform = 'ios'
     end
+    if platform == 'mac' then
+        platform = 'ios'
+    end
     return platform
 end
 
@@ -313,8 +315,8 @@ function GameUtils:GetServerInfo(param, callback)
             callback(false)
         end
     end, 
-    string.format("http://gate.batcatstudio.com/dragonfall/query-entry?env=%s&version=%s&platform=%s", string.urlencode(param.env), string.urlencode(param.version),platform), "GET")
-    request:setTimeout(60)
+    string.format("http://gate.batcatstudio.com/dragonfall/check-version?env=%s&version=%s&platform=%s", string.urlencode(param.env), string.urlencode(param.version),platform), "GET")
+    request:setTimeout(6.18)
     request:start()
 end
 
@@ -537,6 +539,14 @@ function GameUtils:GetGameLanguageFromNative()
     if string.find(code,'en') then
         code = 'en'
     end
+    if device.platform == 'ios' or device.platform == 'mac' then -- fix iOS9
+        for k,v in pairs(target_map) do
+            local transferred = string.gsub(k,"%-","%%-")
+            if string.find(code, transferred) then
+                return v
+            end
+        end
+    end
     return target_map[code] or 'en' -- we can not find the right language ,'en' as the default value
 end
 
@@ -576,7 +586,24 @@ function GameUtils:getSupportMailFormat(category,logMsg)
     end
     return "[Dragonfall]" .. category ,result_str
 end
+function GameUtils:getLoginErrorMailFormat(category)
+    local UTCTime    = "UTC Time:" .. os.date('!%Y-%m-%d %H:%M:%S', app.timer:GetServerTime())
+    local GameName   = "Game:" .. "Dragonfall"
+    local Version    = "Version:" .. ext.getAppVersion()
+    local OpenUDID   = "Open UDID:" .. device.getOpenUDID()
+    local Category   = "Category:" .. category or ""
+    local Language   = "Language:" .. GameUtils:GetGameLanguage()
+    local DeviceType = "Device Type:" ..ext.getDeviceModel()
+    local OSVersion  = "OS Version:" .. ext.getOSVersion()
+    print("....---",UTCTime,GameName,Version,OpenUDID,Category,Language,DeviceType,OSVersion)
 
+    local format_str = "\n\n\n\n\n---------------%s---------------\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s"
+    local result_str = string.format(format_str,_("不能删除"),UTCTime,GameName,Version,OpenUDID,Category,Language,DeviceType,OSVersion)
+    if logMsg then
+        result_str = string.format("%s\n---------------Log---------------\n%s",result_str,logMsg)
+    end
+    return "[Dragonfall]" .. category ,result_str
+end
 function GameUtils:SetGameLanguage(lang)
     cc.UserDefault:getInstance():setStringForKey("GAME_LANGUAGE", lang)
     cc.UserDefault:getInstance():flush()

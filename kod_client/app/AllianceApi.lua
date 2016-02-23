@@ -35,7 +35,6 @@ function AllianceApi:RequestToJoinAlliance()
             while call_count <= chat_count and call_over do
                 call_over = false
                 local chat = chat_data[call_count]
-                print("chat.allianceTag=",chat.allianceTag)
                 if chat.allianceTag ~="" then
                     NetManager:getSearchAllianceByTagPromsie(chat.allianceTag):done(function ( response )
                         if #response.msg.allianceDatas == 0 then
@@ -158,36 +157,12 @@ function AllianceApi:AllianceMemberApi()
                 end
             end)
         end
-        -- local excute_fun = math.random(10)
-        -- if excute_fun ~= 1 then
-        --     -- 职位改变
-        --     local up_or_down = math.random(2)
-        --     if up_or_down == 1 then
-        --         -- 降级
-        --         local auth,title_can = me:CanDemotionMemberLevel(member:Title())
-        --         local isLow = member:IsTitleLowest()
-        --         if auth and title_can and not isLow then
-        --             print("职位降级",member.name,member:TitleDegrade())
-        --             return NetManager:getEditAllianceMemberTitlePromise(member:Id(), member:TitleDegrade())
-        --         end
-        --     else
-        --         -- 晋级
-        --         local auth,title_can = me:CanUpgradeMemberLevel(member:TitleUpgrade())
-        --         local isHighest = member:IsTitleHighest()
-        --         if auth and title_can and not isHighest then
-        --             print("职位晋级",member.name,member:TitleUpgrade())
-        --             return NetManager:getEditAllianceMemberTitlePromise(member:Id(), member:TitleUpgrade())
-        --         end
-
-        --     end
-        -- else
-            -- 踢出
-            local auth,title_can = me:CanKickOutMember(member:Title())
-            if not title_can or not auth or alliance.basicInfo.status == "fight" then
-                return
-            end
-            return NetManager:getKickAllianceMemberOffPromise(member:Id())
-        -- end
+        -- 踢出
+        local auth,title_can = me:CanKickOutMember(member:Title())
+        if not title_can or not auth or alliance.basicInfo.status == "fight" then
+            return
+        end
+        return NetManager:getKickAllianceMemberOffPromise(member:Id())
     end
 end
 -- 联盟捐赠
@@ -230,10 +205,11 @@ function AllianceApi:UpgradeAllianceBuilding()
     if not Alliance_Manager:GetMyAlliance():IsDefault() then
         local alliance = Alliance_Manager:GetMyAlliance()
         local building_names = {
-            -- "orderHall",
+            "orderHall",
             "palace",
-            -- "shop",
-            -- "shrine",
+            "shop",
+            "shrine",
+            "watchTower",
         }
         local building_name = building_names[math.random(#building_names)]
         local building = alliance:GetAllianceBuildingInfoByName(building_name)
@@ -313,22 +289,8 @@ function AllianceApi:EditAllianceInfo()
             if me:CanEditAllianceNotice() then
                 return NetManager:getEditAllianceDescriptionPromise("机器人联盟描述")
             end
-        -- elseif excute_fun <= 25 and me:CanEditAllianceMemeberTitle() then
-        --     local title_keys = {
-        --         "supervisor",
-        --         "quartermaster",
-        --         "elite",
-        --         "member",
-        --         "archon",
-        --         "general",
-        --     }
-        --     local change_title = title_keys[math.random(#title_keys)]
-        --     print("修改联盟职位名称",change_title)
-        --     return NetManager:getEditAllianceTitleNamePromise(change_title,"机器人"..change_title)
         elseif excute_fun <= 30 then
             return NetManager:getItemLogsPromise(alliance._id)
-        elseif excute_fun <= 35 then
-            return NetManager:getNearedAllianceInfosPromise()
         end
     end
 end
@@ -466,11 +428,10 @@ function AllianceApi:HelpSpeedUp()
 end
 function AllianceApi:AllianceOtherApi()
     local alliance = Alliance_Manager:GetMyAlliance()
-    print("alliance:IsDefault()=",alliance:IsDefault())
     if not alliance:IsDefault() then
         local member = alliance:GetSelf()
-        -- local random = math.random(100)
-        local random = 12
+        local random = math.random(100)
+        -- local random = 12
         -- 发联盟邮件
         if member:CanSendAllianceMail() and random < 5 then
             return NetManager:getSendAllianceMailPromise("机器人联盟邮件", "机器人联盟邮件")
@@ -489,11 +450,10 @@ function AllianceApi:AllianceOtherApi()
             if #alliance:GetMyMarchEvents() > 0 then
                 return
             end
-            local locationX = math.random(29)
-            local locationY = math.random(29)
+            local locationX = math.random(GameDatas.AllianceInitData.intInit.allianceRegionMapWidth.value-2)
+            local locationY = math.random(GameDatas.AllianceInitData.intInit.allianceRegionMapHeight.value-2)
             local mapObjects = alliance.mapObjects
             local can_move = true
-            print("locationX==",locationX,"locationY",locationY)
             for i,v in ipairs(mapObjects) do
                 if v.location.x == locationX and v.location.y == locationY then
                     can_move = false
@@ -501,23 +461,15 @@ function AllianceApi:AllianceOtherApi()
                 end
             end
             local terrainStyle = alliance.basicInfo.terrainStyle
-            print("terrainStyle===",terrainStyle)
             local terrainStyle_map = GameDatas.AllianceMap["allianceMap_"..terrainStyle]
             local buildingName = GameDatas.AllianceMap.buildingName
             for i,v in ipairs(terrainStyle_map) do
-                if v.x == locationX and v.y == locationY then
-                    can_move = false
-                    break
-                end
                 local sizeInfo = buildingName[v.name]
-                if sizeInfo.width > 1 then
-                    for i=1,sizeInfo.width do
-                        for j=1,sizeInfo.height do
-                            print("大装饰计算移动坐标是否合理x=",(v.x - i),"y=",(v.y - j))
-                            if (v.x - i + 1) == locationX and (v.y - j + 1) == locationY then
-                                can_move = false
-                                break
-                            end
+                for i=v.x,v.x - sizeInfo.width + 1,-1 do
+                    for j=v.y,v.y - sizeInfo.height + 1,-1 do
+                        if i==locationX and j==locationY then
+                            can_move = false
+                            break
                         end
                     end
                 end
@@ -617,7 +569,8 @@ end
 function AllianceApi:MoveAlliance()
     local alliance = Alliance_Manager:GetMyAlliance()
     if not alliance:IsDefault() then
-        local mapIndex = math.random(0,35 * 35 - 1)
+        local bigMapLength = GameDatas.AllianceInitData.intInit.bigMapLength.value
+        local mapIndex = math.random(0,bigMapLength * bigMapLength - 1)
         if mapIndex == alliance.mapIndex then
             return
         end
@@ -888,6 +841,9 @@ return {
     FirstJoinAllianceReward,
     MoveAlliance
 }
+
+
+
 
 
 

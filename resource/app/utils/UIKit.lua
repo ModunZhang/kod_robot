@@ -9,6 +9,7 @@ local promise = import(".promise")
 local Enum = import("..utils.Enum")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
+local RichText = import("..widget.RichText")
 local UILib = import("..ui.UILib")
 local UIListView = import("..ui.UIListView")
 local CURRENT_MODULE_NAME = ...
@@ -641,15 +642,18 @@ function UIKit:isMessageDialogShowWithUserData(userData)
     return self.messageDialogs[userData] ~= nil
 end
 
-function UIKit:showKeyMessageDialog(title,tips,ok_callback,cancel_callback)
+function UIKit:showKeyMessageDialog(title,tips,ok_callback,cancel_callback,ok_button_string,visible_x_button)
     if self:isKeyMessageDialogShow() then
         print("忽略了一次关键性弹窗")
         return
     end
-    local dialog =  UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,false,nil,"__key__dialog")
+    if(type(visible_x_button) ~= 'boolean') then visible_x_button = false end
+    local dialog =  UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_x_button,nil,"__key__dialog",ok_button_string)
+    -- 关键性的弹窗即使是显示关闭按钮也屏蔽自动关闭的属性!
+    dialog:DisableAutoClose()
 end
 
-function UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_x_button,x_button_callback,user_data)
+function UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_x_button,x_button_callback,user_data,ok_button_string)
     title = title or _("提示")
     tips = tips or ""
     if type(visible_x_button) ~= 'boolean' then visible_x_button = true end
@@ -660,7 +664,8 @@ function UIKit:showMessageDialog(title,tips,ok_callback,cancel_callback,visible_
                 if ok_callback then
                     ok_callback()
                 end
-            end
+            end,
+            btn_name = ok_button_string
         })
     end
 
@@ -764,7 +769,7 @@ end
 -- 可能得到材料的派兵行为检查
 function UIKit:showSendTroopMessageDialog(attack_func,material_name,effect_str,isNotEffection)
     -- 特殊提示，医院爆满，特殊兵种材料爆满
-    local is_hospital_overhead = City:GetFirstBuildingByType("hospital"):IsWoundedSoldierOverhead()
+    local is_hospital_overhead = User:IsWoundedSoldierOverflow()
     local is_material_overhead = User:IsMaterialOutOfRange(material_name)
     --
     if is_material_overhead and not isNotEffection or is_hospital_overhead then
@@ -780,12 +785,12 @@ function UIKit:showSendTroopMessageDialog(attack_func,material_name,effect_str,i
         local body = dialog:GetBody()
         local hospital_bg = WidgetUIBackGround.new({width = 332 ,height = 96},WidgetUIBackGround.STYLE_TYPE.STYLE_5):addTo(body):pos(236,220)
         display.newSprite("hospital.png"):addTo(hospital_bg):align(display.LEFT_CENTER, 16, hospital_bg:getContentSize().height/2):scale(0.35)
-        self:ttfLabel({
-            text = _("医院"),
-            size = 20,
-            color = 0x403c2f
-        }):align(display.LEFT_CENTER, 110, 65)
-            :addTo(hospital_bg)
+        -- self:ttfLabel({
+        --     text = _("医院"),
+        --     size = 20,
+        --     color = 0x403c2f
+        -- }):align(display.LEFT_CENTER, 110, 72)
+        --     :addTo(hospital_bg)
         local label_1
         if is_hospital_overhead then
             display.newSprite("icon_warning_22x42.png"):addTo(hospital_bg):align(display.CENTER, 75, hospital_bg:getContentSize().height/2 + 15)
@@ -793,19 +798,26 @@ function UIKit:showSendTroopMessageDialog(attack_func,material_name,effect_str,i
         else
             label_1 = _("正常")
         end
-        self:ttfLabel({
-            text = label_1,
-            size = 18,
-            color = is_hospital_overhead and 0x7e0000 or 0x007c23
-        }):align(display.LEFT_CENTER, 110, 30)
-            :addTo(hospital_bg)
+        -- self:ttfLabel({
+        --     text = label_1,
+        --     size = 18,
+        --     color = is_hospital_overhead and 0x7e0000 or 0x007c23,
+        --     dimensions = cc.size(220,0)
+        -- }):align(display.LEFT_CENTER, 110, 37)
+        --     :addTo(hospital_bg)
+        local color = is_hospital_overhead and 0x7e0000 or 0x007c23
+        local contenet_label = RichText.new({width = 180,size = 20,color = 0x403c2f})
+        local str = "[{\"type\":\"text\", \"value\":\"%s\n\"},{\"type\":\"text\", \"size\":\"%d\", \"color\":\"%d\", \"value\":\"%s\"}]"
+        str = string.format(str,_("医院"),18,color,label_1)
+        contenet_label:Text(str):align(display.LEFT_CENTER,115,48):addTo(hospital_bg)
+
         local materialDepot_bg = WidgetUIBackGround.new({width = 332 ,height = 96},WidgetUIBackGround.STYLE_TYPE.STYLE_5):addTo(body):pos(236,100)
         display.newSprite("materialDepot.png"):addTo(materialDepot_bg):align(display.LEFT_CENTER, 16, materialDepot_bg:getContentSize().height/2):scale(0.35)
         self:ttfLabel({
             text = _("材料库房"),
             size = 20,
             color = 0x403c2f
-        }):align(display.LEFT_CENTER, 110, 65)
+        }):align(display.LEFT_CENTER, 110, 72)
             :addTo(materialDepot_bg)
         local label_1
         if is_material_overhead then
@@ -817,8 +829,8 @@ function UIKit:showSendTroopMessageDialog(attack_func,material_name,effect_str,i
         self:ttfLabel({
             text = label_1,
             size = 18,
-            color = is_material_overhead and 0x7e0000 or 0x007c23
-        }):align(display.LEFT_CENTER, 110, 30)
+            color = is_material_overhead and 0x7e0000 or 0x007c23,
+        }):align(display.LEFT_CENTER, 110, 37)
             :addTo(materialDepot_bg)
     else
         attack_func()
@@ -949,15 +961,15 @@ function UIKit:GotoPreconditionBuilding(jump_building)
         end
     end)
 end
--- 暂时只有宝箱
+-- 宝箱,红包
 function UIKit:PlayUseItemAni(item_name,awards,message)
     if string.find(item_name,"dragonChest")
-        or string.find(item_name,"chest") then
-        local ani = ""
+        or string.find(item_name,"chest") or string.find(item_name,"redbag") then
+        local ani
         if item_name == "dragonChest_1" then
-            ani = "lanse"
-        elseif item_name == "dragonChest_2" then
             ani = "lvse_box"
+        elseif item_name == "dragonChest_2" then
+            ani = "lanse"
         elseif item_name == "dragonChest_3" then
             ani = "zise_box"
         elseif item_name == "chest_1" then
@@ -971,6 +983,8 @@ function UIKit:PlayUseItemAni(item_name,awards,message)
         end
         if ani then
             self:newGameUI("GameUIChest",awards,message,ani):AddToCurrentScene():setLocalZOrder(10000)
+        else
+            GameGlobalUI:showTips(_("提示"),message)
         end
     end
 end
@@ -1073,6 +1087,7 @@ function UIKit:GetItemImage(reward_type,item_key)
     if reward_type == 'soldiers' then
         return UILib.soldier_image[item_key]
     elseif reward_type == 'resource'
+        or reward_type == 'items'
         or reward_type == 'special'
         or reward_type == 'speedup'
         or reward_type == 'buff'
@@ -1128,10 +1143,10 @@ function UIKit:ButtonAddScaleAction(button)
 end
 
 local dragon_config = {
-    greenDragon = {"green_long_breath", cc.p(0.63,0.29), 2},
-    redDragon   = {  "red_long_breath", cc.p(0.63,0.29), 2},
-    blueDragon  = { "blue_long_breath", cc.p(0.63,0.29), 2},
-    blackDragon = {   "heilong_breath",  cc.p(0.63,0.2), 2.4},
+    greenDragon = {"green_long_breath", cc.p(0.63,0.29), 1.4},
+    redDragon   = {  "red_long_breath", cc.p(0.63,0.29), 1.4},
+    blueDragon  = { "blue_long_breath", cc.p(0.63,0.29), 1.4},
+    blackDragon = {   "heilong_breath", cc.p(0.63,0.29), 1.8},
 }
 function UIKit:CreateDragonBreathAni(dragon_type, is_left)
     local ani, ap, s = unpack(dragon_config[dragon_type])
@@ -1152,21 +1167,21 @@ local monster_config = {
     ranger_1 = {"heihua_gongjianshou_2_45", cc.p(0.4, 0.15), 4, -1},
     ranger_2 = {"heihua_gongjianshou_2_45", cc.p(0.4, 0.15), 4, -1},
     ranger_3 = {"heihua_gongjianshou_3_45", cc.p(0.4, 0.3), 4, -1},
-    lancer_1 = {"heihua_qibing_2_45", cc.p(0.5, 0.4), 2, -1},
-    lancer_2 = {"heihua_qibing_2_45", cc.p(0.5, 0.4), 2, -1},
-    lancer_3 = {"heihua_qibing_3_45", cc.p(0.5, 0.45), 2, -1},
+    lancer_1 = {"heihua_qibing_2_45", cc.p(0.5, 0.5), 2, -1},
+    lancer_2 = {"heihua_qibing_2_45", cc.p(0.5, 0.5), 2, -1},
+    lancer_3 = {"heihua_qibing_3_45", cc.p(0.5, 0.55), 2, -1},
     catapult_1 = {"heihua_toushiche_2_45", cc.p(0.5, 0.35), 1, -1},
     catapult_2 = {"heihua_toushiche_2_45", cc.p(0.5, 0.35), 1, -1},
-    catapult_3 = {"heihua_toushiche_3_45", cc.p(0.5, 0.35), 1, -1},
+    catapult_3 = {"heihua_toushiche_3_45", cc.p(0.5, 0.4), 1, -1},
     sentinel_1 = {"heihua_shaobing_2_45", cc.p(0.5, 0.2), 4, -1},
     sentinel_2 = {"heihua_shaobing_2_45", cc.p(0.5, 0.2), 4, -1},
     sentinel_3 = {"heihua_shaobing_3_45", cc.p(0.5, 0.2), 4, -1},
     crossbowman_1 = {"heihua_nugongshou_2_45", cc.p(0.5, 0.28), 4, -1},
     crossbowman_2 = {"heihua_nugongshou_2_45", cc.p(0.5, 0.28), 4, -1},
     crossbowman_3 = {"heihua_nugongshou_3_45", cc.p(0.5, 0.28), 4, -1},
-    horseArcher_1 = {"heihua_youqibing_2_45", cc.p(0.5, 0.3), 2, -1},
-    horseArcher_2 = {"heihua_youqibing_2_45", cc.p(0.5, 0.3), 2, -1},
-    horseArcher_3 = {"heihua_youqibing_3_45", cc.p(0.5, 0.3), 2, -1},
+    horseArcher_1 = {"heihua_youqibing_2_45", cc.p(0.5, 0.45), 2, -1},
+    horseArcher_2 = {"heihua_youqibing_2_45", cc.p(0.5, 0.45), 2, -1},
+    horseArcher_3 = {"heihua_youqibing_3_45", cc.p(0.5, 0.45), 2, -1},
     ballista_1 = {"heihua_nuche_2_45", cc.p(0.5, 0.4), 1, -1},
     ballista_2 = {"heihua_nuche_2_45", cc.p(0.5, 0.4), 1, -1},
     ballista_3 = {"heihua_nuche_3_45", cc.p(0.5, 0.4), 1, -1},
@@ -1177,26 +1192,59 @@ local monster_config = {
 }
 local position_map = {
     [1] = {
-        {x = 0, y = 0}
+        {x = 0, y = -20}
     },
     [2] = {
-        {x = -20, y = 10},
-        {x = 20, y = -10},
+        {x = -20, y = 0},
+        {x = 20, y = -20},
     },
     [4] = {
-        {x = 0, y = 0},
-        {x = -25, y = -15},
-        {x = 25, y = -15},
-        {x = 0, y = -30},
+        {x = 0, y = -10},
+        {x = -25, y = -25},
+        {x = 25, y = -25},
+        {x = 0, y = -40},
     }
 }
+local monster_scale = {
+    swordsman_1     = 1,
+    swordsman_2     = 1,
+    swordsman_3     = 1,
+    ranger_1        = 1,
+    ranger_2        = 1,
+    ranger_3        = 1,
+    lancer_1        = 1,
+    lancer_2        = 1,
+    lancer_3        = 1,
+    catapult_1      = 0.8,
+    catapult_2      = 0.8,
+    catapult_3      = 0.8,
+    sentinel_1      = 1,
+    sentinel_2      = 1,
+    sentinel_3      = 1,
+    crossbowman_1   = 1,
+    crossbowman_2   = 1,
+    crossbowman_3   = 1,
+    horseArcher_1   = 1,
+    horseArcher_2   = 1,
+    horseArcher_3   = 1,
+    ballista_1      = 0.8,
+    ballista_2      = 0.8,
+    ballista_3      = 0.8,
+    skeletonWarrior = 1,
+    skeletonArcher  = 1,
+    deathKnight     = 1,
+    meatWagon       = 1,
+}
 function UIKit:CreateMonster(name)
-    local soldier_name, star = unpack(string.split(name, ':'))
-    local _,_,count,s = unpack(monster_config[soldier_name])
+    local soldierName, star = unpack(string.split(name, ':'))
+    local _,_,count,s = unpack(monster_config[soldierName])
     local node = display.newNode()
+    local unit_scale = monster_scale[soldierName]
     for _,v in ipairs(position_map[count]) do
-        UIKit:CreateSoldierIdle45Ani(soldier_name, star, monster_config)
-            :pos(v.x, v.y):addTo(node):setScaleX(s or 1)
+        local soldier = UIKit:CreateSoldierIdle45Ani(soldierName, star, monster_config)
+        :addTo(node):pos(v.x, v.y)
+        soldier:setScaleX((s or 1) * unit_scale)
+        soldier:setScaleY(unit_scale)
     end
     return node
 end
@@ -1296,8 +1344,8 @@ local soldier_ani_idle_map = {
     lancer_1 = {"qibing_1_45", cc.p(0.5, 0.48),2},
     lancer_2 = {"qibing_2_45", cc.p(0.5, 0.48),2},
     lancer_3 = {"qibing_3_45", cc.p(0.5, 0.48),2},
-    catapult_1 = {"toushiche_45", cc.p(0.5, 0.3),1},
-    catapult_2 = {"toushiche_2_45", cc.p(0.5, 0.3),1},
+    catapult_1 = {"toushiche_45", cc.p(0.5, 0.15),1},
+    catapult_2 = {"toushiche_2_45", cc.p(0.45, 0.3),1},
     catapult_3 = {"toushiche_3_45", cc.p(0.5, 0.3),1},
     sentinel_1 = {"shaobing_1_45", cc.p(0.5, 0.23),4},
     sentinel_2 = {"shaobing_2_45", cc.p(0.5, 0.23),4},
@@ -1308,7 +1356,7 @@ local soldier_ani_idle_map = {
     horseArcher_1 = {"youqibing_1_45", cc.p(0.5, 0.3),2},
     horseArcher_2 = {"youqibing_2_45", cc.p(0.5, 0.3),2},
     horseArcher_3 = {"youqibing_3_45", cc.p(0.5, 0.3),2},
-    ballista_1 = {"nuche_1_45", cc.p(0.5, 0.4),1},
+    ballista_1 = {"nuche_1_45", cc.p(0.4, 0.4),1},
     ballista_2 = {"nuche_2_45", cc.p(0.5, 0.4),1},
     ballista_3 = {"nuche_3_45", cc.p(0.5, 0.4),1},
     skeletonWarrior = {"kulouyongshi_45", cc.p(0.5, 0.35),4},
@@ -1726,6 +1774,38 @@ function UIKit:CreateSand()
     end, 2 + math.random(3))
     return emitter
 end
+function UIKit:CreateFog(png)
+    local emitter = cc.ParticleSystemQuad:createWithTotalParticles(50)
+    emitter:setDuration(-1)
+    emitter:setPositionType(2)
+    emitter:setAngle(0)
+    emitter:setPosVar(cc.p(-300, 1224 * 2))
+    emitter:setGravity(cc.p(0, 0))
+    emitter:setRotationIsDir(true)
+    emitter:setEmitterMode(0)
+    emitter:setLife(30)
+    emitter:setLifeVar(10)
+    emitter:setStartSize(450)
+    emitter:setStartSizeVar(150)
+    emitter:setEndSize(450)
+    emitter:setEndSizeVar(150)
+    emitter:setSpeed(100)
+    emitter:setSpeedVar(100)
+    emitter:setStartSpinVar(90)
+    emitter:setEndSpinVar(-1)
+    -- emitter:setTangentialAccelVar(200)
+    emitter:setEmissionRate(50)
+    emitter:setStartColor(cc.c4f(1))
+    emitter:setEndColor(cc.c4f(0))
+    emitter:setBlendAdditive(true)
+    emitter:setBlendFunc(gl.ONE, gl.ONE_MINUS_SRC_COLOR)
+    emitter:setTexture(cc.Director:getInstance():getTextureCache():addImage(png or "fog.png"))
+    -- emitter:schedule(function()
+    --     emitter:setLife(15)
+    --     emitter:setEmissionRate(50 + math.random(100))
+    -- end, 2 + math.random(3))
+    return emitter
+end
 
 function UIKit:CreateNumberImageNode(params)
     local number_node = display.newNode()
@@ -1758,15 +1838,15 @@ function UIKit:CreateNumberImageNode(params)
                 replace_key = num_string
             end
             local num_sprite =display.newSprite(string.format("icon_%s.png",replace_key)):addTo(self)
-            x = x + (i == 1 and num_sprite:getContentSize().width/2 or num_sprite:getContentSize().width) + ((replace_key == "point" or replace_key == "slash" or replace_key == "colon") and 6 or 0)
-            num_sprite:pos(x,15)
+            x = x + (i == 1 and num_sprite:getContentSize().width/2 or num_sprite:getContentSize().width) 
+            num_sprite:pos(x + ((replace_key == "point" or replace_key == "slash" or replace_key == "colon" or replace_key == "comma") and 6 or 0),15)
             num_sprite:setColor(UIKit:hex2c4b(color))
             if i == string.len(text) then
                 node_width = x + num_sprite:getContentSize().width/2
             end
         end
-        number_node:setContentSize(cc.size(node_width,30))
-        number_node:scale(size/30)
+        self:setContentSize(cc.size(node_width,30))
+        self:scale(size/30)
     end
     function number_node:SetNumColor( color)
         for i,num_sprite in ipairs(self:getChildren()) do

@@ -1,5 +1,17 @@
 UtilsForItem = {}
 
+
+
+function UtilsForItem:IsItemEventActive(userData, type_)
+    for k,v in pairs(userData.itemEvents) do
+        if v.type == type_ then
+            local time = self:GetItemEventTime(v)
+            return time > 0, time
+        end
+    end
+    return false, 0
+end
+
 function UtilsForItem:GetItemEventTime(itemEvent)
     return math.ceil(itemEvent.finishTime/1000 - app.timer:GetServerTime())
 end

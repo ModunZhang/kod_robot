@@ -82,7 +82,6 @@ function DragonApi:MakeEquipment(force_equip_type)
                 break
             end
             for m_name,m_count in pairs(User.dragonEquipments) do
-                print("m_name,m_count=",m_name,m_count)
                 if m_name == v[1] then
                     if tonumber(v[2]) > m_count then
                         is_material_enough = false
@@ -125,7 +124,6 @@ function DragonApi:LoadEquipment()
         if not dragon:IsAllEquipmentsLoaded() then
             -- 当前已有的所有装备
             local all_equipments = User.dragonEquipments
-            dump(all_equipments,"all_equipments")
             for k,equi in pairs(dragon:Equipments()) do
                 -- 没有装备该部位
                 if not equi:IsLoaded() and not equi:IsLocked() then
