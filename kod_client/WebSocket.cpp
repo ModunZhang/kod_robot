@@ -38,6 +38,7 @@
 #include <assert.h>
 #include "libwebsockets.h"
 #include "Common.h"
+#include <string.h>
 
 #define CC_SAFE_DELETE(p) do { delete (p); (p) = nullptr; } while(0)
 #define CC_SAFE_DELETE_ARRAY(p)     do { if(p) { delete[] (p); (p) = nullptr; } } while(0)
