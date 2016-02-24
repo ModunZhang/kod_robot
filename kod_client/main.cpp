@@ -607,7 +607,7 @@ client(void * data)
 	{
 		test_set = time_set; 
 		struct timeval timeout;   
-		timeout.tv_sec = 1;
+		timeout.tv_sec = 0;
        	timeout.tv_usec = 0;
        	int result = select( pomelo->GetReadFd() + 1, &test_set, (fd_set *)0, (fd_set *)0, &timeout ); 
        	switch(result)   

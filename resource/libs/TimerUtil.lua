@@ -4,7 +4,11 @@
 --
 
 local TimerUtil = class("TimerUtil")
-
+local DEBUG = false
+local print = print
+if not DEBUG then
+	print = function(...)end
+end
 function TimerUtil:ctor()
 	self.__tasks__ = {}
 	self._nextDeltaTimeZero = true
@@ -30,6 +34,20 @@ function TimerUtil:unscheduleGlobal(identity)
 	end
 end
 
+function TimerUtil:scheduleGlobal(fn, interval)
+	local ret = tostring(fn)
+	local interval = tonumber(interval) or 0
+	self.__tasks__[ret] = {fn = fn,interval = interval,needRemove = false}
+	return ret
+end
+
+function TimerUtil:unscheduleGlobal(handle)
+	local task = self.__tasks__[handle]
+	if task then
+		task.needRemove = true
+	end
+end
+
 function TimerUtil:update()
 	local now = ext.now()/1000 -- sec
 	if self._nextDeltaTimeZero then
@@ -52,10 +70,22 @@ function TimerUtil:checkTasks(dt)
 			v._elapsed = v._elapsed + dt
 		end
 		print("[TimerUtil]:__tasks__",k,v.delay,v._elapsed)
-		if v._elapsed > v.delay or v._elapsed == v.delay then
-			table.insert(needRemoveEvents,k)
-			print("[TimerUtil]:trigger",k)
-			v.fn()
+		if not v.interval then 
+			if v._elapsed > v.delay or v._elapsed == v.delay then
+				table.insert(needRemoveEvents,k)
+				print("[TimerUtil]:trigger delay",k)
+				v.fn()
+			end
+		else
+			if v.needRemove then
+				table.insert(needRemoveEvents,k)
+			else
+				if v._elapsed > v.interval or v._elapsed == v.interval then
+					print("[TimerUtil]:trigger global",k)
+					v._elapsed = 0
+					v.fn()
+				end
+			end
 		end
 	end
 	for __,v in ipairs(needRemoveEvents) do
