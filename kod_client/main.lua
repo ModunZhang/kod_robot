@@ -1,5 +1,5 @@
 _ = function(...) return ... end
-cc = {}
+cc = cc or {}
 cc.PACKAGE_NAME = "app.cc"
 cc.UserDefault = {
     getInstance = function()
@@ -133,6 +133,23 @@ cc.HelperFunc = {
         return ""
     end,
 }
+-- for websocket
+cc.WEBSOCKET_OPEN     = 0
+cc.WEBSOCKET_MESSAGE  = 1
+cc.WEBSOCKET_CLOSE    = 2
+cc.WEBSOCKET_ERROR    = 3
+
+cc.WEBSOCKET_STATE_CONNECTING = 0
+cc.WEBSOCKET_STATE_OPEN       = 1
+cc.WEBSOCKET_STATE_CLOSING    = 2
+cc.WEBSOCKET_STATE_CLOSED     = 3
+
+cc.XMLHTTPREQUEST_RESPONSE_STRING       = 0
+cc.XMLHTTPREQUEST_RESPONSE_ARRAY_BUFFER = 1
+cc.XMLHTTPREQUEST_RESPONSE_BLOB         = 2
+cc.XMLHTTPREQUEST_RESPONSE_DOCUMENT     = 3
+cc.XMLHTTPREQUEST_RESPONSE_JSON         = 4
+--websocket end
 require("config")
 require("functions")
 require("json")
@@ -147,42 +164,30 @@ function GameGlobalUIUtils:showTips()
 end
 function GameGlobalUIUtils:showNotice()
 end
-
+TimerUtil = require("libs.TimerUtil")
 
 require("app.MyApp").new():run()
--- running = false
+running_1 = false
 local run_count = 0
 -- 随机种子设置
 local d_id = string.split(device.getOpenUDID(), "_")
 local number = tonumber(d_id[1]) * 10 + tonumber(d_id[2])
 math.randomseed(tostring(os.time() * number):reverse():sub(1, 6))
-
+local startAi = false
 local count_limit = 1
 -- local count_limit = math.random(5,15)
 function Run()
-    run_count = (run_count + 1) > count_limit and 1 or (run_count + 1)
-    -- print("main run id =",device.getOpenUDID(),"run_count=",run_count,"count_limit",count_limit)
-    print("running==",running)
-    if running and app and run_count == 1 then
-        -- if running and app then
-        app.timer:OnTimer()
-        app:RunAI()
+    TimerUtil:getInstance():update()
+    if not startAi then
+        startAi = true
+        TimerUtil:getInstance():scheduleGlobal(function()
+            run_count = (run_count + 1) > count_limit and 1 or (run_count + 1)
+            if running_1 and app and run_count == 1 then
+                app.timer:OnTimer()
+                app:RunAI()
+            end
+        end,1)
     end
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

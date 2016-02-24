@@ -173,76 +173,22 @@ local run_count = 0
 local d_id = string.split(device.getOpenUDID(), "_")
 local number = tonumber(d_id[1]) * 10 + tonumber(d_id[2])
 math.randomseed(tostring(os.time() * number):reverse():sub(1, 6))
-
+local startAi = false
 local count_limit = 1
 -- local count_limit = math.random(5,15)
 function Run()
-    run_count = (run_count + 1) > count_limit and 1 or (run_count + 1)
-    -- print("main run id =",device.getOpenUDID(),"run_count=",run_count,"count_limit",count_limit)
-    print("running_1",running_1)
-    if running_1 and app and run_count == 1 then
-        -- if running and app then
-        TimerUtil:getInstance():update()
-        app.timer:OnTimer()
-        app:RunAI()
+
+    TimerUtil:getInstance():update()
+    if not startAi then
+        startAi = true
+        TimerUtil:getInstance():scheduleGlobal(function()
+            run_count = (run_count + 1) > count_limit and 1 or (run_count + 1)
+            if running_1 and app and run_count == 1 then
+                app.timer:OnTimer()
+                app:RunAI()
+            end
+        end,1)
     end
 end
 
 
--- test websoket
--------------------------------------
-
--- local sendFlag,closeFlag = false,false
--- function Run()
---     if not websocket then return end
---     if(websocket:getReadyState() == cc.WEBSOCKET_STATE_OPEN and not closeFlag and sendFlag) then
---         closeFlag = true
---         websocket:close()
---     end
---     if websocket:getReadyState() == cc.WEBSOCKET_STATE_OPEN and not sendFlag then
---             sendFlag = true
---             websocket:sendString("Hello Websocket")
---     end
--- end
-
-
-
--- function _checkEnv()
---     print("LuaBitOp:",type(LuaBitOp))
---     print("cc2:",type(cc))
---     print("cc.WebSocket:",type(cc.WebSocket))
---     print("cc.WEBSOCKET_OPEN:",cc.WEBSOCKET_OPEN)
---     print("dhcrypt:",type(dhcrypt))
---     for k,v in pairs(dhcrypt) do
---         print(k,v)
---     end
---     for k,v in pairs(cc) do
---         print(k,v)
---     end
--- end
--- _checkEnv()
-
--- function onOpen()
---     print("[WebSockets]:open")
--- end
-
--- function onMessage(message)
---     print("[WebSockets]:onMessage",message)
--- end
-
--- function onClose()
---    print("[WebSockets]:onClose") 
--- end
-
--- function onError()
---    print("[WebSockets]:onError") 
--- end
-
--- function TestWS()
---     websocket = cc.WebSocket:create("ws://echo.websocket.org")
---     websocket:registerScriptHandler(onOpen, cc.WEBSOCKET_OPEN)
---     websocket:registerScriptHandler(onMessage,cc.WEBSOCKET_MESSAGE)
---     websocket:registerScriptHandler(onClose,cc.WEBSOCKET_CLOSE)
---     websocket:registerScriptHandler(onError,cc.WEBSOCKET_ERROR)
--- end
--- TestWS()
