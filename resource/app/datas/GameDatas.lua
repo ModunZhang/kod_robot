@@ -102,6 +102,7 @@ GameDatas.AllianceMap = {
 	["moveLimit"] = {},
 	["bigRound"] = {},
 	["roundIndex"] = {},
+	["monsters"] = {},
 	["allianceMap_1"] = {},
 	["allianceMap_2"] = {},
 	["allianceMap_3"] = {},
@@ -115,6 +116,7 @@ require("app.datas.AllianceMap_buff")
 require("app.datas.AllianceMap_moveLimit")
 require("app.datas.AllianceMap_bigRound")
 require("app.datas.AllianceMap_roundIndex")
+require("app.datas.AllianceMap_monsters")
 require("app.datas.AllianceMap_allianceMap_1")
 require("app.datas.AllianceMap_allianceMap_2")
 require("app.datas.AllianceMap_allianceMap_3")
