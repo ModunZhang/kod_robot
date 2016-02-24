@@ -495,7 +495,7 @@ std::map<CCPomeloWebSocket*, LuaEngine*> GlobalPomeloToLuaEngine;
 #define MULTI_THREAD 0
 #endif
 
-const int MAX_CLIENT = 1;
+const int MAX_CLIENT = 10;
 static int pipefds[MAX_CLIENT * 2] = {};
 static int pipefd[2];
 
