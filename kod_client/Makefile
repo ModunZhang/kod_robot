@@ -33,7 +33,7 @@ client_obj = CCPomelo.o LuaExtension.o main.o
 objects = $(luaengine_obj) $(tolua_obj) $(client_obj) $(websocket_obj)
 
 all: kod_client
-	@$(MAKE) cleanObjects
+	@$(MAKE) cleanObjects lua
 
 kod_client: $(objects)
 	# lipomelo
@@ -58,13 +58,10 @@ cleanObjects:
 	-@rm *.o
 
 clean:
-	-@echo "clean all"
 	-@rm -f kod_client
 	-@rm -f *.lua
 	-@rm -rf libs
 	-@rm -rf app
 lua:
-	-@echo "copy lua file..."
 	-@cp -rf ../resource/* .
-	-@echo "copy lua finished"
 	
