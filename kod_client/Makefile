@@ -1,9 +1,11 @@
 # 如果要编译libpomelo版本,将下面websocket相关部分注释,打开libpomelo部分即可。当然lua源码中需要修改为使用libpomelo
+# MULTI_THREAD宏定义,如果不需要启用多线程,将MULTI_THREAD设置为0
+MULTI_THREAD=0
 GCC=gcc
 OBJDIR=./obj
 CFLAGS= -Wall -c -I../lua_engine/ -I../tolua/ -I../lua/ -I../pomelolib/libpomelo/deps/jansson/src \
  -I../pomelolib/libpomelo/include -I../pomelolib/libpomelo/deps/uv/include -I../
-
+CFLAGS += -DMULTI_THREAD=$(MULTI_THREAD)
 #websockets
 CFLAGS_WEBSOCKETS = -I../websocket
 MAKEEOS = -DUSE_LUA_WEBSOCKET=1
