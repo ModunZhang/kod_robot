@@ -17,3 +17,8 @@ bin
 project.xcworkspace/
 */xcuserdata/*
 xcuserdata/
+kod_client/*.lua
+kod_client/app/
+kod_client/kod_client
+kod_client/libs/
+kod_client/log
