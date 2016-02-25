@@ -184,6 +184,7 @@ function Run()
         TimerUtil:getInstance():scheduleGlobal(function()
             run_count = (run_count + 1) > count_limit and 1 or (run_count + 1)
             if running_1 and app and run_count == 1 then
+                count_limit = math.random(5,15)
                 app.timer:OnTimer()
                 app:RunAI()
             end
