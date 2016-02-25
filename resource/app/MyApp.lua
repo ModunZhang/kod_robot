@@ -206,18 +206,39 @@ api_group_index = 1
 api_index = 1
 function MyApp:RunAI()
     print("RunAI robot id:", device.getOpenUDID(),running_1)
-    if running_1 then
-        running_1 = false
-        local group = func_map[api_group_index]
-        print("run func index",api_group_index,api_index)
-        group[api_index]()
-        if (api_index + 1) > #group then
-            api_group_index = math.random(#func_map)
-            api_index = 1
-        else
-            api_index = api_index + 1
+    if not NetManager:isConnected() and running_1 then
+        NetManager:getConnectLogicServerPromise()
+            :next(function ()
+                return NetManager:getLoginPromise(device.getOpenUDID())
+            end):done(function ()
+            if running_1 then
+                running_1 = false
+                local group = func_map[api_group_index]
+                print("run func index",api_group_index,api_index)
+                group[api_index]()
+                if (api_index + 1) > #group then
+                    api_group_index = math.random(#func_map)
+                    api_index = 1
+                else
+                    api_index = api_index + 1
+                end
+            end
+            end)
+    else
+        if running_1 then
+            running_1 = false
+            local group = func_map[api_group_index]
+            print("run func index",api_group_index,api_index)
+            group[api_index]()
+            if (api_index + 1) > #group then
+                api_group_index = math.random(#func_map)
+                api_index = 1
+            else
+                api_index = api_index + 1
+            end
         end
     end
+
 end
 
 -- 辅助方法
@@ -231,6 +252,9 @@ function MyApp:IsBuildingUnLocked(location_id)
 end
 
 return MyApp
+
+
+
 
 
 
