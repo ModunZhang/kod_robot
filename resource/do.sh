@@ -32,22 +32,22 @@ function run()
 	let "index+=1"
 	getNext $index
 	start $s $e
-	sleep $executetime
-	let "index+=1"
-	getNext $index
-	start $s $e
-	sleep $executetime
-	let "index+=1"
-	getNext $index
-	start $s $e
-	sleep $executetime
-	let "index+=1"
-	getNext $index
-	start $s $e
-	sleep $executetime
-	let "index+=1"
-	getNext $index
-	start $s $e
+	# sleep $executetime
+	# let "index+=1"
+	# getNext $index
+	# start $s $e
+	# sleep $executetime
+	# let "index+=1"
+	# getNext $index
+	# start $s $e
+	# sleep $executetime
+	# let "index+=1"
+	# getNext $index
+	# start $s $e
+	# sleep $executetime
+	# let "index+=1"
+	# getNext $index
+	# start $s $e
 }
 if [[ $1 -eq 1 ]]; then
 	run 1
