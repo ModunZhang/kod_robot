@@ -174,8 +174,8 @@ local d_id = string.split(device.getOpenUDID(), "_")
 local number = tonumber(d_id[1]) * 10 + tonumber(d_id[2])
 math.randomseed(tostring(os.time() * number):reverse():sub(1, 6))
 local startAi = false
-local count_limit = 1
--- local count_limit = math.random(5,15)
+-- local count_limit = 1
+local count_limit = math.random(5,15)
 function Run()
 
     TimerUtil:getInstance():update()
