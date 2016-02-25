@@ -15,6 +15,7 @@ elif [ ${#@} -eq 2 ]; then
 	for(( i = $1; i <= $2; i++ ))
 	do
 	{
+		sleep 5
 		runClient $i
 	}&
 	done
