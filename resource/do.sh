@@ -5,7 +5,7 @@ function start()
 	sh start.sh $1 $2 > /dev/null 2>&1 &
 }
 
-executetime=5
+executetime=60
 s=0
 e=0
 function getNext()
