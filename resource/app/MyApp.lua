@@ -131,12 +131,12 @@ function MyApp:GetUpdateFile()
     end
 end
 function MyApp:run()
-    local file = io.open("log", "a+")
+    -- local file = io.open("log", "a+")
 
-    if file then
-        file:write("login : "..device.getOpenUDID().."\n")
-        io.close(file)
-    end
+    -- if file then
+    --     file:write("login : "..device.getOpenUDID().."\n")
+    --     io.close(file)
+    -- end
     NetManager:getConnectGateServerPromise()
         :next(function()
             return NetManager:getLogicServerInfoPromise()
@@ -144,39 +144,39 @@ function MyApp:run()
         :next(function()
             return NetManager:getConnectLogicServerPromise()
         end):next(function ()
-            return NetManager:getLoginPromise(device.getOpenUDID())
+        return NetManager:getLoginPromise(device.getOpenUDID())
         end):next(function ()
-            if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
-                local terrains = {
-                    "grassLand",
-                    "desert",
-                    "iceField",
-                }
-                return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
-            end
+        if DataManager:getUserData().basicInfo.terrain == "__NONE__" then
+            local terrains = {
+                "grassLand",
+                "desert",
+                "iceField",
+            }
+            return NetManager:initPlayerData(terrains[math.random(#terrains)],"en")
+        end
         end):next(function()
-            return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
+        return NetManager:getSendGlobalMsgPromise("resources gem 99999999999")
         end):next(function()
-            return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
+        return NetManager:getSendGlobalMsgPromise("dragonmaterial 99999999999")
         end):next(function()
-            return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
+        return NetManager:getSendGlobalMsgPromise("soldiermaterial 99999999999")
         end):next(function()
-            return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
+        return NetManager:getSendGlobalMsgPromise("buildinglevel 1 40")
         end):next(function()
-            print("登录游戏成功!")
-            return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
+        print("登录游戏成功!")
+        return NetManager:getSendGlobalMsgPromise("buildinglevel 4 40")
         end):done(function ()
-            self:setRun()
+        self:setRun()
         end):catch(function(err)
-            dump(err:reason())
-            -- local content, title = err:reason()
-            -- local code = content.code
-            -- if content.code == 684 then
-            -- NetManager:disconnect()
-            -- self:run()
-            -- else
-            -- threadExit()
-            -- end
+        dump(err:reason())
+        local content, title = err:reason()
+        local code = content.code
+        if content.code == 683 then
+            NetManager:disconnect()
+            self:run()
+        else
+            threadExit()
+        end
         end)
 end
 
@@ -231,6 +231,8 @@ function MyApp:IsBuildingUnLocked(location_id)
 end
 
 return MyApp
+
+
 
 
 
