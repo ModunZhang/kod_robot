@@ -4,7 +4,7 @@ echo > log
 
 function runClient()
 {
-	./kod_client $1 > null
+	./kod_client $1
 	# >> log
 }
 

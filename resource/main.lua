@@ -1,3 +1,4 @@
+print = function(...)end
 _ = function(...) return ... end
 cc = cc or {}
 cc.PACKAGE_NAME = "app.cc"
