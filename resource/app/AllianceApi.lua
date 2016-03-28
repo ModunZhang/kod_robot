@@ -652,6 +652,9 @@ local function JoinAlliance()
             local joined = false
             local function join()
                 if joined then
+                    if Alliance_Manager:GetMyAlliance():IsDefault() then
+                        CreateAlliance()
+                    end
                     return
                 end
                 NetManager:getFetchCanDirectJoinAlliancesPromise(page):done(function(response)

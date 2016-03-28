@@ -136,7 +136,7 @@ function AllianceFightApi:March()
         if User.basicInfo.marchQueue < 2 then
             return NetManager:getUnlockPlayerSecondMarchQueuePromise()
         end
-        
+
         -- 首先检查是否有条件攻打，龙，兵
         local dragonType
         local dragonWidget = 0
@@ -154,13 +154,14 @@ function AllianceFightApi:March()
         if dragon then
             -- 带兵量判定
             local leadCitizen = dragon:LeadCitizen()
+            local unit_citizen = math.floor(leadCitizen/6)
             local soldiers_citizen = 0
             for k,v in pairs(User.soldiers) do
                 if v > 0 then
-                    local count = math.random(v)
-                    soldiers_citizen = soldiers_citizen+count*UtilsForSoldier:GetSoldierConfig(User, k).citizen
+                    local citizen = UtilsForSoldier:GetSoldierConfig(User, k).citizen
+                    local count = math.random(math.min(v,math.floor(unit_citizen/citizen)))
 
-                    if leadCitizen >= soldiers_citizen then
+                    if #fight_soldiers < 6 then
                         table.insert(fight_soldiers,{ name = k, count = count})
                     else
                         break
@@ -447,6 +448,7 @@ return {
     March,
     SpeedUpMarchEvent,
 }
+
 
 
 
