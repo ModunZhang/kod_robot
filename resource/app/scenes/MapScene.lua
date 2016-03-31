@@ -40,7 +40,6 @@ function MapScene:OnUserDataChanged_basicInfo(userData, deltaData)
         self.level = level
     end
 end
-local animation = import("..animation")
 function MapScene:onEnter()
     if self.PreLoadImages then
         self:PreLoadImages()

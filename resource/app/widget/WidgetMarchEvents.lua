@@ -53,34 +53,34 @@ local function HasMyEvent(ok, events)
         end
     end
 end
-function WidgetMarchEvents:OnAllianceDataChanged_marchEvents(userData, deltaData) 
+function WidgetMarchEvents:OnAllianceDataChanged_marchEvents(userData, deltaData)
     if HasMyEvent(deltaData("marchEvents.attackMarchEvents.add"))
-    or HasMyEvent(deltaData("marchEvents.attackMarchEvents.edit"))
-    or HasMyEvent(deltaData("marchEvents.attackMarchEvents.remove"))
-    --
-    or HasMyEvent(deltaData("marchEvents.attackMarchReturnEvents.add"))
-    or HasMyEvent(deltaData("marchEvents.attackMarchReturnEvents.edit"))
-    or HasMyEvent(deltaData("marchEvents.attackMarchReturnEvents.remove"))
-    --
-    or HasMyEvent(deltaData("marchEvents.strikeMarchEvents.add"))
-    or HasMyEvent(deltaData("marchEvents.strikeMarchEvents.edit"))
-    or HasMyEvent(deltaData("marchEvents.strikeMarchEvents.remove"))
-    --
-    or HasMyEvent(deltaData("marchEvents.strikeMarchReturnEvents.add"))
-    or HasMyEvent(deltaData("marchEvents.strikeMarchReturnEvents.edit"))
-    or HasMyEvent(deltaData("marchEvents.strikeMarchReturnEvents.remove"))
+        or HasMyEvent(deltaData("marchEvents.attackMarchEvents.edit"))
+        or HasMyEvent(deltaData("marchEvents.attackMarchEvents.remove"))
+        --
+        or HasMyEvent(deltaData("marchEvents.attackMarchReturnEvents.add"))
+        or HasMyEvent(deltaData("marchEvents.attackMarchReturnEvents.edit"))
+        or HasMyEvent(deltaData("marchEvents.attackMarchReturnEvents.remove"))
+        --
+        or HasMyEvent(deltaData("marchEvents.strikeMarchEvents.add"))
+        or HasMyEvent(deltaData("marchEvents.strikeMarchEvents.edit"))
+        or HasMyEvent(deltaData("marchEvents.strikeMarchEvents.remove"))
+        --
+        or HasMyEvent(deltaData("marchEvents.strikeMarchReturnEvents.add"))
+        or HasMyEvent(deltaData("marchEvents.strikeMarchReturnEvents.edit"))
+        or HasMyEvent(deltaData("marchEvents.strikeMarchReturnEvents.remove"))
     then
         self:PromiseOfSwitch()
     end
 end
 function WidgetMarchEvents:OnAllianceDataChanged_villageEvents(userData, deltaData)
     if deltaData("villageEvents.add")
-    or deltaData("villageEvents.edit")
-    or deltaData("villageEvents.remove") then
+        or deltaData("villageEvents.edit")
+        or deltaData("villageEvents.remove") then
         self:PromiseOfSwitch()
     end
 end
-    
+
 
 function WidgetMarchEvents:AddOrRemoveAllianceEvent(isAdd)
     local User = User
@@ -116,11 +116,11 @@ function WidgetMarchEvents:onEnter()
     end
     scheduleAt(self, function()
         self:IteratorItems(function(v)
-            if v.eventType == "attackMarchEvents" 
-            or v.eventType == "attackMarchReturnEvents"
-            or v.eventType == "strikeMarchEvents"
-            or v.eventType == "strikeMarchReturnEvents"
-                then
+            if v.eventType == "attackMarchEvents"
+                or v.eventType == "attackMarchReturnEvents"
+                or v.eventType == "strikeMarchEvents"
+                or v.eventType == "strikeMarchReturnEvents"
+            then
                 local time, percent = UtilsForEvent:GetEventInfo(v.event)
                 v.time:setString(GameUtils:formatTimeStyle1(time))
                 v.progress:setPercentage(percent)
@@ -479,13 +479,13 @@ function WidgetMarchEvents:CreateDefenceItem(event, eventType)
         node.progress:setPercentage(collectPercent)
         dragonType = event.playerData.dragon.type
     elseif eventType == "helpToTroops" then
-        local target_pos = event.beHelpedPlayerData.location.x .. "," .. event.beHelpedPlayerData.location.y
-        node.prefix = string.format(_("正在协防 %s (%s)"), 
-                event.beHelpedPlayerData.name, target_pos)
+        local target_pos = event.location.x .. "," .. event.location.y
+        node.prefix = string.format(_("正在协防 %s (%s)"),
+            event.name, target_pos)
         node.progress:setPercentage(100)
         display_text = node.prefix
         time_str = ""
-        dragonType = event.playerDragon
+        dragonType = event.dragon
     elseif eventType == "shrineEvents" then
         node.prefix = UtilsForEvent:GetMarchEventPrefix(event, eventType)
         display_text = node.prefix
@@ -499,7 +499,7 @@ function WidgetMarchEvents:CreateDefenceItem(event, eventType)
         end
     end
     self:GetDragonHead(dragonType):align(display.LEFT_CENTER, 2, half_height)
-            :addTo(node)
+        :addTo(node)
     node.desc = UIKit:ttfLabel({
         text = display_text,
         size = 18,
@@ -601,10 +601,10 @@ end
 
 function WidgetMarchEvents:OnRetreatButtonClicked(event, eventType)
     if event.marchType == "village"
-    or event.marchType == "helpDefence"
-    or event.marchType == "city"
-    or event.marchType == "monster"
-    or event.marchType == "shrine"
+        or event.marchType == "helpDefence"
+        or event.marchType == "city"
+        or event.marchType == "monster"
+        or event.marchType == "shrine"
     then
         local widgetUseItems = WidgetUseItems.new():Create({
             item_name = "retreatTroop",
@@ -618,7 +618,7 @@ function WidgetMarchEvents:OnRetreatButtonClicked(event, eventType)
         end)
     elseif eventType == "helpToTroops" then
         UIKit:showMessageDialog(_("提示"),_("确定撤军?"),function()
-            NetManager:getRetreatFromHelpedAllianceMemberPromise(event.beHelpedPlayerData.id)
+            NetManager:getRetreatFromHelpedAllianceMemberPromise(event.id)
         end)
     end
 end
@@ -627,7 +627,7 @@ function WidgetMarchEvents:MoveToTargetAction(event,eventType)
     dump(event,"event")
     local location,mapIndex
     if eventType == 'helpToTroops' then
-        location = event.beHelpedPlayerData.location
+        location = event.location
         mapIndex = Alliance_Manager:GetMyAlliance().mapIndex
     elseif eventType == 'shrineEvents' then
         location = Alliance_Manager:GetMyAlliance():GetShrinePosition()
@@ -650,5 +650,6 @@ function WidgetMarchEvents:OnInfoButtonClicked(event, eventType)
     UIKit:newGameUI("GameUIWatchTowerMyTroopsDetail", event, eventType):AddToCurrentScene(true)
 end
 return WidgetMarchEvents
+
 
 

@@ -50,8 +50,7 @@ function GameUIFteBuild:PromiseOfFte(house_type)
     else
         self:GetFteLayer().arrow:TurnDown():align(display.BOTTOM_CENTER, r.x + r.width/2, r.y + r.height + 10)
     end
-
-    return city:PromiseOfUpgradingByLevel(house_type, 0)
+    return city:GetUser():PromiseOfBeginUpgrading()
 end
 function GameUIFteBuild:GetHouseLocations()
     local x,y = self.select_ruins:GetLogicPosition()

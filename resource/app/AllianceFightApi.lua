@@ -92,8 +92,12 @@ function AllianceFightApi:RecruitSpecialSoldier()
     end
 end
 local function RandomMapIndex()
-    local bigMapLength = GameDatas.AllianceInitData.intInit.bigMapLength.value
-    return math.random(0,bigMapLength * bigMapLength - 1)
+    local mapIndexData = Alliance_Manager.mapIndexData
+    local indexes = {}
+    for k,v in pairs(mapIndexData) do
+        table.insert(indexes, k)
+    end
+    return tonumber(indexes[math.random(#indexes)])
 end
 local function EnterMapIndexAndFunc(mapIndex,func)
     return NetManager:getEnterMapIndexPromise(mapIndex):done(function ( response )
@@ -129,7 +133,6 @@ end
 -- 行军事件
 function AllianceFightApi:March()
     local alliance = Alliance_Manager:GetMyAlliance()
-    -- local enemy_alliance = Alliance_Manager:GetEnemyAlliance()
     local dragon_manager = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
     if not alliance:IsDefault() then
         -- 解锁第二条行军队列
@@ -175,7 +178,8 @@ function AllianceFightApi:March()
         -- 可选的各种行军事件
         local march_types = {
             "attackCity", -- 攻打城市
-            "attackMonster", -- 攻打城市
+            "attackMonster", -- 攻打敌方野怪
+            "attackSelfMonster", -- 攻打自己野怪
             "strikeCity", -- 突袭城市
             "village", -- 采集自己的村落
             "retreatFromVillage", -- 从村落撤军
@@ -195,6 +199,9 @@ function AllianceFightApi:March()
         else
             -- 随机找一个地图，有联盟则攻打
             mapIndex = RandomMapIndex()
+            while mapIndex == alliance.mapIndex do
+                mapIndex = RandomMapIndex()
+            end
         end
         -- excute = "strikeCity"
         if excute == "attackCity" and not isReachEventLimit and canSendTroop then
@@ -230,6 +237,16 @@ function AllianceFightApi:March()
                 end
             end
             return EnterMapIndexAndFunc(mapIndex,AttackMonster)
+        elseif excute == "attackSelfMonster" and not isReachEventLimit and canSendTroop then
+            -- 攻打野怪
+            local can_attack = alliance.monsters
+            if #can_attack > 0 then
+                local attack_target = can_attack[math.random(#can_attack)]
+                print("攻打自己野怪,野怪名字:",attack_target.name)
+                print("攻打自己野怪,派出龙:",dragonType)
+                dump(fight_soldiers,"攻打敌方城市,派出士兵")
+                return NetManager:getAttackMonsterPromise(dragonType, fight_soldiers, alliance._id, attack_target.id)
+            end
         elseif excute == "strikeCity" and not isReachEventLimit and dragonType then
             local function StrikeCity(allianceData)
                 local can_attack = {}
@@ -448,6 +465,7 @@ return {
     March,
     SpeedUpMarchEvent,
 }
+
 
 
 

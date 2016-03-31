@@ -833,8 +833,9 @@ function GameUIReplayNew:ctor(report, callback, skipcallback)
     self.report = report
     local soldiers = self.report:GetOrderedDefenceSoldiers()
     if self.report:IsFightWall() then
-        local count = self.report:GetFightDefenceWallRoundData()[1].wallMaxHp
-        table.insert(soldiers, {name = "wall", star = 1, count = count})
+        local count = self.report:GetFightDefenceWallRoundData()[1].wallHp
+        local wallMaxHp = self.report:GetFightDefenceWallRoundData()[1].wallMaxHp
+        table.insert(soldiers, {name = "wall", star = 1, count = count, wallMaxHp = wallMaxHp})
     end
     self.defence_soldiers = soldiers
 
@@ -891,24 +892,24 @@ function GameUIReplayNew:OnMoveInStage()
 
     GameUIReplayNew.super.OnMoveInStage(self)
 end
-local animation = import("..animation")
+-- local animation = import("..animation")
 function GameUIReplayNew:onExit()
     GameUIReplayNew.super.onExit(self)
     if type(self.callback) == "function" then
         self.callback(self)
     end
-    display.getRunningScene():performWithDelay(function()
-        local manager = ccs.ArmatureDataManager:getInstance()
-        for k,v in pairs(animation) do
-            if string.find(k, "_90") or k == "win"
-            or k == "paizi" or k == "chengqiang_1" then
-                local path = DEBUG_GET_ANIMATION_PATH(string.format("animations/%s.ExportJson", k))
-                print("removeArmatureFileInfo", path)
-                manager:removeArmatureFileInfo(path)
-            end
-        end
-        cc.Director:getInstance():purgeCachedData()
-    end, 0.1)
+    -- display.getRunningScene():performWithDelay(function()
+    --     local manager = ccs.ArmatureDataManager:getInstance()
+    --     for k,v in pairs(animation) do
+    --         if string.find(k, "_90") or k == "win"
+    --         or k == "paizi" or k == "chengqiang_1" then
+    --             local path = DEBUG_GET_ANIMATION_PATH(string.format("animations/%s.ExportJson", k))
+    --             print("removeArmatureFileInfo", path)
+    --             manager:removeArmatureFileInfo(path)
+    --         end
+    --     end
+    --     cc.Director:getInstance():purgeCachedData()
+    -- end, 0.1)
 end
 function GameUIReplayNew:GetOrderedAttackSoldiers()
     return self.report:GetOrderedAttackSoldiers()
@@ -1200,7 +1201,11 @@ function GameUIReplayNew:HurtSoldierRight(corps, decrease)
     local soldierCount = round.soldierCount or round.wallHp
     local soldierDamagedCount = round.soldierDamagedCount or round.wallDamagedHp
     local morale = self.ui_map.soldier_morale_defence:GetPercent()
-    local moraleDecreased = (decrease or 0) / self.ui_map.soldier_count_defence.count * 100
+    local max_count = self.ui_map.soldier_count_defence.count
+    if soldier.name == "wall" then
+        max_count = self.ui_map.soldier_count_defence.wallMaxHp
+    end
+    local moraleDecreased = (decrease or 0) / max_count * 100
     if round.wallHp then
         if round.wallDamagedHp == round.wallHp then
             moraleDecreased = morale
@@ -1209,10 +1214,10 @@ function GameUIReplayNew:HurtSoldierRight(corps, decrease)
     local x,y = corps:getPosition()
     return promise.all(
         self:PromiseOfPlayDamage(soldierDamagedCount, x, y),
-        self.ui_map.soldier_count_defence:PromiseOfProgressTo(0.5, (soldierCount - soldierDamagedCount) / soldier.count * 100),
+        self.ui_map.soldier_count_defence:PromiseOfProgressTo(0.5, (soldierCount - soldierDamagedCount) / max_count * 100),
         self:PormiseOfSchedule(0.5, function(percent)
             local count = math.ceil(soldierCount - soldierDamagedCount * percent)
-            self.ui_map.soldier_count_defence:SetText(count.."/"..soldier.count)
+            self.ui_map.soldier_count_defence:SetText(count.."/"..max_count)
         end),
         self:PromiseOfDelay(0.5):next(function()
             return promise.all(
@@ -1250,9 +1255,16 @@ function GameUIReplayNew:EnterSoldiersRight()
         :SetSoldeir(top_soldier.name, top_soldier.star, self.report.IsPveBattle)
         :show():SetEnable(true)
 
+    local count, max = top_soldier.count, top_soldier.count
+    if top_soldier.name == "wall" then
+        count = top_soldier.count
+        max = top_soldier.wallMaxHp
+        self.ui_map.soldier_count_defence.wallMaxHp = max
+    end
     self.ui_map.soldier_count_defence
-        :SetText(top_soldier.count.."/"..top_soldier.count)
-        :SetProgress(100):show().count = top_soldier.count
+        :SetText(top_soldier.count.."/"..max)
+        :SetProgress((top_soldier.count/max) * 100):show().count = count
+        
     self.ui_map.soldier_morale_defence
         :SetText("100/100")
         :SetProgress(100):show()

@@ -59,11 +59,16 @@ function WidgetAllianceTop:onEnter()
         self.stone_label:setString(GameUtils:formatNumber(User:GetResValueByType("stone")))
         self.coin_label:setString(GameUtils:formatNumber(User:GetResValueByType("coin")))
     end)
+    User:AddListenOnType(self, "allianceData")
 end
 function WidgetAllianceTop:onExit()
     if self.auto_change_page then
         scheduler.unscheduleGlobal(self.auto_change_page)
     end
+    User:RemoveListenerOnType(self, "allianceData")
+end
+function WidgetAllianceTop:OnUserDataChanged_allianceData(userData, deltaData)
+    self:SetLoyalty(GameUtils:formatNumber(userData.allianceData.loyalty))
 end
 function WidgetAllianceTop:Change()
     local pv = self.pv
@@ -248,6 +253,7 @@ function WidgetAllianceTop:UIAllianceContributeClose()
     self.uiAllianceContribute = nil
 end
 return WidgetAllianceTop
+
 
 
 

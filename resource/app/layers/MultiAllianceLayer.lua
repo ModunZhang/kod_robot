@@ -444,36 +444,6 @@ function MultiAllianceLayer:StartCorpsTimer()
     self:scheduleUpdate()
 end
 function MultiAllianceLayer:CreateAllianceCorps(alliance)
-    -- if alliance:IsMyAlliance() then -- 如果是返回事件 无条件显示
-    --     table.foreachi(alliance:GetAttackMarchEvents(),function(_,event)
-    --         self:CreateCorpsIf(event)
-    --     end)
-    -- table.foreachi(alliance:GetAttackMarchReturnEvents(),function(_,event)
-    --     self:CreateCorpsIf(event)
-    -- end)
-    -- table.foreachi(alliance:GetStrikeMarchEvents(),function(_,event)
-    --     self:CreateCorpsIf(event)
-    -- end)
-    -- table.foreachi(alliance:GetStrikeMarchReturnEvents(),function(_,event)
-    --     self:CreateCorpsIf(event)
-    -- end)
-    -- else
-    --     --敌方联盟
-    --     local my_alliance_belvedere = self:GetMyAlliance():GetAllianceBelvedere()
-    --     local my_alliance_watch_tower_level = my_alliance_belvedere:GetWatchTowerLevel()
-    --     table.foreachi(alliance:GetAttackMarchEvents(),function(_,event)
-    --         self:CreateEnemyTroopsIf(event,my_alliance_belvedere,my_alliance_watch_tower_level)
-    --     end)
-    --     table.foreachi(alliance:GetAttackMarchReturnEvents(),function(_,event)
-    --         self:CreateEnemyTroopsIf(event,my_alliance_belvedere,my_alliance_watch_tower_level)
-    --     end)
-    --     table.foreachi(alliance:GetStrikeMarchEvents(),function(_,event)
-    --         self:CreateEnemyTroopsIf(event,my_alliance_belvedere,my_alliance_watch_tower_level)
-    --     end)
-    --     table.foreachi(alliance:GetStrikeMarchReturnEvents(),function(_,event)
-    --         self:CreateEnemyTroopsIf(event,my_alliance_belvedere,my_alliance_watch_tower_level)
-    --     end)
-    -- end
 end
 --过滤敌方对我的行军路线
 function MultiAllianceLayer:CreateEnemyTroopsIf(event,my_alliance_belvedere,my_alliance_watch_tower_level)
@@ -521,51 +491,6 @@ function MultiAllianceLayer:OnStrikeMarchReturnEventDataChanged(changed_map,alli
 end
 
 function MultiAllianceLayer:ManagerCorpsFromChangedMap(changed_map,is_strkie,alliance)
-    -- if alliance:IsMyAlliance() then
-    --     if changed_map.removed then
-    --         table.foreachi(changed_map.removed,function(_,marchEvent)
-    --             local time = math.ceil(marchEvent:ArriveTime() - app.timer:GetServerTime())
-    --             if time < 5 then -- 5秒内误差也认为是部队到达,不是撤退引起的删除行军事件
-    --                 local player_role = marchEvent:GetPlayerRole()
-    --                 if player_role == marchEvent.MARCH_EVENT_PLAYER_ROLE.SENDER then
-    --                     if is_strkie then
-    --                         app:GetAudioManager():PlayeEffectSoundWithKey("STRIKE_PLAYER_ARRIVE")
-    --                     else
-    --                         if not marchEvent:IsReturnEvent() then
-    --                             app:GetAudioManager():PlayeEffectSoundWithKey("ATTACK_PLAYER_ARRIVE")
-    --                         end
-    --                     end
-    --                 end
-    --             end
-    --             self:DeleteCorpsById(marchEvent:Id())
-    --         end)
-    --     elseif changed_map.edited then
-    --         table.foreachi(changed_map.edited,function(_,marchEvent)
-    --             self:CreateCorpsIf(marchEvent)
-    --         end)
-    --     elseif changed_map.added then
-    --         table.foreachi(changed_map.added,function(_,marchEvent)
-    --             self:CreateCorpsIf(marchEvent, true)
-    --         end)
-    --     end
-    -- else
-    --     local my_alliance_belvedere = self:GetMyAlliance():GetAllianceBelvedere()
-    --     local my_alliance_watch_tower_level = my_alliance_belvedere:GetWatchTowerLevel()
-
-    --     if changed_map.removed then
-    --         table.foreachi(changed_map.removed,function(_,marchEvent)
-    --             self:DeleteCorpsById(marchEvent:Id())
-    --         end)
-    --     elseif changed_map.edited then
-    --         table.foreachi(changed_map.edited,function(_,marchEvent)
-    --             self:CreateEnemyTroopsIf(marchEvent,my_alliance_belvedere,my_alliance_watch_tower_level)
-    --         end)
-    --     elseif changed_map.added then
-    --         table.foreachi(changed_map.added,function(_,marchEvent)
-    --             self:CreateEnemyTroopsIf(marchEvent,my_alliance_belvedere,my_alliance_watch_tower_level)
-    --         end)
-    --     end
-    -- end
 end
 
 --适配数据给界面 如果已有路线会更新

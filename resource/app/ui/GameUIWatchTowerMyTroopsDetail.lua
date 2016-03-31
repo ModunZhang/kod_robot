@@ -72,7 +72,7 @@ function GameUIWatchTowerMyTroopsDetail:onEnter()
 end
 
 function GameUIWatchTowerMyTroopsDetail:RequestPlayerHelpedByTroops()
-    NetManager:getHelpDefenceTroopDetailPromise(self.event.beHelpedPlayerData.id, User._id):done(function(response)
+    NetManager:getHelpDefenceTroopDetailPromise(self.event.id):done(function(response)
         self.data = response.msg.troopDetail
         self:RefreshListView()
     end)
@@ -125,7 +125,7 @@ function GameUIWatchTowerMyTroopsDetail:GetItem(ITEM_TYPE,item_data)
             end)
             sub_line = #item_data.soldiers
         end
-        height   = sub_line * 36
+        height   = sub_line * 66
     end
     local bg = display.newScale9Sprite("transparent_1x1.png"):size(548,height + 38)
     local title_bar = display.newSprite("alliance_member_title_548x38.png"):addTo(bg):align(display.LEFT_TOP, 0, height + 38)
@@ -148,7 +148,7 @@ function GameUIWatchTowerMyTroopsDetail:GetItem(ITEM_TYPE,item_data)
         self:GetSubItem(ITEM_TYPE,1,{_("生命值"),dragon_hp}):addTo(bg):align(display.RIGHT_BOTTOM, 547, y)
         y = y + 38
         local dragon_strength = dragon:TotalStrength()
-        self:GetSubItem(ITEM_TYPE,2,{_("力量"),dragon_strength}):addTo(bg):align(display.RIGHT_BOTTOM, 547, y)
+        self:GetSubItem(ITEM_TYPE,2,{_("攻击力"),dragon_strength}):addTo(bg):align(display.RIGHT_BOTTOM, 547, y)
         y = y + 38
         local dragon_level = dragon:Level()
         self:GetSubItem(ITEM_TYPE,3,{_("等级"),dragon_level}):addTo(bg):align(display.RIGHT_BOTTOM, 547, y)
@@ -169,8 +169,9 @@ function GameUIWatchTowerMyTroopsDetail:GetItem(ITEM_TYPE,item_data)
             local y = 0
             for i,v in ipairs(item_data.soldiers) do
                 local name = Localize.soldier_name[v.name]
-                self:GetSubItem(ITEM_TYPE,i,{name,v.count,v.star or User:SoldierStarByName(v.name)}):addTo(bg):align(display.LEFT_BOTTOM,0, y)
-                y = y + 36
+                local star = UtilsForSoldier:SoldierStarByName(User, v.name)
+                self:GetSubItem(ITEM_TYPE,i,{v.name,v.count,v.star or star}):addTo(bg):align(display.LEFT_BOTTOM,0, y)
+                y = y + 66
             end
         end
     end
@@ -180,33 +181,43 @@ function GameUIWatchTowerMyTroopsDetail:GetItem(ITEM_TYPE,item_data)
 end
 
 function GameUIWatchTowerMyTroopsDetail:GetSubItem(ITEM_TYPE,index,item_data)
-    local height = ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO and 38 or 36
+    local height = ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO and 38 or 66
     local width  = ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO and 420 or 546
     local item = display.newScale9Sprite(string.format("back_ground_548x40_%d.png", (index - 1) % 2 == 0 and 1 or 2)):size(width,height)
-    local title_label = UIKit:ttfLabel({
-        text = item_data[1],
-        size = 20,
-        color= 0x615b44
-    }):align(display.LEFT_CENTER, 12, 19):addTo(item)
     if ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO then
+        local title_label = UIKit:ttfLabel({
+            text = item_data[1],
+            size = 20,
+            color= 0x615b44
+        }):align(display.LEFT_CENTER, 12, 19):addTo(item)
         local val_label = UIKit:ttfLabel({
             text = item_data[2],
             size = 20,
             color= 0x403c2f
         }):align(display.LEFT_CENTER, title_label:getPositionX()+title_label:getContentSize().width + 20, 19):addTo(item)
     elseif ITEM_TYPE == self.ITEM_TYPE.SOLIDERS then
+        local title_label = UIKit:ttfLabel({
+            text = Localize.soldier_name[item_data[1]],
+            size = 20,
+            color= 0x615b44
+        }):align(display.LEFT_CENTER, 80, 45):addTo(item)
+        local soldier_ui_config = UILib.soldier_image[item_data[1]]
+        display.newSprite(UILib.soldier_color_bg_images[item_data[1]]):align(display.LEFT_CENTER,12,33):addTo(item):scale(58/128)
+        local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.LEFT_CENTER,12,33):addTo(item):scale(58/128)
+        local soldier_head_bg  = display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2,soldier_head_icon:getContentSize().height/2)
+       
         local val_label = UIKit:ttfLabel({
             text = item_data[2],
             size = 20,
             color= 0x403c2f
-        }):align(display.RIGHT_CENTER,526, 19):addTo(item)
+        }):align(display.RIGHT_CENTER,526, 33):addTo(item)
         StarBar.new({
             max = 3,
             bg = "Stars_bar_bg.png",
             fill = "Stars_bar_highlight.png",
             num = item_data[3],
-        }):addTo(item):align(display.LEFT_CENTER,12, 19):scale(0.8)
-        title_label:setPositionX(90)
+        }):addTo(item):align(display.LEFT_CENTER,80, 19):scale(0.8)
+        -- title_label:setPositionX(90)
     end
     return item
 end

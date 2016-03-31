@@ -10,7 +10,7 @@ local GameUIAllianceInfoMenu = UIKit:createUIClass("GameUIAllianceInfoMenu","UIA
 
 function GameUIAllianceInfoMenu:ctor(callback,alliance_buttong_str,enable_alliance_info)
     GameUIAllianceInfoMenu.super.ctor(self)
-    self.body = display.newSprite("back_ground_588x346.png"):align(display.BOTTOM_CENTER, window.cx, window.bottom_top - 416) --window.bottom_top - 70
+    self.body = display.newScale9Sprite("back_ground_588x346.png",window.cx, window.bottom_top - 416, cc.size(588,290), cc.rect(10,10,568,326)):align(display.BOTTOM_CENTER) --window.bottom_top - 70
     local body = self.body
     self:addTouchAbleChild(body)
     self.callback = callback
@@ -51,20 +51,20 @@ function GameUIAllianceInfoMenu:LoadAllMenus()
     local body = self.body
     local size = body:getContentSize()
 
-	local button = WidgetPushButton.new({normal = "brown_btn_up_552x56.png",pressed = "brown_btn_down_552x56.png",disabled = "disbale_552x56.png"})
-            :setButtonLabel(UIKit:ttfLabel({
-                text = self.alliance_buttong_str ,
-                size = 20,
-                color = 0xffedae,
-            }))
-            :onButtonClicked(function(event)
-                if event.name == "CLICKED_EVENT" then
-                    self:CallButtonActionWithTag("allianceInfo")
-                end
-            end)
-            :align(display.CENTER_TOP, size.width/2, 325)
-            :addTo(body):setButtonEnabled(self.enable_alliance_info)
-    display.newSprite("icon_check_alliance_36x40.png"):addTo(button):pos(-240,-28)
+	-- local button = WidgetPushButton.new({normal = "brown_btn_up_552x56.png",pressed = "brown_btn_down_552x56.png",disabled = "disbale_552x56.png"})
+ --            :setButtonLabel(UIKit:ttfLabel({
+ --                text = self.alliance_buttong_str ,
+ --                size = 20,
+ --                color = 0xffedae,
+ --            }))
+ --            :onButtonClicked(function(event)
+ --                if event.name == "CLICKED_EVENT" then
+ --                    self:CallButtonActionWithTag("allianceInfo")
+ --                end
+ --            end)
+ --            :align(display.CENTER_TOP, size.width/2, 325)
+ --            :addTo(body):setButtonEnabled(self.enable_alliance_info)
+ --    display.newSprite("icon_check_alliance_36x40.png"):addTo(button):pos(-240,-28)
 
    local button =  WidgetPushButton.new({normal = "brown_btn_up_552x56.png",pressed = "brown_btn_down_552x56.png"})
             :setButtonLabel(UIKit:ttfLabel({

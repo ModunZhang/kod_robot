@@ -323,9 +323,12 @@ function GameUIAcademy:GetItem(data)
 end
 
 function GameUIAcademy:GetItemByTag(tag)
-    local scrollNode = self.scrollView:getScrollNode()
-    return scrollNode:getChildByTag(tag)
+    if self.scrollView then
+        local scrollNode = self.scrollView:getScrollNode()
+        return scrollNode:getChildByTag(tag)
+    end
 end
 
 return GameUIAcademy
+
 

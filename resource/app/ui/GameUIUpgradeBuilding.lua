@@ -55,7 +55,6 @@ end
 function GameUIUpgradeBuilding:PromiseOfFte()
     self.tabs:SelectTab("upgrade")
     self.upgrade_layer.acc_layer.acc_button:setButtonEnabled(false)
-    self.upgrade_layer.OnBuildingUpgradingBegin = function() end
     self:GetFteLayer():SetTouchObject(self:Find())
 
 
@@ -79,7 +78,7 @@ function GameUIUpgradeBuilding:PromiseOfFte()
     self:GetFteLayer().arrow = WidgetFteArrow.new(_("点击升级"))
         :addTo(self:GetFteLayer()):TurnDown():align(display.BOTTOM_CENTER, r.x + r.width/2, r.y + r.height + 10)
 
-    return self.building:BelongCity():PromiseOfUpgradingByLevel(self:GetBuilding():GetType())
+    return self.building:BelongCity():GetUser():PromiseOfBeginUpgrading()
 end
 
 return GameUIUpgradeBuilding

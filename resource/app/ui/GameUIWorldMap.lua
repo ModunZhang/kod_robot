@@ -1,6 +1,7 @@
 local EventManager = import("..layers.EventManager")
 local TouchJudgment = import("..layers.TouchJudgment")
 local WorldLayer = import("..layers.WorldLayer")
+local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local GameUIWorldMap = UIKit:createUIClass('GameUIWorldMap')
 local alliancemap_buff = GameDatas.AllianceMap.buff
@@ -12,7 +13,7 @@ function GameUIWorldMap:ctor(fromIndex, toIndex, mapIndex)
 	GameUIWorldMap.super.ctor(self)
     self.__type  = UIKit.UITYPE.BACKGROUND
     self.scene_node = display.newNode():addTo(self)
-    self.scene_layer = WorldLayer.new(self):addTo(self.scene_node, 0)
+    self.scene_layer = WorldLayer.new(self,mapIndex):addTo(self.scene_node, 0)
     self.touch_layer = self:CreateMultiTouchLayer():addTo(self.scene_node, 1)
     self.mask_layer = display.newLayer():addTo(self, 2):hide()
     self.event_manager = EventManager.new(self)
@@ -37,6 +38,8 @@ function GameUIWorldMap:onEnter()
 
     -- bottom 所在位置信息
     self.round_info = self:LoadRoundInfo(mapIndex)
+    -- 图例
+    self:LoadImageIntro()
     -- 返回按钮
     local world_map_btn_bg = display.newSprite("background_86x86.png")
     :addTo(self):align(display.LEFT_BOTTOM,display.left + 7,display.bottom + 253)
@@ -72,16 +75,15 @@ function GameUIWorldMap:onExit()
     removeImageByKey("protect_2.png")
     removeImageByKey("world_alliance_desert.png")
     removeImageByKey("world_alliance_grassLand.png")
-    removeImageByKey("world_alliance_desert.png")
+    removeImageByKey("world_alliance_iceField.png")
     removeImageByKey("world_crown.png")
     removeImageByKey("world_edge.png")
-    removeImageByKey("world_map.png")
-    removeImageByKey("world_middle.png")
+    removeImageByKey("world_middle.jpg")
     
-    removeImageByKey("world_bg.png")
-    removeImageByKey("world_title1.png")
-    removeImageByKey("world_title2.png")
-    removeImageByKey("world_terrain.png")
+    removeImageByKey("world_bg.jpg")
+    removeImageByKey("world_title1.jpg")
+    removeImageByKey("world_title2.jpg")
+    removeImageByKey("tmxmaps/world_terrain.jpg")
 end
 local deg = math.deg
 local ceil = math.ceil
@@ -133,7 +135,7 @@ function GameUIWorldMap:InitArrow()
     --     color = 0xf5e8c4
     -- }):addTo(self.arrow):rotation(90):align(display.LEFT_CENTER, 0, -50)
 end
-local screen_rect = cc.rect(0, 200, display.width, display.height - 200)
+local screen_rect = cc.rect(0, 152 * (display.width > 640 and display.width/768 or 1), display.width, display.height - 200)
 function GameUIWorldMap:UpdateArrow()
     local mapIndex = Alliance_Manager:GetMyAlliance().mapIndex
     local x,y = self:GetSceneLayer():IndexToLogic(mapIndex)
@@ -216,6 +218,18 @@ function GameUIWorldMap:LoadMap()
     if self:IsFingerOn() then
         return
     end
+    local last_middle_pos = self:GetSceneLayer().middle_pos
+    if last_middle_pos then
+        local cur_x,cur_y = self:GetSceneLayer():GetMiddleLogicPosition()
+        if math.abs(last_middle_pos.x - cur_x) > 1 
+        or math.abs(last_middle_pos.y-cur_y) > 1 then
+            self:_LoadMap()
+        end
+    else
+        self:_LoadMap()
+    end
+end
+function GameUIWorldMap:_LoadMap()
     self:ShowLoading()
     self.load_map_node:stopAllActions()
     self.load_map_node:performWithDelay(function()
@@ -315,10 +329,10 @@ function GameUIWorldMap:LoadRoundInfo(mapIndex)
     local ALLIANCE_WIDTH, ALLIANCE_HEIGHT = intInit.allianceRegionMapWidth.value, intInit.allianceRegionMapHeight.value
     mini_map_button:addNodeEventListener(cc.NODE_TOUCH_EVENT, function(event)
         local map_position = mini_map_button:convertToNodeSpace(cc.p(event.x,event.y))
-        if map_position.x > 124 or map_position.y > 124 or map_position.x < 0 or map_position.y < 0 then
+        if  map_position.x >= 124 or map_position.y >= 124 or map_position.x < 0 or map_position.y < 0 then
             return
         end
-        local x,y = math.floor(map_position.x/124 * bigMapLength * ALLIANCE_WIDTH) , math.floor((1 - map_position.y/124) * bigMapLength * ALLIANCE_HEIGHT)
+        local x,y = math.floor(math.floor(map_position.x)/124 * bigMapLength * ALLIANCE_WIDTH) , math.floor((1 - math.floor(map_position.y)/124) * bigMapLength * ALLIANCE_HEIGHT)
         local mapIndex = DataUtils:GetAlliancePosition(x, y)
         local x,y = self:GetSceneLayer():IndexToLogic(mapIndex)
         self:GotoPosition(x,y)
@@ -329,7 +343,8 @@ function GameUIWorldMap:LoadRoundInfo(mapIndex)
         end
         return true
     end)
-    function node:RefreshRoundInfo(mapIndex,x, y)
+    function node:RefreshRoundInfo(mapIndex, x, y)
+        if x >= bigMapLength_value or x < 0 or y >= bigMapLength_value or y < 0 then return end
         self.mapIndex = mapIndex
         local map_round = DataUtils:getMapRoundByMapIndex(mapIndex)
         local buff = alliancemap_buff[map_round]
@@ -354,6 +369,35 @@ function GameUIWorldMap:LoadRoundInfo(mapIndex)
     end,0.5)
 
     return node
+end
+function GameUIWorldMap:LoadImageIntro()
+    local image_intro_bg = display.newSprite("pve_summary_bg4.png")
+        :align(display.BOTTOM_RIGHT, display.right - 10, self.round_info:getPositionY() + self.round_info:getContentSize().height + 10)
+        :addTo(self)
+        :scale(0.5)
+    local current = display.newSprite("icon_current_position_1.png")
+            :addTo(image_intro_bg)
+            :scale(0.8)
+            :pos(image_intro_bg:getContentSize().width/2 - 70, image_intro_bg:getContentSize().height/2 - 30)
+    local self_pos = display.newSprite("icon_current_position.png")
+            :addTo(image_intro_bg)
+            :scale(0.8)
+            :pos(image_intro_bg:getContentSize().width/2 - 70, image_intro_bg:getContentSize().height/2 + 30)
+    UIKit:ttfLabel({
+        text = _("当前位置"),
+        size = 32,
+        color = 0xffedae,
+    }):align(display.LEFT_CENTER, current:getPositionX() + 30, current:getPositionY())
+        :addTo(image_intro_bg)
+    UIKit:ttfLabel({
+        text = _("己方联盟位置"),
+        size = 32,
+        color = 0xffedae,
+    }):align(display.LEFT_CENTER, self_pos:getPositionX() + 30, self_pos:getPositionY())
+        :addTo(image_intro_bg)
+    image_intro_bg:performWithDelay(function()
+                image_intro_bg:fadeTo(1, 0)
+            end, 5)
 end
 function GameUIWorldMap:GetSceneLayer()
     return self.scene_layer
@@ -389,18 +433,30 @@ function GameUIWorldMap:OnTouchCancelled(pre_x, pre_y, x, y)
     print("OnTouchCancelled")
 end
 function GameUIWorldMap:OnTwoTouch(x1, y1, x2, y2, event_type)
-    -- local scene = self.scene_layer
-    -- if event_type == "began" then
-    --     scene:StopScaleAnimation()
-    --     self.distance = math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
-    --     scene:ZoomBegin(x1, y1, x2, y2)
-    -- elseif event_type == "moved" then
-    --     local new_distance = math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
-    --     scene:ZoomBy(new_distance / self.distance, (x1 + x2) * 0.5, (y1 + y2) * 0.5)
-    -- elseif event_type == "ended" then
-    --     scene:ZoomEnd()
-    --     self.distance = nil
-    -- end
+    local scene = self.scene_layer
+    if event_type == "began" then
+        scene:StopScaleAnimation()
+        self.distance = math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+        scene:ZoomBegin(x1, y1, x2, y2)
+    elseif event_type == "moved" then
+        local new_distance = math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
+        scene:ZoomBy(new_distance / self.distance, (x1 + x2) * 0.5, (y1 + y2) * 0.5)
+    elseif event_type == "ended" then
+        scene:ZoomEnd()
+        self.distance = nil
+        self:MakeElastic()
+    end
+end
+function GameUIWorldMap:MakeElastic()
+    local scene = self.scene_layer
+    local min_s, max_s = scene:GetScaleRange()
+    local low = min_s * 1.065
+    local high = max_s * 0.95
+    if scene:getScale() <= low then
+        scene:ZoomToByAnimation(low)
+    elseif scene:getScale() >= high then
+        scene:ZoomToByAnimation(high)
+    end
 end
 --
 function GameUIWorldMap:OnTouchBegan(pre_x, pre_y, x, y)
@@ -444,7 +500,13 @@ function GameUIWorldMap:OnTouchClicked(pre_x, pre_y, x, y)
     if not index then
         return
     end
-    UIKit:newWidgetUI("WidgetWorldAllianceInfo",click_object,index,true):AddToCurrentScene()
+    app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
+    -- 王座
+    if DataUtils:getMapRoundByMapIndex(index) == 0 then
+        UIKit:newGameUI("GameUICrownEnter",index):AddToCurrentScene()
+    else
+        UIKit:newWidgetUI("WidgetWorldAllianceInfo",click_object,index,true):AddToCurrentScene()
+    end
 end
 function GameUIWorldMap:IsFingerOn()
     return self.event_manager:TouchCounts() ~= 0

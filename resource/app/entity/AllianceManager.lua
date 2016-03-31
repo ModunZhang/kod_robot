@@ -26,7 +26,7 @@ end
 function AllianceManager:HasToMyCityEvents()
     local marchEvents = self:GetMyAllianceMarchEvents()
     for k,event in pairs(marchEvents.attackMarchEvents) do
-        if event ~= json.null 
+        if event ~= json.null
             and event.defencePlayerData
             and event.defencePlayerData.id == User._id
             and event.fromAlliance.id ~= self.my_alliance._id then
@@ -48,9 +48,9 @@ function AllianceManager:GetToMineMarchEvents()
     local marchEvents = self:GetMyAllianceMarchEvents()
     for k,kindsOfEvents in pairs(marchEvents) do
         for id,event in pairs(kindsOfEvents) do
-            if event ~= json.null 
-            and event.defencePlayerData 
-            and event.defencePlayerData.id == User:Id() then
+            if event ~= json.null
+                and event.defencePlayerData
+                and event.defencePlayerData.id == User:Id() then
                 event.eventType = k
                 table.insert(to_my_events, event)
             end
@@ -63,9 +63,9 @@ function AllianceManager:GetAboutMyMarchEvents()
     if self:GetMyAlliance():IsDefault() then
         return {},{}
     end
-   local to_my_events = self:GetToMineMarchEvents()
-   local out_march_events = UtilsForEvent:GetAllMyMarchEvents()
-   return to_my_events,out_march_events
+    local to_my_events = self:GetToMineMarchEvents()
+    local out_march_events = UtilsForEvent:GetAllMyMarchEvents()
+    return to_my_events,out_march_events
 end
 function AllianceManager:HasToMyAllianceEvents()
     local marchEvents = self:GetMyAllianceMarchEvents()
@@ -90,10 +90,10 @@ function AllianceManager:GetMyBeAttackingEvent()
     local marchEvents = self:GetMyAllianceMarchEvents()
     for k,kindsOfEvents in pairs(marchEvents) do
         for id,event in pairs(kindsOfEvents) do
-            if event ~= json.null 
-            and event.defencePlayerData
-            and event.defencePlayerData.id == User:Id() 
-            and event.fromAlliance.id ~= self:GetMyAlliance()._id then
+            if event ~= json.null
+                and event.defencePlayerData
+                and event.defencePlayerData.id == User:Id()
+                and event.fromAlliance.id ~= self:GetMyAlliance()._id then
                 event.eventType = k
                 table.insert(to_my_events, event)
             end
@@ -106,9 +106,9 @@ function AllianceManager:GetToMyAllianceMarchEvents()
     local marchEvents = self:GetMyAllianceMarchEvents()
     for k,kindsOfEvents in pairs(marchEvents) do
         for id,event in pairs(kindsOfEvents) do
-            if event ~= json.null 
-            and event.toAlliance.id == self.my_alliance._id 
-            and event.fromAlliance.id ~= self.my_alliance._id then
+            if event ~= json.null
+                and event.toAlliance.id == self.my_alliance._id
+                and event.fromAlliance.id ~= self.my_alliance._id then
                 event.eventType = k
                 table.insert(to_my_events, event)
             end
@@ -285,8 +285,8 @@ function AllianceManager:OnAllianceDataChanged(allianceData,refresh_time,deltaDa
                 app:EnterMyAllianceScene()
             end
         end
-        if allianceData.basicInfo.status == 'prepare' 
-        or allianceData.basicInfo.status == 'fight' then
+        if allianceData.basicInfo.status == 'prepare'
+            or allianceData.basicInfo.status == 'fight' then
             self:RefreshAllianceSceneIf()
         end
     end
@@ -308,24 +308,24 @@ function AllianceManager:OnAllianceDataChanged(allianceData,refresh_time,deltaDa
         end
         if self.status and self.status ~= allianceData.basicInfo.status then
             self:RefreshAllianceSceneIf(self.status)
-            
+
             if self.status == "prepare"
-           and allianceData.basicInfo.status == "fight" then
+                and allianceData.basicInfo.status == "fight" then
                 app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_START")
             end
 
             local enter_fight = self.status ~= "prepare"
-                            and allianceData.basicInfo.status == "prepare"
+                and allianceData.basicInfo.status == "prepare"
             local enter_peace = self.status ~= "protect"
-                            and allianceData.basicInfo.status == "protect"
-            if audio.isMusicPlaying() and
-               (enter_fight or enter_peace) then
-                local last_music_loop = app:GetAudioManager().last_music_loop
-                app:GetAudioManager().last_music_loop = true
-                app:GetAudioManager():StopMusic()
-                app:GetAudioManager().last_music_loop = last_music_loop
-                app:GetAudioManager():PlayGameMusicAutoCheckScene()
-            end
+                and allianceData.basicInfo.status == "protect"
+            -- if audio.isMusicPlaying() and
+            --    (enter_fight or enter_peace) then
+            --     local last_music_loop = app:GetAudioManager().last_music_loop
+            --     app:GetAudioManager().last_music_loop = true
+            --     app:GetAudioManager():StopMusic()
+            --     app:GetAudioManager().last_music_loop = last_music_loop
+            --     app:GetAudioManager():PlayGameMusicAutoCheckScene()
+            -- end
         end
     end
     self.my_mapIndex = allianceData.mapIndex
@@ -398,26 +398,27 @@ function AllianceManager:RefreshAllianceSceneIf(old_alliance_status)
                     })
                 end
             end
-        -- elseif scene_name == 'MainScene' then
-        --     if not self.tipUserWar then
-        --         self.tipUserWar = true
-        --         local dialog = UIKit:getMessageDialogWithParams({
-        --             content = _("联盟对战已开始，您将进入自己联盟对战地图。"),
-        --             ok_callback = function()
-        --                 app:EnterMyAllianceScene()
-        --             end,
-        --             cancel_callback = function()end,
-        --             auto_close = false,
-        --             user_data = '__alliance_war_tips__'
-        --         })
-        --         UIKit:addMessageDialogWillShow(dialog)
-        --     end
+            -- elseif scene_name == 'MainScene' then
+            --     if not self.tipUserWar then
+            --         self.tipUserWar = true
+            --         local dialog = UIKit:getMessageDialogWithParams({
+            --             content = _("联盟对战已开始，您将进入自己联盟对战地图。"),
+            --             ok_callback = function()
+            --                 app:EnterMyAllianceScene()
+            --             end,
+            --             cancel_callback = function()end,
+            --             auto_close = false,
+            --             user_data = '__alliance_war_tips__'
+            --         })
+            --         UIKit:addMessageDialogWillShow(dialog)
+            --     end
         end
     end
 
 end
 
 return AllianceManager
+
 
 
 

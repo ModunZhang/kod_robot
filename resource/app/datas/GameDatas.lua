@@ -50,11 +50,13 @@ GameDatas.NoManMap = {
 	["noManMap_2"] = {},
 	["noManMap_3"] = {},
 	["noManMap_4"] = {},
+	["middle_map"] = {},
 }
 require("app.datas.NoManMap_noManMap_1")
 require("app.datas.NoManMap_noManMap_2")
 require("app.datas.NoManMap_noManMap_3")
 require("app.datas.NoManMap_noManMap_4")
+require("app.datas.NoManMap_middle_map")
 
 GameDatas.Activities = {
 	["day60"] = {},
@@ -265,13 +267,42 @@ GameDatas.Dragons = {
 	["fightFix"] = {},
 	["dragonStar"] = {},
 	["dragonLevel"] = {},
-	["dragonSkills"] = {},
+	["dragonBuff"] = {},
 }
 require("app.datas.Dragons_dragons")
 require("app.datas.Dragons_fightFix")
 require("app.datas.Dragons_dragonStar")
 require("app.datas.Dragons_dragonLevel")
-require("app.datas.Dragons_dragonSkills")
+require("app.datas.Dragons_dragonBuff")
+
+GameDatas.DragonSkills = {
+	["hellFire"] = {},
+	["lightningStorm"] = {},
+	["poisonNova"] = {},
+	["infantryEnhance"] = {},
+	["archerEnhance"] = {},
+	["cavalryEnhance"] = {},
+	["siegeEnhance"] = {},
+	["dragonBreath"] = {},
+	["dragonBlood"] = {},
+	["leadership"] = {},
+	["greedy"] = {},
+	["surge"] = {},
+	["earthquake"] = {},
+}
+require("app.datas.DragonSkills_hellFire")
+require("app.datas.DragonSkills_lightningStorm")
+require("app.datas.DragonSkills_poisonNova")
+require("app.datas.DragonSkills_infantryEnhance")
+require("app.datas.DragonSkills_archerEnhance")
+require("app.datas.DragonSkills_cavalryEnhance")
+require("app.datas.DragonSkills_siegeEnhance")
+require("app.datas.DragonSkills_dragonBreath")
+require("app.datas.DragonSkills_dragonBlood")
+require("app.datas.DragonSkills_leadership")
+require("app.datas.DragonSkills_greedy")
+require("app.datas.DragonSkills_surge")
+require("app.datas.DragonSkills_earthquake")
 
 GameDatas.Errors = {
 	["errors"] = {},

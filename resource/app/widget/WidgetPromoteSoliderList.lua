@@ -100,7 +100,7 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
     }):align(display.CENTER, soldier_box:getContentSize().width/2 , -30)
         :addTo(soldier_box)
     if status == "unlock" then
-        label:setString(_("已解锁"))
+        label:setString(index == 1 and "" or _("已解锁"))
     elseif status == "lock" then
         label:setString(_("未解锁"))
     elseif status == "toUnlock" then
@@ -162,7 +162,7 @@ function WidgetPromoteSoliderList:CreateSoliderBox(soldier_type,index,star)
             soldier_icon:clearFilter()
         end
         if status == "unlock" then
-            label:setString(_("已解锁"))
+            label:setString(index == 1 and "" or _("已解锁"))
             label:setColor(UIKit:hex2c4b(0x403c2f))
         elseif status == "lock" then
             label:setString(_("未解锁"))
@@ -236,7 +236,7 @@ function WidgetPromoteSoliderList:OnUserDataChanged_soldierStarEvents(userData, 
         for _,v in ipairs(value) do
             for _,box in ipairs(self.boxes) do
                 if v.name == box:GetSoldierType() then
-                    box:Refresh(User:SoldierStarByName(v.name))
+                    box:Refresh(UtilsForSoldier:SoldierStarByName(User, v.name))
                 end
             end
         end
@@ -246,7 +246,7 @@ function WidgetPromoteSoliderList:OnUserDataChanged_soldierStarEvents(userData, 
         for _,v in ipairs(value) do
             for _,box in ipairs(self.boxes) do
                 if v.name == box:GetSoldierType() then
-                    box:Refresh(User:SoldierStarByName(v.name))
+                    box:Refresh(UtilsForSoldier:SoldierStarByName(User, v.name))
                 end
             end
         end

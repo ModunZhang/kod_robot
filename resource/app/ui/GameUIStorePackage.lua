@@ -8,6 +8,7 @@ local WidgetPushButton = import("..widget.WidgetPushButton")
 local UIListView = import(".UIListView")
 local Localize = import("..utils.Localize")
 local UILib = import(".UILib")
+local light_gem = import("..particles.light_gem")
 local Localize_item = import("..utils.Localize_item")
 
 function GameUIStorePackage:ctor(data)
@@ -47,7 +48,8 @@ function GameUIStorePackage:CreateItemLogo()
 	local bg = display.newScale9Sprite(data.config.desc):size(335,92)
 	bg:align(display.RIGHT_CENTER, 592, 69):addTo(logo)
 	local gem_box = display.newSprite("store_gem_box_260x116.png"):align(display.CENTER, 0, 46):addTo(bg)
-	display.newSprite("store_gem_260x116.png", 130, 58):addTo(gem_box)
+	local gem_icon = display.newSprite("store_gem_260x116.png", 130, 58):addTo(gem_box)
+	light_gem():addTo(gem_icon, 1022):pos(gem_icon:getContentSize().width/2,gem_icon:getContentSize().height/2):scale(1.2)
 	UIKit:ttfLabel({
 		text = data.gem,
 		size = 30,

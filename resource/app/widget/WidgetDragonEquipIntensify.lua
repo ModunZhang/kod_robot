@@ -32,7 +32,7 @@ function WidgetDragonEquipIntensify:ctor(delegate,equipmentName,current_count,ma
 	self:onButtonClicked(function(event)
 		self:Action(1)
     end)
-	local cancel = cc.ui.UIPushButton.new("cancel_39x39.png",{scale9 = falses}):addTo(self):pos(42,55)
+	local cancel = cc.ui.UIPushButton.new("cancel_39x39.png",{scale9 = falses}):addTo(self):pos(42,52)
 	cancel:setScale(0.8)
 	cancel:onButtonClicked(function(event)
 		self:Action(2)

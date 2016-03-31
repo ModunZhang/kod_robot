@@ -91,6 +91,7 @@ function WidgetMaterials:onExit()
     User:RemoveListenerOnType(self, "buildingEvents")
 end
 function WidgetMaterials:CreateItemWithListView(material_key,materials,notClean)
+    local max = UtilsForBuilding:GetMaterialDepotLimit(self.city:GetUser()).soldierMaterials
     local list_view = self.material_listview
     if not notClean then
         list_view:removeAllItems()
@@ -110,8 +111,8 @@ function WidgetMaterials:CreateItemWithListView(material_key,materials,notClean)
             change_line_count = 2
         end
         local material_box = WidgetMaterialBox.new(material_key,material_name,function ()
-            self:OpenMaterialDetails(material_key,material_name,material_map[material_name].."/"..self.building:GetMaxMaterial())
-        end,true):addTo(row_item):SetNumber(string.formatnumberthousands(material_map[material_name]).."/"..string.formatnumberthousands(self.building:GetMaxMaterial()))
+            self:OpenMaterialDetails(material_key,material_name,material_map[material_name].."/"..max)
+        end,true):addTo(row_item):SetNumber(string.formatnumberthousands(material_map[material_name]).."/"..string.formatnumberthousands(max))
             :pos(origin_x + (unit_width + gap_x) * row_count , -unit_height/2)
         self.material_box_table[material_key][material_name] = material_box
         row_count = row_count + 1
@@ -174,7 +175,7 @@ function WidgetMaterials:CreateSelectButton()
 end
 function WidgetMaterials:OnUserDataChanged_buildingEvents()
     local User = self.city:GetUser()
-    local max = self.city:GetFirstBuildingByType("materialDepot"):GetMaxMaterial()
+    local max = UtilsForBuilding:GetMaterialDepotLimit(User).soldierMaterials
     for material_key,v in pairs(self.material_box_table) do
         local material_map = User[material_key]
         for k,m in pairs(v) do
@@ -189,7 +190,7 @@ function WidgetMaterials:OnUserDataChanged_buildings(userData, deltaData)
     local ok,value = deltaData("buildings.location_8")
     if ok then
         local User = self.city:GetUser()
-        local max = self.city:GetFirstBuildingByType("materialDepot"):GetMaxMaterial()
+        local max = UtilsForBuilding:GetMaterialDepotLimit(User).soldierMaterials
         for material_key,v in pairs(self.material_box_table) do
             local material_map = User[material_key]
             for k,m in pairs(v) do
@@ -214,6 +215,7 @@ function WidgetMaterials:OnUserDataChanged_technologyMaterials(userData, deltaDa
     self:OnMaterialChangedByKey("technologyMaterials", deltaData("technologyMaterials"))
 end
 function WidgetMaterials:OnMaterialChangedByKey(material_key, ok, value)
+    local max = UtilsForBuilding:GetMaterialDepotLimit(self.city:GetUser()).soldierMaterials
     if ok then
         for k,v in pairs(value) do
             if self.material_box_table[material_key] and
@@ -221,7 +223,7 @@ function WidgetMaterials:OnMaterialChangedByKey(material_key, ok, value)
                 self.material_box_table[material_key][k]:SetNumber(
                     string.formatnumberthousands(v)
                     .."/"..
-                    string.formatnumberthousands(self.building:GetMaxMaterial())
+                    string.formatnumberthousands(max)
                 )
             end
         end

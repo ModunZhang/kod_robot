@@ -30,7 +30,7 @@ function GameUIShireFightEvent:onEnter()
             local event = v.event
             if event then
                 local time = UtilsForEvent:GetEventInfo(event)
-                v.time_label:setString(GameUtils:formatTimeStyle1(time) .. "后到达")
+                v.time_label:setString(string.format(_("%s后到达"),GameUtils:formatTimeStyle1(time)))
             end
         end
     end)
@@ -57,9 +57,13 @@ function GameUIShireFightEvent:OnAllianceDataChanged_shrineEvents(alliance, delt
             end
         end
     end
-    if deltaData("shrineEvents.playerTroops") then
-        self.popultaion_label:setString(#self:GetFightEvent().playerTroops)
-        self:RefreshListView()
+    if deltaData("shrineEvents") then
+        if self.popultaion_label then
+            self.popultaion_label:setString(#self:GetFightEvent().playerTroops)
+        end
+        if self.info_list then
+            self:RefreshListView()
+        end
     end
 end
 
@@ -183,7 +187,7 @@ function GameUIShireFightEvent:GetListItem(arrived,obj)
     local time_label_text = ""
     if not arrived then
         local time = UtilsForEvent:GetEventInfo(obj)
-        time_label_text = string.format("%s后到达",GameUtils:formatTimeStyle1(time))
+        time_label_text = string.format(_("%s后到达"),GameUtils:formatTimeStyle1(time))
     else
         time_label_text = _("驻扎中")
     end
@@ -248,7 +252,7 @@ function GameUIShireFightEvent:DispathSoliderButtonClicked()
     end
     local final_func = function ()
         local attack_func = function ()
-            UIKit:newGameUI("GameUIAllianceSendTroops",function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+            UIKit:newGameUI("GameUISendTroopNew",function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
                 if type(self.GetFightEvent) ~= 'function' then gameuialliancesendtroops:LeftButtonClicked() end
                 if total_march_time >= UtilsForShrine:GetEventTime(self:GetFightEvent()) then
                     UIKit:showMessageDialog(_("提示"),
@@ -257,7 +261,9 @@ function GameUIShireFightEvent:DispathSoliderButtonClicked()
                             NetManager:getMarchToShrinePromose(self:GetFightEvent().id,dragonType,soldiers):done(function()
                                 app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
                             end)
-                            gameuialliancesendtroops:LeftButtonClicked()
+                            if gameuialliancesendtroops and gameuialliancesendtroops.LeftButtonClicked then
+                                gameuialliancesendtroops:LeftButtonClicked()
+                            end
                         end,
                         function()
                         end)

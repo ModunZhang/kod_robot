@@ -279,14 +279,14 @@ end
 
 
 -- get method
-function GameUtils:PingBaidu(callback)
+function GameUtils:PingSearchEngine(callback)
     local request = network.createHTTPRequest(function(event)
         if event.name == "completed" then
             callback(true)
         elseif event.name == "failed" then
             callback(false)
         end
-    end, "http://www.baidu.com", "GET")
+    end, "http://global.bing.com", "GET")
     request:setTimeout(180)
     request:start()
 end

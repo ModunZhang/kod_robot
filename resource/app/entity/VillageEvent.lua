@@ -38,14 +38,14 @@ function VillageEvent:ctor()
 	VillageEvent.super.ctor(self)
 end
 
-function VillageEvent:UpdateData(json_data,refresh_time)
-	self:SetId(json_data.id or "")
-	self:SetStartTime(json_data.startTime and json_data.startTime/1000.0 or "")
-	self:SetFinishTime(json_data.finishTime and json_data.finishTime/1000.0 or "")
-	self:SetPlayerData(json_data.playerData or  {})
-	self:SetVillageData(json_data.villageData or {})
-	self.times_ = math.ceil(self:FinishTime() - refresh_time)
-end
+-- function VillageEvent:UpdateData(json_data,refresh_time)
+-- 	self:SetId(json_data.id or "")
+-- 	self:SetStartTime(json_data.startTime and json_data.startTime/1000.0 or "")
+-- 	self:SetFinishTime(json_data.finishTime and json_data.finishTime/1000.0 or "")
+-- 	self:SetPlayerData(json_data.playerData or  {})
+-- 	self:SetVillageData(json_data.villageData or {})
+-- 	self.times_ = math.ceil(self:FinishTime() - refresh_time)
+-- end
 
 function VillageEvent:FromLocation()
 	return self:PlayerData().location,self:PlayerData().alliance.id

@@ -15,12 +15,12 @@ function WidgetResources:onEnter()
     self:CreateResourceListView()
     self:InitAllResources()
     scheduleAt(self, function()
-        local maxwood, maxfood, maxiron, maxstone = self.building:GetResourceValueLimit()
+        local limits = UtilsForBuilding:GetWarehouseLimit(User)
         local resource_max = {
-            wood = maxwood,
-            food = maxfood,
-            iron = maxiron,
-            stone = maxstone,
+            wood = limits.maxWood,
+            food = limits.maxFood,
+            iron = limits.maxIron,
+            stone = limits.maxStone,
         }
         local citizen_map = UtilsForBuilding:GetCitizenMap(self.city:GetUser())
         if self.resource_items then
@@ -47,7 +47,8 @@ function WidgetResources:OnUserDataChanged_buildingEvents()
     self:RefreshProtectPercent()
 end
 function WidgetResources:OnUserDataChanged_soldiers()
-    self.maintenance_cost.value:setString("-"..GameUtils:formatNumber(User:GetSoldierUpkeep()).."/h")
+    local upkeep = UtilsForSoldier:GetSoldierUpkeep(User)
+    self.maintenance_cost.value:setString("-"..GameUtils:formatNumber(upkeep).."/h")
 end
 function WidgetResources:OnUserDataChanged_vipEvents()
     self:RefreshProtectPercent()
@@ -60,7 +61,6 @@ function WidgetResources:RefreshProtectPercent()
         for k,v in pairs(self.resource_items) do
             if v.protectPro then
                 local p = DataUtils:GetResourceProtectPercent(v.type) * 100
-                v.protectPro:setPercentage(18)
                 v.protectPro:setPercentage(math.min(v.r_percent,p))
             end
         end
@@ -93,15 +93,18 @@ end
 
 function WidgetResources:InitAllResources()
     local current_time = app.timer:GetServerTime()
-    local maxwood, maxfood, maxiron, maxstone = self.building:GetResourceValueLimit()
+    local citizen_map = UtilsForBuilding:GetCitizenMap(User)
+    local limits = UtilsForBuilding:GetWarehouseLimit(User)
+    local maxwood, maxfood, maxiron, maxstone = limits.maxWood, limits.maxFood, limits.maxIron, limits.maxStone
+    local upkeep = UtilsForSoldier:GetSoldierUpkeep(User)
     local all_resources = {
         food = {
             resource_icon="res_food_91x74.png",
             resource_limit_value = maxfood,
             resource_current_value=User:GetResValueByType("food"),
             total_income=GameUtils:formatNumber(User:GetFoodRealOutput()).."/h",
-            occupy_citizen=GameUtils:formatNumber(City:GetCitizenByType("farmer")),
-            maintenance_cost="-"..GameUtils:formatNumber(User:GetSoldierUpkeep()).."/h",
+            occupy_citizen=GameUtils:formatNumber(citizen_map.farmer),
+            maintenance_cost="-"..GameUtils:formatNumber(upkeep).."/h",
             type = "food"
         },
         wood = {
@@ -109,7 +112,7 @@ function WidgetResources:InitAllResources()
             resource_limit_value= maxwood,
             resource_current_value=User:GetResValueByType("wood"),
             total_income=GameUtils:formatNumber(User:GetResProduction("wood").output).."/h",
-            occupy_citizen=GameUtils:formatNumber(City:GetCitizenByType("woodcutter")),
+            occupy_citizen=GameUtils:formatNumber(citizen_map.woodcutter),
             type = "wood"
         },
         stone = {
@@ -117,7 +120,7 @@ function WidgetResources:InitAllResources()
             resource_limit_value= maxstone,
             resource_current_value=User:GetResValueByType("stone"),
             total_income=GameUtils:formatNumber(User:GetResProduction("stone").output).."/h",
-            occupy_citizen=GameUtils:formatNumber(City:GetCitizenByType("quarrier")),
+            occupy_citizen=GameUtils:formatNumber(citizen_map.quarrier),
             type = "stone"
         },
         iron = {
@@ -125,7 +128,7 @@ function WidgetResources:InitAllResources()
             resource_limit_value=maxiron,
             resource_current_value=User:GetResValueByType("iron"),
             total_income=GameUtils:formatNumber(User:GetResProduction("iron").output).."/h",
-            occupy_citizen=GameUtils:formatNumber(City:GetCitizenByType("miner")),
+            occupy_citizen=GameUtils:formatNumber(citizen_map.miner),
             type = "iron"
         },
         coin = {

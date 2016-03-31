@@ -12,7 +12,7 @@ local special = GameDatas.Soldiers.special
 local titles = {
     _("战斗胜利"),
     _("龙在战斗中胜利"),
-    _("两个兵种击败敌军"),
+    _("第一轮击败敌军"),
 }
 
 
@@ -365,14 +365,10 @@ end
 function GameUIPveAttack:Attack()
     local enemies = string.split(sections[self.pve_name].troops, ",")
     table.remove(enemies, 1)
-    UIKit:newGameUI('GameUIPVESendTroop',
-        LuaUtils:table_map(enemies, function(k,v)
-            local name,star = unpack(string.split(v, ":"))
-            return k, {name = name, star = tonumber(star)}
-        end),
+    UIKit:newGameUI('GameUISendTroopNew',
         function(dragonType, soldiers)
             local dragon = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager():GetDragon(dragonType)
-            local param = {
+            local dragonParam = {
                 dragonType = dragon:Type(),
                 old_exp = dragon:Exp(),
                 new_exp = dragon:Exp(),
@@ -391,51 +387,18 @@ function GameUIPveAttack:Attack()
             NetManager:getAttackPveSectionPromise(self.pve_name, dragonType, soldiers):done(function()
                 display.getRunningScene():GetSceneLayer():RefreshPve()
             end):done(function(response)
-                local playerSoldierRoundDatas = response.msg.fightReport.playerSoldierRoundDatas
-                playerSoldierRoundDatas.hpDecreased = 0
-                local enemy_enter = {}
-                for i,v in ipairs(response.msg.fightReport.sectionSoldierRoundDatas) do
-                    enemy_enter[v.soldierName] = true
-                end
-                
-                local star = 0
-                local attack_map = {}
-                for i,v in ipairs(playerSoldierRoundDatas) do
-                    attack_map[v.soldierName] = true
-                end
-                if playerSoldierRoundDatas[#playerSoldierRoundDatas].isWin then
-                    local soldierName = playerSoldierRoundDatas[#playerSoldierRoundDatas].soldierName
-                    attack_map[soldierName] = nil
-                end
-                
-                if #soldiers > table.nums(attack_map)
-                and table.nums(enemy_enter) == #enemies 
-                then
-                    star = 2
-                    if response.msg.fightReport.playerDragonFightData.isWin then
-                        star = star + 1
-                    end
-                    local soldierName = {}
-                    local soldiername
-                    for i,v in ipairs(playerSoldierRoundDatas) do
-                        soldierName[v.soldierName] = true
-                    end
-                    if table.nums(soldierName) > 2 then
-                        star = star - 1
-                    end
-                end
-
+                local report = self:DecodeReport(response.msg.fightReport, dragon, soldiers)
                 local dragon = City:GetFirstBuildingByType("dragonEyrie"):GetDragonManager():GetDragon(dragonType)
-                param.new_exp = dragon:Exp()
-                param.new_level = dragon:Level()
-                param.star = star
+                dragonParam.new_exp = dragon:Exp()
+                dragonParam.new_level = dragon:Level()
+                dragonParam.star = self:GetStarByReport(report)
                 if response.get_func then
-                    param.reward = response.get_func()
+                    dragonParam.reward = response.get_func()
                 end
 
                 local pve_name = self.pve_name
                 local user = self.user
-                param.callback = function()
+                dragonParam.callback = function()
                     if user:IsPveBoss(pve_name) and user:GetPveSectionStarByName(pve_name) > 0 then
                         UIKit:newGameUI("GameUIPveAttack", user, pve_name):AddToCurrentScene(true)
                         return
@@ -453,7 +416,7 @@ function GameUIPveAttack:Attack()
                             userdefault:flush()
 
                             UIKit:newGameUI("GameUIPveReward", level, function()
-                                if param.star > 0 and be_star <= 0 then
+                                if dragonParam.star > 0 and be_star <= 0 then
                                     display.getRunningScene():GetSceneLayer():MoveAirship(true)
                                 end
                             end):AddToCurrentScene(true)
@@ -463,27 +426,28 @@ function GameUIPveAttack:Attack()
                         stage,key = stages[string.format("%d_%d", level, index)], DataManager:getUserData()._id.."_pve_stage_"..string.format("%d_%d", level, index)
                     end
                     --
-                    if param.star > 0 and be_star <= 0 then
+                    if dragonParam.star > 0 and be_star <= 0 then
                         display.getRunningScene():GetSceneLayer():MoveAirship(true)
                     end
                 end
+                
                 local is_show = false
-                UIKit:newGameUI("GameUIReplayNew", self:DecodeReport(response.msg.fightReport, dragon, soldiers), function(replayui)
+                UIKit:newGameUI("GameUIReplay", report, function(replayui)
                     if not is_show then
                         is_show = true
-                        UIKit:newGameUI("GameUIPveSummary", param):AddToCurrentScene(true)
+                        UIKit:newGameUI("GameUIPveSummary", dragonParam):AddToCurrentScene(true)
                         self:performWithDelay(function() self:LeftButtonClicked() end, 0)
                     end
                 end, function(replayui)
                     replayui:LeftButtonClicked()
                     if not is_show then
                         is_show = true
-                        UIKit:newGameUI("GameUIPveSummary", param):AddToCurrentScene(true)
+                        UIKit:newGameUI("GameUIPveSummary", dragonParam):AddToCurrentScene(true)
                         self:performWithDelay(function() self:LeftButtonClicked() end, 0)
                     end
                 end):AddToCurrentScene(true)
             end)
-        end):AddToCurrentScene(true)
+        end,{isPVE = true}):AddToCurrentScene(true)
 end
 function GameUIPveAttack:BuyAndUseSweepScroll(count)
     local User = self.user
@@ -596,6 +560,24 @@ function GameUIPveAttack:GetListItem(index,title)
     bg.star = display.newSprite("tmp_pve_star.png"):addTo(bg):pos(55, 20):scale(0.5)
     return bg
 end
+
+
+function GameUIPveAttack:GetStarByReport(report)
+    local star = 0
+    star = star + (report:GetReportResult() and 1 or 0)
+    if report:GetReportResult() then
+        star = star + (report:GetFightAttackDragonRoundData().isWin and 1 or 0)
+
+        local is_first_round_win = #report:GetSoldierRoundData() == 1
+        for i,v in ipairs(report:GetSoldierRoundData()[1].attackResults) do
+            if not v.isWin then
+                is_first_round_win = false
+            end
+        end
+        star = star + (is_first_round_win and 1 or 0)
+    end
+    return star
+end
 function GameUIPveAttack:DecodeReport(report, dragon, attack_soldiers)
     local user = self.user
     local titlename = self.titlename
@@ -607,6 +589,9 @@ function GameUIPveAttack:DecodeReport(report, dragon, attack_soldiers)
         local name,star,count = unpack(string.split(v, ":"))
         return k, {name = name, star = tonumber(star), count = count}
     end)
+    function report:IsFightWithBlackTroops()
+        return true
+    end
     function report:GetFightAttackName()
         return user.basicInfo.name
     end
@@ -628,6 +613,20 @@ function GameUIPveAttack:DecodeReport(report, dragon, attack_soldiers)
     function report:GetFightDefenceSoldierRoundData()
         return self.sectionSoldierRoundDatas
     end
+    function report:CouldAttackDragonUseSkill()
+        local attackRoundDragon = self:GetFightAttackDragonRoundData()
+        return attackRoundDragon.hp - attackRoundDragon.hpDecreased > 0
+    end
+    function report:CouldDefenceDragonUseSkill()
+        local defenceRoundDragon = self:GetFightDefenceDragonRoundData()
+        return defenceRoundDragon.hp - defenceRoundDragon.hpDecreased > 0
+    end
+    function report:IsSoldierFight()
+        return true
+    end
+    function report:GetSoldierRoundData()
+        return  self.roundDatas
+    end
     function report:IsFightWall()
         return false
     end
@@ -638,35 +637,13 @@ function GameUIPveAttack:DecodeReport(report, dragon, attack_soldiers)
         return defence_soldiers
     end
     function report:GetReportResult()
-        local attack_map = {}
-        for i,v in ipairs(self.playerSoldierRoundDatas) do
-            attack_map[v.soldierName] = true
-        end
-        if self.playerSoldierRoundDatas[#self.playerSoldierRoundDatas].isWin then
-            local soldierName = self.playerSoldierRoundDatas[#self.playerSoldierRoundDatas].soldierName
-            attack_map[soldierName] = nil
-        end
-
-        local defence_map = {}
-        for i,v in ipairs(self.sectionSoldierRoundDatas) do
-            defence_map[v.soldierName] = true
-        end
-        if self.sectionSoldierRoundDatas[#self.sectionSoldierRoundDatas].isWin then
-            local soldierName = self.sectionSoldierRoundDatas[#self.sectionSoldierRoundDatas].soldierName
-            defence_map[soldierName] = nil
-        end
-
-        if #self:GetOrderedAttackSoldiers() - table.nums(attack_map) > 0 then
-            return true
-        elseif #self:GetOrderedDefenceSoldiers() - table.nums(defence_map) > 0 then
-            return false
-        else
-            if self.playerSoldierRoundDatas[#self.playerSoldierRoundDatas].isWin then
-                return true
-            else
+        local roundDatas = self:GetSoldierRoundData()
+        for i,v in ipairs(roundDatas[#roundDatas].attackResults) do
+            if not v.isWin then
                 return false
             end
         end
+        return true
     end
     function report:GetAttackDragonLevel()
         return dragon:Level()
@@ -682,6 +659,9 @@ function GameUIPveAttack:DecodeReport(report, dragon, attack_soldiers)
     end
     return report
 end
+
+
+    
 
 return GameUIPveAttack
 

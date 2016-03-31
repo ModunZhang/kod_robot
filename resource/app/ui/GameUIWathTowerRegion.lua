@@ -4,7 +4,6 @@
 --
 local GameUIWathTowerRegion = UIKit:createUIClass('GameUIWathTowerRegion',"GameUIWithCommonHeader")
 local Localize = import("..utils.Localize")
-local AllianceBelvedere = import("..entity.AllianceBelvedere")
 local window = import("..utils.window")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPushButton = import("..widget.WidgetPushButton")
@@ -77,21 +76,6 @@ function GameUIWathTowerRegion:TabButtonsAction(tag)
 end
 
 function GameUIWathTowerRegion:AddOrRemoveListener(isAdd)
-    if isAdd then
-        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.CheckNotHaveTheEventIf)
-        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnCommingDataChanged)
-        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnMarchDataChanged)
-        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
-        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnVillageEventTimer)
-        -- self:GetAllianceBelvedere():AddListenOnType(self, AllianceBelvedere.LISTEN_TYPE.OnFightEventTimerChanged)
-    else
-        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.CheckNotHaveTheEventIf)
-        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnCommingDataChanged)
-        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnMarchDataChanged)
-        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnAttackMarchEventTimerChanged)
-        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnVillageEventTimer)
-        -- self:GetAllianceBelvedere():RemoveListenerOnType(self, AllianceBelvedere.LISTEN_TYPE.OnFightEventTimerChanged)
-    end
 end
 
 --ui
@@ -243,7 +227,7 @@ function GameUIWathTowerRegion:GetMyEventItemWithIndex(index,isOpen,entity)
                 :align(display.RIGHT_BOTTOM,555,10)
                 :onButtonClicked(function(event)
                     local current_scene = display.getRunningScene().__cname
-                    if current_scene == 'AllianceScene' or current_scene == 'AllianceBattleScene' then
+                    if current_scene == 'AllianceScene' then
                         self:LeftButtonClicked()
                     else
                         app:EnterMyAllianceScene()
@@ -606,7 +590,7 @@ end
 function GameUIWathTowerRegion:OnRetreatButtonClicked(entity,cb)
     if entity:GetType() == entity.ENTITY_TYPE.HELPTO then
         UIKit:showMessageDialog(_("提示"),_("确定撤军?"),function()
-            NetManager:getRetreatFromHelpedAllianceMemberPromise(entity:WithObject().beHelpedPlayerData.id)
+            NetManager:getRetreatFromHelpedAllianceMemberPromise(entity:WithObject().id)
                 :done(function()
                     cb(true)
                 end)

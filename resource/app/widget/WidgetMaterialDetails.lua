@@ -105,9 +105,9 @@ function WidgetMaterialDetails:InitMaterialDetails(material_key,material_name)
                     x = location.x,
                     y = location.y,
                     id = Alliance_Manager:GetMyAlliance().id,
-                    -- callback = function (scene)
-                    --     UIKit:newGameUI("GameUIAllianceBattle", City):AddToScene(scene,true)
-                    -- end
+                -- callback = function (scene)
+                --     UIKit:newGameUI("GameUIAllianceBattle", City):AddToScene(scene,true)
+                -- end
                 })
             else
                 UIKit:showMessageDialog(_("主人"),_("您还没有加入联盟"))
@@ -119,7 +119,8 @@ function WidgetMaterialDetails:InitMaterialDetails(material_key,material_name)
             local city = City
             local dragon_manger = city:GetDragonEyrie():GetDragonManager()
             local dragon_type = dragon_manger:GetCanFightPowerfulDragonType()
-            if #dragon_type > 0 or dragon_manger:GetDefenceDragon() then
+            if #dragon_type > 0
+                or UtilsForDragon:GetDefenceDragon(city:GetUser()) then
                 app:EnterPVEScene(city:GetUser():GetLatestPveIndex())
             else
                 UIKit:showMessageDialog(_("主人"),_("需要一条空闲状态的魔龙才能探险"))
@@ -152,7 +153,11 @@ function WidgetMaterialDetails:CreateOriginItem(listView,label,callback)
     --     pressed = "next_32x38.png"}):align(display.CENTER_RIGHT,item_width-8, item_height/2):addTo(bg)
     --     :onButtonClicked(function (event)
     --     end)
-    display.newSprite("next_32x38.png"):align(display.CENTER_RIGHT,item_width-8, item_height/2):addTo(bg)
+    display.newSprite("next_32x38.png"):align(display.CENTER,item_width-24, item_height/2):addTo(bg)
+        :runAction(
+            cc.RepeatForever:create(transition.sequence{cc.ScaleTo:create(1/2, 1.5),
+                cc.ScaleTo:create(1/2, 1.0),})
+        )
 
     item.button = cc.ui.UIPushButton.new():onButtonClicked(function (event)
         callback()
@@ -194,6 +199,7 @@ function WidgetMaterialDetails:Find()
 end
 
 return WidgetMaterialDetails
+
 
 
 

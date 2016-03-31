@@ -241,6 +241,7 @@ function GameUIPVESendTroop:SelectDragon()
                             for k,item in pairs(self.soldiers_table) do
                                 item:SetSoldierCount(0)
                             end
+                            self:AdapterMaxButton(false)
                         end
                         self:RefreashDragon(selectDragon)
                     end,
@@ -425,7 +426,11 @@ function GameUIPVESendTroop:SelectSoldiers()
     for _,name in pairs(soldier_map) do
         local soldier_num = map_s[name]
         if soldier_num > 0 then
-            table.insert(soldiers, {name = name,level = User:SoldierStarByName(name), max_num = soldier_num})
+            table.insert(soldiers, {
+                name = name,
+                level = UtilsForSoldier:SoldierStarByName(User, name),
+                max_num = soldier_num
+            })
         end
     end
     for k,v in pairs(soldiers) do
@@ -521,7 +526,7 @@ function GameUIPVESendTroop:CreateTroopsShow()
     end
     function TroopsShow:SetCitizen(citizen)
         local info_bg =self.info_bg
-        local citizen_item = createInfoItem(_("部队容量"),string.formatnumberthousands(citizen).."/"..string.formatnumberthousands(parent.dragon:LeadCitizen()))
+        local citizen_item = createInfoItem(_("带兵量"),string.formatnumberthousands(citizen).."/"..string.formatnumberthousands(parent.dragon:LeadCitizen()))
         citizen_item:align(display.CENTER,320,26)
             :addTo(info_bg)
         return self
@@ -592,7 +597,8 @@ function GameUIPVESendTroop:CreateTroopsShow()
                     local star = my_soldiers[i].star
                     -- 士兵头像
                     local soldier_ui_config = UILib.soldier_image[name]
-                    local soldier_color_bg = display.newSprite("blue_bg_128x128.png"):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
+                    local color_bg = UILib.soldier_color_bg_images[name]
+                    local soldier_color_bg = display.newSprite(color_bg):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
                     local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.CENTER,origin_x+ (i-1-(current_page-1)*5)*(box_width+gap_x),origin_y):addTo(self):scale(104/128)
                     local soldier_head_bg  = display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2,soldier_head_icon:getContentSize().height/2)
                     table.insert(self.added_my_soldiers,soldier_head_icon)
@@ -720,7 +726,7 @@ function GameUIPVESendTroop:PromiseOfAttack()
     WidgetFteArrow.new(_("点击进攻")):addTo(self:GetFteLayer()):TurnRight()
         :align(display.RIGHT_CENTER, r.x - 20, r.y + r.height/2)
 
-    return UIKit:PromiseOfOpen("GameUIReplayNew")
+    return UIKit:PromiseOfOpen("GameUIReplay")
 end
 
 

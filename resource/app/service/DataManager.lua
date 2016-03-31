@@ -1,4 +1,6 @@
-DataManager = {}
+DataManager = {
+    need_notify = true,
+}
 local initData = import("..fte.initData")
 function DataManager:setUserData( userData, deltaData )
     self.user = userData
@@ -66,7 +68,9 @@ function DataManager:OnUserDataChanged(userData, timer, deltaData)
         City:OnUserDataChanged(userData, timer, deltaData)
     end, "City:OnUserDataChanged")
     
-    User:OnDeltaDataChanged(deltaData)
+    if self.need_notify then
+        User:OnDeltaDataChanged(deltaData)
+    end
 
     LuaUtils:TimeCollect(function()
         Alliance_Manager:OnUserDataChanged(userData, timer, deltaData)

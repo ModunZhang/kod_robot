@@ -8,6 +8,7 @@ local window = import("..utils.window")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local UIListView = import(".UIListView")
+local SpriteConfig = import("..sprites.SpriteConfig")
 local config_day60 = GameDatas.Activities.day60
 local config_online = GameDatas.Activities.online
 local config_day14 = GameDatas.Activities.day14
@@ -98,6 +99,9 @@ end
 
 function GameUIActivityRewardNew:OnUserDataChanged_countInfo()
     self:RefreshUI()
+    if self.march_queue_text then
+        self.march_queue_text:setString(User.countInfo.day14 > 7 and 7 or User.countInfo.day14)
+    end
 end
 
 function GameUIActivityRewardNew:RefreshUI()
@@ -228,15 +232,16 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
     local flag = User.countInfo.day60 % 30 == 0 and 30 or User.countInfo.day60 % 30
     local geted = User.countInfo.day60RewardsCount % 30 == 0 and 30 or User.countInfo.day60RewardsCount % 30  -- <= geted
     local auto_get_reward = 0
+    self.every_day_bg = display.newNode():addTo(self.bg):size(self.bg:getContentSize())
     UIKit:ttfLabel({
         text = _("领取30日奖励后，刷新奖励列表"),
         size = 20,
         color= 0x403c2f
-    }):align(display.CENTER_TOP,304,self.height - 20):addTo(self.bg)
+    }):align(display.CENTER_TOP,304,self.height - 20):addTo(self.every_day_bg)
     local content_bg = UIKit:CreateBoxPanelWithBorder({
         width = 556,
         height= 786
-    }):align(display.CENTER_BOTTOM, 304, 16):addTo(self.bg)
+    }):align(display.CENTER_BOTTOM, 304, 16):addTo(self.every_day_bg)
     local x,y = 3,786 - 10
     for i=1,30 do
         local button = display.newSprite('box_118x118.png')
@@ -252,25 +257,53 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
         button.icon = enable
         button.check_bg = check_bg
         display.newSprite("activity_check_body_55x51.png"):addTo(check_bg):pos(27,17)
-        local could_get = false
         if i > flag then -- other day
             check_bg:hide()
             enable:clearFilter()
-            could_get = auto_get_reward == 0 and (i - flag) == 1
         else
-
             if flag == i then
                 if flag > geted or (geted == 30 and flag == 1) then -- can
                     check_bg:hide()
                     enable:clearFilter()
                     auto_get_reward = i
-                    could_get = true
                 else
                     check_bg:show()
                     if not enable:getFilter() then
                         enable:setFilter(filter.newFilter("CUSTOM", json.encode({frag = "shaders/ps_discoloration.fs",shaderName = "ps_discoloration"})))
                     end
                 end
+
+                display.newSprite("icon_daily_box_118x118.png"):align(display.LEFT_TOP,0, 118):addTo(button,2)
+                local reward_info = display.newNode()
+                reward_info:setContentSize(cc.size(536,118))
+                reward_info:align(display.LEFT_TOP, 0, y)
+                    :addTo(content_bg)
+                local get_btn = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png",disabled = "grey_btn_148x58.png"})
+                    :setButtonLabel(UIKit:commonButtonLable({
+                        text = _("领取"),
+                        color = 0xfff3c7
+                    })):align(display.RIGHT_CENTER,540, -59):onButtonClicked(function(event)
+                    self:On_EVERY_DAY_LOGIN_GetReward(auto_get_reward,rewards[auto_get_reward])
+                    end):addTo(reward_info)
+                get_btn:setVisible(auto_get_reward ~= 0)
+                if auto_get_reward == 0 then
+                    UIKit:ttfLabel({
+                        text = _("已领取"),
+                        size = 22,
+                        color= 0x403c2f
+                    }):align(display.RIGHT_CENTER,520, -59):addTo(reward_info)
+                end
+                UIKit:ttfLabel({
+                    text = Localize_item.item_name[rewards[i].reward],
+                    size = 22,
+                    color= 0x403c2f
+                }):align(display.LEFT_CENTER, 14, -20):addTo(reward_info)
+                UIKit:ttfLabel({
+                    text = Localize_item.item_desc[rewards[i].reward],
+                    size = 20,
+                    color= 0x615b44,
+                    dimensions = cc.size(380,0)
+                }):align(display.LEFT_TOP, 14, -40):addTo(reward_info)
             else
                 check_bg:show()
                 if not enable:getFilter() then
@@ -278,32 +311,7 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
                 end
             end
         end
-        if could_get then
-            display.newSprite("icon_daily_box_118x118.png"):align(display.LEFT_TOP,0, 118):addTo(button,2)
-            local reward_info = display.newNode()
-            reward_info:setContentSize(cc.size(536,118))
-            reward_info:align(display.LEFT_TOP, 0, y)
-                :addTo(content_bg)
-            local get_btn = WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png",disabled = "grey_btn_148x58.png"})
-                :setButtonLabel(UIKit:commonButtonLable({
-                    text = _("领取"),
-                    color = 0xfff3c7
-                })):align(display.RIGHT_CENTER,540, -59):onButtonClicked(function(event)
-                    self:On_EVERY_DAY_LOGIN_GetReward(auto_get_reward,rewards[auto_get_reward])
-                end):addTo(reward_info)
-            get_btn:setButtonEnabled(auto_get_reward ~= 0)
-            UIKit:ttfLabel({
-                text = Localize_item.item_name[rewards[i].reward],
-                size = 22,
-                color= 0x403c2f
-            }):align(display.LEFT_CENTER, 14, -20):addTo(reward_info)
-            UIKit:ttfLabel({
-                text = Localize_item.item_desc[rewards[i].reward],
-                size = 20,
-                color= 0x615b44,
-                dimensions = cc.size(400,0)
-            }):align(display.LEFT_TOP, 14, -40):addTo(reward_info)
-        end
+       
         local num_bg = display.newSprite("activity_num_bg_28x28.png",20,-18 + 118):addTo(button)
         UIKit:ttfLabel({
             text = i,
@@ -313,12 +321,13 @@ function GameUIActivityRewardNew:ui_EVERY_DAY_LOGIN()
         x = x + 110
         if i % 5 == 0 then
             x = 3
-            if i - flag < 5 then
+            if i - flag < 5 and i - flag >= 0 then
                 y = y - 222
             else
                 y = y - 108
             end
         end
+
     end
 end
 
@@ -328,9 +337,12 @@ function GameUIActivityRewardNew:On_EVERY_DAY_LOGIN_GetReward(index,reward)
     local real_index = countInfo.day60 % 30 == 0 and 30 or countInfo.day60 % 30
     if (countInfo.day60 > countInfo.day60RewardsCount and real_index == index) or (countInfo.day60RewardsCount > countInfo.day60 and real_index == index) then
         NetManager:getDay60RewardPromise():done(function()
+            dump(reward,"reward")
             GameGlobalUI:showTips(_("提示"),string.format(_("恭喜您获得 %s x %d"),Localize_item.item_name[reward.reward],reward.count))
             app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
-            self:LeftButtonClicked()
+            self.every_day_bg:removeAllChildren()
+            self:ui_EVERY_DAY_LOGIN()
+            -- self:LeftButtonClicked()
         end)
     else
         if index > real_index then
@@ -342,15 +354,57 @@ end
 
 ----------------------
 function GameUIActivityRewardNew:ui_CONTINUITY()
+    local march_queue_bg = display.newSprite("box_118x118.png"):align(display.LEFT_TOP,30,self.height - 30):addTo(self.bg)
+    display.newSprite("tmp_march_queue_128x128.png"):align(display.CENTER,64,64):addTo(march_queue_bg):scale(0.8)
+    local title_bg = display.newScale9Sprite("title_blue_430x30.png",0,0,cc.size(416,30),cc.rect(20,10,390,10))
+        :addTo(self.bg):align(display.LEFT_TOP, march_queue_bg:getPositionX() + march_queue_bg:getContentSize().width + 10,self.height - 30)
     UIKit:ttfLabel({
-        text = _("在未来的14天连续登陆，每天都会有来自王城的援军前来投奔你，连续登陆14天免费解锁第二条行军队列！"),
+        text = _("第二条行军队列"),
+        size = 22,
+        color= 0xffedae,
+    }):align(display.LEFT_CENTER,20,15):addTo(title_bg)
+    UIKit:ttfLabel({
+        text = _("七天后可激活"),
         size = 20,
         color= 0x403c2f,
-        dimensions = cc.size(500,0),
-        lineHeight = 34
-    }):align(display.CENTER_TOP,304,self.height - 30):addTo(self.bg)
+    }):align(display.LEFT_CENTER,title_bg:getPositionX(),self.height - 90):addTo(self.bg)
+    local text_1 = UIKit:ttfLabel({
+        text = User.countInfo.day14 > 7 and 7 or User.countInfo.day14,
+        size = 22,
+        color= 0x238700,
+    }):align(display.LEFT_CENTER,title_bg:getPositionX(),self.height - 130):addTo(self.bg)
+    self.march_queue_text = text_1
+    UIKit:ttfLabel({
+        text = "/7",
+        size = 22,
+        color= 0x403c2f,
+    }):align(display.LEFT_CENTER,text_1:getPositionX()+text_1:getContentSize().width,self.height - 130):addTo(self.bg)
+    local button = WidgetPushButton.new({normal = 'yellow_btn_up_148x58.png',pressed = 'yellow_btn_down_148x58.png',disabled = 'gray_btn_148x58.png'})
+        :setButtonLabel("normal", UIKit:commonButtonLable({
+            text = _("领取")
+        }))
+        :addTo(self.bg)
+        :align(display.RIGHT_CENTER,title_bg:getPositionX() + title_bg:getContentSize().width,self.height - 110)
+        :onButtonClicked(function()
+            NetManager:getUnlockPlayerSecondMarchQueuePromise():done(function (response)
+                GameGlobalUI:showTips(_("提示"),_("永久行军队列+1"))
+                self:LeftButtonClicked()
+                return response
+            end)
+        end)
+        :setButtonEnabled(User.countInfo.day14==7)
+    print("User.basicInfo.marchQueue=",User.basicInfo.marchQueue)
+    if User.basicInfo.marchQueue == 2 then
+        button:setVisible(false)
+        local title_label = UIKit:ttfLabel({
+            text = _("已领取"),
+            size = 22,
+            color= 0x514d3e
+        }):addTo(self.bg)
+            :align(display.RIGHT_CENTER,title_bg:getPositionX() + title_bg:getContentSize().width - 30,self.height - 90)
+    end
     self.list_view = UIListView.new{
-        viewRect = cc.rect(26,20,556,630),
+        viewRect = cc.rect(26,20,556,590),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL
     }:addTo(self.bg)
     self:RefreshContinutyList(true)
@@ -566,6 +620,7 @@ end
 
 function GameUIActivityRewardNew:GetRewardName(reward_type,reward_key)
     if reward_type == 'resource'
+        or reward_type == 'items'
         or reward_type == 'special'
         or reward_type == 'speedup'
         or reward_type == 'buff'
@@ -591,7 +646,7 @@ function GameUIActivityRewardNew:ui_FIRST_IN_PURGURE()
         size = 34,
         color = 0xfed36c,
         shadow = true
-    }):addTo(bar):align(display.RIGHT_CENTER,580,622)
+    }):addTo(bar):align(display.CENTER,440,622)
     UIKit:ttfLabel({
         text = _("永久激活第二条建筑队列并可领取下列丰厚奖励"),
         size = 22,
@@ -689,7 +744,8 @@ end
 
 function GameUIActivityRewardNew:ui_PLAYER_LEVEL_UP()
     local box = display.newSprite("alliance_item_flag_box_126X126.png"):align(display.LEFT_TOP, 20,self.height - 30):addTo(self.bg)
-    display.newSprite("keep_1.png",70,63):addTo(box):scale(120/420)
+    local keep_img = SpriteConfig["keep"]:GetConfigByLevel(City:GetFirstBuildingByType("keep"):GetLevel()).png
+    display.newSprite(keep_img,70,63):addTo(box):scale(120/420)
     local title_bg = display.newScale9Sprite("title_blue_430x30.png",0,0, cc.size(390,30), cc.rect(10,10,410,10))
         :align(display.LEFT_TOP, 180, self.height - 30):addTo(self.bg)
     UIKit:ttfLabel({
@@ -1101,6 +1157,15 @@ function GameUIActivityRewardNew:GetNextOnlineTimePoint()
 end
 
 return GameUIActivityRewardNew
+
+
+
+
+
+
+
+
+
 
 
 

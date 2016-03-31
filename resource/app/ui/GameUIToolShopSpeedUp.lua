@@ -18,7 +18,9 @@ function GameUIToolShopSpeedUp:ctor(building)
     self.event = event
     self:SetAccBtnsGroup(self:GetEventType(), event.id)
     self:SetAccTips(_("生产材料不能免费加速"))
-    self:SetUpgradeTip(_("制造材料").."X "..building:GetProduction())
+    
+    local production = UtilsForBuilding:GetPropertyBy(User, "toolShop", "production")
+    self:SetUpgradeTip(_("制造材料").."X "..production)
 
     User:AddListenOnType(self, "materialEvents")
     scheduleAt(self, function()

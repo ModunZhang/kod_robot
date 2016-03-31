@@ -11,6 +11,7 @@ function WidgetPopDialog:ctor(height,title_text,y,title_bg, param)
     local rb_size = body:getContentSize()
     local title = display.newSprite(title_bg or "title_blue_600x56.png"):align(display.CENTER, rb_size.width/2, rb_size.height+10)
         :addTo(body)
+    self.title_sprite = title
     self.title_label = UIKit:ttfLabel({
         text = title_text,
         size = 22,

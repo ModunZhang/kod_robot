@@ -6,7 +6,7 @@ dragonStar[1] = {
 	["initLeadership"] = 6,
 	["initStrength"] = 18,
 	["initVitality"] = 21,
-	["skillsUnlocked"] = "infantryEnhance,archerEnhance,dragonBlood"
+	["skillsUnlocked"] = "hellFire,lightningStorm,poisonNova"
 }
 dragonStar[2] = {
 	["star"] = 2,
@@ -15,7 +15,7 @@ dragonStar[2] = {
 	["initStrength"] = 44,
 	["initVitality"] = 53,
 	["allCategory"] = "crown,armguardLeft,armguardRight",
-	["skillsUnlocked"] = "infantryEnhance,archerEnhance,dragonBlood,cavalryEnhance,siegeEnhance"
+	["skillsUnlocked"] = "hellFire,lightningStorm,poisonNova,infantryEnhance,archerEnhance,cavalryEnhance,siegeEnhance"
 }
 dragonStar[3] = {
 	["star"] = 3,
@@ -24,7 +24,7 @@ dragonStar[3] = {
 	["initStrength"] = 117,
 	["initVitality"] = 138,
 	["allCategory"] = "crown,armguardLeft,armguardRight,chest,sting,orb",
-	["skillsUnlocked"] = "infantryEnhance,archerEnhance,dragonBlood,cavalryEnhance,siegeEnhance,dragonBreath,leadership"
+	["skillsUnlocked"] = "hellFire,lightningStorm,poisonNova,infantryEnhance,archerEnhance,cavalryEnhance,siegeEnhance,dragonBreath,dragonBlood"
 }
 dragonStar[4] = {
 	["star"] = 4,
@@ -33,7 +33,7 @@ dragonStar[4] = {
 	["initStrength"] = 320,
 	["initVitality"] = 372,
 	["allCategory"] = "crown,armguardLeft,armguardRight,chest,sting,orb",
-	["skillsUnlocked"] = "infantryEnhance,archerEnhance,dragonBlood,cavalryEnhance,siegeEnhance,dragonBreath,leadership,greedy,frenzied,recover,insensitive,earthquake,battleHunger"
+	["skillsUnlocked"] = "hellFire,lightningStorm,poisonNova,infantryEnhance,archerEnhance,cavalryEnhance,siegeEnhance,dragonBreath,dragonBlood,leadership,greedy,surge,earthquake"
 }
 dragonStar[5] = {
 	["star"] = 5,
@@ -42,5 +42,5 @@ dragonStar[5] = {
 	["initStrength"] = 868,
 	["initVitality"] = 995,
 	["allCategory"] = "crown,armguardLeft,armguardRight,chest,sting,orb",
-	["skillsUnlocked"] = "infantryEnhance,archerEnhance,dragonBlood,cavalryEnhance,siegeEnhance,dragonBreath,leadership,greedy,frenzied,recover,insensitive,earthquake,battleHunger"
+	["skillsUnlocked"] = "hellFire,lightningStorm,poisonNova,infantryEnhance,archerEnhance,cavalryEnhance,siegeEnhance,dragonBreath,dragonBlood,leadership,greedy,surge,earthquake"
 }

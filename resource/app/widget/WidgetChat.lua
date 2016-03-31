@@ -71,9 +71,9 @@ function WidgetChat:ctor()
         current_page_index = last_chat_channel
     end
     local size = self:getContentSize()
-    local index_1 = display.newSprite("chat_page_index_1.png"):addTo(self):pos(size.width/2-21,size.height-5)
-    local index_2 = display.newSprite("chat_page_index_2.png"):addTo(self):pos(size.width/2,size.height-5)
-    local index_3 = display.newSprite("chat_page_index_2.png"):addTo(self):pos(size.width/2+21,size.height-5)
+    local index_1 = display.newSprite("chat_page_index_1.png"):addTo(self):pos(size.width/2-10,size.height-5)
+    local index_2 = display.newSprite("chat_page_index_2.png"):addTo(self):pos(size.width/2+11,size.height-5)
+    -- local index_3 = display.newSprite("chat_page_index_2.png"):addTo(self):pos(size.width/2+21,size.height-5)
 
     local pv = UIPageView.new {
         -- bgColor = cc.c4b(255, 0, 0, 255),
@@ -86,25 +86,25 @@ function WidgetChat:ctor()
         dump(event,"UIPageView event")
         if event.name == "pageChange" then
             if 1 == event.pageIdx then
-                index_1:setPositionX(size.width/2-21)
-                index_2:setPositionX(size.width/2)
-                index_3:setPositionX(size.width/2+21)
+                index_1:setPositionX(size.width/2-10)
+                index_2:setPositionX(size.width/2+11)
+                -- index_3:setPositionX(size.width/2+21)
             elseif 2 == event.pageIdx then
-                index_1:setPositionX(size.width/2)
-                index_2:setPositionX(size.width/2-21)
-                index_3:setPositionX(size.width/2+21)
-            elseif 3 == event.pageIdx then
-                index_3:setPositionX(size.width/2-21)
-                index_1:setPositionX(size.width/2+21)
-                index_2:setPositionX(size.width/2)
+                index_1:setPositionX(size.width/2+11)
+                index_2:setPositionX(size.width/2-10)
+                -- index_3:setPositionX(size.width/2+21)
+            -- elseif 3 == event.pageIdx then
+            --     index_3:setPositionX(size.width/2-21)
+            --     index_1:setPositionX(size.width/2+21)
+            --     index_2:setPositionX(size.width/2)
             end
             local channel
             if event.pageIdx == 1 then
                 channel = "global"
             elseif event.pageIdx == 2 then
                 channel = "alliance"
-            else
-                channel = "allianceFight"
+            -- else
+            --     channel = "allianceFight"
             end
             app:GetChatManager():setChannelReadStatus(channel,false)
             if self[channel.."Ani"]  then
@@ -117,8 +117,8 @@ function WidgetChat:ctor()
                 UIKit:newGameUI('GameUIChatChannel',"global"):AddToCurrentScene(true)
             elseif event.pageIdx == 2 then
                 UIKit:newGameUI('GameUIChatChannel',"alliance"):AddToCurrentScene(true)
-            elseif event.pageIdx == 3 then
-                UIKit:newGameUI('GameUIChatChannel',"allianceFight"):AddToCurrentScene(true)
+            -- elseif event.pageIdx == 3 then
+            --     UIKit:newGameUI('GameUIChatChannel',"allianceFight"):AddToCurrentScene(true)
             end
             app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
         end
@@ -129,7 +129,7 @@ function WidgetChat:ctor()
     self.chat_labels = {}
     local last_chat_messages = self.chatManager:FetchLastChannelMessage()
     -- add items
-    for i=1,3 do
+    for i=1,2 do
         local item = pv:newItem()
         local content
         local index = (i - 1) * 2 + 1
@@ -148,8 +148,8 @@ function WidgetChat:ctor()
             display.newSprite("global_channel_39x44.png"):align(display.LEFT_CENTER,0, 22):addTo(content)
         elseif i == 2 then
             display.newSprite("alliance_join_tips_79x83.png"):align(display.LEFT_CENTER,0, 22):addTo(content):scale(0.53)
-        elseif i == 3 then
-            display.newSprite("fight_62x70.png"):align(display.LEFT_CENTER,0, 22):addTo(content):scale(0.62)
+        -- elseif i == 3 then
+        --     display.newSprite("fight_62x70.png"):align(display.LEFT_CENTER,0, 22):addTo(content):scale(0.62)
         end
 
         item:addChild(content)
@@ -166,8 +166,8 @@ function WidgetChat:ctor()
                 UIKit:newGameUI('GameUIChatChannel',"global"):AddToCurrentScene(true)
             elseif 2 == pv:getCurPageIdx() then
                 UIKit:newGameUI('GameUIChatChannel',"alliance"):AddToCurrentScene(true)
-            elseif 3 == pv:getCurPageIdx() then
-                UIKit:newGameUI('GameUIChatChannel',"allianceFight"):AddToCurrentScene(true)
+            -- elseif 3 == pv:getCurPageIdx() then
+            --     UIKit:newGameUI('GameUIChatChannel',"allianceFight"):AddToCurrentScene(true)
             end
         end)
     self:RefreshNewChatAni()
@@ -187,9 +187,9 @@ function WidgetChat:RefreshNewChatAni()
     -- 新消息动画提示
     local size = self:getContentSize()
     local pos_ani = {
-        global = {x = size.width/2-21, y = size.height-5},
-        alliance = {x = size.width/2 , y = size.height-5},
-        allianceFight = {x = size.width/2+21, y = size.height-5}
+        global = {x = size.width/2-10, y = size.height-5},
+        alliance = {x = size.width/2 + 11 , y = size.height-5},
+        -- allianceFight = {x = size.width/2+21, y = size.height-5}
     }
     local channel = self:GetCurrentChannel()
     local channelReadStatus = app:GetChatManager():getAllChannelReadStatus()
@@ -206,8 +206,8 @@ function WidgetChat:GetCurrentChannel()
         channel = "global"
     elseif page_index == 2 then
         channel = "alliance"
-    else
-        channel = "allianceFight"
+    -- else
+    --     channel = "allianceFight"
     end
     return channel
 end

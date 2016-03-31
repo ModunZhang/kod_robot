@@ -16,7 +16,7 @@ function WidgetPromoteSoldier:ctor(soldier_type,building_type)
     WidgetPromoteSoldier.super.ctor(self,780,_("兵种晋级"))
     self.soldier_type = soldier_type
     self.building_type = building_type
-    self.star = User:SoldierStarByName(soldier_type)
+    self.star = UtilsForSoldier:SoldierStarByName(User, soldier_type)
 end
 
 function WidgetPromoteSoldier:onEnter()
@@ -71,7 +71,7 @@ function WidgetPromoteSoldier:CreateSoldierBox(isGray)
         scale = 0.8,
     }):addTo(soldier_star_bg):align(display.CENTER,58, 11)
     function soldier_box:SetSoldierIcon(isNext)
-        local current_star = User:SoldierStarByName(soldier_type)
+        local current_star = UtilsForSoldier:SoldierStarByName(User, soldier_type)
         local star = isNext and current_star+1 or current_star
         self:removeChild(self.soldier_icon, true)
 
@@ -175,7 +175,7 @@ function WidgetPromoteSoldier:UpgradeButtons()
         text = self:GetInstantUpgradeGems(),
         size = 20,
         color = 0x403c2f
-    }):align(display.LEFT_CENTER,size.width/2 - 230,size.height-294):addTo(body)
+    }):align(display.LEFT_CENTER,size.width/2 - 230,size.height-290):addTo(body)
     --升级所需时间
     local level_up_config = self:GetNextLevelConfig()
 
@@ -184,7 +184,7 @@ function WidgetPromoteSoldier:UpgradeButtons()
         text = GameUtils:formatTimeStyle1(level_up_config.upgradeTimeSecondsNeed),
         size = 18,
         color = 0x403c2f
-    }):align(display.LEFT_CENTER,size.width/2+125,size.height-294):addTo(body)
+    }):align(display.LEFT_CENTER,size.width/2+125,size.height-290):addTo(body)
 
 end
 function WidgetPromoteSoldier:UpgradeRequirement()
@@ -318,17 +318,18 @@ function WidgetPromoteSoldier:IsAbleToUpgradeSecond()
         table.insert(results, _("升级军事科技队列被占用"))
     end
     if current_coin<level_up_config.upgradeCoinNeed then
-        table.insert(results, string.format( _("银币不足 需要补充 %d"), level_up_config.upgradeCoinNeed-current_coin ) )
+        table.insert(results, string.format(_("银币不足,需要补充:%s 银币"),string.formatnumberthousands(level_up_config.upgradeCoinNeed-current_coin)))
     end
 
 
     return results
 end
 function WidgetPromoteSoldier:GetNextLevelConfig()
-
-    return NORMAL[self.soldier_type.."_"..(User:SoldierStarByName(self.soldier_type) + 1)]
+    local star = UtilsForSoldier:SoldierStarByName(User, self.soldier_type)
+    return NORMAL[self.soldier_type.."_"..(star + 1)]
 end
 return WidgetPromoteSoldier
+
 
 
 

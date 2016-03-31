@@ -7,16 +7,17 @@ local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local UIListView = import(".UIListView")
 local WidgetSoldierBox = import("..widget.WidgetSoldierBox")
+local WidgetSoldierDetails = import("..widget.WidgetSoldierDetails")
 local WidgetSelectDragon = import("..widget.WidgetSelectDragon")
 local timer = app.timer
 local WidgetUseItems = import("..widget.WidgetUseItems")
-local WidgetSelectWallDragon = import("..widget.WidgetSelectWallDragon")
 
 function GameUIWall:ctor(city,building,default_tab)
     self.city = city
     GameUIWall.super.ctor(self,city,Localize.building_name[building:GetType()],building,default_tab)
     self.dragon_manager = city:GetFirstBuildingByType("dragonEyrie"):GetDragonManager()
     self.dragon_manager:AddListenOnType(self,self.dragon_manager.LISTEN_TYPE.OnHPChanged)
+    User:AddListenOnType(self, "defenceTroop")
 end
 
 function GameUIWall:OnMoveInStage()
@@ -50,6 +51,7 @@ end
 
 function GameUIWall:OnMoveOutStage()
     self.dragon_manager:RemoveListenerOnType(self,self.dragon_manager.LISTEN_TYPE.OnHPChanged)
+    User:RemoveListenerOnType(self, "defenceTroop")
     GameUIWall.super.OnMoveOutStage(self)
 end
 
@@ -86,7 +88,8 @@ function GameUIWall:CreateMilitaryUIIf()
     self.wall_hp_recovery_label = UIKit:ttfLabel({
         text = "+" .. res.output .. "/h",
         size = 22,
-        color= 0xfff3c7
+        color= 0xfff3c7,
+        shadow = true
     }):align(display.RIGHT_CENTER, 480, 20):addTo(process_wall_bg)
 
     WidgetPushButton.new({normal = "add_btn_up_50x50.png",pressed = "add_btn_down_50x50.png"})
@@ -165,7 +168,7 @@ function GameUIWall:CreateMilitaryUIIf()
     local level_str = string.format(_("当前联盟地形:%s"),Alliance_Manager:GetMyAlliance():IsDefault() and _("无") or Localize.terrain[Alliance_Manager:GetMyAlliance().basicInfo.terrain])
     if dragon then
         name_str = dragon:GetLocalizedName()
-        level_str=  _("力量")
+        level_str=  _("攻击力")
     end
     local title_bg = display.newScale9Sprite("title_blue_430x30.png",0, 0, cc.size(416,30), cc.rect(10,10,410,10)):addTo(military_node)
         :align(display.LEFT_TOP, tips_label:getPositionX(), draogn_box:getPositionY() + draogn_box:getContentSize().height)
@@ -181,15 +184,15 @@ function GameUIWall:CreateMilitaryUIIf()
         text = level_str,
         size = 20,
         color= 0x615b44
-    }):align(display.LEFT_BOTTOM,title_bg:getPositionX(), tips_label:getPositionY() + tips_label:getContentSize().height + 20):addTo(military_node)
+    }):align(display.LEFT_BOTTOM,title_bg:getPositionX(), title_bg:getPositionY() - title_bg:getContentSize().height - 40):addTo(military_node)
     self.level_title_label = level_title_label
     self.dragon_level_label = UIKit:ttfLabel({
         text = "",
         color= 0x514d3e,
         size = 20
-    }):addTo(military_node):align(display.LEFT_BOTTOM,level_title_label:getPositionX()+50, level_title_label:getPositionY())
+    }):addTo(military_node):align(display.LEFT_BOTTOM,level_title_label:getPositionX()+level_title_label:getContentSize().width + 5, level_title_label:getPositionY())
     if dragon then
-        self.dragon_level_label:setString(string.formatnumberthousands(dragon:Strength()))
+        self.dragon_level_label:setString(string.formatnumberthousands(dragon:TotalStrength()))
         self.tips_label:hide()
     else
         self.dragon_level_label:hide()
@@ -217,7 +220,7 @@ function GameUIWall:CreateMilitaryUIIf()
         :align(display.CENTER_BOTTOM, window.width/2,tips_panel:getPositionY() - tips_panel:getContentSize().height - 70)
         :setButtonLabel("normal", UIKit:ttfLabel({text = _("驻防部队"),size = 22,color = 0xffedae,shadow = true}))
         :onButtonClicked(function()
-            UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers)
+            UIKit:newGameUI('GameUISendTroopNew',function(dragonType,soldiers)
                 if self.dragon_manager:GetDragon(dragonType):IsDead() then
                     UIKit:showMessageDialog(nil,_("选择的龙已经死亡")):CreateCancelButton(
                         {
@@ -252,7 +255,6 @@ function GameUIWall:CreateMilitaryUIIf()
             end)
         end)
     self.retreat_troop_btn = retreat_btn
-
     local edit_button = WidgetPushButton.new({
         normal = "blue_btn_up_148x58.png",
         pressed = "blue_btn_down_148x58.png",
@@ -262,7 +264,7 @@ function GameUIWall:CreateMilitaryUIIf()
         :align(display.RIGHT_BOTTOM, window.width - 50,list_node:getPositionY() - 70)
         :setButtonLabel("normal", UIKit:ttfLabel({text = _("编辑"),size = 22,color = 0xffedae,shadow = true}))
         :onButtonClicked(function()
-            UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers)
+            UIKit:newGameUI('GameUISendTroopNew',function(dragonType,soldiers)
                 if self.dragon_manager:GetDragon(dragonType):IsDead() then
                     UIKit:showMessageDialog(nil,_("选择的龙已经死亡")):CreateCancelButton(
                         {
@@ -276,10 +278,12 @@ function GameUIWall:CreateMilitaryUIIf()
                     )
                     return
                 end
-                NetManager:getSetDefenceTroopPromise(dragonType,soldiers):done(function ()
-                    self:RefreshUIAfterSelectDragon(self.dragon_manager:GetDragon(dragonType),soldiers)
+                NetManager:getCancelDefenceTroopPromise():done(function()
+                    NetManager:getSetDefenceTroopPromise(dragonType,soldiers):done(function ()
+                        self:RefreshUIAfterSelectDragon(self.dragon_manager:GetDragon(dragonType),soldiers)
+                    end)
                 end)
-            end,{isMilitary = true,terrain = not Alliance_Manager:GetMyAlliance():IsDefault() and Alliance_Manager:GetMyAlliance().basicInfo.terrain or User.basicInfo.terrain,title = _("驻防部队"),military_soldiers = User.defenceTroop.soldiers}):AddToCurrentScene(true)
+            end,{dragon = self:GetDragon(), isMilitary = true,terrain = not Alliance_Manager:GetMyAlliance():IsDefault() and Alliance_Manager:GetMyAlliance().basicInfo.terrain or User.basicInfo.terrain,title = _("驻防部队"),military_soldiers = User.defenceTroop.soldiers}):AddToCurrentScene(true)
         end)
     self.edit_troop_btn = edit_button
     if dragon then
@@ -349,24 +353,21 @@ function GameUIWall:RefreshListView()
         return
     end
     local soldiers = clone(User.defenceTroop.soldiers)
-    table.sort( soldiers, function ( a,b )
-        local total_power_a = User:GetSoldierConfig(a.name).power * a.count
-        local total_power_b = User:GetSoldierConfig(b.name).power * b.count
-        return total_power_a > total_power_b
-    end )
-    for i=1,#soldiers,4 do
+    local pos = {65,273,481}
+    for i=1,#soldiers,3 do
         local row_item = display.newNode()
-        local added = 1
         local j = i
-        for j=1,4 do
+        for j=1,3 do
             local soldier = soldiers[i+j-1]
             if soldier then
                 row_item:setContentSize(cc.size(546,166))
-                WidgetSoldierBox.new(nil, function()end):addTo(row_item)
-                    :alignByPoint(cc.p(0.5, 0.5), 65 + (130 + 9) * (added - 1) , 83)
-                    :SetSoldier(soldier.name, self.city:GetUser():SoldierStarByName(soldier.name))
+                WidgetSoldierBox.new(nil, function() WidgetSoldierDetails.new(soldier.name, UtilsForSoldier:SoldierStarByName(User, soldier.name)):addTo(self)end):addTo(row_item)
+                    :alignByPoint(cc.p(0.5, 0.5), pos[j] , 83)
+                    :SetSoldier(
+                        soldier.name,
+                        UtilsForSoldier:SoldierStarByName(self.city:GetUser(), soldier.name)
+                    )
                     :SetNumber(soldier.count)
-                added = added + 1
             end
         end
         local item = self.info_list:newItem()
@@ -390,8 +391,8 @@ function GameUIWall:RefreshUIAfterSelectDragon(dragon,soldiers)
         self.edit_troop_btn:show()
         self.dragon_info_panel:show()
         self.tips_panel:hide()
-        self.level_title_label:setString(_("力量"))
-        self.dragon_level_label:setString(string.formatnumberthousands(dragon:Strength()))
+        self.level_title_label:setString(_("攻击力"))
+        self.dragon_level_label:setString(string.formatnumberthousands(dragon:TotalStrength()))
         self.dragon_level_label:show()
         self.tips_label:hide()
         self.progressTimer_bg:show()
@@ -429,7 +430,13 @@ function GameUIWall:OnHPChanged()
         self.dragon_hp_progress:setPercentage(dragon:Hp()/dragon:GetMaxHP()*100)
     end
 end
+function GameUIWall:OnUserDataChanged_defenceTroop(userData, deltaData)
+    self:RefreshListView()
+end
 return GameUIWall
+
+
+
 
 
 

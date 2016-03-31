@@ -101,7 +101,6 @@ function GameUITownHall:CreateAdministration()
     listnode:align(display.BOTTOM_CENTER, layer_width/2, 20):addTo(admin_layer)
     self.quest_list_view = list_view
     -- 获取任务
-    self:CreateAllQuests(User:GetDailyQuests())
     User:AddListenOnType(self, "dailyQuests")
     User:AddListenOnType(self, "dailyQuestEvents")
     User:AddListenOnType(self, "buildingEvents")

@@ -185,11 +185,7 @@ local SOLDIER_IMAGES = {
     paladin = "deathKnight.png",
     steamTank = "meatWagon.png",
 
-    wall = {
-        "gate_1.png",
-        "gate_2.png",
-        "gate_3.png",
-    }
+    wall = "gate_1.png",
 }
 local SOLDIER_COLOR_BG_IMAGES = {
     wall = "blue_bg_128x128.png",
@@ -304,11 +300,7 @@ local BLACK_SOLDIER_IMAGES = {
     paladin = "deathKnight.png",
     steamTank = "meatWagon.png",
 
-    wall = {
-        "gate_1.png",
-        "gate_2.png",
-        "gate_3.png",
-    }
+    wall = "gate_1.png",
 }
 local DECORATOR_IMAGE = {
     grassLand = {
@@ -360,7 +352,8 @@ local DECORATOR_IMAGE = {
 local DRAGON_HEAD = {
     blueDragon = "Dragon_blue_113x128.png",
     redDragon = "redDragon.png",
-    greenDragon = "greenDragon.png"
+    greenDragon = "greenDragon.png",
+    blackDragon = "tmp_black_dragon_113x128.png",
 }
 local SMALL_DRAGON_HEAD = {
     blueDragon = "blueDragon_40x40.png",
@@ -427,8 +420,8 @@ local ITEM = {
     warSpeedupClass_1 = "warSpeedup_1_128x128.png",
     warSpeedupClass_2 = "warSpeedup_2_128x128.png",
 
-    dragonChest_1 = "dragonChest_1_128x128.png",
-    dragonChest_2 = "dragonChest_2_128x128.png",
+    dragonChest_1 = "dragonChest_2_128x128.png",
+    dragonChest_2 = "dragonChest_1_128x128.png",
     dragonChest_3 = "dragonChest_3_128x128.png",
     chest_1 = "chest_1_128x128.png",
     chest_2 = "chest_2_128x128.png",
@@ -553,6 +546,10 @@ local ITEM = {
     restoreWall_2 = "restoreWall_2_128x128.png",
     restoreWall_3 = "restoreWall_3_128x128.png",
     sweepScroll = "sweep_128x128.png",
+
+    redbag_1 = "red_packet_1_128x128.png",
+    redbag_2 = "red_packet_2_128x128.png",
+    redbag_3 = "red_packet_3_128x128.png",
 }
 
 local ALLIANCE_BUILDING = {
@@ -716,30 +713,33 @@ local DRAGON_SKILL_ICON = {
         greenDragon = "greedy_128x128.png",
         blueDragon = "greedy_128x128.png",
     },
-    frenzied = {
-        redDragon = "frenzied_128x128.png",
-        greenDragon = "frenzied_128x128.png",
-        blueDragon = "frenzied_128x128.png",
-    },
-    recover = {
-        redDragon = "recover_128x128.png",
-        greenDragon = "recover_128x128.png",
-        blueDragon = "recover_128x128.png",
-    },
-    insensitive = {
-        redDragon = "insensitive_128x128.png",
-        greenDragon = "insensitive_128x128.png",
-        blueDragon = "insensitive_128x128.png",
-    },
     earthquake = {
         redDragon = "earthquake_128x128.png",
         greenDragon = "earthquake_128x128.png",
         blueDragon = "earthquake_128x128.png",
     },
-    battleHunger = {
-        redDragon = "battleHunger_128x128.png",
-        greenDragon = "battleHunger_128x128.png",
-        blueDragon = "battleHunger_128x128.png",
+    hellFire = {
+        redDragon = "hellFire_128x128.png",
+        greenDragon = "hellFire_128x128.png",
+        blueDragon = "hellFire_128x128.png",
+    }
+    ,
+    lightningStorm = {
+        redDragon = "lightningStorm_128x128..png",
+        greenDragon = "lightningStorm_128x128.png",
+        blueDragon = "lightningStorm_128x128.png",
+    }
+    ,
+    poisonNova = {
+        redDragon = "poisonNova_128x128.png",
+        greenDragon = "poisonNova_128x128.png",
+        blueDragon = "poisonNova_128x128.png",
+    }
+    ,
+    surge = {
+        redDragon = "surge_128x128.png",
+        greenDragon = "surge_128x128.png",
+        blueDragon = "surge_128x128.png",
     }
 }
 local DAILY_QUESTS_ICON = {

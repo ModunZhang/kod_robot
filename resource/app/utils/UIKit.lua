@@ -7,6 +7,7 @@ import(".bit")
 local cocos_promise = import(".cocos_promise")
 local promise = import(".promise")
 local Enum = import("..utils.Enum")
+local window = import("..utils.window")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local RichText = import("..widget.RichText")
@@ -235,7 +236,8 @@ function UIKit:ttfLabel( params )
     end
     params.font = UIKit:getFontFilePath()
     params.UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF
-    if params.color then
+    if params.color and 
+        (type(params.color) == "number" or type(params.color) == "string") then
         params.color = self:hex2c3b(params.color)
     end
     local label = cc.ui.UILabel.new(params)
@@ -362,7 +364,7 @@ function UIKit:getImageByBuildingType( building_type ,level)
     elseif building_type=="shop" then
         return UILib.alliance_building.shop
     elseif building_type=="shrine" then
-        return UILib.alliance_building.shrine
+        return {UILib.alliance_building.shrine,"alliance_shrine_2.png"}
     end
 end
 
@@ -1151,7 +1153,7 @@ local dragon_config = {
 function UIKit:CreateDragonBreathAni(dragon_type, is_left)
     local ani, ap, s = unpack(dragon_config[dragon_type])
     local node = display.newNode()
-    local sprite = ccs.Armature:create(ani):addTo(node)
+    local sprite = ccs.Armature:create(ani):addTo(node,0,1)
     sprite:setScaleX(is_left and -s or s)
     sprite:setScaleY(s)
     sprite:setAnchorPoint(ap)
@@ -1242,7 +1244,7 @@ function UIKit:CreateMonster(name)
     local unit_scale = monster_scale[soldierName]
     for _,v in ipairs(position_map[count]) do
         local soldier = UIKit:CreateSoldierIdle45Ani(soldierName, star, monster_config)
-        :addTo(node):pos(v.x, v.y)
+            :addTo(node):pos(v.x, v.y)
         soldier:setScaleX((s or 1) * unit_scale)
         soldier:setScaleY(unit_scale)
     end
@@ -1327,10 +1329,6 @@ local function createAniWithConfig(ani, config, default_animation)
     sprite:setScaleY(s)
     sprite:setAnchorPoint(ap)
     sprite:getAnimation():play(default_animation)
-    if shadow then
-        display.newSprite("tmp_soldier_shadow.png")
-            :addTo(sprite):setAnchorPoint(cc.p(0.25,0.45))
-    end
     return sprite
 end
 
@@ -1422,9 +1420,9 @@ function UIKit:CreateDragonByDegree(degree, s, dragonType)
     local ani_name, scalex = unpack(dragon_dir_map[GetDirIndexByDegree(degree)])
     local dragon_ani = dragon_ani_map[dragonType or "redDragon"]
     if ani_name == "flying_45" then
-        UIKit:CreateDragonFly45Ani(dragon_ani):addTo(node):setScaleX(scalex)
+        node.dragonAni = UIKit:CreateDragonFly45Ani(dragon_ani):addTo(node):setScaleX(scalex)
     elseif ani_name == "flying_-45" then
-        UIKit:CreateDragonFlyNeg45Ani(dragon_ani):addTo(node):setScaleX(scalex)
+        node.dragonAni = UIKit:CreateDragonFlyNeg45Ani(dragon_ani):addTo(node):setScaleX(scalex)
     end
     return node
 end
@@ -1505,6 +1503,840 @@ function UIKit:CreateMoveSoldiers(degree, soldier, s)
     end
     return node
 end
+
+
+local soldier_fight_map = {
+    swordsman_1     = {"bubing_1_90"      , cc.p(0.43, 0.23), 4, true},
+    swordsman_2     = {"bubing_2_90"      , cc.p(0.43, 0.21), 4, true},
+    swordsman_3     = {"bubing_3_90"      , cc.p(0.43, 0.23), 4, true},
+    ranger_1        = {"gongjianshou_1_90", cc.p(0.36, 0.20), 4, false},
+    ranger_2        = {"gongjianshou_2_90", cc.p(0.30, 0.19), 4, false},
+    ranger_3        = {"gongjianshou_3_90", cc.p(0.30, 0.18), 4, false},
+    lancer_1        = {"qibing_1_90"      , cc.p(0.32, 0.35), 2, true},
+    lancer_2        = {"qibing_2_90"      , cc.p(0.32, 0.33), 2, true},
+    lancer_3        = {"qibing_3_90"      , cc.p(0.28, 0.35), 2, true},
+    catapult_1      = {"toushiche_90"     , cc.p(0.50, 0.25), 1, false},
+    catapult_2      = {"toushiche_2_90"   , cc.p(0.50, 0.25), 1, false},
+    catapult_3      = {"toushiche_3_90"   , cc.p(0.50, 0.25), 1, false},
+    sentinel_1      = {"shaobing_1_90"    , cc.p(0.30, 0.24), 4, true},
+    sentinel_2      = {"shaobing_2_90"    , cc.p(0.30, 0.23), 4, true},
+    sentinel_3      = {"shaobing_3_90"    , cc.p(0.30, 0.23), 4, true},
+    crossbowman_1   = {"nugongshou_1_90"  , cc.p(0.32, 0.34), 4, false},
+    crossbowman_2   = {"nugongshou_2_90"  , cc.p(0.32, 0.29), 4, false},
+    crossbowman_3   = {"nugongshou_3_90"  , cc.p(0.32, 0.28), 4, false},
+    horseArcher_1   = {"youqibing_1_90"   , cc.p(0.29, 0.23), 2, false},
+    horseArcher_2   = {"youqibing_2_90"   , cc.p(0.26, 0.25), 2, false},
+    horseArcher_3   = {"youqibing_3_90"   , cc.p(0.26, 0.22), 2, false},
+    ballista_1      = {"nuche_1_90"       , cc.p(0.18, 0.37), 1, false},
+    ballista_2      = {"nuche_2_90"       , cc.p(0.20, 0.37), 1, false},
+    ballista_3      = {"nuche_3_90"       , cc.p(0.17, 0.30), 1, false},
+    skeletonWarrior = {"kulouyongshi_90"  , cc.p(0.38, 0.32), 4, true},
+    skeletonArcher  = {"kulousheshou_90"  , cc.p(0.26, 0.29), 4, false},
+    deathKnight     = {"siwangqishi_90"   , cc.p(0.28, 0.30), 2, true},
+    meatWagon       = {"jiaorouche_90"    , cc.p(0.50, 0.40), 1, false},
+    wall_1          = {"chengqiang_1"     , cc.p(0.50, 0.50), 1, false},
+    wall_2          = {"chengqiang_2"     , cc.p(0.50, 0.50), 1, false},
+    wall_3          = {"chengqiang_3"     , cc.p(0.50, 0.50), 1, false},
+}
+local pve_soldier_fight_map = {
+    swordsman_1     = {"bubing_1_90"              , cc.p(0.43, 0.23), 4, true},
+    swordsman_2     = {"heihua_bubing_2_90"       , cc.p(0.43, 0.21), 4, true},
+    swordsman_3     = {"heihua_bubing_3_90"       , cc.p(0.43, 0.23), 4, true},
+    ranger_1        = {"gongjianshou_1_90"        , cc.p(0.36, 0.20), 4, false},
+    ranger_2        = {"heihua_gongjianshou_2_90" , cc.p(0.30, 0.19), 4, false},
+    ranger_3        = {"heihua_gongjianshou_3_90" , cc.p(0.30, 0.18), 4, false},
+    lancer_1        = {"qibing_1_90"              , cc.p(0.32, 0.35), 2, true},
+    lancer_2        = {"heihua_qibing_2_90"       , cc.p(0.32, 0.33), 2, true},
+    lancer_3        = {"heihua_qibing_3_90"       , cc.p(0.28, 0.35), 2, true},
+    catapult_1      = {"toushiche_90"             , cc.p(0.50, 0.25), 1, false},
+    catapult_2      = {"heihua_toushiche_2_90"    , cc.p(0.50, 0.25), 1, false},
+    catapult_3      = {"heihua_toushiche_3_90"    , cc.p(0.50, 0.25), 1, false},
+    sentinel_1      = {"shaobing_1_90"            , cc.p(0.30, 0.24), 4, true},
+    sentinel_2      = {"heihua_shaobing_2_90"     , cc.p(0.30, 0.23), 4, true},
+    sentinel_3      = {"heihua_shaobing_3_90"     , cc.p(0.30, 0.23), 4, true},
+    crossbowman_1   = {"nugongshou_1_90"          , cc.p(0.32, 0.34), 4, false},
+    crossbowman_2   = {"heihua_nugongshou_2_90"   , cc.p(0.32, 0.29), 4, false},
+    crossbowman_3   = {"heihua_nugongshou_3_90"   , cc.p(0.32, 0.28), 4, false},
+    horseArcher_1   = {"youqibing_1_90"           , cc.p(0.29, 0.23), 2, false},
+    horseArcher_2   = {"heihua_youqibing_2_90"    , cc.p(0.26, 0.25), 2, false},
+    horseArcher_3   = {"heihua_youqibing_3_90"    , cc.p(0.26, 0.22), 2, false},
+    ballista_1      = {"nuche_1_90"               , cc.p(0.18, 0.37), 1, false},
+    ballista_2      = {"heihua_nuche_2_90"        , cc.p(0.20, 0.37), 1, false},
+    ballista_3      = {"heihua_nuche_3_90"        , cc.p(0.17, 0.30), 1, false},
+    skeletonWarrior = {"kulouyongshi_90"          , cc.p(0.38, 0.32), 4, true},
+    skeletonArcher  = {"kulousheshou_90"          , cc.p(0.26, 0.29), 4, false},
+    deathKnight     = {"siwangqishi_90"           , cc.p(0.28, 0.30), 2, true},
+    meatWagon       = {"jiaorouche_90"            , cc.p(0.50, 0.40), 1, false},
+    wall_1          = {"chengqiang_1"             , cc.p(0.50, 0.50), 1, false},
+    wall_2          = {"chengqiang_2"             , cc.p(0.50, 0.50), 1, false},
+    wall_3          = {"chengqiang_3"             , cc.p(0.50, 0.50), 1, false},
+}
+local count_map = {
+    [1] = {{x = 0, y = 0}},
+    [2] = {{x = 0, y = 20}, {x = 0, y = -20}},
+    [4] = {{x = -20, y = 20}, {x = 20, y = 20}, {x = -20, y = -20}, {x = 20, y = -20}},
+}
+local SPEED_TAG = 119
+local empty_animation_func = function()end
+local empty_gameController = {}
+setmetatable(empty_gameController, {
+    __index = function()
+        return function()end
+    end
+})
+local function getColorByPercent(percent)
+    local theta_start, theta_end = -45, 120
+    local angle = theta_start + percent * (theta_end - theta_start)
+    local theta = math.rad(angle)
+    local r = 0.5 + 0.5 * math.cos(theta)
+    local g = 0.5 + 0.5 * math.sin(theta)
+    return cc.c3b(r * 255, g * 255, 0)
+end
+function UIKit:CreateDragonBattle(attackDragon, defenceDragon, gameController)
+    local TIMER_TAG = 120
+    local RESULT_TAG = 121
+    gameController = gameController or empty_gameController
+    local dragonBattleNode = display.newNode()
+    display.newNode():addTo(dragonBattleNode,0,TIMER_TAG)
+    local backBuffNode = display.newNode():addTo(dragonBattleNode)
+    local dragonBattle = ccs.Armature:create("paizi"):addTo(dragonBattleNode,1)
+    ccs.Armature:create("paizi"):addTo(dragonBattleNode, 100, RESULT_TAG):hide()
+
+    local attackBone = dragonBattle:getBone("Layer4")
+    local leftDragon = UIKit:CreateFightDragon(attackDragon, gameController)
+    :SetPercent(attackDragon.hp/attackDragon.hpMax)
+    :addTo(attackBone):pos(-360, -50)
+    
+    attackBone:addDisplay(leftDragon, 0)
+    attackBone:changeDisplayWithIndex(0, true)
+
+
+    local defenceBone = dragonBattle:getBone("Layer5")
+    local rightDragon = UIKit:CreateFightDragon(defenceDragon, gameController)
+    :SetPercent(defenceDragon.hp/defenceDragon.hpMax)
+    :addTo(defenceBone):pos(238, -82)
+    
+    defenceBone:addDisplay(rightDragon, 0)
+    defenceBone:changeDisplayWithIndex(0, true)
+
+    local attackBuffNode = display.newNode():addTo(backBuffNode)
+    local attackBuff = display.newSprite("background_replay.png")
+    :addTo(attackBuffNode):pos(-308, -190 + 200):opacity(0)
+
+    local defenceBuffNode = display.newNode():addTo(backBuffNode)
+    local defenceBuff = display.newSprite("background_replay.png")
+    :addTo(defenceBuffNode):pos(272, -220 + 200):opacity(0)
+
+    backBuffNode:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
+        local attackBuffBone = dragonBattle:getBone("Layer4")
+        local attackWorldPoint = attackBuffBone:convertToWorldSpace(cc.p(0,0))
+        local attackNodePoint = backBuffNode:convertToNodeSpace(attackWorldPoint)
+        attackBuffNode:pos(attackNodePoint.x,attackNodePoint.y)
+
+        local defenceBuffBone = dragonBattle:getBone("Layer5")
+        local defenceWorldPoint = defenceBuffBone:convertToWorldSpace(cc.p(0,0))
+        local defenceNodePoint = backBuffNode:convertToNodeSpace(defenceWorldPoint)
+        defenceBuffNode:pos(defenceNodePoint.x,defenceNodePoint.y)
+    end)
+    backBuffNode:scheduleUpdate()
+
+
+    function dragonBattleNode:GetAttackDragon()
+        return leftDragon
+    end
+    function dragonBattleNode:GetDefenceDragon()
+        return rightDragon
+    end
+    function dragonBattleNode:Speed()
+        return gameController.speed or 1
+    end
+    function dragonBattleNode:PromiseOfAnimationFinished(animation)
+        local p = promise.new()
+        animation:setMovementEventCallFunc(function(armatureBack, movementType, movementID)
+            if movementType == ccs.MovementEventType.complete then
+                animation:setMovementEventCallFunc(empty_animation_func)
+                p:resolve()
+            end
+        end)
+        return p
+    end
+    function dragonBattleNode:GetAni()
+        return dragonBattle:getAnimation()
+    end
+    function dragonBattleNode:PromsieOfFight()
+        self:GetAni():play("Animation1", -1, 0)
+        app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_DRAGON")
+        self:RefreshSpeed()
+        return self:PromiseOfAnimationFinished(self:GetAni())
+    end
+    function dragonBattleNode:PromsieOfHide()
+        self:GetAni():play("Animation2", -1, 0)
+        self:RefreshSpeed()
+        return self:PromiseOfAnimationFinished(self:GetAni()):next(function()
+            self:hide()
+        end)
+    end
+    function dragonBattleNode:RefreshSpeed()
+        local speed = self:Speed()
+        self:GetAni():setSpeedScale(speed)
+        self:getChildByTag(RESULT_TAG):getAnimation():setSpeedScale(speed)
+        leftDragon:RefreshSpeed()
+        rightDragon:RefreshSpeed()
+        if attackBuff:getActionByTag(SPEED_TAG) then
+            attackBuff:getActionByTag(SPEED_TAG):setSpeed(speed)
+        end
+        if defenceBuff:getActionByTag(SPEED_TAG) then
+            defenceBuff:getActionByTag(SPEED_TAG):setSpeed(speed)
+        end
+        return self
+    end
+    function dragonBattleNode:Delay(time)
+        return function(obj)
+            return self:PromiseOfDelay(time, function() return obj end)
+        end
+    end
+    function dragonBattleNode:PromiseOfDelay(time, func)
+        local p = promise.new(func)
+        local speed = cc.Speed:create(transition.sequence({
+            cc.DelayTime:create(time),
+            cc.CallFunc:create(function() p:resolve() end),
+        }), self:Speed())
+        speed:setTag(SPEED_TAG)
+        self:getChildByTag(TIMER_TAG):runAction(speed)
+        return p
+    end
+    function dragonBattleNode:Pause()
+        self:GetAni():pause()
+        self:getChildByTag(TIMER_TAG):stopAllActions()
+        self:getChildByTag(RESULT_TAG):getAnimation():pause()
+        leftDragon:Pause()
+        rightDragon:Pause()
+        attackBuff:stopAllActions()
+        defenceBuff:stopAllActions()
+        return self
+    end
+    function dragonBattleNode:PromiseOfVictory()
+        local reuslt = self:getChildByTag(RESULT_TAG)
+        reuslt:show():getAnimation():playWithIndex(2, -1, 0)
+        self:RefreshSpeed()
+        return self:PromiseOfAnimationFinished(reuslt:getAnimation())
+    end
+    function dragonBattleNode:PromiseOfDefeat()
+        local reuslt = self:getChildByTag(RESULT_TAG)
+        reuslt:show():GetAni():playWithIndex(3, -1, 0)
+        self:RefreshSpeed()
+        return self:PromiseOfAnimationFinished(reuslt:getAnimation())
+    end
+    function dragonBattleNode:PromiseOfVictoryHide()
+        local reuslt = self:getChildByTag(RESULT_TAG)
+        reuslt:show():getAnimation():playWithIndex(4, -1, 0)
+        self:RefreshSpeed()
+        return self:PromiseOfAnimationFinished(reuslt:getAnimation())
+    end
+    function dragonBattleNode:PromiseOfDefeatHide()
+        local reuslt = self:getChildByTag(RESULT_TAG)
+        reuslt:show():getAnimation():playWithIndex(5, -1, 0)
+        self:RefreshSpeed()
+        return self:PromiseOfAnimationFinished(reuslt:getAnimation())
+    end
+    function dragonBattleNode:PromiseOfShowBuff()
+        local buffs = {_("攻击强化"), _("生命强化"), _("负重强化")}
+        local length = #buffs * 32
+        for i,v in ipairs(buffs) do
+            UIKit:ttfLabel({
+            text = v,
+            size = 20,
+            color = 0xffedae,
+            shadow = true,
+            }):addTo(attackBuff):align(display.LEFT_CENTER, 30, length - (i-1) * 32)
+            UIKit:ttfLabel({
+                text = string.format("+%d%%", attackDragon.increase),
+                size = 20,
+                color = getColorByPercent(leftDragon:GetPercent()/100),
+                shadow = true,
+            }):addTo(attackBuff):align(display.RIGHT_CENTER, 275, length - (i-1) * 32)
+
+
+            UIKit:ttfLabel({
+            text = v,
+            size = 20,
+            color = 0xffedae,
+            shadow = true,
+            }):addTo(defenceBuff):align(display.LEFT_CENTER, 30, length - (i-1) * 32)
+            UIKit:ttfLabel({
+                text = string.format("+%d%%", defenceDragon.increase),
+                size = 20,
+                color = getColorByPercent(rightDragon:GetPercent()/100),
+                shadow = true,
+            }):addTo(defenceBuff):align(display.RIGHT_CENTER, 275, length - (i-1) * 32)
+        end
+
+        local p1 = promise.new()
+        local seq = transition.sequence({
+            cc.Spawn:create({cc.MoveBy:create(1, cc.p(0, -200)), cc.FadeIn:create(1)}),
+            cc.CallFunc:create(function() p1:resolve() end),
+        })
+        local speed = cc.Speed:create(seq, self:Speed())
+        speed:setTag(SPEED_TAG)
+        attackBuff:runAction(speed)
+
+        local p2 = promise.new()
+        local seq = transition.sequence({
+            cc.Spawn:create({cc.MoveBy:create(1, cc.p(0, -200)), cc.FadeIn:create(1)}),
+            cc.CallFunc:create(function() p2:resolve() end),
+        })
+        local speed = cc.Speed:create(seq, self:Speed())
+        speed:setTag(SPEED_TAG)
+        defenceBuff:runAction(speed)
+        return promise.all(p1, p2):next(self:Delay(1.5))
+    end
+    return dragonBattleNode:RefreshSpeed()
+end
+function UIKit:CreateFightDragon(param, gameController)
+    gameController = gameController or empty_gameController
+    local dragonType = param.dragonType or "redDragon"
+    local fightDragonNode = display.newNode()
+
+    local level = UIKit:ttfLabel({
+        text = 1,
+        size = 20,
+        color = 0xffedae,
+        shadow = true,
+    }):addTo(fightDragonNode)
+
+    local name = UIKit:ttfLabel({
+        text = Localize.dragon[dragonType],
+        size = 20,
+        color = 0xffedae,
+        shadow = true,
+    }):addTo(fightDragonNode)
+
+    local progress = display.newProgressTimer("replay_progress.png", display.PROGRESS_TIMER_BAR)
+        :addTo(fightDragonNode)
+    progress:setBarChangeRate(cc.p(1,0))
+    progress:setMidpoint(cc.p(0,0))
+    progress:addNodeEventListener(cc.NODE_ENTER_FRAME_EVENT, function(dt)
+        local percent = progress:getPercentage()/100
+        progress:setColor(getColorByPercent(percent))
+        fightDragonNode.hp:setString(string.format("%d/%d", math.floor(param.hpMax * percent + 0.5), math.floor(param.hpMax + 0.5)))
+    end)
+    progress:scheduleUpdate()
+
+    local hp = UIKit:ttfLabel({
+        text = string.format("%d/%d", param.hp, param.hpMax),
+        size = 15,
+        color = 0xffedae,
+        shadow = true,
+    }):addTo(fightDragonNode)
+
+    local dragon = UIKit:CreateDragonBreathAni(dragonType, not param.isleft)
+    :addTo(fightDragonNode):scale(0.6)
+
+    if not param.isleft then
+        level:align(display.CENTER, 150, 180)
+        name:align(display.CENTER, 15, 180)
+        progress:align(display.LEFT_CENTER, 170, 147):setScaleX(-1)
+        hp:align(display.CENTER, 45, 147)
+        dragon:align(display.CENTER, 0, 0)
+    else
+        level:align(display.CENTER, -65, 180)
+        name:align(display.CENTER, 80, 180)
+        progress:align(display.LEFT_CENTER, -85, 145)
+        hp:align(display.CENTER, 45, 145)
+        dragon:align(display.CENTER, 90, 0)
+    end
+    fightDragonNode.level   = level
+    fightDragonNode.name    = name
+    fightDragonNode.progress= progress
+    fightDragonNode.hp      = hp
+    fightDragonNode.result  = result
+    fightDragonNode.dragon  = dragon
+    function fightDragonNode:Speed()
+        return gameController.speed or 1
+    end
+    function fightDragonNode:Pause()
+        self.progress:stopAllActions()
+        self.dragon:getChildByTag(1):getAnimation():pause()
+        return self
+    end
+    function fightDragonNode:RefreshSpeed()
+        local speed = self:Speed()
+        local action = self.progress:getActionByTag(SPEED_TAG)
+        if action then
+            action:setSpeed(speed)
+        end
+        self.dragon:getChildByTag(1):getAnimation():setSpeedScale(speed)
+        return self
+    end
+    function fightDragonNode:GetPercent()
+        return self.progress:getPercentage()
+    end
+    function fightDragonNode:SetPercent(percent)
+        self.progress:setPercentage(percent * 100)
+        return self
+    end
+    function fightDragonNode:PromiseOfProgressTo(time, percent)
+        local p = promise.new()
+        local seq = transition.sequence({
+            cc.ProgressTo:create(time, percent),
+            cc.CallFunc:create(function() p:resolve() end),
+        })
+        local speed = cc.Speed:create(seq, self:Speed())
+        speed:setTag(SPEED_TAG)
+        self.progress:runAction(speed)
+        return p
+    end
+    return fightDragonNode:RefreshSpeed()
+end
+local skill_dragon_map = {
+    redDragon   = "red_dragon_90",
+    blueDragon  = "blue_dragon_90",
+    greenDragon = "green_dragon_90",
+    blackDragon = "black_dragon_90",
+}
+local skill_time_map = {
+    redDragon = 0,
+    blueDragon = 0,
+    greenDragon = 0.3,
+    blackDragon = 0,
+}
+function UIKit:CreateSkillDragon(dragonType, isattack, gameController)
+    gameController = gameController or empty_gameController
+    local dragonNode = display.newNode()
+    dragonNode.dragonAni = ccs.Armature:create(skill_dragon_map[dragonType])
+    :addTo(dragonNode):setScaleX(isattack and 1 or -1)
+    -- local dragonNode = self:CreateDragonByDegree(degree or 90, 3, dragonType or "redDragon")
+    dragonNode.dragonType = dragonType
+    function dragonNode:IsDragon()end
+    function dragonNode:Pause()
+        self:stopAllActions()
+        self.dragonAni:getAnimation():pause()
+        return self
+    end
+    function dragonNode:Speed()
+        return gameController.speed or 1
+    end
+    function dragonNode:RefreshSpeed()
+        local speed = self:Speed()
+        local action = self:getActionByTag(SPEED_TAG)
+        if action then
+            action:setSpeed(speed)
+        end
+        self.dragonAni:getAnimation():setSpeedScale(speed)
+        return self
+    end
+    function dragonNode:Attack(func)
+        local totalTime = 3
+        local skillTime = skill_time_map[self.dragonType]
+        self.dragonAni:getAnimation():play("Animation1", -1, 0)
+        self:RefreshSpeed()
+        local acts = transition.sequence({
+            cc.CallFunc:create(function()
+                app:GetAudioManager():PlayBuildingEffectByType("dragonEyrie")
+            end),
+            cc.DelayTime:create(skillTime),
+            cc.CallFunc:create(function()
+                if type(func) == "function" then
+                    func(false)
+                end
+            end),
+            cc.DelayTime:create(totalTime - skillTime),
+            cc.CallFunc:create(function()
+                if type(func) == "function" then
+                    func(true)
+                end
+            end),
+        })
+        local speed = cc.Speed:create(acts, self:Speed())
+        speed:setTag(SPEED_TAG)
+        self:runAction(speed)
+        return self
+    end
+    function dragonNode:Move(x, y, time, func, delayTime)
+        local acts = transition.sequence({
+            cc.MoveTo:create(time, cc.p(x, y)),
+            cc.CallFunc:create(function()
+                if type(func) == "function" then
+                    func(false)
+                end
+            end),
+            cc.DelayTime:create(delayTime or 0.5),
+            cc.CallFunc:create(function()
+                if type(func) == "function" then
+                    func(true)
+                end
+            end),
+        })
+        local speed = cc.Speed:create(acts, self:Speed())
+        speed:setTag(SPEED_TAG)
+        self:runAction(speed)
+        return self
+    end
+    return dragonNode:RefreshSpeed()
+end
+local effect_map = {
+    poison_1 = cc.p(0.5,0.25),
+    poison_2 = cc.p(0.5,0.2),
+    poison_3 = cc.p(0.5,0.3),
+    fire = cc.p(0.5,0.3),
+    lightning = cc.p(0.5,0.3),
+}
+function UIKit:CreateSkillEffect(effectType, isFlipX)
+    local armature = ccs.Armature:create(effectType)
+    if isFlipX then
+        armature:setScaleX(- armature:getScaleX())
+    end
+    armature:setAnchorPoint(effect_map[effectType])
+    armature:getAnimation():playWithIndex(0, -1, 0)
+    return armature
+end
+local SOLDIER_NODE = 1
+local BULLET_NODE = 2
+local EFFECT_TAG = 3
+local INFO_TAG = 4
+local HURT_TAG = 5
+local normal = GameDatas.Soldiers.normal
+local special = GameDatas.Soldiers.special
+local SOLDIER_SCALE = 0.8
+function UIKit:CreateFightTroops(soldierName, properties, gameController)
+    gameController = gameController or empty_gameController
+    local troopsNode = display.newNode()
+    local soldiersNode = display.newNode():addTo(troopsNode, 0, SOLDIER_NODE):scale(SOLDIER_SCALE)
+    troopsNode.bulletNode = display.newNode():addTo(troopsNode, 1, BULLET_NODE)
+    troopsNode.infoNode = display.newNode():addTo(troopsNode, 2, INFO_TAG)
+    troopsNode.effectsNode = display.newNode():addTo(troopsNode, 3, EFFECT_TAG)
+    troopsNode.properties = properties or {}
+    troopsNode.soldierName = soldierName
+    local config = special[soldierName] or normal[soldierName.."_"..1]
+    if config then
+        troopsNode.soldierType = config.type
+    end
+    local fight_soldier_config = properties.ispve and pve_soldier_fight_map or soldier_fight_map
+    local _,_,count = unpack(fight_soldier_config[soldierName])
+    local soldiers = {}
+    for i,v in ipairs(count_map[count]) do
+        local aniName, ap = unpack(fight_soldier_config[soldierName])
+        local armature = ccs.Armature:create(aniName)
+        armature:setAnchorPoint(ap)
+        if "wall" == soldierName then
+            armature:setScaleX(-1)
+        end
+        soldiers[i] = armature:addTo(soldiersNode,1):pos(v.x, v.y)
+    end
+    troopsNode.soldiers = soldiers
+    function troopsNode:IsTroops() return soldierName ~= "wall" end
+    function troopsNode:StopAni()
+         for _,v in pairs(self.soldiers) do
+            v:getAnimation():pause()
+         end
+         return self
+     end
+    function troopsNode:Pause()
+        self:stopAllActions()
+        self:StopAni()
+        return self
+    end
+    function troopsNode:RefreshSpeed()
+        local speed = self:Speed()
+        local action = self:getActionByTag(SPEED_TAG)
+        if action then
+            action:setSpeed(speed)
+        end
+
+        local hurtLabel = self.infoNode:getChildByTag(HURT_TAG)
+        if hurtLabel then
+            local action = hurtLabel:getActionByTag(SPEED_TAG)
+            if action then
+                action:setSpeed(speed)
+            end
+        end
+
+        for _, v in pairs(self.soldiers) do
+            v:getAnimation():setSpeedScale(speed)
+        end
+
+        for _,v in pairs(self.bulletNode:getChildren()) do
+            v:getAnimation():setSpeedScale(speed)
+        end
+
+        return self
+    end
+    function troopsNode:Speed()
+        return gameController.speed or 1
+    end
+    function troopsNode:IsWall()
+        return not self.soldiers[1]:getAnimation():getAnimationData():getMovement("move_90")
+    end
+    function troopsNode:IsCatapult()
+        return string.find(soldierName, "catapult") or string.find(soldierName, "meatWagon")
+    end
+    function troopsNode:IsMelee()
+        local _,_,_,ismelee = unpack(fight_soldier_config[soldierName])
+        return ismelee
+    end
+    function troopsNode:GetAni()
+        return self.soldiers[1]:getAnimation()
+    end
+    function troopsNode:PromiseOfShowHurtCount(count)
+        local p = promise.new()
+        self:ShowHurtCount(count, function()
+            p:resolve()
+        end)
+        return p
+    end
+    function troopsNode:ShowHurtCount(count, func)
+        self.infoNode:removeChildByTag(HURT_TAG)
+        local hurtLabel = UIKit:ttfLabel({
+            text = string.format("- %s", GameUtils:formatNumber(count)),
+            size = 30,
+            color = 0xff0000,
+        }):addTo(self.infoNode, 1, HURT_TAG)
+        :align(display.CENTER)
+
+        local action = cc.Speed:create(transition.sequence({
+            cc.MoveBy:create(0.6, cc.p(0, 30)),
+            cc.CallFunc:create(function()
+                if type(func) == "function" then
+                    func()
+                end
+            end),
+            cc.RemoveSelf:create(),
+        }), self:Speed())
+        action:setTag(SPEED_TAG)
+
+        hurtLabel:runAction(action)
+        return self
+    end
+    function troopsNode:Hold(time, func)
+        local acts = transition.sequence({
+            cc.DelayTime:create(time),
+            cc.CallFunc:create(function()
+                if type(func) == "function" then
+                    func()
+                end
+            end),
+        })
+        local speed = cc.Speed:create(acts, self:Speed())
+        speed:setTag(SPEED_TAG)
+        self:runAction(speed)
+        return self
+    end
+    function troopsNode:Return(x, y, time, func)
+        self.infoNode:hide()
+        self:Play("move_90", -1)
+
+        local moveActs = transition.sequence({
+            cc.MoveTo:create(time, cc.p(x, y)),
+            cc.CallFunc:create(function()
+                self:Idle()
+                if type(func) == "function" then
+                    func()
+                end
+            end),
+        })
+
+        local function step()
+                app:GetAudioManager():PlaySoldierStepEffectByType(self.soldierType)
+            end
+        local footSounds = {}
+        for i = 0, time, 0.8 do
+            table.insert(footSounds, cc.CallFunc:create(step))
+            table.insert(footSounds, cc.DelayTime:create(0.5))
+        end
+        local soundActs = transition.sequence(footSounds)
+
+        local speed = cc.Speed:create(cc.Spawn:create(moveActs, soundActs),self:Speed())
+        speed:setTag(SPEED_TAG)
+        self:runAction(speed)
+        local soldierNode = self:getChildByTag(SOLDIER_NODE)
+        soldierNode:setScaleX(-soldierNode:getScaleX())
+        return self
+    end
+    function troopsNode:Move(x, y, time, func, delayTime)
+        self.infoNode:hide()
+
+        local moveActs = transition.sequence{
+            cc.MoveTo:create(time, cc.p(x, y)),
+            cc.CallFunc:create(function()
+                self:Idle()
+                if type(func) == "function" then
+                    func(false)
+                end
+            end),
+            cc.DelayTime:create(delayTime or 0.5),
+            cc.CallFunc:create(function()
+                if type(func) == "function" then
+                    func(true)
+                end
+            end),
+        }
+
+        if self:IsWall() then
+            local speed = cc.Speed:create(moveActs, self:Speed())
+            speed:setTag(SPEED_TAG)
+            self:runAction(speed)
+        else
+            self:Play("move_90", -1)
+            local function step()
+                app:GetAudioManager():PlaySoldierStepEffectByType(self.soldierType)
+            end
+            local footSounds = {}
+            for i = 0, time, 0.5 do
+                table.insert(footSounds, cc.CallFunc:create(step))
+                table.insert(footSounds, cc.DelayTime:create(0.5))
+            end
+            local soundActs = transition.sequence(footSounds)
+
+            local speed = cc.Speed:create(cc.Spawn:create(moveActs, soundActs),self:Speed())
+            speed:setTag(SPEED_TAG)
+            self:runAction(speed)
+        end
+        return self
+    end
+    function troopsNode:PromiseOfDeath()
+        local p = promise.new()
+        self:Death(function()
+            p:resolve()
+        end)
+        return p
+    end
+    function troopsNode:Death(func)
+        app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_LOSE")
+        local acts = transition.sequence({
+            cc.FadeOut:create(0.8),
+            cc.CallFunc:create(function()
+                self:hide()
+                if type(func) == "function" then
+                    func()
+                end
+            end),
+        })
+        local speed = cc.Speed:create(acts, self:Speed())
+        speed:setTag(SPEED_TAG)
+        self:runAction(speed)
+        return self
+    end
+    function troopsNode:Idle()
+        self.infoNode:show()
+        local animationData = self.soldiers[1]:getAnimation():getAnimationData()
+        if not not animationData:getMovement("idle_90") then
+            self:Play("idle_90", -1)
+        elseif not not animationData:getMovement("move_90") then
+            self:Play("move_90", -1):StopAni()
+        else
+            self:Play("hurt", -1):StopAni()
+        end
+        return self
+    end
+    function troopsNode:PromiseOfHurt()
+        self:Play("hurt", 0)
+        return self:PromiseOfAnimationFinished(self:GetAni())
+    end
+    function troopsNode:PromiseOfAttack(isrevenge)
+        if isrevenge then
+            local p1 = promise.new()
+            local p2 = promise.new()
+            local d = self:IsLeft() and 20 or -20
+            local x,y = self:getPosition()
+            self:Play("move_90", -1)
+            local acts = transition.sequence({
+                cc.MoveTo:create(0.15,cc.p(x+d,y)),
+                cc.CallFunc:create(function() 
+                    app:GetAudioManager()
+                    :PlayeAttackSoundBySoldierName(self.soldierName, "rush")
+                    p1:resolve() 
+                end),
+                cc.MoveTo:create(0.15,cc.p(x,y)),
+                cc.CallFunc:create(function() 
+                    self:Idle()
+                    p2:resolve()
+                end),
+            })
+            local speed = cc.Speed:create(acts, self:Speed())
+            speed:setTag(SPEED_TAG)
+            self:runAction(speed)
+            return p1,p2
+        end
+        self.bulletNode:removeAllChildren()
+        self:Play("attack", 0)
+        if self:IsCatapult() then
+            local attackPromise = self:PromiseOfAnimationFinished(self:GetAni()):next(function()
+                    self:Idle()
+                end)
+            local bulletPromise = promise.new()
+            local acts = transition.sequence({
+                    cc.DelayTime:create(0.6),
+                    cc.CallFunc:create(function()
+                        local armature = ccs.Armature:create("stone"):addTo(self.bulletNode)
+                        if self:IsLeft() then
+                            armature:pos(-50, 50)
+                        else
+                            armature:pos(50, 50):setScaleX(-1)
+                        end
+                        armature:getAnimation():playWithIndex(0,-1,0)
+                        armature:getAnimation():setSpeedScale(self:Speed())
+                        self:PromiseOfAnimationFinished(armature:getAnimation()):next(function()
+                            bulletPromise:resolve()
+                        end)
+                    end),
+                })
+            local speed = cc.Speed:create(acts, self:Speed())
+            speed:setTag(SPEED_TAG)
+            self:runAction(speed)
+            return promise.all(attackPromise,bulletPromise)
+        else
+            return self:PromiseOfAnimationFinished(self:GetAni())
+        end
+        
+    end
+    function troopsNode:PromiseOfAnimationFinished(animation)
+        local p = promise.new()
+        animation:setMovementEventCallFunc(function(armatureBack, movementType, movementID)
+            if movementType == ccs.MovementEventType.complete then
+                animation:setMovementEventCallFunc(empty_animation_func)
+                p:resolve()
+            end
+        end)
+        return p
+    end
+    function troopsNode:Play(aniName, aniTimes)
+        if aniName == "attack" then
+            if string.find(self.soldierName, "wall") then
+                app:GetAudioManager():PlayeAttackSoundBySoldierName("ranger")
+            else
+                app:GetAudioManager():PlayeAttackSoundBySoldierName(self.soldierName)
+            end
+        end
+        for _,v in pairs(self.soldiers) do
+            v:getAnimation():play(aniName, 0, aniTimes or 0)
+            v:getAnimation():setSpeedScale(self:Speed())
+        end
+        return self
+    end
+    function troopsNode:IsLeft()
+        return self.properties.isleft
+    end
+    function troopsNode:FaceCorrect()
+        if self:IsLeft() then
+            self:Left()
+        else
+            self:Right()
+        end
+        return self
+    end
+    function troopsNode:Left()
+        self:getChildByTag(SOLDIER_NODE):setScaleX(SOLDIER_SCALE)
+        return self
+    end
+    function troopsNode:Right()
+        self:getChildByTag(SOLDIER_NODE):setScaleX(-SOLDIER_SCALE)
+        return self
+    end
+    return troopsNode:RefreshSpeed()
+end
+
+
+
 function UIKit:CreateNameBanner(name, dragon_type)
     local node = display.newNode()
     local size = self:ttfLabel({
@@ -1693,6 +2525,15 @@ function UIKit:CreateArrow(param, func)
     return arrow
 end
 
+function UIKit:ScaleAni()
+    return cc.RepeatForever:create(
+                    transition.sequence{
+                        cc.ScaleTo:create(0.8, 1.02),
+                        cc.ScaleTo:create(0.8, 1.0),
+                    }
+                )
+end
+
 
 
 
@@ -1838,7 +2679,7 @@ function UIKit:CreateNumberImageNode(params)
                 replace_key = num_string
             end
             local num_sprite =display.newSprite(string.format("icon_%s.png",replace_key)):addTo(self)
-            x = x + (i == 1 and num_sprite:getContentSize().width/2 or num_sprite:getContentSize().width) 
+            x = x + (i == 1 and num_sprite:getContentSize().width/2 or num_sprite:getContentSize().width)
             num_sprite:pos(x + ((replace_key == "point" or replace_key == "slash" or replace_key == "colon" or replace_key == "comma") and 6 or 0),15)
             num_sprite:setColor(UIKit:hex2c4b(color))
             if i == string.len(text) then
@@ -1858,15 +2699,51 @@ function UIKit:CreateNumberImageNode(params)
 end
 
 
+function UIKit:CreateTerrainForNode(clip,terrain)
+    local city_terrain = terrain or User.basicInfo.terrain 
+    GameUtils:LoadImagesWithFormat(function()
+        cc.TMXTiledMap:create(string.format("tmxmaps/alliance_%s1.tmx",city_terrain))
+            :align(display.LEFT_BOTTOM, 0, 0):addTo(clip)
+    end, cc.TEXTURE2_D_PIXEL_FORMAT_RG_B565)
 
-
-
-
-
-
-
-
-
-
-
-
+    local unlock_position = {
+        {100,180},
+        {100,720},
+        {300,600},
+        {250,350},
+    }
+    for i=1,4 do
+        display.newSprite(string.format("unlock_tile_surface_%d_%s.png",i,city_terrain))
+            :align(display.LEFT_CENTER, unlock_position[i][1], unlock_position[i][2])
+            :addTo(clip)
+    end
+    -- 顶部和底部的树木
+    local tree_width = 0 -- 已经填充了的宽度
+    local count = 1
+    -- 顶部
+    while tree_width < 608 do
+        count = count > 4 and 1 or count
+        local tree = display.newSprite(string.format("tree_%d_%s.png",count,city_terrain))
+            :align(display.LEFT_BOTTOM, tree_width,800)
+            :addTo(clip)
+        tree_width = tree_width + tree:getContentSize().width
+        count = count + 1
+    end
+    -- 底部
+    tree_width = 0
+    count = 1
+    while tree_width < 608 do
+        count = count > 4 and 1 or count
+        local tree = display.newSprite(string.format("tree_%d_%s.png",count,city_terrain))
+            :align(display.LEFT_TOP, tree_width,100)
+            :addTo(clip)
+        tree_width = tree_width + tree:getContentSize().width
+        count = count + 1
+    end
+    -- 两边的黑条
+    display.newSprite("line_send_trop_612x2.png")
+        :align(display.CENTER_TOP, 612/2 + 15, 900)
+        :addTo(clip)
+        :setScaleY(900/2)
+    return clip
+end

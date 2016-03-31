@@ -199,11 +199,12 @@ end
 function WidgetCitizen:UpdateData()
     local city = self.city
     citizen_array = {}
+    local citizen_map = UtilsForBuilding:GetCitizenMap(city:GetUser())
     citizen_array[CITIZEN] = city:GetUser():GetResValueByType("citizen")
-    citizen_array[FOOD] = city:GetCitizenByType("farmer")
-    citizen_array[WOOD] = city:GetCitizenByType("woodcutter")
-    citizen_array[IRON] = city:GetCitizenByType("miner")
-    citizen_array[STONE] = city:GetCitizenByType("quarrier")
+    citizen_array[FOOD] = citizen_map.farmer
+    citizen_array[WOOD] = citizen_map.woodcutter
+    citizen_array[IRON] = citizen_map.miner
+    citizen_array[STONE] = citizen_map.quarrier
     local total_limit = city:GetUser():GetResProduction("citizen").limit + UtilsForBuilding:GetCitizenMap(city:GetUser()).total
     self:SetMaxCitizen(total_limit)
     self:OnCitizenChanged(citizen_array)

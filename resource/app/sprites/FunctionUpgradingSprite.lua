@@ -2,13 +2,6 @@ local SpriteConfig = import(".SpriteConfig")
 local UpgradingSprite = import(".UpgradingSprite")
 local FunctionUpgradingSprite = class("FunctionUpgradingSprite", UpgradingSprite)
 
--- function FunctionUpgradingSprite:OnUserDataChanged_buildingEvents(userData, deltaData)
---     FunctionUpgradingSprite.super.OnUserDataChanged_buildingEvents(self, userData, deltaData)
---     if deltaData("buildingEvents.add") 
---     or deltaData("buildingEvents.remove") then
---         self:OnTileChanged(self:GetEntity():BelongCity())
---     end
--- end
 function FunctionUpgradingSprite:OnTileLocked(city)
     self:OnTileChanged(city)
 end
@@ -35,9 +28,11 @@ function FunctionUpgradingSprite:GetSpriteTopPosition()
     local x,y = FunctionUpgradingSprite.super.GetSpriteTopPosition(self)
     local type_ = self:GetEntity():GetType()
     if type_ == "keep" then
-        return x - 30, y - 50
+        return x - 30, y 
     elseif type_ == "watchTower" then
         return x - 30, y - 50
+    elseif type_ == "dragonEyrie" then
+        return x + 20, y + 70
     end
     return x,y
 end

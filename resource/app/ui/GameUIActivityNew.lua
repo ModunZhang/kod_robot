@@ -212,7 +212,7 @@ function GameUIActivityNew:GetActivityItem(item_type)
             color= 0xffedae,
             align = cc.TEXT_ALIGNMENT_LEFT,
             shadow= true
-        }):align(display.RIGHT_BOTTOM,sign_bg:getPositionX() - 34,54):addTo(bg)
+        }):align(display.LEFT_BOTTOM,208,54):addTo(bg)
         local content_label = UIKit:ttfLabel({
             text = sign_str,
             size = 20,
@@ -367,7 +367,7 @@ function GameUIActivityNew:RefreshAwardList()
     self:RefreshAwardListDataSource()
     self.award_list:reload()
     self.award_list:stopAllActions()
-    self.award_list:scheduleAt(function()
+    scheduleAt(self,function()
         for k,v in pairs(User.iapGifts) do
             self:OnIapGiftTimer(v)
         end
@@ -403,7 +403,7 @@ function GameUIActivityNew:OnIapGiftTimer(iapGift)
     local item = self.award_list:getItemWithLogicIndex(index)
     if not item then return end
     local content = item:getContent()
-    local time = User:GetIapGiftTime(iapGift)
+    local time = User:GetIapGiftTime(iapGift) - app.timer:GetServerTime()
     if time >= 0 then
         content.time_out_label:hide()
         if content.red_btn then
@@ -462,10 +462,10 @@ function GameUIActivityNew:GetAwardListContent()
     }):align(display.CENTER,276, 21):addTo(title_bg)
     display.newSprite("activity_box_552x112.png"):align(display.CENTER_BOTTOM,288, 10):addTo(content,2)
     local icon_bg = display.newSprite("activity_icon_box_78x78.png"):align(display.LEFT_BOTTOM, 20, 20):addTo(content)
-    local reward_icon = display.newSprite(nil, 39, 39):addTo(icon_bg)
+    local reward_icon = display.newSprite("activity_icon_box_78x78.png", 39, 39):addTo(icon_bg)
     local contenet_label = RichText.new({width = 400,size = 20,color = 0x403c2f})
-    local str = "[{\"type\":\"text\", \"value\":\"%s\"},{\"type\":\"text\",\"color\":0x076886,\"value\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\"}]"
-    str = string.format(str,_("盟友"),"xxx",_("赠送!"))
+    local str = "[{\"type\":\"text\", \"value\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\"}]"
+    str = string.format(str,_("盟友"),_("赠送!"))
     contenet_label:Text(str):align(display.LEFT_BOTTOM,115,67):addTo(content)
 
     local time_out_label = UIKit:ttfLabel({
@@ -503,10 +503,10 @@ function GameUIActivityNew:FillAwardItemContent(content,data,idx)
     content.reward_icon:setTexture(UILib.item[data.name])
     content.reward_icon:scale(0.6)
     content.title_label:setString(string.format(_("获得%s"),Localize_item.item_name[data.name]))
-    local str = "[{\"type\":\"text\", \"value\":\"%s\"},{\"type\":\"text\",\"color\":0x076886,\"value\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\"}]"
-    str = string.format(str,_("盟友"),data.from,_("赠送!"))
+    local str = "[{\"type\":\"text\", \"value\":\"%s\"},{\"type\":\"text\", \"value\":\"%s\"}]"
+    str = string.format(str,_("盟友"),_("赠送!"))
     content.contenet_label:Text(str):align(display.LEFT_BOTTOM,115,67)
-    local time = User:GetIapGiftTime(data)
+    local time = User:GetIapGiftTime(data) - app.timer:GetServerTime()
     content.time_label:setString(GameUtils:formatTimeStyle1(time))
     if content.yellow_btn then
         content.yellow_btn:removeSelf()
@@ -525,7 +525,7 @@ function GameUIActivityNew:FillAwardItemContent(content,data,idx)
             :align(display.BOTTOM_RIGHT, 556, 18)
             :addTo(content)
             :setButtonLabel("normal", UIKit:commonButtonLable({
-                text = _("放弃"),
+                text = _("移除"),
             }))
             :onButtonClicked(function()
                 self:OnAwardButtonClicked(content.idx)

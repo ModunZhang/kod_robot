@@ -123,7 +123,7 @@ function GameUIBarracks:CreateSoldierUI()
         {"swordsman_3", "ranger_3", "lancer_3", "catapult_3"},
         {"sentinel_3", "crossbowman_3", "horseArcher_3", "ballista_3"},
     }) do
-        local item = self:CreateSpecialItemWithListView(self.list_view, v,titles[i].title, titles[i].title_img,i == 1 and _("此系列单位生命属性较高") or _("此系列单位攻击属性较高"))
+        local item = self:CreateSpecialItemWithListView(self.list_view, v,titles[i].title, titles[i].title_img)
         self.list_view:addItem(item)
     end
 
@@ -235,7 +235,10 @@ function GameUIBarracks:CreateItemWithListView(list_view, soldiers)
                     :addTo(self,1000, WidgetRecruitSoldier_tag):pos(0,0)
             end):addTo(row_item)
                 :alignByPoint(cc.p(0.5, 0.5), origin_x + (unit_width + gap_x) * (i - 1) + unit_width / 2, 0)
-                :SetSoldier(soldier_name, self.barracks_city:GetUser():SoldierStarByName(soldier_name))
+                :SetSoldier(
+                    soldier_name, 
+                    UtilsForSoldier:SoldierStarByName(self.barracks_city:GetUser(), soldier_name)
+                )
         if self.need_recruit_soldier == soldier_name then
             if arrow_left_dir_map[soldier_name] then
                 WidgetFteArrow.new(_("点击士兵"))
@@ -273,12 +276,19 @@ function GameUIBarracks:CreateSpecialItemWithListView( list_view, soldiers ,titl
                 if self.soldier_map[soldier_name]:IsLocked() then
                     return
                 end
-                WidgetRecruitSoldier.new(self.barracks, self.barracks_city, soldier_name,self.barracks_city:GetUser():SoldierStarByName(soldier_name))
-                    :addTo(self,1000, WidgetRecruitSoldier_tag)
-                    :align(display.CENTER, window.cx, 500 / 2)
+                WidgetRecruitSoldier.new(
+                    self.barracks, 
+                    self.barracks_city, 
+                    soldier_name,
+                    UtilsForSoldier:SoldierStarByName(self.barracks_city:GetUser(), soldier_name)
+                ):addTo(self,1000, WidgetRecruitSoldier_tag)
+                 :align(display.CENTER, window.cx, 500 / 2)
             end):addTo(row_item)
                 :alignByPoint(cc.p(0.5, 0.5), origin_x + (unit_width + gap_x) * (i - 1) + unit_width / 2, row_height - 130)
-                :SetSoldier(soldier_name, self.barracks_city:GetUser():SoldierStarByName(soldier_name))
+                :SetSoldier(
+                    soldier_name, 
+                    UtilsForSoldier:SoldierStarByName(self.barracks_city:GetUser(), soldier_name)
+                )
     end
 
     -- title
@@ -341,7 +351,7 @@ end
 function GameUIBarracks:RefershUnlockInfo()
     local level = self.barracks:GetLevel()
     for k,v in pairs(self.soldier_map) do
-        local needBarracksLevel = User:GetSoldierConfig(k).needBarracksLevel
+        local needBarracksLevel = UtilsForSoldier:GetSoldierConfig(User, k).needBarracksLevel
         if needBarracksLevel then
             local is_unlock = needBarracksLevel <= level
             v:Enable(is_unlock)

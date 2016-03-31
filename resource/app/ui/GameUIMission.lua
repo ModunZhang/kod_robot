@@ -17,6 +17,7 @@ local Localize_item = import("..utils.Localize_item")
 local UILib = import(".UILib")
 local UIListView = import(".UIListView")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
+local lights = import("..particles.lights")
 local dailyTasksConfig = GameDatas.PlayerInitData.dailyTasks
 local dailyTaskRewardsConfig = GameDatas.PlayerInitData.dailyTaskRewards
 
@@ -28,17 +29,20 @@ function GameUIMission:OnUserDataChanged_dailyTasks(userData, deltaData)
     if not self:CurrentIsDailyMission() then return end
     self:RefreshDailyList()
     local points = self:GetDailyTasksFinishedPoints()
-    self.dailyTaskRewardCount_progress:setPercentage(points/200 * 100)
+    self.dailyTaskRewardCount_progress:setPercentage(points/self:GetMaxPoint() * 100)
     self.my_points:setString(string.format(_("我的积分:%d"),points))
 end
 function GameUIMission:OnUserDataChanged_countInfo()
     local points = self:GetDailyTasksFinishedPoints()
-    self.dailyTaskRewardCount_progress:setPercentage(points/200 * 100)
+    self.dailyTaskRewardCount_progress:setPercentage(points/self:GetMaxPoint() * 100)
     self.boxed_node:RefreshBoxes()
     self:RefreshDisplayGreenPoint()
 end
 function GameUIMission:OnUserDataChanged_growUpTasks()
     self:RefreshAchievementList()
+end
+function GameUIMission:GetMaxPoint()
+    return dailyTaskRewardsConfig[#dailyTaskRewardsConfig].score
 end
 function GameUIMission:ctor(city,mission_type, need_tips)
     GameUIMission.super.ctor(self,city, _("任务"))
@@ -117,12 +121,13 @@ function GameUIMission:CreateUIIf_achievement()
         text = _("赛琳娜:"),
         size = 24,
         color= 0x403c2f
-    }):align(display.LEFT_BOTTOM, 28, 112):addTo(recommend_contet_bg)
+    }):align(display.LEFT_BOTTOM, 28, 118):addTo(recommend_contet_bg)
     UIKit:ttfLabel({
         text = _("大人,我们现在应该:"),
         size = 20,
-        color= 0x403c2f
-    }):align(display.LEFT_BOTTOM, 28, 82):addTo(recommend_contet_bg)
+        color= 0x403c2f,
+        dimensions = cc.size(400,0)
+    }):align(display.LEFT_CENTER, 28, 92):addTo(recommend_contet_bg)
     self.recommend_desc_label = UIKit:ttfLabel({
         text = self:GetRecommendMissionDesc(),
         size = 24,
@@ -201,10 +206,11 @@ end
 function GameUIMission:GetAchievementListItem(isFinished,data)
     local item = self.achievement_list:newItem()
     local content = UIKit:CreateBoxWithoutContent()
-    UIKit:ttfLabel({
+    local desc = UIKit:ttfLabel({
         text = isFinished and data:Title() or data:Desc(),
         size = 22,
-        color= 0x403c2f
+        color= 0x403c2f,
+        dimensions = cc.size(380,0)
     }):align(display.LEFT_CENTER, 5, 33):addTo(content)
     if not isFinished then
         display.newSprite("next_32x38.png"):align(display.RIGHT_CENTER, 548, 33):addTo(content)
@@ -304,7 +310,6 @@ end
 
 --日常任务
 function GameUIMission:CreateUIIf_daily()
-    print("CreateUIIf_daily---->")
     if self.daily_layer then
         --refresh list
         self:RefreshDailyList()
@@ -325,12 +330,13 @@ function GameUIMission:CreateUIIf_daily()
         text = _("克里冈:"),
         size = 24,
         color= 0x403c2f
-    }):align(display.LEFT_BOTTOM, 28, 112):addTo(recommend_contet_bg)
+    }):align(display.LEFT_BOTTOM, 28, 118):addTo(recommend_contet_bg)
     UIKit:ttfLabel({
         text = _("大人,完成任务领取丰厚奖励:"),
         size = 20,
-        color= 0x403c2f
-    }):align(display.LEFT_BOTTOM, 28, 82):addTo(recommend_contet_bg)
+        color= 0x403c2f,
+        dimensions = cc.size(400,0)
+    }):align(display.LEFT_CENTER, 28, 92):addTo(recommend_contet_bg)
     local daily_refresh_label = UIKit:ttfLabel({
         text = string.format(_("%s后刷新"),"00:10:10"),
         size = 24,
@@ -363,7 +369,7 @@ function GameUIMission:CreateUIIf_daily()
     self.my_points = my_points
     local progress_bg,progress =  self:GetProgressBar()
     progress_bg:align(display.CENTER_TOP, layer:getContentSize().width/2, my_points:getPositionY() - my_points:getContentSize().height - 16):addTo(layer)
-    progress:setPercentage(points/200 * 100)
+    progress:setPercentage(points/self:GetMaxPoint() * 100)
     self.dailyTaskRewardCount_progress = progress
     local boxed_node = self:GetRewardsNode():align(display.CENTER_TOP, layer:getContentSize().width/2 + 30, progress_bg:getPositionY() - progress_bg:getContentSize().height - 15):addTo(layer)
     self.boxed_node = boxed_node
@@ -444,7 +450,9 @@ function GameUIMission:GetDailyItem(data,index)
         size = 20,
         color= self.city:GetUser():GetDailyTasksFinishedCountByIndex(index) ~= data.maxCount and 0x403c2f or 0x007c23,
     }):align(display.CENTER, 400, content_height/2):addTo(content)
-    display.newSprite("next_32x38.png"):align(display.RIGHT_CENTER, 510, content_height/2):addTo(content)
+    if index ~= 14 and index ~= 15 and index ~= 12 then
+        display.newSprite("next_32x38.png"):align(display.RIGHT_CENTER, 510, content_height/2):addTo(content)
+    end
 
     item:addContent(content)
     item:setItemSize(520,content_height)
@@ -521,10 +529,12 @@ function GameUIMission:OpenGetDailyRewardDialog(reward_index,flag)
         local item_bg = display.newSprite("box_118x118.png"):addTo(body_1):pos(65,65)
         local item_icon = display.newSprite(UILib.item[data[2]]):addTo(item_bg):align(display.CENTER, item_bg:getContentSize().width/2, item_bg:getContentSize().height/2):scale(0.6)
         item_icon:scale(100/item_icon:getContentSize().width)
+        lights():addTo(item_icon):pos(80, 80)
+
 
         -- 道具名称
         UIKit:ttfLabel({
-            text = UtilsForItem:GetItemLocalize(data[2]),
+            text = UtilsForItem:GetItemLocalize(data[2]).."X"..data[3],
             size = 24,
             color = 0x403c2f,
         }):addTo(body_1):align(display.LEFT_CENTER,130, body_1:getContentSize().height-22)
@@ -552,17 +562,28 @@ function GameUIMission:OpenGetDailyRewardDialog(reward_index,flag)
                 UIKit:showMessageDialog(_("提示"),_("已经领取过奖励"))
                 return
             end
-            if User.countInfo.dailyTaskRewardCount ~= reward_index + 1 then
+            if User.countInfo.dailyTaskRewardCount ~= reward_index then
                 UIKit:showMessageDialog(_("提示"),_("请首先领取前面的奖励"))
                 return
             end
             NetManager:getDailyTaskRewards():done(function ()
                 GameGlobalUI:showTips(_("获得奖励"),string.format(_("获得%s"),show_msg))
+                app:GetAudioManager():PlayeEffectSoundWithKey("BUY_ITEM")
                 dialog:LeftButtonClicked()
             end)
         end)
-    btn:setButtonEnabled(flag == 1)
-
+    local ta = UIKit:ttfLabel({
+        text = _("已领取"),
+        size = 24,
+        color = 0x403c2f,
+    }):align(display.BOTTOM_CENTER, size.width/2, 30)
+        :addTo(body)
+    if flag == 0 then
+        btn:setButtonEnabled(false)
+    elseif flag == 2 then
+        btn:setVisible(false)
+    end
+    ta:setVisible(flag == 2)
 end
 -- 获取当前能够领取日常任务奖励的数量
 function GameUIMission:GetDailyTasksCanGetRewardCount()
@@ -588,7 +609,7 @@ function GameUIMission:GetDailyTasksFinishedPoints()
 end
 function GameUIMission:RefreshDisplayGreenPoint()
     if not self.tab_buttons then return end
-    self.tab_buttons:SetButtonTipNumber("daily",self:GetDailyTasksCanGetRewardCount() - User.countInfo.dailyTaskRewardCount + 1)
+    self.tab_buttons:SetGreenTipsShow("daily",self:GetDailyTasksFinishedPoints() < 200)
 end
 
 
@@ -596,8 +617,10 @@ end
 
 function GameUIMission:dailyListviewListener(event)
     local city = self.city
+    local User = city:GetUser()
     local listView = event.listView
     if "clicked" == event.name then
+        app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
         local pos = event.itemPos
         if pos == 1 then
             UIKit:newGameUI("GameUIHasBeenBuild", city):AddToCurrentScene(true)
@@ -629,7 +652,7 @@ function GameUIMission:dailyListviewListener(event)
             if Alliance_Manager:GetMyAlliance():IsDefault() then
                 UIKit:showMessageDialog(_("提示"),_("你必须加入联盟后，才能参加圣地战"))
             else
-                app:EnterMyAllianceScene({mapIndex = Alliance_Manager:GetMyAlliance().mapIndex,x = 13,y = 17,callback = function ( alliance_scene )
+                app:EnterMyAllianceScene({mapIndex = Alliance_Manager:GetMyAlliance().mapIndex,x = 8,y = 12,callback = function ( alliance_scene )
                     alliance_scene:TwinkleShrine()
                 end})
             end
@@ -648,7 +671,7 @@ function GameUIMission:dailyListviewListener(event)
         elseif pos == 9 then
             local dragon_manger = city:GetDragonEyrie():GetDragonManager()
             local dragon_type = dragon_manger:GetCanFightPowerfulDragonType()
-            if #dragon_type > 0 or dragon_manger:GetDefenceDragon() then
+            if #dragon_type > 0 or UtilsForDragon:GetDefenceDragon(User) then
                 app:EnterPVEScene(city:GetUser():GetLatestPveIndex())
             else
                 UIKit:showMessageDialog(_("主人"),_("需要一条空闲状态的魔龙才能探险"))
@@ -729,6 +752,8 @@ end
 
 
 return GameUIMission
+
+
 
 
 

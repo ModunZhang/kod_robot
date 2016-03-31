@@ -187,7 +187,7 @@ function MyCityScene:NewLockButtonFromBuildingSprite(building_sprite)
     local wp = building_sprite:GetWorldPosition()
     local lp = self:GetTopLayer():convertToNodeSpace(wp)
     local btn_png = "tmp_lock_btn.png"
-    if self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint() > 0 then
+    if UtilsForBuilding:GetFreeUnlockPoint(self.city:GetUser()) > 0 then
         btn_png = "tmp_unlock_btn.png"
     end
     local button = cc.ui.UIPushButton.new({normal = btn_png, pressed = btn_png})
@@ -205,7 +205,7 @@ function MyCityScene:NewLockButtonFromBuildingSprite(building_sprite)
 end
 function MyCityScene:RefreshLockBtnStatus()
     local btn_png = "tmp_lock_btn.png"
-    if self.city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint() > 0 then
+    if UtilsForBuilding:GetFreeUnlockPoint(self.city:GetUser()) > 0 then
         btn_png = "tmp_unlock_btn.png"
     end
     self:IteratorLockButtons(function(btn)
@@ -240,7 +240,9 @@ end
 function MyCityScene:onEnterTransitionFinish()
     MyCityScene.super.onEnterTransitionFinish(self)
     if ext.registereForRemoteNotifications then
-        ext.registereForRemoteNotifications()
+        display.newNode():addTo(self):performWithDelay(function()
+            ext.registereForRemoteNotifications()
+        end, 1.5)
     end
     app:sendPlayerLanguageCodeIf()
     app:sendApnIdIf()
@@ -337,17 +339,14 @@ end
 function MyCityScene:OnUserDataChanged_houseEvents(userData, deltaData)
     if deltaData("houseEvents.add") then
         self:GetSceneLayer():CheckCanUpgrade()
-        app:GetAudioManager():PlayeEffectSoundWithKey("UI_BUILDING_UPGRADE_START")
     end
     if deltaData("houseEvents.remove") then
         self:GetSceneLayer():CheckCanUpgrade()
-        app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
     end
 end
 function MyCityScene:OnUserDataChanged_buildingEvents(userData, deltaData)
     if deltaData("buildingEvents.add") then
         self:GetSceneLayer():CheckCanUpgrade()
-        app:GetAudioManager():PlayeEffectSoundWithKey("UI_BUILDING_UPGRADE_START")
     end
     local ok, value = deltaData("buildingEvents.remove")
     if ok then
@@ -357,7 +356,6 @@ function MyCityScene:OnUserDataChanged_buildingEvents(userData, deltaData)
             end
         end
         self:GetSceneLayer():CheckCanUpgrade()
-        app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
     end
 end
 function MyCityScene:OnUserDataChanged_soldierEvents(userData, deltaData)
@@ -448,10 +446,9 @@ function MyCityScene:OpenUI(building, default_tab, need_tips, build_name)
     local city = self:GetCity()
     local User = city:GetUser()
     if iskindof(building, "HelpedTroopsSprite") then
-        local helped = User.helpedByTroops[building:GetIndex()]
+        local helped = User.helpedByTroop
         local user = self.city:GetUser()
-        NetManager:getHelpDefenceTroopDetailPromise(user:Id(),helped.id):done(function(response)
-            LuaUtils:outputTable("response", response)
+        NetManager:getHelpDefenceTroopDetailPromise(user:Id()):done(function(response)
             UIKit:newGameUI("GameUIHelpDefence",self.city, helped ,response.msg.troopDetail):AddToCurrentScene(true)
         end)
         return
@@ -469,7 +466,7 @@ function MyCityScene:OpenUI(building, default_tab, need_tips, build_name)
     elseif type_ == "airship" then
         local dragon_manger = city:GetDragonEyrie():GetDragonManager()
         local dragon_type = dragon_manger:GetCanFightPowerfulDragonType()
-        if #dragon_type > 0 or dragon_manger:GetDefenceDragon() then
+        if #dragon_type > 0 or UtilsForDragon:GetDefenceDragon(User) then
             app:EnterPVEScene(city:GetUser():GetLatestPveIndex())
         else
             UIKit:showMessageDialog(_("主人"),_("需要一条空闲状态的魔龙才能探险"))

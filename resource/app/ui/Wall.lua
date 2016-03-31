@@ -14,18 +14,18 @@ function Wall:PlayAnimation(ani, loop_time)
     self.wall:getAnimation():setSpeedScale(self:Speed())
 end
 function Wall:hit()
-    self:PlayAnimation("Animation1", 0)
+    self:PlayAnimation("hurt", 0)
     local p = promise.new()
-    self:OnAnimationPlayEnd("Animation1", function()
+    self:OnAnimationPlayEnd("hurt", function()
         p:resolve(self)
     end)
     return p
 end
 function Wall:attack()
-    self:PlayAnimation("Animation2", 0)
+    self:PlayAnimation("attack", 0)
     app:GetAudioManager():PlayeAttackSoundBySoldierName("ranger")
     local p = promise.new()
-    self:OnAnimationPlayEnd("Animation2", function()
+    self:OnAnimationPlayEnd("attack", function()
         p:resolve(self)
     end)
     return p

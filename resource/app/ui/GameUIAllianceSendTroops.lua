@@ -7,6 +7,7 @@ local UIListView = import(".UIListView")
 local WidgetSlider = import("..widget.WidgetSlider")
 local WidgetSelectDragon = import("..widget.WidgetSelectDragon")
 local WidgetInput = import("..widget.WidgetInput")
+local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 
 local Corps = import(".Corps")
 local UILib = import(".UILib")
@@ -129,7 +130,7 @@ function GameUIAllianceSendTroops:ctor(march_callback,params)
     self.march_callback = march_callback
 
     -- 默认选中最强的并且可以出战的龙,如果都不能出战，则默认最强龙
-    self.dragon = self.dragon_manager:GetDragon(self.dragon_manager:GetCanFightPowerfulDragonType()) or self.dragon_manager:GetDragon(self.dragon_manager:GetPowerfulDragonType())
+    self.dragon = params.dragon or self.dragon_manager:GetDragon(self.dragon_manager:GetCanFightPowerfulDragonType()) or self.dragon_manager:GetDragon(self.dragon_manager:GetPowerfulDragonType())
 end
 
 function GameUIAllianceSendTroops:OnMoveInStage()
@@ -256,8 +257,8 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                     end
                     return
                 end
-                if self.dragon:IsDefenced() then
-                    UIKit:showMessageDialog(_("提示"),_("当前选择的龙处于驻防状态，是否取消驻防将这条龙派出")):CreateCancelButton(
+                if self.dragon:IsDefenced() and not self.military_soldiers then
+                    UIKit:showMessageDialog(_("提示"),_("当前选择的龙处于驻防状态，是否取消驻防将这条龙派出")):CreateOKButton(
                         {
                             listener = function ()
                                 NetManager:getCancelDefenceTroopPromise():done(function()
@@ -268,7 +269,7 @@ function GameUIAllianceSendTroops:OnMoveInStage()
                             btn_name= _("派出"),
                             btn_images = {normal = "red_btn_up_148x58.png",pressed = "red_btn_down_148x58.png"}
                         }
-                    ):CreateOKButton({
+                    ):CreateCancelButton({
                         listener = function ()
                         end,
                         btn_name= _("取消"),
@@ -375,10 +376,18 @@ function GameUIAllianceSendTroops:RefreashDragon(dragon)
     self.dragon_img:setTexture(UILib.dragon_head[dragon:Type()])
     self.dragon_name:setString(Localize.dragon[dragon:Type()].."（LV "..dragon:Level().."）")
     self.dragon_vitality:setString(_("生命值")..string.formatnumberthousands(dragon:Hp()).."/"..string.formatnumberthousands(dragon:GetMaxHP()))
+    if self.dragon:Type() ~= dragon:Type() then
+        self:Reset()
+    end
     self.dragon = dragon
-    self:RefreashSoldierShow()
 end
-
+function GameUIAllianceSendTroops:Reset()
+    for k,item in pairs(self.soldiers_table) do
+        item:SetSoldierCount(0)
+    end
+    self:AdapterMaxButton(true)
+    self.show:ShowOrRefreasTroops({})
+end
 function GameUIAllianceSendTroops:SelectDragon()
     WidgetSelectDragon.new(
         {
@@ -593,7 +602,8 @@ function GameUIAllianceSendTroops:SelectSoldiers()
             end
         end
         if soldier_num + defence_soldier_count > 0 then
-            table.insert(soldiers, {name = name,level = User:SoldierStarByName(name), max_num = soldier_num + defence_soldier_count})
+
+            table.insert(soldiers, {name = name,level = UtilsForSoldier:SoldierStarByName(User, name), max_num = soldier_num + defence_soldier_count})
         end
     end
     for k,v in pairs(soldiers) do
@@ -775,7 +785,7 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
         return self
     end
     function TroopShow:SetCitizen(citizen)
-        local citizen_item = createInfoItem(_("部队容量"),citizen.."/"..parent.dragon:LeadCitizen())
+        local citizen_item = createInfoItem(_("带兵量"),citizen.."/"..parent.dragon:LeadCitizen())
         citizen_item:align(display.CENTER,310-citizen_item:getContentSize().width/2,0)
             :addTo(info_bg)
         self.exceed_lead = citizen > parent.dragon:LeadCitizen()
@@ -830,32 +840,72 @@ function GameUIAllianceSendTroops:CreateTroopsShow()
         -- 更新
         self:SetSoldiers(soldiers)
         self:RemoveAllSoldierCrops()
-        local y  = 110
-        local x = 681
-        local total_power , total_weight, total_citizen =0,0,0
+        self.y  = 110
+        self.x = 681
+        self.total_power , self.total_weight, self.total_citizen =0,0,0
         self.soldier_crops = {}
-        for index,v in pairs(soldiers) do
-            local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
-            if not string.find(v.soldier_type , "catapult") and not string.find(v.soldier_type , "ballista") and not string.find(v.soldier_type , "meatWagon") then
-                corp:PlayAnimation("idle_90")
-            else
-                corp:PlayAnimation("move_90")
-            end
-            table.insert(self.soldier_crops,corp)
-            x = x - soldier_ani_width[v.soldier_type]
 
-            corp:pos(x,y)
-            total_power = total_power + v.power
-            total_weight = total_weight + v.soldier_weight
-            total_citizen = total_citizen + v.soldier_citizen
-        end
-        self:RefreshScrollNode(x)
-        info_bg:removeAllChildren()
-        self:SetPower(total_power)
-        self:SetWeight(total_weight)
-        self:SetCitizen(total_citizen)
+        self.addCount = 1
+        self.handle = scheduler.scheduleGlobal(handler(self, self.addSoldiers), 0.01, false)
+
+
+        -- for index,v in pairs(soldiers) do
+        --     local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
+        --     if not string.find(v.soldier_type , "catapult") and not string.find(v.soldier_type , "ballista") and not string.find(v.soldier_type , "meatWagon") then
+        --         corp:PlayAnimation("idle_90")
+        --     else
+        --         corp:PlayAnimation("move_90")
+        --     end
+        --     table.insert(self.soldier_crops,corp)
+        --     x = x - soldier_ani_width[v.soldier_type]
+
+        --     corp:pos(x,y)
+        --     total_power = total_power + v.power
+        --     total_weight = total_weight + v.soldier_weight
+        --     total_citizen = total_citizen + v.soldier_citizen
+        -- end
+        -- self:RefreshScrollNode(x)
+        -- info_bg:removeAllChildren()
+        -- self:SetPower(total_power)
+        -- self:SetWeight(total_weight)
+        -- self:SetCitizen(total_citizen)
     end
-
+    function TroopShow:addSoldiers()
+        if not self.soldiers then
+            return
+        end
+        if (self.addCount > #self.soldiers or #self.soldiers == 0) then
+            self:RefreshScrollNode(self.x)
+            info_bg:removeAllChildren()
+            self:SetPower(self.total_power)
+            self:SetWeight(self.total_weight)
+            self:SetCitizen(self.total_citizen)
+            scheduler.unscheduleGlobal(self.handle)
+            return
+        end
+        local x = self.x
+        local y = self.y
+        local v = self.soldiers[self.addCount]
+        if not v then
+            return
+        end
+        -- for index,v in pairs(soldiers) do
+        local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
+        if not string.find(v.soldier_type , "catapult") and not string.find(v.soldier_type , "ballista") and not string.find(v.soldier_type , "meatWagon") then
+            corp:PlayAnimation("idle_90")
+        else
+            corp:PlayAnimation("move_90")
+        end
+        table.insert(self.soldier_crops,corp)
+        x = x - soldier_ani_width[v.soldier_type]
+        self.x = x
+        corp:pos(x,y)
+        self.total_power = self.total_power + v.power
+        self.total_weight = self.total_weight + v.soldier_weight
+        self.total_citizen = self.total_citizen + v.soldier_citizen
+        -- end
+        self.addCount = self.addCount + 1
+    end
     return TroopShow
 end
 function GameUIAllianceSendTroops:OnUserDataChanged_soldiers(userData, deltaData)
@@ -871,24 +921,33 @@ function GameUIAllianceSendTroops:OnUserDataChanged_soldiers(userData, deltaData
         end
     end
 end
-local animation = import("..animation")
+-- local animation = import("..animation")
 function GameUIAllianceSendTroops:onExit()
     User:RemoveListenerOnType(self, "soldiers")
-    display.getRunningScene():performWithDelay(function()
-        local manager = ccs.ArmatureDataManager:getInstance()
-        for k,v in pairs(animation) do
-            if string.find(k, "_90") then
-                local path = DEBUG_GET_ANIMATION_PATH(string.format("animations/%s.ExportJson", k))
-                print("removeArmatureFileInfo", path)
-                manager:removeArmatureFileInfo(path)
-            end
-        end
-        cc.Director:getInstance():purgeCachedData()
-    end, 0.1)
+    -- display.getRunningScene():performWithDelay(function()
+    --     local manager = ccs.ArmatureDataManager:getInstance()
+    --     for k,v in pairs(animation) do
+    --         if string.find(k, "_90") then
+    --             local path = DEBUG_GET_ANIMATION_PATH(string.format("animations/%s.ExportJson", k))
+    --             print("removeArmatureFileInfo", path)
+    --             manager:removeArmatureFileInfo(path)
+    --         end
+    --     end
+    --     cc.Director:getInstance():purgeCachedData()
+    -- end, 0.1)
+    if self.show.handle then
+        scheduler.unscheduleGlobal(self.show.handle)
+    end
     GameUIAllianceSendTroops.super.onExit(self)
 end
 
 return GameUIAllianceSendTroops
+
+
+
+
+
+
 
 
 

@@ -370,7 +370,7 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             isVisible = true,
             isSatisfy = not User:HasProductionTechEvent(),
             icon="hammer_33x40.png",
-            description= User:HasProductionTechEvent() and "0/1" or "1/1"
+            description= _("升级队列")..(User:HasProductionTechEvent() and " 0/1" or " 1/1")
         })
     if unLockByTech.index ~= current_tech.index then
         table.insert(requirements,
@@ -379,7 +379,7 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
                 isVisible = true,
                 isSatisfy = unLockByTech.level >= current_tech_info.unlockLevel,
                 icon= UtilsForTech:GetProductionTechImage(tech_name),
-                description= _("等级达到") .. current_tech_info.unlockLevel,
+                description= UtilsForTech:GetTechLocalize(tech_name).." ".._("等级达到") .. current_tech_info.unlockLevel,
                 canNotBuy = true,
             })
     end
@@ -389,7 +389,7 @@ function GameUIUpgradeTechnology:GetUpgradeRequirements()
             isVisible = true,
             isSatisfy = current_tech_info.academyLevel <= User:GetAcademyLevel(),
             icon="academy.png",
-            description = _("等级达到") .. current_tech_info.academyLevel,
+            description = _("学院").." ".._("等级达到") .. current_tech_info.academyLevel,
             canNotBuy = true,
         })
     table.insert(requirements,
@@ -568,12 +568,12 @@ function GameUIUpgradeTechnology:CheckCanUpgradeActionReturnGems()
     local gems_cost,msg = 0,""
     if User:HasProductionTechEvent() then
         gems_cost = self:GetUpgradeGemsIfQueueNotEnough()
-        msg = _("已有科技升级队列,需加速完成该队列花费金龙币") .. gems_cost.. "\n"
+        msg = _("已有科技升级队列,需加速完成该队列花费金龙币") .. string.formatnumberthousands(gems_cost).. "\n"
     end
     local resource_gems = self:GetUpgradeGemsIfResourceNotEnough()
     if resource_gems ~= 0 then
         gems_cost = resource_gems + gems_cost
-        msg = msg  .. _("升级所需物品不足,购买所缺物品需花费金龙币") .. resource_gems.. "\n"
+        msg = msg  .. _("升级所需物品不足,购买所缺物品需花费金龙币") .. string.formatnumberthousands(resource_gems).. "\n"
     end
     return gems_cost,msg
 end

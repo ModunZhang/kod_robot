@@ -117,7 +117,7 @@ function WidgetUseItems:OpenBuffDialog( item_name )
 
     -- 是否激活buff
     local event_type = string.split(item_name,"_")[1]
-    local isactive, time = User:IsItemEventActive(event_type)
+    local isactive, time = UtilsForItem:IsItemEventActive(User, event_type)
     local buff_status_label = UIKit:ttfLabel({
         size = 22,
         color = isactive and 0x007c23 or 0x403c2f,
@@ -153,7 +153,7 @@ function WidgetUseItems:OpenBuffDialog( item_name )
         end
     end
     dialog:scheduleAt(function()
-        local isactive, time = User:IsItemEventActive(event_type)
+        local isactive, time = UtilsForItem:IsItemEventActive(User, event_type)
         if isactive then
             buff_status_label:setString(string.format( _("已激活,剩余时间:%s"), GameUtils:formatTimeStyle1(time) ))
             buff_status_label:setColor(UIKit:hex2c4b(0x007c23))
@@ -802,12 +802,12 @@ function WidgetUseItems:OpenVipActive( item_name )
     local dialog = UIKit:newWidgetUI("WidgetPopDialog",3 * 130+24 +80,_("激活VIP"),window.top-230)
     local body = dialog:GetBody()
     local size = body:getContentSize()
+    local isactive,leftTime = UtilsForVip:IsVipActived(User)
     -- 是否激活 vip
     local vip_status_label = UIKit:ttfLabel({
         size = 22,
-        color = User:IsVIPActived() and 0x007c23 or 0x403c2f,
+        color = isactive and 0x007c23 or 0x403c2f,
     }):addTo(body):align(display.CENTER,size.width/2, size.height-35)
-    local isactive,leftTime = User:IsVIPActived()
     if isactive then
         local left_time_str = GameUtils:formatTimeStyle1(leftTime)
         vip_status_label:setString( string.format( _("已激活,剩余时间:%s"), left_time_str ) )
@@ -819,7 +819,7 @@ function WidgetUseItems:OpenVipActive( item_name )
 
 
     function dialog:OnVipEventTimer()
-        local isactive, time = User:IsVIPActived()
+        local isactive, time = UtilsForVip:IsVipActived(User)
         if time > 0 then
             local left_time_str = GameUtils:formatTimeStyle1(time)
             vip_status_label:setString( string.format( _("已激活,剩余时间:%s"), left_time_str ) )

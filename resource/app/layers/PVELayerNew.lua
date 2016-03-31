@@ -85,7 +85,7 @@ function PVELayerNew:ctor(scene, user, level)
     })
 
     local color = pve_color[self.level]
-    local suffix = device.platform == "winrt" and "png" or "jpg"
+    local suffix = "jpg"
     local img = string.format("pve_background.%s", suffix)
     GameUtils:LoadImagesWithFormat(function()
         self.background = display.newNode():addTo(self)

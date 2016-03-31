@@ -57,7 +57,7 @@ function CityBuildApi:UpgradingBuilding(building)
 end
 
 function CityBuildApi:Recommend()
-    if #City:GetUpgradingBuildings() == 0 then
+    if UtilsForBuilding:GetFreeBuildQueueCount(User) > 0 then
         return self:UpgradingBuilding(City:GetHighestBuildingByType(City:GetRecommendTask():BuildingType()))
     end
 end
@@ -91,8 +91,8 @@ local house_type = {
 }
 function CityBuildApi:BuildHouseByType(type_)
     if City:GetLeftBuildingCountsByType(type_) > 0 then
-        local need_citizen = BuildingRegister[type_].new({building_type = type_, level = 1, finishTime = 0}):GetCitizen()
-        -- local citizen = City:GetResourceManager():GetCitizenResource():GetNoneAllocatedByTime(app.timer:GetServerTime())
+        -- local need_citizen = BuildingRegister[type_].new({building_type = type_, level = 1, finishTime = 0}):GetCitizen()
+        local need_citizen = GameDatas.HouseLevelUp[type_][1].citizen
         local citizen = User:GetResValueByType("citizen")
         if need_citizen <= citizen then
             for i,v in ipairs(City:GetRuinsNotBeenOccupied()) do

@@ -90,6 +90,8 @@ function GameUIHome:onEnter()
         local User = self.city:GetUser()
         self.wood_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("wood")))
         self.food_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("food")))
+        -- print("User:GetResValueByType(food)==",User:GetResValueByType("food"))
+        -- NetManager:getPlayerInfoPromise("VyxUbGow","cache-server-1")
         self.iron_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("iron")))
         self.stone_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("stone")))
         self.citizen_label:SetNumString(GameUtils:formatNumber(User:GetResValueByType("citizen")))
@@ -262,7 +264,7 @@ function GameUIHome:CreateTop()
                 UIKit:newGameUI('GameUIVipNew', self.city,"VIP"):AddToCurrentScene(true)
             end
         end)
-    local vip_btn_img = User:IsVIPActived() and "vip_bg_110x124.png" or "vip_bg_disable_110x124.png"
+    local vip_btn_img = UtilsForVip:IsVipActived(User) and "vip_bg_110x124.png" or "vip_bg_disable_110x124.png"
     vip_btn:setButtonImage(cc.ui.UIPushButton.NORMAL, vip_btn_img, true)
     vip_btn:setButtonImage(cc.ui.UIPushButton.PRESSED, vip_btn_img, true)
     self.vip_level = display.newNode():addTo(vip_btn):pos(-3, 0):scale(0.8)
@@ -275,8 +277,8 @@ function GameUIHome:CreateTop()
     ):onButtonClicked(function(event)
         UIKit:newGameUI("GameUIStore"):AddToCurrentScene(true)
     end):addTo(top_bg):pos(top_bg:getContentSize().width - 155, -16)
-    local gem_icon = display.newSprite("gem_icon_62x61.png"):addTo(button):pos(60, 3)
-    light_gem():addTo(gem_icon, 1022):pos(62/2, 61/2)
+    local gem_icon = display.newSprite("store_gem_260x116.png"):addTo(button):pos(59, 6):scale(0.5)
+    light_gem():addTo(gem_icon, 1022):pos(260/2, 116/2)
 
     -- self.gem_label = UIKit:ttfLabel({
     --     size = 20,
@@ -285,7 +287,7 @@ function GameUIHome:CreateTop()
     self.gem_label = UIKit:CreateNumberImageNode({
         size = 20,
         color = 0xffd200,
-    }):addTo(button):align(display.CENTER, -30, 8)
+    }):addTo(button):align(display.CENTER, -24, 6)
 
 
     -- 任务条
@@ -319,6 +321,8 @@ function GameUIHome:CreateTop()
         size = 20,
         color = 0xfffeb3,
     }):addTo(quest_bar_bg):align(display.LEFT_CENTER, -130, 0)
+
+    self.quest_label:runAction(UIKit:ScaleAni())
 
     return top_bg
 end
@@ -380,13 +384,13 @@ function GameUIHome:RefreshExp()
 end
 function GameUIHome:RefreshVIP()
     local vip_btn = self.vip_btn
-    local vip_btn_img = User:IsVIPActived() and "vip_bg_110x124.png" or "vip_bg_disable_110x124.png"
+    local vip_btn_img = UtilsForVip:IsVipActived(User) and "vip_bg_110x124.png" or "vip_bg_disable_110x124.png"
     vip_btn:setButtonImage(cc.ui.UIPushButton.NORMAL, vip_btn_img, true)
     vip_btn:setButtonImage(cc.ui.UIPushButton.PRESSED, vip_btn_img, true)
     local vip_level = self.vip_level
     vip_level:removeAllChildren()
     local level_img = display.newSprite(string.format("VIP_%d_46x32.png", User:GetVipLevel()),5,0,{class=cc.FilteredSpriteWithOne}):addTo(vip_level)
-    if not User:IsVIPActived() then
+    if not UtilsForVip:IsVipActived(User) then
         local my_filter = filter
         local filters = my_filter.newFilter("GRAY", {0.2, 0.3, 0.5, 0.1})
         level_img:setFilter(filters)
@@ -509,12 +513,12 @@ function GameUIHome:FindVip()
     return self.vip_btn
 end
 function GameUIHome:PromiseOfFteWaitFinish()
-    if #self.city:GetUpgradingBuildings() > 0 then
+    if UtilsForBuilding:GetBuildingEventsCount(self.city:GetUser()) > 0 then
         if not self.event_tab:IsShow() then
             self.event_tab:EventChangeOn("build", true)
         end
         self:GetFteLayer()
-        return self.city:PromiseOfFinishUpgradingByLevel(nil, nil)
+        return self.city:GetUser():PromiseOfFinishUpgrading()
             :next(function()self:GetFteLayer():Reset()end)
             :next(cocos_promise.delay(1))
             :next(function()self:GetFteLayer():removeFromParent()end)
@@ -522,10 +526,7 @@ function GameUIHome:PromiseOfFteWaitFinish()
     return cocos_promise.defer()
 end
 function GameUIHome:PromiseOfFteFreeSpeedUp()
-    if #self.city:GetUpgradingBuildings() > 0 then
-        -- if not self.event_tab:IsShow() then
-        --     self.event_tab:EventChangeOn("build", true)
-        -- end
+    if UtilsForBuilding:GetBuildingEventsCount(self.city:GetUser()) > 0 then
         self:GetFteLayer()
         self.event_tab:PromiseOfPopUp():next(function()
             self:GetFteLayer():SetTouchObject(self:Find())
@@ -533,12 +534,13 @@ function GameUIHome:PromiseOfFteFreeSpeedUp()
             self:Find():onButtonClicked(function()
                 self:Find():setButtonEnabled(false)
 
-                local building = self:GetBuilding()
-                if building then
-                    if building:IsHouse() then
-                        mockData.FinishBuildHouseAt(self:GetBuildingLocation(), building:GetNextLevel())
+                local event = UtilsForBuilding:GetBuildingEventsBySeq(self.city:GetUser())[1]
+                if event then
+                    local building = UtilsForBuilding:GetBuildingByEvent(self.city:GetUser(), event)
+                    if event.buildingLocation then
+                        mockData.FinishBuildHouseAt(event.buildingLocation, building.level + 1)
                     else
-                        mockData.FinishUpgradingBuilding(building:GetType(), building:GetNextLevel())
+                        mockData.FinishUpgradingBuilding(building.type, building.level + 1)
                     end
                 end
             end)
@@ -548,7 +550,7 @@ function GameUIHome:PromiseOfFteFreeSpeedUp()
                 :TurnDown(true):align(display.RIGHT_BOTTOM, r.x + r.width/2 + 30, r.y + 50)
         end)
 
-        return self.city:PromiseOfFinishUpgradingByLevel(nil, nil)
+        return self.city:GetUser():PromiseOfFinishUpgrading()
             :next(function()
                 self:GetFteLayer():removeFromParent()
                 self:GetFteLayer()
@@ -559,10 +561,7 @@ function GameUIHome:PromiseOfFteFreeSpeedUp()
     return cocos_promise.defer()
 end
 function GameUIHome:PromiseOfFteInstantSpeedUp()
-    if #self.city:GetUpgradingBuildings() > 0 then
-        -- if not self.event_tab:IsShow() then
-        --     self.event_tab:EventChangeOn("build", true)
-        -- end
+    if UtilsForBuilding:GetBuildingEventsCount(self.city:GetUser()) > 0 then
         self:GetFteLayer()
         self.event_tab:PromiseOfPopUp():next(function()
             self:GetFteLayer():SetTouchObject(self:Find())
@@ -570,15 +569,15 @@ function GameUIHome:PromiseOfFteInstantSpeedUp()
             self:Find():onButtonClicked(function()
                 self:Find():setButtonEnabled(false)
 
-                local building = self:GetBuilding()
-                if building then
-                    if building:IsHouse() then
-                        mockData.FinishBuildHouseAt(self:GetBuildingLocation(), building:GetNextLevel())
+                local event = UtilsForBuilding:GetBuildingEventsBySeq(self.city:GetUser())[1]
+                if event then
+                    local building = UtilsForBuilding:GetBuildingByEvent(self.city:GetUser(), event)
+                    if event.buildingLocation then
+                        mockData.FinishBuildHouseAt(event.buildingLocation, building.level + 1)
                     else
-                        mockData.FinishUpgradingBuilding(building:GetType(), building:GetNextLevel())
+                        mockData.FinishUpgradingBuilding(building.type, building.level + 1)
                     end
                 end
-
             end)
 
             local r = self:Find():getCascadeBoundingBox()
@@ -588,7 +587,7 @@ function GameUIHome:PromiseOfFteInstantSpeedUp()
 
         end)
 
-        return self.city:PromiseOfFinishUpgradingByLevel()
+        return self.city:GetUser():PromiseOfFinishUpgrading()
             :next(function()
                 self:GetFteLayer():removeFromParent()
                 self:GetFteLayer()
@@ -597,18 +596,6 @@ function GameUIHome:PromiseOfFteInstantSpeedUp()
             :next(function()self:GetFteLayer():removeFromParent()end)
     end
     return cocos_promise.defer()
-end
-function GameUIHome:GetBuildingLocation()
-    local building = self.city:GetUpgradingBuildings()[1]
-    assert(building)
-    local x,y = building:GetLogicPosition()
-    local tile = self.city:GetTileByBuildingPosition(x, y)
-    return tile.location_id
-end
-function GameUIHome:GetBuilding()
-    local building = self.city:GetUpgradingBuildings()[1]
-    assert(building)
-    return building
 end
 function GameUIHome:PromiseOfActivePromise()
     self:GetFteLayer():SetTouchObject(self:FindVip())

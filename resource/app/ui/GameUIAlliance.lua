@@ -75,10 +75,18 @@ function GameUIAlliance:OnAllianceDataChanged_members(alliance)
     if self.tab_buttons:GetSelectedButtonTag() == 'overview' then
         self:RefreshOverViewUI()
     end
+    if self.tab_buttons:GetSelectedButtonTag() == 'members' then
+        self:RefreshMemberList()
+    end
 end
 
 function GameUIAlliance:OnAllianceDataChanged_operation(alliance,operation_type)
     self:RefreshMainUI()
+end
+function GameUIAlliance:OnUserDataChanged_inviteToAllianceEvents()
+    if Alliance_Manager:GetMyAlliance():IsDefault() then
+        self.tab_buttons:SetButtonTipNumber("invite",#User.inviteToAllianceEvents or 0)
+    end
 end
 
 function GameUIAlliance:AddListenerOfMyAlliance()
@@ -90,6 +98,8 @@ function GameUIAlliance:AddListenerOfMyAlliance()
     myAlliance:AddListenOnType(self, "members")
     myAlliance:AddListenOnType(self, "events")
     myAlliance:AddListenOnType(self, "joinRequestEvents")
+    User:AddListenOnType(self, "inviteToAllianceEvents")
+
 end
 
 function GameUIAlliance:Reset()
@@ -116,6 +126,9 @@ end
 function GameUIAlliance:RefreshMainUI()
     self:Reset()
     self.main_content:removeAllChildren()
+    if self.tab_buttons then
+        self.tab_buttons:removeFromParent()
+    end
     if Alliance_Manager:GetMyAlliance():IsDefault() then
         self:CreateNoAllianceUI()
     else
@@ -139,6 +152,8 @@ function GameUIAlliance:OnMoveOutStage()
     myAlliance:RemoveListenerOnType(self, "members")
     myAlliance:RemoveListenerOnType(self, "events")
     myAlliance:RemoveListenerOnType(self, "joinRequestEvents")
+    User:RemoveListenerOnType(self, "inviteToAllianceEvents")
+
     GameUIAlliance.super.OnMoveOutStage(self)
 end
 
@@ -182,6 +197,7 @@ function GameUIAlliance:CreateNoAllianceUI()
             end
         end
     ):pos(window.cx, window.bottom + 34)
+    self.tab_buttons:SetButtonTipNumber("invite",#User.inviteToAllianceEvents or 0)
 end
 
 -- TabButtons event
@@ -876,7 +892,7 @@ function GameUIAlliance:HaveAlliaceUI_overviewIf()
     }):addTo(notice_button)
     btn_label:align(display.LEFT_CENTER, -(btn_label:getContentSize().width + 26)/2,-18)
 
-    display.newSprite("alliance_notice_icon_26x26.png"):addTo(notice_button):align(display.LEFT_CENTER,btn_label:getContentSize().width + btn_label:getPositionX(),-18)
+    display.newSprite("alliance_notice_icon_26x26.png"):addTo(notice_button):align(display.LEFT_CENTER,btn_label:getContentSize().width + btn_label:getPositionX()+10,-18)
 
 
     local line_2 = display.newSprite("dividing_line.png")
@@ -1155,6 +1171,7 @@ function GameUIAlliance:MembersListonTouch(event)
         local list_data = self.list_dataSource[item.idx_]
         local data = list_data.data
         if list_data.data_type == 2 and list_data.data ~= '__empty' and User:Id() ~= data.id then
+            app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
             UIKit:newGameUI("GameUIAllianceMemberInfo",true,data.id,function()
                 if self.tab_buttons:GetSelectedButtonTag() == 'members' then
                     self:RefreshMemberList()
@@ -1689,7 +1706,8 @@ function GameUIAlliance:OnInfoButtonClicked(tag)
                 end)
             end)
     elseif tag == 2 then
-        self:CreateInvateUI()
+        UIKit:newGameUI("GameUISearchPlayer",self.city):AddToCurrentScene(true)
+        -- self:CreateInvateUI()
     elseif tag == 3 then
         UIKit:newGameUI("GameAllianceApproval"):AddToCurrentScene(true)
     elseif tag == 4 then -- 邮件

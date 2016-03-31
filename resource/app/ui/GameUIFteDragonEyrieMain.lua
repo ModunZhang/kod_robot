@@ -28,6 +28,9 @@ end
 function GameUIFteDragonEyrieMain:FindGarrisonBtn()
     return self.garrison_button
 end
+function GameUIFteDragonEyrieMain:FindDetailBtn()
+    return self.detailButton
+end
 function GameUIFteDragonEyrieMain:PromiseOfFte()
     local p = cocos_promise.defer()
     if not check("HateDragon") then
@@ -41,6 +44,8 @@ function GameUIFteDragonEyrieMain:PromiseOfFte()
                 {words = _("不可思议，传说是真的？！觉醒者过让能够号令龙族。。。大人您真是厉害！"), brow = "shy"}
             ):next(function()
                 return GameUINpc:PromiseOfLeave()
+            end):next(function()
+                return self:PormiseOfLearnSkill()
             end):next(function()
                 return self:PormiseOfDefence()
             end):next(function()
@@ -92,6 +97,29 @@ function GameUIFteDragonEyrieMain:Defence()
     terrain = User.basicInfo.terrain, 
     title = _("驻防部队"), 
     military_soldiers = {{name = "swordsman_1", count = 10}}}):AddToCurrentScene(true)
+end
+
+function GameUIFteDragonEyrieMain:PormiseOfLearnSkill()
+    local p = promise.new()
+    self:FindDetailBtn():setTouchSwallowEnabled(true)
+    self:GetFteLayer():SetTouchObject(self:FindDetailBtn())
+
+    self:FindDetailBtn():removeEventListenersByEvent("CLICKED_EVENT")
+    self:FindDetailBtn():onButtonClicked(function()
+        UIKit:PromiseOfOpen("GameUIDragonEyrieDetailFte"):next(function(ui)
+            ui:PromiseOfFte():next(function()
+                p:resolve()
+            end)
+        end)
+        UIKit:newGameUI("GameUIDragonEyrieDetailFte",self.city,self.building,self:GetCurrentDragon():Type()):AddToCurrentScene(false)
+        self:DestroyFteLayer()
+    end)
+
+    local r = self:FindDetailBtn():getCascadeBoundingBox()
+    WidgetFteArrow.new(_("点击详情:学习技能"))
+        :addTo(self:GetFteLayer()):TurnRight():align(display.RIGHT_CENTER, r.x - 10, r.y + r.height/2)
+
+    return p
 end
 
 

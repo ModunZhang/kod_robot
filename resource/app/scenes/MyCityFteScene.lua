@@ -185,10 +185,9 @@ function MyCityFteScene:OpenUI(building, default_tab)
     local city = self:GetCity()
     local User = city:GetUser()
     if iskindof(building, "HelpedTroopsSprite") then
-        local helped = User.helpedByTroops[building:GetIndex()]
+        local helped = User.helpedByTroop
         local user = self.city:GetUser()
-        NetManager:getHelpDefenceTroopDetailPromise(user:Id(),helped.id):done(function(response)
-            LuaUtils:outputTable("response", response)
+        NetManager:getHelpDefenceTroopDetailPromise(user:Id()):done(function(response)
             UIKit:newGameUI("GameUIHelpDefence",self.city, helped ,response.msg.troopDetail):AddToCurrentScene(true)
         end)
         return
@@ -207,7 +206,7 @@ function MyCityFteScene:OpenUI(building, default_tab)
     elseif type_ == "airship" then
         local dragon_manger = city:GetDragonEyrie():GetDragonManager()
         local dragon_type = dragon_manger:GetCanFightPowerfulDragonType()
-        if #dragon_type > 0 or dragon_manger:GetDefenceDragon() then
+        if #dragon_type > 0 or UtilsForDragon:GetDefenceDragon(User) then
             app:EnterPVEFteScene(city:GetUser():GetLatestPveIndex())
         else
             UIKit:showMessageDialog(_("主人"),_("需要一条空闲状态的魔龙才能探险"))
@@ -285,7 +284,7 @@ function MyCityFteScene:RunFte()
         end
     end):next(function()
 
-            cc.ui.UIPushButton.new({normal = "skip.png",pressed = "skip.png"})
+            cc.ui.UIPushButton.new({normal = "skip1.png",pressed = "skip1.png"})
                 :addTo(self, 1000000):align(display.RIGHT_TOP, display.width, display.height)
                 :onButtonClicked(function(event)
                     event.target:setButtonEnabled(false)

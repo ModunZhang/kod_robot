@@ -117,7 +117,7 @@ function Item:ctor(parent_ui)
         :onButtonClicked(function(event)
             local building = self.building
             if self.status == "free" then
-                local event = User:GetBuildingEventByLocation(self:GetCurrentLocation())
+                local event = UtilsForBuilding:GetBuildingEventByLocation(User, self:GetCurrentLocation())
                 if event then
                     local time = UtilsForEvent:GetEventInfo(event)
                     if time > 2 then
@@ -216,7 +216,7 @@ function Item:ctor(parent_ui)
                     end)
                 end
             elseif self.status == "building" then
-                local event = User:GetBuildingEventByLocation(self:GetCurrentLocation())
+                local event = UtilsForBuilding:GetBuildingEventByLocation(User, self:GetCurrentLocation())
                 UIKit:newGameUI("GameUIBuildingSpeedUp", event):AddToCurrentScene(true)
             end
         end)
@@ -257,7 +257,7 @@ function Item:UpdateByBuilding(building)
     local User = building:BelongCity():GetUser()
     self.building = building
     repeat
-        local event = User:GetBuildingEventByLocation(self:GetCurrentLocation())
+        local event = UtilsForBuilding:GetBuildingEventByLocation(User, self:GetCurrentLocation())
         if event then
             local time, percent = UtilsForEvent:GetEventInfo(event)
             local can_free_speedUp = time <= DataUtils:getFreeSpeedUpLimitTime()
@@ -301,7 +301,7 @@ function Item:GetCurrentLocation()
 end
 function Item:UpdateDesc(building)
     local User = building:BelongCity():GetUser()
-    local event = User:GetBuildingEventByLocation(self:GetCurrentLocation())
+    local event = UtilsForBuilding:GetBuildingEventByLocation(User, self:GetCurrentLocation())
     if event then
         if building:GetNextLevel() == 1 then
             self.desc_label:setString(building:IsHouse() and _("正在建造") or _("正在解锁"))
@@ -406,8 +406,10 @@ function GameUIHasBeenBuild:OnMoveInStage()
     self.build_city:GetUser():AddListenOnType(self, "buildingEvents")
     scheduleAt(self, function()
         local City = self.build_city
-        self.queue:SetBuildingQueue(City:GetAvailableBuildQueueCounts(),
-            City:GetUser().basicInfo.buildQueue)
+        self.queue:SetBuildingQueue(
+            UtilsForBuilding:GetFreeBuildQueueCount(City:GetUser()),
+            City:GetUser().basicInfo.buildQueue
+        )
         self:RefreshAllItems()
     end)
 end

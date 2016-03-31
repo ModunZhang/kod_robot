@@ -31,40 +31,13 @@ function UpgradeBuilding:ctor(building_info)
     self.config_building_function = GameDatas.BuildingFunction
     self.level = building_info.level and building_info.level or 1
     self.upgrade_to_next_level_time = (building_info.finishTime == nil) and 0 or building_info.finishTime
-    self.upgrade_building_observer = Observer.new()
     self.unique_upgrading_key = nil
 end
 function UpgradeBuilding:GetRealEntity()
     return self
 end
-function UpgradeBuilding:GetFreeSpeedupTime()
-    return DataUtils:getFreeSpeedUpLimitTime()
-end
-function UpgradeBuilding:EventType()
-    return self:IsHouse() and "houseEvents" or "buildingEvents"
-end
 function UpgradeBuilding:UniqueUpgradingKey()
     return self.unique_upgrading_key
-end
-function UpgradeBuilding:ResetAllListeners()
-    self:GetUpgradeObserver():RemoveAllObserver()
-end
-function UpgradeBuilding:AddUpgradeListener(listener)
-    assert(listener.OnBuildingUpgradingBegin)
-    assert(listener.OnBuildingUpgradeFinished)
-    assert(listener.OnBuildingUpgrading)
-    self.upgrade_building_observer:AddObserver(listener)
-    return self
-end
-function UpgradeBuilding:RemoveUpgradeListener(listener)
-    self.upgrade_building_observer:RemoveObserver(listener)
-end
-function UpgradeBuilding:GetUpgradeObserver()
-    return self.upgrade_building_observer
-end
-function UpgradeBuilding:GetUpgradingLeftTimeByCurrentTime(current_time)
-    local left_time = self.upgrade_to_next_level_time - current_time
-    return left_time > 0 and left_time or 0
 end
 function UpgradeBuilding:CanUpgrade()
     local legal = self:IsBuildingUpgradeLegal()
@@ -82,35 +55,15 @@ end
 function UpgradeBuilding:IsUpgrading()
     return self.upgrade_to_next_level_time ~= 0
 end
-function UpgradeBuilding:InstantUpgradeBy(level)
-    self:InstantUpgradeTo(self.level + level)
-end
 function UpgradeBuilding:InstantUpgradeTo(level)
-    local is_upgrading = self.upgrade_to_next_level_time ~= 0
     self.level = level
     self.upgrade_to_next_level_time = 0
-
-    -- self:CancelLocalPush()
-    self.upgrade_building_observer:NotifyObservers(function(listener)
-        listener:OnBuildingUpgradeFinished(self, is_upgrading)
-    end)
-end
-function UpgradeBuilding:UpgradeByCurrentTime(current_time)
-    -- self:GeneralLocalPush()
-    self.upgrade_building_observer:NotifyObservers(function(listener)
-        listener:OnBuildingUpgradingBegin(self, current_time)
-    end)
 end
 function UpgradeBuilding:GetUpgradeTimeToNextLevel()
-    return self:GetNextLevelUpgradeTimeByLevel(self.level)
-end
-function UpgradeBuilding:GetNextLevelUpgradeTimeByLevel(level)
-    local config = self.config_building_levelup[self:GetType()]
-    if config then
-        local is_max_level = #config == level
-        return is_max_level and 0 or config[level + 1].buildTime
-    end
-    return 1
+    return UtilsForBuilding:GetLevelUpConfigBy(
+        self:BelongCity():GetUser(), 
+        {type = self:GetType(), level = self.level + 1}
+    ).buildTime
 end
 function UpgradeBuilding:GetNextLevel()
     return self:IsMaxLevel() and self.level or self.level + 1
@@ -119,13 +72,6 @@ function UpgradeBuilding:IsMaxLevel()
     local config = self.config_building_levelup[self:GetType()]
     return #config == self.level
 end
-function UpgradeBuilding:GetBeforeLevel()
-    if self.level > 0 then
-        return self.level - 1
-    else
-        return 0
-    end
-end
 function UpgradeBuilding:GetEfficiencyLevel()
     return self.level <= 0 and 1 or self.level
 end
@@ -133,24 +79,8 @@ function UpgradeBuilding:GetLevel()
     return self.level
 end
 
--- function UpgradeBuilding:GeneralLocalPush()
---     local pushIdentity = self.x .. self.y .. self.w .. self.h .. self.orient
---     local title = format(_("修建%s到LV%d完成"),Localize.getLocaliedKeyByType(self.building_type),(self.level+1))
---     app:GetPushManager():UpdateBuildPush(self.upgrade_to_next_level_time,title,pushIdentity)
--- end
--- function UpgradeBuilding:CancelLocalPush()
---     local pushIdentity = self.x .. self.y .. self.w .. self.h .. self.orient
---     app:GetPushManager():CancelBuildPush(pushIdentity)
--- end
 function UpgradeBuilding:IsNeedToUpdate()
     return self.upgrade_to_next_level_time ~= 0
-end
-function UpgradeBuilding:OnTimer(current_time)
-    if self.upgrade_to_next_level_time >= current_time then
-        self.upgrade_building_observer:NotifyObservers(function(listener)
-            listener:OnBuildingUpgrading(self, current_time)
-        end)
-    end
 end
 function UpgradeBuilding:OnUserDataChanged(userData, current_time, location_info, house_location_info, deltaData, event)
     local level, finished_time, type_
@@ -189,10 +119,8 @@ function UpgradeBuilding:OnHandle(level, finish_time)
         if self.upgrade_to_next_level_time == 0 and finish_time ~= 0 then
             self.upgrade_to_next_level_time = finish_time
             local total = self:GetUpgradeTimeToNextLevel()
-            self:UpgradeByCurrentTime(finish_time - total - DataUtils:getBuildingBuff(total))
         elseif self.upgrade_to_next_level_time ~= 0 and finish_time ~= 0 then
             self.upgrade_to_next_level_time = finish_time
-            -- self:GeneralLocalPush()
         elseif self.upgrade_to_next_level_time ~= 0 and finish_time == 0 then
             self:InstantUpgradeTo(level)
         end
@@ -202,7 +130,6 @@ function UpgradeBuilding:OnHandle(level, finish_time)
         else
             self.level = level
             self.upgrade_to_next_level_time = finish_time
-            -- self:GeneralLocalPush()
         end
     end
 end
@@ -288,7 +215,8 @@ function UpgradeBuilding:IsBuildingUpgradeLegal()
         return UpgradeBuilding.NOT_ABLE_TO_UPGRADE.TILE_NOT_UNLOCKED
     end
     -- 是否达到建造上限
-    if city:GetFirstBuildingByType("keep"):GetFreeUnlockPoint() < 1 and self.level==0 then
+    
+    if UtilsForBuilding:GetFreeUnlockPoint(city:GetUser()) < 1 and self.level==0 then
         return UpgradeBuilding.NOT_ABLE_TO_UPGRADE.IS_MAX_UNLOCK
     end
     local config
@@ -386,7 +314,8 @@ function UpgradeBuilding:IsAbleToUpgrade(isUpgradeNow)
         or m.blueprints<config[self:GetNextLevel()].blueprints
         or m.pulley<config[self:GetNextLevel()].pulley
     local max = User.basicInfo.buildQueue
-    local current = max - #city:GetUpgradingBuildings()
+
+    local current = max - UtilsForBuilding:GetBuildingEventsCount(User)
 
     if is_resource_enough and current <= 0 then
         return UpgradeBuilding.NOT_ABLE_TO_UPGRADE.BUILDINGLIST_AND_RESOURCE_NOT_ENOUGH
@@ -400,12 +329,10 @@ function UpgradeBuilding:IsAbleToUpgrade(isUpgradeNow)
 end
 
 function UpgradeBuilding:getUpgradeNowNeedGems()
-    local resource_config = DataUtils:getBuildingUpgradeRequired(self.building_type, self:GetNextLevel())
-    local required_gems = 0
-    required_gems = required_gems + DataUtils:buyResource(resource_config.resources, {})
-    required_gems = required_gems + DataUtils:buyMaterial(resource_config.materials, {})
-    required_gems = required_gems + DataUtils:getGemByTimeInterval(resource_config.buildTime)
-    return required_gems
+    return UtilsForBuilding:GetUpgradeNowGems(
+            self:BelongCity():GetUser(), 
+            {type = self.building_type , level = self:GetNextLevel()}
+        )
 end
 
 function UpgradeBuilding:getUpgradeRequiredGems()
@@ -423,15 +350,10 @@ function UpgradeBuilding:getUpgradeRequiredGems()
     required_gems = required_gems + DataUtils:buyResource(resource_config.resources, has_resourcce)
     required_gems = required_gems + DataUtils:buyMaterial(resource_config.materials, has_materials)
     --当升级队列不足时，立即完成正在升级的建筑中所剩升级时间最少的建筑
-    if city:GetAvailableBuildQueueCounts() == 0 then
-        local min_time = math.huge
-        for k,v in pairs(city:GetUpgradingBuildings()) do
-            local left_time = v:GetUpgradingLeftTimeByCurrentTime(app.timer:GetServerTime())
-            if left_time<min_time then
-                min_time=left_time
-            end
-        end     
-        required_gems = required_gems + DataUtils:getGemByTimeInterval(min_time)
+    local shortest_event = UtilsForBuilding:GetBuildingEventsBySeq(User)[1]
+    if UtilsForBuilding:GetFreeBuildQueueCount(User) == 0 and shortest_event then
+        local time = UtilsForEvent:GetEventInfo(shortest_event)     
+        required_gems = required_gems + DataUtils:getGemByTimeInterval(time)
     end
 
     return required_gems

@@ -10,65 +10,15 @@ local DragonManager = class("DragonManager", MultiObserver)
 local AutomaticUpdateResource = import(".AutomaticUpdateResource")
 local Dragon = import(".Dragon")
 local promise = import("..utils.promise")
-local DragonEvent = import(".DragonEvent")
-local DragonDeathEvent = import(".DragonDeathEvent")
 local config_intInit = GameDatas.PlayerInitData.intInit
 
-DragonManager.LISTEN_TYPE = Enum("OnHPChanged","OnBasicChanged","OnDragonHatched",
-    -- "OnDragonEventChanged","OnDragonEventTimer",
-    -- "OnDefencedDragonChanged",
-    "OnDragonDeathEventChanged","OnDragonDeathEventTimer","OnDragonDeathEventRefresh")
+DragonManager.LISTEN_TYPE = Enum("OnHPChanged","OnBasicChanged","OnDragonHatched")
 
 
 function DragonManager:ctor()
     DragonManager.super.ctor(self)
     self.dragons_hp = {}
-    -- self.dragon_events = {} --孵化事件
     self.dragonDeathEvents = {} --复活事件
-end
-function DragonManager:GetEnableHatedDragon()
-    -- if self:HaveDragonHateEvent() then
-    --     return
-    -- end
-    for _,dragon in pairs(self:GetDragons()) do
-        if not dragon:Ishated() then
-            return dragon
-        end
-    end
-end
-function DragonManager:IsAllHated()
-    local count = 0
-    -- if self:HaveDragonHateEvent() then
-    --     count = count + 1
-    -- end
-    local max = 0
-    for _,dragon in pairs(self:GetDragons()) do
-        max = max + 1
-        if dragon:Ishated() then
-            count = count + 1
-        end
-    end
-    return max == count
-end
-function DragonManager:IsHateEnable()
-    -- if self:HaveDragonHateEvent() then
-    --     return false
-    -- end
-    for _,dragon in pairs(self:GetDragons()) do
-        if not dragon:Ishated() then
-            return true
-        end
-    end
-    return false
-end
-function DragonManager:GetHatedCount()
-    local count = 0
-    for _,dragon in pairs(self:GetDragons()) do
-        if dragon:Ishated() then
-            count = count + 1
-        end
-    end
-    return count
 end
 function DragonManager:GetDragonArray()
     local arr = {"redDragon","greenDragon","blueDragon"}
@@ -187,82 +137,6 @@ end
 
 function DragonManager:OnUserDataChanged(user_data, current_time, deltaData,hp_recovery_perHour)
     self:RefreshDragonData(user_data.dragons,current_time,hp_recovery_perHour,deltaData)
-    self:RefreshDragonDeathEvents(user_data,deltaData)
-end
-
---复活事件
-function DragonManager:RefreshDragonDeathEvents(user_data,deltaData)
-    if not user_data.dragonDeathEvents then return end
-    local is_fully_update = deltaData == nil
-    local is_delta_update = not is_fully_update and deltaData.dragonDeathEvents ~= nil
-    local is_full_array = is_delta_update and not deltaData.dragonDeathEvents.add and not deltaData.dragonDeathEvents.edit and not deltaData.dragonDeathEvents.remove
-
-    if is_fully_update or is_full_array then
-        for __,v in pairs(self.dragonDeathEvents) do
-            v:Reset()
-        end
-        self.dragonDeathEvents = {}
-        for _,v in ipairs(user_data.dragonDeathEvents) do
-            if not self.dragonDeathEvents[v.dragonType] then
-                local dragonDeathEvent = DragonDeathEvent.new()
-                dragonDeathEvent:UpdateData(v)
-                dragonDeathEvent:AddObserver(self)
-                self.dragonDeathEvents[dragonDeathEvent:DragonType()] = dragonDeathEvent
-            end
-        end
-        self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDragonDeathEventRefresh,function(listener)
-            listener.OnDragonDeathEventRefresh(listener,self.dragonDeathEvents)
-        end)
-    end
-    if is_delta_update and not is_full_array then
-        local changed_map = GameUtils:Handler_DeltaData_Func(
-            deltaData.dragonDeathEvents
-            ,function(event_data)
-                local dragonDeathEvent = DragonDeathEvent.new()
-                dragonDeathEvent:UpdateData(event_data)
-                dragonDeathEvent:AddObserver(self)
-                self.dragonDeathEvents[dragonDeathEvent:DragonType()] = dragonDeathEvent
-                return dragonDeathEvent
-            end
-            ,function(event_data)
-                if self.dragonDeathEvents[event_data.dragonType] then
-                    local dragonDeathEvent = self.dragonDeathEvents[event_data.dragonType]
-                    dragonDeathEvent:UpdateData(event_data)
-                end
-                return dragonDeathEvent
-            end
-            ,function(event_data)
-                if self.dragonDeathEvents[event_data.dragonType] then
-                    local dragonDeathEvent = self.dragonDeathEvents[event_data.dragonType]
-                    dragonDeathEvent:Reset()
-                    self.dragonDeathEvents[event_data.dragonType] = nil
-                    dragonDeathEvent = DragonDeathEvent.new()
-                    dragonDeathEvent:UpdateData(event_data)
-                    GameGlobalUI:showTips(_("提示"),string.format(_("%s已经复活"),Localize.dragon[event_data.dragonType]))
-                    return dragonDeathEvent
-                end
-            end
-        )
-        self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDragonDeathEventChanged,function(listener)
-            listener.OnDragonDeathEventChanged(listener,GameUtils:pack_event_table(changed_map))
-        end)
-    end
-end
-
-function DragonManager:IteratorDragonDeathEvents(func)
-    for __,v in pairs(self.dragonDeathEvents) do
-        func(v)
-    end
-end
-
-function DragonManager:GetDragonDeathEventByType(dragonType)
-    return self.dragonDeathEvents[dragonType]
-end
-
-function DragonManager:OnDragonDeathEventTimer(dragonDeathEvent)
-    self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDragonDeathEventTimer,function(listener)
-        listener.OnDragonDeathEventTimer(listener,dragonDeathEvent)
-    end)
 end
 
 function DragonManager:RefreshDragonData( dragons,resource_refresh_time,hp_recovery_perHour,deltaData)
@@ -284,6 +158,7 @@ function DragonManager:RefreshDragonData( dragons,resource_refresh_time,hp_recov
                 local dragonIsHated_ = dragon:Ishated()
                 local isDefenced = dragon:IsDefenced()
                 local old_star = dragon:Star()
+                local old_level = dragon:Level()
                 dragon:Update(v) -- include UpdateEquipmetsAndSkills
                 --[[  
                     dannyhe:修复龙血刷新界面bug,如果不是血的字段更新，这里会设置被为最初的值
@@ -293,6 +168,7 @@ function DragonManager:RefreshDragonData( dragons,resource_refresh_time,hp_recov
                 if reallyHp > 0 then dragon:SetHp(reallyHp) end
 
                 local star_chaned =  dragon:Star() > old_star
+                local level_chaned = old_level ~= 0 and dragon:Level() > old_level
                 if not need_notify_defence then
                     need_notify_defence = isDefenced ~= dragon:IsDefenced()
                 end
@@ -309,19 +185,20 @@ function DragonManager:RefreshDragonData( dragons,resource_refresh_time,hp_recov
                         listener.OnBasicChanged(listener,dragon,star_chaned)
                     end)
                 end
+                if level_chaned then
+                    if not UIKit:GetUIInstance("GameUIPveSummary") then
+                        UIKit:newGameUI("GameUIShowDragonUpStarAnimation",dragon,true):AddToCurrentScene(true)
+                    end
+                end
             end
         end
         if need_notify_defence then
-            -- self:NotifyListeneOnType(DragonManager.LISTEN_TYPE.OnDefencedDragonChanged,function(listener)
-            --     listener.OnDefencedDragonChanged(listener,self:GetDefenceDragon())
-            -- end)
             if DragonManager.defence_callback then
                 DragonManager.defence_callback()
                 DragonManager.defence_callback = nil
             end
         end
     end
-    self:CheckFinishEquipementDragonPormise()
 end
 
 
@@ -383,9 +260,6 @@ end
 function DragonManager:OnTimer(current_time)
     self:UpdateHPResourceByTime(current_time)
     self:OnHPChanged()
-    self:IteratorDragonDeathEvents(function(dragonDeathEvent)
-        dragonDeathEvent:OnTimer(current_time)
-    end)
 end
 
 function DragonManager:OnHPChanged()
@@ -394,28 +268,6 @@ function DragonManager:OnHPChanged()
     end)
 end
 --新手引导
-DragonManager.promise_callbacks = {}
-function DragonManager:PromiseOfFinishEquipementDragon()
-    local p = promise.new()
-    table.insert(self.promise_callbacks, function(dragon)
-        if dragon:Ishated() then
-            for _,eq in pairs(dragon:Equipments()) do
-                if eq:IsLoaded() then
-                    return p:resolve()
-                end
-            end
-        end
-    end)
-    return p
-end
-
-function DragonManager:CheckFinishEquipementDragonPormise()
-    for _,dragon in pairs(self:GetDragons()) do
-        if #self.promise_callbacks > 0 and self.promise_callbacks[1](dragon) then
-            table.remove(self.promise_callbacks, 1)
-        end
-    end
-end
 function DragonManager:PromiseOfHate()
     local p = promise.new()
     DragonManager.hate_callback = function()

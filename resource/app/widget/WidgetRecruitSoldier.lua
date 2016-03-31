@@ -41,12 +41,12 @@ function WidgetRecruitSoldier:ctor(barracks, city, soldier_name, soldier_star)
     self.barracks = barracks
     self.soldier_name = soldier_name
     
-    
-    self.star = soldier_star or city:GetUser():SoldierStarByName(soldier_name)
+    self.star = soldier_star or UtilsForSoldier:SoldierStarByName(city:GetUser(), soldier_name)
     local soldier_config, aaa = self:GetConfigBySoldierTypeAndStar(soldier_name, self.star)
-    self.recruit_max = barracks:GetMaxRecruitSoldierCount()
+    self.recruit_max = UtilsForBuilding:GetMaxRecruitSoldier(city:GetUser())
+
     if soldier_config.citizen ~= 0 then
-        self.recruit_max = math.floor(barracks:GetMaxRecruitSoldierCount()/soldier_config.citizen)
+        self.recruit_max = math.floor(UtilsForBuilding:GetMaxRecruitSoldier(city:GetUser())/soldier_config.citizen)
     end
     self.city = city
 
@@ -476,7 +476,7 @@ function WidgetRecruitSoldier:onEnter()
         local res_map = {}
         if not self.soldier_config.specialMaterials then
             res_map.wood = User:GetResValueByType("wood")
-            res_map.food = User:GetResValueByType("food")
+            res_map.food = User:GetDelayTimeResValueByType("food",5)
             res_map.iron = User:GetResValueByType("iron")
             res_map.stone = User:GetResValueByType("stone")
             res_map.citizen = User:GetResValueByType("citizen")
@@ -634,6 +634,7 @@ function WidgetRecruitSoldier:GetCurrentMaxRecruitNum(total_resouce)
     local soldier_config = self.soldier_config
     local total_map = total_resouce
     local max_count = math.huge
+    local effect = UtilsForTech:GetEffect("recruitment", User.productionTechs["recruitment"])
     for k, v in pairs(self.res_map) do
         local total,temp_max
         if soldier_config.specialMaterials then
@@ -647,7 +648,7 @@ function WidgetRecruitSoldier:GetCurrentMaxRecruitNum(total_resouce)
             end
         else
             total = total_map[k] == nil and 0 or total_map[k]
-            temp_max = math.floor(total / soldier_config[k])
+            temp_max = math.floor(total / (soldier_config[k] * (k == "citizen" and 1 or (1 - effect))))
         end
         max_count = math.min(max_count,temp_max)
     end

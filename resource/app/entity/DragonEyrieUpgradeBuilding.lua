@@ -43,11 +43,12 @@ function DragonEyrieUpgradeBuilding:GetDragonManager()
 end
 -- 检查当前能否解锁一条龙
 function DragonEyrieUpgradeBuilding:CheckIfHateDragon()
-    return self:GetDragonManager():GetHatedCount() < config_function[self:GetLevel()].dragonCount
+    return #UtilsForDragon:GetHatedDragons(self:BelongCity():GetUser()) 
+         < config_function[self:GetLevel()].dragonCount
 end
 -- 解锁下一条龙的龙巢等级
 function DragonEyrieUpgradeBuilding:GetNextHateLevel()
-    local current_count = self:GetDragonManager():GetHatedCount()
+    local current_count = #UtilsForDragon:GetHatedDragons(self:BelongCity():GetUser())
     for i = 1,#config_function do
         if config_function[i].dragonCount > current_count then
             return i

@@ -87,7 +87,7 @@ function GameUIHelp:IsAbleToHelpAll()
     return false
 end
 function GameUIHelp:SetLoyalty()
-    self.loyalty_label:setString(_("每日获得最大忠诚度：")..User.countInfo.todayLoyaltyGet.."/"..intInit.maxLoyaltyGetPerDay.value)
+    self.loyalty_label:setString(_("每日获得最大忠诚度：").." "..User.countInfo.todayLoyaltyGet.."/"..intInit.maxLoyaltyGetPerDay.value)
     self.ProgressTimer:setPercentage(math.floor(User.countInfo.todayLoyaltyGet/10000*100))
 end
 function GameUIHelp:InitHelpEvents()

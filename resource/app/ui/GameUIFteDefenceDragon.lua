@@ -1,4 +1,4 @@
-local GameUIFteDefenceDragon = UIKit:createUIClass("GameUIFteDefenceDragon", "GameUIAllianceSendTroops")
+local GameUIFteDefenceDragon = UIKit:createUIClass("GameUIFteDefenceDragon", "GameUISendTroopNew")
 local DiffFunction = import("..utils.DiffFunction")
 
 

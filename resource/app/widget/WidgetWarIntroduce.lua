@@ -43,24 +43,29 @@ function WidgetWarIntroduce:ctor()
         _("战前期：就是干（注意协防己方玩家城市）。击溃敌方城市可获得额外联盟荣耀值。"),
         _("保护期：战争期结束后，开战的两个联盟会进入保护期。其他联盟无法对处于保护期的联盟发起联盟战。但处于保护期的联盟可以主动破除保护，对其他联盟发起联盟战。"),
     }
-    local x,y = -280 , 0
     local total_size = 0
+    local labels = {}
     for i,v in ipairs(info) do
-        local star = display.newSprite("icon_star_22x20.png"):addTo(content):align(display.LEFT_TOP,x,y)
-        local label = UIKit:ttfLabel({
+        local label =  UIKit:ttfLabel({
             text = v,
             size = 20,
             color = 0x403c2f,
             dimensions = cc.size(530,0)
-        }):align(display.LEFT_TOP, x + 30, y)
-            :addTo(content)
-        y = y - label:getContentSize().height
+        })
+        table.insert(labels,label) 
         total_size = total_size + label:getContentSize().height
     end
 
-
+    content:setContentSize(cc.size(560,total_size))
+    local x,y = 0,total_size
+    for i,label in ipairs(labels) do
+        local star = display.newSprite("icon_star_22x20.png"):addTo(content):align(display.LEFT_TOP,x,y)
+        label:align(display.LEFT_TOP, x + 30, y)
+            :addTo(content)
+        y = y - label:getContentSize().height
+    end
     item:addContent(content)
-    item:setItemSize(560, total_size/2)
+    item:setItemSize(560, total_size)
     listview:addItem(item)
     listview:reload()
 end

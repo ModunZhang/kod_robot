@@ -52,8 +52,13 @@ intInit["allianceRegionMapHeight"] = {
 }
 intInit["citizenPerLeadership"] = {
 	["type"] = "citizenPerLeadership",
-	["value"] = 100,
+	["value"] = 20,
 	["desc"] = "每一点龙的领导力带领多少兵力"
+}
+intInit["maxTroopPerDragon"] = {
+	["type"] = "maxTroopPerDragon",
+	["value"] = 6,
+	["desc"] = "每条龙最多带多少部队"
 }
 intInit["dragonStrikeHpDecreasedPercent"] = {
 	["type"] = "dragonStrikeHpDecreasedPercent",
@@ -134,4 +139,9 @@ intInit["allianceFightRewardGem"] = {
 	["type"] = "allianceFightRewardGem",
 	["value"] = 100,
 	["desc"] = "联盟战宝石奖励"
+}
+intInit["canBuyAllianceArchonMinutes"] = {
+	["type"] = "canBuyAllianceArchonMinutes",
+	["value"] = 10080,
+	["desc"] = "多长时间能购竞选联盟盟主职位"
 }

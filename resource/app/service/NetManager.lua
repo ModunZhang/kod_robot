@@ -12,6 +12,7 @@ NetManager = {}
 -- 过滤器
 local function get_player_response_msg(response)
     if response.msg.playerData then
+        -- LuaUtils:outputTable(response)
         local user_data = DataManager:getUserData()
         local edit = decodeInUserDataFromDeltaData(user_data, response.msg.playerData)
         -- LuaUtils:outputTable("get_player_response_msg edit",edit)
@@ -335,9 +336,10 @@ function NetManager:init()
     self.m_netService:init()
 
     self.m_updateServer = {
-        host = CONFIG_IS_LOCAL and CONFIG_LOCAL_SERVER.update.host or CONFIG_REMOTE_SERVER.update.host,
-        port = CONFIG_IS_LOCAL and CONFIG_LOCAL_SERVER.update.port or CONFIG_REMOTE_SERVER.update.port,
-        name = CONFIG_IS_LOCAL and CONFIG_LOCAL_SERVER.update.name or CONFIG_REMOTE_SERVER.update.name,
+        host = "http://gate.batcatstudio.com",
+        port = 80,
+        name = "DragonfallAutoUpdateServer",
+        basePath = "",
     }
     self.m_gateServer = {
         host = CONFIG_IS_LOCAL and CONFIG_LOCAL_SERVER.gate.host or CONFIG_REMOTE_SERVER.gate.host,
@@ -715,6 +717,7 @@ end
 -- 获取服务器列表
 function NetManager:getLogicServerInfoPromise()
     local device_id = device.getOpenUDID()
+    local device_tag = app.client_tag
     local platform = ''
     if device.platform == 'windows' then
         platform = 'wp'
@@ -729,7 +732,6 @@ function NetManager:getLogicServerInfoPromise()
     elseif device.platform == 'wp8' then
         platform = 'wp'
     end
-    local device_tag = app.client_tag
     if not device_tag then -- fix tag nil
         device_tag = self:tryGetAppTag()
         if not device_tag then
@@ -738,7 +740,7 @@ function NetManager:getLogicServerInfoPromise()
             end)
         end
     end
-    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {platform = platform,deviceId = device_id,tag = -1}, "获取逻辑服务器失败",true)
+    return get_none_blocking_request_promise("gate.gateHandler.queryEntry", {platform = platform,deviceId = device_id,tag = device_tag}, "获取逻辑服务器失败",true)
         :done(function(result)
             self:CleanAllEventListeners()
             self.m_netService:disconnect()
@@ -866,7 +868,7 @@ function NetManager:getUpgradeHouseByLocationPromise(location, sub_location)
 end
 function NetManager:getInstantUpgradeHouseByLocationPromise(location, sub_location)
     return get_upgradeHouse_promise(location, sub_location, true):done(function()
-        local house = User:GetHouseByLocation(location, sub_location)
+        local house = UtilsForBuilding:GetHouseByLocation(User, location, sub_location)
         GameGlobalUI:showTips(_("提示"),
             string.format(_("建造%s至%d级完成"),
                 Localize.building_name[house.type], house.level))
@@ -885,7 +887,7 @@ function NetManager:getUpgradeBuildingByLocationPromise(location)
 end
 function NetManager:getInstantUpgradeBuildingByLocationPromise(location)
     return get_upgradeBuilding_promise(location, true):done(function()
-        local building = User:GetBuildingByLocation(location)
+        local building = UtilsForBuilding:GetBuildingByLocation(User, location)
         GameGlobalUI:showTips(_("提示"),
             string.format(_("建造%s至%d级完成"),
                 Localize.building_name[building.type], building.level))
@@ -898,7 +900,7 @@ function NetManager:getUpgradeTowerPromise()
 end
 function NetManager:getInstantUpgradeTowerPromise()
     return NetManager:getInstantUpgradeBuildingByLocationPromise(22):done(function()
-        local building = User:GetBuildingByLocation(22)
+        local building = UtilsForBuilding:GetBuildingByLocation(User, 22)
         GameGlobalUI:showTips(_("提示"),
             string.format(_("建造%s至%d级完成"),
                 Localize.building_name[building.type], building.level))
@@ -911,7 +913,7 @@ function NetManager:getUpgradeWallByLocationPromise()
 end
 function NetManager:getInstantUpgradeWallByLocationPromise()
     return NetManager:getInstantUpgradeBuildingByLocationPromise(21):done(function()
-        local building = User:GetBuildingByLocation(21)
+        local building = UtilsForBuilding:GetBuildingByLocation(User, 21)
         GameGlobalUI:showTips(_("提示"),
             string.format(_("建造%s至%d级完成"),
                 Localize.building_name[building.type], building.level))
@@ -1119,6 +1121,7 @@ function NetManager:getSendPersonalMailPromise(memberId, title, content , contac
         content = content,
     }, "发送个人邮件失败!"):done(get_response_msg):done(function ( response )
         GameGlobalUI:showTips(_("提示"),_("发送邮件成功"))
+        app:GetAudioManager():PlayeEffectSoundWithKey("OPEN_MAIL")
         if contacts then
             -- 保存联系人
             contacts.time = app.timer:GetServerTime()
@@ -1190,6 +1193,7 @@ function NetManager:getSendAllianceMailPromise(title, content)
         content = content,
     }, "发送联盟邮件失败!"):done(get_player_response_msg):done(function ( response )
         GameGlobalUI:showTips(_("提示"),_("发送邮件成功"))
+        app:GetAudioManager():PlayeEffectSoundWithKey("OPEN_MAIL")
         return response
     end)
 end
@@ -1347,6 +1351,13 @@ function NetManager:getPlayerInfoPromise(memberId,serverId)
         memberId = memberId,
         serverId = serverId
     }, "获取玩家信息失败!"):done(get_player_response_msg)
+end
+-- 模糊查询玩家
+function NetManager:getSearchPlayerByNamePromise(name,fromIndex)
+    return get_blocking_request_promise("logic.playerHandler.searchPlayerByName", {
+        name = name,
+        fromIndex = fromIndex
+    }, "模糊查询玩家信息失败!"):done(get_player_response_msg)
 end
 -- 获取玩家城市信息
 function NetManager:getPlayerCityInfoPromise(targetPlayerId)
@@ -1531,7 +1542,7 @@ function NetManager:getAllianceInfoPromise(allianceId,serverId)
 end
 --请求联盟基本数据
 function NetManager:getAllianceBasicInfoPromise(allianceId,serverId)
-    return get_none_blocking_request_promise("logic.allianceHandler.getAllianceBasicInfo",{allianceId = allianceId , serverId = serverId},
+    return get_blocking_request_promise("logic.allianceHandler.getAllianceBasicInfo",{allianceId = allianceId , serverId = serverId},
         "请求联盟基本数据失败!",false,0)
 end
 
@@ -1548,9 +1559,7 @@ end
 --撤销协防
 function NetManager:getRetreatFromHelpedAllianceMemberPromise(beHelpedPlayerId)
     return get_blocking_request_promise("logic.allianceHandler.retreatFromBeHelpedAllianceMember",
-        {
-            beHelpedPlayerId = beHelpedPlayerId,
-        },
+        {beHelpedPlayerId = beHelpedPlayerId},
         "撤销协防失败!"):done(get_player_response_msg)
 end
 --复仇其他联盟
@@ -1592,15 +1601,16 @@ end
 
 --设置驻防使用的龙
 function NetManager:getSetDefenceTroopPromise(dragonType,soldiers)
-    return get_none_blocking_request_promise("logic.playerHandler.setDefenceTroop",
+    return get_blocking_request_promise("logic.playerHandler.setDefenceTroop",
         {dragonType=dragonType,soldiers=soldiers},
         "设置驻防使用的龙失败!"):done(get_player_response_msg):done(function()
             GameGlobalUI:showTips(_("提示"),_("驻防成功"))
+            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_RECRUIT")
         end)
 end
 --取消龙驻防
 function NetManager:getCancelDefenceTroopPromise()
-    return get_none_blocking_request_promise("logic.playerHandler.cancelDefenceTroop",
+    return get_blocking_request_promise("logic.playerHandler.cancelDefenceTroop",
         nil,
         "取消龙驻防失败!"):done(get_player_response_msg)
 end
@@ -1640,9 +1650,9 @@ function NetManager:getHelpDefenceMarchEventDetailPromise(eventId)
         {eventId = eventId},"获取协防事件数据失败!"):done(get_player_response_msg)
 end
 --查看协防部队详细信息
-function NetManager:getHelpDefenceTroopDetailPromise(playerId,helpedByPlayerId)
+function NetManager:getHelpDefenceTroopDetailPromise(playerId)
     return get_blocking_request_promise("logic.allianceHandler.getHelpDefenceTroopDetail",
-        {playerId = playerId,helpedByPlayerId = helpedByPlayerId},"查看协防部队详细信息失败!"):done(get_player_response_msg)
+        {playerId = playerId},"查看协防部队详细信息失败!"):done(get_player_response_msg)
 end
 -- 出售商品
 function NetManager:getSellItemPromise(type,name,count,price)
@@ -1731,6 +1741,7 @@ local function upgrade_soldier_star_promise(soldierName,finishNow)
         finishNow = finishNow,
     }, "士兵晋级失败!"):done(get_player_response_msg):done(function()
         if finishNow then
+            app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
             GameGlobalUI:showTips(
                 _("士兵晋级完成"),
                 string.format(
@@ -1787,7 +1798,7 @@ function NetManager:getUseItemPromise(itemName,params,need_tips)
         itemName = itemName,
         params = params,
     }, "使用道具失败!"):done(get_player_response_msg):done(function ()
-        if not (string.find(itemName,"dragonChest") or string.find(itemName,"chest")) and itemName ~= "sweepScroll" and need_tips ~= false then
+        if not (string.find(itemName,"dragonChest") or string.find(itemName,"chest") or string.find(itemName,"redbag")) and itemName ~= "sweepScroll" and need_tips ~= false then
             if params[itemName] and params[itemName].count then
                 GameGlobalUI:showTips(_("提示"),string.format(_("使用%s道具X %d成功"),Localize_item.item_name[itemName],params[itemName].count))
             else
@@ -1970,7 +1981,7 @@ function NetManager:getAllianceRankPromise(rankType, fromRank)
 end
 -- 设置gc
 function NetManager:getBindGcPromise(type,gcId,gcName)
-    return get_none_blocking_request_promise("logic.playerHandler.bindGc",{
+    return get_blocking_request_promise("logic.playerHandler.bindGc",{
         type=type,
         gcId=gcId,
         gcName=gcName,
@@ -1979,12 +1990,12 @@ function NetManager:getBindGcPromise(type,gcId,gcName)
 end
 -- 更新GcName
 function NetManager:getUpdateGcNamePromise(gcName)
-    return get_none_blocking_request_promise("logic.playerHandler.updateGcName",{gcName=gcName},
+    return get_blocking_request_promise("logic.playerHandler.updateGcName",{gcName=gcName},
         "更新GcName失败"):done(get_player_response_msg)
 end
 -- 切换GC账号
 function NetManager:getSwitchGcPromise(gcId)
-    return get_none_blocking_request_promise("logic.playerHandler.switchGc",{gcId=gcId},
+    return get_blocking_request_promise("logic.playerHandler.switchGc",{gcId=gcId},
         "切换GC账号失败")
 end
 
@@ -2059,7 +2070,7 @@ function NetManager:getPveStageRewardPromise(stageName)
     },"领取奖励失败!"):done(get_player_response_msg)
 end
 function NetManager:getMapAllianceDatasPromise(mapIndexs)
-    return get_blocking_request_promise("logic.allianceHandler.getMapAllianceDatas",{
+    return get_none_blocking_request_promise("logic.allianceHandler.getMapAllianceDatas",{
         mapIndexs = mapIndexs,
     },"获取世界地图信息失败!")
 end
@@ -2085,13 +2096,16 @@ end
 
 ----------------------------------------------------------------------------------------------------------------
 function NetManager:getUpdateFileList(cb)
-    local updateServer = self.m_updateServer.host .. ":" .. self.m_updateServer.port .. "/update/res/fileList.json"
-    self.m_netService:get(updateServer, nil, function(success, statusCode, msg)
+    local fileListJsonPath = string.format("%s:%s%s/res/fileList.json",self.m_updateServer.host,self.m_updateServer.port,self.m_updateServer.basePath)
+    -- local fileListJsonPath = self.m_updateServer.host .. ":" .. self.m_updateServer.port .. "/update/res/fileList.json"
+    print("fileListJsonPath:",fileListJsonPath)
+    self.m_netService:get(fileListJsonPath, nil, function(success, statusCode, msg)
         cb(success and statusCode == 200, msg)
     end)
 end
 function NetManager:downloadFile(fileInfo, cb, progressCb)
-    local downloadUrl = self.m_updateServer.host .. ":" .. self.m_updateServer.port .. "/update/" .. fileInfo.path
+    -- local downloadUrl = self.m_updateServer.host .. ":" .. self.m_updateServer.port .. "/update/" .. fileInfo.path
+    local downloadUrl = string.format("%s:%s%s/%s",self.m_updateServer.host,self.m_updateServer.port,self.m_updateServer.basePath,fileInfo.path)
     local filePath = GameUtils:getUpdatePath() .. fileInfo.path
     local docPath = LuaUtils:getDocPathFromFilePath(filePath)
     if not ext.isDirectoryExist(docPath) then

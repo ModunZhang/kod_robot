@@ -38,12 +38,6 @@ end
 function TowerUpgradeBuilding:GetRealEntity()
     return self.real_entity
 end
-function TowerUpgradeBuilding:AddUpgradeListener(listener)
-    return self.real_entity:AddUpgradeListener(listener)
-end
-function TowerUpgradeBuilding:RemoveUpgradeListener(listener)
-    self.real_entity:RemoveUpgradeListener(listener)
-end
 function TowerUpgradeBuilding:IsVisible()
     return (self:GetOrient() ~= Orient.NEG_X and
         self:GetOrient() ~= Orient.NEG_Y and

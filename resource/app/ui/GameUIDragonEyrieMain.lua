@@ -21,10 +21,11 @@ local GameUIDragonDeathSpeedUp = import(".GameUIDragonDeathSpeedUp")
 local UICheckBoxButton = import(".UICheckBoxButton")
 
 -- lockDragon: 是否锁定选择龙的操作,默认不锁定
-function GameUIDragonEyrieMain:ctor(city,building,default_tab,lockDragon,fte_dragon_type)
+function GameUIDragonEyrieMain:ctor(city,building,default_tab,lockDragon,fte_dragon_type,show_setDefence_tip)
     GameUIDragonEyrieMain.super.ctor(self,city,_("龙巢"),building,default_tab)
     self.building = building
     self.city = city
+    self.show_setDefence_tip = show_setDefence_tip
     self.draong_index = 1
     self.dragon_manager = building:GetDragonManager()
     if type(lockDragon) ~= "boolean" then lockDragon = false end
@@ -66,39 +67,13 @@ function GameUIDragonEyrieMain:OnUserDataChanged_buildings(userData, deltaData)
         self.hate_button:setButtonEnabled(self.building:CheckIfHateDragon())
     end
 end
--- function GameUIDragonEyrieMain:OnDragonEventChanged()
---     local dragonEvent = self.dragon_manager:GetDragonEventByDragonType(self:GetCurrentDragon():Type())
---     if dragonEvent then
---         self:RefreshUI()
---     end
--- end
-function GameUIDragonEyrieMain:OnDragonDeathEventChanged()
-    local dragonDeathEvent = self.dragon_manager:GetDragonDeathEventByType(self:GetCurrentDragon():Type())
-    if dragonDeathEvent then
+function GameUIDragonEyrieMain:OnUserDataChanged_dragonDeathEvents(userData, deltaData)
+    if deltaData("dragonDeathEvents.add")
+        or deltaData("dragonDeathEvents.edit")
+        or deltaData("dragonDeathEvents.remove") then
         self:RefreshUI()
     end
 end
-
-function GameUIDragonEyrieMain:OnDragonDeathEventRefresh(dragonDeathEvents)
-    self:RefreshUI()
-end
-
-function GameUIDragonEyrieMain:OnDragonDeathEventTimer(dragonDeathEvent)
-    if self:GetCurrentDragon():Type() == dragonDeathEvent:DragonType()
-        and self.progress_content_death
-        and self.progress_content_death:isVisible()
-    then
-        self.progress_death:setPercentage(dragonDeathEvent:GetPercent())
-        self.dragon_death_label:setString(GameUtils:formatTimeStyleDayHour(dragonDeathEvent:GetTime()))
-    end
-end
-
--- function GameUIDragonEyrieMain:OnDragonEventTimer(dragonEvent)
---     if self:GetCurrentDragon():Type() == dragonEvent:DragonType() and self.hate_event_node then
---         local timer_text = GameUtils:formatTimeStyleDayHour(dragonEvent:GetTime())
---         self.hate_event_node:SetProgressInfo(timer_text,dragonEvent:GetPercent())
---     end
--- end
 
 ------------------------------------------------------------------
 
@@ -110,37 +85,37 @@ end
 
 function GameUIDragonEyrieMain:OnMoveInStage()
     self:CreateUI()
+    GameUIDragonEyrieMain.super.OnMoveInStage(self)
+
     self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnHPChanged)
     self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
     self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonHatched)
-    -- self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonEventTimer)
-    -- self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonEventChanged)
-    self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventChanged)
-    self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventRefresh)
-    self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventTimer)
     User:AddListenOnType(self, "buildings")
-    GameUIDragonEyrieMain.super.OnMoveInStage(self)
+    User:AddListenOnType(self, "dragonDeathEvents")
+
+    scheduleAt(self, function()
+        local event
+        for i,v in ipairs(User.dragonDeathEvents) do
+            if v.dragonType == self:GetCurrentDragon():Type() then
+                event = v
+            end
+        end
+        if event and self.progress_content_death
+            and self.progress_content_death:isVisible()
+        then
+            local time, percent = UtilsForEvent:GetEventInfo(event)
+            self.progress_death:setPercentage(percent)
+            self.dragon_death_label:setString(GameUtils:formatTimeStyleDayHour(time))
+        end
+    end)
 end
-
--- if building:GetType() == self:GetBuilding():GetType() then
---     if self.dragon_hp_recovery_count_label then
---         local dragon_hp_recovery = self:GetBuilding():GetTotalHPRecoveryPerHour(self:GetCurrentDragon():Type())
---         self.dragon_hp_recovery_count_label:setString(string.format("+%s/h",string.formatnumberthousands(dragon_hp_recovery)))
---     end
---     self.hate_button:setButtonEnabled(self.building:CheckIfHateDragon())
--- end
-
 
 function GameUIDragonEyrieMain:OnMoveOutStage()
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnHPChanged)
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnBasicChanged)
     self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonHatched)
-    -- self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonEventTimer)
-    -- self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonEventChanged)
-    self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventChanged)
-    self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventRefresh)
-    self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventTimer)
     User:RemoveListenerOnType(self, "buildings")
+    User:RemoveListenerOnType(self, "dragonDeathEvents")
     GameUIDragonEyrieMain.super.OnMoveOutStage(self)
 end
 
@@ -198,13 +173,19 @@ function GameUIDragonEyrieMain:RefreshUI()
         self.garrison_button:setButtonSelected(dragon:IsDefenced())
         self.info_panel:show()
         self.strength_val_label:setString(string.formatnumberthousands(dragon:TotalStrength()))
-        self.vitality_val_label:setString(string.formatnumberthousands(dragon:TotalVitality()))
-        self.leadership_val_label:setString(string.formatnumberthousands(dragon:TotalLeadership()))
+        self.vitality_val_label:setString(string.formatnumberthousands(dragon:GetMaxHP()))
+        self.leadership_val_label:setString(string.formatnumberthousands(dragon:LeadCitizen()))
         if dragon:IsDead() then
-            local dragonDeathEvent = self.dragon_manager:GetDragonDeathEventByType(self:GetCurrentDragon():Type())
-            if dragonDeathEvent then
-                self.progress_death:setPercentage(dragonDeathEvent:GetPercent())
-                self.dragon_death_label:setString(GameUtils:formatTimeStyleDayHour(dragonDeathEvent:GetTime()))
+            local event
+            for i,v in ipairs(User.dragonDeathEvents) do
+                if v.dragonType == self:GetCurrentDragon():Type() then
+                    event = v
+                end
+            end
+            if event then
+                local time, percent = UtilsForEvent:GetEventInfo(event)
+                self.progress_death:setPercentage(percent)
+                self.dragon_death_label:setString(GameUtils:formatTimeStyleDayHour(time))
             end
             self.death_speed_button:show()
             self.progress_content_death:show()
@@ -365,6 +346,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
         --驻防
         local checkbox_image = {on = "draon_garrison_btn_d_82x86.png",off = "draon_garrison_btn_n_82x86.png",}
         local dragon = self:GetCurrentDragon()
+
         self.garrison_button = UICheckBoxButton.new(checkbox_image)
             :addTo(dragonAnimateNode):align(display.LEFT_BOTTOM, 25, 310)
             :setButtonSelected(dragon:IsDefenced())
@@ -384,56 +366,27 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
                         return
                     end
                     if dragon:IsFree() then
-                        -- local total_soldiers = {}
-                        -- local final_soldiers = {}
-                        -- local max_soldiers_citizen = 0
-                        -- for soldier_name,count in pairs(User.soldiers) do
-                        --     max_soldiers_citizen = max_soldiers_citizen + User:GetSoldierConfig(soldier_name).citizen * count
-                        --     table.insert(total_soldiers, {name = soldier_name,count = count})
-                        -- end
-                        -- if User.defenceTroop and User.defenceTroop ~= json.null then
-                        --     for __,soldier in ipairs(User.defenceTroop.soldiers) do
-                        --         max_soldiers_citizen = max_soldiers_citizen + User:GetSoldierConfig(soldier.name).citizen * soldier.count
-                        --         for i,t_soldier in ipairs(total_soldiers) do
-                        --             if soldier.name == t_soldier.name then
-                        --                 t_soldier.count = t_soldier.count + count
-                        --             end
-                        --         end
-                        --     end
-                        -- end
-
-                        -- if dragon:LeadCitizen()<max_soldiers_citizen then
-                        --     -- 拥有士兵数量大于派兵数量上限时，首先选取power最高的兵种，依次到达最大派兵上限为止
-                        --     table.sort(total_soldiers, function(a, b)
-                        --         return User:GetSoldierConfig(a.name).power > User:GetSoldierConfig(b.name).power
-                        --     end)
-                        --     local max_troop_num = dragon:LeadCitizen()
-                        --     for k,item in ipairs(total_soldiers) do
-                        --         local max_citizen = User:GetSoldierConfig(item.name).citizen * item.count
-                        --         if max_citizen <= max_troop_num then
-                        --             max_troop_num = max_troop_num - max_citizen
-                        --             table.insert(final_soldiers, item)
-                        --         else
-                        --             local num = math.floor(max_troop_num/User:GetSoldierConfig(item.name).citizen)
-                        --             table.insert(final_soldiers, {name = item.name,count = num})
-                        --             break
-                        --         end
-                        --     end
-                        -- else
-                        --     final_soldiers = total_soldiers
-                        -- end
-                        -- NetManager:getSetDefenceTroopPromise(dragon:Type(),final_soldiers):done(function()
-                        --     GameGlobalUI:showTips(_("提示"),_("设置驻防成功"))
-                        -- end)
-                        UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers)
+                        UIKit:newGameUI('GameUISendTroopNew',function(dragonType,soldiers)
                             if self.dragon_manager:GetDragon(dragonType):IsDead() then
                                 UIKit:showMessageDialog(nil,_("选择的龙已经死亡"))
                                 return
                             end
-                            NetManager:getSetDefenceTroopPromise(dragonType,soldiers):done(function ()
-                                self.garrison_button:setButtonSelected(true)
-                            end)    
-                        end,{isMilitary = true,terrain = Alliance_Manager:GetMyAlliance().basicInfo.terrain,title = _("驻防部队")}):AddToCurrentScene(true)
+                            if self.dragon_manager:GetDefenceDragon() then
+                                NetManager:getCancelDefenceTroopPromise():done(function()
+                                    NetManager:getSetDefenceTroopPromise(dragonType,soldiers):done(function ()
+                                        if self:GetCurrentDragon():Type() == dragonType then
+                                            self.garrison_button:setButtonSelected(true)
+                                        end
+                                    end)
+                                end)
+                            else
+                                NetManager:getSetDefenceTroopPromise(dragonType,soldiers):done(function ()
+                                    if self:GetCurrentDragon():Type() == dragonType then
+                                        self.garrison_button:setButtonSelected(true)
+                                    end
+                                end)
+                            end
+                        end,{dragon = dragon,isMilitary = true,terrain = Alliance_Manager:GetMyAlliance().basicInfo.terrain,title = _("驻防部队")}):AddToCurrentScene(true)
                     else
                         UIKit:showMessageDialog(nil,_("龙未处于空闲状态"))
                         self.garrison_button:setButtonSelected(not target,false)
@@ -449,6 +402,15 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
                     end
                 end
             end)
+        if not self.dragon_manager:GetDefenceDragon() and not GLOBAL_FTE and self.show_setDefence_tip then
+            local r = self.garrison_button:getCascadeBoundingBox()
+            local arrow = WidgetFteArrow.new(_("点击：驻防"))
+                :addTo(self:GetView()):TurnUp(false):align(display.LEFT_TOP, r.x + 30, r.y - 20)
+            self:performWithDelay(function()
+                self:GetView():removeChild(arrow, true)
+            end, 3)
+        end
+
 
         --
         self.progress_content_hated,self.progress_hated = self:CreateProgressTimer()
@@ -469,7 +431,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
             :align(display.CENTER_TOP,window.cx,self.progress_content_hated:getPositionY() - self.progress_content_hated:getContentSize().height - 32)
         self.info_panel = info_panel
         local strength_title_label =  UIKit:ttfLabel({
-            text = _("力量"),
+            text = _("攻击力"),
             color = 0x615b44,
             size  = 20
         }):addTo(info_panel):align(display.LEFT_BOTTOM,10,80)--  10 45
@@ -477,10 +439,10 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
             text = "",
             color = 0x403c2f,
             size  = 20
-        }):addTo(info_panel):align(display.LEFT_BOTTOM, 114, 80) -- 活力
+        }):addTo(info_panel):align(display.LEFT_BOTTOM, 134, 80) -- 活力
 
         local vitality_title_label =  UIKit:ttfLabel({
-            text = _("活力"),
+            text = _("生命值"),
             color = 0x615b44,
             size  = 20
         }):addTo(info_panel):align(display.LEFT_BOTTOM,10,45) -- 领导力 10
@@ -489,10 +451,10 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
             text = "",
             color = 0x403c2f,
             size  = 20
-        }):addTo(info_panel):align(display.LEFT_BOTTOM, 114, 45)
+        }):addTo(info_panel):align(display.LEFT_BOTTOM, 134, 45)
 
         local leadership_title_label =  UIKit:ttfLabel({
-            text = _("领导力"),
+            text = _("带兵量"),
             color = 0x615b44,
             size  = 20
         }):addTo(info_panel):align(display.LEFT_BOTTOM,10,10) -- 力量
@@ -501,7 +463,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
             text = "",
             color = 0x403c2f,
             size  = 20
-        }):addTo(info_panel):align(display.LEFT_BOTTOM, 114, 10)
+        }):addTo(info_panel):align(display.LEFT_BOTTOM, 134, 10)
 
         self.state_label = UIKit:ttfLabel({
             text = "",
@@ -517,6 +479,7 @@ function GameUIDragonEyrieMain:CreateDragonContentNodeIf()
             shadow = true
         })):addTo(info_panel):align(display.RIGHT_BOTTOM,540,5):onButtonClicked(function()
             UIKit:newGameUI("GameUIDragonEyrieDetail",self.city,self.building,self:GetCurrentDragon():Type()):AddToCurrentScene(false)
+            self:LeftButtonClicked()
         end)
         self.detailButton = detailButton
         self.draongContentNode:OnEnterIndex(math.abs(0))
@@ -724,11 +687,17 @@ function GameUIDragonEyrieMain:OnDragonExpItemUseButtonClicked()
 end
 
 function GameUIDragonEyrieMain:OnDragonDeathSpeedUpClicked()
-    UIKit:newGameUI("GameUIDragonDeathSpeedUp", self.dragon_manager,self:GetCurrentDragon():Type()):AddToCurrentScene(true)
+    UIKit:newGameUI("GameUIDragonDeathSpeedUp", self:GetCurrentDragon():Type()):AddToCurrentScene(true)
 end
 
 
 return GameUIDragonEyrieMain
+
+
+
+
+
+
 
 
 

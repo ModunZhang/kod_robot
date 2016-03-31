@@ -23,9 +23,8 @@ function FriendCityScene:OnTouchClicked(pre_x, pre_y, x, y)
         Sprite:PromiseOfFlash(unpack(self:CollectBuildings(building))):next(function()
             if iskindof(building, "HelpedTroopsSprite") then
                 local User = self.city:GetUser()
-                local helped = User.helpedByTroops[building:GetIndex()]
-                NetManager:getHelpDefenceTroopDetailPromise(User._id, helped.id):done(function(response)
-                    LuaUtils:outputTable("response", response)
+                local helped = User.helpedByTroop
+                NetManager:getHelpDefenceTroopDetailPromise(User._id):done(function(response)
                     UIKit:newGameUI("GameUIHelpDefence",self.city, helped ,response.msg.troopDetail):AddToCurrentScene(true)
                 end)
             end

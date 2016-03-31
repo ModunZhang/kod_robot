@@ -477,8 +477,12 @@ function GameUIItems:UseItemFunc( item_name )
     if self:IsItemCouldUseNow(item_name) then
         -- 使用巨龙宝箱会获得龙装备材料，需要提示
         local clone_dragon_materials
-        if string.find(item_name,"dragonChest") then
+        if string.find(item_name,"dragonChest") or string.find(item_name,"redbag") then
             clone_dragon_materials = clone(User.dragonMaterials)
+        end
+        local clone_technologyMaterials
+        if string.find(item_name,"redbag") then
+            clone_technologyMaterials = clone(User.technologyMaterials)
         end
         -- 木,铜,银,金宝箱
         if string.find(item_name,"chest") then
@@ -525,7 +529,6 @@ function GameUIItems:UseItemFunc( item_name )
                     end
                     -- GameGlobalUI:showTips(_("获得"),message)
                 elseif string.find(item_name,"chest") then
-                    LuaUtils:outputTable("item_name", response)
                     for i,v in ipairs(response.msg.playerData) do
                         if tolua.type(v[2]) == "table" then
                             local m_name = v[2].name
@@ -535,6 +538,26 @@ function GameUIItems:UseItemFunc( item_name )
                         end
                     end
                     -- GameGlobalUI:showTips(_("获得"),message)
+                elseif string.find(item_name,"redbag") then
+                    for i,v in ipairs(response.msg.playerData) do
+                        if string.find(v[1],"dragonMaterials") then
+                            local m_name = string.split(v[1], ".")[2]
+                            print("·clone_dragon_materials[m_name]··",clone_dragon_materials[m_name])
+                            local m_count = v[2]-clone_dragon_materials[m_name]
+                            message = message .. Localize.equip_material[m_name].."x"..m_count.." "
+                            table.insert(awards, {name = m_name, count = m_count})
+                        elseif string.find(v[1],"technologyMaterials") then
+                            local m_name = string.split(v[1], ".")[2]
+                            local m_count = v[2]-clone_technologyMaterials[m_name]
+                            message = message .. Localize.materials[m_name].."x"..m_count.." "
+                            table.insert(awards, {name = m_name, count = m_count})
+                        elseif tolua.type(v[2]) == "table" then
+                            local m_name = v[2].name
+                            local m_count = v[2].count - UtilsForItem:GetItemCount(clone_items, m_name)
+                            message = message .. Localize_item.item_name[m_name].."x"..m_count.." "
+                            table.insert(awards, {name = m_name, count = m_count})
+                        end
+                    end
                 end
                 -- 提示统一动画播放之后提示
                 UIKit:PlayUseItemAni(item_name,awards,message)

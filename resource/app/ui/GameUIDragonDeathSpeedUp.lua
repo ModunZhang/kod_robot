@@ -8,49 +8,56 @@ local GameUtils = GameUtils
 local Localize = import("..utils.Localize")
 local DragonManager = import("..entity.DragonManager")
 
-function GameUIDragonDeathSpeedUp:ctor(dragon_manager,dragon_type)
+function GameUIDragonDeathSpeedUp:ctor(dragonType)
 	GameUIDragonDeathSpeedUp.super.ctor(self)
-	local dragonDeathEvent = dragon_manager:GetDragonDeathEventByType(dragon_type) 
-	self:SetAccBtnsGroup(self:GetEventType(),dragonDeathEvent:Id())
+	local event 
+	for i,v in ipairs(User.dragonDeathEvents) do
+		if v.dragonType == dragonType then
+			event = v
+		end
+	end
+	if not event then
+		self:LeftButtonClicked()
+	end
+	self.event = event
+	self:SetAccBtnsGroup(self:GetEventType(), event.id)
     self:SetAccTips(_("龙的复活没有免费加速"))
-    self:SetUpgradeTip(Localize.dragon[dragonDeathEvent:DragonType()] .. _("正在复活"))
-    self.dragonDeathEvent = dragonDeathEvent
-    self.dragon_manager = City:GetDragonEyrie():GetDragonManager()
-	self.dragon_manager:AddListenOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventChanged)
-	self:SetProgressInfo(GameUtils:formatTimeStyle1(dragonDeathEvent:GetTime()),dragonDeathEvent:GetPercent())
-	self.dragon_type = dragonDeathEvent:DragonType()
-end
+    self:SetUpgradeTip(Localize.dragon[dragonType] .. _("正在复活"))
+	scheduleAt(self, function()
+        local time, percent = UtilsForEvent:GetEventInfo(self.event)
+        self:SetProgressInfo(GameUtils:formatTimeStyle1(time), percent)
+    end)
 
+    User:AddListenOnType(self, "dragonDeathEvents")
+end
 function GameUIDragonDeathSpeedUp:CheckCanSpeedUpFree()
 	return false
 end
-
-function GameUIDragonDeathSpeedUp:onEnter()
-	GameUIDragonDeathSpeedUp.super.onEnter(self)
-	self.dragonDeathEvent:AddObserver(self)
+function GameUIDragonDeathSpeedUp:onExit()
+    User:RemoveListenerOnType(self, "dragonDeathEvents")
+    GameUIDragonDeathSpeedUp.super.onExit(self)
 end
-
 function GameUIDragonDeathSpeedUp:GetEventType()
 	return "dragonDeathEvents"
 end
-
-function GameUIDragonDeathSpeedUp:onCleanup()
-    self.dragonDeathEvent:RemoveObserver(self)
-    self.dragon_manager:RemoveListenerOnType(self,DragonManager.LISTEN_TYPE.OnDragonDeathEventChanged)
-    GameUIDragonDeathSpeedUp.super.onCleanup(self)
-end
-
-function GameUIDragonDeathSpeedUp:OnDragonDeathEventChanged(changed_map)
-	local dragonDeathEvent = self.dragon_manager:GetDragonDeathEventByType(self.dragon_type)
-	if not dragonDeathEvent then 
-		self:LeftButtonClicked()
-	end
-end
-
-function GameUIDragonDeathSpeedUp:OnDragonDeathEventTimer(event)
-	if event:GetTime() >= 0 then
-	 	self:SetProgressInfo(GameUtils:formatTimeStyle1(event:GetTime()),event:GetPercent())
-	end
+function GameUIDragonDeathSpeedUp:OnUserDataChanged_dragonDeathEvents(userData, deltaData)
+	local ok, value = deltaData("dragonDeathEvents.remove")
+    if ok then
+        for i,v in ipairs(value) do
+            if v.id == self.event.id then
+                self:LeftButtonClicked()
+                return
+            end
+        end
+    end
+    local ok, value = deltaData("dragonDeathEvents.edit")
+    if ok then
+        for i,v in ipairs(value) do
+            if v.id == self.event.id then
+                self.event = v
+            end
+        end
+    end
 end
 
 return GameUIDragonDeathSpeedUp

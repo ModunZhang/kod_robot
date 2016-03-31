@@ -32,6 +32,10 @@ function WidgetSlider:SetMax( max )
     self.max_ = max
     return self
 end
+function WidgetSlider:SetMin( min )
+    self.min_ = min
+    return self
+end
 function WidgetSlider:onTouch_(event, x, y)
      if event == "began" then
         if not self:checkTouchInButton_(x, y) then return false end
@@ -101,7 +105,7 @@ function WidgetSlider:onSliderValueChanged(callback)
     return WidgetSlider.super.onSliderValueChanged(self, function(event)
         local percent = math.floor((event.value- self.min_)/ (self.max_ - self.min_) * 100)
         if self.progress then
-            self.progress:setPercentage(percent)
+            self.progress:setPercentage(percent ~= percent and 0 or percent)
         end
         callback(event)
         self:CheckProgress(percent)

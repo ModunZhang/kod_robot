@@ -35,17 +35,43 @@ function WidgetSelectDragon:ctor(params)
             :addTo(box_bg,2)
         -- 总力量
         local dragon_vitality = UIKit:ttfLabel({
-            text = _("总力量").." "..dragon:TotalStrength(),
-            size = 20,
+            text = _("攻击力"),
+            size = 18,
             color = 0x615b44,
-        }):align(display.LEFT_CENTER,20,60)
+        }):align(display.LEFT_CENTER,20,65)
             :addTo(box_bg)
+        UIKit:ttfLabel({
+            text = string.formatnumberthousands(dragon:TotalStrength()),
+            size = 18,
+            color = 0x403c2f,
+        }):align(display.LEFT_CENTER,dragon_vitality:getPositionX() + dragon_vitality:getContentSize().width + 45,65)
+            :addTo(box_bg)
+
+        local dragon_vitality = UIKit:ttfLabel({
+            text = _("带兵量"),
+            size = 18,
+            color = 0x615b44,
+        }):align(display.LEFT_CENTER,20,40)
+            :addTo(box_bg)
+        UIKit:ttfLabel({
+            text = string.formatnumberthousands(dragon:LeadCitizen()),
+            size = 18,
+            color = 0x403c2f,
+        }):align(display.LEFT_CENTER,dragon_vitality:getPositionX() + dragon_vitality:getContentSize().width + 45,40)
+            :addTo(box_bg)
+
         -- 龙活力
         local dragon_vitality = UIKit:ttfLabel({
-            text = _("生命值").." "..string.formatnumberthousands(dragon:Hp()) .."/"..string.formatnumberthousands(dragon:GetMaxHP()),
-            size = 20,
+            text = _("生命值"),
+            size = 18,
             color = 0x615b44,
-        }):align(display.LEFT_CENTER,20,20)
+        }):align(display.LEFT_CENTER,20,15)
+            :addTo(box_bg)
+        UIKit:ttfLabel({
+            text = string.formatnumberthousands(dragon:Hp()) .."/"..string.formatnumberthousands(dragon:GetMaxHP()),
+            size = 18,
+            color = 0x403c2f,
+        }):align(display.LEFT_CENTER,dragon_vitality:getPositionX() + dragon_vitality:getContentSize().width + 45,15)
             :addTo(box_bg)
         -- 龙状态
         local d_status = dragon:GetLocalizedStatus()
@@ -59,7 +85,7 @@ function WidgetSelectDragon:ctor(params)
             color = s_color,
         }):align(display.LEFT_CENTER,dragon_name:getContentSize().width + dragon_name:getPositionX() + 10,100)
             :addTo(box_bg)
-        
+
         return dragon_frame
     end
 
@@ -168,6 +194,8 @@ function WidgetSelectDragon:ctor(params)
 end
 
 return WidgetSelectDragon
+
+
 
 
 

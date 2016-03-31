@@ -26,7 +26,7 @@ end
 print("- CONFIG_IS_DEBUG :",CONFIG_IS_DEBUG)
 function PlatformAdapter:android()
     device.getOpenUDID = ext.getOpenUDID
-    
+
     DEBUG_GET_ANIMATION_PATH = function(filePath)
         filePath = string.gsub(filePath,".pvr.ccz",".png")
         return filePath
@@ -55,7 +55,7 @@ function PlatformAdapter:ios()
     device.getOpenUDID = ext.getOpenUDID
     if CONFIG_LOG_DEBUG_FILE then
         local print__ = print
-         print = function ( ... )
+        print = function ( ... )
             print__(...)
             local t = {}
             for i,v in ipairs({...}) do
@@ -85,7 +85,7 @@ end
 
 function PlatformAdapter:winrt()
     device.getOpenUDID = ext.getOpenUDID
-   
+
     audio = require("app.utils.audio-WP")
 
     DEBUG_GET_ANIMATION_PATH = function(filePath)
@@ -174,7 +174,17 @@ function PlatformAdapter:mac()
     ext.getAppMemoryUsage = function()
         return 0
     end
-
+    
+    ext.google = {}
+    ext.google.login = function(func)
+        func({event = "login_success",userid = "121312321",username = "test"})
+    end
+    ext.google.getPlayerNameAndId = function()
+        return "test","121312321"
+    end
+    ext.google.isAuthenticated = function()
+        return false
+    end
     DEBUG_GET_ANIMATION_PATH = function(filePath)
         filePath = string.gsub(filePath,".pvr.ccz",".png")
         filePath = string.gsub(filePath,"animations/","animations_mac/")
@@ -269,7 +279,7 @@ function PlatformAdapter:mac()
     local getOpenUDID = device.getOpenUDID
     device.getOpenUDID = function()
         return getOpenUDID().."_"..run_pids_map[pid]
-        -- return "0a0608b995423eec21bc4d6e00e0467404a69dfb"
+            -- return "0a0608b995423eec21bc4d6e00e0467404a69dfb"
     end
 end
 
@@ -358,3 +368,4 @@ if PlatformAdapter[device.platform] then
     PlatformAdapter[device.platform]()
 end
 PlatformAdapter:common()
+

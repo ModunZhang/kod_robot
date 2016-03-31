@@ -115,7 +115,7 @@ function GameUIMonsterReport:onEnter()
         :onButtonClicked(function(event)
             local c_report = clone(report)
             c_report.IsPveBattle = true
-            UIKit:newGameUI("GameUIReplayNew",c_report):AddToCurrentScene(true)
+            UIKit:newGameUI("GameUIReplay",c_report):AddToCurrentScene(true)
         end)
     -- 分享战报按钮
     if self.can_share then
@@ -124,7 +124,7 @@ function GameUIMonsterReport:onEnter()
             {scale9 = false}
         ):addTo(report_body):align(display.CENTER,  report_body:getContentSize().width-210, rb_size.height-186)
             :onButtonClicked(function(event)
-               UIKit:newGameUI("GameUIShareReport", report):AddToCurrentScene()
+                UIKit:newGameUI("GameUIShareReport", report):AddToCurrentScene()
             end)
         display.newSprite("tmp_icon_share_24x34.png"):addTo(share_button)
         -- 删除按钮
@@ -349,15 +349,15 @@ function GameUIMonsterReport:CreateArmyItem(title,troop,dragon,enemy_troop,round
             troopTotal=troopTotal+v.count
         end
         for k,v in pairs(enemy_round_datas) do
-            for _,data in pairs(v) do
-                killed = killed+data.soldierDamagedCount
-            end
+            -- for _,data in pairs(v) do
+            killed = killed+v.soldierDamagedCount
+            -- end
         end
         for k,v in pairs(round_datas) do
-            for _,data in pairs(v) do
-                totalDamaged = totalDamaged+data.soldierDamagedCount
-                totalWounded = totalWounded+data.soldierWoundedCount
-            end
+            -- for _,data in pairs(v) do
+            totalDamaged = totalDamaged+v.soldierDamagedCount
+            totalWounded = totalWounded+v.soldierWoundedCount
+            -- end
         end
 
         army_info = {
@@ -475,7 +475,7 @@ function GameUIMonsterReport:CreateMonsterItem(monster)
     -- 联盟名字背景框
     display.newScale9Sprite("back_ground_red_254x42.png", 1, 0,cc.size(256,50),cc.rect(10,10,234,22)):align(display.LEFT_BOTTOM):addTo(player_item)
     -- 玩家头像
-    local heroBg = display.newSprite("dragon_bg_114x114.png"):addTo(player_item,1):align(display.CENTER, 50, height/2):setScale(0.7)
+    local heroBg = display.newSprite("dragon_bg_114x114.png"):addTo(player_item,1):align(display.CENTER, 45, height/2):setScale(0.7)
     local icon = display.newSprite("tmp_black_dragon_113x128.png"):addTo(heroBg)
         :align(display.CENTER,56,65)
 
@@ -487,6 +487,7 @@ function GameUIMonsterReport:CreateMonsterItem(monster)
         text = battleAt .." " .. string.format(_("等级%d"),monster.level),
         size = 20,
         color = 0x403c2f,
+        dimensions = cc.size(140,0)
     }):align(display.CENTER,170, height-25)
         :addTo(player_item)
 
@@ -546,7 +547,7 @@ function GameUIMonsterReport:CreateSoldierInfo(soldiers,isSelf)
         local origin_x = -4
         local count = 0
         for j=i,i+3 do
-            if soldiers[j] then
+            if soldiers[j] and soldiers[j].countDecreased > 0 then
                 self:CreateSoldiersInfo(soldiers[j],isSelf):align(display.CENTER, origin_x+count*gap_x,25):addTo(page_item)
                 count = count + 1
             end
@@ -614,9 +615,8 @@ function GameUIMonsterReport:GetReportTitle()
 end
 function GameUIMonsterReport:GetFightTarget()
     local monster_data = self.report:GetEnemyPlayerData().soldiers[1]
-    local monster_type = monster_data.name
 
-    local battleAt = _("黑龙军团").."-"..Localize.soldier_name[monster_type]
+    local battleAt = _("黑龙军团")
     local location = self.report:GetBattleLocation()
     return string.format(_("Battle at %s (%d,%d)"),battleAt,location.x,location.y)
 end
@@ -624,6 +624,7 @@ function GameUIMonsterReport:GetRewards()
     return  self.report:GetMyRewards()
 end
 return GameUIMonsterReport
+
 
 
 

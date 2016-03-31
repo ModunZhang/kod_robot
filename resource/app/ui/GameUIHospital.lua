@@ -364,7 +364,6 @@ function GameUIHospital:CreateCasualtyRateBar()
     pro:setBarChangeRate(cc.p(1,0))
     pro:setMidpoint(cc.p(0,0))
     pro:align(display.LEFT_BOTTOM, 0, 0):addTo(bar)
-    -- pro:setPercentage(0/self.building:GetMaxCasualty())
     self:SetProgressCasualtyRate()
     self.heal_layer.casualty_rate_label = cc.ui.UILabel.new({
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -389,7 +388,7 @@ function GameUIHospital:SetProgressCasualtyRate()
     self.heal_layer.ProgressTimer:setPercentage(
         User:GetTreatCitizen()
         /
-        self.building:GetMaxCasualty() * 100
+        UtilsForBuilding:GetMaxCasualty(User) * 100
     )
 end
 -- 设置伤兵比例条文本框
@@ -398,7 +397,7 @@ function GameUIHospital:SetProgressCasualtyRateLabel()
     self.heal_layer.casualty_rate_label:setString(
         string.formatnumberthousands(User:GetTreatCitizen())
         .."/"..
-        string.formatnumberthousands(self.building:GetMaxCasualty())
+        string.formatnumberthousands(UtilsForBuilding:GetMaxCasualty(User))
     )
 end
 
@@ -434,7 +433,7 @@ function GameUIHospital:CreateItemWithListView(list_view)
         local soldier = WidgetSoldierBox.new("",function ()
             if soldier_number>0 then
                 local widget = WidgetTreatSoldier.new(soldier_name,
-                    self.city:GetUser():SoldierStarByName(soldier_name),
+                    UtilsForSoldier:SoldierStarByName(self.city:GetUser(), soldier_name),
                     soldier_number)
                     :addTo(self,1000)
                     :align(display.CENTER, window.cx, 500 / 2)
@@ -453,7 +452,8 @@ function GameUIHospital:CreateItemWithListView(list_view)
             end
         end):addTo(row_item)
             :alignByPoint(cc.p(0.5,0.5), origin_x + (unit_width + gap_x) * row_count + unit_width / 2, 0)
-        soldier:SetSoldier(soldier_name,self.city:GetUser():SoldierStarByName(soldier_name))
+        soldier:SetSoldier(soldier_name,
+            UtilsForSoldier:SoldierStarByName(self.city:GetUser(), soldier_name))
         soldier:SetNumber(soldier_number)
         soldier:Enable(soldier_number>0)
         self.treat_soldier_boxes_table[soldier_name] = soldier

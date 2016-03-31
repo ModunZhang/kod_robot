@@ -21,16 +21,17 @@ local alliance_building = UILib.alliance_building
 local other_alliance_building = UILib.other_alliance_building
 local intInit = GameDatas.AllianceInitData.intInit
 local bigMapLength_value = intInit.bigMapLength.value
+local ALLIANCE_MIDDLE_INDEX = math.floor((bigMapLength_value-1)/2 + 0.5)
 local MAP_LEGNTH_WIDTH = bigMapLength_value
 local MAP_LEGNTH_HEIGHT = bigMapLength_value
 local TILE_WIDTH = 160
 local ALLIANCE_WIDTH, ALLIANCE_HEIGHT = intInit.allianceRegionMapWidth.value, intInit.allianceRegionMapHeight.value
+local middle_index = (ALLIANCE_WIDTH - 1) / 2
 local worldsize = {width = ALLIANCE_WIDTH * 160 * MAP_LEGNTH_WIDTH, height = ALLIANCE_HEIGHT * 160 * MAP_LEGNTH_HEIGHT}
 local timer = app.timer
 local MINE,FRIEND,ENEMY = 1,2,3
-local SPRITE_TAG = 112
 local CLOUD_TAG = 120
-local function createBuildingSprite(png)
+local function createEffectSprite(png)
     return display.newSprite(png, nil, nil, {class=cc.FilteredSpriteWithOne})
 end
 local function getZorderByXY(x, y)
@@ -55,6 +56,9 @@ function AllianceLayer:onEnter()
     self:StartCorpsTimer()
 
 
+    -- self:schedule(function()
+    --     self:Print()
+    -- end, 5)
 
 
     -- local x,y = 15, 15
@@ -88,28 +92,26 @@ function AllianceLayer:onEnter()
     --     end
     -- end)
 end
+function AllianceLayer:Print()
+    print("===============")
+    print("alliance_nomanland.1:", #self.alliance_nomanland[1])
+    print("alliance_nomanland.2:", #self.alliance_nomanland[2])
+    print("alliance_nomanland.3:", #self.alliance_nomanland[3])
+    print("alliance_nomanland.4:", #self.alliance_nomanland[4])
+    print("alliance_objects:", table.nums(self.alliance_objects))
+    print("alliance_objects_free.1:", #self.alliance_objects_free[1])
+    print("alliance_objects_free.2:", #self.alliance_objects_free[2])
+    print("alliance_objects_free.3:", #self.alliance_objects_free[3])
+    print("alliance_objects_free.4:", #self.alliance_objects_free[4])
+    print("alliance_objects_free.5:", #self.alliance_objects_free[5])
+    print("alliance_objects_free.6:", #self.alliance_objects_free[6])
+    print("alliance_bg:", table.nums(self.alliance_bg))
+    print("alliance_bg_free.desert:", #self.alliance_bg_free.desert)
+    print("alliance_bg_free.grassLand:", #self.alliance_bg_free.grassLand)
+    print("alliance_bg_free.iceField:", #self.alliance_bg_free.iceField)
+    print("===============")
+end
 function AllianceLayer:onCleanup()
-    local count = 0
-    for k,v in pairs(self.alliance_bg) do
-        count = count + 1
-    end
-    -- print_("===============")
-    -- print_("alliance_nomanland.1:", #self.alliance_nomanland[1])
-    -- print_("alliance_nomanland.2:", #self.alliance_nomanland[2])
-    -- print_("alliance_nomanland.3:", #self.alliance_nomanland[3])
-    -- print_("alliance_nomanland.4:", #self.alliance_nomanland[4])
-    -- print_("alliance_objects:", count)
-    -- print_("alliance_objects_free.1:", #self.alliance_objects_free[1])
-    -- print_("alliance_objects_free.2:", #self.alliance_objects_free[2])
-    -- print_("alliance_objects_free.3:", #self.alliance_objects_free[3])
-    -- print_("alliance_objects_free.4:", #self.alliance_objects_free[4])
-    -- print_("alliance_objects_free.5:", #self.alliance_objects_free[5])
-    -- print_("alliance_objects_free.6:", #self.alliance_objects_free[6])
-    -- print_("alliance_bg:", count)
-    -- print_("alliance_bg_free.desert:", #self.alliance_bg_free.desert)
-    -- print_("alliance_bg_free.grassLand:", #self.alliance_bg_free.grassLand)
-    -- print_("alliance_bg_free.iceField:", #self.alliance_bg_free.iceField)
-    -- print_("===============")
     for _,v1 in pairs(self.alliance_nomanland) do
         for _,v2 in pairs(v1) do
             v2:release()
@@ -126,6 +128,9 @@ function AllianceLayer:onCleanup()
         for _,v2 in pairs(v1) do
             v2:release()
         end
+    end
+    if self.middle_crown and not self.middle_crown:getParent() then
+        self.middle_crown:release()
     end
 end
 function AllianceLayer:InitAllianceMap()
@@ -152,25 +157,7 @@ function AllianceLayer:InitAllianceMap()
         grassLand = {},
         iceField = {},
     }
-    -- display.newNode():addTo(self):schedule(function()
-    --     local count = 0
-    --     for k,v in pairs(self.alliance_bg) do
-    --         count = count + 1
-    --     end
-
-    --     print("alliance_objects:", count)
-    --     print("alliance_objects_free.1:", #self.alliance_objects_free[1])
-    --     print("alliance_objects_free.2:", #self.alliance_objects_free[2])
-    --     print("alliance_objects_free.3:", #self.alliance_objects_free[3])
-    --     print("alliance_objects_free.4:", #self.alliance_objects_free[4])
-    --     print("alliance_objects_free.5:", #self.alliance_objects_free[5])
-    --     print("alliance_objects_free.6:", #self.alliance_objects_free[6])
-    --     print("alliance_bg:", count)
-    --     print("alliance_bg_free.desert:", #self.alliance_bg_free.desert)
-    --     print("alliance_bg_free.grassLand:", #self.alliance_bg_free.grassLand)
-    --     print("alliance_bg_free.iceField:", #self.alliance_bg_free.iceField)
-    --     print("===============")
-    -- end, 5)
+    self.middle_crown = nil
 end
 function AllianceLayer:CreateMap()
     local map = display.newNode():addTo(self)
@@ -317,7 +304,7 @@ function AllianceLayer:CreateOrUpdateCorps(id, start_pos, end_pos, start_time, f
         local corps = display.newNode():addTo(self.corps_node)
         local is_strike = not soldiers or #soldiers == 0
         if is_strike then
-            UIKit:CreateDragonByDegree(march_info.degree, 1.2, dragonType):addTo(corps)
+            UIKit:CreateDragonByDegree(march_info.degree, 1.4, dragonType):addTo(corps)
         else
             UIKit:CreateMoveSoldiers(march_info.degree, soldiers[1]):addTo(corps)
         end
@@ -333,31 +320,17 @@ function AllianceLayer:CreateOrUpdateCorps(id, start_pos, end_pos, start_time, f
     end
     return corps
 end
-local resource_map = {
-    food = true,
-    wood = true,
-    iron = true,
-    coin = true,
-    stone = true,
-}
 function AllianceLayer:CreateDeadEvent(event)
-    local myid = Alliance_Manager:GetMyAlliance()._id
     local id_corps = event.id
     if not self:IsExistCorps(id_corps) or self.map_dead[id_corps] then return end
     local is_dead = false
     if event.marchType == "monster" then
         is_dead = not not next(event.attackPlayerData.rewards)
-    -- elseif event.marchType == "village" then
-    --     local alliance = Alliance_Manager:GetAllianceByCache(event.toAlliance.id)
-    --     if alliance and event.toAlliance.id ~= Alliance_Manager:GetMyAlliance()._id then
-    --         if not Alliance.GetAllianceVillageInfosById(alliance, event.defenceVillageData.id) then
-    --             is_dead = true
-    --         end
-    --     end
+        -- 打死野怪了
     end
     if is_dead then
         local mapIndex
-        if myid == event.toAlliance.id then
+        if Alliance_Manager:GetMyAlliance()._id == event.toAlliance.id then
             mapIndex = Alliance_Manager:GetMyAlliance().mapIndex
         else
             mapIndex = event.toAlliance.mapIndex
@@ -365,22 +338,9 @@ function AllianceLayer:CreateDeadEvent(event)
         local point = self:RealPosition(mapIndex, 
                                       event.toAlliance.location.x, 
                                       event.toAlliance.location.y)
-        self.map_dead[id_corps] = self:CreateDeadSpriteByEvent(event)
+        self.map_dead[id_corps] = display.newSprite("warriors_tomb_80x72.png")
                                     :addTo(self.objects_node, point.x*point.y):pos(point.x,point.y)
     end
-end
-function AllianceLayer:CreateDeadSpriteByEvent(event)
-    local sprite
-    if event.marchType == "village" then
-        local config = SpriteConfig[event.defenceVillageData.name]
-        :GetConfigByLevel(tonumber(event.defenceVillageData.level))
-        sprite = display.newSprite(config.png):scale(config.scale)
-        local size = sprite:getContentSize()
-        fire():addTo(sprite):pos(size.width/2, 30)
-    else
-        sprite = display.newSprite("warriors_tomb_80x72.png")
-    end
-    return sprite
 end
 function AllianceLayer:UpdateCorpsBy(corps, march_info)
     local x,y = corps:getPosition()
@@ -436,11 +396,11 @@ function AllianceLayer:CreateLine(id, march_info, ally)
     local middle = cc.pMidpoint(march_info.start_info.real, march_info.end_info.real)
     local scale = march_info.length / 32
     local unit_count = math.floor(scale)
-    local sprite = createBuildingSprite(line_ally_map[ally])
+    local line = createEffectSprite(line_ally_map[ally])
         :addTo(self.lines_node)
         :pos(middle.x, middle.y)
         :rotation(march_info.degree)
-    sprite:setFilter(filter.newFilter("CUSTOM",
+    line:setFilter(filter.newFilter("CUSTOM",
         json.encode({
             frag = "shaders/multi_tex.fs",
             shaderName = "lineShader_"..id,
@@ -450,10 +410,10 @@ function AllianceLayer:CreateLine(id, march_info, ally)
             elapse = 0,
         })
     ))
-    sprite:setScaleY(scale)
-    sprite.is_enemy = ally == ENEMY
-    self.map_lines[id] = sprite
-    return sprite
+    line:setScaleY(scale)
+    line.is_enemy = ally == ENEMY
+    self.map_lines[id] = line
+    return line
 end
 function AllianceLayer:GetMiddleAllianceIndex()
     local point = self.map:convertToNodeSpace(cc.p(display.cx, display.cy))
@@ -485,6 +445,12 @@ end
 function AllianceLayer:RealPosition(index, lx, ly)
     local x,y = self:IndexToLogic(index)
     return self:ConvertLogicPositionToMapPosition(ALLIANCE_WIDTH * x + lx, ALLIANCE_HEIGHT * y + ly)
+end
+function AllianceLayer:IsCrown(index)
+    local x,y = self:IndexToLogic(index)
+    if x == ALLIANCE_MIDDLE_INDEX and y == ALLIANCE_MIDDLE_INDEX then
+        return true
+    end
 end
 function AllianceLayer:IndexToLogic(index)
     return index % MAP_LEGNTH_WIDTH, math.floor(index / MAP_LEGNTH_WIDTH)
@@ -523,11 +489,21 @@ function AllianceLayer:GetMapIndexByWorldPosition(world_x, world_y)
     local index = self:LogicToIndex(self:GetAllianceLogicMap():ConvertToLogicPosition(point.x, point.y))
     return index
 end
-local buildingName = GameDatas.AllianceMap.buildingName
 function AllianceLayer:FindMapObject(index, x, y)
     local alliance_object = self.alliance_objects[index]
     if alliance_object and alliance_object.nomanland then return end
     if alliance_object then
+        if alliance_object.isCrown then
+            for k,v in pairs(alliance_object.tower1) do
+                -- 点击到中心
+                if (v.x == x and v.y == y) 
+                -- 点击到王座周围
+                or (v.name == "crown" and math.abs(x - v.x) < 2 and math.abs(y - v.y) < 2)
+                then
+                    return {index = index, x = v.x, y = v.y, name = v.name, obj = v}
+                end
+            end
+        end
         for k,v in pairs(alliance_object.mapObjects) do
             if v.x == x and v.y == y then
                 return {index = index, x = v.x, y = v.y, name = v.name, obj = v}
@@ -552,9 +528,9 @@ function AllianceLayer:AddMapObjectByIndex(index, mapObject, alliance)
     local alliance_object = self.alliance_objects[index]
     if alliance_object then
         if not alliance_object.mapObjects[mapObject.id] then
-            local sprite = self:AddMapObject(alliance_object, mapObject, alliance)
-            if sprite then
-                self:RefreshSpriteInfo(sprite, mapObject, alliance)
+            local object = self:AddMapObject(alliance_object, mapObject, alliance)
+            if object then
+                self:RefreshObjectInfo(object, mapObject, alliance)
             end
         end
     end
@@ -571,25 +547,25 @@ end
 function AllianceLayer:RefreshMapObjectByIndex(index, mapObject, alliance)
     local alliance_object = self.alliance_objects[index]
     if alliance_object then
-        local sprite = alliance_object.mapObjects[mapObject.id]
-        if sprite then
-            self:RefreshMapObjectPosition(sprite, mapObject)
-            self:RefreshSpriteInfo(sprite, mapObject, alliance)
+        local object = alliance_object.mapObjects[mapObject.id]
+        if object then
+            self:RefreshMapObjectPosition(object, mapObject)
+            self:RefreshObjectInfo(object, mapObject, alliance)
         end
     end
 end
 function AllianceLayer:RefreshBuildingByIndex(index, building, alliance)
     local alliance_object = self.alliance_objects[index]
     if alliance_object then
-        local sprite = alliance_object.buildings[building.name]
-        if sprite then
-            local x,y = self:GetBannerPos(index, sprite.x, sprite.y)
-            sprite.info.level:setString(building.level)
-            sprite.info:pos(x, y):zorder(x * y)
+        local object = alliance_object.buildings[building.name]
+        if object then
+            local x,y = self:GetBannerPos(index, object.x, object.y)
+            object.info.level:setString(building.level)
+            object.info:pos(x, y):zorder(x * y)
             if alliance and 
                 alliance._id == Alliance_Manager:GetMyAlliance()._id then
-                local door = sprite:getChildByTag(SPRITE_TAG).door
-                local light = sprite:getChildByTag(SPRITE_TAG).light
+                local door = object:GetSprite().door
+                local light = object:GetSprite().light
                 if building.name == "shrine" and door then
                     door:setVisible(#alliance.shrineEvents > 0)
                 elseif building.name == "watchTower" and light then
@@ -611,12 +587,12 @@ function AllianceLayer:LoadAllianceByIndex(index, alliance)
                 map_obj_id[v.id] = true
             end
             for _,mapObj in pairs(allianceData.mapObjects) do
-                local sprite = objects_node.mapObjects[mapObj.id]
-                if not sprite then
-                    sprite = self:AddMapObject(objects_node, mapObj, allianceData)
+                local object = objects_node.mapObjects[mapObj.id]
+                if not object then
+                    object = self:AddMapObject(objects_node, mapObj, allianceData)
                 end
-                if sprite then
-                    self:RefreshSpriteInfo(sprite, mapObj, allianceData)
+                if object then
+                    self:RefreshObjectInfo(object, mapObj, allianceData)
                 end
             end
             local mapObjects = objects_node.mapObjects
@@ -630,7 +606,7 @@ function AllianceLayer:LoadAllianceByIndex(index, alliance)
                 if name ~= "bloodSpring" then
                     local b = Alliance.FindAllianceBuildingInfoByName(allianceData, name)
                     v.info.level:setString(b.level)
-                    local sprite = v:getChildByTag(SPRITE_TAG)
+                    local sprite = v:GetSprite()
                     local size = sprite:getContentSize()
                     if name == "shrine" then
                         if not sprite.door and isMyAlliance then
@@ -673,7 +649,7 @@ function AllianceLayer:AddMapObject(objects_node, mapObj, alliance)
     local mapObject = objects_node.mapObjects[mapObj.id]
     local sprite
     if mapObj.name == "member" then
-        sprite = createBuildingSprite("my_keep_1.png")
+        sprite = createEffectSprite("my_keep_1.png")
     elseif mapObj.name == "woodVillage"
         or mapObj.name == "stoneVillage"
         or mapObj.name == "ironVillage"
@@ -682,7 +658,7 @@ function AllianceLayer:AddMapObject(objects_node, mapObj, alliance)
     then
         local info = Alliance.GetAllianceVillageInfosById(alliance, mapObj.id)
         local config = SpriteConfig[mapObj.name]:GetConfigByLevel(info.level)
-        sprite = createBuildingSprite(config.png):scale(config.scale)
+        sprite = createEffectSprite(config.png):scale(config.scale)
     elseif mapObj.name == "monster" then
         local info = Alliance.GetAllianceMonsterInfosById(alliance, mapObj.id)
         local corps = string.split(monsters[info.level].soldiers, ";")
@@ -690,17 +666,15 @@ function AllianceLayer:AddMapObject(objects_node, mapObj, alliance)
         sprite = UIKit:CreateMonster(soldiers[1])
     else
         return 
-        -- print_(mapObj.name)
-        --todo
-        -- assert(false)
     end
-    local node = display.newNode()
-    sprite:addTo(node, 0, SPRITE_TAG)
+
+    local node = self:CreateClickableObject()
+                :addTo(objects_node)
+                :AddSprite(sprite)
     node.info = self:CreateInfoBanner()
     node.name = mapObj.name
-    objects_node.mapObjects[mapObj.id] = node:addTo(objects_node)
+    objects_node.mapObjects[mapObj.id] = node
     self:RefreshMapObjectPosition(node, mapObj)
-    self:AddFuncToBuilding(node)
     return node
 end
 local function resetStatus(sprite)
@@ -727,24 +701,38 @@ local function beginFlash(sprite, lastTime)
     end)
     sprite:scheduleUpdate()
 end
-function AllianceLayer:AddFuncToBuilding(building)
-    function building:Flash(time)
+function AllianceLayer:CreateClickableObject()
+    local layer = self
+    local node = display.newNode()
+    local SPRITE_TAG = 112
+    function node:SetAlliancePos(x, y)
+        return self:zorder(getZorderByXY(x,y))
+                :pos(layer:GetInnerMapPosition(x,y))
+    end
+    function node:AddSprite(sprite)
+        sprite:addTo(self, 0, SPRITE_TAG)
+        return self
+    end
+    function node:GetSprite()
+        return self:getChildByTag(SPRITE_TAG)
+    end
+    function node:Flash(time)
         self:ResetFlashStatus()
         self:BeginFlash(time)
     end
-    function building:ResetFlashStatus()
-        resetStatus(self:getChildByTag(SPRITE_TAG))
+    function node:ResetFlashStatus()
+        resetStatus(self:GetSprite())
         if self.part then
             resetStatus(self.part)
         end
     end
-    function building:BeginFlash(lastTime)
-        beginFlash(self:getChildByTag(SPRITE_TAG), lastTime)
+    function node:BeginFlash(lastTime)
+        beginFlash(self:GetSprite(), lastTime)
         if self.part then
             beginFlash(self.part, lastTime)
         end
     end
-    return building
+    return node
 end
 local flag_map = {
     [MINE] = {"village_flag_mine.png", "village_icon_mine.png"},
@@ -754,40 +742,41 @@ local flag_map = {
 local FIRE_TAG = 11900
 local SMOKE_TAG = 12000
 local VILLAGE_TAG = 120990
-function AllianceLayer:RefreshSpriteInfo(sprite, mapObj, alliance)
-    local info = sprite.info
+function AllianceLayer:RefreshObjectInfo(object, mapObj, alliance)
+    local info = object.info
     local isenemy = User.allianceId ~= alliance._id
     local banners = isenemy and UILib.enemy_city_banner or UILib.my_city_banner
     if mapObj.name == "member" then
         local member = Alliance.GetMemberByMapObjectsId(alliance, mapObj.id)
         local config = SpriteConfig[isenemy and "other_keep" or "my_keep"]
             :GetConfigByLevel(member.keepLevel)
-        sprite:getChildByTag(SPRITE_TAG):setTexture(config.png)
+        object:GetSprite():setTexture(config.png)
 
-        info.banner:setTexture(banners[member.helpedByTroopsCount])
+        local helpedByTroopsCount = member.beHelped and 1 or 0
+        info.banner:setTexture(banners[helpedByTroopsCount])
         info.level:setString(member.keepLevel)
-        info.name:setString(string.format("[%s]%s", alliance.basicInfo.tag, member.name))
+        info.name:setString(string.format("%s", member.name))
 
         if member.isProtected then
-            if sprite:getChildByTag(SMOKE_TAG) then
-                sprite:removeChildByTag(SMOKE_TAG)
+            if object:getChildByTag(SMOKE_TAG) then
+                object:removeChildByTag(SMOKE_TAG)
             end
-            if not sprite:getChildByTag(FIRE_TAG) then
-                fire():addTo(sprite, 2, FIRE_TAG):pos(0,-50)
+            if not object:getChildByTag(FIRE_TAG) then
+                fire():addTo(object, 2, FIRE_TAG):pos(0,-50)
             end
         else
-            if sprite:getChildByTag(FIRE_TAG) then
-                sprite:removeChildByTag(FIRE_TAG)
+            if object:getChildByTag(FIRE_TAG) then
+                object:removeChildByTag(FIRE_TAG)
             end
             local attackTime = (timer:GetServerTime() - member.lastBeAttackedTime / 1000)
             local is_smoke = attackTime < 10 * 60
             if is_smoke then
-                if not sprite:getChildByTag(SMOKE_TAG) then
-                    smoke_city():addTo(sprite, 2, SMOKE_TAG):pos(-20,-20)
+                if not object:getChildByTag(SMOKE_TAG) then
+                    smoke_city():addTo(object, 2, SMOKE_TAG):pos(-20,-20)
                 end
             else
-                if sprite:getChildByTag(SMOKE_TAG) then
-                    sprite:removeChildByTag(SMOKE_TAG)
+                if object:getChildByTag(SMOKE_TAG) then
+                    object:removeChildByTag(SMOKE_TAG)
                 end
             end
         end
@@ -818,17 +807,17 @@ function AllianceLayer:RefreshSpriteInfo(sprite, mapObj, alliance)
             else
                 banner = UILib.enemy_city_banner[0]
             end
-            local flag = sprite:getChildByTag(VILLAGE_TAG)
-            if sprite:getChildByTag(VILLAGE_TAG) then
+            local flag = object:getChildByTag(VILLAGE_TAG)
+            if object:getChildByTag(VILLAGE_TAG) then
                 local head,circle = unpack(flag_map[ally])
                 flag:setTexture(head)
                 flag:getChildByTag(1):setTexture(circle)
             else
                 self:CreateVillageFlag(ally)
-                    :addTo(sprite,2,VILLAGE_TAG):pos(0, 150):scale(1.5)
+                    :addTo(object,2,VILLAGE_TAG):pos(0, 150):scale(1.5)
             end
-        elseif not event and sprite:getChildByTag(VILLAGE_TAG) then
-            sprite:getChildByTag(VILLAGE_TAG):removeFromParent()
+        elseif not event and object:getChildByTag(VILLAGE_TAG) then
+            object:getChildByTag(VILLAGE_TAG):removeFromParent()
         end
         info.banner:setTexture(banner)
         info.level:setString(village.level)
@@ -870,11 +859,11 @@ function AllianceLayer:CreateVillageFlag(e)
         )
     return flag
 end
-function AllianceLayer:RefreshMapObjectPosition(sprite, mapObject)
+function AllianceLayer:RefreshMapObjectPosition(object, mapObject)
     local x,y = mapObject.location.x, mapObject.location.y
-    sprite.x = x
-    sprite.y = y
-    sprite:zorder(getZorderByXY(x, y)):pos(self:GetInnerMapPosition(x, y))
+    object.x = x
+    object.y = y
+    object:zorder(getZorderByXY(x, y)):pos(self:GetInnerMapPosition(x, y))
 end
 function AllianceLayer:FreeInvisible()
     local background = self.background_node
@@ -912,20 +901,24 @@ function AllianceLayer:LoadObjects(index, alliance, func)
                 self:GetAllianceLogicMap()
                     :ConvertToLeftBottomMapPosition(self:IndexToLogic(index))
             )
-        -- new_obj:release()
         if type(func) == "function" then
             func(new_obj)
         end
     else
-        if alliance and (alliance_obj.nomanland or alliance_obj.style ~= style) then
+        -- 联盟领地
+        if (alliance_obj.nomanland or alliance_obj.style ~= style) 
+        and alliance then
             self:FreeObjects(alliance_obj)
             self.alliance_objects[index] = nil
             return self:LoadObjects(index, alliance, func)
-        elseif not alliance and not alliance_obj.nomanland then
+        -- 无主之地
+        elseif  not alliance 
+            and not alliance_obj.nomanland 
+            and not self:IsCrown(index) then
             self:FreeObjects(alliance_obj)
             self.alliance_objects[index] = nil
             return self:LoadObjects(index, alliance, func)
-        elseif alliance_obj.terrain ~= terrain then
+        elseif alliance_obj.terrain ~= terrain then -- 地形不符
             self:ReloadObjectsByTerrain(alliance_obj, terrain)
         end
         if type(func) == "function" then
@@ -935,8 +928,16 @@ function AllianceLayer:LoadObjects(index, alliance, func)
 end
 function AllianceLayer:FreeObjects(obj)
     if not obj then return end
-
     obj:removeChildByTag(CLOUD_TAG)
+
+    -- 如果是中间王座，直接持有，从父节点移除就行了
+    if obj.isCrown then
+        if obj:getParent() then
+            obj:retain()
+            obj:getParent():removeChild(obj, false)
+        end
+        return
+    end
 
     if obj.nomanland then
         if obj:getParent() then
@@ -953,7 +954,7 @@ function AllianceLayer:FreeObjects(obj)
 
     for name,v in pairs(obj.buildings) do
         v.info:hide()
-        local sprite = v:getChildByTag(SPRITE_TAG)
+        local sprite = v:GetSprite()
         if name == "shrine" then
             if v.door then
                 v.door:removeFromParent()
@@ -974,43 +975,59 @@ function AllianceLayer:FreeObjects(obj)
     end
     table.insert(self.alliance_objects_free[obj.style], obj)
 end
+local NoManMap_max = 0
+for k,v in pairs(GameDatas.NoManMap) do
+    if string.find(k, "noManMap_") then
+        NoManMap_max = NoManMap_max + 1
+    end
+end
 function AllianceLayer:GetFreeObjects(terrain, style, index, alliance, isnomanland)
+    if self:IsCrown(index) then
+        if not self.middle_crown then
+            local middle_node = display.newNode()
+            self:CreateMiddleCrown(middle_node)
+            middle_node.isCrown = true
+            self.middle_crown = middle_node
+        end
+        return self.middle_crown
+    end
+
+    -- 判断是否是nomanland
     if not alliance and isnomanland then
-        local nomanland_style = (index % 1 + 1)
+        -- 固定每个无主之地是固定的造型
+        local nomanland_style = index % NoManMap_max + 1 
         local obj = table.remove(self.alliance_nomanland[nomanland_style], 1)
-        if obj then
-            if obj.terrain ~= terrain then
-                self:ReloadObjectsByTerrain(obj, terrain)
-            end
-            return obj
-        else
-            local obj = display.newNode()
-            self:CreateNoManLand(obj, terrain, index)
+        if not obj then
+            obj = display.newNode()
+            self:CreateNoManLand(obj, terrain, nomanland_style)
             obj.terrain = terrain
             obj.nomanland = true
             obj.nomanland_style = nomanland_style
-            -- obj:retain()
-            return obj
         end
-    end
-
-    local obj = table.remove(self.alliance_objects_free[style], 1)
-    if obj then
-        self:RefreshAllianceBuildings(obj, index)
+        -- 如果地形不对，就切换地形
         if obj.terrain ~= terrain then
             self:ReloadObjectsByTerrain(obj, terrain)
         end
         return obj
-    else
-        local obj = display.newNode()
+    end
+
+    -- 有联盟
+    local obj = table.remove(self.alliance_objects_free[style], 1)
+    if not obj then
+        obj = display.newNode()
         self:CreateAllianceObjects(obj, terrain, style, index, alliance)
-        self:RefreshAllianceBuildings(obj, index)
         obj.mapObjects = {}
         obj.terrain = terrain
         obj.style = style
-        -- obj:retain()
-        return obj
     end
+    -- 刷新联盟内的名牌
+    self:RefreshAllianceBuildings(obj, index)
+
+    -- 如果地形不对，就切换地形
+    if obj.terrain ~= terrain then
+        self:ReloadObjectsByTerrain(obj, terrain)
+    end
+    return obj
 end
 function AllianceLayer:RefreshAllianceBuildings(obj, index)
     local ismyaln = Alliance_Manager:GetMyAlliance().mapIndex == index
@@ -1023,7 +1040,7 @@ function AllianceLayer:RefreshAllianceBuildings(obj, index)
         v.info:show():pos(x, y):zorder(x * y)
         v.info.banner:setTexture(banner)
         v.info.name:setString(Localize.alliance_buildings[name])
-        v:getChildByTag(SPRITE_TAG):setTexture(building_png[name])
+        v:GetSprite():setTexture(building_png[name])
     end
 end
 function AllianceLayer:ReloadObjectsByTerrain(obj_node, terrain)
@@ -1044,7 +1061,7 @@ end
 function AllianceLayer:CreateCloud()
     local sprite = display.newSprite(string.format("cloud_%d.png", math.random(4)))
     function sprite:Run()
-        local x = math.random(25 * TILE_WIDTH) + TILE_WIDTH
+        local x = math.random(ALLIANCE_HEIGHT * 0.8 * TILE_WIDTH) + TILE_WIDTH
         local y = math.random(1 + (ALLIANCE_HEIGHT - 2) * TILE_WIDTH)
         local dis = ALLIANCE_WIDTH * TILE_WIDTH - x - TILE_WIDTH
         time = dis / (math.random(10) + 20)
@@ -1090,32 +1107,36 @@ function AllianceLayer:CreateAllianceObjects(obj_node, terrain, style, index, al
             decorator.is_ani = true
             table.insert(decorators, decorator)
         elseif deco_png then
+            local s = deco_png == "crushed_airship.png" and 2 or 1
             local decorator = display.newSprite(deco_png)
                 :addTo(obj_node, getZorderByXY(x, y))
                 :pos(self:GetInnerMapPosition(x,y))
+                :scale(s)
             decorator.x = v.x
             decorator.y = v.y
             decorator.name = name
             table.insert(decorators, decorator)
         elseif building_png then
-            local node = display.newNode()
-                :addTo(obj_node, getZorderByXY(x, y))
-                :pos(self:GetInnerMapPosition(x,y))
-            local sprite = createBuildingSprite(building_png)
-                :addTo(node, 0, SPRITE_TAG)
+            local sprite = createEffectSprite(building_png)
+            local node = self:CreateClickableObject():addTo(obj_node)
+                        :SetAlliancePos(x,y):AddSprite(sprite)
             if name == "palace" then
                 sprite:setAnchorPoint(cc.p(0.5, 0.4))
+            elseif name == "shop" then
+                sprite:scale(1.1)
             elseif name == "orderHall" then
-                sprite:setAnchorPoint(cc.p(0.5, 0.35))
+                sprite:scale(1.1):setAnchorPoint(cc.p(0.5, 0.35))
             elseif name == "bloodSpring" then
                 sprite:scale(0.7):setAnchorPoint(cc.p(0.5, 0.4))
                 local size = sprite:getContentSize()
                 ccs.Armature:create("longpengquan"):addTo(sprite)
                 :pos(size.width/2, size.height/2):getAnimation():playWithIndex(0)
             elseif name == "shrine" then
-                local size = sprite:getContentSize()
-                node.part = createBuildingSprite("alliance_shrine_2.png")
+                local size = sprite:scale(1.4):getContentSize()
+                node.part = createEffectSprite("alliance_shrine_2.png")
                             :addTo(sprite, 1):pos(size.width/2, size.height/2)
+            elseif name == "watchTower" then
+                sprite:scale(1.2)
             end
             node.x = v.x
             node.y = v.y
@@ -1123,7 +1144,6 @@ function AllianceLayer:CreateAllianceObjects(obj_node, terrain, style, index, al
             local x,y = self:GetBannerPos(index, v.x, v.y)
             node.info = self:CreateInfoBanner():pos(x, y):zorder(x * y)
             buildings[name] = node
-            self:AddFuncToBuilding(node)
         else
             assert(false, name)
         end
@@ -1131,11 +1151,9 @@ function AllianceLayer:CreateAllianceObjects(obj_node, terrain, style, index, al
     obj_node.decorators = decorators
     obj_node.buildings = buildings
 end
-local NoManMap = GameDatas.NoManMap
-function AllianceLayer:CreateNoManLand(obj_node, terrain, index)
+function AllianceLayer:CreateNoManLand(obj_node, terrain, style)
     local decorators = {}
-    local style = math.random(4)
-    for _,v in ipairs(NoManMap[string.format("noManMap_%d", style)]) do
+    for _,v in ipairs(GameDatas.NoManMap[string.format("noManMap_%d", style)]) do
         local name = v.name
         local size = buildingName[name]
         if size then
@@ -1153,9 +1171,11 @@ function AllianceLayer:CreateNoManLand(obj_node, terrain, index)
                 decorator.is_ani = true
                 table.insert(decorators, decorator)
             elseif deco_png then
+                local s = deco_png == "crushed_airship.png" and 2 or 1
                 local decorator = display.newSprite(deco_png)
-                    :addTo(obj_node, getZorderByXY(x, y))
+                    :addTo(obj_node, getZorderByXY(x,y))
                     :pos(self:GetInnerMapPosition(x,y))
+                    :scale(s)
                 decorator.x = x
                 decorator.y = y
                 decorator.name = name
@@ -1164,10 +1184,70 @@ function AllianceLayer:CreateNoManLand(obj_node, terrain, index)
         end
     end
     ccs.Armature:create("daqizi")
-    :addTo(obj_node, getZorderByXY(15,15))
-    :pos(self:GetInnerMapPosition(15,15))
+    :addTo(obj_node, getZorderByXY(middle_index,middle_index))
+    :pos(self:GetInnerMapPosition(middle_index,middle_index))
     :getAnimation():playWithIndex(0)
 
+    obj_node.decorators = decorators
+end
+function AllianceLayer:CreateMiddleCrown(obj_node)
+    local terrain = "iceField"
+    local decorators = {}
+    local tower1 = {}
+    local tower2 = {}
+    for _,v in ipairs(GameDatas.NoManMap.middle_map) do
+        local name = v.name
+        local size = buildingName[name]
+        if size then
+            local x,y = (2 * v.x - size.width + 1) / 2, (2 * v.y - size.height + 1) / 2
+            local deco_png = decorator_image[terrain][name]
+            local building_png = alliance_building[name]
+            if animap[name] then
+                local decorator = ccs.Armature:create(animap[name])
+                                    :addTo(obj_node, getZorderByXY(x, y))
+                                    :pos(self:GetInnerMapPosition(x,y))
+                decorator:getAnimation():playWithIndex(0)
+                decorator.x = v.x
+                decorator.y = v.y
+                decorator.name = name
+            elseif deco_png then
+                local s = deco_png == "crushed_airship.png" and 2 or 1
+                local decorator = display.newSprite(deco_png)
+                    :addTo(obj_node, getZorderByXY(x,y))
+                    :pos(self:GetInnerMapPosition(x,y))
+                    :scale(s)
+                decorator.x = x
+                decorator.y = y
+                decorator.name = name
+            end
+        else -- 没有找到就是tower
+            size = {width = 1, height = 1}
+            local x,y = (2 * v.x - size.width + 1) / 2, (2 * v.y - size.height + 1) / 2
+            local sprite = display.newNode()
+            if name == "tower1" then
+                ccs.Armature:create("crystalTower"):addTo(sprite)
+                :pos(0,50):getAnimation():playWithIndex(0)
+                -- sprite = createEffectSprite("crystalTower.png")
+            elseif name == "tower2" then
+                ccs.Armature:create("guardTower"):addTo(sprite)
+                :pos(0,50):getAnimation():playWithIndex(0)
+                -- sprite = createEffectSprite("guardTower.png")
+            elseif name == "crown" then
+                ccs.Armature:create("crystalThrone"):addTo(sprite)
+                :pos(0,50):getAnimation():playWithIndex(0)
+                -- sprite = createEffectSprite("crystalThrone.png")
+            end
+            local node = self:CreateClickableObject():addTo(obj_node)
+                        :SetAlliancePos(x,y):AddSprite(sprite)
+            node.x = x
+            node.y = y
+            node.name = name
+            table.insert(tower1, node)
+        end
+    end
+    obj_node.mapObjects = {}
+    obj_node.buildings = {}
+    obj_node.tower1 = tower1
     obj_node.decorators = decorators
 end
 function AllianceLayer:GetInnerMapPosition(xOrPosition, y)
@@ -1184,7 +1264,6 @@ function AllianceLayer:LoadBackground(index, alliance)
         local x,y = self:GetAllianceLogicMap()
                     :ConvertToLeftBottomMapPosition(self:IndexToLogic(index))
         self.alliance_bg[index] = new_bg:addTo(self.background_node, -index):pos(x,y)
-        -- new_bg:release()
     elseif self.alliance_bg[index].terrain ~= terrain then
         self:FreeBackground(self.alliance_bg[index])
         self.alliance_bg[index] = nil
@@ -1260,41 +1339,8 @@ function AllianceLayer:GetFreeBackground(terrain)
             map = self:CreateIceFieldBg()
         elseif terrain == "desert" then
             map = self:CreateDesertBg()
-        else
-            -- map = cc.TMXTiledMap:create(string.format("tmxmaps/alliance_%s1.tmx", terrain))
-            -- local LEN = 115
-            -- display.newSprite(string.format("%s_plus_right.png", terrain))
-            --     :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, 0)
-            -- for i = 0, 9 do
-            --     display.newSprite(string.format("%s_plus_right.png", terrain))
-            --         :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, i * 480 + 160)
-            -- end
-            -- for i = 0, 9 do
-            --     display.newSprite(string.format("%s_plus_down.png", terrain))
-            --         :addTo(map):align(display.LEFT_TOP, i * 480, LEN)
-            -- end
-            -- display.newSprite(string.format("%s_plus_down.png", terrain))
-            --     :addTo(map):align(display.LEFT_TOP, 10 * 480 - 320, LEN)
-
-            -- display.newSprite(string.format("%s_plus.png", terrain))
-            --     :addTo(map):align(display.LEFT_TOP, map:getContentSize().width, 0)
-
-
-            -- math.randomseed(12345)
-            -- local random = math.random
-            -- local array = terrain_map[terrain]
-            -- if #array > 0 then
-            --     local sx,sy,ex,ey = self.inner_alliance_logic_map:GetRegion()
-            --     local span = 0
-            --     for i = 1, 60 do
-            --         local x = random(sx + span, ex - span)
-            --         local y = random(sy + span, ey - span)
-            --         display.newSprite(array[random(#array)]):addTo(map, 1000):pos(x, y)
-            --     end
-            -- end
         end
         self:LoadMiddleTerrain(map, terrain)
-        -- map:retain()
         map.terrain = terrain
         return map
     end
@@ -1316,26 +1362,29 @@ function AllianceLayer:LoadMiddleTerrain(map, terrain)
 end
 function AllianceLayer:CreateDesertBg()
     local terrain = "desert"
-    local map = cc.TMXTiledMap:create(string.format("tmxmaps/alliance_%s1.tmx", terrain))
+    local map
+    GameUtils:LoadImagesWithFormat(function()
+        map = cc.TMXTiledMap:create(string.format("tmxmaps/alliance_%s1.tmx", terrain))
+    end, cc.TEXTURE2_D_PIXEL_FORMAT_RG_B565)
     local width = map:getContentSize().width
     local LEN = 160
-    display.newSprite(string.format("plus_right_%s.png", terrain))
-        :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, 0)
-    for i = 0, 9 do
+    -- display.newSprite(string.format("plus_right_%s.png", terrain))
+    --     :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, 0)
+    for i = 0, math.floor(ALLIANCE_WIDTH/3 + 0.5) do
         display.newSprite(string.format("plus_right_%s.png", terrain))
-            :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, i * 480 + 160)
+            :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, i * 480)
     end
     local w = 0
     math.randomseed(737)
     while true do
         local index = math.random(2)
         local png = string.format("plus_down%d_%s.png", index, terrain)
-        local sprite = display.newSprite(png):addTo(map)
-        local size = sprite:getContentSize()
+        local terrain_bg = display.newSprite(png):addTo(map)
+        local size = terrain_bg:getContentSize()
         local offset = (index == 1 and -10 or -10)
         local x = (index == 1 and 0 or 0)
         local y = (index == 1 and 5 or 10)
-        sprite:align(display.LEFT_TOP, w + x, y)
+        terrain_bg:align(display.LEFT_TOP, w + x, y)
         w = size.width + w + offset
         if w > width then
             break
@@ -1347,27 +1396,28 @@ function AllianceLayer:CreateDesertBg()
 end
 function AllianceLayer:CreateIceFieldBg()
     local terrain = "iceField"
-    local map = cc.TMXTiledMap:create(string.format("tmxmaps/alliance_%s1.tmx", terrain))
+    local map 
+    GameUtils:LoadImagesWithFormat(function()
+        map = cc.TMXTiledMap:create(string.format("tmxmaps/alliance_%s1.tmx", terrain))
+    end, cc.TEXTURE2_D_PIXEL_FORMAT_RG_B565)
     local width = map:getContentSize().width
 
     local LEN = 160
-    display.newSprite(string.format("plus_right_%s.png", terrain))
-        :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, 0)
-    for i = 0, 9 do
+    for i = 0, math.floor(ALLIANCE_WIDTH/3 - 0.5) do
         display.newSprite(string.format("plus_right_%s.png", terrain))
-            :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, i * 480 + 160)
+            :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, i * 480)
     end
     local w = 0
     math.randomseed(737)
     while true do
         local index = math.random(2)
         local png = string.format("plus_down%d_%s.png", index, terrain)
-        local sprite = display.newSprite(png):addTo(map)
-        local size = sprite:getContentSize()
-        local offset = (index == 1 and -25 or -90)
+        local terrain_bg = display.newSprite(png):addTo(map)
+        local size = terrain_bg:getContentSize()
+        local offset = (index == 1 and -20 or -50)
         local x = (index == 1 and -5 or -5)
         local y = (index == 1 and 20 or 18)
-        sprite:align(display.LEFT_TOP, w + x, y)
+        terrain_bg:align(display.LEFT_TOP, w + x, y)
         w = size.width + w + offset
         if w > width then
             break
@@ -1379,27 +1429,30 @@ function AllianceLayer:CreateIceFieldBg()
 end
 function AllianceLayer:CreateGrassLandBg()
     local terrain = "grassLand"
-    local map = cc.TMXTiledMap:create(string.format("tmxmaps/alliance_%s1.tmx", terrain))
+    local map
+    GameUtils:LoadImagesWithFormat(function()
+        map = cc.TMXTiledMap:create(string.format("tmxmaps/alliance_%s1.tmx", terrain))
+    end, cc.TEXTURE2_D_PIXEL_FORMAT_RG_B565)
     local width = map:getContentSize().width
 
     local LEN = 160
-    display.newSprite(string.format("plus_right_%s.png", terrain))
-        :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, 0)
-    for i = 0, 9 do
+    -- display.newSprite(string.format("plus_right_%s.png", terrain))
+    --     :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, 0)
+    for i = 0, math.floor(ALLIANCE_WIDTH/3 + 0.5) do
         display.newSprite(string.format("plus_right_%s.png", terrain))
-            :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, i * 480 + 160)
+            :addTo(map):align(display.LEFT_BOTTOM, map:getContentSize().width - LEN, i * 480)
     end
     local w = 0
     math.randomseed(737)
     while true do
         local index = math.random(2)
         local png = string.format("plus_down%d_grassLand.png", index)
-        local sprite = display.newSprite(png):addTo(map)
-        local size = sprite:getContentSize()
-        local offset = (index == 1 and -40 or -60)
+        local terrain_bg = display.newSprite(png):addTo(map)
+        local size = terrain_bg:getContentSize()
+        local offset = (index == 1 and -40 or -50)
         local x = (index == 1 and -20 or -30)
         local y = (index == 1 and 30 or 38)
-        sprite:align(display.LEFT_TOP, w + x, y)
+        terrain_bg:align(display.LEFT_TOP, w + x, y)
         w = size.width + w + offset
         if w > width then
             break
@@ -1408,6 +1461,9 @@ function AllianceLayer:CreateGrassLandBg()
     return map
 end
 function AllianceLayer:GetMapInfoByIndex(index, alliance)
+    if self:IsCrown(index) then -- 中心永远都是雪地
+        return "iceField", -1
+    end
     local terrain, style
     if (alliance == nil or alliance == json.null) then
         terrain, style = Alliance_Manager:getMapDataByIndex(index)
@@ -1418,13 +1474,12 @@ function AllianceLayer:GetMapInfoByIndex(index, alliance)
     style = style == nil and math.random(6) or style
     return terrain, style
 end
-
-local CLICK_EMPTY_TAG = 911
-function AllianceLayer:PromiseOfFlashEmptyGround(mapIndex, x, y)
-    self:RemoveClickNode()
+function AllianceLayer:PromiseOfFlashEmptyGround(mapIndex, x, y, scale)
+    local CLICK_EMPTY_TAG = 911
+    self.empty_node:removeChildByTag(CLICK_EMPTY_TAG)
     local point = self:RealPosition(mapIndex, x, y)
     local p = promise.new()
-    display.newSprite("click_empty.png")
+    display.newSprite("click_empty.png"):scale(scale or 1)
         :addTo(self.empty_node, 10000, CLICK_EMPTY_TAG)
         :pos(point.x, point.y):opacity(0)
         :runAction(
@@ -1433,14 +1488,11 @@ function AllianceLayer:PromiseOfFlashEmptyGround(mapIndex, x, y)
                 cc.FadeTo:create(0.15, 0),
                 cc.CallFunc:create(function()
                     p:resolve()
-                    self:RemoveClickNode()
+                    self.empty_node:removeChildByTag(CLICK_EMPTY_TAG)
                 end)
             }
         )
     return p
-end
-function AllianceLayer:RemoveClickNode()
-    self.empty_node:removeChildByTag(CLICK_EMPTY_TAG)
 end
 function AllianceLayer:TrackCorpsById(id)
     if self.track_id then
@@ -1455,9 +1507,9 @@ local CIRCLE_TAG = 4356
 function AllianceLayer:AddToCorpsCircle(corps)
     if not corps then return end
     if corps:getChildByTag(CIRCLE_TAG) then return end
-    local sprite = display.newSprite("tmp_monster_circle.png")
+    local circle = display.newSprite("tmp_monster_circle.png")
         :addTo(corps, -1, CIRCLE_TAG)
-    sprite:runAction(
+    circle:runAction(
         cc.RepeatForever:create(
             transition.sequence{
                 cc.ScaleTo:create(0.5/2, 1.2),
@@ -1465,7 +1517,7 @@ function AllianceLayer:AddToCorpsCircle(corps)
             }
         )
     )
-    sprite:setColor(cc.c3b(96,255,0))
+    circle:setColor(cc.c3b(96,255,0))
 end
 function AllianceLayer:RemoveCorpsCircle(corps)
     if corps and corps:getChildByTag(CIRCLE_TAG) then

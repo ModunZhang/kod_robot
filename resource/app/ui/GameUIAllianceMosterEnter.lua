@@ -38,7 +38,7 @@ function GameUIAllianceMosterEnter:ctor(mapObj,alliance)
 end
 function GameUIAllianceMosterEnter:onCleanup()
     local scene_name = display.getRunningScene().__cname
-    if (scene_name == 'AllianceBattleScene' or scene_name == 'AllianceScene') then
+    if scene_name == 'AllianceScene' then
         for k,v in pairs(display.getRunningScene():GetSceneLayer():GetAllianceViews()) do
             if v:GetMapObjectById(self.entity.id) then
                 v:GetMapObjectById(self.entity.id):Unlock()
@@ -105,18 +105,20 @@ function GameUIAllianceMosterEnter:onEnter()
         size = 20,
     }):addTo(title_bg):align(display.LEFT_CENTER, 10, title_bg:getContentSize().height/2)
 
-    local clipNode = display.newClippingRegionNode(cc.rect(soldier_head_icon:getPositionX() + 90 ,20,380,150)):addTo(body)
-    local rewards_node = display.newNode():addTo(clipNode)
-    rewards_node:setContentSize(cc.size(#rewards * 100,100))
-    rewards_node:align(display.LEFT_CENTER, 0, 50)
+    -- 创建奖励node
+    local reward_table = {}
+    local origin_x,origin_y,gap_x ,added_count = soldier_head_icon:getPositionX() + 90,soldier_head_icon:getPositionY() - 85, 100,1
     for i,reward in ipairs(rewards) do
         local info = string.split(reward,":")
-        display.newSprite("box_118x118.png"):addTo(rewards_node):align(display.CENTER, 44 + (i - 1) * 100, 100):scale(88/118)
+        local reward_node = display.newNode():setOpacity(i < 5 and 255 or 0)
+        reward_node:setContentSize(cc.size(88,88))
+        reward_node:addTo(body):align(display.LEFT_CENTER, origin_x + (added_count - 1) * gap_x, origin_y)
+        local reward_box = display.newSprite("box_118x118.png"):addTo(reward_node):align(display.CENTER, 44 , 44):scale(88/118)
         local material_icon = display.newSprite(UILib.materials[info[2]] or UILib.item[info[2]])
-            :align(display.CENTER, 44 + (i - 1) * 100, 100)
-            :addTo(rewards_node)
+            :align(display.CENTER, 44 , 44)
+            :addTo(reward_node)
         material_icon:scale(74/math.max(material_icon:getContentSize().width,material_icon:getContentSize().height))
-        local num_bg = display.newSprite("gacha_num_bg.png"):addTo(rewards_node):align(display.CENTER, 64 + (i - 1) * 100,70)
+        local num_bg = display.newSprite("gacha_num_bg.png"):addTo(reward_node):align(display.CENTER, 64,14)
         UIKit:ttfLabel({
             text = "X "..info[3],
             size = 16,
@@ -125,20 +127,66 @@ function GameUIAllianceMosterEnter:onEnter()
             :addTo(num_bg)
         UIKit:ttfLabel({
             text = info[1] == "buildingMaterials" and  Localize.materials[info[2]] or Localize_item.item_name[info[2]],
-            -- text = "X "..info[3],
             color = 0x615b44,
             size = 16,
-        -- ellipsis = true,
-        -- dimensions = cc.size(90,20)
-        }):addTo(rewards_node):align(display.CENTER, 44 + (i - 1) * 100 ,40)
+        }):addTo(reward_node):align(display.CENTER, 44 ,- 16)
+        if added_count + 1 > 4 then
+            added_count = 1
+        else
+            added_count = added_count + 1
+        end
+        table.insert(reward_table, reward_node)
     end
+    local show_reward_index = 5
+    self:performWithDelay(function()
+        scheduleAt(self, function()
+            local end_index = show_reward_index + 4
+            for i,reward_node in ipairs(reward_table) do
+                if i < end_index and i >= show_reward_index then
+                    reward_node:runAction(cc.FadeTo:create(0.4, 255))
+                else
+                    if reward_node:isVisible() then
+                        reward_node:runAction(cc.FadeTo:create(0.4, 0))
+                    end
+                end
+            end
+            show_reward_index = end_index > #reward_table and 1 or end_index
+        end,2)
+    end, 2)
+    -- local clipNode = display.newClippingRegionNode(cc.rect(soldier_head_icon:getPositionX() + 90 ,20,380,150)):addTo(body)
+    -- local rewards_node = display.newNode():addTo(clipNode)
+    -- rewards_node:setContentSize(cc.size(#rewards * 100,100))
+    -- rewards_node:align(display.LEFT_CENTER, 0, 50)
+    -- for i,reward in ipairs(rewards) do
+    --     local info = string.split(reward,":")
+    --     display.newSprite("box_118x118.png"):addTo(rewards_node):align(display.CENTER, 44 + (i - 1) * 100, 100):scale(88/118)
+    --     local material_icon = display.newSprite(UILib.materials[info[2]] or UILib.item[info[2]])
+    --         :align(display.CENTER, 44 + (i - 1) * 100, 100)
+    --         :addTo(rewards_node)
+    --     material_icon:scale(74/math.max(material_icon:getContentSize().width,material_icon:getContentSize().height))
+    --     local num_bg = display.newSprite("gacha_num_bg.png"):addTo(rewards_node):align(display.CENTER, 64 + (i - 1) * 100,70)
+    --     UIKit:ttfLabel({
+    --         text = "X "..info[3],
+    --         size = 16,
+    --         color = 0xffedae
+    --     }):align(display.RIGHT_CENTER, num_bg:getContentSize().width, num_bg:getContentSize().height/2)
+    --         :addTo(num_bg)
+    --     UIKit:ttfLabel({
+    --         text = info[1] == "buildingMaterials" and  Localize.materials[info[2]] or Localize_item.item_name[info[2]],
+    --         -- text = "X "..info[3],
+    --         color = 0x615b44,
+    --         size = 16,
+    --     -- ellipsis = true,
+    --     -- dimensions = cc.size(90,20)
+    --     }):addTo(rewards_node):align(display.CENTER, 44 + (i - 1) * 100 ,40)
+    -- end
 
-    rewards_node:runAction(cc.RepeatForever:create(transition.sequence{
-        cc.MoveTo:create(10, cc.p(soldier_head_icon:getPositionX() + 90 - rewards_node:getContentSize().width, 50)),
-        cc.CallFunc:create(function()
-            rewards_node:setPositionX(soldier_head_icon:getPositionX() + 90 + 380)
-        end)
-    }))
+    -- rewards_node:runAction(cc.RepeatForever:create(transition.sequence{
+    --     cc.MoveTo:create(10, cc.p(soldier_head_icon:getPositionX() + 90 - rewards_node:getContentSize().width, 50)),
+    --     cc.CallFunc:create(function()
+    --         rewards_node:setPositionX(soldier_head_icon:getPositionX() + 90 + 380)
+    --     end)
+    -- }))
 
     self.handle = scheduler.scheduleGlobal(handler(self, self.ShowReward), 1, false)
 
@@ -152,27 +200,27 @@ function GameUIAllianceMosterEnter:onEnter()
         ,{
             disabled = { name = "GRAY", params = {0.2, 0.3, 0.5, 0.1} }
         }):onButtonClicked(function()
-            local final_func = function ()
-                local attack_monster_func = function ()
-                    UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
-                        local scene_name = display.getRunningScene().__cname
-                        if not alliance:FindAllianceMonsterInfoByObject(mapObj) then
-                            UIKit:showMessageDialog(_("提示"),_("敌人已经消失了"))
-                            return
-                        end
-                        NetManager:getAttackMonsterPromise(dragonType,soldiers,alliance._id,entity.id):done(function()
-                            app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                        end)
-                    end,{targetAlliance = alliance,toLocation = entity.location,returnCloseAction = false}):AddToCurrentScene(true)
-                end
-                UIKit:showSendTroopMessageDialog(attack_monster_func,"buildingMaterials",_("建筑"))
+        local final_func = function ()
+            local attack_monster_func = function ()
+                UIKit:newGameUI('GameUISendTroopNew',function(dragonType,soldiers,total_march_time,GameUISendTroopNew)
+                    local scene_name = display.getRunningScene().__cname
+                    if not alliance:FindAllianceMonsterInfoByObject(mapObj) then
+                        UIKit:showMessageDialog(_("提示"),_("敌人已经消失了"))
+                        return
+                    end
+                    NetManager:getAttackMonsterPromise(dragonType,soldiers,alliance._id,entity.id):done(function()
+                        app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
+                    end)
+                end,{targetAlliance = alliance,toLocation = entity.location,returnCloseAction = false}):AddToCurrentScene(true)
             end
+            UIKit:showSendTroopMessageDialog(attack_monster_func,"buildingMaterials",_("建筑"))
+        end
 
-            if my_alliance:GetSelf():IsProtected() then
-                UIKit:showMessageDialog(_("提示"),_("进攻该目标将失去保护状态，确定继续派兵?"),final_func)
-            else
-                final_func()
-            end
+        if my_alliance:GetSelf():IsProtected() then
+            UIKit:showMessageDialog(_("提示"),_("进攻该目标将失去保护状态，确定继续派兵?"),final_func)
+        else
+            final_func()
+        end
         end):addTo(body):align(display.RIGHT_TOP, b_width, 10)
     local s = btn:getCascadeBoundingBox().size
     display.newSprite("attack_58x56.png"):align(display.CENTER, -s.width/2, -s.height/2+12):addTo(btn)
@@ -196,6 +244,8 @@ function GameUIAllianceMosterEnter:GetBelongAlliance()
 end
 
 return GameUIAllianceMosterEnter
+
+
 
 
 

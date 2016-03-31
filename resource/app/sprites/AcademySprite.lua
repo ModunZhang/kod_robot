@@ -2,18 +2,10 @@ local zz = import("..particles.zz")
 local FunctionUpgradingSprite = import(".FunctionUpgradingSprite")
 local AcademySprite = class("AcademySprite", FunctionUpgradingSprite)
 
-function AcademySprite:OnUserDataChanged_productionTechEvents(userData, deltaDate)
-    if deltaDate("productionTechEvents.remove") then
-        app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
-    end
-end
-
-
 
 local EMPTY_TAG = 11400
 function AcademySprite:ctor(city_layer, entity, city)
     AcademySprite.super.ctor(self, city_layer, entity, city)
-    city:GetUser():AddListenOnType(self, "productionTechEvents")
     scheduleAt(self, function() self:CheckEvent() end)
 end
 function AcademySprite:RefreshSprite()

@@ -206,8 +206,8 @@ function WidgetEventTabButtons:RefreshAllEvents()
     else
         self:GetTabByKey("material"):SetOrResetProgress(nil)
     end
-
-    local event = User:GetBuildingEventsBySeq()[1]
+    
+    local event = UtilsForBuilding:GetBuildingEventsBySeq(User)[1]
     if event then
         local time, percent = UtilsForEvent:GetEventInfo(event)
         self:GetTabByKey("build"):SetOrResetProgress(time, percent)
@@ -264,7 +264,7 @@ function WidgetEventTabButtons:RefreshBuildQueueByType(...)
         local item = self.tab_map[key]
         local able = self:IsTabEnable(key)
         if key == "build" then
-            local count = #city:GetUpgradingBuildings()
+            local count = UtilsForBuilding:GetBuildingEventsCount(User)
             local total = User.basicInfo.buildQueue
             item:SetActiveNumber(count, total):Enable(able)
         elseif key == "soldier" then
@@ -307,7 +307,7 @@ function WidgetEventTabButtons:ShowStartEvent()
     end
 end
 function WidgetEventTabButtons:HasAnyBuildingEvent()
-    return #self.city:GetUpgradingBuildings() > 0
+    return UtilsForBuilding:GetBuildingEventsCount(self.city:GetUser())
 end
 function WidgetEventTabButtons:HasAnySoldierEvent()
     return #self.city:GetUser().soldierEvents > 0
@@ -768,18 +768,7 @@ function WidgetEventTabButtons:LoadBuildingEvents()
     self:InsertItem(self:CreateBottom():OnOpenClicked(function(event)
         UIKit:newGameUI('GameUIHasBeenBuild', self.city):AddToCurrentScene(true)
     end):SetLabel(_("查看已拥有的建筑")))
-    local User = self.city:GetUser()
-    local events = {}
-    for _,v in ipairs(User.houseEvents) do
-        table.insert(events, v)
-    end
-    for _,v in ipairs(User.buildingEvents) do
-        table.insert(events, v)
-    end
-    table.sort(events, function(a, b)
-        return a.finishTime > b.finishTime
-    end)
-
+    local events = UtilsForBuilding:GetBuildingEventsBySeq(self.city:GetUser())
     local items = {}
     for _,v in ipairs(events) do
         local event_item = self:CreateItem()
@@ -958,14 +947,14 @@ function WidgetEventTabButtons:BuildingDescribe(event)
     local User = self.city:GetUser()
     local str
     if event.location then
-        local building = User:GetBuildingByEvent(event)
+        local building = UtilsForBuilding:GetBuildingByEvent(User, event)
         if building.level == 0 then
             str = string.format(_("%s (解锁)"), Localize.building_name[building.type])
         else
             str = string.format(_("%s (升级到 等级%d)"), Localize.building_name[building.type], building.level + 1)
         end
     else
-        local house = User:GetBuildingByEvent(event)
+        local house = UtilsForBuilding:GetBuildingByEvent(User, event)
         if house.level == 0 then
             str = string.format(_("%s (建造)"), Localize.building_name[house.type])
         else
@@ -998,9 +987,10 @@ function WidgetEventTabButtons:TechDescribe(event)
     local User = self.city:GetUser()
     local str
     if User:IsProductionTechEvent(event) then
-        str = _("研发")..Localize.productiontechnology_name[event.name]
+        local next_level = User.productionTechs[event.name].level + 1
+        str = _("研发") .. string.format(" %s Lv %d", Localize.productiontechnology_name[event.name], next_level)
     elseif User:IsSoldierStarEvent(event) then
-        str = UtilsForEvent:GetMilitaryTechEventLocalize(event.name, User:SoldierStarByName(event.name))
+        str = UtilsForEvent:GetMilitaryTechEventLocalize(event.name, UtilsForSoldier:SoldierStarByName(User, event.name))
     elseif User:IsMilitaryTechEvent(event) then
         str = UtilsForEvent:GetMilitaryTechEventLocalize(event.name, User:GetMilitaryTechLevel(event.name))
     else

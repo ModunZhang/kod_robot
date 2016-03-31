@@ -33,13 +33,10 @@ function OtherCityScene:OnTouchClicked(pre_x, pre_y, x, y)
 	local building = self:GetSceneLayer():GetClickedObject(x, y)
     if building then
         app:lockInput(true);self:performWithDelay(function()app:lockInput()end,0.3)
-        -- Sprite:PromiseOfFlash(unpack(self:CollectBuildings(building)))
          Sprite:PromiseOfFlash(unpack(self:CollectBuildings(building))):next(function()
             if iskindof(building, "HelpedTroopsSprite") then
                 local User = self.city:GetUser()
-                local helped = User.helpedByTroops[building:GetIndex()]
-                NetManager:getHelpDefenceTroopDetailPromise(User._id, helped.id):done(function(response)
-                    LuaUtils:outputTable("response", response)
+                NetManager:getHelpDefenceTroopDetailPromise(User._id):done(function(response)
                      UIKit:newGameUI("GameUIAllianceWatchTowerTroopDetail",response.msg.troopDetail,Alliance_Manager:GetMyAlliance():GetAllianceBuildingInfoByName("watchTower").level,true,GameUIAllianceWatchTowerTroopDetail.DATA_TYPE.MARCH,true)
                                 :AddToCurrentScene(true)
                 end)

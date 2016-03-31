@@ -21,7 +21,6 @@ local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 local light_gem = import("..particles.light_gem")
 local loginDays = GameDatas.Vip.loginDays
 local VIP_LEVEL = GameDatas.Vip.level
-local config_store = GameDatas.StoreItems.items
 
 local GameUIVipNew = UIKit:createUIClass('GameUIVipNew',"GameUIWithCommonHeader")
 
@@ -203,7 +202,6 @@ function GameUIVipNew:onExit()
 end
 function GameUIVipNew:onCleanup()
     GameUIVipNew.super.onCleanup(self)
-    cc.Director:getInstance():getTextureCache():removeTextureForKey("back_ground_vip_608x164.png")
     cc.Director:getInstance():getTextureCache():removeTextureForKey("back_ground_vip_608x164.jpg")
 end
 function GameUIVipNew:InitVip()
@@ -215,7 +213,7 @@ function GameUIVipNew:InitVipTop()
     local shadow = display.newColorLayer(UIKit:hex2c4b(0xff000000))
     shadow:setContentSize(cc.size(620,164))
     shadow:pos((display.width - 620) / 2, window.top_bottom - 146):addTo(vip_layer)
-    local back_ground_vip_608x164 = device.platform == 'winrt' and "back_ground_vip_608x164.png" or "back_ground_vip_608x164.jpg" 
+    local back_ground_vip_608x164 = "back_ground_vip_608x164.jpg"
     local top_bg = display.newSprite(back_ground_vip_608x164):align(display.TOP_CENTER, window.cx, window.top_bottom + 16):addTo(vip_layer)
     local bg_size = top_bg:getContentSize()
     local line = display.newSprite("line_624x58.png"):align(display.TOP_CENTER, bg_size.width/2, 16):addTo(top_bg)
@@ -242,7 +240,7 @@ function GameUIVipNew:InitVipTop()
                 }):AddToCurrentScene()
             end
         end)
-    local isactive, leftTime = User:IsVIPActived()
+    local isactive, leftTime = UtilsForVip:IsVipActived(User)
     local status_text = isactive and _("已激活").." "..GameUtils:formatTimeStyle1(leftTime) or _("未激活VIP")
     self.vip_status_label = UIKit:ttfLabel({
         text = status_text,
@@ -258,7 +256,7 @@ function GameUIVipNew:InitVipTop()
     local vip_level,percent,exp = User:GetVipLevel()
     progressTimer_vip_exp:setPercentage(percent)
     self.vip_exp_label = UIKit:ttfLabel({
-        text = string.formatnumberthousands(exp - User:GetSpecialVipLevelExp(vip_level)).."/"..string.formatnumberthousands(User:GetSpecialVipLevelExpTo(vip_level)),
+        text = string.formatnumberthousands(exp).."/"..string.formatnumberthousands(User:GetSpecialVipLevelExpTo(vip_level)),
         size = 20,
         color = 0xfff3c7,
         shadow = true
@@ -277,7 +275,7 @@ function GameUIVipNew:InitVipTop()
 
     -- 当前vip等级
     -- 是否激活
-    if User:IsVIPActived() then
+    if UtilsForVip:IsVipActived(User) then
         btn_pic = "vip_unlock_normal.png"
     else
         btn_pic = "vip_lock.png"
@@ -286,7 +284,7 @@ function GameUIVipNew:InitVipTop()
     local current_level = display.newSprite(btn_pic):align(display.CENTER, bg_size.width/2,bg_size.height - 55):addTo(top_bg)
 
     self.vip_level_pic = display.newSprite("VIP_"..vip_level.."_46x32.png"):addTo(current_level)
-        :align(display.CENTER,52,45)
+        :align(display.CENTER,48,45)
     self.vip_level_bg = current_level
 
     -- 连续登陆，明日登陆
@@ -387,6 +385,7 @@ function GameUIVipNew:CreateVipEff()
     end):addTo(vip_layer)
     pv:setTouchSwallowEnabled(false)
     local all_vip_nodes = {}
+    local all_right_levels = {}
     for i=1,VIP_MAX_LEVEL do
         if i ~= self.current_vip_level then
             local item = pv:newItem()
@@ -395,6 +394,7 @@ function GameUIVipNew:CreateVipEff()
             local vip_node = self:CreateVipEffNodeByLevel(i)
             vip_node:align(display.TOP_LEFT,0, 514 ):addTo(content_node)
             table.insert(all_vip_nodes, vip_node)
+            table.insert(all_right_levels, i)
             item:addChild(content_node)
             pv:addItem(item)
         end
@@ -416,12 +416,12 @@ function GameUIVipNew:CreateVipEff()
             for i,vip_node in ipairs(all_vip_nodes) do
                 local tar_y = vip_node:getPositionY() + offset_y
                 tar_y = math.max(tar_y,514)
-                tar_y = math.min(tar_y, math.max(self:GetVipEffectiveCountByLevel(pv:getCurPageIdx()) * 86,current_vip_node:getContentSize().height))
+                tar_y = math.min(tar_y, math.max(self:GetVipEffectiveCountByLevel(all_right_levels[pv:getCurPageIdx()]) * 86,current_vip_node:getContentSize().height))
                 vip_node:setPositionY(tar_y)
             end
             local tar_y = current_vip_node:getPositionY() + offset_y
             tar_y = math.max(tar_y,window.bottom_top + 44 + 514)
-            tar_y = math.min(tar_y,math.max(window.bottom_top + 44 + self:GetVipEffectiveCountByLevel(pv:getCurPageIdx()) * 86,window.bottom_top + 44 + current_vip_node:getContentSize().height))
+            tar_y = math.min(tar_y,math.max(window.bottom_top + 44 + self:GetVipEffectiveCountByLevel(all_right_levels[pv:getCurPageIdx()]) * 86,window.bottom_top + 44 + current_vip_node:getContentSize().height))
             current_vip_node:setPositionY(tar_y)
         end
         return true
@@ -441,12 +441,12 @@ function GameUIVipNew:CreateVipEff()
             for i,vip_node in ipairs(all_vip_nodes) do
                 local tar_y = vip_node:getPositionY() + offset_y
                 tar_y = math.max(tar_y,514)
-                tar_y = math.min(tar_y, math.max(self:GetVipEffectiveCountByLevel(pv:getCurPageIdx()) * 86,current_vip_node:getContentSize().height))
+                tar_y = math.min(tar_y, math.max(self:GetVipEffectiveCountByLevel(all_right_levels[pv:getCurPageIdx()]) * 86,current_vip_node:getContentSize().height))
                 vip_node:setPositionY(tar_y)
             end
             local tar_y = current_vip_node:getPositionY() + offset_y
             tar_y = math.max(tar_y,window.bottom_top + 44 + 514)
-            tar_y = math.min(tar_y,math.max(window.bottom_top + 44 + self:GetVipEffectiveCountByLevel(pv:getCurPageIdx()) * 86,window.bottom_top + 44 + current_vip_node:getContentSize().height))
+            tar_y = math.min(tar_y,math.max(window.bottom_top + 44 + self:GetVipEffectiveCountByLevel(all_right_levels[pv:getCurPageIdx()]) * 86,window.bottom_top + 44 + current_vip_node:getContentSize().height))
             current_vip_node:setPositionY(tar_y)
         end
         return true
@@ -600,7 +600,7 @@ function GameUIVipNew:OnUserDataChanged_basicInfo(userData, deltaData)
     end
 end
 function GameUIVipNew:OnVipEventTimer()
-    local isactive, time = User:IsVIPActived()
+    local isactive, time = UtilsForVip:IsVipActived(User)
     if time > 0 then
         self.vip_status_label:setString(_("已激活").." "..GameUtils:formatTimeStyle1(time))
         self.vip_level_bg:setTexture("vip_unlock_normal.png")
@@ -610,6 +610,7 @@ function GameUIVipNew:OnVipEventTimer()
     end
 end
 return GameUIVipNew
+
 
 
 

@@ -1,4 +1,7 @@
 local UIListView = import("..ui.UIListView")
+local WidgetUseItems = import(".WidgetUseItems")
+local Localize = import("..utils.Localize")
+
 local WidgetRequirementListview = class("WidgetRequirementListview", function ()
     local layer = cc.Layer:create()
     layer:setCascadeOpacityEnabled(true)
@@ -18,17 +21,19 @@ function WidgetRequirementListview:ctor(parms)
 
     local list_bg = display.newScale9Sprite("back_ground_540x64.png", 0, 0,cc.size(self.width, self.listview_height))
         :align(display.LEFT_BOTTOM):addTo(self)
-    local title_bg = display.newSprite("alliance_evnets_title_548x50.png", x, y):align(display.CENTER_BOTTOM, self.width/2, self.listview_height):addTo(self)
-    UIKit:ttfLabel({
-        text = self.title ,
-        size = 24,
-        color = 0xffedae
-    }):align(display.CENTER,self.width/2, 25):addTo(title_bg)
+    if self.title then
+        local title_bg = display.newSprite("alliance_evnets_title_548x50.png", x, y):align(display.CENTER_BOTTOM, self.width/2, self.listview_height):addTo(self)
+        UIKit:ttfLabel({
+            text = self.title ,
+            size = 24,
+            color = 0xffedae
+        }):align(display.CENTER,self.width/2, 25):addTo(title_bg)
+    end
     self.listview = UIListView.new({
         viewRect = cc.rect(0,0, self.listview_width, self.listview_height-20),
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL})
         :addTo(list_bg,2):pos((self.width-self.listview_width)/2, 12)
-
+    self.listview:onTouch(handler(self, self.listviewListener))
     -- 缓存已经添加的升级条件项,供刷新时使用
     self.added_items = {}
     self.top_index = 0
@@ -48,6 +53,7 @@ function WidgetRequirementListview:RefreshListView(contents)
             -- 需求已添加，则更新最新资源数据
             if self.added_items[v.resource_type] then
                 local added_resource = self.added_items[v.resource_type]
+                added_resource.content = v
                 local content = added_resource:getContent()
                 if meetFlag then
                     content.bg:setTexture("upgrade_resources_background_3.png")
@@ -181,9 +187,10 @@ function WidgetRequirementListview:RefreshListView(contents)
                         self.top_index = self.top_index + 1
                         index = self.top_index
                     else
-                        -- index = self.top_index + 1
+                    -- index = self.top_index + 1
                     end
                 end
+                item.content = v
                 self.listview:addItem(item,index)
                 self.added_items[v.resource_type] = item
                 self.listview:reload()
@@ -198,8 +205,76 @@ function WidgetRequirementListview:RefreshListView(contents)
         end
     end
 end
-
+function WidgetRequirementListview:listviewListener(event)
+    local listView = event.listView
+    if "clicked" == event.name then
+        local pos = event.itemPos
+        if not pos then
+            return
+        end
+        app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
+        local item = event.item
+        if not item.content.isSatisfy then
+            local resource_type = item.content.resource_type
+            if resource_type == _("木材") then
+                WidgetUseItems.new():Create({
+                    item_name = "woodClass_1"
+                }):AddToCurrentScene()
+            elseif resource_type == _("石料") then
+                WidgetUseItems.new():Create({
+                    item_name = "stoneClass_1"
+                }):AddToCurrentScene()
+            elseif resource_type == _("铁矿") then
+                WidgetUseItems.new():Create({
+                    item_name = "ironClass_1"
+                }):AddToCurrentScene()
+            elseif resource_type == _("空闲城民") then
+                WidgetUseItems.new():Create({
+                    item_name = "citizenClass_1"
+                }):AddToCurrentScene()
+            elseif resource_type == "coin" or resource_type == _("银币") then
+                WidgetUseItems.new():Create({
+                    item_name = "coinClass_1"
+                }):AddToCurrentScene()
+            elseif resource_type == _("工程图纸")
+                or resource_type == _("建造工具")
+                or resource_type == _("砖石瓦片")
+                or resource_type == _("滑轮组") then
+                local tile = City:GetTileByLocationId(16)
+                local b_x,b_y =tile.x,tile.y
+                -- 工具作坊是否已解锁
+                if City:IsUnLockedAtIndex(b_x,b_y) then
+                    UIKit:newGameUI("GameUIToolShop", City,City:GetFirstBuildingByType("toolShop"),"manufacture","buildingMaterials"):AddToCurrentScene(true)
+                else
+                    UIKit:showMessageDialog(_("提示"),_("请先升级城堡，解锁工具作坊"),function()end)
+                end
+            elseif resource_type == _("木人桩")
+                or resource_type == _("箭靶")
+                or resource_type == _("马鞍")
+                or resource_type == _("精铁零件") then
+                local tile = City:GetTileByLocationId(16)
+                local b_x,b_y =tile.x,tile.y
+                -- 工具作坊是否已解锁
+                if City:IsUnLockedAtIndex(b_x,b_y) then
+                    UIKit:newGameUI("GameUIToolShop", City,City:GetFirstBuildingByType("toolShop"),"manufacture","technologyMaterials"):AddToCurrentScene(true)
+                else
+                    UIKit:showMessageDialog(_("提示"),_("请先升级城堡，解锁工具作坊"),function()end)
+                end
+            elseif resource_type == _("英雄之血") then
+                 WidgetUseItems.new():Create({
+                    item_name = "heroBlood_1"
+                }):AddToCurrentScene()
+            elseif Localize.equip_material[resource_type] then
+                UIKit:newWidgetUI("WidgetMaterialDetails", "dragonMaterials",resource_type):AddToCurrentScene()
+            end
+        end
+    end
+end
 return WidgetRequirementListview
+
+
+
+
 
 
 

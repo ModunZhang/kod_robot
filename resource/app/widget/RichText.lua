@@ -116,7 +116,7 @@ function RichText:Text(str, line , url_handle)
         elseif v.type == "text" then
             local head, tail, is_newline = v.value, ""
             local underLine = url or v.underLine
-            local label_size = v.size or self.size
+            local label_size = tonumber(v.size) or self.size
             local color = v.color or self.color
             repeat
                 local line_width = cur_x

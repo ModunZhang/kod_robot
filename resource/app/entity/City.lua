@@ -7,11 +7,9 @@ local Enum = import("..utils.Enum")
 local Orient = import(".Orient")
 local Tile = import(".Tile")
 local Building = import(".Building")
-local GateEntity = import(".GateEntity")
-local TowerEntity = import(".TowerEntity")
+local UpgradeBuilding = import(".UpgradeBuilding")
 local TowerUpgradeBuilding = import(".TowerUpgradeBuilding")
 local MultiObserver = import(".MultiObserver")
-local property = import("..utils.property")
 local City = class("City", MultiObserver)
 local floor = math.floor
 local ceil = math.ceil
@@ -61,18 +59,14 @@ function City:ctor(user)
     self.belong_user = user
     self.buildings = {}
     self.walls = {}
-    self.gate = GateEntity.new({building_type = "wall", city = self}):AddUpgradeListener(self)
-    self.tower = TowerEntity.new({building_type = "tower", city = self}):AddUpgradeListener(self)
+    self.gate = UpgradeBuilding.new({building_type = "wall", city = self})
+    self.tower = UpgradeBuilding.new({building_type = "tower", city = self})
     self.visible_towers = {}
     self.decorators = {}
     self.need_update_buildings = {}
     self.building_location_map = {}
     self:InitLocations()
     self:InitRuins()
-
-    -- fte
-    self.upgrading_building_callbacks = {}
-    self.finish_upgrading_callbacks = {}
 end
 --------------------
 function City:GetRecommendTask()
@@ -222,7 +216,7 @@ function City:GetBeginnersTask()
         if v.type == "reward" and not flag[i] and count > 0 then
             return setmetatable({ index = i }, reward_meta)
         elseif v.type == "unlock" then
-            if self:GetFirstBuildingByType("keep"):GetFreeUnlockPoint() > 0 then
+            if UtilsForBuilding:GetFreeUnlockPoint(self:GetUser()) > 0 then
                 for i,lstr in ipairs(string.split(v.name, ",")) do
                     local location_id = tonumber(lstr)
                     local building = self:GetBuildingByLocationId(location_id)
@@ -385,14 +379,7 @@ function City:InitWithJsonData(userData)
     return self
 end
 function City:ResetAllListeners()
-    self.upgrading_building_callbacks = {}
-    self.finish_upgrading_callbacks = {}
-
     self:ClearAllListener()
-    self:IteratorCanUpgradeBuildings(function(building)
-        building:ResetAllListeners()
-        building:AddUpgradeListener(self)
-    end)
 end
 function City:NewBuildingWithType(building_type, x, y, w, h, level, finish_time)
     return BuildingRegister[building_type].new{
@@ -447,7 +434,6 @@ function City:InitBuildings(buildings)
             assert(not self[type_])
             self[type_] = building
         end
-        building:AddUpgradeListener(self)
     end)
 end
 function City:InitLocations()
@@ -460,8 +446,6 @@ end
 function City:InitDecorators(decorators)
     self.decorators = decorators
     table.foreach(decorators, function(key, building)
-        building:AddUpgradeListener(self)
-
         local tile = self:GetTileWhichBuildingBelongs(building)
         local sub_location = tile:GetBuildingLocation(building)
         assert(sub_location)
@@ -513,52 +497,13 @@ function City:IsHouse(building)
     return building:IsHouse()
 end
 function City:IsTower(building)
-    return iskindof(building, "TowerEntity")
+    return building:GetType() == "tower"
 end
 function City:IsGate(building)
-    return iskindof(building, "GateEntity")
+    return building:GetType() == "wall"
 end
-function City:GetAvailableBuildQueueCounts()
-    return self:GetUser().basicInfo.buildQueue - #self:GetUpgradingBuildings()
-end
-function City:GetUpgradingBuildings(need_sort)
-    local builds = {}
-    self:IteratorCanUpgradeBuildings(function(building)
-        if building:IsUpgrading() then
-            insert(builds, building)
-        end
-    end)
-    if need_sort then
-        table.sort(builds, function(a, b)
-            local a_index = self:GetLocationIdByBuildingType(a:GetType())
-            local b_index = self:GetLocationIdByBuildingType(b:GetType())
-            if a_index and b_index then
-                return a_index < b_index
-            elseif a_index == nil and b_index then
-                return false
-            elseif a_index and b_index == nil then
-                return true
-            else
-                return a:GetType() == b:GetType() and a:IsAheadOfBuilding(b) or a:IsImportantThanBuilding(b)
-            end
-        end)
-    end
-    return builds
-end
-function City:GetUpgradingBuildingsWithOrder(current_time)
-    local builds = {}
-    self:IteratorCanUpgradeBuildings(function(building)
-        if building:IsUpgrading() then
-            insert(builds, building)
-        end
-    end)
-    table.sort(builds, function(a, b)
-        return a:GetUpgradingLeftTimeByCurrentTime(current_time) < b:GetUpgradingLeftTimeByCurrentTime(current_time)
-    end)
-    return builds
-end
-function City:GetLeftBuildingCountsByType(building_type)
-    return self:GetMaxHouseCanBeBuilt(building_type) - #self:GetBuildingByType(building_type)
+function City:GetLeftBuildingCountsByType(houseType)
+    return UtilsForBuilding:GetMaxBuildHouse(self:GetUser(), houseType) - #self:GetBuildingByType(houseType)
 end
 local function alignmeng_path(path)
     if #path <= 3 then
@@ -646,10 +591,10 @@ local BUILDING_MAP = {
     miner = "foundry",
 }
 function City:GetMaxHouseCanBeBuilt(house_type)
-    --基础值
     local max = intInit.eachHouseInitCount.value
     for _, v in pairs(self:GetBuildingByType(BUILDING_MAP[house_type])) do
-        max = max + v:GetMaxHouseNum()
+        local houseAdd = UtilsForBuilding:GetPropertyBy(self:GetUser(), v:GetType(), "houseAdd")
+        max = max + houseAdd
     end
     return max
 end
@@ -1071,8 +1016,6 @@ function City:CreateDecorator(current_time, decorator_building)
     assert(self:GetDecoratorsByLocationId(tile.location_id)[sub_location] == nil)
     self:GetDecoratorsByLocationId(tile.location_id)[sub_location] = decorator_building
 
-    self:OnCreateDecorator(current_time, decorator_building)
-
     self:CheckIfDecoratorsIntersectWithRuins()
     self:NotifyListeneOnType(City.LISTEN_TYPE.CREATE_DECORATOR, function(listener)
         listener:OnCreateDecorator(decorator_building)
@@ -1098,14 +1041,6 @@ function City:GetRuinsNotBeenOccupied()
     end)
     return r
 end
---根据type获取装饰物列表
-function City:GetCitizenByType(building_type)
-    local total_citizen = 0
-    for k, v in pairs(self:GetDecoratorsByType(building_type)) do
-        total_citizen = total_citizen + v:GetCitizen()
-    end
-    return total_citizen
-end
 function City:GetDecoratorsByType(building_type)
     local r = {}
     self:IteratorDecoratorBuildingsByFunc(function(key, building)
@@ -1114,9 +1049,6 @@ function City:GetDecoratorsByType(building_type)
         end
     end)
     return r
-end
-function City:DestoryDecorator(current_time, building)
-    self:DestoryDecoratorByPosition(current_time, building.x, building.y)
 end
 function City:DestoryDecoratorByPosition(current_time, x, y)
     local destory_decorator = self:GetDecoratorByPosition(x, y)
@@ -1149,8 +1081,6 @@ function City:DestoryDecoratorByPosition(current_time, x, y)
             end
         end)
 
-        self:OnDestoryDecorator(current_time, destory_decorator)
-
         self:NotifyListeneOnType(City.LISTEN_TYPE.DESTROY_DECORATOR, function(listener)
             listener:OnDestoryDecorator(destory_decorator, release_ruins)
         end)
@@ -1172,6 +1102,20 @@ function City:OnUserDataChanged(userData, current_time, deltaData)
         end
     end)
     self.need_update_buildings = need_update_buildings
+    if deltaData then
+        local ok_1 = deltaData("buildingEvents.add")
+        local ok_2 = deltaData("buildingEvents.remove")
+        local ok_3 = deltaData("houseEvents.add")
+        local ok_4 = deltaData("houseEvents.remove")
+        local ok_5 = deltaData("productionTechEvents.remove")
+
+        if ok_1 or ok_3 then
+            app:GetAudioManager():PlayeEffectSoundWithKey("UI_BUILDING_UPGRADE_START")
+        end
+        if ok_2 or ok_4 or ok_5 then
+            app:GetAudioManager():PlayeEffectSoundWithKey("COMPLETE")
+        end
+    end
     return self
 end
 local function find_building_info_by_location(houses, location_id)
@@ -1229,7 +1173,7 @@ function City:OnHouseChanged(userData, current_time, deltaData)
                     -- 如果类型不对也认为是删除
                     if not house_info or
                         (house_info.type ~= building:GetType()) then
-                        self:DestoryDecorator(current_time, building)
+                        self:DestoryDecoratorByPosition(current_time, building.x, building.y)
                     end
             end)
 
@@ -1253,20 +1197,6 @@ function City:OnHouseChanged(userData, current_time, deltaData)
         end)
     end)
     return true, is_unlock_any_tiles, unlock_table
-end
-function City:OnCreateDecorator(current_time, building)
-    building:AddUpgradeListener(self)
-end
-function City:OnDestoryDecorator(current_time, building)
-    building:RemoveUpgradeListener(self)
-end
-function City:OnBuildingUpgradingBegin(building, current_time)
-    self:CheckUpgradingBuildingPormise(building)
-end
-function City:OnBuildingUpgrading(building, current_time)
-end
-function City:OnBuildingUpgradeFinished(building)
-    self:CheckFinishUpgradingBuildingPormise(building)
 end
 function City:LockTilesByIndexArray(index_array)
     table.foreach(index_array, function(_, index)
@@ -1307,19 +1237,8 @@ function City:UnlockTilesByIndex(x, y)
     self:NotifyListeneOnType(City.LISTEN_TYPE.UNLOCK_TILE, function(listener)
         listener:OnTileUnlocked(city, x, y)
     end)
-    -- 检查是否解锁完一圈
-    -- local round = self:GetAroundByPosition(x, y)
-    -- if self:IsUnlockedInAroundNumber(round) then
-    --     self:NotifyListeneOnType(City.LISTEN_TYPE.UNLOCK_ROUND, function(listener)
-    --         listener:OnRoundUnlocked(round)
-    --     end)
-    -- end
     return success, ret_code
 end
--- function City:OnInitBuilding(building)
---     building.city = self
---     building:AddUpgradeListener(self)
--- end
 ---------
 local function find_beside_wall(walls, wall)
     for i, v in ipairs(walls) do
@@ -1433,71 +1352,6 @@ function City:GenerateTowers(walls)
 
     self.visible_towers = visible_tower
 end
-
--- promise
-local function promiseOfBuilding(callbacks, building_type, level)
-    assert(#callbacks == 0)
-    local p = promise.new()
-    insert(callbacks, function(building)
-        if building_type == nil or (building:GetType() == building_type and (not level or level == building:GetLevel())) then
-            return p:resolve(building)
-        end
-    end)
-    return p
-end
-local function checkBuilding(callbacks, building)
-    if #callbacks > 0 and callbacks[1](building) then
-        table.remove(callbacks, 1)
-    end
-end
-function City:PromiseOfUpgradingByLevel(building_type, level)
-    return promiseOfBuilding(self.upgrading_building_callbacks, building_type, level)
-end
-function City:CheckUpgradingBuildingPormise(building)
-    return checkBuilding(self.upgrading_building_callbacks, building)
-end
-function City:PromiseOfFinishUpgradingByLevel(building_type, level)
-    return promiseOfBuilding(self.finish_upgrading_callbacks, building_type, level)
-end
-function City:CheckFinishUpgradingBuildingPormise(building)
-    return checkBuilding(self.finish_upgrading_callbacks, building)
-end
---
-function City:PromiseOfRecruitSoldier(soldier_type)
-    return self:GetFirstBuildingByType("barracks"):PromiseOfRecruitSoldier(soldier_type)
-end
-function City:PromiseOfFinishSoldier(soldier_type)
-    return self:GetFirstBuildingByType("barracks"):PromiseOfFinishSoldier(soldier_type)
-end
---
-function City:PromiseOfTreatSoldier(soldier_type)
-    return self:GetFirstBuildingByType("hospital"):PromiseOfTreatSoldier(soldier_type)
-end
-function City:PromiseOfFinishTreatSoldier(soldier_type)
-    return self:GetFirstBuildingByType("hospital"):PromiseOfFinishTreatSoldier(soldier_type)
-end
---
-function City:PromiseOfFinishEquipementDragon()
-    return self:GetDragonEyrie():GetDragonManager():PromiseOfFinishEquipementDragon()
-end
-
-function City:GetWatchTowerLevel()
-    local watch_tower = self:GetFirstBuildingByType("watchTower")
-    return watch_tower and watch_tower:GetLevel() or 0
-end
-
-function City:GeneralProductionLocalPush(productionTechnologyEvent)
-    if ext and ext.localpush then
-        local title = productionTechnologyEvent:GetBuffLocalizedDescComplete()
-        app:GetPushManager():UpdateTechnologyPush(productionTechnologyEvent:FinishTime(),title,productionTechnologyEvent:Id())
-    end
-end
-function City:CancelProductionLocalPush(Id)
-    if ext and ext.localpush then
-        app:GetPushManager():CancelTechnologyPush(Id)
-    end
-end
-
 
 
 

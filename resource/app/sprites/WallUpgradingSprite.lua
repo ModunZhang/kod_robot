@@ -31,8 +31,8 @@ function WallUpgradingSprite:ctor(city_layer, entity, level)
     WallUpgradingSprite.super.ctor(self, city_layer, entity)
 
     if entity:IsGate() then
-        UIKit:CreateSoldierIdle45Ani("sentinel_3", 3):addTo(self):pos(-170, 0)
-        UIKit:CreateSoldierIdle45Ani("sentinel_3", 3):addTo(self):pos(-80, -50)
+        UIKit:CreateSoldierIdle45Ani("sentinel_3", 3):addTo(self):scale(0.7):pos(-170 + 10, 0 + 10)
+        UIKit:CreateSoldierIdle45Ani("sentinel_3", 3):addTo(self):scale(0.7):pos(-80 + 10, -50 + 10)
     end
 end
 function WallUpgradingSprite:GetSpriteFile()

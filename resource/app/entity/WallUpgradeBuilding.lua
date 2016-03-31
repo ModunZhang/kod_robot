@@ -14,16 +14,6 @@ end
 function WallUpgradeBuilding:GetRealEntity()
     return self.real_entity
 end
-function WallUpgradeBuilding:AddUpgradeListener(listener)
-    if self:IsGate() then
-        self.real_entity:AddUpgradeListener(listener)
-    end
-end
-function WallUpgradeBuilding:RemoveUpgradeListener(listener)
-    if self:IsGate() then
-        self.real_entity:RemoveUpgradeListener(listener)
-    end
-end
 
 ----
 function WallUpgradeBuilding:GetSize()

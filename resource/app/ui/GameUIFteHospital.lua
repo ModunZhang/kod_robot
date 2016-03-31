@@ -35,7 +35,7 @@ function GameUIFteHospital:PromiseOfFte()
         mockData.TreatSoldier(name, count)
     end)
 
-    return self.city:PromiseOfTreatSoldier(name):next(function()
+    return self.city:GetUser():PromiseOfBeginTreat():next(function()
         return self:PromsieOfExit("GameUIFteHospital")
     end)
 end

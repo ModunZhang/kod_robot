@@ -11,6 +11,7 @@ require("app.utils.UtilsForVip")
 require("app.utils.UtilsForSoldier")
 require("app.utils.UtilsForBuilding")
 require("app.utils.UtilsForShrine")
+require("app.utils.UtilsForDragon")
 local BuildingRegister = import("app.entity.BuildingRegister")
 local promise = import("app.utils.promise")
 local GameDefautlt = import("app.utils.GameDefautlt")
@@ -171,11 +172,11 @@ function MyApp:run()
         dump(err:reason())
         local content, title = err:reason()
         local code = content.code
-        if content.code == 683 then
+        if content.code == 683 or content.code == 504 then
             NetManager:disconnect()
             self:run()
-        else
-            threadExit()
+        -- else
+        --     threadExit()
         end
         end)
 end

@@ -52,7 +52,7 @@ function WidgetBuffBox:ctor(params)
             size = 20,
         }):align(display.CENTER, info_bg:getContentSize().width/2 ,info_bg:getContentSize().height/2)
         :addTo(info_bg)
-    self:SetActived(User:IsItemEventActive(buff_type))
+    self:SetActived(UtilsForItem:IsItemEventActive(User, buff_type))
 end
 function WidgetBuffBox:SetActived(isActive, time)
     if not isActive then
@@ -75,7 +75,7 @@ function WidgetBuffBox:SetInfo(info,color)
 end
 function WidgetBuffBox:onEnter()
     self:scheduleAt(function()
-        self:SetActived(User:IsItemEventActive(self.buff_type))
+        self:SetActived(UtilsForItem:IsItemEventActive(User, self.buff_type))
     end)
 end
 return WidgetBuffBox

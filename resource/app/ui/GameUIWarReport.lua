@@ -114,7 +114,7 @@ function GameUIWarReport:onEnter()
         ):setButtonLabel(replay_label)
             :addTo(report_body):align(display.CENTER, report_body:getContentSize().width-100, rb_size.height-186)
             :onButtonClicked(function(event)
-                UIKit:newGameUI("GameUIReplayNew",clone(report)):AddToCurrentScene(true)
+                UIKit:newGameUI("GameUIReplay",clone(report)):AddToCurrentScene(true)
             end)
     end
     if self.can_share then
@@ -419,15 +419,11 @@ function GameUIWarReport:CreateArmyItem(title,troop,dragon,enemy_troop,round_dat
             troopTotal=troopTotal+v.count
         end
         for k,v in pairs(enemy_round_datas) do
-            for _,data in pairs(v) do
-                killed = killed+data.soldierDamagedCount
-            end
+            killed = killed + v.soldierDamagedCount
         end
         for k,v in pairs(round_datas) do
-            for _,data in pairs(v) do
-                totalDamaged = totalDamaged+data.soldierDamagedCount
-                totalWounded = totalWounded+data.soldierWoundedCount
-            end
+            totalDamaged = totalDamaged + v.soldierDamagedCount
+            totalWounded = totalWounded + v.soldierWoundedCount
         end
 
         army_info = {
@@ -578,19 +574,19 @@ function GameUIWarReport:CreateSoldierInfo(soldiers)
 
     local content = WidgetClickPageView.new({bg=bg})
     for i=1,#soldiers,4 do
-
         local page_item = content:newItem()
         local gap_x = 120
         local origin_x = -4
         local count = 0
         for j=i,i+3 do
-            if soldiers[j] then
+            if soldiers[j] and soldiers[j].countDecreased > 0 then
                 self:CreateSoldiersInfo(soldiers[j]):align(display.CENTER, origin_x+count*gap_x,25):addTo(page_item)
                 count = count + 1
             end
         end
-
-        content:addItem(page_item)
+        if count > 0 then
+            content:addItem(page_item)
+        end
     end
     content:pos(50,101)
     content:reload()
@@ -728,10 +724,7 @@ function GameUIWarReport:GetReportTitle()
     return self.report:GetReportTitle()
 
 end
--- function GameUIWarReport.report:GetReportResult()
---     return self.report:GetReportStar()
 
--- end
 function GameUIWarReport:GetFightTarget()
     local battleAt = self.report:GetBattleAt()
     local location = self.report:GetBattleLocation()
@@ -741,6 +734,8 @@ function GameUIWarReport:GetRewards()
     return  self.report:GetMyRewards()
 end
 return GameUIWarReport
+
+
 
 
 

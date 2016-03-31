@@ -104,7 +104,7 @@ function WidgetSelectPlayerHeadIcon:CheckUnlock(icon_key)
     elseif icon_key == 9 then -- 术士
         return User:GetVipLevel() == 10
     elseif icon_key == 10 then -- 贵妇
-        return City:GetFirstBuildingByType("keep"):GetLevel() >= 40
+        return UtilsForBuilding:GetBuildingBy(User, "keep").level >= 40
     elseif icon_key == 11 then -- 旧神
         return User:IsAllPassed()
     end

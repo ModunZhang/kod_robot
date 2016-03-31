@@ -203,58 +203,98 @@ end
 function Report:GetMyRoundDatas()
     local data = self:GetData()
     local round_datas = {}
+    local soldierRoundDatas, wallRoundDatas
     if self.player_id == data.attackPlayerData.id then
         if data.fightWithHelpDefencePlayerReports then
-            table.insert(round_datas, data.fightWithHelpDefencePlayerReports.attackPlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithHelpDefencePlayerReports.soldierRoundDatas
         end
         if data.fightWithDefencePlayerReports then
-            table.insert(round_datas, data.fightWithDefencePlayerReports.attackPlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithDefencePlayerReports.soldierRoundDatas
             if data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas then
-                table.insert(round_datas, data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas)
+                wallRoundDatas = data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas
             end
         end
         if data.fightWithDefenceVillageReports then
-            table.insert(round_datas, data.fightWithDefenceVillageReports.attackPlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithDefenceVillageReports.soldierRoundDatas
         end
         if data.fightWithDefenceMonsterReports then
-            table.insert(round_datas, data.fightWithDefenceMonsterReports.attackPlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithDefenceMonsterReports.soldierRoundDatas
+        end
+        if soldierRoundDatas then
+            for i,round in ipairs(soldierRoundDatas) do
+                for i,attack in ipairs(round.attackResults) do
+                    table.insert(round_datas, attack)
+                end
+            end
+        end
+        if wallRoundDatas then
+            for i,attack in ipairs(wallRoundDatas) do
+                table.insert(round_datas, attack)
+            end
         end
     else
         if data.fightWithHelpDefencePlayerReports then
-            table.insert(round_datas, data.fightWithHelpDefencePlayerReports.defencePlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithHelpDefencePlayerReports.soldierRoundDatas
         end
         if data.fightWithDefencePlayerReports then
-            table.insert(round_datas, data.fightWithDefencePlayerReports.defencePlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithDefencePlayerReports.soldierRoundDatas
+        end
+        if soldierRoundDatas then
+            for i,round in ipairs(soldierRoundDatas) do
+                for i,defence in ipairs(round.defenceResults) do
+                    table.insert(round_datas, defence)
+                end
+            end
         end
     end
+
     return round_datas
 end
 function Report:GetEnemyRoundDatas()
     local data = self:GetData()
     local round_datas = {}
-    -- LuaUtils:outputTable("data", data)
+    local soldierRoundDatas, wallRoundDatas
     if self.player_id == data.attackPlayerData.id then
         if data.fightWithHelpDefencePlayerReports then
-            table.insert(round_datas, data.fightWithHelpDefencePlayerReports.defencePlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithHelpDefencePlayerReports.soldierRoundDatas
         end
         if data.fightWithDefencePlayerReports then
-            table.insert(round_datas, data.fightWithDefencePlayerReports.defencePlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithDefencePlayerReports.soldierRoundDatas
         end
         if data.fightWithDefenceMonsterReports then
-            table.insert(round_datas, data.fightWithDefenceMonsterReports.defenceMonsterSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithDefenceMonsterReports.soldierRoundDatas
+        end
+        if soldierRoundDatas then
+            for i,round in ipairs(soldierRoundDatas) do
+                for i,defence in ipairs(round.defenceResults) do
+                    table.insert(round_datas, defence)
+                end
+            end
         end
     else
         if data.fightWithHelpDefencePlayerReports then
-            table.insert(round_datas, data.fightWithHelpDefencePlayerReports.attackPlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithHelpDefencePlayerReports.soldierRoundDatas
         end
         if data.fightWithDefencePlayerReports then
-            table.insert(round_datas, data.fightWithDefencePlayerReports.attackPlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithDefencePlayerReports.soldierRoundDatas
             if data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas then
-                table.insert(round_datas, data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas)
+                wallRoundDatas = data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas
             end
         end
         if data.fightWithDefenceVillageReports then
-            table.insert(round_datas, data.fightWithDefenceVillageReports.attackPlayerSoldierRoundDatas)
+            soldierRoundDatas = data.fightWithDefenceVillageReports.soldierRoundDatas
+        end
+        if soldierRoundDatas then
+            for i,round in ipairs(soldierRoundDatas) do
+                for i,attack in ipairs(round.attackResults) do
+                    table.insert(round_datas, attack)
+                end
+            end
+        end
+        if wallRoundDatas then
+            for i,attack in ipairs(wallRoundDatas) do
+                table.insert(round_datas, attack)
+            end
         end
     end
     return round_datas
@@ -500,40 +540,56 @@ function Report:GetFightDefenceName()
     local data = self:GetData()
     return data.helpDefencePlayerData and data.helpDefencePlayerData.name
         or data.defencePlayerData and data.defencePlayerData.name
-        or data.defenceVillageData and Localize.village_name[data.defenceVillageData.type].." Lv "..data.defenceVillageData.level
         or data.defenceMonsterData and Localize.soldier_name[data.defenceMonsterData.soldiers[1].name]
 end
 function Report:IsDragonFight()
-    local data = self:GetFightReports()
-    return data.attackPlayerDragonFightData
+    local data = self:GetData()
+    local dragonFightData = data.fightWithHelpDefencePlayerReports or
+        data.fightWithDefencePlayerReports or
+        data.fightWithDefenceMonsterReports
+    local isFight = false
+    if dragonFightData and dragonFightData.attackPlayerDragonFightData and dragonFightData.attackPlayerDragonFightData ~= json.null then
+        isFight = true
+    end
+    return isFight
+end
+function Report:CouldAttackDragonUseSkill()
+    local dragonData = self:GetFightAttackDragonRoundData()
+    return dragonData.hp - dragonData.hpDecreased > 0
+end
+function Report:CouldDefenceDragonUseSkill()
+    local dragonData = self:GetFightDefenceDragonRoundData()
+    return dragonData.hp - dragonData.hpDecreased > 0
 end
 function Report:GetFightAttackDragonRoundData()
-    local data = self:GetFightReports()
-    return data.attackPlayerDragonFightData or {}
+    local data = self:GetData()
+    if not self:IsDragonFight() then
+        return {}
+    end
+    local dragonFightData = data.fightWithHelpDefencePlayerReports or
+        data.fightWithDefencePlayerReports or
+        data.fightWithDefenceMonsterReports
+    return dragonFightData.attackPlayerDragonFightData
 end
 function Report:GetFightDefenceDragonRoundData()
-    local data = self:GetFightReports()
-    return data.defencePlayerDragonFightData or data.defenceMonsterDragonFightData or {}
+    local data = self:GetData()
+    if not self:IsDragonFight() then
+        return {}
+    end
+    local dragonFightData = data.fightWithHelpDefencePlayerReports or
+        data.fightWithDefencePlayerReports or
+        data.fightWithDefenceMonsterReports
+    return dragonFightData.defencePlayerDragonFightData or dragonFightData.defenceMonsterDragonFightData
 end
-function Report:GetFightAttackSoldierRoundData()
-    local data = self:GetFightReports()
-    return data.attackPlayerSoldierRoundDatas or {}
-end
-function Report:GetFightDefenceSoldierRoundData()
-    local data = self:GetFightReports()
-    return data.defencePlayerSoldierRoundDatas or data.defenceMonsterSoldierRoundDatas or {}
-end
-function Report:IsFightWall()
-    local data = self:GetFightReports()
-    return  data.attackPlayerWallRoundDatas and #data.attackPlayerWallRoundDatas > 0
-end
-function Report:GetFightAttackWallRoundData()
-    local data = self:GetFightReports()
-    return data.attackPlayerWallRoundDatas or {}
-end
-function Report:GetFightDefenceWallRoundData()
-    local data = self:GetFightReports()
-    return data.defencePlayerWallRoundDatas or {}
+function Report:IsSoldierFight()
+    local data = self:GetData()
+    local fightReports = data.fightWithHelpDefencePlayerReports or
+        data.fightWithDefencePlayerReports or
+        data.fightWithDefenceMonsterReports
+    if not fightReports then
+        return
+    end
+    return fightReports.soldierRoundDatas and not LuaUtils:table_empty(fightReports.soldierRoundDatas)
 end
 function Report:GetOrderedAttackSoldiers()
     local attackPlayerData = self:GetData().attackPlayerData
@@ -547,6 +603,43 @@ function Report:GetOrderedDefenceSoldiers()
     local soldiers = defenceData and defenceData.soldiers or {}
     return soldiers
 end
+function Report:GetSoldierRoundData()
+    if not self:IsSoldierFight() then
+        return {}
+    end
+    local data = self:GetData()
+    local fightData = data.fightWithHelpDefencePlayerReports or
+        data.fightWithDefencePlayerReports or
+        data.fightWithDefenceMonsterReports
+    return fightData.soldierRoundDatas
+end
+
+function Report:IsFightWall()
+    local data = self:GetData()
+    local isFight = false
+    if data.fightWithDefencePlayerReports and data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas and #data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas > 0 then
+        isFight = true
+    end
+    return isFight
+end
+function Report:IsFightWithBlackTroops()
+    return self:Type() == "attackMonster"
+end
+function Report:GetFightAttackWallRoundData()
+    if not self:IsFightWall() then
+        return {}
+    end
+    local data = self:GetData()
+    return data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas
+end
+function Report:GetFightDefenceWallRoundData()
+    if not self:IsFightWall() then
+        return {}
+    end
+    local data = self:GetData()
+    return data.fightWithDefencePlayerReports.defencePlayerWallRoundDatas
+end
+
 function Report:GetFightReports()
     local data = self:GetData()
     return data.fightWithHelpDefencePlayerReports or data.fightWithDefencePlayerReports or data.fightWithDefenceMonsterReports
@@ -556,97 +649,31 @@ function Report:GetReportResult()
     local data = self.data
     if data.attackPlayerData.id == self.player_id then
         if data.fightWithHelpDefencePlayerReports then
-            local my_round = data.fightWithHelpDefencePlayerReports.attackPlayerSoldierRoundDatas
-            local defence_round = data.fightWithHelpDefencePlayerReports.defencePlayerSoldierRoundDatas
-            -- 判定是否双方所有士兵都参加了战斗
-            local my_soldiers = self:GetOrderedAttackSoldiers()
-            local defence_soldiers = self:GetOrderedDefenceSoldiers()
-            for i,s in ipairs(my_soldiers) do
-                local isFight = false
-                for i,r in ipairs(my_round) do
-                    if s.name == r.soldierName then
-                        isFight = true
-                    end
-                end
-                if not isFight then
-                    return true
-                end
+            local my_round = data.fightWithHelpDefencePlayerReports.soldierRoundDatas
+            local isWin = true
+            for i,v in ipairs(my_round[#my_round].attackResults) do
+                isWin = isWin and v.isWin
             end
-            for i,s in ipairs(defence_soldiers) do
-                local isFight = false
-                for i,r in ipairs(defence_round) do
-                    if s.name == r.soldierName then
-                        isFight = true
-                    end
-                end
-                if not isFight then
-                    return false
-                end
-            end
-            return my_round[#my_round].isWin
+            return isWin
         elseif data.fightWithDefencePlayerReports then
             -- 打到城墙，直接算赢
             local wall_round = data.fightWithDefencePlayerReports.attackPlayerWallRoundDatas
             if wall_round then
                 return true
             end
-            local my_round = data.fightWithDefencePlayerReports.attackPlayerSoldierRoundDatas
-            local defence_round = data.fightWithDefencePlayerReports.defencePlayerSoldierRoundDatas
-            -- 判定是否双方所有士兵都参加了战斗
-            local my_soldiers = self:GetOrderedAttackSoldiers()
-            local defence_soldiers = self:GetOrderedDefenceSoldiers()
-            for i,s in ipairs(my_soldiers) do
-                local isFight = false
-                for i,r in ipairs(my_round) do
-                    if s.name == r.soldierName then
-                        isFight = true
-                    end
-                end
-                if not isFight then
-                    return true
-                end
+            local my_round = data.fightWithDefencePlayerReports.soldierRoundDatas
+            local isWin = true
+            for i,v in ipairs(my_round[#my_round].attackResults) do
+                isWin = isWin and v.isWin
             end
-            for i,s in ipairs(defence_soldiers) do
-                local isFight = false
-                for i,r in ipairs(defence_round) do
-                    if s.name == r.soldierName then
-                        isFight = true
-                    end
-                end
-                if not isFight then
-                    return false
-                end
-            end
-            return my_round[#my_round].isWin
+            return isWin
         elseif data.fightWithDefenceMonsterReports then
-            local my_round = data.fightWithDefenceMonsterReports.attackPlayerSoldierRoundDatas
-            local defence_round = data.fightWithDefenceMonsterReports.defenceMonsterSoldierRoundDatas
-            -- 判定是否双方所有士兵都参加了战斗
-            local my_soldiers = self:GetOrderedAttackSoldiers()
-            local defence_soldiers = self:GetOrderedDefenceSoldiers()
-            for i,s in ipairs(my_soldiers) do
-                local isFight = false
-                for i,r in ipairs(my_round) do
-                    if s.name == r.soldierName then
-                        isFight = true
-                    end
-                end
-                if not isFight then
-                    return true
-                end
+            local my_round = data.fightWithDefenceMonsterReports.soldierRoundDatas
+            local isWin = true
+            for i,v in ipairs(my_round[#my_round].attackResults) do
+                isWin = isWin and v.isWin
             end
-            for i,s in ipairs(defence_soldiers) do
-                local isFight = false
-                for i,r in ipairs(defence_round) do
-                    if s.name == r.soldierName then
-                        isFight = true
-                    end
-                end
-                if not isFight then
-                    return false
-                end
-            end
-            return my_round[#my_round].isWin
+            return isWin
         else
             return true
         end
@@ -660,64 +687,20 @@ function Report:GetReportResult()
         if wall_round then
             return false
         end
-        local my_round = data.fightWithDefencePlayerReports.defencePlayerSoldierRoundDatas
-        local attact_round = data.fightWithDefencePlayerReports.attackPlayerSoldierRoundDatas
-        -- 判定是否双方所有士兵都参加了战斗
-        local attack_soldiers = self:GetOrderedAttackSoldiers()
-        local my_soldiers = self:GetOrderedDefenceSoldiers()
-        for i,s in ipairs(my_soldiers) do
-            local isFight = false
-            for i,r in ipairs(my_round) do
-                if s.name == r.soldierName then
-                    isFight = true
-                end
-            end
-            if not isFight then
-                return true
-            end
+        local my_round = data.fightWithDefencePlayerReports.soldierRoundDatas
+        local isWin = true
+        for i,v in ipairs(my_round[#my_round].defenceResults) do
+            isWin = isWin and v.isWin
         end
-        for i,s in ipairs(attack_soldiers) do
-            local isFight = false
-            for i,r in ipairs(attact_round) do
-                if s.name == r.soldierName then
-                    isFight = true
-                end
-            end
-            if not isFight then
-                return false
-            end
-        end
-        return my_round[#my_round].isWin
+        return isWin
     elseif data.helpDefencePlayerData and
         data.helpDefencePlayerData.id == self.player_id then
-        local my_round = data.fightWithHelpDefencePlayerReports.defencePlayerSoldierRoundDatas
-        local attact_round = data.fightWithHelpDefencePlayerReports.attackPlayerSoldierRoundDatas
-        -- 判定是否双方所有士兵都参加了战斗
-        local attack_soldiers = self:GetOrderedAttackSoldiers()
-        local my_soldiers = self:GetOrderedDefenceSoldiers()
-        for i,s in ipairs(my_soldiers) do
-            local isFight = false
-            for i,r in ipairs(my_round) do
-                if s.name == r.soldierName then
-                    isFight = true
-                end
-            end
-            if not isFight then
-                return true
-            end
+        local my_round = data.fightWithHelpDefencePlayerReports.soldierRoundDatas
+        local isWin = true
+        for i,v in ipairs(my_round[#my_round].defenceResults) do
+            isWin = isWin and v.isWin
         end
-        for i,s in ipairs(attack_soldiers) do
-            local isFight = false
-            for i,r in ipairs(attact_round) do
-                if s.name == r.soldierName then
-                    isFight = true
-                end
-            end
-            if not isFight then
-                return false
-            end
-        end
-        return my_round[#my_round].isWin
+        return isWin
     end
 end
 function Report:GetAttackDragonLevel()
@@ -742,6 +725,15 @@ function Report:GetAttackTargetTerrain()
     return data.attackTarget.terrain
 end
 return Report
+
+
+
+
+
+
+
+
+
 
 
 

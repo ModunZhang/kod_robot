@@ -135,7 +135,7 @@ function WidgetMilitaryTechnologyStatus:RefreshTop()
             upgrade_node:SetUpgradeTip(str)
         end
         if User:IsSoldierStarEvent(event) then
-            local star = User:SoldierStarByName(event.name)
+            local star = UtilsForSoldier:SoldierStarByName(User, event.name)
             upgrade_node:SetUpgradeTip(string.format(_("晋升%s的星级 star %d"),Localize.soldier_name[event.name],star + 1))
         end
         self.normal_node:setVisible(false)

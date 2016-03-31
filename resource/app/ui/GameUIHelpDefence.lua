@@ -10,17 +10,30 @@ local WidgetUIBackGround = import('..widget.WidgetUIBackGround')
 local UIScrollView = import(".UIScrollView")
 local UILib = import(".UILib")
 local Corps = import(".Corps")
+local scheduler = require(cc.PACKAGE_NAME .. ".scheduler")
 
 local GameUIHelpDefence = UIKit:createUIClass("GameUIHelpDefence", "GameUIWithCommonHeader")
 
 local soldier_arrange = {
-    swordsman = {row = 4, col = 2},
-    ranger = {row = 4, col = 2},
-    lancer = {row = 3, col = 1},
-    catapult = {row = 2, col = 1},
+    swordsman_1 = {row = 4, col = 2},
+    swordsman_2 = {row = 4, col = 2},
+    swordsman_3 = {row = 4, col = 2},
+    ranger_1 = {row = 4, col = 2},
+    ranger_2 = {row = 4, col = 2},
+    ranger_3 = {row = 4, col = 2},
+    lancer_1 = {row = 3, col = 1},
+    lancer_2 = {row = 3, col = 1},
+    lancer_3 = {row = 3, col = 1},
+    catapult_1 = {row = 2, col = 1},
+    catapult_2 = {row = 2, col = 1},
+    catapult_3 = {row = 2, col = 1},
 
-    horseArcher = {row = 3, col = 1},
-    ballista = {row = 2, col = 1},
+    horseArcher_1 = {row = 3, col = 1},
+    horseArcher_2 = {row = 3, col = 1},
+    horseArcher_3 = {row = 3, col = 1},
+    ballista_1 = {row = 2, col = 1},
+    ballista_2 = {row = 2, col = 1},
+    ballista_3 = {row = 2, col = 1},
     skeletonWarrior = {row = 4, col = 2},
     skeletonArcher = {row = 4, col = 2},
 
@@ -31,19 +44,39 @@ local soldier_arrange = {
 
     paladin = {row = 4, col = 2},
     steamTank = {row = 2, col = 1},
-    sentinel = {row = 4, col = 2},
-    crossbowman = {row = 4, col = 2},
+    sentinel_1 = {row = 4, col = 2},
+    sentinel_2 = {row = 4, col = 2},
+    sentinel_3 = {row = 4, col = 2},
+    crossbowman_1 = {row = 4, col = 2},
+    crossbowman_2 = {row = 4, col = 2},
+    crossbowman_3 = {row = 4, col = 2},
 }
 local soldier_ani_width = {
-    swordsman = 180,
-    ranger = 180,
-    lancer = 180,
-    catapult = 180,
+    swordsman_1 = 180,
+    swordsman_2 = 180,
+    swordsman_3 = 180,
+    ranger_1 = 180,
+    ranger_2 = 180,
+    ranger_3 = 180,
+    lancer_1 = 180,
+    lancer_2 = 180,
+    lancer_3 = 180,
+    catapult_1 = 180,
+    catapult_2 = 180,
+    catapult_3 = 180,
 
-    sentinel = 180,
-    crossbowman = 180,
-    horseArcher = 180,
-    ballista = 180,
+    sentinel_1 = 180,
+    sentinel_2 = 180,
+    sentinel_3 = 180,
+    crossbowman_1 = 180,
+    crossbowman_2 = 180,
+    crossbowman_3 = 180,
+    horseArcher_1 = 180,
+    horseArcher_2 = 180,
+    horseArcher_3 = 180,
+    ballista_1 = 180,
+    ballista_2 = 180,
+    ballista_3 = 180,
 
     skeletonWarrior = 180,
     skeletonArcher = 180,
@@ -66,7 +99,7 @@ function GameUIHelpDefence:OnMoveInStage()
     local soldiers = self.soldiers
     for i,soldier in ipairs(soldiers) do
         local soldier_level = soldier.star
-        local soldier_config = self.city:GetUser():GetSoldierConfig(soldier.name)
+        local soldier_config = UtilsForSoldier:GetSoldierConfig(self.city:GetUser(), soldier.name)
         local soldier_number = soldier.count
         table.insert(soldier_show_table, {
             soldier_type = soldier.name,
@@ -78,11 +111,14 @@ function GameUIHelpDefence:OnMoveInStage()
         })
     end
     troop_show:ShowOrRefreasTroops(soldier_show_table)
-
+    self.show = troop_show
     self:DragonPart()
     self:PlayerPart()
 end
 function GameUIHelpDefence:onExit()
+    if self.show.handle then
+        scheduler.unscheduleGlobal(self.show.handle)
+    end
     GameUIHelpDefence.super.onExit(self)
 end
 function GameUIHelpDefence:CreateSoldierNode()
@@ -249,31 +285,69 @@ function GameUIHelpDefence:CreateSoldierNode()
         -- 更新
         self:SetSoldiers(soldiers)
         self:RemoveAllSoldierCrops()
-        local y  = 110
-        local x = 681
-        local total_power , total_weight, total_citizen =0,0,0
+
+        self.total_power , self.total_weight, self.total_citizen =0,0,0
+        self.y  = 110
+        self.x = 681
         self.soldier_crops = {}
-        for index,v in pairs(soldiers) do
-            local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
-            if v.soldier_type ~= "catapult" and v.soldier_type ~= "ballista" and v.soldier_type ~= "meatWagon" then
-                corp:PlayAnimation("idle_90")
-            else
-                corp:PlayAnimation("move_90")
-            end
-            table.insert(self.soldier_crops,corp)
-            x = x - soldier_ani_width[v.soldier_type]
+        self.addCount = 1
+        self.handle = scheduler.scheduleGlobal(handler(self, self.addSoldiers), 0.01, false)
 
-            corp:pos(x,y)
-            total_power = total_power + v.power
-            total_weight = total_weight + v.soldier_weight
-            total_citizen = total_citizen + v.soldier_citizen
-        end
-        self:RefreshScrollNode(x)
-        info_bg:removeAllChildren()
-        self:SetPower(total_power)
-        self:SetCitizen(total_citizen)
+        -- for index,v in pairs(soldiers) do
+        --     local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
+        --     if not string.find(v.soldier_type , "catapult") and not string.find(v.soldier_type , "ballista") and not string.find(v.soldier_type , "meatWagon") then
+        --         corp:PlayAnimation("idle_90")
+        --     else
+        --         corp:PlayAnimation("move_90")
+        --     end
+        --     table.insert(self.soldier_crops,corp)
+        --     x = x - soldier_ani_width[v.soldier_type]
+
+        --     corp:pos(x,y)
+        --     total_power = total_power + v.power
+        --     total_weight = total_weight + v.soldier_weight
+        --     total_citizen = total_citizen + v.soldier_citizen
+        -- end
+        -- self:RefreshScrollNode(x)
+        -- info_bg:removeAllChildren()
+        -- self:SetPower(total_power)
+        -- self:SetCitizen(total_citizen)
     end
-
+    function TroopShow:addSoldiers()
+        if not self.soldiers then
+            return
+        end
+        if (self.addCount > #self.soldiers or #self.soldiers == 0) then
+            self:RefreshScrollNode(self.x)
+            info_bg:removeAllChildren()
+            self:SetPower(self.total_power)
+            self:SetCitizen(self.total_citizen)
+            scheduler.unscheduleGlobal(self.handle)
+            return
+        end
+        local x = self.x
+        local y = self.y
+        local v = self.soldiers[self.addCount]
+        if not v then
+            return
+        end
+        -- for index,v in pairs(soldiers) do
+        local corp = self:NewCorps(v.soldier_type,v.power,v.soldier_star):addTo(self,2)
+        if not string.find(v.soldier_type , "catapult") and not string.find(v.soldier_type , "ballista") and not string.find(v.soldier_type , "meatWagon") then
+            corp:PlayAnimation("idle_90")
+        else
+            corp:PlayAnimation("move_90")
+        end
+        table.insert(self.soldier_crops,corp)
+        x = x - soldier_ani_width[v.soldier_type]
+        self.x = x
+        corp:pos(x,y)
+        self.total_power = self.total_power + v.power
+        -- self.total_weight = self.total_weight + v.soldier_weight
+        self.total_citizen = self.total_citizen + v.soldier_citizen
+        -- end
+        self.addCount = self.addCount + 1
+    end
     return TroopShow
 end
 function GameUIHelpDefence:DragonPart()
@@ -315,7 +389,7 @@ function GameUIHelpDefence:DragonPart()
 
     -- 龙力量
     UIKit:ttfLabel({
-        text = _("力量"),
+        text = _("攻击力"),
         size = 20,
         color = 0x615b44,
     }):align(display.LEFT_CENTER,10,30)
@@ -368,6 +442,7 @@ function GameUIHelpDefence:PlayerPart()
 
 end
 return GameUIHelpDefence
+
 
 
 

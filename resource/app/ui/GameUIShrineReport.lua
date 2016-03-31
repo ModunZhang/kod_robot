@@ -8,7 +8,6 @@ local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local window = import("..utils.window")
 local UIListView = import(".UIListView")
 local WidgetPushButton = import("..widget.WidgetPushButton")
-local StarBar = import(".StarBar")
 local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
 local User = User
 local config_shrineStage = GameDatas.AllianceInitData.shrineStage
@@ -253,7 +252,7 @@ function GameUIShrineReport:OnRePlayClicked(idx)
     local list_data = self.data_source[idx]
     if list_data and list_data.type == 2 then
         local roundData = list_data.data
-        UIKit:newGameUI("GameUIReplayNew", UtilsForShrine:GetFightReport(roundData)):AddToCurrentScene(true)
+        UIKit:newGameUI("GameUIReplay", UtilsForShrine:GetFightReport(roundData)):AddToCurrentScene(true)
     end
 end
 
@@ -268,7 +267,7 @@ end
 function GameUIShrineReport:CreateIf_data_statistics()
     if self.data_statistics_node then return self.data_statistics_node end
     local data_statistics_node = display.newNode():addTo(self:GetBody())
-    local image = self:GetShrineReport().star > 0 and "report_victory_590x137.png" or "report_failure_590x137.png"
+    local image = self:GetShrineReport().isWin and "report_victory_590x137.png" or "report_failure_590x137.png"
     local logo = display.newSprite(image):align(display.LEFT_TOP, 20, 727):addTo(data_statistics_node)
     local layer = UIKit:shadowLayer():size(590,30):addTo(logo)
     logo:scale(0.96)
@@ -281,20 +280,13 @@ function GameUIShrineReport:CreateIf_data_statistics()
     }):align(display.
     RIGHT_CENTER,honour_icon:getPositionX()-20,honour_icon:getPositionY()):addTo(layer)
     local shrineStage = GameDatas.AllianceInitData.shrineStage
-    local key = string.format("star%dHonour", self:GetShrineReport().star)
     
     UIKit:ttfLabel({
-        text = shrineStage[self:GetShrineReport().stageName][key] or 0,
+        text = shrineStage[self:GetShrineReport().stageName].honour or 0,
         size = 20,
         color = 0xffedae,
         shadow= true,
     }):align(display.LEFT_CENTER, honour_icon:getPositionX()+20, honour_icon:getPositionY()):addTo(layer)
-    local star_bar = StarBar.new({
-        max = 3,
-        bg = "Stars_bar_bg.png",
-        fill = "Stars_bar_highlight.png",
-        num = self:GetShrineReport().star,
-    }):addTo(logo):align(display.CENTER,295,120)
     self.data_statistics_node = data_statistics_node
     local viewRect = cc.rect(10,12,548,464)
     local list_node = display.newScale9Sprite("background_568x120.png",0,0,cc.size(viewRect.width+20,viewRect.height+24),cc.rect(10,10,548,100))
@@ -451,7 +443,6 @@ function GameUIShrineReport:fillPlayerDataItemContent(content,list_data,item,idx
         local node = content[string.format("reward_bg%d",i)]
         if node and node.icon then
             if reward then
-                print("UIKit:GetItemImage(reward.type,reward.name)=",UIKit:GetItemImage(reward.type,reward.name),reward.type,reward.name)
                 node.icon:setTexture(UIKit:GetItemImage(reward.type,reward.name))
                 node.label:setString(string.format("x%d",reward.count))
                 node:show()

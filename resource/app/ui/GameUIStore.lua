@@ -211,11 +211,12 @@ end
 
 function GameUIStore:CreateShopButton(on_clicked)
     local gem_button = cc.ui.UIImage.new("gem_btn_up.png"):align(display.RIGHT_TOP, 670, 86)
-    local gem_icon = cc.ui.UIImage.new("gem_icon_62x61.png")
+    local gem_icon = cc.ui.UIImage.new("store_gem_260x116.png")
         :addTo(gem_button)
-        :pos(106,0)
+        :pos(86,8)
+        :scale(0.42)
 
-    light_gem():addTo(gem_icon, 1022):pos(62/2, 61/2)
+    light_gem():addTo(gem_icon, 1022):pos(260/2, 116/2)
 
     local gem_label = UIKit:ttfLabel({
         text = ""..string.formatnumberthousands(City:GetUser():GetGemValue()),

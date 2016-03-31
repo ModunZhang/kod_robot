@@ -81,16 +81,6 @@ function GameUIAllianceTitle:BuildUI()
     }):align(display.CENTER, bg:getContentSize().width/2, bg:getContentSize().height-60)
         :addTo(bg)
     self.widget_page = widget_page
-    if Alliance_Manager:GetMyAlliance():GetSelf():CanEditAllianceMemeberTitle() then
-    	local label = widget_page.current_page_label
-    	-- display.newSprite("edit_alliance_title_icon_27x26.png")
-    	-- 	:align(display.RIGHT_CENTER, label:getPositionX()-label:getContentSize().width-10, 32):addTo(widget_page)
-    	-- WidgetPushTransparentButton.new(cc.rect(0,0,434,46))
-    	-- 	:addTo(widget_page):align(display.LEFT_BOTTOM, 60, 10)
-    	-- 	:onButtonClicked(function()
-    	-- 		self:CreateEditTitleUI()
-    	-- 	end)
-    end
     local listBg = display.newScale9Sprite("background_568x120.png", 0,0,cc.size(572,346),cc.rect(15,10,538,100))
 		:addTo(bg)
 		:align(display.CENTER_TOP,304,widget_page:getPositionY() - widget_page:getCascadeBoundingBox().height)
@@ -112,7 +102,7 @@ function GameUIAllianceTitle:BuildUI()
     )
     :setButtonLabelOffset(0, 15)
     local gem_bg = display.newSprite("alliance_title_gem_bg_154x20.png"):addTo(button):align(display.TOP_CENTER,0,0)
-    local gem_icon = display.newSprite("gem_icon_62x61.png"):scale(0.4):align(display.LEFT_BOTTOM, 10, 0):addTo(gem_bg)
+    local gem_icon = display.newSprite("gem_icon_62x61.png"):scale(0.4):align(display.LEFT_BOTTOM, 10, -2):addTo(gem_bg)
     UIKit:ttfLabel({
 			text = config_intInit.buyArchonGem.value,
 			size = 20,
@@ -130,7 +120,7 @@ end
 function GameUIAllianceTitle:CheckArchonLastLoginTimeGraterThen7Days()
     local alliance = Alliance_Manager:GetMyAlliance()
     local alliance_archon =  alliance:GetAllianceArchon()
-    if alliance_archon.lastLogoutTime / 1000 - app.timer:GetServerTime() > 7 * 24 * 60 *60 then
+    if app.timer:GetServerTime() - alliance_archon.lastLogoutTime / 1000  > 7 * 24 * 60 *60 then
         return true
     else
         return false
@@ -200,69 +190,4 @@ function GameUIAllianceTitle:RefreshTitle()
 	self.widget_page:ResetOneTitle(alliance:GetTitles()[self.title_],index)
 end
 
-function GameUIAllianceTitle:CreateEditTitleUI()
-    local layer = UIKit:shadowLayer()
-    local bg = WidgetUIBackGround.new({height=180}):addTo(layer):pos(window.left+20,window.cy-20)
-    local title_bar = display.newSprite("title_blue_600x56.png")
-        :addTo(bg)
-        :align(display.LEFT_BOTTOM, 4,180-15)
-
-    local closeButton = UIKit:closeButton()
-        :addTo(title_bar)
-        :align(display.BOTTOM_RIGHT,title_bar:getContentSize().width, 0)
-        :onButtonClicked(function ()
-            layer:removeFromParent(true)
-        end)
-    UIKit:ttfLabel({
-        text = _("修改联盟职位名称"),
-        size = 22,
-        color = 0xffedae
-    }):addTo(title_bar):align(display.CENTER, 300, 26)
-
-    local title_label = UIKit:ttfLabel({
-        text = _("职位名称"),
-        size = 20,
-        color = 0x615b44
-    }):addTo(bg):align(display.LEFT_TOP, 20,150-20)
-
-    local editbox = cc.ui.UIInput.new({
-        UIInputType = 1,
-        image = "input_box.png",
-        size = cc.size(608 - title_label:getContentSize().width - 50,40),
-    })
-    editbox:setFont(UIKit:getEditBoxFont(),18)
-    editbox:setFontColor(cc.c3b(0,0,0))
-    local display_title,__ = self:GetAllianceTitleAndLevelPng(self.title_)
-    editbox:setPlaceHolder(display_title)
-    editbox:setMaxLength(20)
-    editbox:setPlaceholderFontColor(UIKit:hex2c3b(0xccc49e))
-    editbox:setReturnType(cc.KEYBOARD_RETURNTYPE_DEFAULT)
-    editbox:align(display.RIGHT_TOP,588,140):addTo(bg)
-    WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
-            :setButtonLabel(
-                UIKit:commonButtonLable({
-                    text = _("确定"),
-                    color = 0xffedae
-                })
-            )
-            :onButtonClicked(function(event)
-                local newTitle = string.trim(editbox:getText())
-                if string.len(newTitle) == 0 then
-                    UIKit:showMessageDialog(_("主人"),_("请输入联盟职位名称"))
-                    return
-                end
-                NetManager:getEditAllianceTitleNamePromise(self.title_,newTitle):done(function()
- 					self:RefreshTitle()
-					layer:removeFromParent(true)
-                    local ui_alliance = UIKit:GetUIInstance("GameUIAlliance")
-                    if ui_alliance and ui_alliance.RefreshMemberListIf then
-                        ui_alliance:RefreshMemberListIf()
-                    end
-		 		end):fail(function()
-		 			layer:removeFromParent(true)
-		 		end)
-            end)
-            :addTo(bg):align(display.RIGHT_BOTTOM,editbox:getPositionX(), 24)
-    layer:addTo(self)
-end
 return GameUIAllianceTitle

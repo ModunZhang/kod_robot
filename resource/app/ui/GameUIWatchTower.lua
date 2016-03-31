@@ -157,7 +157,7 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
         :align(display.LEFT_BOTTOM, 10, 19)
     if not isOpen then
         local countInfo = User.countInfo
-        tile_label:setString(_("未解锁"))
+        tile_label:setString(string.format(_("行军队列 %d - "),index).._("未解锁"))
         WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
             :setButtonLabel(
                 UIKit:commonButtonLable({
@@ -195,7 +195,7 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
                         )
                 else
                     NetManager:getUnlockPlayerSecondMarchQueuePromise():done(function (response)
-                        GameGlobalUI:showTips(_("提示"),_("永久行军队列+1"),name,event_name)
+                        GameGlobalUI:showTips(_("提示"),_("永久行军队列+1"))
                         self:LeftButtonClicked()
                         return response
                     end)
@@ -216,12 +216,13 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
         UIKit:ttfLabel({
             text =  string.format(_("累计签到%s天，永久+1进攻队列"), 7),
             size = 22,
-            color= 0x403c2f
-        }):addTo(bg):align(display.LEFT_TOP, 164, event_bg:getPositionY() + 118)
+            color= 0x403c2f,
+            dimensions = cc.size(360,0)
+        }):addTo(bg):align(display.LEFT_TOP, 164, event_bg:getPositionY() + 120)
         display.newSprite(string.format("player_queue_seq_%d_112x112.png",index), 67, 67):addTo(event_bg)
     else
         if not entity then
-            tile_label:setString(_("待命中"))
+            tile_label:setString(string.format(_("行军队列 %d - "),index).._("待命中"))
             WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
                 :setButtonLabel(
                     UIKit:commonButtonLable({
@@ -262,7 +263,7 @@ function GameUIWatchTower:GetMyEventItemWithIndex(index,isOpen,entity)
                 size = 20,
                 color= 0x403c2f
             }):align(display.RIGHT_TOP,554,115):addTo(bg)
-            tile_label:setString(UtilsForEvent:GetMarchEventPrefix(entity, entity.eventType))
+            tile_label:setString(string.format(_("行军队列 %d - "),index)..UtilsForEvent:GetMarchEventPrefix(entity, entity.eventType))
             if entity.eventType == "helpToTroops" then
                 local button = self:GetYellowRetreatButton():pos(558,15):addTo(bg)
                     :onButtonClicked(function(event)
@@ -442,42 +443,21 @@ function GameUIWatchTower:OnEventDetailButtonClicked(entity)
     if strEntityType == "attackMarchEvents" then
         if entity.marchType == "helpDefence" then
             NetManager:getHelpDefenceMarchEventDetailPromise(entity.id):done(function(response)
-                -- UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.MARCH,response.msg.eventDetail,User:Id())
-                --     :AddToCurrentScene(true)
                 UIKit:newGameUI("GameUIAllianceWatchTowerTroopDetail",response.msg.eventDetail,watchTowerLevel,false,GameUIAllianceWatchTowerTroopDetail.DATA_TYPE.HELP_DEFENCE)
                     :AddToCurrentScene(true)
             end)
         else
             local my_status = Alliance_Manager:GetMyAlliance().basicInfo.status
-            -- if my_status == "prepare" or  my_status == "fight" then
-            -- local __,alliance_id = entity:WithObject():FromLocation()
-            -- NetManager:getAttackMarchEventDetailPromise(entity:WithObject():Id(),alliance_id):done(function(response)
-            --     UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.HELP_DEFENCE,response.msg.eventDetail,User:Id())
-            --         :AddToCurrentScene(true)
-            -- end)
             NetManager:getAttackMarchEventDetailPromise(entity.id,entity.fromAlliance.id):done(function(response)
                 UIKit:newGameUI("GameUIAllianceWatchTowerTroopDetail",response.msg.eventDetail,watchTowerLevel,true,GameUIAllianceWatchTowerTroopDetail.DATA_TYPE.MARCH)
                     :AddToCurrentScene(true)
             end)
-            -- else
-            --     UIKit:showMessageDialog(_("错误"),_("联盟未处于战争期"),function()end)
-            -- end
         end
     elseif strEntityType == "strikeMarchEvents" then
-        -- local my_status = Alliance_Manager:GetMyAlliance().basicInfo.status
-        -- if my_status == "prepare" or  my_status == "fight" then
-        -- local __,alliance_id = entity:WithObject():FromLocation()
-        -- NetManager:getStrikeMarchEventDetailPromise(entity:WithObject():Id(),alliance_id):done(function(response)
-        --     UIKit:newGameUI("GameUIWatchTowerTroopDetail",GameUIWatchTowerTroopDetail.DATA_TYPE.STRIKE,response.msg.eventDetail,User:Id())
-        --         :AddToCurrentScene(true)
-        -- end)
         NetManager:getStrikeMarchEventDetailPromise(entity.id,entity.fromAlliance.id):done(function(response)
             UIKit:newGameUI("GameUIAllianceWatchTowerTroopDetail",response.msg.eventDetail,watchTowerLevel,true,GameUIAllianceWatchTowerTroopDetail.DATA_TYPE.STRIKE)
                 :AddToCurrentScene(true)
         end)
-        -- else
-        --     UIKit:showMessageDialog(_("错误"),_("联盟未处于战争期"),function()end)
-        -- end
     end
 end
 
@@ -617,7 +597,7 @@ end
 function GameUIWatchTower:OnRetreatButtonClicked(entity,cb)
     if entity.eventType == "helpToTroops" then
         UIKit:showMessageDialog(_("提示"),_("确定撤军?"),function()
-            NetManager:getRetreatFromHelpedAllianceMemberPromise(entity.beHelpedPlayerData.id)
+            NetManager:getRetreatFromHelpedAllianceMemberPromise(entity.id)
                 :done(function()
                     cb(true)
                 end)
@@ -645,6 +625,7 @@ function GameUIWatchTower:OnRetreatButtonClicked(entity,cb)
 end
 
 return GameUIWatchTower
+
 
 
 

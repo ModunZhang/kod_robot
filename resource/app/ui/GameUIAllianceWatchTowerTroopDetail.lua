@@ -71,7 +71,7 @@ function GameUIAllianceWatchTowerTroopDetail:onEnter()
 end
 
 function GameUIAllianceWatchTowerTroopDetail:RequestPlayerHelpedByTroops()
-    NetManager:getHelpDefenceTroopDetailPromise(self:GetUserId(),self:GetEventData().id):done(function(msg)
+    NetManager:getHelpDefenceTroopDetailPromise(self:GetUserId()):done(function(msg)
         self.event_data = msg
         self:RefreshListView()
     end)
@@ -118,9 +118,9 @@ function GameUIAllianceWatchTowerTroopDetail:GetItem(ITEM_TYPE,item_data)
     elseif ITEM_TYPE == self.ITEM_TYPE.SOLIDERS then
         if self:CanShowSoliderName() then
             sub_line = #item_data.soldiers
-            height   = sub_line * 36
+            height   = sub_line * 66
         else
-            height = 36
+            height = 66
         end
     elseif ITEM_TYPE == self.ITEM_TYPE.BUFF_EFFECT then
         if self:CanShowTechnologyAndBuffEffect() then
@@ -163,7 +163,7 @@ function GameUIAllianceWatchTowerTroopDetail:GetItem(ITEM_TYPE,item_data)
         self:GetSubItem(ITEM_TYPE,1,{_("生命值"),dragon_hp}):addTo(bg):align(display.RIGHT_BOTTOM, 547, y)
         y = y + 38
         local dragon_strength = self:CanShowDragonStrength() and (self:GetDragonStrength() or 0) or "?"
-        self:GetSubItem(ITEM_TYPE,2,{_("力量"),dragon_strength}):addTo(bg):align(display.RIGHT_BOTTOM, 547, y)
+        self:GetSubItem(ITEM_TYPE,2,{_("攻击力"),dragon_strength}):addTo(bg):align(display.RIGHT_BOTTOM, 547, y)
         y = y + 38
         local dragon_level = self:CanShowDragonLevelAndStar() and item_data.dragon.level or "?"
         self:GetSubItem(ITEM_TYPE,3,{_("等级"),dragon_level}):addTo(bg):align(display.RIGHT_BOTTOM, 547, y)
@@ -202,8 +202,8 @@ function GameUIAllianceWatchTowerTroopDetail:GetItem(ITEM_TYPE,item_data)
                     if not self:CanShowSoliderStar() then
                         name = Localize.soldier_name[v.name]
                     end
-                    self:GetSubItem(ITEM_TYPE,i,{name,v.count}):addTo(bg):align(display.LEFT_BOTTOM,0, y)
-                    y = y + 36
+                    self:GetSubItem(ITEM_TYPE,i,{v.name,v.count,v.star}):addTo(bg):align(display.LEFT_BOTTOM,0, y)
+                    y = y + 66
                 end
             else
                 self:GetTipsItem():addTo(bg):align(display.LEFT_BOTTOM, 0, 0)
@@ -271,46 +271,65 @@ function GameUIAllianceWatchTowerTroopDetail:GetDragonMaxHP()
 end
 
 function GameUIAllianceWatchTowerTroopDetail:GetSubItem(ITEM_TYPE,index,item_data)
-    local height = ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO and 38 or 36
+    local height = ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO and 38 or ITEM_TYPE == self.ITEM_TYPE.SOLIDERS and 66 or 36
     local width  = ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO and 420 or 546
     local item = display.newScale9Sprite(string.format("back_ground_548x40_%d.png", (index - 1) % 2 == 0 and 1 or 2)):size(width,height)
-    local title_label = UIKit:ttfLabel({
-        text = item_data[1],
-        size = 20,
-        color= 0x615b44
-    }):align(display.LEFT_CENTER, 12, 19):addTo(item)
-    if ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO then
-        local val_label = UIKit:ttfLabel({
-            text = item_data[2],
+    if ITEM_TYPE == self.ITEM_TYPE.SOLIDERS then
+        local title_label = UIKit:ttfLabel({
+            text = Localize.soldier_name[item_data[1]],
             size = 20,
-            color= 0x403c2f
-        }):align(display.LEFT_CENTER, title_label:getPositionX()+title_label:getContentSize().width + 20, 19):addTo(item)
-    elseif ITEM_TYPE == self.ITEM_TYPE.DRAGON_EQUIPMENT then
-        local star_bar = StarBar.new({
-            max = 4,
+            color= 0x615b44
+        }):align(display.LEFT_CENTER, 80, 45):addTo(item)
+        local soldier_ui_config = UILib.soldier_image[item_data[1]]
+        display.newSprite(UILib.soldier_color_bg_images[item_data[1]]):align(display.LEFT_CENTER,12,33):addTo(item):scale(58/128)
+        local soldier_head_icon = display.newSprite(soldier_ui_config):align(display.LEFT_CENTER,12,33):addTo(item):scale(58/128)
+        local soldier_head_bg  = display.newSprite("box_soldier_128x128.png"):addTo(soldier_head_icon):pos(soldier_head_icon:getContentSize().width/2,soldier_head_icon:getContentSize().height/2)
+       
+        StarBar.new({
+            max = 3,
             bg = "Stars_bar_bg.png",
             fill = "Stars_bar_highlight.png",
-            num = item_data[2],
-            scale = 0.8
-        }):addTo(item):align(display.RIGHT_CENTER,526,19)
-    elseif ITEM_TYPE == self.ITEM_TYPE.TECHNOLOGY or ITEM_TYPE == self.ITEM_TYPE.BUFF_EFFECT then
-        local val_label = UIKit:ttfLabel({
-            text = item_data[2],
-            size = 20,
-            color= 0x403c2f
-        }):align(display.RIGHT_CENTER,526, 19):addTo(item)
-    elseif ITEM_TYPE == self.ITEM_TYPE.SOLIDERS then
+            num = item_data[3],
+        }):addTo(item):align(display.LEFT_CENTER,80, 19):scale(0.8)
+
         local val_label = UIKit:ttfLabel({
             text = self:FileterSoliderCount(item_data[2]),
             size = 20,
             color= 0x403c2f
-        }):align(display.RIGHT_CENTER,526, 19):addTo(item)
-    elseif ITEM_TYPE == self.ITEM_TYPE.DRAGON_SKILL then
-        local val_label = UIKit:ttfLabel({
-            text = item_data[2],
+        }):align(display.RIGHT_CENTER,526, 33):addTo(item)
+    else
+        local title_label = UIKit:ttfLabel({
+            text = item_data[1],
             size = 20,
-            color= 0x403c2f
-        }):align(display.RIGHT_CENTER,526, 19):addTo(item)
+            color= 0x615b44
+        }):align(display.LEFT_CENTER, 12, 19):addTo(item)
+        if ITEM_TYPE == self.ITEM_TYPE.DRAGON_INFO then
+            local val_label = UIKit:ttfLabel({
+                text = item_data[2],
+                size = 20,
+                color= 0x403c2f
+            }):align(display.LEFT_CENTER, title_label:getPositionX()+title_label:getContentSize().width + 20, 19):addTo(item)
+        elseif ITEM_TYPE == self.ITEM_TYPE.DRAGON_EQUIPMENT then
+            local star_bar = StarBar.new({
+                max = 4,
+                bg = "Stars_bar_bg.png",
+                fill = "Stars_bar_highlight.png",
+                num = item_data[2],
+                scale = 0.8
+            }):addTo(item):align(display.RIGHT_CENTER,526,19)
+        elseif ITEM_TYPE == self.ITEM_TYPE.TECHNOLOGY or ITEM_TYPE == self.ITEM_TYPE.BUFF_EFFECT then
+            local val_label = UIKit:ttfLabel({
+                text = item_data[2],
+                size = 20,
+                color= 0x403c2f
+            }):align(display.RIGHT_CENTER,526, 19):addTo(item)
+        elseif ITEM_TYPE == self.ITEM_TYPE.DRAGON_SKILL then
+            local val_label = UIKit:ttfLabel({
+                text = item_data[2],
+                size = 20,
+                color= 0x403c2f
+            }):align(display.RIGHT_CENTER,526, 19):addTo(item)
+        end
     end
     return item
 end
@@ -463,6 +482,8 @@ function GameUIAllianceWatchTowerTroopDetail:FuzzyCount(count)
 end
 
 return GameUIAllianceWatchTowerTroopDetail
+
+
 
 
 

@@ -5,7 +5,6 @@
 local GameUIDragonEquipmentMake = UIKit:createUIClass("GameUIDragonEquipmentMake","UIAutoClose")
 local StarBar = import(".StarBar")
 local UIListView = import(".UIListView")
-local WidgetDragonEquipIntensify = import("..widget.WidgetDragonEquipIntensify")
 local BODY_HEIGHT = 578
 local BODY_WIDTH = 608
 local LISTVIEW_WIDTH = 548
@@ -188,9 +187,9 @@ function GameUIDragonEquipmentMake:GetEquipmentEffect()
   local equipment = self:GetEquipment()
   local vitality,strength = equipment:GetVitalityAndStrengh()
   local leadership = equipment:GetLeadership()
-  table.insert(r,{_("活力"),vitality})
-  table.insert(r,{_("力量"),strength})
-  table.insert(r,{_("领导力"),leadership})
+  table.insert(r,{_("生命值"),vitality})
+  table.insert(r,{_("攻击力"),strength})
+  table.insert(r,{_("带兵量"),leadership})
   table.insert(r,{_("附加随机属性数量"),self.dragon:Star()})
   return r
 end

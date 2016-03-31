@@ -161,7 +161,9 @@ function GameUIChatChannel:CreateTextFieldBody()
         end
         editbox:setText('')
         self:GetChatManager():SendChat(self._channelType,msg,function()
-            sendChatButton:StartTimer()
+            if sendChatButton and sendChatButton.StartTimer then
+                sendChatButton:StartTimer()
+            end
         end)
     end)
     self.sendChatButton = sendChatButton
@@ -197,11 +199,11 @@ function GameUIChatChannel:CreateTabButtons()
             tag = "alliance",
             default = self.default_tag == "alliance",
         },
-        {
-            label = _("对战"),
-            tag = "allianceFight",
-            default = self.default_tag == "allianceFight",
-        },
+        -- {
+        --     label = _("对战"),
+        --     tag = "allianceFight",
+        --     default = self.default_tag == "allianceFight",
+        -- },
     },
     function(tag)
         self._channelType = tag
@@ -216,8 +218,8 @@ function GameUIChatChannel:CreateTabButtons()
             pageIdx = 1
         elseif tag == "alliance" then
             pageIdx = 2
-        else
-            pageIdx = 3
+        -- else
+        --     pageIdx = 3
         end
         app:GetChatManager():setChannelReadStatus(tag,false)
         app:GetGameDefautlt():setStringForKey("LAST_CHAT_CHANNEL",""..pageIdx)
@@ -263,9 +265,14 @@ end
 function GameUIChatChannel:GetChatItemCell()
     local content = display.newNode()
     local other_content = display.newNode()
-    local bottom = display.newScale9Sprite("chat_bubble_bottom_484x14.png"):addTo(other_content):align(display.RIGHT_BOTTOM,LISTVIEW_WIDTH, 0)
-    local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png"):addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH, 12)
-    local header = display.newScale9Sprite("chat_bubble_header_484x38.png"):addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH,32)
+    local bottom = display.newScale9Sprite("chat_bubble_bottom_484x14.png",
+        nil,nil,cc.size(484,14),centerRect(484,14))
+    :addTo(other_content):align(display.RIGHT_BOTTOM,LISTVIEW_WIDTH, 0)
+    local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png",
+        nil,nil,cc.size(484,20),centerRect(484,20))
+    :addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH, 12)
+    local header = display.newScale9Sprite("chat_bubble_header_484x38.png",
+        nil,nil,cc.size(484,38),centerRect(484,38)):addTo(other_content):align(display.RIGHT_BOTTOM, LISTVIEW_WIDTH,32)
     local chat_icon = self:GetChatIcon():addTo(other_content):align(display.LEFT_TOP, 3, 72)
     local system_label = UIKit:ttfLabel({
         text = _("官方"),
@@ -326,9 +333,14 @@ function GameUIChatChannel:GetChatItemCell()
     -- end of other_content
     -- mine
     local mine_content = display.newNode()
-    local bottom = display.newScale9Sprite("chat_bubble_bottom_484x14.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 0)
-    local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 12)
-    local header = display.newScale9Sprite("chat_bubble_header_484x38.png"):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 32)
+    local bottom = display.newScale9Sprite("chat_bubble_bottom_484x14.png",
+        nil,nil,cc.size(484,14),centerRect(484,14))
+    :addTo(mine_content):align(display.LEFT_BOTTOM, 0, 0)
+    local middle = display.newScale9Sprite("chat_bubble_middle_484x20.png",
+        nil,nil,cc.size(484,20),centerRect(484,20))
+    :addTo(mine_content):align(display.LEFT_BOTTOM, 0, 12)
+    local header = display.newScale9Sprite("chat_bubble_header_484x38.png",
+        nil,nil,cc.size(484,38),centerRect(484,38)):addTo(mine_content):align(display.LEFT_BOTTOM, 0, 32)
     local chat_icon = self:GetChatIcon():addTo(mine_content):align(display.RIGHT_TOP, LISTVIEW_WIDTH - 3, 72)
 
     local from_label = UIKit:ttfLabel({
@@ -634,6 +646,19 @@ function GameUIChatChannel:listviewListener(event)
             return
         end
         if string.lower(chat.id) == 'system' then
+            return
+        end
+        local button = content.chat_icon
+        local bound = button:getBoundingBox()
+        bound.width = button:getContentSize().width
+        bound.height = button:getContentSize().height
+        local nodePoint = content:convertToWorldSpace(cc.p(bound.x, bound.y))
+        nodePoint = listView:getScrollNode():convertToNodeSpace(nodePoint)
+        bound.x = nodePoint.x
+        bound.y = nodePoint.y
+        local isTouchChatIcon = cc.rectContainsPoint(bound,event.point)
+        if isTouchChatIcon then
+            UIKit:newGameUI("GameUIAllianceMemberInfo",false,chat.id,nil,chat.serverId):AddToCurrentScene(true)
             return
         end
         self:CreatePlayerMenu(event,chat)

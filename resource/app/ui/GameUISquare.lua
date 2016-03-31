@@ -42,11 +42,17 @@ function GameUISquare:CreateSoldierUI()
     })
     list_node:addTo(view):align(display.BOTTOM_CENTER, window.cx, window.bottom + 40)
     local content = display.newNode()
-    content:setContentSize(cc.size(568,7 * 166 + 6 * 10))
+    local count = 0
+    for k,v in pairs(User.soldiers) do
+        if v > 0 then
+            count = count + 1
+        end
+    end
+    content:setContentSize(cc.size(568,(count%4) * 166 + (count%4 -1) * 10))
     local total_width = 568
     local unit_width = 130
     local unit_height = 166
-    local origin_y = 7 * 166 + 6 * 10 - unit_height/2
+    local origin_y = (count%4) * 166 + (count%4 -1) * 10 - unit_height/2
     local origin_x =  unit_width/2
     local gap_x = (total_width - unit_width * 4) / 3
     local add_count = 0
@@ -61,7 +67,7 @@ function GameUISquare:CreateSoldierUI()
         "skeletonWarrior", "skeletonArcher", "deathKnight", "meatWagon",
     }) do
     
-        local soldier_star = User:SoldierStarByName(soldier_name)
+        local soldier_star = UtilsForSoldier:SoldierStarByName(User, soldier_name)
         local soldier_num =  User.soldiers[soldier_name]
         if soldier_num > 0 then
             self.soldier_map[soldier_name] = WidgetSoldierBox.new(nil, function()
@@ -72,11 +78,11 @@ function GameUISquare:CreateSoldierUI()
                 :SetNumber(soldier_num)
             add_count = add_count + 1
 
-            total_citizen = total_citizen + User:GetSoldierConfig(soldier_name).citizen * soldier_num
+            total_citizen = total_citizen + UtilsForSoldier:GetSoldierConfig(User, soldier_name).citizen * soldier_num
         end
     end
     local item = list:newItem()
-    item:setItemSize(568,7 * 166 + 6 * 10)
+    item:setItemSize(568,(count%4) * 166 + (count%4 -1) * 10)
     item:addContent(content)
     list:addItem(item)
     list:reload()

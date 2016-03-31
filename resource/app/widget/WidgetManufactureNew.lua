@@ -72,6 +72,7 @@ function WidgetManufactureNew:onEnter()
     User:AddListenOnType(self, "materialEvents")
     scheduleAt(self, function()
         self:UpdateCurrentEvent()
+        self:RefreshRequirements(self.material_tab:GetSelectedButtonTag())
     end)
 end
 function WidgetManufactureNew:onExit()
@@ -180,9 +181,9 @@ function WidgetManufactureNew:ReloadMaterials(materials, materials_map)
                 local iron_cur = User:GetResValueByType("iron")
                 local count, wood, stone, iron, time
                 if self.material_tab:GetSelectedButtonTag() == "buildingMaterials" then
-                    count, wood, stone, iron, time = self.toolShop:GetNeedByCategory("buildingMaterials")
+                    count, wood, stone, iron, time = UtilsForBuilding:GetToolShopNeedByCategory(User, "buildingMaterials")
                 else
-                    count, wood, stone, iron, time = self.toolShop:GetNeedByCategory("technologyMaterials")
+                    count, wood, stone, iron, time = UtilsForBuilding:GetToolShopNeedByCategory(User, "technologyMaterials")
                 end
                 local need_gems = DataUtils:buyResource({
                     wood = wood,
@@ -294,7 +295,7 @@ function WidgetManufactureNew:ReloadMaterials(materials, materials_map)
 end
 function WidgetManufactureNew:UpdateCurrentEvent()
     local event_name = self.material_tab:GetSelectedButtonTag()
-    self:UpdateByEvent(User:GetMakingMaterialsEvent(event_name) 
+    self:UpdateByEvent(User:GetMakingMaterialsEvent(event_name)
         or User:GetStoreMaterialsEvent(event_name))
 end
 function WidgetManufactureNew:UpdateByEvent(event)
@@ -306,7 +307,7 @@ function WidgetManufactureNew:UpdateByEvent(event)
         self.progress_node:hide()
         self.get_node:hide()
         self:CleanStoreNumbers()
-        local number, wood, stone, iron, time = self.toolShop:GetNeedByCategory(self.material_tab:GetSelectedButtonTag())
+        local number, wood, stone, iron, time = UtilsForBuilding:GetToolShopNeedByCategory(User, category)
         self.build_node.build_label:setString(string.format(_("随机制造%d个材料"), number))
         self.build_node.build_time:setString(GameUtils:formatTimeStyle1(time))
         local size = self.build_node.build_time:getContentSize()
@@ -327,7 +328,9 @@ function WidgetManufactureNew:UpdateByEvent(event)
         self.build_node:hide()
         self.progress_node:show()
         self.get_node:hide()
-        local number = self.toolShop:GetNeedByCategory(event.type)
+
+        local User = self.toolShop:BelongCity():GetUser()
+        local number = UtilsForBuilding:GetToolShopNeedByCategory(User, category)
         local time, percent = UtilsForEvent:GetEventInfo(event)
         local prog = self.progress_node.progress
         prog.describe:setString(string.format(_("制造材料 x%d"), number))
@@ -340,7 +343,8 @@ function WidgetManufactureNew:CleanStoreNumbers()
     end
 end
 function WidgetManufactureNew:RefreshRequirements(category)
-    local _, wood, stone, iron, time = self.toolShop:GetNeedByCategory(category)
+    local User = self.toolShop:BelongCity():GetUser()
+    local _, wood, stone, iron, time = UtilsForBuilding:GetToolShopNeedByCategory(User, category)
     self:RefreshRequirementList(wood, stone, iron, time)
 end
 function WidgetManufactureNew:RefreshRequirementList(wood, stone, iron, time)
@@ -386,7 +390,7 @@ end
 function WidgetManufactureNew:CheckOverFlow(content)
     local city = self.toolShop:BelongCity()
     local User = city:GetUser()
-    local limit = city:GetFirstBuildingByType("materialDepot"):GetMaxMaterial()
+    local limit = UtilsForBuilding:GetMaterialDepotLimit(User).soldierMaterials
     local mm = User.technologyMaterials
     for k,v in pairs(User.buildingMaterials) do
         mm[k] = v
@@ -426,6 +430,7 @@ end
 
 
 return WidgetManufactureNew
+
 
 
 

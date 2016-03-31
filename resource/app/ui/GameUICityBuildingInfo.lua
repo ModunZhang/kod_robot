@@ -8,6 +8,7 @@ local Localize = import("..utils.Localize")
 local Localize_item = import("..utils.Localize_item")
 local UIListView = import(".UIListView")
 local GameUICityBuildingInfo = class("GameUICityBuildingInfo", WidgetPopDialog)
+local intInit = GameDatas.PlayerInitData.intInit
 
 local AllianceBuilding = GameDatas.AllianceBuilding
 
@@ -25,7 +26,7 @@ local building_details_map = {
     },
     ["warehouse"] = {
         {90,        100,        200,            130       },
-        {_("等级"), _("战斗力"),_("资源存储上限"),_("暗仓保护") },
+        {_("等级"), _("战斗力"),_("资源存储上限"),_("暗仓基础保护") },
         {"level",   "power",    "maxWood"},
     },
     ["dragonEyrie"] = {
@@ -176,15 +177,7 @@ function GameUICityBuildingInfo:ctor(building)
     local config , building_name,building_level
     if building.__cname and string.find(building.__cname,"UpgradeBuilding") then
         building_name = building:GetType()
-        config = building:GetFunctionConfig()[building_name]
-        building_level = building:GetLevel()
-    elseif building.__cname == "GateEntity" then
-        building_name = building:GetType()
-        config = building:GetConfig()
-        building_level = building:GetLevel()
-    elseif building.__cname == "TowerEntity" then
-        building_name = building:GetType()
-        config = building:GetConfig()
+        config = UtilsForBuilding:GetBuildingConfig(building_name)
         building_level = building:GetLevel()
     else
         building_name = building.name
@@ -204,7 +197,7 @@ function GameUICityBuildingInfo:onEnter()
     local body = self:GetBody()
     local b_size = body:getContentSize()
     -- 总览介绍
-    local total_title_bg = WidgetUIBackGround.new({width = 556 , height = 106},WidgetUIBackGround.STYLE_TYPE.STYLE_5)
+    local total_title_bg = WidgetUIBackGround.new({width = 556 , height = 116},WidgetUIBackGround.STYLE_TYPE.STYLE_5)
         :align(display.TOP_CENTER, b_size.width/2, b_size.height - 30)
         :addTo(body)
     UIKit:ttfLabel({
@@ -302,7 +295,7 @@ function GameUICityBuildingInfo:CreateDetails()
             local watchTower = GameDatas.ClientInitGame.watchTower
             table.insert(details, Localize.building_description["watchTower_"..idx])
         elseif parent.building_name == "warehouse" then
-            local value = parent.config[idx][parent.attrs[3]]/10
+            local value = parent.config[idx][parent.attrs[3]]*(intInit.playerResourceProtectPercent.value/100)
             if tolua.type(value) == "number" then
                 value = string.formatnumberthousands(value)
             end

@@ -71,9 +71,10 @@ function GameUIAllianceShrineDetail:onEnter()
     self:BuildUI()
 
     scheduleAt(self, function()
+        self:RefreshStateLable()
         self.event_button:setButtonEnabled(
         Alliance_Manager:GetMyAlliance():GetPerception() 
-        >= self:GetShrineStage().needPerception)
+        >= self:GetShrineStage().needPerception and not Alliance_Manager:GetMyAlliance():GetShrineEventByStageName(self:GetShrineStage().stageName))
     end)
 end
 

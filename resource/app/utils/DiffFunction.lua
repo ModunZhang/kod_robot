@@ -24,8 +24,44 @@ end
 
 
 return function(base, delta)
+    setmetatable(base, deltameta)
+    
+    local fixDelta = {}
+    for i,v in ipairs(delta) do
+        local origin_key,value = unpack(v)
+        if type(value) == "table" then
+            local ok,origin_value = base(origin_key)
+            if ok and origin_value ~= json.null then
+                if #origin_value > 0 and #value > 0 then
+                    for _,_ in ipairs(origin_value) do
+                        table.insert(fixDelta, {string.format("%s.0", origin_key), json.null})
+                    end
+                    for i,v in ipairs(value) do
+                        table.insert(fixDelta, {string.format("%s.%d", origin_key, i - 1), v})
+                    end
+                elseif #origin_value > 0 and #value == 0 then
+                    for _,_ in ipairs(origin_value) do
+                        table.insert(fixDelta, {string.format("%s.0", origin_key), json.null})
+                    end
+                elseif #origin_value == 0 and #value > 0 then
+                    for i,v in ipairs(value) do
+                        table.insert(fixDelta, {string.format("%s.%d", origin_key, i - 1), v})
+                    end
+                else
+                    table.insert(fixDelta, v)
+                end
+            else
+                table.insert(fixDelta, v)
+            end
+        else
+            table.insert(fixDelta, v)
+        end
+    end
+
+    -- LuaUtils:outputTable("fixDelta", fixDelta)
+
     local edit = {}
-    for _,v in ipairs(delta) do
+    for _,v in ipairs(fixDelta) do
         if type(v) == "string" and GameUtils then
             GameUtils:UploadErrors(v)
         end

@@ -408,19 +408,27 @@ function GameUIAllianceShop:InitRecordPart()
     if LuaUtils:table_size(item_logs) == 0 then
         NetManager:getItemLogsPromise(self.alliance.id):done(function ( response )
             local item_logs = response.msg.itemLogs
-            dump(item_logs,"getItemLogsPromise done")
             if item_logs then
                 self.record_logs_items = {}
-                for i,v in ipairs(item_logs) do
+                local clone_items = clone(item_logs)
+                table.sort( clone_items, function ( a,b )
+                    return a.time > b.time
+                end )
+                for i,v in ipairs(clone_items) do
                     self:CreateRecordItem(v)
                 end
                 self.record_list:reload()
+                self.alliance.itemLogs = item_logs
                 return response
             end
         end)
     else
         self.record_logs_items = {}
-        for i,v in ipairs(item_logs) do
+        local clone_items = clone(item_logs)
+        table.sort( clone_items, function ( a,b )
+            return a.time > b.time
+        end )
+        for i,v in ipairs(clone_items) do
             self:CreateRecordItem(v)
         end
         self.record_list:reload()
@@ -567,6 +575,7 @@ function GameUIAllianceShop:OnUserDataChanged_allianceData(userData, deltaData)
 end
 
 return GameUIAllianceShop
+
 
 
 

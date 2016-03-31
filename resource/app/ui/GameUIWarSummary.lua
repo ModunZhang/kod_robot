@@ -18,13 +18,15 @@ function GameUIWarSummary:onEnter()
     self:DisableCloseBtn()
     self:DisableAutoClose()
     local alliance = Alliance_Manager:GetMyAlliance()
-      if alliance.allianceFightReports == nil then
-            NetManager:getAllianceFightReportsPromise(alliance._id):done(function ()
+    if alliance.allianceFightReports == nil then
+        NetManager:getAllianceFightReportsPromise(alliance._id):done(function ()
+            if self.InitWarSummary then
                 self:InitWarSummary(alliance:GetLastAllianceFightReports())
-            end)
-        else
-            self:InitWarSummary(alliance:GetLastAllianceFightReports())
-        end
+            end
+        end)
+    else
+        self:InitWarSummary(alliance:GetLastAllianceFightReports())
+    end
 end
 function GameUIWarSummary:InitWarSummary(report)
     if not report then
@@ -169,17 +171,13 @@ function GameUIWarSummary:InitWarSummary(report)
             shadow= true
         })):onButtonClicked(function(event)
         if event.name == "CLICKED_EVENT" then
-            -- local scene_name = display.getRunningScene().__cname
-            -- alliance:SetLastAllianceFightReport(nil)
-            -- if scene_name == 'AllianceBattleScene' or scene_name == 'AllianceScene' then
-            --     app:EnterMyAllianceScene()
-            -- elseif scene_name == 'MyCityScene' then
-                self:LeftButtonClicked()
-            -- end
+            self:LeftButtonClicked()
         end
         end)
 end
 return GameUIWarSummary
+
+
 
 
 

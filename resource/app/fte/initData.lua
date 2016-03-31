@@ -13,7 +13,7 @@ return {
     deals = { },
     inviteToAllianceEvents = { },
     itemEvents = { },
-    helpedByTroops = { },
+    helpedByTroop = json.null,
     mails = { },
     iapGifts = { },
     serverId = "cache-server-1",
@@ -513,15 +513,15 @@ return {
             skills = {
                 skill_9 = {
                     level = 0,
-                    name = "battleHunger"
+                    name = "earthquake"
                 },
                 skill_8 = {
                     level = 0,
-                    name = "earthquake"
+                    name = "leadership"
                 },
                 skill_7 = {
                     level = 0,
-                    name = "leadership"
+                    name = "dragonBlood"
                 },
                 skill_6 = {
                     level = 0,
@@ -537,15 +537,15 @@ return {
                 },
                 skill_3 = {
                     level = 0,
-                    name = "dragonBlood"
+                    name = "archerEnhance"
                 },
                 skill_2 = {
                     level = 0,
-                    name = "archerEnhance"
+                    name = "infantryEnhance"
                 },
                 skill_1 = {
                     level = 0,
-                    name = "infantryEnhance"
+                    name = "poisonNova"
                 }
             },
             type = "greenDragon",
@@ -598,15 +598,15 @@ return {
             skills = {
                 skill_9 = {
                     level = 0,
-                    name = "frenzied"
+                    name = "greedy"
                 },
                 skill_8 = {
                     level = 0,
-                    name = "greedy"
+                    name = "leadership"
                 },
                 skill_7 = {
                     level = 0,
-                    name = "leadership"
+                    name = "dragonBlood"
                 },
                 skill_6 = {
                     level = 0,
@@ -622,15 +622,15 @@ return {
                 },
                 skill_3 = {
                     level = 0,
-                    name = "dragonBlood"
+                    name = "archerEnhance"
                 },
                 skill_2 = {
                     level = 0,
-                    name = "archerEnhance"
+                    name = "infantryEnhance"
                 },
                 skill_1 = {
                     level = 0,
-                    name = "infantryEnhance"
+                    name = "hellFire"
                 }
             },
             type = "redDragon",
@@ -683,15 +683,15 @@ return {
             skills = {
                 skill_9 = {
                     level = 0,
-                    name = "insensitive"
+                    name = "surge"
                 },
                 skill_8 = {
                     level = 0,
-                    name = "recover"
+                    name = "leadership"
                 },
                 skill_7 = {
                     level = 0,
-                    name = "leadership"
+                    name = "dragonBlood"
                 },
                 skill_6 = {
                     level = 0,
@@ -707,15 +707,15 @@ return {
                 },
                 skill_3 = {
                     level = 0,
-                    name = "dragonBlood"
+                    name = "archerEnhance"
                 },
                 skill_2 = {
                     level = 0,
-                    name = "archerEnhance"
+                    name = "infantryEnhance"
                 },
                 skill_1 = {
                     level = 0,
-                    name = "infantryEnhance"
+                    name = "lightningStorm"
                 }
             },
             type = "blueDragon",

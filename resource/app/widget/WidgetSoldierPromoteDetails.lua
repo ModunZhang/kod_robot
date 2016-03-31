@@ -205,7 +205,7 @@ function WidgetSoldierPromoteDetails:onEnter()
             {
                 text = "-"..next_config.consumeFoodPerHour,
                 size = 22,
-                color = 0x700E00,
+                color = 0x403c2f,
             },
         },
     }

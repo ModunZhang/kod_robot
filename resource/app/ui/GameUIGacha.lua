@@ -307,7 +307,6 @@ function GameUIGacha:CreateGachaPool(layer)
         end
         layer:EnAbleButton(false)
         local terminal_point
-        print("item_name=",item_name,"count=",item[2])
         for i,item in ipairs(items) do
             if item:GetGachaItemName() == item_name and item:GetGachaItemCount()== self.current_gacha_item_count then
                 terminal_point = i
@@ -318,11 +317,11 @@ function GameUIGacha:CreateGachaPool(layer)
 
         -- 随机转几圈
         math.randomseed(tostring(os.time()):reverse():sub(1, 6))
-        local round_num = math.random(3,5)
+        local round_num = math.random(1,2)
         -- 总共要跳动的格子数
         self.total_steps = round_num*16+terminal_point - current_index
         -- 当前计时器周期
-        self.current_period = 0.005
+        self.current_period = 0.08
         -- 跳动步子参数，越慢的计时器行走的格子数越少
         self.step_offset = 10
         if self.handle then
@@ -356,8 +355,8 @@ function GameUIGacha:CreateGachaPool(layer)
             self.handle = nil
             if self.total_steps-self.run_steps<10 then
                 self.current_period = self.current_period + 0.03
-            elseif self.total_steps-self.run_steps<40 then
-                self.current_period = self.current_period + 0.001
+            -- elseif self.total_steps-self.run_steps<40 then
+            --     self.current_period = self.current_period + 0.005
             end
             self.handle = scheduler.scheduleGlobal(handler(self, self.Run), self.current_period, false)
             -- if self.total_steps-self.run_steps<10 then
@@ -412,14 +411,14 @@ end
 function GameUIGacha:InitOrdinary()
     local main = self
     local layer = self.ordinary_layer
-    local background_gacha_1 = device.platform == 'winrt' and "background_gacha_1.png" or "background_gacha_1.jpg" 
+    local background_gacha_1 = "background_gacha_1.jpg" 
     self.isOrdinaryInit = display.newSprite(background_gacha_1):addTo(layer)
         :align(display.TOP_CENTER, window.cx, window.top_bottom+36)
     UIKit:ttfLabel({
         text = _("每日获得免费抽奖机会，激活VIP5 以上，每日可获得额外的免费抽奖机会"),
         size = 22,
         color = 0xffedae,
-        dimensions = cc.size(400,0)
+        dimensions = cc.size(420,0)
     }):align(display.CENTER, window.cx, window.top_bottom-50):addTo(layer)
     local OrdinaryGachaPool = self:CreateGachaPool(layer)
 
@@ -508,7 +507,7 @@ end
 function GameUIGacha:InitDeluxe()
     local main = self
     local layer = self.deluxe_layer
-    local background_gacha_2 = device.platform == 'winrt' and "background_gacha_2.png" or "background_gacha_2.jpg" 
+    local background_gacha_2 = "background_gacha_2.jpg" 
     self.isDeluxeInit = display.newSprite(background_gacha_2):addTo(layer)
         :align(display.TOP_CENTER, window.cx, window.top_bottom+36)
     UIKit:ttfLabel({

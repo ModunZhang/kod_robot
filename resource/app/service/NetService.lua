@@ -68,7 +68,7 @@ function NetService:request(route, lmsg, cb)
     end
     lmsg = lmsg or {}
     -- lmsg.__time__ = ext.now() + self.m_deltatime
-    self.m_pomelo:request(route, json.encode(lmsg), function ( success, jmsg )
+    local ret = self.m_pomelo:request(route, json.encode(lmsg), function ( success, jmsg )
             if not success then  self.net_state = self.NET_STATE.DISCONNECT end 
             if jmsg then
                 jmsg = json.decode(jmsg)
@@ -77,6 +77,11 @@ function NetService:request(route, lmsg, cb)
             end
             cb(success, jmsg)
     end)
+    if not ret then
+        cocos_promise.defer(function()
+            cb(false,{message = _("连接服务器失败,请检测你的网络环境!"),code = 0}) 
+        end)
+    end
 end
 
 function NetService:notify( route, lmsg, cb )

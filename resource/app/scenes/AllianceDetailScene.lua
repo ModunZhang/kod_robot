@@ -305,6 +305,9 @@ end
 function AllianceDetailScene:onEnter()
     AllianceDetailScene.super.onEnter(self)
 
+    display.newSprite("city_filter.png"):addTo(self,10):opacity(110)
+    :scale(display.width / 640):pos(display.cx, display.cy)
+
     Alliance_Manager:ClearCache()
     Alliance_Manager:UpdateAllianceBy(Alliance_Manager:GetMyAlliance().mapIndex, Alliance_Manager:GetMyAlliance())
 
@@ -352,6 +355,10 @@ function AllianceDetailScene:onEnter()
     -- :onButtonClicked(function(event)
     --     app:onEnterForeground()
     -- end)
+
+    if app:GetAudioManager():GetLastPlayedFileName() == "sfx_city" then
+        app:GetAudioManager():PlayGameMusicAutoCheckScene()
+    end
 end
 function AllianceDetailScene:onExit()
     self.fetchtimer:stopAllActions()
@@ -371,6 +378,9 @@ function AllianceDetailScene:onExit()
     Alliance_Manager:GetMyAlliance():RemoveListenerOnType(self, "villageEvents")
     Alliance_Manager:GetMyAlliance():RemoveListenerOnType(self, "shrineEvents")
     Alliance_Manager:GetMyAlliance():RemoveListenerOnType(self, "operation")
+end
+function AllianceDetailScene:ViewIndex()
+    return self.current_allinace_index
 end
 function AllianceDetailScene:FetchAllianceDatasByIndex(index, func)
     if Alliance_Manager:GetMyAlliance().mapIndex == index then
@@ -410,7 +420,7 @@ function AllianceDetailScene:StartTimer(index, func)
     end, 0.2)
 end
 function AllianceDetailScene:CreateHomePage()
-    local home_page = GameUIAllianceHome.new(Alliance_Manager:GetMyAlliance()):addTo(self)
+    local home_page = GameUIAllianceHome.new(Alliance_Manager:GetMyAlliance()):addTo(self,10)
     home_page:setTouchSwallowEnabled(false)
     return home_page
 end
@@ -443,9 +453,9 @@ function AllianceDetailScene:OnTouchClicked(pre_x, pre_y, x, y)
     local mapObj = self:GetSceneLayer():GetClickedObject(x, y)
     if mapObj then
         local alliance = Alliance_Manager:GetAllianceByCache(mapObj.index)
+        local type_ = Alliance:GetMapObjectType(mapObj)
+        app:GetAudioManager():PlayeEffectSoundWithKey("HOME_PAGE")
         if alliance then
-            app:GetAudioManager():PlayeEffectSoundWithKey("HOME_PAGE")
-            local type_ = Alliance:GetMapObjectType(mapObj)
             if type_ == "member"
                 or type_ == "village"
                 or type_ == "building" then
@@ -476,6 +486,25 @@ function AllianceDetailScene:OnTouchClicked(pre_x, pre_y, x, y)
             else
                 self:OpenUI(alliance, mapObj)
             end
+        else
+            if type_ == "empty" then
+                return
+            end
+            local scale_map = {
+                tower1 = 1,
+                tower2 = 1,
+                crown = 3
+            }
+            self.util_node:performWithDelay(function()app:lockInput(false)end,0.5)
+            self:GetSceneLayer()
+            :PromiseOfFlashEmptyGround(mapObj.index,mapObj.x,mapObj.y,scale_map[type_])
+            :next(function()
+                if type_ == "crown" then
+                    UIKit:newGameUI("GameUIThroneMain"):AddToCurrentScene()
+                elseif type_ == "tower1" or type_ == "tower2" then
+                    UIKit:showMessageDialog(_("提示"), _("即将开放"))
+                end
+            end)
         end
     else
         app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
@@ -568,7 +597,7 @@ function AllianceDetailScene:EnterNotAllianceBuilding(alliance,mapObj)
 
 end
 function AllianceDetailScene:TwinkleShrine()
-    local mapObject = self:GetSceneLayer():FindMapObject(Alliance_Manager:GetMyAlliance().mapIndex, 13, 17)
+    local mapObject = self:GetSceneLayer():FindMapObject(Alliance_Manager:GetMyAlliance().mapIndex, 8, 12)
     self:performWithDelay(function()
         Sprite:PromiseOfFlash(mapObject.obj):next(function()
             Sprite:PromiseOfFlash(mapObject.obj):next(function()

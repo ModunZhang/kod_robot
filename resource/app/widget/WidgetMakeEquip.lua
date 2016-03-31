@@ -107,14 +107,14 @@ function WidgetMakeEquip:ctor(equip_type, black_smith, city)
     for i = 1,3 do
         local desc,value
         if i == 1 and equip_attr.strength > 0 then
-            desc = _("力量")
+            desc = _("攻击力")
             value = equip_attr.strength
         elseif i == 2 and equip_attr.vitality > 0 then
-            desc = _("活力")
-            value = equip_attr.vitality
+            desc = _("生命值")
+            value = equip_attr.vitality * 4
         elseif i == 3 and equip_attr.leadership > 0 then
-            desc = _("领导力")
-            value = equip_attr.leadership
+            desc = _("带兵量")
+            value = equip_attr.leadership * 100
         end
         if desc then
             UIKit:ttfLabel({
@@ -347,12 +347,9 @@ function WidgetMakeEquip:RefreshUI()
 end
 -- 装备数量监听
 function WidgetMakeEquip:OnUserDataChanged_dragonMaterials(userData, deltaData)
-    local ok, value = deltaData("dragonEquipments")
+    local ok, value = deltaData("dragonMaterials")
     if ok then
-        local current = value[self.equip_type]
-        if current then
-            self.number:setString(current)
-        end
+        self:UpdateMaterials()
     end
 end
 -- 建造队列监听
@@ -402,8 +399,9 @@ function WidgetMakeEquip:UpdateGemLabel()
 end
 -- 更新buff加成
 function WidgetMakeEquip:UpdateBuffTime()
+    local User = self.city:GetUser()
     local time = self.equip_config.makeTime
-    local efficiency = self.black_smith:GetEfficiency()
+    local efficiency = UtilsForBuilding:GetEfficiencyBy(User, "blackSmith")
     local buff_time = DataUtils:getBuffEfffectTime(time,efficiency)
     self.buff_time:setString(string.format("(-%s)", GameUtils:formatTimeStyle1(buff_time)))
 end
@@ -445,7 +443,17 @@ function WidgetMakeEquip:IsAbleToMakeEqui(isFinishNow)
         for m_name,m_count in pairs(User.dragonMaterials) do
             if m_name == v[1] then
                 if tonumber(v[2]) > m_count then
-                    UIKit:showMessageDialog(_("提示"),_("材料不足"),function()end)
+                    UIKit:showMessageDialogWithParams({
+                        title = _("提示"),
+                        content = _("材料不足"),
+                        ok_callback = function ()
+                            UIKit:newGameUI("GameUIItems", self.city,"shop"):AddToCurrentScene(true)
+                        end,
+                        ok_btn_images = {normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"},
+                        ok_string = _("购买"),
+                        cancel_callback = function ()
+                        end
+                    })
                     is_material_enough = false
                 end
             end
@@ -506,6 +514,7 @@ function WidgetMakeEquip:IsAbleToMakeEqui(isFinishNow)
 end
 
 return WidgetMakeEquip
+
 
 
 

@@ -69,17 +69,17 @@ function GameUIShareReport:onEnter()
         local attackTarget = report:GetAttackTarget()
         UIKit:ttfLabel(
             {
-                text = string.gsub(attackTarget.stageName,"_","-")..Localize.shrine_desc[attackTarget.stageName][1],
+                text = Localize.shrine_desc[attackTarget.stageName][1],
                 size = 18,
                 color = 0x403c2f
             }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-20, 60)
             :addTo(report_content_bg)
-        StarBar.new({
-            max = 3,
-            bg = "alliance_shire_star_60x58_0.png",
-            fill = "alliance_shire_star_60x58_1.png",
-            num = attackTarget.fightStar
-        }):addTo(report_content_bg):align(display.LEFT_CENTER,report_content_bg:getContentSize().width/2-20, 30):scale(0.5)
+        -- StarBar.new({
+        --     max = 3,
+        --     bg = "alliance_shire_star_60x58_0.png",
+        --     fill = "alliance_shire_star_60x58_1.png",
+        --     num = attackTarget.fightStar
+        -- }):addTo(report_content_bg):align(display.LEFT_CENTER,report_content_bg:getContentSize().width/2-20, 30):scale(0.5)
     else
         -- 战报发出方信息
         -- 旗帜
@@ -205,7 +205,7 @@ function GameUIShareReport:onEnter()
         {normal = "yellow_btn_up_148x58.png", pressed = "yellow_btn_down_148x58.png"},
         {scale9 = false}
     ):setButtonLabel(label)
-        :addTo(body):align(display.CENTER, 310, 50)
+        :addTo(body):align(display.CENTER, 510, 50)
         :onButtonClicked(function(event)
             if Alliance_Manager:GetMyAlliance():IsDefault() then
                 UIKit:showMessageDialog(_("提示"), _("加入联盟后开放此功能!"))
@@ -219,27 +219,27 @@ function GameUIShareReport:onEnter()
         end)
 
     -- 对战按钮
-    local label = UIKit:ttfLabel({
-        text = _("对战"),
-        size = 20,
-        color = 0xfff3c7})
-    label:enableShadow()
+    -- local label = UIKit:ttfLabel({
+    --     text = _("对战"),
+    --     size = 20,
+    --     color = 0xfff3c7})
+    -- label:enableShadow()
 
-    WidgetPushButton.new(
-        {normal = "yellow_btn_up_148x58.png", pressed = "yellow_btn_down_148x58.png"},
-        {scale9 = false}
-    ):setButtonLabel(label)
-        :addTo(body):align(display.CENTER, 510, 50)
-        :onButtonClicked(function(event)
-            if Alliance_Manager:GetMyAlliance().basicInfo.status == "fight" or Alliance_Manager:GetMyAlliance().basicInfo.status == "prepare"  then
-                local message = string.format("<report>reportName:%s,userId:%s,reportId:%s<report> %s",reportName,User:Id(),report:Id(),textView:getText() or "")
-                app:GetChatManager():SendChat("allianceFight",message)
-        		GameGlobalUI:showTips(_("提示"),_("分享成功"))
-                self:LeftButtonClicked()
-            else
-                UIKit:showMessageDialog(_("提示"), _("联盟未处于战争状态，不能使用此聊天频道!"))
-            end
-        end)
+    -- WidgetPushButton.new(
+    --     {normal = "yellow_btn_up_148x58.png", pressed = "yellow_btn_down_148x58.png"},
+    --     {scale9 = false}
+    -- ):setButtonLabel(label)
+    --     :addTo(body):align(display.CENTER, 510, 50)
+    --     :onButtonClicked(function(event)
+    --         if Alliance_Manager:GetMyAlliance().basicInfo.status == "fight" or Alliance_Manager:GetMyAlliance().basicInfo.status == "prepare"  then
+    --             local message = string.format("<report>reportName:%s,userId:%s,reportId:%s<report> %s",reportName,User:Id(),report:Id(),textView:getText() or "")
+    --             app:GetChatManager():SendChat("allianceFight",message)
+    --     		GameGlobalUI:showTips(_("提示"),_("分享成功"))
+    --             self:LeftButtonClicked()
+    --         else
+    --             UIKit:showMessageDialog(_("提示"), _("联盟未处于战争状态，不能使用此聊天频道!"))
+    --         end
+    --     end)
 end
 function GameUIShareReport:GetMyName(report)
     local data = report:GetData()

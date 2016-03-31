@@ -38,21 +38,32 @@ function WidgetAllianceBuildingUpgrade:onEnter()
     }):align(display.LEFT_CENTER, 20, level_bg:getContentSize().height/2)
         :addTo(level_bg)
     -- 建筑功能介绍
-    display.newSprite("alliance_item_flag_box_126X126.png")
-        :align(display.LEFT_CENTER, display.cx-268, display.top-175)
+    WidgetPushButton.new({normal = "alliance_item_flag_box_126X126.png"}):onButtonClicked(function(event)
+        if event.name == "CLICKED_EVENT" then
+            UIKit:newGameUI("GameUICityBuildingInfo", self.building):AddToCurrentScene(true)
+        end
+    end):align(display.LEFT_CENTER, display.cx-268, display.top-175)
         :scale(136/126)
         :addTo(self)
 
-    self.building_info_btn = WidgetPushButton.new({normal = UIKit:getImageByBuildingType( self.building.name ,1),
-        pressed = UIKit:getImageByBuildingType( self.building.name ,1)})
-        :onButtonClicked(function(event)
-            if event.name == "CLICKED_EVENT" then
-                UIKit:newGameUI("GameUICityBuildingInfo", self.building):AddToCurrentScene(true)
-            end
-        end):align(display.CENTER, display.cx-196, display.top-158):addTo(self)
-    self.building_info_btn:setScale(124/self.building_info_btn:getCascadeBoundingBox().size.width)
+    local images = UIKit:getImageByBuildingType( self.building.name ,1)
+    if tolua.type(images) == "table" then
+        for i,image in ipairs(images) do
+            local building_image = display.newSprite(image)
+            building_image:addTo(self):align(display.CENTER,display.cx-196, display.top-158)
+            building_image:setScale(124/building_image:getContentSize().width)
+        end
+    else
+        local building_image = display.newSprite(images)
+        building_image:addTo(self):align(display.CENTER,display.cx-196, display.top-158)
+        building_image:setScale(124/building_image:getContentSize().width)
+    end
+
 
     -- i image
+    display.newSprite("info_26x26.png")
+        :align(display.CENTER, display.cx-250, display.top-225)
+        :addTo(self)
     WidgetPushButton.new({normal = "info_26x26.png"})
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
@@ -60,7 +71,6 @@ function WidgetAllianceBuildingUpgrade:onEnter()
             end
         end):align(display.CENTER, display.cx-250, display.top-225)
         :addTo(self)
-
     self:InitBuildingIntroduces()
 
     self:InitNextLevelEfficiency()
@@ -96,9 +106,9 @@ function WidgetAllianceBuildingUpgrade:InitBuildingIntroduces()
         UILabelType = cc.ui.UILabel.LABEL_TYPE_TTF,
         font = UIKit:getFontFilePath(),
         size = 18,
-        dimensions = cc.size(380, 90),
+        dimensions = cc.size(380, 0),
         color = UIKit:hex2c3b(0x615b44)
-    }):align(display.LEFT_CENTER,display.cx-110, display.top-190):addTo(self)
+    }):align(display.LEFT_CENTER,display.cx-110, display.top-200):addTo(self)
     self:SetBuildingIntroduces()
 end
 
@@ -242,6 +252,9 @@ function WidgetAllianceBuildingUpgrade:getNextLevelConfig__()
 end
 
 return WidgetAllianceBuildingUpgrade
+
+
+
 
 
 

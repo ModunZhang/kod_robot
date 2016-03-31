@@ -32,70 +32,51 @@ function WidgetGachaItemBox:SetNodeEvent(gacha_box,include_tips_node)
 end
 -- 设置起点或取消起点状态
 function WidgetGachaItemBox:SetOrginStatus()
-    local img_1,img_2
-    if self.isSenior then
-        img_1,img_2="box_gacha_senior_136x136_1.png","box_gacha_senior_136x136_2.png"
-    else
-        img_1,img_2="box_gacha_112x112_1.png","box_gacha_112x112_2.png"
-    end
+    local img_1 = self.isSenior and "box_gacha_senior_136x136_1.png" or "box_gacha_112x112_1.png"
     if self.light_box then
         self:removeChild(self.light_box, true)
         self.light_box = nil
     else
-        local patten , size
+        local patten
         if self.isSenior then
             patten = "box_gacha_senior_136x136_%d.png"
-            size = 136
         else
             patten = "box_gacha_112x112_%d.png"
-            size= 112
         end
-        local srpite_frame_1 = cc.SpriteFrame:create(img_1,cc.rect(0,0,size,size))
-        local srpite_frame_2 = cc.SpriteFrame:create(img_2,cc.rect(0,0,size,size))
         local light_box = display.newSprite(img_1)
         self:addChild(light_box)
-
-        -- cc.SpriteFrameCache:getInstance():addSpriteFrame(srpite_frame_1,img_1)
-        -- cc.SpriteFrameCache:getInstance():addSpriteFrame(srpite_frame_2,img_2)
+        self.light_box = light_box
         local frames = display.newFrames(patten, 1, 2)
+        if not frames then
+            return
+        end
         local animation = display.newAnimation(frames, 0.2)
         light_box:playAnimationForever(animation)
-        self.light_box = light_box
-
     end
 end
 -- 设置选中点或取消选中点状态 ，针对3连抽
 function WidgetGachaItemBox:SetSelectedStatus()
-    local img_1,img_2
-    if self.isSenior then
-        img_1,img_2="box_gacha_senior_136x136_1.png","box_gacha_senior_136x136_2.png"
-    else
-        img_1,img_2="box_gacha_112x112_1.png","box_gacha_112x112_2.png"
-    end
+    local img_1 = self.isSenior and "box_gacha_senior_136x136_1.png" or "box_gacha_112x112_1.png"
     if self.select_box then
         self:removeChild(self.select_box, true)
         self.select_box = nil
     else
-        local patten , size
+        local patten 
         if self.isSenior then
             patten = "box_gacha_senior_136x136_%d.png"
-            size = 136
         else
             patten = "box_gacha_112x112_%d.png"
-            size= 112
         end
-        local srpite_frame_1 = cc.SpriteFrame:create(img_1,cc.rect(0,0,size,size))
-        local srpite_frame_2 = cc.SpriteFrame:create(img_2,cc.rect(0,0,size,size))
         local select_box = display.newSprite(img_1)
         self:addChild(select_box)
 
-        -- cc.SpriteFrameCache:getInstance():addSpriteFrame(srpite_frame_1,img_1)
-        -- cc.SpriteFrameCache:getInstance():addSpriteFrame(srpite_frame_2,img_2)
         local frames = display.newFrames(patten, 1, 2)
+        self.select_box = select_box
+        if not frames then
+            return
+        end
         local animation = display.newAnimation(frames, 0.2)
         select_box:playAnimationForever(animation)
-        self.select_box = select_box
-
     end
 end
 -- 设置经过状态或取消经过状态

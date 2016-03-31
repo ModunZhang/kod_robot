@@ -290,7 +290,7 @@ function OtherApi:GetRank()
 end
 -- vip
 function OtherApi:VIP()
-    if User:IsVIPActived() then
+    if UtilsForVip:IsVipActived(User) then
         -- 增加vip点数
         return  NetManager:getBuyAndUseItemPromise("vipPoint_"..math.random(3,4),{})
     else
@@ -303,19 +303,14 @@ function OtherApi:Chat()
         {
             "global",
             "alliance",
-            "allianceFight",
         }
 
     local alliance = Alliance_Manager:GetMyAlliance()
     local channel
     if not alliance:IsDefault() then
-        if alliance.basicInfo.status == "fight" then
-            channel = channels[math.random(3)]
-        else
-            channel = channels[math.random(2)]
-        end
+        channel = channels[math.random(2)]
     else
-        channel = channels[math.random(1)]
+        channel = channels[1]
     end
     if math.random(10) < 3 then
         return NetManager:getSendChatPromise(channel,"我是"..User.basicInfo.name)
@@ -403,6 +398,7 @@ return {
     VIP,
     Chat,
 }
+
 
 
 

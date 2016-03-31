@@ -17,7 +17,7 @@ local Localize = import("..utils.Localize")
 local config_playerLevel = GameDatas.PlayerInitData.playerLevel
 function GameUIAllianceMemberInfo:ctor(isMyAlliance,memberId,func_call,serverId)
     GameUIAllianceMemberInfo.super.ctor(self)
-    self.isMyAlliance = isMyAlliance or false
+    -- self.isMyAlliance = isMyAlliance or false -- 不再使用传入的这个参数，使用从服务器获得的数据作为判断依据
     self.memberId_ = memberId
     self.serverId_ = serverId or User.serverId
     self.func_call = func_call
@@ -25,7 +25,7 @@ end
 
 function GameUIAllianceMemberInfo:OnMoveInStage()
     GameUIAllianceMemberInfo.super.OnMoveInStage(self)
-    local main_height,min_y = 750,window.bottom + 120
+    local main_height,min_y = 745,window.bottom + 120
 
 
     local bg = WidgetUIBackGround.new({height=main_height}):pos(window.left+20,min_y)
@@ -55,67 +55,117 @@ end
 function GameUIAllianceMemberInfo:BuildUI()
     if self.isMyAlliance then
         if not Alliance_Manager:GetMyAlliance():GetSelf():CanHandleAllianceApply() then
-            WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
-                :setButtonLabel(
-                    UIKit:ttfLabel({
-                        text = _("邮件"),
-                        size = 20,
-                        shadow = true,
-                        color = 0xfff3c7
-                    })
-                )
-                :align(display.CENTER_BOTTOM,self.bg:getContentSize().width/2,15)
-                :onButtonClicked(function(event)
-                    self:OnPlayerButtonClicked(5)
-                end)
-                :addTo(self.bg)
-        else
-            local titles =  {_("逐出"),_("移交盟主"),_("降级"),_("晋级"),_("邮件"),}
-            local x,y = 15,15
-            for i = 1,5 do
-                WidgetPushButton.new({normal = "player_operate_n_116x64.png",pressed = "player_operate_h_116x64.png"})
-                    :align(display.LEFT_BOTTOM, x + (i - 1)*116, y)
-                    :addTo(self.bg)
-                    :setButtonLabel("normal", UIKit:ttfLabel({
-                        text = titles[i],
-                        size = 20,
-                        color= 0xffedae,
-                        shadow= true
-                    }))
-                    :onButtonClicked(function()
-                        self:OnPlayerButtonClicked(i)
+            if self.player_info.id ~= User._id then
+                WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+                    :setButtonLabel(
+                        UIKit:ttfLabel({
+                            text = _("邮件"),
+                            size = 20,
+                            shadow = true,
+                            color = 0xfff3c7
+                        })
+                    )
+                    :align(display.CENTER_BOTTOM,self.bg:getContentSize().width/2,15)
+                    :onButtonClicked(function(event)
+                        self:OnPlayerButtonClicked(5)
                     end)
+                    :addTo(self.bg)
+            end
+        else
+            if self.player_info.id ~= User._id then
+                local titles =  {_("逐出"),_("移交盟主"),_("降级"),_("晋级"),_("邮件"),}
+                local x,y = 15,15
+                for i = 1,5 do
+                    WidgetPushButton.new({normal = "player_operate_n_116x64.png",pressed = "player_operate_h_116x64.png"})
+                        :align(display.LEFT_BOTTOM, x + (i - 1)*116, y)
+                        :addTo(self.bg)
+                        :setButtonLabel("normal", UIKit:ttfLabel({
+                            text = titles[i],
+                            size = 20,
+                            color= 0xffedae,
+                            shadow= true
+                        }))
+                        :onButtonClicked(function()
+                            self:OnPlayerButtonClicked(i)
+                        end)
+                end
             end
         end
     else
-        WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
-            :setButtonLabel(
-                UIKit:ttfLabel({
-                    text = _("邮件"),
-                    size = 20,
-                    shadow = true,
-                    color = 0xfff3c7
-                })
-            )
-            :align(display.CENTER_BOTTOM,self.bg:getContentSize().width/2,15)
-            :onButtonClicked(function(event)
-                 local mail = GameUIWriteMail.new(GameUIWriteMail.SEND_TYPE.PERSONAL_MAIL,{
-                    id = self.player_info.id,
-                    name = self.player_info.name,
-                    icon = self.player_info.icon,
-                    allianceTag = self.player_info.alliance and self.player_info.alliance.tag,
-                })
-                mail:SetTitle(_("个人邮件"))
-                mail:SetAddressee(self.player_info.name)
-                mail:addTo(self)
-            end)
-            :addTo(self.bg)
+        if Alliance_Manager:GetMyAlliance():IsDefault() then -- 自己无联盟时
+            local mail_btn = self:AddNormalMailButton()
+            if self.player_info.alliance then -- 查看的玩家有联盟
+                WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+                    :setButtonLabel(
+                        UIKit:ttfLabel({
+                            text = _("加入联盟"),
+                            size = 20,
+                            shadow = true,
+                            color = 0xfff3c7
+                        })
+                    )
+                    :align(display.LEFT_BOTTOM, 50,15)
+                    :onButtonClicked(function(event)
+                        UIKit:newGameUI("GameUIAllianceInfo",self.player_info.alliance.id,nil,self.serverId_):AddToCurrentScene(true)
+                    end):addTo(self.bg)
+                mail_btn:align(display.RIGHT_BOTTOM,self.bg:getContentSize().width - 50,15)
+            end
+        else -- 自己有联盟时
+            if Alliance_Manager:GetMyAlliance():GetSelf():CanInvatePlayer() and not self.player_info.alliance then
+                WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+                    :setButtonLabel(
+                        UIKit:ttfLabel({
+                            text = _("邀请加入"),
+                            size = 20,
+                            shadow = true,
+                            color = 0xfff3c7
+                        })
+                    )
+                    :align(display.LEFT_BOTTOM, 50,15)
+                    :onButtonClicked(function(event)
+                        if User.serverId ~= self.serverId_ then
+                            UIKit:showMessageDialog(_("提示"), _("不能邀请其他服务器的玩家"), function()end)
+                        else
+                            NetManager:getInviteToJoinAlliancePromise(self.player_info.id):done(function()
+                                UIKit:showMessageDialog(_("提示"), _("邀请发送成功"), function()end)
+                            end)
+                        end
+                    end):addTo(self.bg)
+                self:AddNormalMailButton():align(display.RIGHT_BOTTOM,self.bg:getContentSize().width - 50,15)
+            else
+                self:AddNormalMailButton()
+            end
+        end
     end
     local player_node = WidgetPlayerNode.new(cc.size(564,644),self)
-        :addTo(self.bg):pos(22,82)
+        :addTo(self.bg):pos(22,86)
     self.player_node = player_node
 end
+function GameUIAllianceMemberInfo:AddNormalMailButton()
+    return WidgetPushButton.new({normal = "yellow_btn_up_148x58.png",pressed = "yellow_btn_down_148x58.png"})
+        :setButtonLabel(
+            UIKit:ttfLabel({
+                text = _("邮件"),
+                size = 20,
+                shadow = true,
+                color = 0xfff3c7
+            })
+        )
+        :align(display.CENTER_BOTTOM,self.bg:getContentSize().width/2,15)
+        :onButtonClicked(function(event)
+            local mail = GameUIWriteMail.new(GameUIWriteMail.SEND_TYPE.PERSONAL_MAIL,{
+                id = self.player_info.id,
+                name = self.player_info.name,
+                icon = self.player_info.icon,
+                allianceTag = self.player_info.alliance and self.player_info.alliance.tag,
+            })
+            mail:SetTitle(_("个人邮件"))
+            mail:SetAddressee(self.player_info.name)
+            mail:addTo(self)
+        end)
+        :addTo(self.bg)
 
+end
 function GameUIAllianceMemberInfo:OnPlayerButtonClicked( tag )
     local can_do,msg = self:CheckPlayerAuthor(tag)
     if not can_do then
@@ -127,10 +177,10 @@ function GameUIAllianceMemberInfo:OnPlayerButtonClicked( tag )
         if Alliance_Manager:GetMyAlliance().basicInfo.status == "fight" or Alliance_Manager:GetMyAlliance().basicInfo.status == "prepare" then
             UIKit:showMessageDialog(_("提示"), _("联盟正在战争准备期或战争期,不能将玩家踢出联盟"))
             return
-        end
-        self:ShowSureDialog(string.format(_("您确定逐出玩家:%s?"),member:Name()),function()
-            self:SendToServerWithTag(tag,member)
-        end)
+    end
+    self:ShowSureDialog(string.format(_("您确定逐出玩家:%s?"),member:Name()),function()
+        self:SendToServerWithTag(tag,member)
+    end)
     elseif tag == 2 then -- 移交盟主
         self:ShowSureDialog(string.format(_("您确定移交盟主职位给:%s?"),member:Name()),function()
             self:SendToServerWithTag(tag,member)
@@ -185,11 +235,11 @@ function GameUIAllianceMemberInfo:SendToServerWithTag(tag,member)
     end
     elseif tag == 5 then
         local mail = GameUIWriteMail.new(GameUIWriteMail.SEND_TYPE.PERSONAL_MAIL,{
-                    id = member:Id(),
-                    name = member:Name(),
-                    icon = member:Icon(),
-                    allianceTag = self.player_info.alliance and self.player_info.alliance.tag,
-                })
+            id = member:Id(),
+            name = member:Name(),
+            icon = member:Icon(),
+            allianceTag = self.player_info.alliance and self.player_info.alliance.tag,
+        })
         mail:SetTitle(_("个人邮件"))
         mail:SetAddressee(self.player_info.name)
         mail:addTo(self)
@@ -210,14 +260,14 @@ function GameUIAllianceMemberInfo:AdapterPlayerList()
         table.insert(r,{_("职位"),_("无")})
         table.insert(r,{_("联盟"),_("无")})
     end
-    if player.alliance.tag == Alliance_Manager:GetMyAlliance().basicInfo.tag then
+    if player.alliance and player.alliance.tag == Alliance_Manager:GetMyAlliance().basicInfo.tag then
         if type(player.online) == 'boolean' and player.online then
             table.insert(r,{_("最后登陆"),_("在线")})
         else
             table.insert(r,{_("最后登陆"),NetService:formatTimeAsTimeAgoStyleByServerTime(player.lastLogoutTime)})
         end
     end
-    table.insert(r,{_("服务器"),string.format(_("World %s"),string.sub(User.serverId,-1,-1))})
+    table.insert(r,{_("服务器"),Localize.server_name[User.serverId]})
     table.insert(r,{_("战斗力"),string.formatnumberthousands(player.power)})
     table.insert(r,{_("击杀"),string.formatnumberthousands(player.kill)})
 
@@ -227,6 +277,8 @@ end
 function GameUIAllianceMemberInfo:OnGetPlayerInfoSuccess(data)
     if data.success then
         self.player_info = data.msg.playerViewData
+        self.isMyAlliance = self.player_info.alliance and not Alliance_Manager:GetMyAlliance():IsDefault() and Alliance_Manager:GetMyAlliance().basicInfo.tag == self.player_info.alliance.tag
+
         self:BuildUI()
         self:RefreshListView()
     end
@@ -258,7 +310,7 @@ function GameUIAllianceMemberInfo:WidgetPlayerNode_PlayerCanClickedButton(name,a
     elseif name == 'PlayerTitle' then -- 点击头衔
         return true
     elseif name == 'PlayerIDCopy' then --复制玩家ID
-        return true
+        return false
     elseif name == 'PlayerName' then --修改玩家名
         return false
     end
@@ -355,5 +407,13 @@ function GameUIAllianceMemberInfo:ShowSureDialog(msg,ok_func,cancel_func)
 end
 
 return GameUIAllianceMemberInfo
+
+
+
+
+
+
+
+
 
 

@@ -6,8 +6,8 @@ local window = import("..utils.window")
 local WidgetPushButton = import("..widget.WidgetPushButton")
 local WidgetUIBackGround = import("..widget.WidgetUIBackGround")
 local WidgetAllianceHelper = import("..widget.WidgetAllianceHelper")
-local StarBar = import(".StarBar")
 local WidgetRoundTabButtons = import("..widget.WidgetRoundTabButtons")
+local WidgetPushTransparentButton = import("..widget.WidgetPushTransparentButton")
 local WidgetPopDialog = import("..widget.WidgetPopDialog")
 local UILib = import(".UILib")
 local Localize = import("..utils.Localize")
@@ -167,11 +167,19 @@ function GameUIMail:CreateMailControlBox()
                             listener =function ()
                                 local select_map = self:GetSelectMailsOrReports()
                                 local ids = {}
+                                local hasReward = false
                                 for k,v in pairs(select_map) do
                                     table.insert(ids, v.id)
+                                    if self:IsRewardNotGetted(v) then
+                                        hasReward = true
+                                    end
                                 end
                                 self.is_deleting = true
                                 if control_type == "mail" then
+                                    if hasReward then
+                                        UIKit:showMessageDialog(_("提示"),_("邮件中有未领取的奖励，不能删除!"),function()end)
+                                        return
+                                    end
                                     MailManager:DecreaseUnReadMailsNumByIds(ids)
                                     NetManager:getDeleteMailsPromise(ids):done(function ()
                                         self:SelectAllMailsOrReports(false)
@@ -964,7 +972,9 @@ function GameUIMail:SelectAllMailsOrReports(isSelect)
         for i,v in ipairs(self.manager:GetReports()) do
             self:SelectItems(v,isSelect)
         end
-        self.report_listview:asyncLoadWithCurrentPosition_()
+        if #self.manager:GetReports() > 0 then
+            self.report_listview:asyncLoadWithCurrentPosition_()
+        end
     elseif self.saved_layer:isVisible() then
         if self.save_mails_listview and self.save_mails_listview:isVisible() then
             for i,v in ipairs(self.manager:GetSavedMails()) do
@@ -1222,6 +1232,9 @@ function GameUIMail:ShowMailDetails(mail)
     -- player head icon
     UIKit:GetPlayerCommonIcon(mail.fromIcon):align(display.CENTER, 76, size.height - 80):addTo(body)
 
+    WidgetPushTransparentButton.new(cc.rect(0,0,114,114)):addTo(body):align(display.CENTER, 76, size.height - 80):onButtonClicked(function()
+        UIKit:newGameUI("GameUIAllianceMemberInfo",false,mail.fromId,nil,User.serverId):AddToCurrentScene(true)
+    end)
     -- 主题
     local subject_label = cc.ui.UILabel.new(
         {cc.ui.UILabel.LABEL_TYPE_TTF,
@@ -1297,8 +1310,14 @@ function GameUIMail:ShowMailDetails(mail)
             :addTo(body):align(display.CENTER, 92, 42)
             :onButtonClicked(function(event)
                 if event.name == "CLICKED_EVENT" then
+                    if self:IsRewardNotGetted(mail) then
+                        UIKit:showMessageDialog(_("提示"),_("邮件中有未领取的奖励，不能删除!"),function()end)
+                        return
+                    end
                     NetManager:getDeleteMailsPromise({mail.id}):done(function ()
-                        dialog:LeftButtonClicked()
+                        if dialog then
+                            dialog:LeftButtonClicked()
+                        end
                     end)
                 end
             end)
@@ -1434,6 +1453,9 @@ function GameUIMail:ShowRewardMailDetails(mail)
         elseif reward.type == "dragonMaterials" then
             reward_png = UILib.dragon_material_pic_map[reward.name]
             reward_name = Localize.equip_material[reward.name]
+        elseif reward.type == "soldiers" then
+            reward_name = Localize.soldier_name[reward.name]
+            reward_png = UILib.soldier_image[reward.name]
         end
         display.newSprite(reward_png):align(display.CENTER, item_bg:getContentSize().width/2,item_bg:getContentSize().height/2):addTo(item_bg):scale(0.8)
 
@@ -1476,6 +1498,10 @@ function GameUIMail:ShowRewardMailDetails(mail)
         :addTo(body):align(display.CENTER, 92, 42)
         :onButtonClicked(function(event)
             if event.name == "CLICKED_EVENT" then
+                if self:IsRewardNotGetted(mail) then
+                    UIKit:showMessageDialog(_("提示"),_("邮件中有未领取的奖励，不能删除!"),function()end)
+                    return
+                end
                 NetManager:getDeleteMailsPromise({mail.id}):done(function ()
                     dialog:LeftButtonClicked()
                 end)
@@ -1550,8 +1576,9 @@ function GameUIMail:InitReport()
                 return response
             end)
         end
+    else
+        self.report_listview:reload()
     end
-    self.report_listview:reload()
 end
 
 function GameUIMail:DelegateReport( listView, tag, idx )
@@ -1634,8 +1661,14 @@ function GameUIMail:CreateReportContent()
                     elseif report:Type() == "attackShrine" then
                         UIKit:newGameUI("GameUIShrineReportInMail", report,true):AddToCurrentScene(true)
                     end
-                    if report:Type() ~= "collectResource" then
+                    if report:Type() ~= "collectResource" and report:Type() ~= "attackShrine" then
                         if report:GetReportResult() then
+                            app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_VICTORY")
+                        else
+                            app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_DEFEATED")
+                        end
+                    elseif report:Type() == "attackShrine" then
+                        if report:GetAttackTarget().isWin then
                             app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_VICTORY")
                         else
                             app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_DEFEATED")
@@ -1730,8 +1763,6 @@ function GameUIMail:CreateReportContent()
                 }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-10, 25)
                 :addTo(report_content_bg)
         elseif isFromMe == "attackShrine" then
-            -- display.newScale9Sprite("alliance_watchTower.png"):addTo(report_content_bg)
-            --     :align(display.CENTER_TOP,160, 80):scale(0.6)
             display.newSprite("alliance_shrine_1.png"):addTo(report_content_bg)
                 :align(display.CENTER_TOP,160, 90):scale(0.6)
             display.newSprite("alliance_shrine_2.png"):addTo(report_content_bg)
@@ -1741,17 +1772,11 @@ function GameUIMail:CreateReportContent()
             local attackTarget = report:GetAttackTarget()
             UIKit:ttfLabel(
                 {
-                    text = string.gsub(attackTarget.stageName,"_","-")..Localize.shrine_desc[attackTarget.stageName][1],
+                    text = Localize.shrine_desc[attackTarget.stageName][1],
                     size = 18,
                     color = 0x403c2f
                 }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-20, 60)
                 :addTo(report_content_bg)
-            StarBar.new({
-                max = 3,
-                bg = "alliance_shire_star_60x58_0.png",
-                fill = "alliance_shire_star_60x58_1.png",
-                num = attackTarget.fightStar
-            }):addTo(report_content_bg):align(display.LEFT_CENTER,report_content_bg:getContentSize().width/2-20, 30):scale(0.5)
         else
             -- 战报发出方信息
             -- 旗帜
@@ -1968,8 +1993,14 @@ function GameUIMail:CreateSavedReportContent()
                     elseif report:Type() == "attackShrine" then
                         UIKit:newGameUI("GameUIShrineReportInMail", report):AddToCurrentScene(true)
                     end
-                    if report:Type() ~= "collectResource" then
+                    if report:Type() ~= "collectResource" and report:Type() ~= "attackShrine" then
                         if report:GetReportResult() then
+                            app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_VICTORY")
+                        else
+                            app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_DEFEATED")
+                        end
+                    elseif report:Type() == "attackShrine" then
+                        if report:GetAttackTarget().isWin then
                             app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_VICTORY")
                         else
                             app:GetAudioManager():PlayeEffectSoundWithKey("BATTLE_DEFEATED")
@@ -2063,23 +2094,19 @@ function GameUIMail:CreateSavedReportContent()
                 }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-10, 25)
                 :addTo(report_content_bg)
         elseif isFromMe == "attackShrine" then
-            display.newScale9Sprite("alliance_watchTower.png"):addTo(report_content_bg)
-                :align(display.CENTER_TOP,160, 80):scale(0.6)
+            display.newSprite("alliance_shrine_1.png"):addTo(report_content_bg)
+                :align(display.CENTER_TOP,160, 90):scale(0.6)
+            display.newSprite("alliance_shrine_2.png"):addTo(report_content_bg)
+                :align(display.CENTER_TOP,160, 90):scale(0.6)
             -- 圣地关卡名字
             local attackTarget = report:GetAttackTarget()
             UIKit:ttfLabel(
                 {
-                    text = string.gsub(attackTarget.stageName,"_","-")..Localize.shrine_desc[attackTarget.stageName][1],
+                    text = Localize.shrine_desc[attackTarget.stageName][1],
                     size = 18,
                     color = 0x403c2f
                 }):align(display.LEFT_CENTER, report_content_bg:getContentSize().width/2-20, 60)
                 :addTo(report_content_bg)
-            StarBar.new({
-                max = 3,
-                bg = "alliance_shire_star_60x58_0.png",
-                fill = "alliance_shire_star_60x58_1.png",
-                num = attackTarget.fightStar
-            }):addTo(report_content_bg):align(display.LEFT_CENTER,report_content_bg:getContentSize().width/2-20, 30):scale(0.5)
         else
             -- 战报发出方信息
             -- 旗帜
@@ -2384,7 +2411,15 @@ function GameUIMail:SaveOrUnsaveReport(report,target)
     end
 end
 
-
+function GameUIMail:IsRewardNotGetted(mail)
+    local rewardGetted = mail.rewardGetted
+    local rewards = mail.rewards
+    if rewards and LuaUtils:table_empty(rewards) then
+        return false
+    else
+        return not rewardGetted
+    end
+end
 function GameUIMail:GetMyName(report)
     local data = report:GetData()
     if report:Type() == "strikeCity" or report:Type()== "cityBeStriked" then
@@ -2539,6 +2574,7 @@ function GameUIMail:GetEnemyAllianceTag(report)
 end
 
 return GameUIMail
+
 
 
 

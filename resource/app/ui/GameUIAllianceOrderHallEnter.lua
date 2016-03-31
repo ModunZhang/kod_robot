@@ -48,11 +48,6 @@ function GameUIAllianceOrderHallEnter:GetBuildingInfo()
 end
 
 function GameUIAllianceOrderHallEnter:GetNormalButton()
-    -- local info_button = self:BuildOneButton("icon_proficiency_78x56.png",_("熟练度")):onButtonClicked(function()
-    --     UIKit:newGameUI('GameUIOrderHall',City,"proficiency",self:GetBuilding()):AddToCurrentScene(true)
-    --     self:LeftButtonClicked()
-    -- end)
-
     local village_button = self:BuildOneButton("village_manage_66x72.png",_("村落管理")):onButtonClicked(function()
          UIKit:newGameUI('GameUIOrderHall',City,"village",self:GetBuilding()):AddToCurrentScene(true)
         self:LeftButtonClicked()

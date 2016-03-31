@@ -143,7 +143,6 @@ function CityLayer:OnTileLocked(city)
 end
 function CityLayer:OnTileUnlocked(city)
     self:OnTileChanged(city)
-    print("OnTileUnlocked")
 end
 function CityLayer:OnTileChanged(city)
     self:UpdateRuinsVisibleWithCity(city)
@@ -168,18 +167,11 @@ function CityLayer:OnCreateDecorator(building)
     city_node:addChild(house)
     table.insert(self.houses, house)
     self:CreateLevelArrowBy(house)
-
-    -- self:NotifyObservers(function(listener)
-    --     listener:OnCreateDecoratorSprite(house)
-    -- end)
 end
 function CityLayer:OnDestoryDecorator(destory_decorator, release_ruins)
     for i, house in pairs(self.houses) do
         local x, y = house:GetLogicPosition()
         if destory_decorator:IsSamePositionWith(house) then
-            -- self:NotifyObservers(function(listener)
-            --     listener:OnDestoryDecoratorSprite(house)
-            -- end)
             local house = table.remove(self.houses, i)
             self:DeleteLevelArrowBy(house)
             house:removeFromParent()
@@ -203,8 +195,8 @@ function CityLayer:OnUserDataChanged_buildings(userData, deltaData)
         v:RefreshSprite()
     end
     self:CheckUpgradeCondition()
-
-    if deltaData("buildings.location_2.level") then
+    
+    if deltaData("buildings.location_5.level") then
         self:RefreshSoldiers()
     end
 end
@@ -278,8 +270,8 @@ function CityLayer:OnUserDataChanged_soldiers(userData, deltaData)
     if self:IsBarracksMoving() then return end
     self:UpdateSoldiersVisible()
 end
-function CityLayer:OnUserDataChanged_helpedByTroops(userData, deltaData)
-    self:UpdateHelpedByTroopsVisible(userData.helpedByTroops)
+function CityLayer:OnUserDataChanged_helpedByTroop(userData, deltaData)
+    self:UpdateHelpedByTroopsVisible({userData.helpedByTroop})
 end
 function CityLayer:IsBarracksMoving()
     return self:GetCityNode():getChildByTag(BARRACKS_SOLDIER_TAG)
@@ -289,7 +281,7 @@ local SCENE_ZORDER = Enum("SCENE_BACKGROUND", "CITY_LAYER", "SKY_LAYER", "INFO_L
 local CITY_ZORDER = Enum("BUILDING_NODE", "LEVEL_NODE")
 function CityLayer:ctor(city_scene)
     Observer.extend(self)
-    CityLayer.super.ctor(self, city_scene, 0.6, 1.5)
+    CityLayer.super.ctor(self, city_scene, 0.6, 1.0)
     self.scene = city_scene
     self.buildings = {}
     self.houses = {}
@@ -363,7 +355,17 @@ function CityLayer:CheckCanUpgrade()
 end
 --
 function CityLayer:InitWeather()
-
+    local emmiter 
+    if self:Terrain() == "grassLand" then
+        emmiter = UIKit:CreateFog("fog1.png"):addTo(self, 11):pos(0, 1224)
+    elseif self:Terrain() == "iceField" then
+        emmiter = UIKit:CreateFog():addTo(self, 11):pos(0, 1224)
+    end
+    if emmiter then
+        for i = 1, 100 do
+            emmiter:update(1)
+        end
+    end
 end
 function CityLayer:ChangeTerrain()
     self:ReloadSceneBackground()
@@ -392,7 +394,7 @@ function CityLayer:ReloadSceneBackground()
         self.background:removeFromParent()
     end
     self.background = display.newNode():addTo(self, SCENE_ZORDER.SCENE_BACKGROUND)
-    local suffix = device.platform == "winrt" and "png" or "jpg"
+    local suffix = "jpg"
     local s = suffix == "png" and (1316 / 1024) or 1
     local terrain = self:Terrain()
     local left_1 = string.format("left_background_1_%s.%s", terrain, suffix)
@@ -420,24 +422,26 @@ function CityLayer:ReloadSceneBackground()
     end
     local background = self.background
     function square:Flash(time)
-        -- local sprite = display.newSprite("click_empty.png")
-        -- :addTo(background):opacity(0)
-        -- if device.platform == "ios" then
-        --     sprite:pos(1050, 440 + 1224)
-        -- else
-        --     sprite:pos(1050 + 150, 440 + 1224 - 150)
-        -- end
-        -- sprite:setScaleX(1.8)
-        -- sprite:setScaleY(1.3)
-        -- sprite:rotation(-30)
-        -- sprite:setSkewX(-23)
-        -- sprite:runAction(transition.sequence({
-        --     cc.FadeIn:create(time/2),
-        --     cc.FadeOut:create(time/2),
-        --     cc.RemoveSelf:create(),
-        -- }))
+        local sprite = display.newSprite("click_empty.png")
+        :addTo(background):opacity(0)
+        sprite:pos(980, 440 + 1280)
+        sprite:setScaleX(1.8)
+        sprite:setScaleY(1.3)
+        sprite:rotation(-30)
+        sprite:setSkewX(-23)
+        sprite:runAction(transition.sequence({
+            cc.FadeIn:create(time/2),
+            cc.FadeOut:create(time/2),
+            cc.RemoveSelf:create(),
+        }))
     end
     self.square = square
+
+
+    -- local emitter = UIKit:CreateFog():addTo(background, 11):pos(0, 1224)
+    -- for i = 1, 1000 do
+    --     emitter:update(0.01)
+    -- end
 end
 function CityLayer:InitWithCity(city)
     city:AddListenOnType(self, city.LISTEN_TYPE.UNLOCK_TILE)
@@ -447,7 +451,7 @@ function CityLayer:InitWithCity(city)
     city:AddListenOnType(self, city.LISTEN_TYPE.DESTROY_DECORATOR)
     local User = self.scene:GetCity():GetUser()
     User:AddListenOnType(self, "soldiers")
-    User:AddListenOnType(self, "helpedByTroops")
+    User:AddListenOnType(self, "helpedByTroop")
     User:AddListenOnType(self, "buildings")
     User:AddListenOnType(self, "houseEvents")
     User:AddListenOnType(self, "buildingEvents")
@@ -508,7 +512,7 @@ function CityLayer:InitWithCity(city)
     -- 协防的部队
     local helpedByTroops = {}
     for i, v in ipairs({
-        {x = 25, y = 55},
+        -- {x = 25, y = 55},
         {x = 35, y = 55},
     }) do
         table.insert(helpedByTroops, HelpedTroopsSprite.new(self, i, v.x, v.y):addTo(city_node))
@@ -542,7 +546,7 @@ function CityLayer:InitWithCity(city)
 end
 function CityLayer:MoveBarracksSoldiers(soldier_name, is_mark)
     if soldier_name then
-        local star = User:SoldierStarByName(soldier_name)
+        local star = UtilsForSoldier:SoldierStarByName(User, soldier_name)
         local soldier = self:CreateBarracksSoldier(soldier_name, star)
             :addTo(self:GetCityNode(), 0, BARRACKS_SOLDIER_TAG)
         if is_mark then
@@ -633,7 +637,7 @@ function CityLayer:UpdateAllDynamicWithCity(city)
     self:UpdateTreesWithCity(city)
     self:UpdateWallsWithCity(city)
     self:UpdateSoldiersVisible()
-    self:UpdateHelpedByTroopsVisible(User.helpedByTroops)
+    self:UpdateHelpedByTroopsVisible({User.helpedByTroop})
     self:UpdateCitizen(city)
 end
 function CityLayer:UpdateRuinsVisibleWithCity(city)
@@ -652,19 +656,6 @@ function CityLayer:UpdateSingleTreeVisibleWithCity(city)
         tree:setVisible(city:GetTileByBuildingPosition(tree.x, tree.y):IsUnlocked())
     end)
 end
--- function CityLayer:UpdateLockedTilesWithCity(city)
---     local city_node = self:GetCityNode()
---     for _, v in pairs(self.locked_tiles) do
---         v:removeFromParent()
---     end
---     self.locked_tiles = {}
---     city:IteratorTilesByFunc(function(x, y, tile)
---         local building = city:GetBuildingByLocationId(tile.location_id)
---         if tile:NeedWalls() and tile.locked and not building:IsUnlocking() then
---             table.insert(self.locked_tiles, self:CreateLockedTileSpriteWithTile(tile):addTo(city_node))
---         end
---     end)
--- end
 function CityLayer:UpdateTilesWithCity(city)
     local city_node = self:GetCityNode()
     for _, v in pairs(self.tiles) do
@@ -795,9 +786,9 @@ function CityLayer:RefreshSoldiers()
 
     self:UpdateSoldiersVisible()
 end
-function CityLayer:UpdateHelpedByTroopsVisible(helped_by_troops)
+function CityLayer:UpdateHelpedByTroopsVisible(helpedByTroops)
     self:IteratorHelpedTroops(function(i, v)
-        v:setVisible(helped_by_troops[i] ~= nil)
+        v:setVisible(type(helpedByTroops[i]) == "table")
     end)
 end
 function CityLayer:IteratorHelpedTroops(func)

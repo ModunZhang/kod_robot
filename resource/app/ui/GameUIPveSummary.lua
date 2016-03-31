@@ -359,7 +359,7 @@ function GameUIPveSummary:Performance(t, func)
         if time >= t then
             func(1)
             node:unscheduleUpdate()
-            node:removeFromParent()
+            -- node:removeFromParent() winphone will crush
         else
             func(time/t)
         end

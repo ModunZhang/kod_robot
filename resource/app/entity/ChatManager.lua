@@ -119,7 +119,7 @@ function ChatManager:ctor(gameDefault)
     self.emojiUtil             = EmojiUtil.new()
     self.global_channel        = {}
     self.alliance_channel      = {}
-    self.allianceFight_channel = {}
+    -- self.allianceFight_channel = {}
     self.push_buff_queue       = {}
     self.___handle___          = scheduler.scheduleGlobal(handler(self, self.__checkNotifyIf),PUSH_INTVAL)
     self._blockedIdList_       = self:GetGameDefault():getBasicInfoValueForKey(BLOCK_LIST_KEY,{})
@@ -148,8 +148,8 @@ end
 function ChatManager:__getMessageWithChannel(channel)
     if channel == 'global' then
         return self.global_channel
-    elseif channel == 'allianceFight' then
-        return self.allianceFight_channel
+    -- elseif channel == 'allianceFight' then
+    --     return self.allianceFight_channel
     elseif channel == 'alliance' then
         return self.alliance_channel
     end
@@ -170,11 +170,11 @@ function ChatManager:insertNormalMessage_(msg)
             table.insert(self.alliance_channel,1,msg)
             return true
         end
-    elseif msg_type == 'alliancefight' then
-        if not self:__checkIsBlocked(msg) then
-            table.insert(self.allianceFight_channel,1,msg)
-            return true
-        end
+    -- elseif msg_type == 'alliancefight' then
+    --     if not self:__checkIsBlocked(msg) then
+    --         table.insert(self.allianceFight_channel,1,msg)
+    --         return true
+    --     end
     end
     return false
 end
@@ -182,6 +182,7 @@ end
 
 function ChatManager:callEventsChangedListeners_(LISTEN_TYPE,tabel_param)
     tabel_param = tabel_param or {}
+    -- dump(tabel_param)
     self:NotifyListeneOnType(LISTEN_TYPE, function(listener)
         listener[self.LISTEN_TYPE[LISTEN_TYPE]](listener,unpack(tabel_param))
     end)
@@ -199,7 +200,7 @@ function ChatManager:getAllChannelReadStatus()
         self.channelReadStatus = {
             global = false,
             alliance = false,
-            allianceFight = false,
+            -- allianceFight = false,
         }
     end
     return self.channelReadStatus
@@ -209,7 +210,7 @@ function ChatManager:setChannelReadStatus(channel,status)
         self.channelReadStatus = {
             global = false,
             alliance = false,
-            allianceFight = false,
+            -- allianceFight = false,
         }
     end
     self.channelReadStatus[channel] = status
@@ -224,8 +225,8 @@ end
 
 function ChatManager:emptyAllianceChannel()
     self.alliance_channel = {}
-    self.allianceFight_channel = {}
-    self:setChannelHaveInited('allianceFight',false)
+    -- self.allianceFight_channel = {}
+    -- self:setChannelHaveInited('allianceFight',false)
     self:setChannelHaveInited('alliance',false)
 end
 
@@ -233,18 +234,18 @@ function ChatManager:emptyChannel_(channel)
     if channel == 'global' then
         self.global_channel = {}
         self:setChannelHaveInited(channel,false)
-    elseif channel == 'allianceFight' then
-        self.allianceFight_channel = {}
-        self:setChannelHaveInited(channel,false)
+    -- elseif channel == 'allianceFight' then
+    --     self.allianceFight_channel = {}
+    --     self:setChannelHaveInited(channel,false)
     elseif channel == 'alliance' then
         self.alliance_channel = {}
         self:setChannelHaveInited(channel,false)
     else
         self.global_channel = {}
         self.alliance_channel = {}
-        self.allianceFight_channel = {}
+        -- self.allianceFight_channel = {}
         self:setChannelHaveInited('global',false)
-        self:setChannelHaveInited('allianceFight',false)
+        -- self:setChannelHaveInited('allianceFight',false)
         self:setChannelHaveInited('alliance',false)
     end
 end
@@ -301,24 +302,24 @@ end
 function ChatManager:FetchLastChannelMessage()
     local messages_1 = self:__getMessageWithChannel('global')
     local messages_2 = self:__getMessageWithChannel('alliance')
-    local messages_3 = self:__getMessageWithChannel('allianceFight')
+    -- local messages_3 = self:__getMessageWithChannel('allianceFight')
     messages_1 =  LuaUtils:table_filteri(messages_1,function(_,v)
         return not self:__checkIsBlocked(v)
     end)
     messages_2 =  LuaUtils:table_filteri(messages_2,function(_,v)
         return not self:__checkIsBlocked(v)
     end)
-    messages_3 =  LuaUtils:table_filteri(messages_3,function(_,v)
-        return not self:__checkIsBlocked(v)
-    end)
+    -- messages_3 =  LuaUtils:table_filteri(messages_3,function(_,v)
+    --     return not self:__checkIsBlocked(v)
+    -- end)
     return
         {
             self:__formatLastMessage(messages_1[1]),
             self:__formatLastMessage(messages_1[2]),
             self:__formatLastMessage(messages_2[1]),
             self:__formatLastMessage(messages_2[2]),
-            self:__formatLastMessage(messages_3[1]),
-            self:__formatLastMessage(messages_3[2]),
+            -- self:__formatLastMessage(messages_3[1]),
+            -- self:__formatLastMessage(messages_3[2]),
         }
 end
 
@@ -327,12 +328,12 @@ function ChatManager:FetchChatWhenReLogined()
     local alliance = Alliance_Manager:GetMyAlliance()
     if not alliance:IsDefault() then
         self:FetchAllChatMessageFromServer('alliance')
-        local status = alliance.basicInfo.status
-        if status ~= 'prepare' and status ~= 'fight' then
-            self:emptyChannel_('allianceFight')
-        else
-            self:FetchAllChatMessageFromServer('allianceFight')
-        end
+        -- local status = alliance.basicInfo.status
+        -- if status ~= 'prepare' and status ~= 'fight' then
+        --     self:emptyChannel_('allianceFight')
+        -- else
+        --     self:FetchAllChatMessageFromServer('allianceFight')
+        -- end
     end
 end
 
@@ -403,14 +404,14 @@ function ChatManager:FetMessageFirstStartGame()
         if not self:isChannelInited("alliance") then
             self:FetchAllChatMessageFromServer('alliance')
         end
-        if not self:isChannelInited("allianceFight") then
-            local status = alliance.basicInfo.status
-            if status ~= 'prepare' and status ~= 'fight' then
-                self:emptyChannel_('allianceFight')
-            else
-                self:FetchAllChatMessageFromServer('allianceFight')
-            end
-        end
+        -- if not self:isChannelInited("allianceFight") then
+        --     local status = alliance.basicInfo.status
+        --     if status ~= 'prepare' and status ~= 'fight' then
+        --         self:emptyChannel_('allianceFight')
+        --     else
+        --         self:FetchAllChatMessageFromServer('allianceFight')
+        --     end
+        -- end
     end
 end
 

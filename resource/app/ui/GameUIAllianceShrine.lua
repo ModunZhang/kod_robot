@@ -132,8 +132,6 @@ function GameUIAllianceShrine:RefreshUI()
     local tag = self:GetSelectedButtonTag()
     if tag == 'stage' then
         self:RefreshStageListView()
-        local current,total = Alliance_Manager:GetMyAlliance():GetStarInfoBy(self:GetStagePage())
-        self.stage_ui.percentLabel:setString(current .. "/" .. total)
     elseif tag == 'fight_event' then
         self:RefreshFightListView()
     elseif tag == 'events_history' then
@@ -236,24 +234,10 @@ function GameUIAllianceShrine:TabEvent_stage()
         :align(display.LEFT_CENTER,70,29)
         :addTo(title_bg)
     self.stage_ui.stage_label = stage_label
-    local star_bar = StarBar.new({
-        max = 1,
-        bg = "Stars_bar_bg.png",
-        fill = "Stars_bar_highlight.png",
-        num = 1,
-    }):addTo(title_bg):align(display.RIGHT_CENTER,430,29)
-
-    local current,total = Alliance_Manager:GetMyAlliance():GetStarInfoBy(self:GetStagePage())
-    local percentLabel = UIKit:ttfLabel({
-        color = 0xffedae,
-        size = 20,
-        text = current .. "/" .. total
-    }):align(display.LEFT_CENTER,431,29):addTo(title_bg)
-    self.stage_ui.percentLabel = percentLabel
+   
     local list,list_node = UIKit:commonListView({
         direction = cc.ui.UIScrollView.DIRECTION_VERTICAL,
         viewRect = cc.rect(0,0,568,630),
-    -- bgColor = UIKit:hex2c4b(0x7a000000),
     })
     self.stage_list = list
     list_node:addTo(stage_node):pos(35,80)
@@ -301,17 +285,12 @@ function GameUIAllianceShrine:GetStageListItem(index,stage_obj)
         color=  desc_color,
         dimensions = cc.size(400,74)
     }):align(display.LEFT_TOP, 10, 82):addTo(logo_bg)
-
-    local stage_star = alliance:GetSubStageStar(stage_obj.stageName)
-    local x,y = 14,15
-    for star_index = 1,3 do
-        local image_file = "alliance_shire_star_60x58_0.png"
-        if star_index <= stage_star then
-            image_file = "alliance_shire_star_60x58_1.png"
-        end
-        display.newSprite(image_file):align(display.LEFT_BOTTOM, x, y):addTo(bg)
-        x = x + 70
-    end
+    local is_passed = alliance:IsSubStagePassed(stage_obj.stageName)
+    local isPassed = UIKit:ttfLabel({
+        text = is_passed and _("已通关") or "",
+        size = 22,
+        color=  0x403c2f,
+    }):align(display.LEFT_BOTTOM, 14, 20):addTo(bg)
 
     local troop_image = UILib.soldier_image[troop.type]
     if is_locked then
@@ -526,7 +505,6 @@ function GameUIAllianceShrine:reportsSouceDelegate(listView, tag, idx)
     end
 end
 function GameUIAllianceShrine:RefreshEventsListView()
-    -- self.events_list:removeAllItems()
     local data = clone(Alliance_Manager:GetMyAlliance().shrineReports)
     table.sort( data, function(a,b)
         return a.time > b.time
@@ -570,16 +548,13 @@ end
 
 function GameUIAllianceShrine:fillReportItemContent(content,report,idx)
     content.idx = idx
-    if report.star > 0 then
+    if report.isWin then
         content.title_bg_0:show()
         content.title_bg_1:hide()
-        content.star_bar:show()
-        content.star_bar:setNum(report.star)
         content.faild_label:hide()
     else
         content.title_bg_0:hide()
         content.title_bg_1:show()
-        content.star_bar:hide()
         content.faild_label:show()
     end
     local box = content.box
@@ -615,11 +590,6 @@ function GameUIAllianceShrine:GetReportsItem(report)
         size = 22,
         color = 0xffedae,
     }):align(display.LEFT_CENTER, 10, title_bg_1:getPositionY() - 17):addTo(bg)
-    local star_bar = StarBar.new({
-        max = 3,
-        bg = "Stars_bar_bg.png",
-        fill = "Stars_bar_highlight.png",
-    }):addTo(bg):align(display.RIGHT_CENTER,540,title_bg_1:getPositionY() -17)
     local faild_label = UIKit:ttfLabel({
         text = _("失败"),
         size = 22,
@@ -644,7 +614,6 @@ function GameUIAllianceShrine:GetReportsItem(report)
     bg.title_bg_0 = title_bg_0
     bg.title_bg_1 = title_bg_1
     bg.title_label = title_label
-    bg.star_bar = star_bar
     bg.faild_label = faild_label
     bg.box = box
     bg.date_label = date_label

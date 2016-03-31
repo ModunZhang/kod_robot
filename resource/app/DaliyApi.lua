@@ -185,7 +185,7 @@ function DaliyApi:TradeGuild()
     else
         local trade_guild = city:GetBuildingByLocationId(14)
 
-        local is_sell = trade_guild:GetMaxSellQueue() > #my_deals
+        local is_sell = UtilsForBuilding:GetMaxSellQueue(User) > #my_deals
         local sell_sub_types = {
             resources =  {
                 [1] = "wood",

@@ -268,6 +268,9 @@ end
 
 local function IsCanbeHelpedByMe(event)
     local _id = User:Id()
+    if not event or not event.eventData then
+        return false
+    end
     for k,id in pairs(event.eventData.helpedMembers) do
         if id == _id then
             return false
@@ -570,24 +573,6 @@ function Alliance:GetShrineEventByid(id)
         end
     end
 end
-function Alliance:GetStarInfoBy(stage)
-    local stagesinfo = {}
-    local stages_map = {}
-    for _,v in pairs(shrineStage) do
-        if shrineStage[v.stageName].stage == stage then
-            table.insert(stagesinfo, v)
-            stages_map[v.stageName] = v
-        end
-    end
-    local total_stars = #stagesinfo * 3
-    local stars = 0
-    for i,v in ipairs(self.shrineDatas) do
-        if stages_map[v.stageName] then
-            stars = stars + v.maxStar
-        end
-    end
-    return stars,total_stars
-end
 function Alliance:GetSubStagesInfoBy(stage)
     local t = {}
     for _,v in pairs(shrineStage) do
@@ -607,6 +592,19 @@ function Alliance:IsSubStageUnlock(stageName)
         end
     end
     return false
+end
+function Alliance:IsSubStagePassed(stageName)
+    local index = shrineStage[stageName].index 
+    local next_stage_name
+    for k,v in pairs(shrineStage) do
+        if v.index == index + 1 then
+            next_stage_name = v.stageName
+        end
+    end
+    if not next_stage_name then
+        return false
+    end
+    return self:IsSubStageUnlock(next_stage_name)
 end
 function Alliance:GetSubStageStar(stageName)
     for i,v in ipairs(self.shrineDatas) do
@@ -711,7 +709,6 @@ local before_map = {
     villageEvents = function()end,
 }
 function Alliance:OnAllianceDataChanged(allianceData,refresh_time,deltaData)
-    dump(allianceData.allianceFight,"allianceFight")
     local is_join, is_quit
     if self._id ~= allianceData._id then
         if (self._id == nil or self._id == json.null) and allianceData._id ~= nil and allianceData._id ~= json.null then
@@ -868,7 +865,7 @@ function Alliance:CanCheckOtherAllianceCityBuildingLevel()
     return self:GetAllianceBuildingInfoByName("watchTower").level >= 12
 end
 function Alliance:GetShrinePosition()
-    return {x = 13, y = 17}
+    return {x = 8, y = 12}
 end
 function Alliance:SetIsMyAlliance(isMyAlliance)
     self.isMyAlliance = isMyAlliance
@@ -876,31 +873,6 @@ end
 
 function Alliance:IsMyAlliance()
     return self.isMyAlliance
-end
-
-function Alliance:updateWatchTowerLocalPushIf(marchEvent)
--- if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
---     if not marchEvent:IsReturnEvent() then
---         local marchType = marchEvent:MarchType()
---         local msg = marchEvent:IsStrikeEvent() and _("你的城市正被敌军突袭") or _("你的城市正被敌军攻击")
---         local warningTime = self:GetAllianceBelvedere():GetWarningTime()
---         if marchType == 'city' then
---             app:GetPushManager():UpdateWatchTowerPush(marchEvent:ArriveTime() - warningTime,msg,marchEvent:Id())
---         end
---     end
--- end
-end
---因为这里添加了音效效果 so 所有的事件删除都要调用此方法
-function Alliance:cancelLocalMarchEventPushIf(marchEvent)
-    if marchEvent:GetPlayerRole() == marchEvent.MARCH_EVENT_PLAYER_ROLE.RECEIVER then
-        if marchEvent:IsReturnEvent() then
-            if not marchEvent:IsStrikeEvent() then --我的一般进攻部队返回城市
-                app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_BACK")
-            end
-        else
-            app:GetPushManager():CancelWatchTowerPush(marchEvent:Id())
-        end
-    end
 end
 return Alliance
 

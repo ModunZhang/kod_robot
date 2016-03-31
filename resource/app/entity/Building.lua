@@ -58,9 +58,6 @@ end
 function Building:BelongCity()
     return self.city
 end
-function Building:UniqueKey()
-    return string.format("%s_%d_%d", self:GetType(), self.x, self.y)
-end
 function Building:OnTimer(current_time)
 end
 function Building:GetSize()

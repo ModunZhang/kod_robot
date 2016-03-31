@@ -150,18 +150,33 @@ function GameUIKeep:CreateCityBasicInfo()
         :addTo(self.info_layer)
 
     for i,v in ipairs(self:GetTerrainBuff()) do
-        local label_1 = UIKit:ttfLabel({
-            text = v[1],
-            size = 20,
-            color = 0x615b44
-        }):align(display.LEFT_CENTER, display.cx-120 + (i % 2 == 0 and 200 or 0), display.top-185 - (i > 2 and 40 or 0))
-            :addTo(self.info_layer)
-        UIKit:ttfLabel({
-            text = v[2],
-            size = 20,
-            color = 0x403c2f
-        }):align(display.LEFT_CENTER, label_1:getPositionX() + label_1:getContentSize().width + 10,label_1:getPositionY())
-            :addTo(self.info_layer)
+        if i % 2 == 0 then
+            local label_1 = UIKit:ttfLabel({
+                text = v[2],
+                size = 20,
+                color = 0x403c2f
+            }):align(display.RIGHT_CENTER, window.right -40, display.top-185 - (i > 2 and 40 or 0))
+                :addTo(self.info_layer)
+            UIKit:ttfLabel({
+                text = v[1],
+                size = 20,
+                color = 0x615b44
+            }):align(display.RIGHT_CENTER, label_1:getPositionX() - label_1:getContentSize().width - 10,label_1:getPositionY())
+                :addTo(self.info_layer)
+        else
+            local label_1 = UIKit:ttfLabel({
+                text = v[1],
+                size = 20,
+                color = 0x615b44
+            }):align(display.LEFT_CENTER, display.cx-120 , display.top-185 - (i > 2 and 40 or 0))
+                :addTo(self.info_layer)
+            UIKit:ttfLabel({
+                text = v[2],
+                size = 20,
+                color = 0x403c2f
+            }):align(display.LEFT_CENTER, label_1:getPositionX() + label_1:getContentSize().width + 10,label_1:getPositionY())
+                :addTo(self.info_layer)
+        end
     end
 end
 function GameUIKeep:GetTerrainBuff(terrain)
@@ -295,6 +310,10 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
                 :addTo(title_bg)
             if canUnlock then
                 display.newSprite("next_32x38.png"):align(display.CENTER, 260, 0):addTo(content, 10)
+                    :runAction(
+                        cc.RepeatForever:create(transition.sequence{cc.ScaleTo:create(1/2, 1.5),
+                            cc.ScaleTo:create(1/2, 1.0),})
+                    )
             end
 
             UIKit:ttfLabel({
@@ -310,7 +329,7 @@ function GameUIKeep:CreateCanBeUnlockedBuildingListView()
                 aglin = ui.TEXT_ALIGN_LEFT,
                 valign = ui.TEXT_VALIGN_CENTER,
                 dimensions = cc.size(374, 0),
-                color = 0x615b44}):align(display.TOP_LEFT, -120, 30)
+                color = 0x615b44}):align(display.CENTER_LEFT, -120, -15)
             content:addWidget(building_tip)
 
             -- 建筑图片 放置区域左右边框
@@ -416,7 +435,7 @@ function GameUIKeep:CreateChangeTerrainWindow()
         :setButtonsLayoutMargin(0, 130, 0, 0)
         :onButtonSelectChanged(function(event)
             local selected = event.selected
-            local terrain 
+            local terrain
             if selected == 1 then
                 terrain = "grassLand"
             elseif selected == 2 then
@@ -593,6 +612,8 @@ end
 
 
 return GameUIKeep
+
+
 
 
 

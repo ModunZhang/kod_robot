@@ -241,7 +241,7 @@ function GameUIAllianceInfo:LoadInfo()
         )
         :align(display.RIGHT_TOP,titleBg:getPositionX(),titleBg:getPositionY() - titleBg:getContentSize().height -10)
         :addTo(layer)
-    button:setButtonEnabled(Alliance_Manager:GetMyAlliance():IsDefault() and User.serverId ~= self.serverId )
+    button:setButtonEnabled(Alliance_Manager:GetMyAlliance():IsDefault() and User.serverId == self.serverId )
     button:onButtonClicked(function(event)
         self:OnJoinActionClicked(alliance_data.joinType,button)
     end)
@@ -435,7 +435,7 @@ function GameUIAllianceInfo:LoadMembers()
         :addTo(layer)
         :align(display.LEFT_TOP, 154, 664)
     local title_label = UIKit:ttfLabel({
-        text = archon_data.name,
+        text = archon_data.name.." Lv"..User:GetPlayerLevelByExp(archon_data.levelExp),
         size = 22,
         color= 0xffedae,
         align = cc.TEXT_ALIGNMENT_LEFT,
@@ -617,7 +617,9 @@ function GameUIAllianceInfo:FillDataToAllianceItem(list_data,content,item)
 
             local isOnline = (type(data.online) == 'boolean' and data.online) and true or false
             real_content.player_icon.icon:setTexture(UIKit:GetPlayerIconImage(data.icon))
-            if isOnline then
+            local archon_data = self:GetAllianceArchonData()
+
+            if isOnline or not Alliance_Manager:GetMyAlliance():GetMemeberById(archon_data.id) then
                 real_content.player_icon.icon:clearFilter()
                 real_content.player_icon:clearFilter()
             else
@@ -662,6 +664,7 @@ function GameUIAllianceInfo:listviewListener(event)
         if list_data.data_type == 2 and list_data.data ~= '__empty' then
             local data = list_data.data
             UIKit:newGameUI("GameUIAllianceMemberInfo",false,data.id,nil,self.serverId):AddToCurrentScene(true)
+            app:GetAudioManager():PlayeEffectSoundWithKey("NORMAL_DOWN")
         end
     end
 end

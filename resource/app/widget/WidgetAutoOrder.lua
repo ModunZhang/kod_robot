@@ -29,7 +29,7 @@ end
 function WidgetAutoOrder:RefreshOrder()
     local gap = 0
     for i,v in ipairs(self.element_table) do
-        if not not_need_order then
+        if not self.not_need_order then
             v:setVisible(v:CheckVisible())
             if self.order_type == WidgetAutoOrder.ORIENTATION.BOTTOM_TO_TOP then
                 v:setPositionY(gap)

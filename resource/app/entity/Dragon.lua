@@ -11,7 +11,7 @@ local DragonSkill =  class("DragonSkill")
 local config_dragonLevel = GameDatas.Dragons.dragonLevel
 local config_dragonStar = GameDatas.Dragons.dragonStar
 local config_equipments = GameDatas.DragonEquipments.equipments
-local config_dragonSkill = GameDatas.Dragons.dragonSkills
+local config_dragonSkill = GameDatas.DragonSkills
 local Localize = import("..utils.Localize")
 local config_equipment_buffs = GameDatas.DragonEquipments.equipmentBuff
 local config_dragoneyrie = GameDatas.DragonEquipments
@@ -33,15 +33,15 @@ end
 
 --将配置表里的数据直接注入object
 function DragonSkill:LoadConfig_()
-	self.config_skill = config_dragonSkill[self:Level()]
+	self.config_skill = config_dragonSkill[self:Name()]
 end
 
 function DragonSkill:IsMaxLevel()
-	return #config_dragonSkill == self:Level()
+	return #self.config_skill == self:Level()
 end
 
 function DragonSkill:GetSkillConfig()
-	return self.config_skill
+	return self.config_skill[self:Level()]
 end
 
 function DragonSkill:IsLocked()
@@ -64,11 +64,21 @@ function DragonSkill:GetEffect()
 	end
 	return 0
 end
-
+--获取下一级技能的效果
+function DragonSkill:GetNextLevelEffect()
+	if self:IsMaxLevel() then
+		return self:GetEffect()
+	end
+	local config = self.config_skill[self:Level()+1]
+	if config then
+		return config.effect
+	end
+	return 0
+end
 function DragonSkill:GetBloodCost()
-	local config = config_dragonSkill[self:Level() + 1]
-	if config and config[self:Name() .. 'BloodCost'] then
-		return config[self:Name() .. 'BloodCost']
+	local config = self.config_skill[self:Level() + 1]
+	if config then
+		return config.bloodCost
 	end
 	return 0
 end
@@ -132,12 +142,12 @@ end
 
 function DragonEquipment:GetVitalityAndStrengh()
   	local config_category = self:GetDetailConfig()
-  	return config_category.vitality,config_category.strength
+  	return config_category.vitality * 4 ,config_category.strength
 end
 
 function DragonEquipment:GetLeadership()
 	local config_category = self:GetDetailConfig()
-	return config_category.leadership
+	return config_category.leadership * config_alliance_initData_int.citizenPerLeadership.value
 end
 
 function DragonEquipment:GetBufferAndEffect()
@@ -173,7 +183,11 @@ function Dragon:LeadCitizen()
 	local leadCitizen = self:TotalLeadership() * config_alliance_initData_int.citizenPerLeadership.value
 	return leadCitizen
 end
-
+--基础总带兵量（不算装备，buff等）
+function Dragon:LeadBasicCitizen()
+	local leadCitizen = self:Leadership() * config_alliance_initData_int.citizenPerLeadership.value
+	return leadCitizen
+end
 --自身的力量
 function Dragon:Strength()
   	return config_dragonLevel[self:Level()].strength + config_dragonStar[self:Star()].initStrength
@@ -345,7 +359,10 @@ end
 function Dragon:GetMaxHP()
 	return self:TotalVitality() * 4
 end
-
+-- 基础血量（不算装备，buff等）
+function Dragon:GetBasicMaxHP()
+	return self:Vitality() * 4
+end
 --升级需要的经验值
 function Dragon:GetMaxExp()	
 	-- if self:Level() == self:GetMaxLevel() then
@@ -358,17 +375,25 @@ end
 function Dragon:GetMaxLevel()
 	return config_dragonStar[self:Star()] and config_dragonStar[self:Star()].levelMax or 0
 end
--- 升星后的值变动
-function Dragon:GetPromotionedDifferentVal()
+-- 升星后的值
+function Dragon:GetPromotionedOldVal()
 	local old_star = self:Star() - 1
 	local old_max_level = config_dragonStar[old_star].levelMax
 	local old_level_config = config_dragonLevel[old_max_level]
 	local oldStrenth =  old_level_config.strength
 	local oldVitality =  old_level_config.vitality
 	local oldLeadership = old_level_config.leadership
-	return self:Strength() - oldStrenth,self:Vitality() - oldVitality,self:Leadership() - oldLeadership
+	return oldStrenth,(oldVitality + config_dragonStar[old_star].initVitality) * 4,(oldLeadership + config_dragonStar[old_star].initLeadership) * config_alliance_initData_int.citizenPerLeadership.value
 end
-
+-- 升级后的值变动
+function Dragon:GetLevelPromotionedOldVal()
+	local old_level = self:Level() - 1
+	local old_level_config = config_dragonLevel[old_level]
+	local oldStrenth =  old_level_config.strength
+	local oldVitality =  old_level_config.vitality
+	local oldLeadership = old_level_config.leadership
+	return oldStrenth, (oldVitality + config_dragonStar[self:Star()].initVitality) * 4,(oldLeadership + config_dragonStar[self:Star()].initLeadership) * config_alliance_initData_int.citizenPerLeadership.value
+end
 --是否达到晋级等级
 function Dragon:IsReachPromotionLevel()
 	 return self:Level() >= self:GetPromotionLevel()
@@ -454,7 +479,7 @@ function Dragon:TotalVitality()
 	for __,equipment in pairs(self:Equipments()) do
 		if equipment:IsLoaded() then
 			local vitality_add,___ = equipment:GetVitalityAndStrengh()
-			vitality = vitality + vitality_add
+			vitality = vitality + vitality_add / 4
 		end
 	end
 	return vitality
@@ -471,7 +496,7 @@ function Dragon:TotalLeadership()
 	leadership = leadership + math.floor(leadership * buff)
 	for __,equipment in pairs(self:Equipments()) do
 		if equipment:IsLoaded() then
-			local leadership_add = equipment:GetLeadership()
+			local leadership_add = equipment:GetLeadership() / config_alliance_initData_int.citizenPerLeadership.value
 			leadership = leadership + leadership_add
 		end
 	end
@@ -481,10 +506,11 @@ end
 function Dragon:__getDragonLeadershipBuff()
 	local effect = 0
 	local skill = self:GetSkillByName('leadership')
-	if skill then
+	if skill and skill:Level()>0 then
 		effect  = effect + skill:GetEffect()
 	end
-	if User:IsItemEventActive("troopSizeBonus") then
+	
+	if UtilsForItem:IsItemEventActive(User, "troopSizeBonus") then
 		effect = effect + UtilsForItem:GetItemBuff("troopSizeBonus")
 	end
 	local eq_buffs = self:GetAllEquipmentBuffEffect()
@@ -493,7 +519,7 @@ function Dragon:__getDragonLeadershipBuff()
 			effect = effect + buffData[2]
 		end
 	end)
-	effect = effect + User:GetVIPDragonLeaderShipAdd()
+	effect = effect + UtilsForVip:GetVipBuffByName(User, "dragonLeaderShipAdd")
 	return effect
 end
 return Dragon

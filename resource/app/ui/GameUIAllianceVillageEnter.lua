@@ -8,7 +8,6 @@ local VillageEvent = import("..entity.VillageEvent")
 local GameUIStrikePlayer = import(".GameUIStrikePlayer")
 local SpriteConfig = import("..sprites.SpriteConfig")
 local UILib = import(".UILib")
-local BelvedereEntity = import("..entity.BelvedereEntity")
 
 function GameUIAllianceVillageEnter:ctor(building,alliance)
     GameUIAllianceVillageEnter.super.ctor(self,building,alliance)
@@ -23,7 +22,11 @@ function GameUIAllianceVillageEnter:IsRuins()
 end
 
 function GameUIAllianceVillageEnter:GetVillageInfo()
-    return self:GetFocusAlliance():GetAllianceVillageInfosById(self:GetBuilding().id)
+    local info = self:GetFocusAlliance():GetAllianceVillageInfosById(self:GetBuilding().id)
+    if not info then
+        self:LeftButtonClicked()
+    end
+    return info
 end
 
 function GameUIAllianceVillageEnter:GetProcessIconConfig()
@@ -312,7 +315,7 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
                 local final_func = function ()
                     local attack_func = function ()
                         UIKit:showMessageDialog(_("提示"), _("当前资源点已被盟友占领，你可能无法进行采集，仍要派兵吗？"), function ()
-                            UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                            UIKit:newGameUI('GameUISendTroopNew',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
                                 NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
                                     app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
                                     gameuialliancesendtroops:LeftButtonClicked()
@@ -328,6 +331,7 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
                 else
                     final_func()
                 end
+                self:LeftButtonClicked()
             end)
             buttons = {attack_button}
         end
@@ -338,7 +342,7 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
 
                 local final_func = function ()
                     local attack_func = function ()
-                        UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                        UIKit:newGameUI('GameUISendTroopNew',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
                             NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
                                 app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
                                 gameuialliancesendtroops:LeftButtonClicked()
@@ -353,6 +357,7 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
                 else
                     final_func()
                 end
+                self:LeftButtonClicked()
             end)
             local strike_button = self:BuildOneButton("strike_66x62.png",_("突袭")):onButtonClicked(function()
                 local toLocation = self:GetLogicPosition()
@@ -363,6 +368,7 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
                 else
                     UIKit:newGameUI("GameUIStrikePlayer",GameUIStrikePlayer.STRIKE_TYPE.VILLAGE,{alliance = focus_alliance,toLocation = toLocation,defenceAllianceId = alliance_id,defenceVillageId = village_id}):AddToCurrentScene(true)
                 end
+                self:LeftButtonClicked()
             end)
             buttons = {attack_button,strike_button}
         else -- 无人占领
@@ -371,10 +377,12 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
 
                 local final_func = function ()
                     local attack_func = function ()
-                        UIKit:newGameUI('GameUIAllianceSendTroops',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
+                        UIKit:newGameUI('GameUISendTroopNew',function(dragonType,soldiers,total_march_time,gameuialliancesendtroops)
                             NetManager:getAttackVillagePromise(dragonType,soldiers,alliance_id,village_id):done(function()
                                 app:GetAudioManager():PlayeEffectSoundWithKey("TROOP_SENDOUT")
-                                gameuialliancesendtroops:LeftButtonClicked()
+                                if gameuialliancesendtroops.LeftButtonClicked then
+                                    gameuialliancesendtroops:LeftButtonClicked()
+                                end
                             end)
                         end,{targetAlliance = focus_alliance,toLocation = toLocation,returnCloseAction = true}):AddToCurrentScene(true)
                     end
@@ -387,6 +395,7 @@ function GameUIAllianceVillageEnter:GetEnterButtons()
                 else
                     final_func()
                 end
+                self:LeftButtonClicked()
             end)
             buttons = {attack_button}
         end

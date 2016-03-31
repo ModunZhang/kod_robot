@@ -48,7 +48,9 @@ function GameUITower:CreateBetweenBgAndTitle()
     self.info_layer = display.newLayer():addTo(self:GetView())
 end
 function GameUITower:GetInfos()
-    local atkinfs,atkarcs,atkcavs,atkcats,defencePower = self.building:GetAtk()
+
+    local config = UtilsForBuilding:GetFunctionConfigBy(self.city:GetUser(), "tower")
+    local atkinfs,atkarcs,atkcavs,atkcats,defencePower = config.infantry, config.archer, config.cavalry, config.siege, config.defencePower
     local current_wall_hp = User:GetResValueByType("wallHp")
     local eff = self.city:GetUser():GetProductionTechEff(8) -- 高级箭塔科技buff
     return {

@@ -174,9 +174,9 @@ function GameUIWithCommonHeader:CreateHomeButton(on_clicked)
         end)
         :align(display.LEFT_TOP, 50 , 86)
     cc.ui.UIImage.new("home_icon.png")
-        :pos(34, -50)
+        :pos(28, -50)
         :addTo(home_button)
-        :scale(0.8)
+        -- :scale(0.8)
     return home_button
 end
 
@@ -191,11 +191,12 @@ function GameUIWithCommonHeader:CreateShopButton(on_clicked)
         end
     end)
     gem_button:align(display.RIGHT_TOP, 670, 86)
-    local gem_icon = cc.ui.UIImage.new("gem_icon_62x61.png")
+    local gem_icon = cc.ui.UIImage.new("store_gem_260x116.png")
         :addTo(gem_button)
-        :pos(-60, -62)
+        :pos(-80, -54)
+        :scale(0.42)
 
-    light_gem():addTo(gem_icon, 1022):pos(62/2, 61/2)
+    light_gem():addTo(gem_icon, 1022):pos(260/2, 116/2)
 
     local gem_label = UIKit:ttfLabel({
         text = ""..string.formatnumberthousands(City:GetUser():GetGemValue()),
