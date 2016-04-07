@@ -117,13 +117,17 @@ function DaliyApi:MilitaryTech()
                 else
                     -- 加速军事科技升级
                     local upgrading_tech = User:GetMilitaryTechEventBy(building_name)
-                    -- 随机使用事件加速道具
-                    local speedUp_item_name = "speedup_"..math.random(8)
-                    print("使用"..speedUp_item_name.."加速"..upgrading_tech:GetEventType().." ,id:",upgrading_tech:Id())
-                    return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
-                        eventType = upgrading_tech:GetEventType(),
-                        eventId = upgrading_tech:Id()
-                    }})
+                    if math.random(2) == 1 then -- 宝石加速
+                        return NetManager:getSpeedUpPromise(upgrading_tech:GetEventType(),upgrading_tech:Id())
+                    else
+                        -- 随机使用事件加速道具
+                        local speedUp_item_name = "speedup_"..math.random(8)
+                        print("使用"..speedUp_item_name.."加速"..upgrading_tech:GetEventType().." ,id:",upgrading_tech:Id())
+                        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+                            eventType = upgrading_tech:GetEventType(),
+                            eventId = upgrading_tech:Id()
+                        }})
+                    end
                 end
 
             end
@@ -150,13 +154,17 @@ function DaliyApi:ToolShop()
     else
         local materialsEvent = User:GetMakingMaterialsEvent()
         if materialsEvent then
-            -- 随机使用事件加速道具
-            local speedUp_item_name = "speedup_"..math.random(8)
-            print("使用"..speedUp_item_name.."加速材料制造 ,id:",materialsEvent.id)
-            return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
-                eventType = "materialEvents",
-                eventId = materialsEvent.id
-            }})
+            if math.random(2) == 1 then -- 宝石加速
+                return NetManager:getSpeedUpPromise("materialEvents",materialsEvent.id)
+            else
+                -- 随机使用事件加速道具
+                local speedUp_item_name = "speedup_"..math.random(8)
+                print("使用"..speedUp_item_name.."加速材料制造 ,id:",materialsEvent.id)
+                return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+                    eventType = "materialEvents",
+                    eventId = materialsEvent.id
+                }})
+            end
         end
     end
 end
@@ -446,6 +454,8 @@ return {
     TradeGuild,
     GetDaliyRewards,
 }
+
+
 
 
 

@@ -128,13 +128,17 @@ function CityBuildApi:SpeedUpBuildingEvents()
         print("免费加速 建筑升级")
         return NetManager:getFreeSpeedUpPromise(eventType,eventId)
     else
-        -- 随机使用事件加速道具
-        local speedUp_item_name = "speedup_"..math.random(8)
-        print("使用"..speedUp_item_name.."加速, ,id:",eventId)
-        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
-            eventType = eventType,
-            eventId = eventId
-        }})
+        if math.random(2) == 1 then -- 宝石加速
+            return NetManager:getSpeedUpPromise(eventType,eventId)
+        else
+            -- 随机使用事件加速道具
+            local speedUp_item_name = "speedup_"..math.random(8)
+            print("使用"..speedUp_item_name.."加速, ,id:",eventId)
+            return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+                eventType = eventType,
+                eventId = eventId
+            }})
+        end
     end
 end
 

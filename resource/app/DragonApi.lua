@@ -44,14 +44,18 @@ function DragonApi:MakeEquipment(force_equip_type)
     local black_smith = City:GetBuildingByLocationId(9)
     if #User.dragonEquipmentEvents > 0 then
         -- 加速
-        -- 随机使用事件加速道具
         local making_event = User.dragonEquipmentEvents[1]
-        local speedUp_item_name = "speedup_"..math.random(8)
-        print("使用"..speedUp_item_name.."加速制造装备 ,id:",making_event.id)
-        return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
-            eventType = "dragonEquipmentEvents",
-            eventId = making_event.id
-        }})
+        if math.random(2) == 1 then -- 宝石加速
+            return NetManager:getSpeedUpPromise("dragonEquipmentEvents",making_event.id)
+        else
+            -- 随机使用事件加速道具
+            local speedUp_item_name = "speedup_"..math.random(8)
+            print("使用"..speedUp_item_name.."加速制造装备 ,id:",making_event.id)
+            return NetManager:getBuyAndUseItemPromise(speedUp_item_name,{[speedUp_item_name] = {
+                eventType = "dragonEquipmentEvents",
+                eventId = making_event.id
+            }})
+        end
     else
         -- 制造装备
         local isFinishNow = math.random(2) == 2
@@ -88,7 +92,7 @@ function DragonApi:MakeEquipment(force_equip_type)
                     end
                 end
             end
-            
+
             -- material_manager:IteratorDragonMaterials(function (m_name,m_count)
             --     if m_name == v[1] then
             --         if tonumber(v[2]) > m_count then
@@ -349,6 +353,7 @@ return {
     EnhanceDragonEquipment,
     UpgradeDragonDragonSkill,
 }
+
 
 
 

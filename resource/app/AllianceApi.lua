@@ -136,7 +136,7 @@ end
 -- 踢出或者改变成员职位
 function AllianceApi:AllianceMemberApi()
     local alliance = Alliance_Manager:GetMyAlliance()
-    if not alliance:IsDefault() then
+    if not alliance:IsDefault() and math.random(100) < 5 then
         local members = alliance:GetAllMembers()
         if LuaUtils:table_size(members) == 1 then
             return
@@ -565,6 +565,14 @@ function AllianceApi:FirstJoinAllianceReward()
         return NetManager:getFirstJoinAllianceRewardPromise()
     end
 end
+-- 绝句或者同意加入联盟
+function AllianceApi:AcceptAllianceInvite()
+    local alliance = Alliance_Manager:GetMyAlliance()
+    if alliance:IsDefault() and User.inviteToAllianceEvents and #User.inviteToAllianceEvents > 0 then
+        local event = User.inviteToAllianceEvents[math.random(#User.inviteToAllianceEvents)]
+        return NetManager:getHandleJoinAllianceInvitePromise(event.id,math.random(2) ~= 1)
+    end
+end
 -- 迁移联盟
 function AllianceApi:MoveAlliance()
     local alliance = Alliance_Manager:GetMyAlliance()
@@ -821,12 +829,21 @@ local function MoveAlliance()
         setRun()
     end
 end
+local function AcceptAllianceInvite()
+    local p = AllianceApi:AcceptAllianceInvite()
+    if p then
+        p:always(setRun)
+    else
+        setRun()
+    end
+end
 
 return {
     setRun,
     JoinAlliance,
     ApproveOrRejectJoinAllianceRequest,
     InviteToJoinAlliance,
+    AcceptAllianceInvite,
     CancelJoinAlliance,
     RequestSpeedUp,
     HelpSpeedUp,
@@ -842,8 +859,9 @@ return {
     BuyAllianceItem,
     GetGift,
     FirstJoinAllianceReward,
-    MoveAlliance
+    MoveAlliance,
 }
+
 
 
 

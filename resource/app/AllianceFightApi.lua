@@ -194,8 +194,8 @@ function AllianceFightApi:March()
         -- 战争期寻找对战联盟mapIndex
         local mapIndex
         if alliance.basicInfo.status == "fight" then
-            local alliance = alliance.allianceFight.attacker.alliance.id == alliance._id and alliance.allianceFight.defencer.alliance or alliance.allianceFight.attacker.alliance
-            mapIndex = alliance.mapIndex
+            local allianceData = alliance.allianceFight.attacker.alliance.id == alliance._id and alliance.allianceFight.defencer.alliance or alliance.allianceFight.attacker.alliance
+            mapIndex = allianceData.mapIndex
         else
             -- 随机找一个地图，有联盟则攻打
             mapIndex = RandomMapIndex()
@@ -458,12 +458,12 @@ end
 
 return {
     setRun,
-    TreatSoldiers,
-    RecruitNormalSoldier,
-    RecruitSpecialSoldier,
-    StartAllianceWar,
+    -- TreatSoldiers,
+    -- RecruitNormalSoldier,
+    -- RecruitSpecialSoldier,
+    -- StartAllianceWar,
     March,
-    SpeedUpMarchEvent,
+    -- SpeedUpMarchEvent,
 }
 
 
